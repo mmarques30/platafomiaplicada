@@ -2,7 +2,6 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -117,8 +116,6 @@ export default function VideoPlayer() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <main className="container py-6">
         <Breadcrumb className="mb-6">
           <BreadcrumbList>

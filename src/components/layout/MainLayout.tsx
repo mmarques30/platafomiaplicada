@@ -1,13 +1,9 @@
-import { ReactNode } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { TopHeader } from "./TopHeader";
+import { Outlet } from "react-router-dom";
 
-interface MainLayoutProps {
-  children: ReactNode;
-}
-
-export function MainLayout({ children }: MainLayoutProps) {
+export function MainLayout() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -15,7 +11,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <div className="flex-1 flex flex-col">
           <TopHeader />
           <main className="flex-1">
-            {children}
+            <Outlet />
           </main>
         </div>
       </div>

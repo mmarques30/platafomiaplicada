@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -123,8 +122,6 @@ export default function Chat() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Navbar />
-
       <main className="flex-1 container py-6 flex flex-col">
         <div className="mb-4">
           <h1 className="text-2xl font-bold">Chat com IA</h1>

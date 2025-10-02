@@ -11,6 +11,7 @@ import VideoPlayer from "./pages/VideoPlayer";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { MainLayout } from "./components/layout/MainLayout";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
@@ -29,11 +30,14 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/trilhas" element={<ProtectedRoute><Trilhas /></ProtectedRoute>} />
-          <Route path="/trilhas/:id" element={<ProtectedRoute><TrilhaDetalhes /></ProtectedRoute>} />
-          <Route path="/videos/:id" element={<ProtectedRoute><VideoPlayer /></ProtectedRoute>} />
-          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          
+          <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/trilhas" element={<Trilhas />} />
+            <Route path="/trilhas/:id" element={<TrilhaDetalhes />} />
+            <Route path="/videos/:id" element={<VideoPlayer />} />
+            <Route path="/chat" element={<Chat />} />
+          </Route>
           
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />

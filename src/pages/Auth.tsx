@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Auth() {
@@ -70,92 +71,139 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            Plataforma de Mentoria
-          </CardTitle>
-          <CardDescription className="text-center">
-            Entre ou crie sua conta para acessar o conteúdo
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Cadastrar</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    name="signin-email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Senha</Label>
-                  <Input
-                    id="signin-password"
-                    name="signin-password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Entrando..." : "Entrar"}
-                </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-nome">Nome Completo</Label>
-                  <Input
-                    id="signup-nome"
-                    name="signup-nome"
-                    type="text"
-                    placeholder="Seu nome completo"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    name="signup-email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Senha</Label>
-                  <Input
-                    id="signup-password"
-                    name="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    minLength={6}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Cadastrando..." : "Cadastrar"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen flex bg-background">
+      {/* Hero Section - 60% */}
+      <div className="hidden lg:flex lg:w-[60%] relative items-center justify-center overflow-hidden">
+        {/* Gradiente de fundo */}
+        <div className="absolute inset-0 gradient-bg" />
+        
+        {/* Grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)]" />
+        
+        {/* Conteúdo Hero */}
+        <div className="relative z-10 max-w-2xl px-12 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
+            <GraduationCap className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-primary">Plataforma de Mentoria</span>
+          </div>
+          
+          <h1 className="text-6xl font-bold mb-6 leading-tight">
+            Aprenda com os
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-300">
+              melhores mentores
+            </span>
+          </h1>
+          
+          <p className="text-xl text-muted-foreground mb-8">
+            Trilhas personalizadas, conteúdos exclusivos e acompanhamento individual para acelerar seu crescimento profissional.
+          </p>
+          
+          {/* Stats */}
+          <div className="flex gap-8">
+            <div>
+              <div className="text-3xl font-bold text-primary">500+</div>
+              <div className="text-sm text-muted-foreground">Alunos ativos</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-primary">50+</div>
+              <div className="text-sm text-muted-foreground">Horas de conteúdo</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-primary">95%</div>
+              <div className="text-sm text-muted-foreground">Satisfação</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Form Section - 40% */}
+      <div className="w-full lg:w-[40%] flex items-center justify-center bg-card/50 backdrop-blur-xl border-l border-border p-4">
+        <Card className="w-full max-w-md bg-card/80 backdrop-blur border-border animate-slide-up">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-3xl font-bold text-foreground">
+              Bem-vindo à Aplicada
+            </CardTitle>
+            <CardDescription>
+              Entre ou crie sua conta para acessar o conteúdo
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Entrar</TabsTrigger>
+                <TabsTrigger value="signup">Cadastrar</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <Input
+                      id="signin-email"
+                      name="signin-email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password">Senha</Label>
+                    <Input
+                      id="signin-password"
+                      name="signin-password"
+                      type="password"
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full glow-cyan" disabled={isLoading}>
+                    {isLoading ? "Entrando..." : "Entrar"}
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-nome">Nome Completo</Label>
+                    <Input
+                      id="signup-nome"
+                      name="signup-nome"
+                      type="text"
+                      placeholder="Seu nome completo"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <Input
+                      id="signup-email"
+                      name="signup-email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Senha</Label>
+                    <Input
+                      id="signup-password"
+                      name="signup-password"
+                      type="password"
+                      placeholder="••••••••"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full glow-cyan" disabled={isLoading}>
+                    {isLoading ? "Cadastrando..." : "Cadastrar"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

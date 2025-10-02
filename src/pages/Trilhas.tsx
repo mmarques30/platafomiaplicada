@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,8 +54,6 @@ export default function Trilhas() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <main className="container py-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Trilhas de Aprendizado</h1>
