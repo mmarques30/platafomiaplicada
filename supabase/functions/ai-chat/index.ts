@@ -45,7 +45,7 @@ serve(async (req) => {
     console.log(`Usuário autenticado: ${user.id}`);
 
     // Buscar contexto do usuário e conteúdo da plataforma
-    const [formulario, objetivos, roles, trilhas, cursos] = await Promise.all([
+    const [formulario, objetivos, roles, trilhas, cursos, knowledgeBase] = await Promise.all([
       supabaseClient
         .from("formulario_diagnostico")
         .select("*")
@@ -71,6 +71,11 @@ serve(async (req) => {
         .eq("ativo", true)
         .order("ordem")
         .limit(20),
+      supabaseClient
+        .from("knowledge_base")
+        .select("titulo, categoria, conteudo_extraido")
+        .eq("ativo", true)
+        .order("created_at", { ascending: false }),
     ]);
 
     // Construir system prompt com personalidade MarIAna
@@ -110,6 +115,13 @@ ${trilhas.data.map((t: any) => `- **${t.titulo}** (${t.nivel}): ${t.descricao ||
 ${cursos.data && cursos.data.length > 0 ? `
 **Alguns Cursos Disponíveis:**
 ${cursos.data.slice(0, 10).map((c: any) => `- ${c.titulo}${c.duracao_estimada ? ` (${c.duracao_estimada} min)` : ""}`).join("\n")}
+` : ""}
+${knowledgeBase.data && knowledgeBase.data.length > 0 ? `
+## 📚 Base de Conhecimento Adicional
+${knowledgeBase.data.map((kb: any) => `
+### ${kb.titulo} (${kb.categoria})
+${kb.conteudo_extraido}
+`).join("\n---\n")}
 ` : ""}
 
 ## 💬 Meu Jeito de Falar
