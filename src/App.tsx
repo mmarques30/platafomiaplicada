@@ -11,6 +11,13 @@ import VideoPlayer from "./pages/VideoPlayer";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AdminLayout } from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
+import CadastrarUsuario from "./pages/admin/CadastrarUsuario";
+import GerenciarConteudo from "./pages/admin/GerenciarConteudo";
+import GerenciarAvisos from "./pages/admin/GerenciarAvisos";
+import VisualizarFormularios from "./pages/admin/VisualizarFormularios";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +34,16 @@ const App = () => (
           <Route path="/trilhas/:id" element={<ProtectedRoute><TrilhaDetalhes /></ProtectedRoute>} />
           <Route path="/videos/:id" element={<ProtectedRoute><VideoPlayer /></ProtectedRoute>} />
           <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          
+          <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="usuarios" element={<GerenciarUsuarios />} />
+            <Route path="usuarios/novo" element={<CadastrarUsuario />} />
+            <Route path="conteudo" element={<GerenciarConteudo />} />
+            <Route path="avisos" element={<GerenciarAvisos />} />
+            <Route path="formularios" element={<VisualizarFormularios />} />
+          </Route>
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
