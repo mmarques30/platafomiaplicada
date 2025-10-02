@@ -17,7 +17,6 @@ const navItems = [
   { path: "/admin/usuarios/novo", label: "Cadastrar Usuário", icon: UserPlus },
   { path: "/admin/conteudo", label: "Gerenciar Conteúdo", icon: BookOpen },
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
-  { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: FileText },
   { path: "/admin/formularios", label: "Formulários", icon: FileText },
 ];
 

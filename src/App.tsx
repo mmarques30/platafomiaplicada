@@ -25,7 +25,6 @@ import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
 import CadastrarUsuario from "./pages/admin/CadastrarUsuario";
 import GerenciarConteudo from "./pages/admin/GerenciarConteudo";
 import GerenciarAvisos from "./pages/admin/GerenciarAvisos";
-import GerenciarConhecimento from "./pages/admin/GerenciarConhecimento";
 import VisualizarFormularios from "./pages/admin/VisualizarFormularios";
 
 const queryClient = new QueryClient();
@@ -60,7 +59,6 @@ const App = () => (
             <Route path="usuarios/novo" element={<CadastrarUsuario />} />
             <Route path="conteudo" element={<GerenciarConteudo />} />
             <Route path="avisos" element={<GerenciarAvisos />} />
-            <Route path="conhecimento" element={<GerenciarConhecimento />} />
             <Route path="formularios" element={<VisualizarFormularios />} />
           </Route>
           

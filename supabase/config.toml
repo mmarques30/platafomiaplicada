@@ -1,10 +1,1 @@
 project_id = "ocwpsanqtfubixerjive"
-
-[functions.ai-chat]
-verify_jwt = true
-
-[functions.gerar-insight-mentoria]
-verify_jwt = true
-
-[functions.processar-documento]
-verify_jwt = true

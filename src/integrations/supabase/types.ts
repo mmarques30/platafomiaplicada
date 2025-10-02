@@ -307,45 +307,6 @@ export type Database = {
         }
         Relationships: []
       }
-      knowledge_base: {
-        Row: {
-          arquivo_url: string
-          ativo: boolean | null
-          categoria: string
-          conteudo_extraido: string
-          created_at: string | null
-          created_by: string | null
-          id: string
-          tipo_arquivo: string
-          titulo: string
-          updated_at: string | null
-        }
-        Insert: {
-          arquivo_url: string
-          ativo?: boolean | null
-          categoria: string
-          conteudo_extraido: string
-          created_at?: string | null
-          created_by?: string | null
-          id?: string
-          tipo_arquivo: string
-          titulo: string
-          updated_at?: string | null
-        }
-        Update: {
-          arquivo_url?: string
-          ativo?: boolean | null
-          categoria?: string
-          conteudo_extraido?: string
-          created_at?: string | null
-          created_by?: string | null
-          id?: string
-          tipo_arquivo?: string
-          titulo?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       modulos: {
         Row: {
           ativo: boolean | null
