@@ -105,12 +105,12 @@ export default function Auth() {
       <div className="w-full lg:w-[40%] relative flex items-center justify-center border-l border-border p-4 overflow-hidden">
         {/* Background image com transparência */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
           style={{ backgroundImage: `url(${authBackground})` }}
         />
         
         {/* Overlay escuro para garantir legibilidade */}
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
         
         {/* Card (conteúdo) */}
         <Card className="relative z-10 w-full max-w-md bg-card/90 backdrop-blur-md border-border animate-slide-up">
