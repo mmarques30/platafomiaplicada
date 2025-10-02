@@ -17,10 +17,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useUserRole } from "@/hooks/useUserRole";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada.png";
+import { useLocation } from "react-router-dom";
 
 export function TopHeader() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAdmin } = useUserRole();
+  
+  // Detectar rotas ativas para dropdowns
+  const isCursosActive = ['/trilhas', '/mentoria'].some(path => location.pathname.startsWith(path));
+  const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar', '/newsletter', '/busca', '/admin'].some(path => location.pathname.startsWith(path));
 
   const { data: user } = useQuery({
     queryKey: ["current-user"],
@@ -77,7 +83,7 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium smooth-transition",
-              isActive ? "text-accent" : "text-foreground hover:text-accent"
+              isActive ? "text-[#8B0A50]" : "text-white hover:text-[#8B0A50]"
             )}
           >
             Início
@@ -85,7 +91,13 @@ export function TopHeader() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-accent h-auto p-0">
+              <Button 
+                variant="ghost" 
+                className={cn(
+                  "text-sm font-medium h-auto p-0 smooth-transition",
+                  isCursosActive ? "text-[#8B0A50]" : "text-white hover:text-[#8B0A50]"
+                )}
+              >
                 Meus Cursos
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
@@ -108,7 +120,13 @@ export function TopHeader() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-accent h-auto p-0">
+              <Button 
+                variant="ghost" 
+                className={cn(
+                  "text-sm font-medium h-auto p-0 smooth-transition",
+                  isFerramentasActive ? "text-[#8B0A50]" : "text-white hover:text-[#8B0A50]"
+                )}
+              >
                 Ferramentas
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
