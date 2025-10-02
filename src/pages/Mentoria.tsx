@@ -2,39 +2,62 @@ import { useState } from "react";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
+import { HeroMentoria } from "@/components/mentoria/HeroMentoria";
+import { InsightIA } from "@/components/mentoria/InsightIA";
+import { Loader2 } from "lucide-react";
 
 export default function Mentoria() {
-  const { formulario, isLoading } = useMentoriaForm();
+  const { formulario, isLoading, refetch } = useMentoriaForm();
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
 
-  const jaPreencheu = formulario?.completado && !modoEdicao;
+  const naoPreencheu = !formulario?.completado;
+  const preenchido = formulario?.completado && !modoEdicao;
+
+  const handleFormularioFinalizado = () => {
+    setMostrarFormulario(false);
+    setModoEdicao(false);
+    refetch();
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-3">Aplicada Mentoria IA</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          {jaPreencheu
-            ? "Confira abaixo o resumo do seu diagnóstico de mentoria"
-            : "Complete o formulário diagnóstico para iniciar sua jornada de transformação com IA"}
-        </p>
-      </div>
+      {/* Hero Section - quando não preencheu */}
+      {naoPreencheu && !mostrarFormulario && (
+        <HeroMentoria onIniciar={() => setMostrarFormulario(true)} />
+      )}
 
-      {jaPreencheu ? (
-        <ResumoDiagnostico 
-          formulario={formulario} 
-          onEditar={() => setModoEdicao(true)} 
+      {/* Formulário Wizard - quando está preenchendo ou editando */}
+      {(mostrarFormulario || modoEdicao) && (
+        <FormularioWizard 
+          onCancelar={() => {
+            setMostrarFormulario(false);
+            setModoEdicao(false);
+          }}
+          onFinalizado={handleFormularioFinalizado}
         />
-      ) : (
-        <FormularioWizard />
+      )}
+
+      {/* Resumo + Insight - quando já preencheu */}
+      {preenchido && (
+        <div className="max-w-5xl mx-auto space-y-6">
+          <ResumoDiagnostico 
+            formulario={formulario} 
+            onEditar={() => setModoEdicao(true)}
+          />
+          <InsightIA 
+            formulario={formulario}
+            onInsightGerado={refetch}
+          />
+        </div>
       )}
     </div>
   );

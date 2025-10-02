@@ -117,8 +117,9 @@ export const useMentoriaForm = () => {
   return {
     formulario,
     isLoading,
+    refetch: () => queryClient.invalidateQueries({ queryKey: ["formulario-diagnostico"] }),
     salvarRascunho: salvarMutation.mutate,
-    finalizarFormulario: finalizarMutation.mutate,
+    finalizarFormulario: finalizarMutation.mutateAsync,
     isSaving: salvarMutation.isPending || finalizarMutation.isPending,
   };
 };

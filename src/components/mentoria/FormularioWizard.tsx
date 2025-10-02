@@ -14,8 +14,17 @@ import { Step5EstiloAprendizagem } from "./Step5EstiloAprendizagem";
 import { Step6Motivacao } from "./Step6Motivacao";
 import { Step7Expectativas } from "./Step7Expectativas";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
-export function FormularioWizard() {
+interface FormularioWizardProps {
+  onCancelar?: () => void;
+  onFinalizado?: () => void;
+}
+
+export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const { formulario, finalizarFormulario, isSaving } = useMentoriaForm();
   const navigate = useNavigate();
@@ -53,10 +62,43 @@ export function FormularioWizard() {
   };
 
   const onSubmit = async (data: FormData) => {
-    finalizarFormulario(data);
-    setTimeout(() => {
-      navigate("/mentoria");
-    }, 1500);
+    try {
+      // Finalizar formulário
+      await finalizarFormulario(data);
+      
+      // Mostrar toast informando sobre geração de insight
+      toast({
+        title: "Gerando sua análise personalizada...",
+        description: "Aguarde alguns segundos enquanto a IA analisa seu perfil ✨"
+      });
+
+      // Auto-gerar insight após finalização
+      if (formulario?.id) {
+        const { error } = await supabase.functions.invoke('gerar-insight-mentoria', {
+          body: { formulario_id: formulario.id }
+        });
+
+        if (error) {
+          console.error("Erro ao gerar insight:", error);
+          toast({
+            title: "Formulário salvo!",
+            description: "Você pode gerar o insight posteriormente na página de mentoria.",
+            variant: "default"
+          });
+        }
+      }
+
+      // Callback ou navegação
+      if (onFinalizado) {
+        onFinalizado();
+      } else {
+        setTimeout(() => {
+          navigate("/mentoria");
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Erro ao finalizar formulário:", error);
+    }
   };
 
   const getStepFields = (step: number): (keyof FormData)[] => {
@@ -83,6 +125,20 @@ export function FormularioWizard() {
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardContent className="pt-6">
+        {onCancelar && (
+          <div className="flex justify-end mb-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onCancelar}
+              className="gap-2"
+            >
+              <X className="h-4 w-4" />
+              Cancelar
+            </Button>
+          </div>
+        )}
+        
         <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
 
         <Form {...form}>

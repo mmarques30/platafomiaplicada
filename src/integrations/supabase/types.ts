@@ -160,6 +160,8 @@ export type Database = {
           frequencia_uso_ia: string | null
           id: string
           idade: number | null
+          insight_gerado_em: string | null
+          insight_ia: Json | null
           lidera_equipe: boolean | null
           limitacoes_tecnicas: string | null
           linkedin: string | null
@@ -212,6 +214,8 @@ export type Database = {
           frequencia_uso_ia?: string | null
           id?: string
           idade?: number | null
+          insight_gerado_em?: string | null
+          insight_ia?: Json | null
           lidera_equipe?: boolean | null
           limitacoes_tecnicas?: string | null
           linkedin?: string | null
@@ -264,6 +268,8 @@ export type Database = {
           frequencia_uso_ia?: string | null
           id?: string
           idade?: number | null
+          insight_gerado_em?: string | null
+          insight_ia?: Json | null
           lidera_equipe?: boolean | null
           limitacoes_tecnicas?: string | null
           linkedin?: string | null
