@@ -126,14 +126,29 @@ All colors MUST be HSL.
   /* Estilo customizado para mensagens da IA no chat */
   .ai-message-container {
     background-color: #696969;
-    color: #F5F5F5;
+    color: #1C1C1C;
     border-radius: 0.75rem;
     padding: 1rem;
+    line-height: 1.6;
+  }
+
+  .ai-message-container p {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .ai-message-container p:first-child {
+    margin-top: 0;
+  }
+
+  .ai-message-container p:last-child {
+    margin-bottom: 0;
   }
 
   .ai-message-container strong,
   .ai-message-container b {
     color: #8B0A50;
+    font-weight: 600;
   }
 
   .ai-message-container em,
@@ -148,11 +163,31 @@ All colors MUST be HSL.
   .ai-message-container h5,
   .ai-message-container h6 {
     color: #8B0A50;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  .ai-message-container h1:first-child,
+  .ai-message-container h2:first-child,
+  .ai-message-container h3:first-child,
+  .ai-message-container h4:first-child,
+  .ai-message-container h5:first-child,
+  .ai-message-container h6:first-child {
+    margin-top: 0;
   }
 
   .ai-message-container ol,
   .ai-message-container ul {
-    color: #F5F5F5;
+    color: #1C1C1C;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+  }
+
+  .ai-message-container li {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
   }
 
   .ai-message-container li::marker {
@@ -161,9 +196,10 @@ All colors MUST be HSL.
 
   .ai-message-container code {
     background-color: rgba(0, 0, 0, 0.2);
-    color: #F5F5F5;
+    color: #1C1C1C;
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
+    font-size: 0.9em;
   }
 
   .ai-message-container pre {
@@ -171,6 +207,8 @@ All colors MUST be HSL.
     padding: 1rem;
     border-radius: 0.5rem;
     overflow-x: auto;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
   }
 
   .ai-message-container pre code {
