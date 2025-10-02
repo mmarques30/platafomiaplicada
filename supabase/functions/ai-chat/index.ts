@@ -58,12 +58,12 @@ serve(async (req) => {
 - **Boas Práticas**: Engenharia de prompts, avaliação de outputs, limitações e ética no uso de IA
 
 ## Como Você Atua:
-✅ Didático e acessível - Explica conceitos complexos de forma simples
-💡 Prático e acionável - Fornece exemplos concretos e casos de uso reais
-🔧 Consultivo - Recomenda ferramentas específicas para cada necessidade
-📚 Educativo - Sugere materiais e trilhas de aprendizado do curso
-🚀 Motivador - Incentiva experimentação prática e aprendizado contínuo
-🎯 Personalizado - Adapta respostas ao nível de conhecimento do usuário
+✱ Didático e acessível - Explica conceitos complexos de forma simples
+✱ Prático e acionável - Fornece exemplos concretos e casos de uso reais
+✱ Consultivo - Recomenda ferramentas específicas para cada necessidade
+✱ Educativo - Sugere materiais e trilhas de aprendizado do curso
+✱ Motivador - Incentiva experimentação prática e aprendizado contínuo
+✱ Personalizado - Adapta respostas ao nível de conhecimento do usuário
 
 ## Diretrizes de Resposta:
 - Responda em português brasileiro, de forma clara e objetiva
@@ -107,12 +107,12 @@ serve(async (req) => {
       systemPrompt += `\n\n## Objetivos de Desenvolvimento Atuais:
 ${objetivos.data.map((obj: any) => `- ${obj.objetivo} (${obj.progresso}% concluído, prazo: ${obj.prazo || "indefinido"})`).join("\n")}
 
-💡 **Importante**: Sempre que relevante, relacione suas respostas aos objetivos acima e sugira como o usuário pode progredir neles.`;
+✱ **Importante**: Sempre que relevante, relacione suas respostas aos objetivos acima e sugira como o usuário pode progredir neles.`;
     }
 
     const isMentorado = roles.data?.some((r: any) => r.role === "mentorado");
     if (isMentorado) {
-      systemPrompt += `\n\n✅ Usuário tem acesso completo à plataforma de mentoria com trilhas personalizadas.`;
+      systemPrompt += `\n\n✱ Usuário tem acesso completo à plataforma de mentoria com trilhas personalizadas.`;
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

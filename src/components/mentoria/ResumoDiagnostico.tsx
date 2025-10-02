@@ -37,7 +37,7 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
         <CardContent className="space-y-6">
           {/* Perfil */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">📋 Perfil Profissional</h3>
+            <h3 className="text-lg font-semibold mb-3">✱ Perfil Profissional</h3>
             <div className="grid gap-2 text-sm">
               <div><span className="font-medium">Nome:</span> {formulario.nome_completo}</div>
               <div><span className="font-medium">Idade:</span> {formulario.idade} anos</div>
@@ -51,7 +51,7 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
 
           {/* Experiência IA */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">🤖 Experiência com IA</h3>
+            <h3 className="text-lg font-semibold mb-3">✱ Experiência com IA</h3>
             <div className="grid gap-2 text-sm">
               <div><span className="font-medium">Nível:</span> {formulario.nivel_ia}</div>
               <div><span className="font-medium">Frequência de uso:</span> {formulario.frequencia_uso_ia}</div>
@@ -68,7 +68,7 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
 
           {/* Objetivos */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">🎯 Objetivos</h3>
+            <h3 className="text-lg font-semibold mb-3">✱ Objetivos</h3>
             <div className="grid gap-2 text-sm">
               <div><span className="font-medium">Objetivo principal:</span> {formulario.objetivo_principal}</div>
               <div>
@@ -86,7 +86,7 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
 
           {/* Desafios */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">⚡ Principais Desafios</h3>
+            <h3 className="text-lg font-semibold mb-3">✱ Principais Desafios</h3>
             <div className="space-y-2 text-sm">
               <div>
                 <span className="font-medium">1.</span> {formulario.desafio_1}
@@ -104,7 +104,7 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
 
           {/* Aprendizagem */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">📚 Estilo de Aprendizagem</h3>
+            <h3 className="text-lg font-semibold mb-3">✱ Estilo de Aprendizagem</h3>
             <div className="grid gap-2 text-sm">
               <div><span className="font-medium">Estilo:</span> {formulario.estilo_aprendizagem}</div>
               <div><span className="font-medium">Melhor horário:</span> {formulario.melhor_horario}</div>
@@ -116,7 +116,7 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
 
           {/* Motivação */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">💪 Motivação</h3>
+            <h3 className="text-lg font-semibold mb-3">✱ Motivação</h3>
             <div className="grid gap-2 text-sm">
               <div>
                 <span className="font-medium">Motivação:</span>
@@ -132,7 +132,7 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
 
           {/* Expectativas */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">🎁 Expectativas</h3>
+            <h3 className="text-lg font-semibold mb-3">✱ Expectativas</h3>
             <div className="grid gap-2 text-sm">
               <div><span className="font-medium">Tipo de suporte:</span> {formulario.tipo_suporte}</div>
               <div><span className="font-medium">Frequência de feedback:</span> {formulario.frequencia_feedback}</div>
