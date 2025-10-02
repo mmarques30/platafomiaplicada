@@ -9,6 +9,10 @@ import Trilhas from "./pages/Trilhas";
 import TrilhaDetalhes from "./pages/TrilhaDetalhes";
 import VideoPlayer from "./pages/VideoPlayer";
 import Chat from "./pages/Chat";
+import Perfil from "./pages/Perfil";
+import Configuracoes from "./pages/Configuracoes";
+import Favoritos from "./pages/Favoritos";
+import Notificacoes from "./pages/Notificacoes";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
@@ -37,6 +41,10 @@ const App = () => (
             <Route path="/trilhas/:id" element={<TrilhaDetalhes />} />
             <Route path="/videos/:id" element={<VideoPlayer />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/configuracoes" element={<Configuracoes />} />
+            <Route path="/favoritos" element={<Favoritos />} />
+            <Route path="/notificacoes" element={<Notificacoes />} />
           </Route>
           
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>

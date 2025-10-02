@@ -80,10 +80,10 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <NavLink to="/perfil" className={getNavLinkClasses}>
-                <Settings className="h-4 w-4 shrink-0" />
-                {!collapsed && <span>Configurações</span>}
-              </NavLink>
+        <NavLink to="/configuracoes" className={getNavLinkClasses}>
+          <Settings className="h-4 w-4 shrink-0" />
+          {!collapsed && <span>Configurações</span>}
+        </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
