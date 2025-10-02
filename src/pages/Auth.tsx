@@ -83,7 +83,7 @@ export default function Auth() {
         {/* Conteúdo Hero */}
         <div className="relative z-10 max-w-2xl px-12 animate-fade-in">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-8">
-            <img src={logoAplicada} alt="Aplicada" className="h-4 w-auto" />
+            <img src={logoAplicada} alt="Aplicada" className="h-6 w-auto" />
             <span className="text-sm font-medium text-accent">Plataforma de Mentoria</span>
           </div>
           

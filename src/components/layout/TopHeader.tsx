@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, BookOpen, Star, MessageSquare, Search, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Mail } from "lucide-react";
+import { Bell, ChevronDown, BookOpen, Star, MessageSquare, Search, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Mail, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -66,7 +66,7 @@ export function TopHeader() {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <Link to="/" className="flex items-center">
-            <img src={logoAplicada} alt="Aplicada" className="h-12 w-auto" />
+            <img src={logoAplicada} alt="Aplicada" className="h-16 w-auto" />
           </Link>
         </div>
 
@@ -87,6 +87,29 @@ export function TopHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-accent h-auto p-0">
                 Meus Cursos
+                <ChevronDown className="ml-1 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-64 bg-popover border-border">
+                <DropdownMenuItem asChild>
+                  <Link to="/trilhas" className="cursor-pointer">
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Aplicada Trilha
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/mentoria" className="cursor-pointer">
+                    <Users className="mr-2 h-4 w-4" />
+                    Aplicada Mentoria
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-accent h-auto p-0">
+                Ferramentas
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -122,17 +145,6 @@ export function TopHeader() {
                   Newsletter
                 </Link>
               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-accent h-auto p-0">
-                Ferramentas
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
               <DropdownMenuItem asChild>
                 <Link to="/busca" className="cursor-pointer">
                   <Search className="mr-2 h-4 w-4" />
