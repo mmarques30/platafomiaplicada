@@ -122,4 +122,64 @@ All colors MUST be HSL.
   .smooth-transition {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  
+  /* Estilo customizado para mensagens da IA no chat */
+  .ai-message-container {
+    background-color: #696969;
+    color: #F5F5F5;
+    border-radius: 0.75rem;
+    padding: 1rem;
+  }
+
+  .ai-message-container strong,
+  .ai-message-container b {
+    color: #8B0A50;
+  }
+
+  .ai-message-container em,
+  .ai-message-container i {
+    color: #8B0A50;
+  }
+
+  .ai-message-container h1,
+  .ai-message-container h2,
+  .ai-message-container h3,
+  .ai-message-container h4,
+  .ai-message-container h5,
+  .ai-message-container h6 {
+    color: #8B0A50;
+  }
+
+  .ai-message-container ol,
+  .ai-message-container ul {
+    color: #F5F5F5;
+  }
+
+  .ai-message-container li::marker {
+    color: #8B0A50;
+  }
+
+  .ai-message-container code {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: #F5F5F5;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+  }
+
+  .ai-message-container pre {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .ai-message-container pre code {
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .ai-message-container a {
+    color: #8B0A50;
+    text-decoration: underline;
+  }
 }

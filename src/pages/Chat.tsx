@@ -244,10 +244,10 @@ export default function Chat() {
                   }`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                    className={`max-w-[80%] rounded-lg ${
                       message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted prose prose-sm max-w-none dark:prose-invert prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-headings:my-3 prose-pre:my-2 prose-code:text-sm"
+                        ? "bg-primary text-primary-foreground px-4 py-2"
+                        : "ai-message-container"
                     }`}
                   >
                     {message.role === "assistant" ? (
