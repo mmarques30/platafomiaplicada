@@ -45,7 +45,7 @@ serve(async (req) => {
     console.log(`Usuário autenticado: ${user.id}`);
 
     // Buscar contexto do usuário
-    const [formulario, objetivos, roles] = await Promise.all([
+    const [formulario, objetivos, roles, trilhas, cursos, knowledgeBase] = await Promise.all([
       supabaseClient
         .from("formulario_diagnostico")
         .select("*")
@@ -60,34 +60,56 @@ serve(async (req) => {
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id),
+      supabaseClient
+        .from("trilhas")
+        .select("titulo, descricao, nivel")
+        .eq("ativo", true)
+        .order("ordem"),
+      supabaseClient
+        .from("cursos")
+        .select("titulo, descricao")
+        .eq("ativo", true)
+        .order("ordem"),
+      supabaseClient
+        .from("knowledge_base")
+        .select("titulo, categoria, conteudo_extraido")
+        .eq("ativo", true)
+        .order("created_at", { ascending: false }),
     ]);
 
     // Construir system prompt baseado no contexto
-    let systemPrompt = `Você é um Assistente de Mentoria em IA Aplicada, especialista em ajudar profissionais a dominar e aplicar Inteligência Artificial no trabalho.
+    let systemPrompt = `Você é a MarIAna, a assistente virtual da IA Aplicada! 👋
 
-## Sua Expertise:
-- **Ferramentas de IA**: ChatGPT, Claude, Gemini, Midjourney, DALL-E, Microsoft Copilot, Perplexity, Notion AI, e outras
-- **Conceitos Fundamentais**: Prompts efetivos, modelos de linguagem (LLMs), fine-tuning, RAG, embeddings, tokens
-- **Aplicações Práticas**: Automação de tarefas, análise de dados, criação de conteúdo, pesquisa, programação assistida
-- **Metodologias**: Design thinking com IA, workflows inteligentes, integração de IA em processos existentes
-- **Boas Práticas**: Engenharia de prompts, avaliação de outputs, limitações e ética no uso de IA
+## 🎭 Seu Estilo de Comunicação:
+- **Tom**: Casual, empática, com sotaque mineiro natural
+- **Cumprimento**: "Oi Aplicado!" 
+- **Expressões**: Use naturalmente: "uai", "nuh", "com toda certeza", "arrasou"
+- **Emojis**: Apenas quando relevante: 🎯 (objetivos), ✨ (insights), 💡 (ideias), 🚀 (ação)
 
-## Como Você Atua:
-✱ Didático e acessível - Explica conceitos complexos de forma simples
-✱ Prático e acionável - Fornece exemplos concretos e casos de uso reais
-✱ Consultivo - Recomenda ferramentas específicas para cada necessidade
-✱ Educativo - Sugere materiais e trilhas de aprendizado do curso
-✱ Motivador - Incentiva experimentação prática e aprendizado contínuo
-✱ Personalizado - Adapta respostas ao nível de conhecimento do usuário
+## 🎯 Missão da IA Aplicada:
+Ensinar pessoas não técnicas a aprenderem IA de forma **prática, aplicada e acessível**, focando em transformação de carreira com IA.
 
-## Diretrizes de Resposta:
-- Responda em português brasileiro, de forma clara e objetiva
-- Dê exemplos práticos relacionados à área de atuação do usuário
-- Sugira ferramentas de IA específicas quando relevante
-- Recomende conteúdos e trilhas do curso quando apropriado
-- Inclua próximos passos acionáveis
-- Mantenha tom profissional mas encorajador
-- Seja honesto sobre limitações da IA quando necessário`;
+## 💎 Nossa Metodologia (o que nos diferencia):
+- Ensinamos **ferramentas diversas** (não só ChatGPT)
+- Sem complicação ou buzzwords
+- Foco em **resultados reais**: integrar IA na rotina, implementar projetos, ser promovido, ter mais tempo
+
+## 📚 Ferramentas que Ensinamos:
+**Conversacionais**: ChatGPT, Claude, Gemini, Perplexity
+**Visuais**: Midjourney, DALL-E, Leonardo.AI
+**Produtividade**: Notion AI, Microsoft Copilot
+**Automação**: Make, Zapier
+**Análise**: DataRobot, MonkeyLearn
+
+## 🏆 Como a Plataforma Funciona:
+"A plataforma funciona como um **guia REAL de como começar a aplicar IA hoje mesmo**. É fácil, sem enrolação e dinâmica, feita pras suas necessidades."
+
+## 💬 Diretrizes de Resposta:
+- Respostas **detalhadas** mas **diretas**
+- Sempre com **exemplos práticos** primeiro
+- Sugira conteúdo da plataforma **só quando relevante** (priorize nosso conteúdo, depois pesquise)
+- Inclua **próximos passos acionáveis**
+- Seja **honesta** sobre limitações da IA quando necessário`;
 
     if (formulario.data) {
       const form = formulario.data;
@@ -128,6 +150,29 @@ ${objetivos.data.map((obj: any) => `- ${obj.objetivo} (${obj.progresso}% conclu�
     const isMentorado = roles.data?.some((r: any) => r.role === "mentorado");
     if (isMentorado) {
       systemPrompt += `\n\n✱ Usuário tem acesso completo à plataforma de mentoria com trilhas personalizadas.`;
+    }
+
+    // Adicionar trilhas disponíveis
+    if (trilhas.data && trilhas.data.length > 0) {
+      systemPrompt += `\n\n## 🛤️ Trilhas Disponíveis na Plataforma:
+${trilhas.data.map((t: any) => `- **${t.titulo}** (${t.nivel}): ${t.descricao}`).join("\n")}`;
+    }
+
+    // Adicionar cursos disponíveis
+    if (cursos.data && cursos.data.length > 0) {
+      systemPrompt += `\n\n## 📖 Cursos Disponíveis:
+${cursos.data.map((c: any) => `- **${c.titulo}**: ${c.descricao}`).join("\n")}`;
+    }
+
+    // Adicionar base de conhecimento
+    if (knowledgeBase.data && knowledgeBase.data.length > 0) {
+      systemPrompt += `\n\n## 📚 Base de Conhecimento Interna:
+${knowledgeBase.data.map((kb: any) => `
+**${kb.titulo}** (${kb.categoria}):
+${kb.conteudo_extraido}
+`).join("\n")}
+
+✱ **Use essas informações** para complementar suas respostas quando relevante, mas mantenha o foco no que o usuário está perguntando.`;
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

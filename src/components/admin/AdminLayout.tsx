@@ -8,6 +8,7 @@ import {
   Bell,
   FileText,
   ArrowLeft,
+  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ const navItems = [
   { path: "/admin/conteudo", label: "Gerenciar Conteúdo", icon: BookOpen },
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
   { path: "/admin/formularios", label: "Formulários", icon: FileText },
+  { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },
 ];
 
 export function AdminLayout() {
