@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 interface Message {
   role: "user" | "assistant";
@@ -15,10 +16,19 @@ interface Message {
 
 export default function Chat() {
   const { user } = useAuth();
+  const location = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Handle initial message from Dashboard
+  useEffect(() => {
+    const initialMessage = location.state?.initialMessage;
+    if (initialMessage && messages.length === 0) {
+      setInput(initialMessage);
+    }
+  }, [location.state?.initialMessage]);
 
   useEffect(() => {
     if (scrollRef.current) {

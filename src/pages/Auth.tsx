@@ -82,14 +82,14 @@ export default function Auth() {
         
         {/* Conteúdo Hero */}
         <div className="relative z-10 max-w-2xl px-12 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-8">
             <img src={logoAplicada} alt="Aplicada" className="h-4 w-auto" />
-            <span className="text-sm font-medium text-primary">Plataforma de Mentoria</span>
+            <span className="text-sm font-medium text-accent">Plataforma de Mentoria</span>
           </div>
           
           <h1 className="text-6xl font-bold mb-6 leading-tight">
             Aprenda com os
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-300">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
               melhores mentores
             </span>
           </h1>
@@ -101,15 +101,15 @@ export default function Auth() {
           {/* Stats */}
           <div className="flex gap-8">
             <div>
-              <div className="text-3xl font-bold text-primary">500+</div>
+              <div className="text-3xl font-bold text-accent">500+</div>
               <div className="text-sm text-muted-foreground">Alunos ativos</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-primary">50+</div>
+              <div className="text-3xl font-bold text-accent">50+</div>
               <div className="text-sm text-muted-foreground">Horas de conteúdo</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-primary">95%</div>
+              <div className="text-3xl font-bold text-accent">95%</div>
               <div className="text-sm text-muted-foreground">Satisfação</div>
             </div>
           </div>

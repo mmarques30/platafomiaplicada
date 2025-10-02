@@ -1,15 +1,15 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Info, AlertCircle, AlertTriangle, Play, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Info, AlertCircle, AlertTriangle, MessageSquare, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const [question, setQuestion] = useState("");
+
   const { data: avisos } = useQuery({
     queryKey: ["avisos-ativos"],
     queryFn: async () => {
@@ -26,34 +26,16 @@ export default function Dashboard() {
     },
   });
 
-  const { data: videosRecentes } = useQuery({
-    queryKey: ["videos-recentes"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("videos")
-        .select(`
-          *,
-          modulo:modulos(
-            id,
-            titulo,
-            curso:cursos(
-              id,
-              titulo,
-              trilha:trilhas(
-                id,
-                titulo
-              )
-            )
-          )
-        `)
-        .eq("ativo", true)
-        .order("created_at", { ascending: false })
-        .limit(6);
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (question.trim()) {
+      navigate('/chat', { state: { initialMessage: question } });
+    }
+  };
+
+  const handleQuickQuestion = (q: string) => {
+    navigate('/chat', { state: { initialMessage: q } });
+  };
 
   const getAvisoIcon = (tipo: string) => {
     switch (tipo) {
@@ -96,53 +78,58 @@ export default function Dashboard() {
           </section>
         )}
 
-        {/* Vídeos Recentes */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Vídeos Recentes</h2>
-            <Link to="/trilhas">
-              <Button variant="outline">Ver todas as trilhas</Button>
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videosRecentes?.map((video) => (
-              <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="aspect-video bg-muted relative">
-                  {video.thumbnail_url ? (
-                    <img 
-                      src={video.thumbnail_url} 
-                      alt={video.titulo}
-                      className="w-full h-full object-cover"
+        {/* Ask IA Aplicada */}
+        <section className="flex items-center justify-center py-16">
+          <div className="w-full max-w-3xl px-6">
+            {/* Header */}
+            <div className="text-center mb-10">
+              <h1 className="text-5xl font-bold mb-4">
+                Ask <span className="text-accent">IA Aplicada</span>
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Sua assistente inteligente para todas as dúvidas sobre os cursos
+              </p>
+            </div>
+            
+            {/* Input com gradiente */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-accent/30 to-primary/20 rounded-2xl blur-xl"></div>
+              <div className="relative bg-card border-2 border-accent/30 rounded-2xl p-2 shadow-2xl">
+                <form onSubmit={handleSubmit} className="flex items-center gap-3">
+                  <div className="flex-1 flex items-center gap-3 bg-background rounded-xl px-5 py-4">
+                    <MessageSquare className="h-5 w-5 text-accent flex-shrink-0" />
+                    <input
+                      type="text"
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      placeholder="Ask IA Aplicada..."
+                      className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground text-lg"
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Play className="h-12 w-12 text-muted-foreground" />
-                    </div>
-                  )}
-                  {video.duracao && (
-                    <Badge className="absolute bottom-2 right-2" variant="secondary">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {Math.floor(video.duracao / 60)}min
-                    </Badge>
-                  )}
-                </div>
-                <CardHeader>
-                  <CardTitle className="line-clamp-2">{video.titulo}</CardTitle>
-                  <CardDescription className="line-clamp-1">
-                    {video.modulo?.curso?.trilha?.titulo}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link to={`/videos/${video.id}`}>
-                    <Button className="w-full">
-                      <Play className="h-4 w-4 mr-2" />
-                      Assistir
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
+                  </div>
+                  <Button 
+                    type="submit"
+                    size="lg"
+                    disabled={!question.trim()}
+                    className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 rounded-xl glow-accent transition-all"
+                  >
+                    <Sparkles className="h-5 w-5" />
+                  </Button>
+                </form>
+              </div>
+            </div>
+
+            {/* Sugestões rápidas */}
+            <div className="mt-8 flex flex-wrap gap-3 justify-center">
+              <Button variant="outline" size="sm" onClick={() => handleQuickQuestion("Como funciona a plataforma?")}>
+                Como funciona a plataforma?
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleQuickQuestion("Quais cursos disponíveis?")}>
+                Quais cursos disponíveis?
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleQuickQuestion("Como usar as ferramentas de IA?")}>
+                Como usar as ferramentas de IA?
+              </Button>
+            </div>
           </div>
         </section>
       </main>

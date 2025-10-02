@@ -66,21 +66,8 @@ export function TopHeader() {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <Link to="/" className="flex items-center">
-            <img src={logoAplicada} alt="Aplicada" className="h-8 w-auto" />
+            <img src={logoAplicada} alt="Aplicada" className="h-12 w-auto" />
           </Link>
-        </div>
-
-        {/* Chat AI Button - Destacado */}
-        <div className="hidden lg:flex items-center gap-4">
-          <Button 
-            asChild
-            className="bg-accent hover:bg-accent/90 text-accent-foreground glow-accent"
-          >
-            <Link to="/chat">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Chat AI
-            </Link>
-          </Button>
         </div>
 
         {/* CENTRO: Menu de Navegação Horizontal */}
