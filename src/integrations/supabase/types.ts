@@ -118,6 +118,30 @@ export type Database = {
           },
         ]
       }
+      favoritos: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_id: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_id: string
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       formulario_diagnostico: {
         Row: {
           area_aplicacao_ia: string | null
@@ -317,6 +341,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notificacoes: {
+        Row: {
+          created_at: string | null
+          id: string
+          lida: boolean | null
+          link: string | null
+          mensagem: string | null
+          tipo: string
+          titulo: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          lida?: boolean | null
+          link?: string | null
+          mensagem?: string | null
+          tipo: string
+          titulo: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          lida?: boolean | null
+          link?: string | null
+          mensagem?: string | null
+          tipo?: string
+          titulo?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       objetivos_mentoria: {
         Row: {
