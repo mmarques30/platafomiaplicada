@@ -84,7 +84,7 @@ export default function Dashboard() {
             {/* Header */}
             <div className="text-center mb-10">
               <h1 className="text-5xl font-bold mb-4">
-                Ask <span className="text-accent">IA Aplicada</span>
+                Ask <span className="text-accent">IAplicada</span>
               </h1>
               <p className="text-muted-foreground text-lg">
                 Sua assistente inteligente para todas as dúvidas sobre os cursos
@@ -102,7 +102,7 @@ export default function Dashboard() {
                       type="text"
                       value={question}
                       onChange={(e) => setQuestion(e.target.value)}
-                      placeholder="Ask IA Aplicada..."
+                      placeholder="Ask IAplicada..."
                       className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground text-lg"
                     />
                   </div>
