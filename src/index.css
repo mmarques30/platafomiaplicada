@@ -48,6 +48,48 @@ All colors MUST be HSL.
     --sidebar-border: 0 0% 12%;
     --sidebar-ring: 0 0% 29%;
   }
+
+  .light {
+    /* Aplicada Light Theme */
+    --background: 0 0% 91%; /* #E8E8E8 - Cinza muito claro */
+    --foreground: 0 0% 10%; /* #1a1a1a - Texto escuro para contraste */
+    
+    --card: 0 0% 98%; /* #FAFAFA - Cards quase brancos */
+    --card-foreground: 0 0% 10%;
+    
+    --popover: 0 0% 98%;
+    --popover-foreground: 0 0% 10%;
+    
+    --primary: 0 0% 29%; /* #4A4A4A - Cinza Escuro (mantém identidade) */
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 0 0% 94%; /* Cinza mais claro para elementos secundários */
+    --secondary-foreground: 0 0% 10%;
+    
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%; /* Texto secundário */
+    
+    --accent: 336 89% 29%; /* #8B0A50 - Magenta/Rosa (mantém identidade) */
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 0 0% 85%; /* Bordas sutis */
+    --input: 0 0% 98%;
+    --ring: 0 0% 29%;
+    
+    --radius: 0.75rem;
+    
+    --sidebar-background: 0 0% 96%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 0 0% 29%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 92%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 88%;
+    --sidebar-ring: 0 0% 29%;
+  }
 }
 
 @layer base {
