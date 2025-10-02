@@ -1,24 +1,13 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Brain, Target, Calendar, FileText, BookOpen, ArrowRight } from "lucide-react";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
-import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
-import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
-import { HeroMentoria } from "@/components/mentoria/HeroMentoria";
-import { InsightIA } from "@/components/mentoria/InsightIA";
 import { Loader2 } from "lucide-react";
 
 export default function Mentoria() {
-  const { formulario, isLoading, refetch } = useMentoriaForm();
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [modoEdicao, setModoEdicao] = useState(false);
-
-  const naoPreencheu = !formulario?.completado;
-  const preenchido = formulario?.completado && !modoEdicao;
-
-  const handleFormularioFinalizado = () => {
-    setMostrarFormulario(false);
-    setModoEdicao(false);
-    refetch();
-  };
+  const navigate = useNavigate();
+  const { formulario, isLoading } = useMentoriaForm();
 
   if (isLoading) {
     return (
@@ -28,37 +17,113 @@ export default function Mentoria() {
     );
   }
 
+  const menuOptions = [
+    {
+      title: "Diagnóstico IA",
+      description: formulario?.completado 
+        ? "Visualizar ou atualizar seu diagnóstico personalizado" 
+        : "Inicie seu diagnóstico personalizado com IA",
+      icon: Brain,
+      path: "/mentoria/diagnostico",
+      status: formulario?.completado ? "Completado" : "Pendente",
+      statusColor: formulario?.completado ? "text-green-600" : "text-yellow-600"
+    },
+    {
+      title: "Meus Objetivos",
+      description: "Gerencie seus objetivos de aprendizagem e desenvolvimento",
+      icon: Target,
+      path: "/mentoria/objetivos",
+      status: "Disponível",
+      statusColor: "text-blue-600"
+    },
+    {
+      title: "Sessões",
+      description: "Agende e visualize o histórico de suas sessões de mentoria",
+      icon: Calendar,
+      path: "/mentoria/sessoes",
+      status: "Em breve",
+      statusColor: "text-muted-foreground",
+      disabled: true
+    },
+    {
+      title: "Plano de Desenvolvimento",
+      description: "Visualize seu plano personalizado de desenvolvimento",
+      icon: FileText,
+      path: "/mentoria/plano",
+      status: "Em breve",
+      statusColor: "text-muted-foreground",
+      disabled: true
+    },
+    {
+      title: "Recursos",
+      description: "Materiais e ferramentas recomendadas para você",
+      icon: BookOpen,
+      path: "/mentoria/recursos",
+      status: "Em breve",
+      statusColor: "text-muted-foreground",
+      disabled: true
+    }
+  ];
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
-      {/* Hero Section - quando não preencheu */}
-      {naoPreencheu && !mostrarFormulario && (
-        <HeroMentoria onIniciar={() => setMostrarFormulario(true)} />
-      )}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold mb-3">Mentoria IA</h1>
+        <p className="text-muted-foreground text-lg">
+          Seu programa personalizado de desenvolvimento em Inteligência Artificial
+        </p>
+      </div>
 
-      {/* Formulário Wizard - quando está preenchendo ou editando */}
-      {(mostrarFormulario || modoEdicao) && (
-        <FormularioWizard 
-          onCancelar={() => {
-            setMostrarFormulario(false);
-            setModoEdicao(false);
-          }}
-          onFinalizado={handleFormularioFinalizado}
-        />
-      )}
-
-      {/* Resumo + Insight - quando já preencheu */}
-      {preenchido && (
-        <div className="max-w-5xl mx-auto space-y-6">
-          <ResumoDiagnostico 
-            formulario={formulario} 
-            onEditar={() => setModoEdicao(true)}
-          />
-          <InsightIA 
-            formulario={formulario}
-            onInsightGerado={refetch}
-          />
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {menuOptions.map((option) => {
+          const Icon = option.icon;
+          return (
+            <Card 
+              key={option.path}
+              className={`transition-all hover:shadow-lg ${
+                option.disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-primary'
+              }`}
+              onClick={() => !option.disabled && navigate(option.path)}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <Icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">{option.title}</CardTitle>
+                      <span className={`text-sm font-medium ${option.statusColor}`}>
+                        {option.status}
+                      </span>
+                    </div>
+                  </div>
+                  {!option.disabled && (
+                    <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  {option.description}
+                </CardDescription>
+                {!option.disabled && (
+                  <Button 
+                    variant="ghost" 
+                    className="mt-4 w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(option.path);
+                    }}
+                  >
+                    Acessar
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }

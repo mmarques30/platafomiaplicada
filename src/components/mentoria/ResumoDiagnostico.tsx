@@ -20,8 +20,7 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <Card>
+    <Card className="max-w-5xl mx-auto">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -148,6 +147,5 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
           </Button>
         </CardFooter>
       </Card>
-    </div>
   );
 }

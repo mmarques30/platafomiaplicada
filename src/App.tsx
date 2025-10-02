@@ -14,6 +14,8 @@ import Configuracoes from "./pages/Configuracoes";
 import Favoritos from "./pages/Favoritos";
 import Notificacoes from "./pages/Notificacoes";
 import Mentoria from "./pages/Mentoria";
+import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
+import MentoriaObjetivos from "./pages/MentoriaObjetivos";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
@@ -47,6 +49,8 @@ const App = () => (
             <Route path="/favoritos" element={<Favoritos />} />
             <Route path="/notificacoes" element={<Notificacoes />} />
             <Route path="/mentoria" element={<Mentoria />} />
+            <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
+            <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
           </Route>
           
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
