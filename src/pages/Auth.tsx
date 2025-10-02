@@ -113,7 +113,7 @@ export default function Auth() {
         <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
         
         {/* Card (conteúdo) */}
-        <Card className="relative z-10 w-full max-w-md bg-card/90 backdrop-blur-md border-border animate-slide-up">
+        <Card className="relative z-10 w-full max-w-lg bg-card/90 backdrop-blur-md border-border animate-slide-up">
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold text-foreground">
               Bem-vindo à Aplicada
