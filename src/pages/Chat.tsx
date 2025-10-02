@@ -15,7 +15,7 @@ interface Message {
 }
 
 export default function Chat() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const location = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -39,6 +39,11 @@ export default function Chat() {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    if (!session) {
+      toast.error("Você precisa estar autenticado para usar o chat");
+      return;
+    }
+
     const userMessage: Message = {
       role: "user",
       content: input,
@@ -55,7 +60,7 @@ export default function Chat() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
             messages: [...messages, userMessage],

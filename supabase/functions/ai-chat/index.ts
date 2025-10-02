@@ -48,33 +48,71 @@ serve(async (req) => {
     ]);
 
     // Construir system prompt baseado no contexto
-    let systemPrompt = `Você é um mentor especializado em IA aplicada ao trabalho. Seu objetivo é ajudar o usuário a alcançar seus objetivos com IA de forma prática e objetiva.
+    let systemPrompt = `Você é um Assistente de Mentoria em IA Aplicada, especialista em ajudar profissionais a dominar e aplicar Inteligência Artificial no trabalho.
 
-Instruções:
-- Seja prático e objetivo
-- Dê exemplos concretos relacionados ao contexto do usuário
-- Sugira próximos passos acionáveis
-- Mantenha um tom encorajador mas profissional
-- Responda em português`;
+## Sua Expertise:
+- **Ferramentas de IA**: ChatGPT, Claude, Gemini, Midjourney, DALL-E, Microsoft Copilot, Perplexity, Notion AI, e outras
+- **Conceitos Fundamentais**: Prompts efetivos, modelos de linguagem (LLMs), fine-tuning, RAG, embeddings, tokens
+- **Aplicações Práticas**: Automação de tarefas, análise de dados, criação de conteúdo, pesquisa, programação assistida
+- **Metodologias**: Design thinking com IA, workflows inteligentes, integração de IA em processos existentes
+- **Boas Práticas**: Engenharia de prompts, avaliação de outputs, limitações e ética no uso de IA
+
+## Como Você Atua:
+✅ Didático e acessível - Explica conceitos complexos de forma simples
+💡 Prático e acionável - Fornece exemplos concretos e casos de uso reais
+🔧 Consultivo - Recomenda ferramentas específicas para cada necessidade
+📚 Educativo - Sugere materiais e trilhas de aprendizado do curso
+🚀 Motivador - Incentiva experimentação prática e aprendizado contínuo
+🎯 Personalizado - Adapta respostas ao nível de conhecimento do usuário
+
+## Diretrizes de Resposta:
+- Responda em português brasileiro, de forma clara e objetiva
+- Dê exemplos práticos relacionados à área de atuação do usuário
+- Sugira ferramentas de IA específicas quando relevante
+- Recomende conteúdos e trilhas do curso quando apropriado
+- Inclua próximos passos acionáveis
+- Mantenha tom profissional mas encorajador
+- Seja honesto sobre limitações da IA quando necessário`;
 
     if (formulario.data) {
       const form = formulario.data;
-      systemPrompt += `\n\nContexto do usuário:
+      systemPrompt += `\n\n## Perfil do Usuário:
+**Profissional:**
+- Nome: ${form.nome_completo || "Não informado"}
 - Profissão: ${form.profissao || "Não informado"}
-- Área de atuação: ${form.area_atuacao || "Não informado"}
-- Nível de IA: ${form.nivel_ia || "Não informado"}
+- Área: ${form.area_atuacao || "Não informado"}
+- Experiência: ${form.tempo_experiencia || "Não informado"}
+- Empresa: ${form.tamanho_empresa || "Não informado"}
+
+**Nível de IA:**
+- Conhecimento atual: ${form.nivel_ia || "Iniciante"}
+- Experiência prévia: ${form.experiencia_ia || "Nenhuma"}
+- Ferramentas que usa: ${form.ferramentas_ia ? JSON.stringify(form.ferramentas_ia) : "Nenhuma"}
+- Frequência de uso: ${form.frequencia_uso_ia || "Não usa"}
+
+**Objetivos e Desafios:**
 - Objetivo principal: ${form.objetivo_principal || "Não informado"}
-- Maior dificuldade com IA: ${form.maior_dificuldade_ia || "Não informado"}`;
+- Meta 3 meses: ${form.meta_3_meses || "Não informado"}
+- Meta 12 meses: ${form.meta_12_meses || "Não informado"}
+- Maior dificuldade: ${form.maior_dificuldade_ia || "Não informado"}
+- Desafios: ${[form.desafio_1, form.desafio_2, form.desafio_3].filter(Boolean).join(", ") || "Não informado"}
+
+**Preferências de Aprendizado:**
+- Estilo: ${form.estilo_aprendizagem || "Não informado"}
+- Tempo disponível: ${form.tempo_disponivel || "Não informado"}
+- Melhor horário: ${form.melhor_horario || "Não informado"}`;
     }
 
     if (objetivos.data && objetivos.data.length > 0) {
-      systemPrompt += `\n\nObjetivos atuais:
-${objetivos.data.map((obj: any) => `- ${obj.objetivo} (progresso: ${obj.progresso}%)`).join("\n")}`;
+      systemPrompt += `\n\n## Objetivos de Desenvolvimento Atuais:
+${objetivos.data.map((obj: any) => `- ${obj.objetivo} (${obj.progresso}% concluído, prazo: ${obj.prazo || "indefinido"})`).join("\n")}
+
+💡 **Importante**: Sempre que relevante, relacione suas respostas aos objetivos acima e sugira como o usuário pode progredir neles.`;
     }
 
     const isMentorado = roles.data?.some((r: any) => r.role === "mentorado");
     if (isMentorado) {
-      systemPrompt += `\n\nO usuário é um mentorado com acesso completo à plataforma.`;
+      systemPrompt += `\n\n✅ Usuário tem acesso completo à plataforma de mentoria com trilhas personalizadas.`;
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -103,19 +141,22 @@ ${objetivos.data.map((obj: any) => `- ${obj.objetivo} (progresso: ${obj.progress
       console.error("Erro da API:", response.status, errorText);
       
       if (response.status === 429) {
+        console.error("Rate limit excedido na API de IA");
         return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido" }),
+          JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns minutos." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
+        console.error("Créditos insuficientes na API de IA");
         return new Response(
-          JSON.stringify({ error: "Créditos insuficientes" }),
+          JSON.stringify({ error: "Créditos insuficientes. Entre em contato com o suporte." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       
-      throw new Error("Erro na API de IA");
+      console.error("Erro na API de IA:", response.status, errorText);
+      throw new Error("Erro ao processar sua mensagem. Tente novamente.");
     }
 
     return new Response(response.body, {
