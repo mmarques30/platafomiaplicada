@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import logoAplicada from "@/assets/logo-aplicada.png";
+import authBackground from "@/assets/auth-background.png";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -88,37 +89,31 @@ export default function Auth() {
           </div>
           
           <h1 className="text-6xl font-bold mb-6 leading-tight">
-            Aprenda com os
+            Aprenda com
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
-              melhores mentores
+              IA Aplicada
             </span>
           </h1>
           
           <p className="text-xl text-muted-foreground mb-8">
             Trilhas personalizadas, conteúdos exclusivos e acompanhamento individual para acelerar seu crescimento profissional.
           </p>
-          
-          {/* Stats */}
-          <div className="flex gap-8">
-            <div>
-              <div className="text-3xl font-bold text-accent">500+</div>
-              <div className="text-sm text-muted-foreground">Alunos ativos</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-accent">50+</div>
-              <div className="text-sm text-muted-foreground">Horas de conteúdo</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-accent">95%</div>
-              <div className="text-sm text-muted-foreground">Satisfação</div>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* Form Section - 40% */}
-      <div className="w-full lg:w-[40%] flex items-center justify-center bg-card/50 backdrop-blur-xl border-l border-border p-4">
-        <Card className="w-full max-w-md bg-card/80 backdrop-blur border-border animate-slide-up">
+      <div className="w-full lg:w-[40%] relative flex items-center justify-center border-l border-border p-4 overflow-hidden">
+        {/* Background image com transparência */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+          style={{ backgroundImage: `url(${authBackground})` }}
+        />
+        
+        {/* Overlay escuro para garantir legibilidade */}
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+        
+        {/* Card (conteúdo) */}
+        <Card className="relative z-10 w-full max-w-md bg-card/90 backdrop-blur-md border-border animate-slide-up">
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold text-foreground">
               Bem-vindo à Aplicada
