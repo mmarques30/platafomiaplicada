@@ -94,7 +94,7 @@ export function TopHeader() {
               <Button 
                 variant="ghost" 
                 className={cn(
-                  "text-sm font-medium h-auto p-0 smooth-transition",
+                  "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
                   isCursosActive ? "text-[#8B0A50]" : "text-white hover:text-[#8B0A50]"
                 )}
               >
@@ -123,7 +123,7 @@ export function TopHeader() {
               <Button 
                 variant="ghost" 
                 className={cn(
-                  "text-sm font-medium h-auto p-0 smooth-transition",
+                  "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
                   isFerramentasActive ? "text-[#8B0A50]" : "text-white hover:text-[#8B0A50]"
                 )}
               >
