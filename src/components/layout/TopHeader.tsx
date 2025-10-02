@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Bell, ChevronDown, BookOpen, Star, MessageSquare, Search, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
