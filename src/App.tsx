@@ -16,6 +16,10 @@ import Notificacoes from "./pages/Notificacoes";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MentoriaObjetivos from "./pages/MentoriaObjetivos";
+import IACopieUse from "./pages/IACopieUse";
+import BibliotecaFerramentas from "./pages/BibliotecaFerramentas";
+import BibliotecaPrompts from "./pages/BibliotecaPrompts";
+import MetodosAplicar from "./pages/MetodosAplicar";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
@@ -52,6 +56,10 @@ const App = () => (
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
             <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
+            <Route path="/ia-copie-use" element={<IACopieUse />} />
+            <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
+            <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />
+            <Route path="/metodos-aplicar" element={<MetodosAplicar />} />
           </Route>
           
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>

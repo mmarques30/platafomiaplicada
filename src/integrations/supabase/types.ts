@@ -47,6 +47,42 @@ export type Database = {
         }
         Relationships: []
       }
+      biblioteca_prompts: {
+        Row: {
+          ativo: boolean | null
+          categoria: string
+          created_at: string | null
+          descricao: string
+          id: string
+          prompt: string
+          tags: Json | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria: string
+          created_at?: string | null
+          descricao: string
+          id?: string
+          prompt: string
+          tags?: Json | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string
+          created_at?: string | null
+          descricao?: string
+          id?: string
+          prompt?: string
+          tags?: Json | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -139,6 +175,57 @@ export type Database = {
           item_id?: string
           tipo?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      ferramentas_ia: {
+        Row: {
+          ativo: boolean | null
+          avaliacao: number | null
+          categoria: string
+          created_at: string | null
+          gratuito: boolean | null
+          id: string
+          justificativa: string | null
+          link_ferramenta: string | null
+          logo_url: string | null
+          nome: string
+          o_que_entrega: string
+          objetivo: string
+          updated_at: string | null
+          vale_a_pena: boolean | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          avaliacao?: number | null
+          categoria: string
+          created_at?: string | null
+          gratuito?: boolean | null
+          id?: string
+          justificativa?: string | null
+          link_ferramenta?: string | null
+          logo_url?: string | null
+          nome: string
+          o_que_entrega: string
+          objetivo: string
+          updated_at?: string | null
+          vale_a_pena?: boolean | null
+        }
+        Update: {
+          ativo?: boolean | null
+          avaliacao?: number | null
+          categoria?: string
+          created_at?: string | null
+          gratuito?: boolean | null
+          id?: string
+          justificativa?: string | null
+          link_ferramenta?: string | null
+          logo_url?: string | null
+          nome?: string
+          o_que_entrega?: string
+          objetivo?: string
+          updated_at?: string | null
+          vale_a_pena?: boolean | null
         }
         Relationships: []
       }
@@ -304,6 +391,117 @@ export type Database = {
           user_id?: string
           vitoria_30_dias?: string | null
           zona_conforto?: string | null
+        }
+        Relationships: []
+      }
+      ia_copie_use: {
+        Row: {
+          ativo: boolean | null
+          categoria: string
+          conteudo: string
+          created_at: string | null
+          descricao: string
+          ia_recomendada: string | null
+          id: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria: string
+          conteudo: string
+          created_at?: string | null
+          descricao: string
+          ia_recomendada?: string | null
+          id?: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string
+          conteudo?: string
+          created_at?: string | null
+          descricao?: string
+          ia_recomendada?: string | null
+          id?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      knowledge_base: {
+        Row: {
+          arquivo_url: string
+          ativo: boolean | null
+          categoria: string
+          conteudo_extraido: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          tipo_arquivo: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          arquivo_url: string
+          ativo?: boolean | null
+          categoria: string
+          conteudo_extraido: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          tipo_arquivo: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          arquivo_url?: string
+          ativo?: boolean | null
+          categoria?: string
+          conteudo_extraido?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          tipo_arquivo?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      metodos_aplicar: {
+        Row: {
+          ativo: boolean | null
+          categoria: string
+          created_at: string | null
+          descricao: string
+          exemplo: string | null
+          id: string
+          template: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria: string
+          created_at?: string | null
+          descricao: string
+          exemplo?: string | null
+          id?: string
+          template: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string
+          created_at?: string | null
+          descricao?: string
+          exemplo?: string | null
+          id?: string
+          template?: string
+          titulo?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

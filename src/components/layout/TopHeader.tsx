@@ -1,4 +1,5 @@
-import { Bell, ChevronDown, BookOpen, Star, MessageSquare, Search, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Mail, Users } from "lucide-react";
+import { useState } from "react";
+import { Bell, ChevronDown, BookOpen, Star, MessageSquare, Search, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,11 +19,13 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada.png";
 import { useLocation } from "react-router-dom";
+import { CommandSearch } from "@/components/shared/CommandSearch";
 
 export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin } = useUserRole();
+  const [searchOpen, setSearchOpen] = useState(false);
   
   // Detectar rotas ativas para dropdowns
   const isCursosActive = ['/trilhas', '/mentoria'].some(path => location.pathname.startsWith(path));
@@ -157,17 +160,9 @@ export function TopHeader() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
-              <DropdownMenuItem asChild>
-                <Link to="/newsletter" className="cursor-pointer">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Newsletter
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/busca" className="cursor-pointer">
-                  <Search className="mr-2 h-4 w-4" />
-                  Buscar Conteúdo
-                </Link>
+              <DropdownMenuItem onClick={() => setSearchOpen(true)} className="cursor-pointer">
+                <Search className="mr-2 h-4 w-4" />
+                Buscar Conteúdo
               </DropdownMenuItem>
               {isAdmin && (
                 <>
@@ -239,6 +234,8 @@ export function TopHeader() {
           </DropdownMenu>
         </div>
       </div>
+      
+      <CommandSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }
