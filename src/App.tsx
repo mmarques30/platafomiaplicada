@@ -13,6 +13,7 @@ import Perfil from "./pages/Perfil";
 import Configuracoes from "./pages/Configuracoes";
 import Favoritos from "./pages/Favoritos";
 import Notificacoes from "./pages/Notificacoes";
+import Mentoria from "./pages/Mentoria";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/favoritos" element={<Favoritos />} />
             <Route path="/notificacoes" element={<Notificacoes />} />
+            <Route path="/mentoria" element={<Mentoria />} />
           </Route>
           
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
