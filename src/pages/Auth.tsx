@@ -105,7 +105,7 @@ export default function Auth() {
       <div className="w-full lg:w-[40%] relative flex items-center justify-center border-l border-border p-4 overflow-hidden">
         {/* Background image com transparência */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50 scale-125"
           style={{ backgroundImage: `url(${authBackground})` }}
         />
         
