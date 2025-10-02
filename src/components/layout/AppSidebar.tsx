@@ -1,4 +1,4 @@
-import { Home, BookOpen, Star, Bell, Settings, LogOut, GraduationCap } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -16,11 +16,13 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import logoAplicada from "@/assets/logo-aplicada.png";
 
 const items = [
   { title: "Início", url: "/", icon: Home },
   { title: "Trilhas", url: "/trilhas", icon: BookOpen },
   { title: "Favoritos", url: "/favoritos", icon: Star },
+  { title: "Chat IA", url: "/chat", icon: MessageSquare },
   { title: "Notificações", url: "/notificacoes", icon: Bell },
 ];
 
@@ -45,11 +47,12 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-r border-sidebar-border bg-sidebar/95 backdrop-blur supports-[backdrop-filter]:bg-sidebar/60">
       <SidebarHeader className="border-b border-sidebar-border p-4">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <GraduationCap className="h-5 w-5 text-primary-foreground" />
-          </div>
-          {!collapsed && <span className="font-bold text-xl text-sidebar-foreground">Aplicada</span>}
+        <div className="flex items-center justify-center">
+          {!collapsed ? (
+            <img src={logoAplicada} alt="Aplicada" className="h-10 w-auto" />
+          ) : (
+            <img src={logoAplicada} alt="Aplicada" className="h-8 w-auto" />
+          )}
         </div>
       </SidebarHeader>
 

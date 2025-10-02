@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
+import logoAplicada from "@/assets/logo-aplicada.png";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ export default function Auth() {
         {/* Conteúdo Hero */}
         <div className="relative z-10 max-w-2xl px-12 animate-fade-in">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
-            <GraduationCap className="h-4 w-4 text-primary" />
+            <img src={logoAplicada} alt="Aplicada" className="h-4 w-auto" />
             <span className="text-sm font-medium text-primary">Plataforma de Mentoria</span>
           </div>
           
@@ -156,7 +156,7 @@ export default function Auth() {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full glow-cyan" disabled={isLoading}>
+                  <Button type="submit" className="w-full glow-primary" disabled={isLoading}>
                     {isLoading ? "Entrando..." : "Entrar"}
                   </Button>
                 </form>
@@ -195,7 +195,7 @@ export default function Auth() {
                       minLength={6}
                     />
                   </div>
-                  <Button type="submit" className="w-full glow-cyan" disabled={isLoading}>
+                  <Button type="submit" className="w-full glow-primary" disabled={isLoading}>
                     {isLoading ? "Cadastrando..." : "Cadastrar"}
                   </Button>
                 </form>

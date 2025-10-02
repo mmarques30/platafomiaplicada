@@ -1,4 +1,4 @@
-import { Bell, GraduationCap, ChevronDown, BookOpen, Star, MessageSquare, Search, Settings, User, LogOut } from "lucide-react";
+import { Bell, ChevronDown, BookOpen, Star, MessageSquare, Search, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { useUserRole } from "@/hooks/useUserRole";
 import { cn } from "@/lib/utils";
+import logoAplicada from "@/assets/logo-aplicada.png";
 
 export function TopHeader() {
   const navigate = useNavigate();
@@ -64,24 +65,32 @@ export function TopHeader() {
         {/* ESQUERDA: SidebarTrigger + Logo */}
         <div className="flex items-center gap-4">
           <SidebarTrigger />
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <GraduationCap className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl hidden md:block text-foreground">
-              Aplicada
-            </span>
+          <Link to="/" className="flex items-center">
+            <img src={logoAplicada} alt="Aplicada" className="h-8 w-auto" />
           </Link>
         </div>
 
+        {/* Chat AI Button - Destacado */}
+        <div className="hidden lg:flex items-center gap-4">
+          <Button 
+            asChild
+            className="bg-accent hover:bg-accent/90 text-accent-foreground glow-accent"
+          >
+            <Link to="/chat">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Chat AI
+            </Link>
+          </Button>
+        </div>
+
         {/* CENTRO: Menu de Navegação Horizontal */}
-        <nav className="hidden lg:flex items-center gap-6">
+        <nav className="hidden lg:flex items-center gap-6 flex-1 justify-center">
           <NavLink 
             to="/" 
             end
             className={({ isActive }) => cn(
               "text-sm font-medium smooth-transition",
-              isActive ? "text-primary" : "text-foreground hover:text-primary"
+              isActive ? "text-accent" : "text-foreground hover:text-accent"
             )}
           >
             Início
@@ -89,22 +98,41 @@ export function TopHeader() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-primary h-auto p-0">
+              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-accent h-auto p-0">
                 Meus Cursos
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
+            <DropdownMenuContent align="center" className="w-64 bg-popover border-border">
               <DropdownMenuItem asChild>
-                <Link to="/trilhas" className="cursor-pointer">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Todas as Trilhas
+                <Link to="/ia-copie-use" className="cursor-pointer">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  IA "Copie e Use"
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/favoritos" className="cursor-pointer">
-                  <Star className="mr-2 h-4 w-4" />
-                  Favoritos
+                <Link to="/biblioteca-ferramentas" className="cursor-pointer">
+                  <Wrench className="mr-2 h-4 w-4" />
+                  Biblioteca de Ferramentas
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/biblioteca-prompts" className="cursor-pointer">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Biblioteca de Prompts
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/metodos-aplicar" className="cursor-pointer">
+                  <Target className="mr-2 h-4 w-4" />
+                  Métodos para Aplicar
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-border" />
+              <DropdownMenuItem asChild>
+                <Link to="/newsletter" className="cursor-pointer">
+                  <Mail className="mr-2 h-4 w-4" />
+                  Newsletter
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -112,16 +140,16 @@ export function TopHeader() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-primary h-auto p-0">
+              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-accent h-auto p-0">
                 Ferramentas
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
               <DropdownMenuItem asChild>
-                <Link to="/chat" className="cursor-pointer">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Chat IA
+                <Link to="/busca" className="cursor-pointer">
+                  <Search className="mr-2 h-4 w-4" />
+                  Buscar Conteúdo
                 </Link>
               </DropdownMenuItem>
               {isAdmin && (
