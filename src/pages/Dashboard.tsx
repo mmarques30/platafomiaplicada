@@ -1,30 +1,13 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Info, AlertCircle, AlertTriangle, MessageSquare, Sparkles } from "lucide-react";
+import { MessageSquare, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
+import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [question, setQuestion] = useState("");
-
-  const { data: avisos } = useQuery({
-    queryKey: ["avisos-ativos"],
-    queryFn: async () => {
-      const now = new Date().toISOString();
-      const { data, error } = await supabase
-        .from("avisos")
-        .select("*")
-        .eq("ativo", true)
-        .or(`data_expiracao.is.null,data_expiracao.gt.${now}`)
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,49 +20,22 @@ export default function Dashboard() {
     navigate('/chat', { state: { initialMessage: q } });
   };
 
-  const getAvisoIcon = (tipo: string) => {
-    switch (tipo) {
-      case "info":
-        return <Info className="h-5 w-5" />;
-      case "alerta":
-        return <AlertCircle className="h-5 w-5" />;
-      case "urgente":
-        return <AlertTriangle className="h-5 w-5" />;
-      default:
-        return <Info className="h-5 w-5" />;
-    }
-  };
-
-  const getAvisoVariant = (tipo: string) => {
-    switch (tipo) {
-      case "urgente":
-        return "destructive";
-      default:
-        return "default";
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-6 space-y-8">
-        {/* Avisos */}
-        {avisos && avisos.length > 0 && (
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold">Avisos Importantes</h2>
-            <div className="space-y-3">
-              {avisos.map((aviso) => (
-                <Alert key={aviso.id} variant={getAvisoVariant(aviso.tipo)}>
-                  {getAvisoIcon(aviso.tipo)}
-                  <AlertTitle>{aviso.titulo}</AlertTitle>
-                  <AlertDescription>{aviso.mensagem}</AlertDescription>
-                </Alert>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* Novidades da Semana */}
+        <section>
+          <NovidadesSemana />
+        </section>
+
+        {/* Últimos Conteúdos Adicionados */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold">🆕 Últimos Conteúdos Adicionados</h2>
+          <UltimosConteudos />
+        </section>
 
         {/* Ask IA Aplicada */}
-        <section className="flex items-center justify-center py-16">
+        <section className="flex items-center justify-center py-12">
           <div className="w-full max-w-3xl px-6">
             {/* Header */}
             <div className="text-center mb-10">

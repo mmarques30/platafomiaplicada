@@ -84,12 +84,7 @@ export default function Trilhas() {
                     </div>
                   )}
                   <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
-                      <Badge className={getNivelColor(trilha.nivel)}>
-                        {trilha.nivel}
-                      </Badge>
-                    </div>
+                    <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
                     <CardDescription className="line-clamp-3">
                       {trilha.descricao}
                     </CardDescription>

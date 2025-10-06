@@ -13,6 +13,7 @@ import Perfil from "./pages/Perfil";
 import Configuracoes from "./pages/Configuracoes";
 import Favoritos from "./pages/Favoritos";
 import Notificacoes from "./pages/Notificacoes";
+import Evolucao from "./pages/Evolucao";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MentoriaObjetivos from "./pages/MentoriaObjetivos";
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/favoritos" element={<Favoritos />} />
             <Route path="/notificacoes" element={<Notificacoes />} />
+            <Route path="/evolucao" element={<Evolucao />} />
               <Route path="/mentoria" element={<Mentoria />} />
               <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
               <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />

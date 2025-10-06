@@ -119,7 +119,6 @@ export default function TrilhaDetalhes() {
                                 key={video.id}
                                 id={video.id}
                                 titulo={video.titulo}
-                                duracao={video.duracao}
                                 youtube_id={video.youtube_id}
                                 thumbnail_customizado_url={video.thumbnail_customizado_url}
                               />

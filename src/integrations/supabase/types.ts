@@ -83,6 +83,62 @@ export type Database = {
         }
         Relationships: []
       }
+      certificados: {
+        Row: {
+          codigo_verificacao: string | null
+          created_at: string | null
+          criterios: Json | null
+          data_emissao: string | null
+          descricao: string | null
+          id: string
+          progresso: number | null
+          status: string
+          titulo: string
+          trilha_id: string
+          updated_at: string | null
+          url_pdf: string | null
+          user_id: string
+        }
+        Insert: {
+          codigo_verificacao?: string | null
+          created_at?: string | null
+          criterios?: Json | null
+          data_emissao?: string | null
+          descricao?: string | null
+          id?: string
+          progresso?: number | null
+          status?: string
+          titulo: string
+          trilha_id: string
+          updated_at?: string | null
+          url_pdf?: string | null
+          user_id: string
+        }
+        Update: {
+          codigo_verificacao?: string | null
+          created_at?: string | null
+          criterios?: Json | null
+          data_emissao?: string | null
+          descricao?: string | null
+          id?: string
+          progresso?: number | null
+          status?: string
+          titulo?: string
+          trilha_id?: string
+          updated_at?: string | null
+          url_pdf?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificados_trilha_id_fkey"
+            columns: ["trilha_id"]
+            isOneToOne: false
+            referencedRelation: "trilhas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           content: string
@@ -150,6 +206,47 @@ export type Database = {
             columns: ["trilha_id"]
             isOneToOne: false
             referencedRelation: "trilhas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exercicios_praticos: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          descricao: string
+          id: string
+          tipo_resposta: string
+          titulo: string
+          updated_at: string | null
+          video_id: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao: string
+          id?: string
+          tipo_resposta: string
+          titulo: string
+          updated_at?: string | null
+          video_id: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string
+          id?: string
+          tipo_resposta?: string
+          titulo?: string
+          updated_at?: string | null
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exercicios_praticos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
             referencedColumns: ["id"]
           },
         ]
@@ -795,6 +892,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      respostas_exercicios: {
+        Row: {
+          arquivo_url: string | null
+          created_at: string | null
+          exercicio_id: string
+          feedback_mentor: string | null
+          id: string
+          nota: number | null
+          resposta_texto: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          created_at?: string | null
+          exercicio_id: string
+          feedback_mentor?: string | null
+          id?: string
+          nota?: number | null
+          resposta_texto?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          created_at?: string | null
+          exercicio_id?: string
+          feedback_mentor?: string | null
+          id?: string
+          nota?: number | null
+          resposta_texto?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "respostas_exercicios_exercicio_id_fkey"
+            columns: ["exercicio_id"]
+            isOneToOne: false
+            referencedRelation: "exercicios_praticos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sessoes_mentoria: {
         Row: {

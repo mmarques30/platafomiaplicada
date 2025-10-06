@@ -1,4 +1,4 @@
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -21,7 +21,8 @@ import { useUserRole } from "@/hooks/useUserRole";
 
 const items = [
   { title: "Início", url: "/", icon: Home },
-  { title: "Trilhas", url: "/trilhas", icon: BookOpen },
+  { title: "Trilhas", url: "/trilhas", icon: GraduationCap },
+  { title: "Minha Evolução", url: "/evolucao", icon: TrendingUp },
   { title: "Favoritos", url: "/favoritos", icon: Star },
   { title: "Chat IA", url: "/chat", icon: MessageSquare },
   { title: "Notificações", url: "/notificacoes", icon: Bell },
