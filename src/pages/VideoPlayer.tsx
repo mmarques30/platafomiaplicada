@@ -165,7 +165,7 @@ export default function VideoPlayer() {
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
                       <iframe
                         className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}`}
+                        src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                       />
@@ -175,7 +175,7 @@ export default function VideoPlayer() {
                   <div className="aspect-video bg-black">
                     <iframe
                       className="w-full h-full"
-                      src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}`}
+                      src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />

@@ -198,7 +198,7 @@ export default function TrilhaDetalhes() {
                 {/* Player */}
                 <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
                   <iframe
-                    src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}`}
+                    src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
                     title={currentVideo.titulo}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
