@@ -5,14 +5,33 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { VideoFeedbackSection } from "@/components/video/VideoFeedbackSection";
+import { VideoRatingInput } from "@/components/video/VideoRatingInput";
+import { VideoMaterialsList } from "@/components/video/VideoMaterialsList";
+import { useVideoRating } from "@/hooks/useVideoRating";
 
 export default function VideoPlayer() {
   const { id } = useParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { averageRating, ratingCount, userRating, setRating } = useVideoRating(id!);
+
+  const parseMateriais = (materiais: any): any[] => {
+    if (!materiais) return [];
+    if (Array.isArray(materiais)) return materiais;
+    if (typeof materiais === 'string') {
+      try {
+        const parsed = JSON.parse(materiais);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
 
   const { data: video, isLoading } = useQuery({
     queryKey: ["video", id],
@@ -168,13 +187,28 @@ export default function VideoPlayer() {
             <Card>
               <CardHeader>
                 <CardTitle>{video.titulo}</CardTitle>
-                <CardDescription>
-                  {video.modulo.titulo}
+                <CardDescription className="space-y-2">
+                  <div>{video.modulo.titulo}</div>
+                  <div className="flex items-center gap-4 text-sm">
+                    {video.duracao && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{Math.floor(video.duracao / 60)} min</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <VideoRatingInput
+                        rating={userRating}
+                        onRatingChange={setRating}
+                      />
+                      <span className="text-muted-foreground">
+                        ({ratingCount} {ratingCount === 1 ? 'avaliação' : 'avaliações'})
+                      </span>
+                    </div>
+                  </div>
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">{video.descricao}</p>
-                
+              <CardContent>
                 <div className="flex items-center gap-2">
                   {!progresso?.completado && (
                     <Button 
@@ -194,11 +228,33 @@ export default function VideoPlayer() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <Tabs defaultValue="info" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="info">Informações da aula</TabsTrigger>
+                    <TabsTrigger value="comments">Comentários</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="info" className="space-y-4 mt-4">
+                    <div>
+                      <h3 className="font-semibold mb-2">Descrição</h3>
+                      <p className="text-muted-foreground">{video.descricao}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-3">Materiais de Apoio</h3>
+                      <VideoMaterialsList materiais={parseMateriais(video.materiais)} />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="comments" className="mt-4">
+                    <VideoFeedbackSection videoId={id!} />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="space-y-4">
-            <VideoFeedbackSection videoId={id!} />
-            
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Próximos Vídeos</CardTitle>
