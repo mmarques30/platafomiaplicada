@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCreateVideo, useUpdateVideo, useTrilhas } from "@/hooks/admin/useContent";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -162,11 +163,12 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{video ? "Editar Vídeo" : "Novo Vídeo"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <ScrollArea className="flex-1 px-1">
+          <div className="space-y-4 pr-4">
           <div className="space-y-2">
             <Label>Título</Label>
             <Input {...register("titulo")} required />
@@ -334,11 +336,14 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
             <Switch checked={watch("ativo")} onCheckedChange={(checked) => setValue("ativo", checked)} />
             <Label>Ativo</Label>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button type="submit" disabled={uploading}>{uploading ? "Fazendo upload..." : video ? "Atualizar" : "Criar"}</Button>
-          </DialogFooter>
-        </form>
+          </div>
+        </ScrollArea>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={uploading}>
+            {uploading ? "Fazendo upload..." : video ? "Atualizar" : "Criar"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
