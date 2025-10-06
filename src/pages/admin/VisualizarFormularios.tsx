@@ -42,8 +42,9 @@ export default function VisualizarFormularios() {
   // Filtrar e ordenar formulários
   const filteredFormularios = formularios
     ?.filter((form: any) => {
-      const matchesSearch = form.profiles?.nome_completo
-        ?.toLowerCase()
+      const nomeCompleto = form.profiles?.nome_completo || form.nome_completo || "";
+      const matchesSearch = nomeCompleto
+        .toLowerCase()
         .includes(searchTerm.toLowerCase());
       const matchesStatus =
         statusFilter === "all" ||
@@ -57,7 +58,9 @@ export default function VisualizarFormularios() {
       } else if (sortBy === "date-asc") {
         return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
       } else {
-        return (a.profiles?.nome_completo || "").localeCompare(b.profiles?.nome_completo || "");
+        const nomeA = a.profiles?.nome_completo || a.nome_completo || "";
+        const nomeB = b.profiles?.nome_completo || b.nome_completo || "";
+        return nomeA.localeCompare(nomeB);
       }
     });
 
@@ -152,7 +155,7 @@ export default function VisualizarFormularios() {
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <CardTitle className="text-lg">
-                      {form.profiles?.nome_completo || "Nome não disponível"}
+                      {form.profiles?.nome_completo || form.nome_completo || "Nome não disponível"}
                     </CardTitle>
                   </div>
                   <Badge variant={form.completado ? "default" : "secondary"}>

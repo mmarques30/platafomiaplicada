@@ -23,17 +23,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-6 space-y-8">
-        {/* Novidades da Semana */}
-        <section>
-          <NovidadesSemana />
-        </section>
-
-        {/* Últimos Conteúdos Adicionados */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold">🆕 Últimos Conteúdos Adicionados</h2>
-          <UltimosConteudos />
-        </section>
-
         {/* Ask IA Aplicada */}
         <section className="flex items-center justify-center py-12">
           <div className="w-full max-w-3xl px-6">
@@ -87,6 +76,17 @@ export default function Dashboard() {
               </Button>
             </div>
           </div>
+        </section>
+
+        {/* Novidades da Semana */}
+        <section>
+          <NovidadesSemana />
+        </section>
+
+        {/* Últimos Conteúdos Adicionados */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-center">Últimos Conteúdos Adicionados</h2>
+          <UltimosConteudos />
         </section>
       </main>
     </div>

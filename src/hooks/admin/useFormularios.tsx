@@ -9,7 +9,7 @@ export function useFormularios() {
       
       const { data, error } = await supabase
         .from("formulario_diagnostico")
-        .select("*, profiles!inner(nome_completo, email)")
+        .select("*, profiles(nome_completo)")
         .order("created_at", { ascending: false });
       
       if (error) {
@@ -29,9 +29,9 @@ export function useFormulario(id: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("formulario_diagnostico")
-        .select("*, profiles(nome_completo, email)")
+        .select("*, profiles(nome_completo)")
         .eq("id", id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },

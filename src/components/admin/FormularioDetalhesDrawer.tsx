@@ -41,7 +41,7 @@ export function FormularioDetalhesDrawer({ formulario, open, onOpenChange }: For
             <div>
               <DrawerTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                {formulario.profiles?.nome_completo || "Formulário"}
+                {formulario.profiles?.nome_completo || formulario.nome_completo || "Formulário"}
               </DrawerTitle>
               <DrawerDescription className="flex items-center gap-2 mt-1">
                 <Calendar className="h-4 w-4" />
@@ -96,7 +96,6 @@ export function FormularioDetalhesDrawer({ formulario, open, onOpenChange }: For
               </AccordionTrigger>
               <AccordionContent className="pt-4">
                 {renderField("Nome Completo", formulario.nome_completo)}
-                {renderField("Email", formulario.profiles?.email)}
                 {renderField("Idade", formulario.idade)}
                 {renderField("LinkedIn", formulario.linkedin)}
                 {renderField("Profissão", formulario.profissao)}
