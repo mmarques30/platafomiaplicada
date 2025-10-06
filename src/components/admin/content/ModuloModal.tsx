@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useCreateModulo, useUpdateModulo, useCursos } from "@/hooks/admin/useContent";
+import { useCreateModulo, useUpdateModulo, useTrilhas } from "@/hooks/admin/useContent";
 
 interface ModuloModalProps {
   open: boolean;
@@ -16,7 +16,7 @@ interface ModuloModalProps {
 }
 
 export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
-  const { data: cursos } = useCursos();
+  const { data: trilhas } = useTrilhas();
   const createModulo = useCreateModulo();
   const updateModulo = useUpdateModulo();
   const { register, handleSubmit, reset, setValue, watch } = useForm();
@@ -25,7 +25,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
     if (modulo) {
       reset(modulo);
     } else {
-      reset({ titulo: "", descricao: "", curso_id: "", ordem: 0, ativo: true });
+      reset({ titulo: "", descricao: "", trilha_id: "", ordem: 0, ativo: true });
     }
   }, [modulo, reset, open]);
 
@@ -53,14 +53,14 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
             <Textarea {...register("descricao")} rows={3} />
           </div>
           <div className="space-y-2">
-            <Label>Curso</Label>
-            <Select onValueChange={(value) => setValue("curso_id", value)} defaultValue={watch("curso_id")}>
+            <Label>Trilha</Label>
+            <Select onValueChange={(value) => setValue("trilha_id", value)} defaultValue={watch("trilha_id")}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione um curso" />
+                <SelectValue placeholder="Selecione uma trilha" />
               </SelectTrigger>
               <SelectContent>
-                {cursos?.map((curso: any) => (
-                  <SelectItem key={curso.id} value={curso.id}>{curso.titulo}</SelectItem>
+                {trilhas?.map((trilha: any) => (
+                  <SelectItem key={trilha.id} value={trilha.id}>{trilha.titulo}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

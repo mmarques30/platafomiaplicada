@@ -130,7 +130,7 @@ export function useModulos() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("modulos")
-        .select("*, cursos(titulo)")
+        .select("*, trilhas(titulo)")
         .order("ordem");
       if (error) throw error;
       return data;

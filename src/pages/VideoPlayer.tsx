@@ -24,13 +24,9 @@ export default function VideoPlayer() {
           modulo:modulos(
             id,
             titulo,
-            curso:cursos(
+            trilha:trilhas(
               id,
-              titulo,
-              trilha:trilhas(
-                id,
-                titulo
-              )
+              titulo
             )
           )
         `)
@@ -125,8 +121,8 @@ export default function VideoPlayer() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={`/trilhas/${video.modulo.curso.trilha.id}`}>
-                {video.modulo.curso.trilha.titulo}
+              <BreadcrumbLink href={`/trilhas/${video.modulo.trilha.id}`}>
+                {video.modulo.trilha.titulo}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -173,7 +169,7 @@ export default function VideoPlayer() {
               <CardHeader>
                 <CardTitle>{video.titulo}</CardTitle>
                 <CardDescription>
-                  {video.modulo.titulo} - {video.modulo.curso.titulo}
+                  {video.modulo.titulo}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">

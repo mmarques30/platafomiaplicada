@@ -606,39 +606,39 @@ export type Database = {
         Row: {
           ativo: boolean | null
           created_at: string | null
-          curso_id: string
           descricao: string | null
           id: string
           ordem: number
           titulo: string
+          trilha_id: string
           updated_at: string | null
         }
         Insert: {
           ativo?: boolean | null
           created_at?: string | null
-          curso_id: string
           descricao?: string | null
           id?: string
           ordem?: number
           titulo: string
+          trilha_id: string
           updated_at?: string | null
         }
         Update: {
           ativo?: boolean | null
           created_at?: string | null
-          curso_id?: string
           descricao?: string | null
           id?: string
           ordem?: number
           titulo?: string
+          trilha_id?: string
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "modulos_curso_id_fkey"
-            columns: ["curso_id"]
+            foreignKeyName: "modulos_trilha_id_fkey"
+            columns: ["trilha_id"]
             isOneToOne: false
-            referencedRelation: "cursos"
+            referencedRelation: "trilhas"
             referencedColumns: ["id"]
           },
         ]

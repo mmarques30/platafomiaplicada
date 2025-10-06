@@ -31,7 +31,7 @@ export function ModulosTab() {
           <TableHeader>
             <TableRow>
               <TableHead>Título</TableHead>
-              <TableHead>Curso</TableHead>
+              <TableHead>Trilha</TableHead>
               <TableHead>Ordem</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -41,7 +41,7 @@ export function ModulosTab() {
             {modulos?.map((modulo: any) => (
               <TableRow key={modulo.id}>
                 <TableCell className="font-medium">{modulo.titulo}</TableCell>
-                <TableCell>{modulo.cursos?.titulo}</TableCell>
+                <TableCell>{modulo.trilhas?.titulo}</TableCell>
                 <TableCell>{modulo.ordem}</TableCell>
                 <TableCell>
                   <Badge variant={modulo.ativo ? "default" : "secondary"}>

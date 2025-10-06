@@ -1,6 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrilhasTab } from "@/components/admin/content/TrilhasTab";
-import { CursosTab } from "@/components/admin/content/CursosTab";
 import { ModulosTab } from "@/components/admin/content/ModulosTab";
 import { VideosTab } from "@/components/admin/content/VideosTab";
 import { ExerciciosTab } from "@/components/admin/exercicios/ExerciciosTab";
@@ -13,7 +12,6 @@ export default function GerenciarConteudo() {
       <Tabs defaultValue="trilhas" className="w-full">
         <TabsList>
           <TabsTrigger value="trilhas">Trilhas</TabsTrigger>
-          <TabsTrigger value="cursos">Cursos</TabsTrigger>
           <TabsTrigger value="modulos">Módulos</TabsTrigger>
           <TabsTrigger value="videos">Vídeos</TabsTrigger>
           <TabsTrigger value="exercicios">Exercícios Práticos</TabsTrigger>
@@ -21,10 +19,6 @@ export default function GerenciarConteudo() {
 
         <TabsContent value="trilhas" className="mt-6">
           <TrilhasTab />
-        </TabsContent>
-
-        <TabsContent value="cursos" className="mt-6">
-          <CursosTab />
         </TabsContent>
 
         <TabsContent value="modulos" className="mt-6">

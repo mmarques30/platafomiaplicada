@@ -35,12 +35,9 @@ export default function TrilhaDetalhes() {
         .from("trilhas")
         .select(`
           *,
-          cursos:cursos(
+          modulos:modulos(
             *,
-            modulos:modulos(
-              *,
-              videos:videos(*)
-            )
+            videos:videos(*)
           )
         `)
         .eq("id", id)
@@ -67,10 +64,8 @@ export default function TrilhaDetalhes() {
   });
 
   // Get all videos from all modules
-  const allVideos = trilha?.cursos?.flatMap(curso => 
-    curso.modulos?.flatMap(modulo => 
-      modulo.videos?.map(video => ({ ...video, modulo, curso })) || []
-    ) || []
+  const allVideos = trilha?.modulos?.flatMap(modulo => 
+    modulo.videos?.map(video => ({ ...video, modulo })) || []
   ) || [];
 
   // Filter videos based on search
@@ -298,9 +293,8 @@ export default function TrilhaDetalhes() {
               {/* Video List */}
               <ScrollArea className="h-[600px] rounded-lg border bg-card">
                 <div className="p-4 space-y-2">
-                  <Accordion type="multiple" defaultValue={trilha.cursos?.flatMap(c => c.modulos?.map(m => `modulo-${m.id}`) || [])}>
-                    {trilha.cursos?.map((curso) => (
-                      curso.modulos?.map((modulo, modIndex) => {
+                  <Accordion type="multiple" defaultValue={trilha.modulos?.map(m => `modulo-${m.id}`) || []}>
+                    {trilha.modulos?.map((modulo, modIndex) => {
                         const moduloVideos = searchTerm 
                           ? filteredVideos.filter(v => v.modulo.id === modulo.id)
                           : modulo.videos || [];
@@ -379,8 +373,7 @@ export default function TrilhaDetalhes() {
                             </AccordionContent>
                           </AccordionItem>
                         );
-                      })
-                    ))}
+                      })}
                   </Accordion>
                 </div>
               </ScrollArea>
