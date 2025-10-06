@@ -2,8 +2,6 @@ import { useUsers } from "@/hooks/admin/useUsers";
 import { useAvisos } from "@/hooks/admin/useAvisos";
 import { useVideoAnalytics } from "@/hooks/useVideoAnalytics";
 import { StatsCard } from "@/components/admin/StatsCard";
-import { VideoAnalyticsCharts } from "@/components/admin/analytics/VideoAnalyticsCharts";
-import { VideoStatsTable } from "@/components/admin/analytics/VideoStatsTable";
 import { Users, GraduationCap, Bell, Clock, TrendingUp, Video, Award } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -89,17 +87,6 @@ export default function AdminDashboard() {
           icon={Award}
         />
       </div>
-
-      {/* Gráficos */}
-      {analytics && (
-        <>
-          <VideoAnalyticsCharts
-            topVideos={analytics.topVideos}
-            distribuicaoTrilhas={analytics.distribuicaoTrilhas}
-          />
-          <VideoStatsTable data={analytics.tabelaDetalhada} />
-        </>
-      )}
     </div>
   );
 }
