@@ -16,6 +16,9 @@ import Notificacoes from "./pages/Notificacoes";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MentoriaObjetivos from "./pages/MentoriaObjetivos";
+import MentoriaSessoes from "./pages/MentoriaSessoes";
+import MentoriaRecursos from "./pages/MentoriaRecursos";
+import MentoriaProjetos from "./pages/MentoriaProjetos";
 import IACopieUse from "./pages/IACopieUse";
 import BibliotecaFerramentas from "./pages/BibliotecaFerramentas";
 import BibliotecaPrompts from "./pages/BibliotecaPrompts";
@@ -53,9 +56,12 @@ const App = () => (
             <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/favoritos" element={<Favoritos />} />
             <Route path="/notificacoes" element={<Notificacoes />} />
-            <Route path="/mentoria" element={<Mentoria />} />
-            <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
-            <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
+              <Route path="/mentoria" element={<Mentoria />} />
+              <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
+              <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
+              <Route path="/mentoria/sessoes" element={<MentoriaSessoes />} />
+              <Route path="/mentoria/recursos" element={<MentoriaRecursos />} />
+              <Route path="/mentoria/projetos" element={<MentoriaProjetos />} />
             <Route path="/ia-copie-use" element={<IACopieUse />} />
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
             <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />

@@ -686,6 +686,155 @@ export type Database = {
           },
         ]
       }
+      projetos_mentoria: {
+        Row: {
+          anexos: Json | null
+          avaliacao_mentor: number | null
+          avaliacao_mentorado: number | null
+          comentarios_mentor: string | null
+          comentarios_mentorado: string | null
+          contribuicao_plano: string
+          created_at: string
+          data_entrega: string | null
+          descricao: string
+          devolutiva_mentor: string | null
+          id: string
+          objetivo_id: string | null
+          objetivo_projeto: string
+          status: Database["public"]["Enums"]["status_projeto"]
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anexos?: Json | null
+          avaliacao_mentor?: number | null
+          avaliacao_mentorado?: number | null
+          comentarios_mentor?: string | null
+          comentarios_mentorado?: string | null
+          contribuicao_plano: string
+          created_at?: string
+          data_entrega?: string | null
+          descricao: string
+          devolutiva_mentor?: string | null
+          id?: string
+          objetivo_id?: string | null
+          objetivo_projeto: string
+          status?: Database["public"]["Enums"]["status_projeto"]
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anexos?: Json | null
+          avaliacao_mentor?: number | null
+          avaliacao_mentorado?: number | null
+          comentarios_mentor?: string | null
+          comentarios_mentorado?: string | null
+          contribuicao_plano?: string
+          created_at?: string
+          data_entrega?: string | null
+          descricao?: string
+          devolutiva_mentor?: string | null
+          id?: string
+          objetivo_id?: string | null
+          objetivo_projeto?: string
+          status?: Database["public"]["Enums"]["status_projeto"]
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projetos_mentoria_objetivo_id_fkey"
+            columns: ["objetivo_id"]
+            isOneToOne: false
+            referencedRelation: "objetivos_mentoria"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recursos_mentoria: {
+        Row: {
+          categoria: string
+          como_usar: string | null
+          created_at: string
+          descricao: string
+          id: string
+          link: string | null
+          nome: string
+          para_que_serve: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          categoria: string
+          como_usar?: string | null
+          created_at?: string
+          descricao: string
+          id?: string
+          link?: string | null
+          nome: string
+          para_que_serve: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          categoria?: string
+          como_usar?: string | null
+          created_at?: string
+          descricao?: string
+          id?: string
+          link?: string | null
+          nome?: string
+          para_que_serve?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sessoes_mentoria: {
+        Row: {
+          created_at: string
+          data_sessao: string
+          duracao: number | null
+          id: string
+          notas: string | null
+          status: Database["public"]["Enums"]["status_sessao"]
+          titulo: string
+          transcricao: string | null
+          updated_at: string
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_sessao: string
+          duracao?: number | null
+          id?: string
+          notas?: string | null
+          status?: Database["public"]["Enums"]["status_sessao"]
+          titulo: string
+          transcricao?: string | null
+          updated_at?: string
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_sessao?: string
+          duracao?: number | null
+          id?: string
+          notas?: string | null
+          status?: Database["public"]["Enums"]["status_sessao"]
+          titulo?: string
+          transcricao?: string | null
+          updated_at?: string
+          user_id?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       trilhas: {
         Row: {
           ativo: boolean | null
@@ -808,6 +957,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "mentorado" | "aluno_trilha"
+      status_projeto:
+        | "planejamento"
+        | "em_andamento"
+        | "concluido"
+        | "cancelado"
+      status_sessao: "agendada" | "realizada" | "cancelada"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -936,6 +1091,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "mentorado", "aluno_trilha"],
+      status_projeto: [
+        "planejamento",
+        "em_andamento",
+        "concluido",
+        "cancelado",
+      ],
+      status_sessao: ["agendada", "realizada", "cancelada"],
     },
   },
 } as const

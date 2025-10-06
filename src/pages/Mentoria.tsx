@@ -38,30 +38,27 @@ export default function Mentoria() {
     },
     {
       title: "Sessões",
-      description: "Agende e visualize o histórico de suas sessões de mentoria",
+      description: "Acompanhe suas sessões, gravações e transcrições",
       icon: Calendar,
       path: "/mentoria/sessoes",
-      status: "Em breve",
-      statusColor: "text-muted-foreground",
-      disabled: true
-    },
-    {
-      title: "Plano de Desenvolvimento",
-      description: "Visualize seu plano personalizado de desenvolvimento",
-      icon: FileText,
-      path: "/mentoria/plano",
-      status: "Em breve",
-      statusColor: "text-muted-foreground",
-      disabled: true
+      status: "Disponível",
+      statusColor: "text-blue-600"
     },
     {
       title: "Recursos",
-      description: "Materiais e ferramentas recomendadas para você",
+      description: "Ferramentas recomendadas para seu desenvolvimento",
       icon: BookOpen,
       path: "/mentoria/recursos",
-      status: "Em breve",
-      statusColor: "text-muted-foreground",
-      disabled: true
+      status: "Disponível",
+      statusColor: "text-blue-600"
+    },
+    {
+      title: "Projetos",
+      description: "Seus projetos de mentoria com avaliações e feedback",
+      icon: FileText,
+      path: "/mentoria/projetos",
+      status: "Disponível",
+      statusColor: "text-blue-600"
     }
   ];
 
@@ -80,10 +77,8 @@ export default function Mentoria() {
           return (
             <Card 
               key={option.path}
-              className={`transition-all hover:shadow-lg ${
-                option.disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-primary'
-              }`}
-              onClick={() => !option.disabled && navigate(option.path)}
+              className="transition-all hover:shadow-lg cursor-pointer hover:border-primary"
+              onClick={() => navigate(option.path)}
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -98,27 +93,23 @@ export default function Mentoria() {
                       </span>
                     </div>
                   </div>
-                  {!option.disabled && (
-                    <ArrowRight className="h-5 w-5 text-muted-foreground" />
-                  )}
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
                 </div>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-base">
                   {option.description}
                 </CardDescription>
-                {!option.disabled && (
-                  <Button 
-                    variant="ghost" 
-                    className="mt-4 w-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(option.path);
-                    }}
-                  >
-                    Acessar
-                  </Button>
-                )}
+                <Button 
+                  variant="ghost" 
+                  className="mt-4 w-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(option.path);
+                  }}
+                >
+                  Acessar
+                </Button>
               </CardContent>
             </Card>
           );
