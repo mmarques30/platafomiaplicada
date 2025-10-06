@@ -2,7 +2,6 @@ import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect, useRef } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -124,10 +123,7 @@ export default function TrilhaDetalhes() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <main className="container py-6">
+    <div className="container py-6">
         <Link to="/trilhas">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -289,8 +285,7 @@ export default function TrilhaDetalhes() {
               </ScrollArea>
             </div>
           </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
