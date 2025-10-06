@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { VideoFeedbackSection } from "@/components/video/VideoFeedbackSection";
 
 export default function VideoPlayer() {
   const { id } = useParams();
@@ -182,6 +183,8 @@ export default function VideoPlayer() {
           </div>
 
           <div className="space-y-4">
+            <VideoFeedbackSection videoId={id!} />
+            
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Próximos Vídeos</CardTitle>

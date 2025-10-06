@@ -6,8 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCreateFerramenta, useUpdateFerramenta } from "@/hooks/admin/useBibliotecas";
+import { Star } from "lucide-react";
 
 interface FerramentaModalProps {
   open: boolean;
@@ -19,12 +20,14 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const createFerramenta = useCreateFerramenta();
   const updateFerramenta = useUpdateFerramenta();
+  const [rating, setRating] = useState(5);
 
   const valeAPena = watch("vale_a_pena");
 
   useEffect(() => {
     if (ferramenta) {
       reset(ferramenta);
+      setRating(ferramenta.avaliacao || 5);
     } else {
       reset({
         nome: "",
@@ -39,6 +42,7 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
         justificativa: "",
         ativo: true,
       });
+      setRating(5);
     }
   }, [ferramenta, reset]);
 
@@ -91,8 +95,31 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
           </div>
 
           <div>
-            <Label htmlFor="avaliacao">Avaliação (1-5)</Label>
-            <Input id="avaliacao" type="number" min="1" max="5" {...register("avaliacao")} />
+            <Label htmlFor="avaliacao">Avaliação</Label>
+            <div className="flex gap-1 py-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => {
+                    setRating(star);
+                    setValue("avaliacao", star);
+                  }}
+                  className="transition-all hover:scale-110 focus:outline-none"
+                >
+                  <Star
+                    className={`w-6 h-6 ${
+                      star <= rating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300 hover:text-yellow-200"
+                    }`}
+                  />
+                </button>
+              ))}
+              <span className="ml-3 text-sm text-muted-foreground">
+                {rating}/5
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center space-x-2">

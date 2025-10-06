@@ -1,25 +1,25 @@
 import { useUsers } from "@/hooks/admin/useUsers";
-import { useTrilhas, useCursos, useVideos } from "@/hooks/admin/useContent";
 import { useAvisos } from "@/hooks/admin/useAvisos";
+import { useVideoAnalytics } from "@/hooks/useVideoAnalytics";
 import { StatsCard } from "@/components/admin/StatsCard";
-import { Users, GraduationCap, Video, Bell } from "lucide-react";
+import { VideoAnalyticsCharts } from "@/components/admin/analytics/VideoAnalyticsCharts";
+import { VideoStatsTable } from "@/components/admin/analytics/VideoStatsTable";
+import { Users, GraduationCap, Bell, Clock, TrendingUp, Video, Award } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminDashboard() {
   const { data: users, isLoading: loadingUsers } = useUsers();
-  const { data: trilhas, isLoading: loadingTrilhas } = useTrilhas();
-  const { data: cursos, isLoading: loadingCursos } = useCursos();
-  const { data: videos, isLoading: loadingVideos } = useVideos();
   const { data: avisos, isLoading: loadingAvisos } = useAvisos();
+  const { data: analytics, isLoading: loadingAnalytics } = useVideoAnalytics();
 
-  const isLoading = loadingUsers || loadingTrilhas || loadingCursos || loadingVideos || loadingAvisos;
+  const isLoading = loadingUsers || loadingAvisos || loadingAnalytics;
 
   if (isLoading) {
     return (
       <div>
         <h1 className="text-3xl font-bold mb-8">Dashboard Administrativo</h1>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <Skeleton key={i} className="h-32" />
           ))}
         </div>
@@ -34,6 +34,7 @@ export default function AdminDashboard() {
     <div>
       <h1 className="text-3xl font-bold mb-8">Dashboard Administrativo</h1>
       
+      {/* KPIs de Usuários */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatsCard
           title="Total de Usuários"
@@ -61,26 +62,44 @@ export default function AdminDashboard() {
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* KPIs de Analytics de Conteúdo */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatsCard
-          title="Trilhas"
-          value={trilhas?.length || 0}
-          description={`${trilhas?.filter((t) => t.ativo).length || 0} ativas`}
-          icon={GraduationCap}
+          title="Total de Horas Assistidas"
+          value={`${analytics?.totalHoras || 0}h`}
+          description="Tempo total de vídeos"
+          icon={Clock}
         />
         <StatsCard
-          title="Cursos"
-          value={cursos?.length || 0}
-          description={`${cursos?.filter((c) => c.ativo).length || 0} ativos`}
-          icon={GraduationCap}
+          title="Taxa de Conclusão"
+          value={`${analytics?.taxaConclusao || 0}%`}
+          description="Vídeos completados"
+          icon={TrendingUp}
         />
         <StatsCard
-          title="Vídeos"
-          value={videos?.length || 0}
-          description={`${videos?.filter((v) => v.ativo).length || 0} ativos`}
+          title="Vídeo Mais Assistido"
+          value={(analytics?.videoMaisAssistido as any)?.visualizacoes || 0}
+          description={(analytics?.videoMaisAssistido as any)?.titulo?.substring(0, 30) || "Nenhum"}
           icon={Video}
         />
+        <StatsCard
+          title="Trilha Mais Popular"
+          value={`${(analytics?.trilhaMaisPopular as any)?.alunos || 0} alunos`}
+          description={(analytics?.trilhaMaisPopular as any)?.nome || "Nenhuma"}
+          icon={Award}
+        />
       </div>
+
+      {/* Gráficos */}
+      {analytics && (
+        <>
+          <VideoAnalyticsCharts
+            topVideos={analytics.topVideos}
+            distribuicaoTrilhas={analytics.distribuicaoTrilhas}
+          />
+          <VideoStatsTable data={analytics.tabelaDetalhada} />
+        </>
+      )}
     </div>
   );
 }

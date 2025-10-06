@@ -7,6 +7,7 @@ import { FerramentaModal } from "./FerramentaModal";
 import { useFerramentasAdmin, useDeleteFerramenta } from "@/hooks/admin/useBibliotecas";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RatingStars } from "@/components/shared/RatingStars";
 
 export function FerramentasTab() {
   const { data: ferramentas, isLoading } = useFerramentasAdmin();
@@ -68,7 +69,9 @@ export function FerramentasTab() {
             <TableRow key={ferramenta.id}>
               <TableCell>{ferramenta.nome}</TableCell>
               <TableCell>{ferramenta.categoria}</TableCell>
-              <TableCell>⭐ {ferramenta.avaliacao}</TableCell>
+              <TableCell>
+                <RatingStars rating={ferramenta.avaliacao || 0} size="sm" />
+              </TableCell>
               <TableCell>
                 {ferramenta.gratuito ? (
                   <Badge variant="secondary">Gratuito</Badge>
