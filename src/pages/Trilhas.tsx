@@ -1,11 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { TrilhaCard } from "@/components/shared/TrilhaCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
 
 export default function Trilhas() {
   const { data: trilhas, isLoading } = useQuery({
@@ -25,20 +21,8 @@ export default function Trilhas() {
     },
   });
 
-  const getNivelColor = (nivel: string) => {
-    switch (nivel) {
-      case "iniciante":
-        return "bg-green-500";
-      case "intermediario":
-        return "bg-yellow-500";
-      case "avancado":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
   const trilhasPorNivel = {
+    todos: trilhas || [],
     iniciante: trilhas?.filter(t => t.nivel === "iniciante") || [],
     intermediario: trilhas?.filter(t => t.nivel === "intermediario") || [],
     avancado: trilhas?.filter(t => t.nivel === "avancado") || [],
@@ -72,33 +56,13 @@ export default function Trilhas() {
 
           <TabsContent value="todos" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trilhas?.map((trilha) => (
-                <Card key={trilha.id} className="hover:shadow-lg transition-shadow overflow-hidden">
-                  {trilha.imagem_url && (
-                    <div className="w-full h-48 overflow-hidden">
-                      <img 
-                        src={trilha.imagem_url} 
-                        alt={trilha.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
-                    <CardDescription className="line-clamp-3">
-                      {trilha.descricao}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      {trilha.cursos?.[0]?.count || 0} cursos
-                    </div>
-                    <Link to={`/trilhas/${trilha.id}`}>
-                      <Button className="w-full">Ver Trilha</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+              {trilhasPorNivel.todos.map((trilha) => (
+                <TrilhaCard
+                  key={trilha.id}
+                  id={trilha.id}
+                  titulo={trilha.titulo}
+                  imagem_url={trilha.imagem_url}
+                />
               ))}
             </div>
           </TabsContent>
@@ -106,32 +70,12 @@ export default function Trilhas() {
           <TabsContent value="iniciante" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trilhasPorNivel.iniciante.map((trilha) => (
-                <Card key={trilha.id} className="hover:shadow-lg transition-shadow overflow-hidden">
-                  {trilha.imagem_url && (
-                    <div className="w-full h-48 overflow-hidden">
-                      <img 
-                        src={trilha.imagem_url} 
-                        alt={trilha.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
-                    <CardDescription className="line-clamp-3">
-                      {trilha.descricao}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      {trilha.cursos?.[0]?.count || 0} cursos
-                    </div>
-                    <Link to={`/trilhas/${trilha.id}`}>
-                      <Button className="w-full">Ver Trilha</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                <TrilhaCard
+                  key={trilha.id}
+                  id={trilha.id}
+                  titulo={trilha.titulo}
+                  imagem_url={trilha.imagem_url}
+                />
               ))}
             </div>
           </TabsContent>
@@ -139,32 +83,12 @@ export default function Trilhas() {
           <TabsContent value="intermediario" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trilhasPorNivel.intermediario.map((trilha) => (
-                <Card key={trilha.id} className="hover:shadow-lg transition-shadow overflow-hidden">
-                  {trilha.imagem_url && (
-                    <div className="w-full h-48 overflow-hidden">
-                      <img 
-                        src={trilha.imagem_url} 
-                        alt={trilha.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
-                    <CardDescription className="line-clamp-3">
-                      {trilha.descricao}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      {trilha.cursos?.[0]?.count || 0} cursos
-                    </div>
-                    <Link to={`/trilhas/${trilha.id}`}>
-                      <Button className="w-full">Ver Trilha</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                <TrilhaCard
+                  key={trilha.id}
+                  id={trilha.id}
+                  titulo={trilha.titulo}
+                  imagem_url={trilha.imagem_url}
+                />
               ))}
             </div>
           </TabsContent>
@@ -172,32 +96,12 @@ export default function Trilhas() {
           <TabsContent value="avancado" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trilhasPorNivel.avancado.map((trilha) => (
-                <Card key={trilha.id} className="hover:shadow-lg transition-shadow overflow-hidden">
-                  {trilha.imagem_url && (
-                    <div className="w-full h-48 overflow-hidden">
-                      <img 
-                        src={trilha.imagem_url} 
-                        alt={trilha.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
-                    <CardDescription className="line-clamp-3">
-                      {trilha.descricao}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      {trilha.cursos?.[0]?.count || 0} cursos
-                    </div>
-                    <Link to={`/trilhas/${trilha.id}`}>
-                      <Button className="w-full">Ver Trilha</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                <TrilhaCard
+                  key={trilha.id}
+                  id={trilha.id}
+                  titulo={trilha.titulo}
+                  imagem_url={trilha.imagem_url}
+                />
               ))}
             </div>
           </TabsContent>
