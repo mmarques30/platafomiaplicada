@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpen, Play, Clock } from "lucide-react";
+import { ArrowLeft, BookOpen } from "lucide-react";
+import { VideoCard } from "@/components/shared/VideoCard";
 
 export default function TrilhaDetalhes() {
   const { id } = useParams();
@@ -112,22 +113,16 @@ export default function TrilhaDetalhes() {
                           <CardDescription>{modulo.descricao}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <div className="space-y-2">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                             {modulo.videos?.map((video) => (
-                              <Link key={video.id} to={`/videos/${video.id}`}>
-                                <div className="flex items-center justify-between p-3 rounded-lg hover:bg-accent transition-colors">
-                                  <div className="flex items-center gap-3">
-                                    <Play className="h-4 w-4 text-primary" />
-                                    <span className="text-sm">{video.titulo}</span>
-                                  </div>
-                                  {video.duracao && (
-                                    <Badge variant="outline">
-                                      <Clock className="h-3 w-3 mr-1" />
-                                      {Math.floor(video.duracao / 60)}min
-                                    </Badge>
-                                  )}
-                                </div>
-                              </Link>
+                              <VideoCard
+                                key={video.id}
+                                id={video.id}
+                                titulo={video.titulo}
+                                duracao={video.duracao}
+                                youtube_id={video.youtube_id}
+                                thumbnail_customizado_url={video.thumbnail_customizado_url}
+                              />
                             ))}
                           </div>
                         </CardContent>
