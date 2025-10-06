@@ -1,4 +1,5 @@
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare } from "lucide-react";
+import { useState } from "react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Search, Shield } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -17,9 +18,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import logoAplicada from "@/assets/logo-aplicada.png";
+import { useUserRole } from "@/hooks/useUserRole";
+import { CommandSearch } from "@/components/shared/CommandSearch";
 
 const items = [
   { title: "Início", url: "/", icon: Home },
+  { title: "Buscar", action: "search", icon: Search },
   { title: "Trilhas", url: "/trilhas", icon: BookOpen },
   { title: "Favoritos", url: "/favoritos", icon: Star },
   { title: "Chat IA", url: "/chat", icon: MessageSquare },
@@ -29,6 +33,8 @@ const items = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const navigate = useNavigate();
+  const { isAdmin } = useUserRole();
+  const [searchOpen, setSearchOpen] = useState(false);
   const collapsed = state === "collapsed";
 
   const handleLogout = async () => {
@@ -63,17 +69,45 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end className={getNavLinkClasses}>
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
+                  <SidebarMenuButton asChild={!item.action}>
+                    {item.action === "search" ? (
+                      <button 
+                        onClick={() => setSearchOpen(true)}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg smooth-transition text-sidebar-foreground hover:bg-sidebar-accent/50`}
+                      >
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </button>
+                    ) : (
+                      <NavLink to={item.url!} end className={getNavLinkClasses}>
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Administração</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/admin" className={getNavLinkClasses}>
+                      <Shield className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>Painel Admin</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
@@ -94,6 +128,8 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      
+      <CommandSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </Sidebar>
   );
 }

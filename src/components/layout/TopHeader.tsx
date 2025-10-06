@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Bell, ChevronDown, BookOpen, Star, MessageSquare, Search, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Users } from "lucide-react";
+import React from "react";
+import { Bell, ChevronDown, BookOpen, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -19,17 +19,14 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada.png";
 import { useLocation } from "react-router-dom";
-import { CommandSearch } from "@/components/shared/CommandSearch";
 
 export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin } = useUserRole();
-  const [searchOpen, setSearchOpen] = useState(false);
   
   // Detectar rotas ativas para dropdowns
   const isCursosActive = ['/trilhas', '/mentoria'].some(path => location.pathname.startsWith(path));
-  const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar', '/newsletter', '/busca', '/admin'].some(path => location.pathname.startsWith(path));
+  const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(path => location.pathname.startsWith(path));
 
   const { data: user } = useQuery({
     queryKey: ["current-user"],
@@ -159,22 +156,6 @@ export function TopHeader() {
                   Métodos para Aplicar
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-border" />
-              <DropdownMenuItem onClick={() => setSearchOpen(true)} className="cursor-pointer">
-                <Search className="mr-2 h-4 w-4" />
-                Buscar Conteúdo
-              </DropdownMenuItem>
-              {isAdmin && (
-                <>
-                  <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem asChild>
-                    <Link to="/admin" className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Painel Admin
-                    </Link>
-                  </DropdownMenuItem>
-                </>
-              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
@@ -234,8 +215,6 @@ export function TopHeader() {
           </DropdownMenu>
         </div>
       </div>
-      
-      <CommandSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }
