@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useCreateVideo, useUpdateVideo, useTrilhas } from "@/hooks/admin/useContent";
+import { useCreateVideo, useUpdateVideo, useModulos } from "@/hooks/admin/useContent";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { X, Download, ExternalLink, FileText, Plus } from "lucide-react";
@@ -18,11 +18,11 @@ interface VideoModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   video?: any;
-  defaultTrilhaId?: string | null;
+  defaultModuloId?: string | null;
 }
 
-export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: VideoModalProps) {
-  const { data: trilhas } = useTrilhas();
+export function VideoModal({ open, onOpenChange, video, defaultModuloId }: VideoModalProps) {
+  const { data: modulos } = useModulos();
   const createVideo = useCreateVideo();
   const updateVideo = useUpdateVideo();
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -54,7 +54,8 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
         titulo: "", 
         descricao: "", 
         youtube_url: "", 
-        trilha_id: defaultTrilhaId || "", 
+        modulo_id: defaultModuloId || null,
+        trilha_id: null,
         duracao: 0, 
         ordem: 0, 
         ativo: true,
@@ -66,7 +67,7 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
     }
     setAdicionandoMaterial(false);
     setNovoMaterial({ titulo: '', url: '', tipo: 'link' });
-  }, [video, reset, open, defaultTrilhaId]);
+  }, [video, reset, open, defaultModuloId]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -139,6 +140,12 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
   };
 
   const onSubmit = async (data: any) => {
+    // Validar se módulo foi selecionado
+    if (!data.modulo_id) {
+      toast.error("Selecione um módulo");
+      return;
+    }
+
     let thumbnailUrl = data.thumbnail_customizado_url;
     
     if (thumbnailFile) {
@@ -167,7 +174,7 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
         <DialogHeader>
           <DialogTitle>{video ? "Editar Vídeo" : "Novo Vídeo"}</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="flex-1 px-1">
+        <ScrollArea className="flex-1 min-h-0 px-1">
           <div className="space-y-4 pr-4">
           <div className="space-y-2">
             <Label>Título</Label>
@@ -182,14 +189,26 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
             <Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
           </div>
           <div className="space-y-2">
-            <Label>Trilha</Label>
-            <Select onValueChange={(value) => setValue("trilha_id", value)} defaultValue={watch("trilha_id")}>
+            <Label>Módulo</Label>
+            <Select 
+              value={watch("modulo_id") || undefined}
+              onValueChange={(value) => {
+                setValue("modulo_id", value, { shouldValidate: true });
+                // Popular trilha_id automaticamente baseado no módulo selecionado
+                const modulo = modulos?.find((m: any) => m.id === value);
+                if (modulo) {
+                  setValue("trilha_id", modulo.trilha_id);
+                }
+              }}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione uma trilha" />
+                <SelectValue placeholder="Selecione um módulo" />
               </SelectTrigger>
               <SelectContent>
-                {trilhas?.map((trilha: any) => (
-                  <SelectItem key={trilha.id} value={trilha.id}>{trilha.titulo}</SelectItem>
+                {modulos?.map((modulo: any) => (
+                  <SelectItem key={modulo.id} value={modulo.id}>
+                    {modulo.trilhas?.titulo} — {modulo.titulo}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
