@@ -28,6 +28,21 @@ export default function TrilhaDetalhes() {
   const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
+  // Helper para garantir que materiais seja sempre um array
+  const parseMateriais = (materiais: any): any[] => {
+    if (!materiais) return [];
+    if (Array.isArray(materiais)) return materiais;
+    if (typeof materiais === 'string') {
+      try {
+        const parsed = JSON.parse(materiais);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
   const { data: trilha, isLoading } = useQuery({
     queryKey: ["trilha", id],
     queryFn: async () => {
@@ -249,7 +264,7 @@ export default function TrilhaDetalhes() {
                         <div>
                           <h3 className="font-semibold mb-3">LINKS IMPORTANTES</h3>
                           <VideoMaterialsList 
-                            materiais={(currentVideo as any)?.materiais || []} 
+                            materiais={parseMateriais(currentVideo?.materiais)} 
                           />
                         </div>
                       </TabsContent>
