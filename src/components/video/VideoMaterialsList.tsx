@@ -8,11 +8,27 @@ interface Material {
 }
 
 interface VideoMaterialsListProps {
-  materiais: Material[];
+  materiais: any;
 }
 
 export function VideoMaterialsList({ materiais }: VideoMaterialsListProps) {
-  if (!materiais || materiais.length === 0) {
+  const normalize = (m: any): Material[] => {
+    if (!m) return [];
+    if (Array.isArray(m)) return m as Material[];
+    if (typeof m === "string") {
+      try {
+        const parsed = JSON.parse(m);
+        return Array.isArray(parsed) ? (parsed as Material[]) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const list = normalize(materiais);
+
+  if (list.length === 0) {
     return (
       <div className="text-sm text-muted-foreground">
         Nenhum material disponível para esta aula.
@@ -28,7 +44,7 @@ export function VideoMaterialsList({ materiais }: VideoMaterialsListProps) {
 
   return (
     <div className="space-y-2">
-      {materiais.map((material, index) => (
+      {list.map((material, index) => (
         <Button
           key={index}
           variant="outline"
