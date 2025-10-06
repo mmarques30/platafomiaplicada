@@ -5,11 +5,19 @@ export function useFormularios() {
   return useQuery({
     queryKey: ["admin-formularios"],
     queryFn: async () => {
+      console.log("🔍 Fetching formularios for admin...");
+      
       const { data, error } = await supabase
         .from("formulario_diagnostico")
-        .select("*, profiles(nome_completo)")
+        .select("*, profiles!inner(nome_completo, email)")
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      
+      if (error) {
+        console.error("❌ Error fetching formularios:", error);
+        throw error;
+      }
+      
+      console.log("✅ Formularios fetched:", data?.length, "forms");
       return data;
     },
   });

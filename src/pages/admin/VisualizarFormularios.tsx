@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormularios } from "@/hooks/admin/useFormularios";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,11 +15,24 @@ import { Search, FileText, User, Calendar, Target, RefreshCw, Eye } from "lucide
 
 export default function VisualizarFormularios() {
   const { data: formularios, isLoading, refetch } = useFormularios();
+  const { user } = useAuth();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
   const [selectedFormulario, setSelectedFormulario] = useState<any>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "completo" | "incompleto">("all");
   const [sortBy, setSortBy] = useState<"date-desc" | "date-asc" | "name">("date-desc");
+
+  // Debug logging
+  useEffect(() => {
+    console.log("📊 Visualizar Formulários - Debug Info:");
+    console.log("  User ID:", user?.id);
+    console.log("  Is Admin:", isAdmin);
+    console.log("  Role Loading:", roleLoading);
+    console.log("  Formularios Loading:", isLoading);
+    console.log("  Formularios Count:", formularios?.length);
+    console.log("  Formularios Data:", formularios);
+  }, [user, isAdmin, roleLoading, isLoading, formularios]);
 
   const handleViewDetails = (form: any) => {
     setSelectedFormulario(form);
