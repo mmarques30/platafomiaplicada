@@ -622,6 +622,7 @@ export type Database = {
           idade: number | null
           linkedin: string | null
           nome_completo: string
+          plano_mentoria: Database["public"]["Enums"]["plano_mentoria"] | null
           profissao: string | null
           updated_at: string | null
         }
@@ -631,6 +632,7 @@ export type Database = {
           idade?: number | null
           linkedin?: string | null
           nome_completo: string
+          plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
           profissao?: string | null
           updated_at?: string | null
         }
@@ -640,6 +642,7 @@ export type Database = {
           idade?: number | null
           linkedin?: string | null
           nome_completo?: string
+          plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
           profissao?: string | null
           updated_at?: string | null
         }
@@ -1005,6 +1008,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "mentorado" | "aluno_trilha"
+      plano_mentoria: "intensivo_grupo" | "light" | "premium"
       status_projeto:
         | "planejamento"
         | "em_andamento"
@@ -1139,6 +1143,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "mentorado", "aluno_trilha"],
+      plano_mentoria: ["intensivo_grupo", "light", "premium"],
       status_projeto: [
         "planejamento",
         "em_andamento",

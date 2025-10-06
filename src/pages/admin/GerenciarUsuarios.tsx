@@ -116,6 +116,7 @@ export default function GerenciarUsuarios() {
               <TableHead>Nome</TableHead>
               <TableHead>Email/ID</TableHead>
               <TableHead>Roles</TableHead>
+              <TableHead>Plano</TableHead>
               <TableHead>Data de Cadastro</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -139,6 +140,26 @@ export default function GerenciarUsuarios() {
                       ))
                     )}
                   </div>
+                </TableCell>
+                <TableCell>
+                  {(user as any).plano_mentoria ? (
+                    <Badge 
+                      variant="outline"
+                      className={
+                        (user as any).plano_mentoria === "intensivo_grupo" 
+                          ? "border-blue-500 text-blue-700"
+                          : (user as any).plano_mentoria === "light"
+                          ? "border-green-500 text-green-700"
+                          : "border-purple-500 text-purple-700"
+                      }
+                    >
+                      {(user as any).plano_mentoria === "intensivo_grupo" && "Intensivo Grupo"}
+                      {(user as any).plano_mentoria === "light" && "Light"}
+                      {(user as any).plano_mentoria === "premium" && "Premium"}
+                    </Badge>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">-</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   {user.created_at

@@ -10,7 +10,7 @@ export function useUsers() {
     queryFn: async () => {
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("*")
+        .select("*, plano_mentoria")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
@@ -93,11 +93,13 @@ export function useCreateUser() {
       password,
       nomeCompleto,
       roles,
+      planoMentoria,
     }: {
       email: string;
       password: string;
       nomeCompleto: string;
       roles: AppRole[];
+      planoMentoria?: string | null;
     }) => {
       // Criar usuário via Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -112,6 +114,16 @@ export function useCreateUser() {
 
       if (authError) throw authError;
       if (!authData.user) throw new Error("Usuário não foi criado");
+
+      // Atualizar profile com plano_mentoria se fornecido
+      if (planoMentoria) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ plano_mentoria: planoMentoria as any })
+          .eq("id", authData.user.id);
+        
+        if (profileError) throw profileError;
+      }
 
       // Adicionar roles
       if (roles.length > 0) {
