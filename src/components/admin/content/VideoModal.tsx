@@ -10,7 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { useCreateVideo, useUpdateVideo, useTrilhas } from "@/hooks/admin/useContent";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, Download, ExternalLink, FileText, Plus } from "lucide-react";
+import { Material } from "@/types/video";
 
 interface VideoModalProps {
   open: boolean;
@@ -26,6 +27,9 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+  const [materiais, setMateriais] = useState<Material[]>([]);
+  const [adicionandoMaterial, setAdicionandoMaterial] = useState(false);
+  const [novoMaterial, setNovoMaterial] = useState<Material>({ titulo: '', url: '', tipo: 'link' });
   
   const { register, handleSubmit, reset, setValue, watch } = useForm();
 
@@ -34,6 +38,16 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
       reset(video);
       setThumbnailPreview(video.thumbnail_customizado_url || "");
       setThumbnailFile(null);
+      
+      // Carregar materiais existentes
+      try {
+        const materiaisExistentes = typeof video.materiais === 'string' 
+          ? JSON.parse(video.materiais) 
+          : video.materiais || [];
+        setMateriais(Array.isArray(materiaisExistentes) ? materiaisExistentes : []);
+      } catch {
+        setMateriais([]);
+      }
     } else {
       reset({ 
         titulo: "", 
@@ -47,7 +61,10 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
       });
       setThumbnailPreview("");
       setThumbnailFile(null);
+      setMateriais([]);
     }
+    setAdicionandoMaterial(false);
+    setNovoMaterial({ titulo: '', url: '', tipo: 'link' });
   }, [video, reset, open, defaultTrilhaId]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +112,31 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
     }
   };
 
+  const handleAdicionarMaterial = () => {
+    if (!novoMaterial.titulo.trim() || !novoMaterial.url.trim()) {
+      toast.error("Título e URL são obrigatórios");
+      return;
+    }
+    setMateriais([...materiais, novoMaterial]);
+    setNovoMaterial({ titulo: '', url: '', tipo: 'link' });
+    setAdicionandoMaterial(false);
+    toast.success("Material adicionado");
+  };
+
+  const handleRemoverMaterial = (index: number) => {
+    setMateriais(materiais.filter((_, i) => i !== index));
+    toast.success("Material removido");
+  };
+
+  const getMaterialIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'download': return <Download className="h-4 w-4" />;
+      case 'link': return <ExternalLink className="h-4 w-4" />;
+      case 'documento': return <FileText className="h-4 w-4" />;
+      default: return <FileText className="h-4 w-4" />;
+    }
+  };
+
   const onSubmit = async (data: any) => {
     let thumbnailUrl = data.thumbnail_customizado_url;
     
@@ -105,7 +147,11 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
       }
     }
 
-    const submitData = { ...data, thumbnail_customizado_url: thumbnailUrl };
+    const submitData = { 
+      ...data, 
+      thumbnail_customizado_url: thumbnailUrl,
+      materiais: JSON.stringify(materiais)
+    };
 
     if (video) {
       updateVideo.mutate({ id: video.id, ...submitData }, { onSuccess: () => onOpenChange(false) });
@@ -185,6 +231,102 @@ export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: Video
               <p className="text-xs text-muted-foreground">
                 Formato horizontal recomendado (16:9), máximo 2MB
               </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Materiais de Suporte</Label>
+            <div className="space-y-2">
+              {materiais.length > 0 && (
+                <div className="space-y-2 p-3 border rounded-lg bg-muted/50">
+                  {materiais.map((material, index) => (
+                    <div key={index} className="flex items-center justify-between gap-2 p-2 bg-background rounded border">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {getMaterialIcon(material.tipo)}
+                        <span className="text-sm truncate">{material.titulo}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoverMaterial(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {!adicionandoMaterial ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAdicionandoMaterial(true)}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Material
+                </Button>
+              ) : (
+                <div className="space-y-3 p-3 border rounded-lg bg-muted/50">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Título</Label>
+                    <Input
+                      value={novoMaterial.titulo}
+                      onChange={(e) => setNovoMaterial({ ...novoMaterial, titulo: e.target.value })}
+                      placeholder="Ex: Planilha de exercícios"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">URL</Label>
+                    <Input
+                      value={novoMaterial.url}
+                      onChange={(e) => setNovoMaterial({ ...novoMaterial, url: e.target.value })}
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Tipo</Label>
+                    <Select 
+                      value={novoMaterial.tipo} 
+                      onValueChange={(value) => setNovoMaterial({ ...novoMaterial, tipo: value as Material['tipo'] })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="link">Link Externo</SelectItem>
+                        <SelectItem value="download">Download</SelectItem>
+                        <SelectItem value="documento">Documento</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleAdicionarMaterial}
+                      className="flex-1"
+                    >
+                      Salvar
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setAdicionandoMaterial(false);
+                        setNovoMaterial({ titulo: '', url: '', tipo: 'link' });
+                      }}
+                      className="flex-1"
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
