@@ -31,6 +31,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
 import CadastrarUsuario from "./pages/admin/CadastrarUsuario";
 import GerenciarConteudo from "./pages/admin/GerenciarConteudo";
+import GerenciarBibliotecas from "./pages/admin/GerenciarBibliotecas";
 import GerenciarAvisos from "./pages/admin/GerenciarAvisos";
 import VisualizarFormularios from "./pages/admin/VisualizarFormularios";
 import GerenciarConhecimento from "./pages/admin/GerenciarConhecimento";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="usuarios" element={<GerenciarUsuarios />} />
             <Route path="usuarios/novo" element={<CadastrarUsuario />} />
             <Route path="conteudo" element={<GerenciarConteudo />} />
+            <Route path="bibliotecas" element={<GerenciarBibliotecas />} />
             <Route path="avisos" element={<GerenciarAvisos />} />
             <Route path="formularios" element={<VisualizarFormularios />} />
             <Route path="conhecimento" element={<GerenciarConhecimento />} />

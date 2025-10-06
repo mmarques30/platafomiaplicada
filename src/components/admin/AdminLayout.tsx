@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   Database,
   GraduationCap,
+  Library,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ const navItems = [
   { path: "/admin/usuarios", label: "Gerenciar Usuários", icon: Users },
   { path: "/admin/usuarios/novo", label: "Cadastrar Usuário", icon: UserPlus },
   { path: "/admin/conteudo", label: "Gerenciar Conteúdo", icon: BookOpen },
+  { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas", icon: Library },
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
   { path: "/admin/formularios", label: "Formulários", icon: FileText },
   { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },

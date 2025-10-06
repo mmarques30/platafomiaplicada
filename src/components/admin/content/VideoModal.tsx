@@ -7,16 +7,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useCreateVideo, useUpdateVideo, useModulos } from "@/hooks/admin/useContent";
+import { useCreateVideo, useUpdateVideo, useTrilhas } from "@/hooks/admin/useContent";
 
 interface VideoModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   video?: any;
+  defaultTrilhaId?: string | null;
 }
 
-export function VideoModal({ open, onOpenChange, video }: VideoModalProps) {
-  const { data: modulos } = useModulos();
+export function VideoModal({ open, onOpenChange, video, defaultTrilhaId }: VideoModalProps) {
+  const { data: trilhas } = useTrilhas();
   const createVideo = useCreateVideo();
   const updateVideo = useUpdateVideo();
   const { register, handleSubmit, reset, setValue, watch } = useForm();
@@ -25,9 +26,17 @@ export function VideoModal({ open, onOpenChange, video }: VideoModalProps) {
     if (video) {
       reset(video);
     } else {
-      reset({ titulo: "", descricao: "", youtube_url: "", modulo_id: "", duracao: 0, ordem: 0, ativo: true });
+      reset({ 
+        titulo: "", 
+        descricao: "", 
+        youtube_url: "", 
+        trilha_id: defaultTrilhaId || "", 
+        duracao: 0, 
+        ordem: 0, 
+        ativo: true 
+      });
     }
-  }, [video, reset, open]);
+  }, [video, reset, open, defaultTrilhaId]);
 
   const onSubmit = (data: any) => {
     if (video) {
@@ -57,14 +66,14 @@ export function VideoModal({ open, onOpenChange, video }: VideoModalProps) {
             <Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
           </div>
           <div className="space-y-2">
-            <Label>Módulo</Label>
-            <Select onValueChange={(value) => setValue("modulo_id", value)} defaultValue={watch("modulo_id")}>
+            <Label>Trilha</Label>
+            <Select onValueChange={(value) => setValue("trilha_id", value)} defaultValue={watch("trilha_id")}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione um módulo" />
+                <SelectValue placeholder="Selecione uma trilha" />
               </SelectTrigger>
               <SelectContent>
-                {modulos?.map((modulo: any) => (
-                  <SelectItem key={modulo.id} value={modulo.id}>{modulo.titulo}</SelectItem>
+                {trilhas?.map((trilha: any) => (
+                  <SelectItem key={trilha.id} value={trilha.id}>{trilha.titulo}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

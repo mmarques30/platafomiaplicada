@@ -900,6 +900,7 @@ export type Database = {
           ordem: number
           thumbnail_url: string | null
           titulo: string
+          trilha_id: string | null
           updated_at: string | null
           youtube_id: string
           youtube_url: string
@@ -914,6 +915,7 @@ export type Database = {
           ordem?: number
           thumbnail_url?: string | null
           titulo: string
+          trilha_id?: string | null
           updated_at?: string | null
           youtube_id: string
           youtube_url: string
@@ -928,6 +930,7 @@ export type Database = {
           ordem?: number
           thumbnail_url?: string | null
           titulo?: string
+          trilha_id?: string | null
           updated_at?: string | null
           youtube_id?: string
           youtube_url?: string
@@ -938,6 +941,13 @@ export type Database = {
             columns: ["modulo_id"]
             isOneToOne: false
             referencedRelation: "modulos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "videos_trilha_id_fkey"
+            columns: ["trilha_id"]
+            isOneToOne: false
+            referencedRelation: "trilhas"
             referencedColumns: ["id"]
           },
         ]

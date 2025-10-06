@@ -190,7 +190,7 @@ export function useVideos() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("videos")
-        .select("*, modulos(titulo)")
+        .select("*, trilhas(titulo)")
         .order("ordem");
       if (error) throw error;
       return data;
