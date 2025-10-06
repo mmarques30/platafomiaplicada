@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCreateVideo, useUpdateVideo, useModulos } from "@/hooks/admin/useContent";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -170,11 +169,11 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>{video ? "Editar Vídeo" : "Novo Vídeo"}</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="flex-1 min-h-0 px-1">
+        <div className="flex-1 min-h-0 overflow-y-auto px-1">
           <div className="space-y-4 pr-4">
           <div className="space-y-2">
             <Label>Título</Label>
@@ -356,7 +355,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
             <Label>Ativo</Label>
           </div>
           </div>
-        </ScrollArea>
+        </div>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={uploading}>
