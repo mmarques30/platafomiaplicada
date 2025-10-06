@@ -844,6 +844,7 @@ export type Database = {
           created_at: string | null
           descricao: string | null
           id: string
+          imagem_url: string | null
           nivel: string
           ordem: number
           titulo: string
@@ -854,6 +855,7 @@ export type Database = {
           created_at?: string | null
           descricao?: string | null
           id?: string
+          imagem_url?: string | null
           nivel: string
           ordem?: number
           titulo: string
@@ -864,6 +866,7 @@ export type Database = {
           created_at?: string | null
           descricao?: string | null
           id?: string
+          imagem_url?: string | null
           nivel?: string
           ordem?: number
           titulo?: string
@@ -939,6 +942,7 @@ export type Database = {
           id: string
           modulo_id: string
           ordem: number
+          thumbnail_customizado_url: string | null
           thumbnail_url: string | null
           titulo: string
           trilha_id: string | null
@@ -954,6 +958,7 @@ export type Database = {
           id?: string
           modulo_id: string
           ordem?: number
+          thumbnail_customizado_url?: string | null
           thumbnail_url?: string | null
           titulo: string
           trilha_id?: string | null
@@ -969,6 +974,7 @@ export type Database = {
           id?: string
           modulo_id?: string
           ordem?: number
+          thumbnail_customizado_url?: string | null
           thumbnail_url?: string | null
           titulo?: string
           trilha_id?: string | null

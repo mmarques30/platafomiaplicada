@@ -140,14 +140,32 @@ export default function VideoPlayer() {
           <div className="lg:col-span-2 space-y-4">
             <Card>
               <CardContent className="p-0">
-                <div className="aspect-video bg-black">
-                  <iframe
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
+                {video.thumbnail_customizado_url ? (
+                  <div className="relative aspect-video bg-black cursor-pointer group">
+                    <img 
+                      src={video.thumbnail_customizado_url} 
+                      alt={video.titulo}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
+                      <iframe
+                        className="w-full h-full"
+                        src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="aspect-video bg-black">
+                    <iframe
+                      className="w-full h-full"
+                      src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
 

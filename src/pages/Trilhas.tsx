@@ -73,7 +73,16 @@ export default function Trilhas() {
           <TabsContent value="todos" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trilhas?.map((trilha) => (
-                <Card key={trilha.id} className="hover:shadow-lg transition-shadow">
+                <Card key={trilha.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                  {trilha.imagem_url && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={trilha.imagem_url} 
+                        alt={trilha.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
@@ -102,7 +111,16 @@ export default function Trilhas() {
           <TabsContent value="iniciante" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trilhasPorNivel.iniciante.map((trilha) => (
-                <Card key={trilha.id} className="hover:shadow-lg transition-shadow">
+                <Card key={trilha.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                  {trilha.imagem_url && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={trilha.imagem_url} 
+                        alt={trilha.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   <CardHeader>
                     <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
                     <CardDescription className="line-clamp-3">
@@ -126,7 +144,16 @@ export default function Trilhas() {
           <TabsContent value="intermediario" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trilhasPorNivel.intermediario.map((trilha) => (
-                <Card key={trilha.id} className="hover:shadow-lg transition-shadow">
+                <Card key={trilha.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                  {trilha.imagem_url && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={trilha.imagem_url} 
+                        alt={trilha.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   <CardHeader>
                     <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
                     <CardDescription className="line-clamp-3">
@@ -150,7 +177,16 @@ export default function Trilhas() {
           <TabsContent value="avancado" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trilhasPorNivel.avancado.map((trilha) => (
-                <Card key={trilha.id} className="hover:shadow-lg transition-shadow">
+                <Card key={trilha.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                  {trilha.imagem_url && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={trilha.imagem_url} 
+                        alt={trilha.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   <CardHeader>
                     <CardTitle className="line-clamp-2">{trilha.titulo}</CardTitle>
                     <CardDescription className="line-clamp-3">

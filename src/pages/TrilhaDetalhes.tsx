@@ -58,6 +58,16 @@ export default function TrilhaDetalhes() {
           </Button>
         </Link>
 
+        {trilha.imagem_url && (
+          <div className="w-full h-64 rounded-lg overflow-hidden mb-6">
+            <img 
+              src={trilha.imagem_url} 
+              alt={trilha.titulo}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
         <div className="mb-8">
           <div className="flex items-start justify-between">
             <div>
