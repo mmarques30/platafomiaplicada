@@ -1,5 +1,5 @@
-import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useParams, Link, useSearchParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect, useRef } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -7,17 +7,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Search, BookOpen, Play, CheckCircle2, Circle, Clock } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { VideoFeedbackSection } from "@/components/video/VideoFeedbackSection";
+import { VideoRatingInput } from "@/components/video/VideoRatingInput";
+import { VideoMaterialsList } from "@/components/video/VideoMaterialsList";
+import { useVideoRating } from "@/hooks/useVideoRating";
+import { toast } from "sonner";
 
 export default function TrilhaDetalhes() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -110,6 +116,49 @@ export default function TrilhaDetalhes() {
     return `${mins} min`;
   };
 
+  const { averageRating, ratingCount, userRating, setRating } = useVideoRating(currentVideoId || "");
+
+  // Mutation para marcar vídeo como concluído
+  const marcarComoConcluidoMutation = useMutation({
+    mutationFn: async () => {
+      if (!user || !currentVideoId) return;
+
+      const { data: existing } = await supabase
+        .from("progresso_videos")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("video_id", currentVideoId)
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await supabase
+          .from("progresso_videos")
+          .update({ completado: true })
+          .eq("id", existing.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("progresso_videos")
+          .insert({
+            user_id: user.id,
+            video_id: currentVideoId,
+            completado: true,
+            tempo_assistido: 0,
+          });
+
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Vídeo marcado como concluído!");
+      queryClient.invalidateQueries({ queryKey: ["video-progress", user?.id] });
+    },
+    onError: () => {
+      toast.error("Erro ao marcar vídeo como concluído");
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -132,10 +181,11 @@ export default function TrilhaDetalhes() {
         </Link>
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left: Video Player */}
+          {/* Left: Video Player e Informações */}
           <div className="flex-1 lg:w-[65%]">
             {currentVideo ? (
-              <div className="space-y-4">
+              <div className="space-y-6">
+                {/* Player */}
                 <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
                   <iframe
                     src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}`}
@@ -145,27 +195,78 @@ export default function TrilhaDetalhes() {
                     className="w-full h-full"
                   />
                 </div>
-                
+
+                {/* Título e duração */}
                 <div>
                   <h1 className="text-2xl font-bold mb-2">{currentVideo.titulo}</h1>
-                  <p className="text-muted-foreground mb-4">{currentVideo.descricao}</p>
-                  
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {formatDuration(currentVideo.duracao)}
-                    </span>
-                    <span>{currentVideo.modulo.titulo}</span>
-                    <span>{currentVideo.curso.titulo}</span>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>{formatDuration(currentVideo.duracao)}</span>
                   </div>
                 </div>
 
-                <Button
-                  onClick={() => navigate(`/videos/${currentVideo.id}`)}
-                  className="w-full"
-                >
-                  Ir para página completa do vídeo
-                </Button>
+                {/* Avaliação e Botão Concluir */}
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Avalie esta aula</div>
+                        <div className="flex items-center gap-3">
+                          <VideoRatingInput
+                            rating={userRating}
+                            onRatingChange={setRating}
+                          />
+                          <span className="text-sm text-muted-foreground">
+                            ({ratingCount} {ratingCount === 1 ? "avaliação" : "avaliações"})
+                          </span>
+                        </div>
+                      </div>
+                      <Button
+                        size="lg"
+                        onClick={() => marcarComoConcluidoMutation.mutate()}
+                        disabled={marcarComoConcluidoMutation.isPending || getVideoProgress(currentVideoId || '')?.completado}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <CheckCircle2 className="h-5 w-5 mr-2" />
+                        {getVideoProgress(currentVideoId || '')?.completado ? "Concluída" : "Marcar como Concluída"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Tabs: Descrição e Comentários */}
+                <Card>
+                  <CardContent className="p-6">
+                    <Tabs defaultValue="descricao" className="w-full">
+                      <TabsList className="mb-4 w-full grid grid-cols-2">
+                        <TabsTrigger value="descricao">Informações da aula</TabsTrigger>
+                        <TabsTrigger value="comentarios">Comentários</TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="descricao" className="space-y-6 mt-4">
+                        <div>
+                          <h3 className="font-semibold mb-3">Descrição</h3>
+                          <p className="text-muted-foreground">
+                            {currentVideo.descricao || "Sem descrição disponível."}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="font-semibold mb-3">LINKS IMPORTANTES</h3>
+                          <VideoMaterialsList 
+                            materiais={(currentVideo as any)?.materiais || []} 
+                          />
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="comentarios" className="mt-4">
+                        {currentVideoId && (
+                          <VideoFeedbackSection videoId={currentVideoId} />
+                        )}
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
               </div>
             ) : (
               <div className="aspect-video w-full rounded-lg bg-muted flex items-center justify-center">

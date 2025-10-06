@@ -1077,13 +1077,50 @@ export type Database = {
           },
         ]
       }
+      video_ratings: {
+        Row: {
+          created_at: string | null
+          id: string
+          rating: number
+          updated_at: string | null
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          rating: number
+          updated_at?: string | null
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          rating?: number
+          updated_at?: string | null
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_ratings_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       videos: {
         Row: {
           ativo: boolean | null
           created_at: string | null
+          data_disponibilidade: string | null
           descricao: string | null
           duracao: number | null
           id: string
+          materiais: Json | null
           modulo_id: string
           ordem: number
           thumbnail_customizado_url: string | null
@@ -1097,9 +1134,11 @@ export type Database = {
         Insert: {
           ativo?: boolean | null
           created_at?: string | null
+          data_disponibilidade?: string | null
           descricao?: string | null
           duracao?: number | null
           id?: string
+          materiais?: Json | null
           modulo_id: string
           ordem?: number
           thumbnail_customizado_url?: string | null
@@ -1113,9 +1152,11 @@ export type Database = {
         Update: {
           ativo?: boolean | null
           created_at?: string | null
+          data_disponibilidade?: string | null
           descricao?: string | null
           duracao?: number | null
           id?: string
+          materiais?: Json | null
           modulo_id?: string
           ordem?: number
           thumbnail_customizado_url?: string | null
