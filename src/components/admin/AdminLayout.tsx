@@ -9,6 +9,7 @@ import {
   FileText,
   ArrowLeft,
   Database,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ const navItems = [
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
   { path: "/admin/formularios", label: "Formulários", icon: FileText },
   { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },
+  { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
 ];
 
 export function AdminLayout() {

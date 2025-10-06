@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FolderKanban, Star, Loader2, MessageSquare, Calendar } from "lucide-react";
+import { FolderKanban, Star, Loader2, MessageSquare, Calendar, Plus, ArrowLeft } from "lucide-react";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
+import ProjetoModal from "@/components/admin/mentoria/ProjetoModal";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -16,8 +18,27 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function MentoriaProjetos() {
-  const { projetos, isLoading } = useMentoriaProjetos();
+  const navigate = useNavigate();
+  const { projetos, createProjeto, updateProjeto, isLoading, isCreating, isUpdating } = useMentoriaProjetos();
   const [selectedProjeto, setSelectedProjeto] = useState<any>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingProjeto, setEditingProjeto] = useState<any>(undefined);
+
+  const handleCreate = (data: any) => {
+    createProjeto(data);
+  };
+
+  const handleEdit = (projeto: any) => {
+    setEditingProjeto(projeto);
+    setModalOpen(true);
+  };
+
+  const handleUpdate = (data: any) => {
+    if (editingProjeto) {
+      updateProjeto({ ...data, id: editingProjeto.id });
+      setEditingProjeto(undefined);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -89,11 +110,26 @@ export default function MentoriaProjetos() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-3">Projetos de Mentoria</h1>
-        <p className="text-muted-foreground text-lg">
-          Acompanhe seus projetos e receba feedback do mentor
-        </p>
+      <Button
+        variant="ghost"
+        onClick={() => navigate("/mentoria")}
+        className="mb-6 -ml-2"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar para Mentoria
+      </Button>
+
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-4xl font-bold mb-3">Projetos de Mentoria</h1>
+          <p className="text-muted-foreground text-lg">
+            Acompanhe seus projetos e receba feedback do mentor
+          </p>
+        </div>
+        <Button onClick={() => { setEditingProjeto(undefined); setModalOpen(true); }}>
+          <Plus className="h-4 w-4 mr-2" />
+          Novo Projeto
+        </Button>
       </div>
 
       <Tabs defaultValue="todos" className="w-full">
@@ -246,6 +282,18 @@ export default function MentoriaProjetos() {
           )}
         </DialogContent>
       </Dialog>
+
+      <ProjetoModal
+        open={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) setEditingProjeto(undefined);
+        }}
+        onSubmit={editingProjeto ? handleUpdate : handleCreate}
+        projeto={editingProjeto}
+        isLoading={isCreating || isUpdating}
+        isAdmin={false}
+      />
     </div>
   );
 }

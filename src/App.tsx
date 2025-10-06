@@ -34,6 +34,7 @@ import GerenciarConteudo from "./pages/admin/GerenciarConteudo";
 import GerenciarAvisos from "./pages/admin/GerenciarAvisos";
 import VisualizarFormularios from "./pages/admin/VisualizarFormularios";
 import GerenciarConhecimento from "./pages/admin/GerenciarConhecimento";
+import GerenciarMentoria from "./pages/admin/GerenciarMentoria";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
             <Route path="avisos" element={<GerenciarAvisos />} />
             <Route path="formularios" element={<VisualizarFormularios />} />
             <Route path="conhecimento" element={<GerenciarConhecimento />} />
+            <Route path="mentoria" element={<GerenciarMentoria />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
