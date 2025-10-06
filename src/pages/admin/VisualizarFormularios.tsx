@@ -46,10 +46,11 @@ export default function VisualizarFormularios() {
       const matchesSearch = nomeCompleto
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
+      const isCompleto = !!form.completado;
       const matchesStatus =
         statusFilter === "all" ||
-        (statusFilter === "completo" && form.completado) ||
-        (statusFilter === "incompleto" && !form.completado);
+        (statusFilter === "completo" && isCompleto) ||
+        (statusFilter === "incompleto" && !isCompleto);
       return matchesSearch && matchesStatus;
     })
     ?.sort((a: any, b: any) => {
@@ -158,8 +159,8 @@ export default function VisualizarFormularios() {
                       {form.profiles?.nome_completo || form.nome_completo || "Nome não disponível"}
                     </CardTitle>
                   </div>
-                  <Badge variant={form.completado ? "default" : "secondary"}>
-                    {form.completado ? "Completo" : "Incompleto"}
+                  <Badge variant={!!form.completado ? "default" : "secondary"}>
+                    {!!form.completado ? "Completo" : "Incompleto"}
                   </Badge>
                 </div>
                 <CardDescription className="flex items-center gap-1">

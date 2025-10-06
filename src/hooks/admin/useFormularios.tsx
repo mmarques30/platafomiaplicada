@@ -20,6 +20,9 @@ export function useFormularios() {
       console.log("✅ Formularios fetched:", data?.length, "forms");
       return data;
     },
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
 }
 
