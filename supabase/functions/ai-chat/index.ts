@@ -184,63 +184,65 @@ ${kb.conteudo_extraido}
 ✱ **Use essas informações** para complementar suas respostas quando relevante, mas mantenha o foco no que o usuário está perguntando.`;
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY não está configurada");
-      throw new Error("LOVABLE_API_KEY não configurada");
+    const MANUS_API_KEY = Deno.env.get("MANUS_API_KEY");
+    if (!MANUS_API_KEY) {
+      console.error("MANUS_API_KEY não está configurada");
+      throw new Error("MANUS_API_KEY não configurada");
     }
 
-    console.log("Chamando Lovable AI Gateway com modelo google/gemini-2.5-flash");
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Combinar system prompt + mensagens do usuário em um prompt único
+    let fullPrompt = systemPrompt + "\n\n";
+    fullPrompt += messages.map((msg: any) => {
+      return `${msg.role === "user" ? "Usuário" : "Assistente"}: ${msg.content}`;
+    }).join("\n\n");
+
+    console.log("Chamando Manus API com modo speed");
+    const response = await fetch("https://api.manus.ai/v1/tasks", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "API_KEY": MANUS_API_KEY,
         "Content-Type": "application/json",
+        "Accept": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
-        stream: true,
+        prompt: fullPrompt,
+        mode: "speed",
       }),
     });
 
-    console.log(`Resposta da API: ${response.status} ${response.statusText}`);
+    console.log(`Resposta da Manus API: ${response.status} ${response.statusText}`);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Erro da Lovable AI (${response.status}):`, errorText);
+      console.error(`Erro da Manus API (${response.status}):`, errorText);
       
       if (response.status === 429) {
-        console.error("✱ Rate limit excedido - usuário atingiu o limite de requisições por minuto");
+        console.error("✱ Rate limit excedido");
         return new Response(
           JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns minutos." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        console.error("✱ Créditos insuficientes - workspace precisa adicionar créditos");
-        return new Response(
-          JSON.stringify({ error: "Créditos insuficientes. Entre em contato com o suporte." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
       
-      console.error("Erro genérico da API de IA:", response.status, errorText);
+      console.error("Erro genérico da Manus API:", response.status, errorText);
       throw new Error("Erro ao processar sua mensagem. Tente novamente.");
     }
 
-    if (!response.body) {
-      console.error("Resposta sem body da API");
-      throw new Error("Resposta inválida da API");
-    }
+    const data = await response.json();
+    console.log("Resposta da Manus recebida:", data);
+    
+    // Tentar extrair o conteúdo da resposta (adaptar conforme formato real)
+    const assistantResponse = data.response || data.text || data.output || data.content || JSON.stringify(data);
 
-    console.log("Retornando stream SSE para o cliente");
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
+    return new Response(
+      JSON.stringify({ content: assistantResponse }),
+      { 
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": "application/json" 
+        } 
+      }
+    );
   } catch (error) {
     console.error("✱ Erro no edge function ai-chat:", error);
     return new Response(
