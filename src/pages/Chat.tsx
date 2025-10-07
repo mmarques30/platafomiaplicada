@@ -88,7 +88,7 @@ export default function Chat() {
 
       clearTimeout(timeoutId);
 
-      if (!response.ok) {
+      if (!response.ok || !response.body) {
         if (response.status === 429) {
           toast.error("Limite de requisições excedido. Aguarde alguns minutos e tente novamente.");
           setMessages((prev) => prev.slice(0, -1));
@@ -102,26 +102,65 @@ export default function Chat() {
         throw new Error("Erro ao enviar mensagem");
       }
 
-      // Manus API retorna JSON simples (não streaming)
-      const data = await response.json();
-      const assistantMessage = data.content;
+      // Process streaming response
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = '';
+      let streamDone = false;
+      let assistantContent = '';
 
-      if (!assistantMessage) {
-        throw new Error("Resposta vazia da API");
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith('\r')) line = line.slice(0, -1);
+          if (line.startsWith(':') || line.trim() === '') continue;
+          if (!line.startsWith('data: ')) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              assistantContent += content;
+              setMessages((prev) => {
+                const lastMsg = prev[prev.length - 1];
+                if (lastMsg?.role === 'assistant') {
+                  return prev.map((m, i) =>
+                    i === prev.length - 1 ? { ...m, content: assistantContent } : m
+                  );
+                }
+                return [...prev, { role: 'assistant', content: assistantContent }];
+              });
+            }
+          } catch {
+            textBuffer = line + '\n' + textBuffer;
+            break;
+          }
+        }
       }
 
-      setMessages((prev) => [...prev, { role: "assistant", content: assistantMessage }]);
-
       // Save to history (non-blocking)
-      if (user && assistantMessage) {
+      if (user && assistantContent) {
         try {
           await supabase.from("chat_messages").insert([
             { user_id: user.id, role: "user", content: userMessage.content },
-            { user_id: user.id, role: "assistant", content: assistantMessage },
+            { user_id: user.id, role: "assistant", content: assistantContent },
           ]);
         } catch (error) {
           console.error("Erro ao salvar histórico:", error);
-          // Continue anyway, don't remove message from UI
         }
       }
     } catch (error: any) {
