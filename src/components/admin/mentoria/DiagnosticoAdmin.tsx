@@ -3,13 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
-import { FileText, Upload, AlertCircle, CheckCircle, Download, Trash2, Eye } from "lucide-react";
+import { FileText, Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Sparkles, Target } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 import { DiagnosticoUploadModal } from "./DiagnosticoUploadModal";
 import { DiagnosticoFormModal } from "./DiagnosticoFormModal";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
+import { GerarPlanoModal } from "./GerarPlanoModal";
+import { useMentoriaObjetivos } from "@/hooks/useMentoriaObjetivos";
+import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 
 interface DiagnosticoAdminProps {
   userId?: string;
@@ -17,9 +20,12 @@ interface DiagnosticoAdminProps {
 
 export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
   const { diagnostico, isLoading, deletarArquivo } = useDiagnosticoAdmin(userId);
+  const { objetivos } = useMentoriaObjetivos(userId);
+  const { tarefas } = useMentoriaTarefas(userId);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [gerarPlanoModalOpen, setGerarPlanoModalOpen] = useState(false);
 
   if (!userId) {
     return (
@@ -141,6 +147,46 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
             </Alert>
           )}
 
+          {!diagnostico.plano_gerado && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Plano de mentoria ainda não criado</AlertTitle>
+              <AlertDescription className="mt-2">
+                <p className="mb-3">
+                  Com base no diagnóstico, você pode gerar automaticamente um plano personalizado com objetivos e tarefas iniciais.
+                </p>
+                <Button onClick={() => setGerarPlanoModalOpen(true)} className="gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Gerar Plano de Mentoria
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {diagnostico.plano_gerado && (
+            <Alert className="border-green-200 bg-green-50">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-900">Plano de mentoria criado</AlertTitle>
+              <AlertDescription className="text-green-800">
+                <div className="mt-2 space-y-1">
+                  <p>
+                    ✱ Plano gerado em {diagnostico.plano_gerado_em && format(new Date(diagnostico.plano_gerado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                  </p>
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4" />
+                      <span className="font-semibold">{objetivos.length}</span> objetivos
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      <span className="font-semibold">{tarefas.length}</span> tarefas criadas
+                    </div>
+                  </div>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setViewModalOpen(true)}>
               <Eye className="h-4 w-4 mr-2" />
@@ -171,6 +217,14 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
         userId={userId}
         diagnostico={diagnostico}
       />
+      {diagnostico && (
+        <GerarPlanoModal
+          open={gerarPlanoModalOpen}
+          onOpenChange={setGerarPlanoModalOpen}
+          userId={userId}
+          diagnostico={diagnostico}
+        />
+      )}
       {viewModalOpen && diagnostico && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
           <div className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg max-h-[90vh] overflow-y-auto">

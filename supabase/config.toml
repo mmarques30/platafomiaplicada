@@ -6,5 +6,8 @@ verify_jwt = false
 [functions.gerar-insight-mentoria]
 verify_jwt = false
 
+[functions.gerar-objetivos-diagnostico]
+verify_jwt = true
+
 [functions.processar-documento]
 verify_jwt = true

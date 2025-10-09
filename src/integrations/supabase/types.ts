@@ -475,6 +475,9 @@ export type Database = {
           objetivo_principal: string | null
           observacoes_admin: string | null
           outras_ferramentas: string | null
+          plano_gerado: boolean | null
+          plano_gerado_em: string | null
+          plano_gerado_por: string | null
           preenchido_por: string | null
           preferencia_aprendizado: string | null
           preferencia_sessoes: string | null
@@ -532,6 +535,9 @@ export type Database = {
           objetivo_principal?: string | null
           observacoes_admin?: string | null
           outras_ferramentas?: string | null
+          plano_gerado?: boolean | null
+          plano_gerado_em?: string | null
+          plano_gerado_por?: string | null
           preenchido_por?: string | null
           preferencia_aprendizado?: string | null
           preferencia_sessoes?: string | null
@@ -589,6 +595,9 @@ export type Database = {
           objetivo_principal?: string | null
           observacoes_admin?: string | null
           outras_ferramentas?: string | null
+          plano_gerado?: boolean | null
+          plano_gerado_em?: string | null
+          plano_gerado_por?: string | null
           preenchido_por?: string | null
           preferencia_aprendizado?: string | null
           preferencia_sessoes?: string | null
