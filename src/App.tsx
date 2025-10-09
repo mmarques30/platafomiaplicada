@@ -21,6 +21,8 @@ import MentoriaSessoes from "./pages/MentoriaSessoes";
 import MentoriaRecursos from "./pages/MentoriaRecursos";
 import MentoriaProjetos from "./pages/MentoriaProjetos";
 import MentoriaTarefas from "./pages/MentoriaTarefas";
+import FormulariosDisponiveis from "./pages/FormulariosDisponiveis";
+import ResponderFormulario from "./pages/ResponderFormulario";
 import IACopieUse from "./pages/IACopieUse";
 import BibliotecaFerramentas from "./pages/BibliotecaFerramentas";
 import BibliotecaPrompts from "./pages/BibliotecaPrompts";

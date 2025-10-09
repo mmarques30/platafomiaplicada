@@ -500,6 +500,57 @@ export type Database = {
         }
         Relationships: []
       }
+      formularios_customizados: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          data_criacao: string | null
+          data_expiracao: string | null
+          descricao: string | null
+          id: string
+          mentorados_ids: Json | null
+          perguntas_geradas: Json
+          status: string
+          texto_original: string
+          titulo: string
+          total_respostas: number | null
+          updated_at: string | null
+          visibilidade: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          data_criacao?: string | null
+          data_expiracao?: string | null
+          descricao?: string | null
+          id?: string
+          mentorados_ids?: Json | null
+          perguntas_geradas: Json
+          status?: string
+          texto_original: string
+          titulo: string
+          total_respostas?: number | null
+          updated_at?: string | null
+          visibilidade?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          data_criacao?: string | null
+          data_expiracao?: string | null
+          descricao?: string | null
+          id?: string
+          mentorados_ids?: Json | null
+          perguntas_geradas?: Json
+          status?: string
+          texto_original?: string
+          titulo?: string
+          total_respostas?: number | null
+          updated_at?: string | null
+          visibilidade?: string
+        }
+        Relationships: []
+      }
       ia_copie_use: {
         Row: {
           ativo: boolean | null
@@ -945,6 +996,47 @@ export type Database = {
             columns: ["exercicio_id"]
             isOneToOne: false
             referencedRelation: "exercicios_praticos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      respostas_formularios_customizados: {
+        Row: {
+          completado: boolean | null
+          created_at: string | null
+          formulario_id: string
+          id: string
+          respostas: Json
+          tempo_resposta: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completado?: boolean | null
+          created_at?: string | null
+          formulario_id: string
+          id?: string
+          respostas: Json
+          tempo_resposta?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completado?: boolean | null
+          created_at?: string | null
+          formulario_id?: string
+          id?: string
+          respostas?: Json
+          tempo_resposta?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "respostas_formularios_customizados_formulario_id_fkey"
+            columns: ["formulario_id"]
+            isOneToOne: false
+            referencedRelation: "formularios_customizados"
             referencedColumns: ["id"]
           },
         ]
