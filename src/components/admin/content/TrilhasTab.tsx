@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTrilhas, useCreateTrilha, useUpdateTrilha, useDeleteTrilha } from "@/hooks/admin/useContent";
+import { useTrilhas, useDeleteTrilha, useTrilhasStats } from "@/hooks/admin/useContent";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 export function TrilhasTab() {
   const { data: trilhas, isLoading } = useTrilhas();
+  const { data: stats } = useTrilhasStats();
   const deleteTrilha = useDeleteTrilha();
   const [editingTrilha, setEditingTrilha] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,33 +51,48 @@ export function TrilhasTab() {
               <TableHead>Título</TableHead>
               <TableHead>Nível</TableHead>
               <TableHead>Ordem</TableHead>
+              <TableHead>Módulos</TableHead>
+              <TableHead>Vídeos</TableHead>
+              <TableHead>Materiais</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {trilhas?.map((trilha) => (
-              <TableRow key={trilha.id}>
-                <TableCell className="font-medium">{trilha.titulo}</TableCell>
-                <TableCell>
-                  <Badge variant="outline">{trilha.nivel}</Badge>
-                </TableCell>
-                <TableCell>{trilha.ordem}</TableCell>
-                <TableCell>
-                  <Badge variant={trilha.ativo ? "default" : "secondary"}>
-                    {trilha.ativo ? "Ativo" : "Inativo"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(trilha)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setDeleteId(trilha.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {trilhas?.map((trilha) => {
+              const trilhaStat = stats?.find((s: any) => s.trilha_id === trilha.id);
+              return (
+                <TableRow key={trilha.id}>
+                  <TableCell className="font-medium">{trilha.titulo}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{trilha.nivel}</Badge>
+                  </TableCell>
+                  <TableCell>{trilha.ordem}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{trilhaStat?.total_modulos || 0}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{trilhaStat?.total_videos || 0}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{trilhaStat?.total_materiais || 0}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={trilha.ativo ? "default" : "secondary"}>
+                      {trilha.ativo ? "Ativo" : "Inativo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(trilha)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(trilha.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

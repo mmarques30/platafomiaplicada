@@ -33,31 +33,38 @@ export function VideosTab() {
               <TableHead>Título</TableHead>
               <TableHead>Módulo</TableHead>
               <TableHead>Duração</TableHead>
+              <TableHead>Materiais</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {videos?.map((video: any) => (
-              <TableRow key={video.id}>
-                <TableCell className="font-medium">{video.titulo}</TableCell>
-                <TableCell>{video.modulo?.titulo}</TableCell>
-                <TableCell>{video.duracao ? `${video.duracao}min` : "-"}</TableCell>
-                <TableCell>
-                  <Badge variant={video.ativo ? "default" : "secondary"}>
-                    {video.ativo ? "Ativo" : "Inativo"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button variant="ghost" size="sm" onClick={() => { setEditingVideo(video); setIsModalOpen(true); }}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setDeleteId(video.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {videos?.map((video: any) => {
+              const totalMateriais = Array.isArray(video.materiais) ? video.materiais.length : 0;
+              return (
+                <TableRow key={video.id}>
+                  <TableCell className="font-medium">{video.titulo}</TableCell>
+                  <TableCell>{video.modulo?.titulo}</TableCell>
+                  <TableCell>{video.duracao ? `${video.duracao}min` : "-"}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{totalMateriais}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={video.ativo ? "default" : "secondary"}>
+                      {video.ativo ? "Ativo" : "Inativo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditingVideo(video); setIsModalOpen(true); }}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(video.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

@@ -251,6 +251,9 @@ export function useUpdateVideo() {
         videoData.thumbnail_url = getYouTubeThumbnail(youtubeId);
       }
 
+      // Remove campo 'modulo' que vem do JOIN - não existe na tabela
+      delete videoData.modulo;
+
       const { error } = await supabase.from("videos").update(videoData).eq("id", id);
       if (error) throw error;
     },
@@ -274,5 +277,29 @@ export function useDeleteVideo() {
       toast.success("Vídeo deletado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
+  });
+}
+
+// Estatísticas de trilhas
+export function useTrilhasStats() {
+  return useQuery({
+    queryKey: ["trilhas-stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_trilhas_stats");
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+// Estatísticas de módulos
+export function useModulosStats() {
+  return useQuery({
+    queryKey: ["modulos-stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_modulos_stats");
+      if (error) throw error;
+      return data;
+    },
   });
 }

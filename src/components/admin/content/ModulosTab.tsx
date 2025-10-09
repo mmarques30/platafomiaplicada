@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useModulos, useDeleteModulo } from "@/hooks/admin/useContent";
+import { useModulos, useDeleteModulo, useModulosStats } from "@/hooks/admin/useContent";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 export function ModulosTab() {
   const { data: modulos, isLoading } = useModulos();
+  const { data: stats } = useModulosStats();
   const deleteModulo = useDeleteModulo();
   const [editingModulo, setEditingModulo] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,31 +34,42 @@ export function ModulosTab() {
               <TableHead>Título</TableHead>
               <TableHead>Trilha</TableHead>
               <TableHead>Ordem</TableHead>
+              <TableHead>Vídeos</TableHead>
+              <TableHead>Materiais</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {modulos?.map((modulo: any) => (
-              <TableRow key={modulo.id}>
-                <TableCell className="font-medium">{modulo.titulo}</TableCell>
-                <TableCell>{modulo.trilhas?.titulo}</TableCell>
-                <TableCell>{modulo.ordem}</TableCell>
-                <TableCell>
-                  <Badge variant={modulo.ativo ? "default" : "secondary"}>
-                    {modulo.ativo ? "Ativo" : "Inativo"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button variant="ghost" size="sm" onClick={() => { setEditingModulo(modulo); setIsModalOpen(true); }}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setDeleteId(modulo.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {modulos?.map((modulo: any) => {
+              const moduloStat = stats?.find((s: any) => s.modulo_id === modulo.id);
+              return (
+                <TableRow key={modulo.id}>
+                  <TableCell className="font-medium">{modulo.titulo}</TableCell>
+                  <TableCell>{modulo.trilhas?.titulo}</TableCell>
+                  <TableCell>{modulo.ordem}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{moduloStat?.total_videos || 0}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{moduloStat?.total_materiais || 0}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={modulo.ativo ? "default" : "secondary"}>
+                      {modulo.ativo ? "Ativo" : "Inativo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditingModulo(modulo); setIsModalOpen(true); }}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(modulo.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

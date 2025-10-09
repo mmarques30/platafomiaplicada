@@ -1513,6 +1513,23 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: string
       }
+      get_modulos_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          modulo_id: string
+          total_materiais: number
+          total_videos: number
+        }[]
+      }
+      get_trilhas_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_materiais: number
+          total_modulos: number
+          total_videos: number
+          trilha_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
