@@ -959,6 +959,7 @@ export type Database = {
           status: Database["public"]["Enums"]["status_sessao"]
           titulo: string
           transcricao: string | null
+          transcricao_url: string | null
           updated_at: string
           user_id: string
           video_url: string | null
@@ -972,6 +973,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["status_sessao"]
           titulo: string
           transcricao?: string | null
+          transcricao_url?: string | null
           updated_at?: string
           user_id: string
           video_url?: string | null
@@ -985,11 +987,90 @@ export type Database = {
           status?: Database["public"]["Enums"]["status_sessao"]
           titulo?: string
           transcricao?: string | null
+          transcricao_url?: string | null
           updated_at?: string
           user_id?: string
           video_url?: string | null
         }
         Relationships: []
+      }
+      tarefas_mentoria: {
+        Row: {
+          arquivo_entrega_url: string | null
+          avaliacao_mentor: number | null
+          created_at: string
+          data_acordo: string
+          data_conclusao: string | null
+          descricao: string
+          feedback_mentor: string | null
+          id: string
+          link_externo: string | null
+          prazo_entrega: string
+          prioridade: string
+          projeto_id: string | null
+          sessao_id: string | null
+          status: string
+          tipo: string
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          arquivo_entrega_url?: string | null
+          avaliacao_mentor?: number | null
+          created_at?: string
+          data_acordo?: string
+          data_conclusao?: string | null
+          descricao: string
+          feedback_mentor?: string | null
+          id?: string
+          link_externo?: string | null
+          prazo_entrega: string
+          prioridade?: string
+          projeto_id?: string | null
+          sessao_id?: string | null
+          status?: string
+          tipo: string
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          arquivo_entrega_url?: string | null
+          avaliacao_mentor?: number | null
+          created_at?: string
+          data_acordo?: string
+          data_conclusao?: string | null
+          descricao?: string
+          feedback_mentor?: string | null
+          id?: string
+          link_externo?: string | null
+          prazo_entrega?: string
+          prioridade?: string
+          projeto_id?: string | null
+          sessao_id?: string | null
+          status?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tarefas_mentoria_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_mentoria"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tarefas_mentoria_sessao_id_fkey"
+            columns: ["sessao_id"]
+            isOneToOne: false
+            referencedRelation: "sessoes_mentoria"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trilhas: {
         Row: {
