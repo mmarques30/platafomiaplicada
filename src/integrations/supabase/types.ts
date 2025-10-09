@@ -331,6 +331,7 @@ export type Database = {
           area_aplicacao_ia: string | null
           area_atuacao: string | null
           area_atuacao_outro: string | null
+          arquivo_diagnostico_url: string | null
           completado: boolean | null
           created_at: string | null
           desafio_1: string | null
@@ -364,7 +365,9 @@ export type Database = {
           nome_completo: string | null
           objetivo_especifico: string | null
           objetivo_principal: string | null
+          observacoes_admin: string | null
           outras_ferramentas: string | null
+          preenchido_por: string | null
           preferencia_aprendizado: string | null
           preferencia_sessoes: string | null
           processo_otimizar: string | null
@@ -385,6 +388,7 @@ export type Database = {
           area_aplicacao_ia?: string | null
           area_atuacao?: string | null
           area_atuacao_outro?: string | null
+          arquivo_diagnostico_url?: string | null
           completado?: boolean | null
           created_at?: string | null
           desafio_1?: string | null
@@ -418,7 +422,9 @@ export type Database = {
           nome_completo?: string | null
           objetivo_especifico?: string | null
           objetivo_principal?: string | null
+          observacoes_admin?: string | null
           outras_ferramentas?: string | null
+          preenchido_por?: string | null
           preferencia_aprendizado?: string | null
           preferencia_sessoes?: string | null
           processo_otimizar?: string | null
@@ -439,6 +445,7 @@ export type Database = {
           area_aplicacao_ia?: string | null
           area_atuacao?: string | null
           area_atuacao_outro?: string | null
+          arquivo_diagnostico_url?: string | null
           completado?: boolean | null
           created_at?: string | null
           desafio_1?: string | null
@@ -472,7 +479,9 @@ export type Database = {
           nome_completo?: string | null
           objetivo_especifico?: string | null
           objetivo_principal?: string | null
+          observacoes_admin?: string | null
           outras_ferramentas?: string | null
+          preenchido_por?: string | null
           preferencia_aprendizado?: string | null
           preferencia_sessoes?: string | null
           processo_otimizar?: string | null

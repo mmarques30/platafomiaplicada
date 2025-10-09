@@ -6,7 +6,9 @@ import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
 import { HeroMentoria } from "@/components/mentoria/HeroMentoria";
 import { InsightIA } from "@/components/mentoria/InsightIA";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Loader2, Info, Download } from "lucide-react";
 
 export default function MentoriaDiagnostico() {
   const navigate = useNavigate();
@@ -62,6 +64,28 @@ export default function MentoriaDiagnostico() {
       {/* Resumo + Insight - quando já preencheu */}
       {preenchido && (
         <div className="max-w-5xl mx-auto space-y-6">
+          {formulario.preenchido_por === 'admin' && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertTitle className="flex items-center gap-2">
+                Diagnóstico realizado em conjunto
+                <Badge variant="secondary">Preenchido pelo mentor</Badge>
+              </AlertTitle>
+              <AlertDescription className="mt-2">
+                Seu diagnóstico foi preenchido durante a sessão com seu mentor.
+                {formulario.arquivo_diagnostico_url && (
+                  <Button 
+                    variant="link" 
+                    className="h-auto p-0 ml-2"
+                    onClick={() => window.open(formulario.arquivo_diagnostico_url, '_blank')}
+                  >
+                    <Download className="h-4 w-4 mr-1" />
+                    Baixar documento original
+                  </Button>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
           <ResumoDiagnostico 
             formulario={formulario} 
             onEditar={() => setModoEdicao(true)}
