@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, AlertTriangle, Clock, FileText, Upload, ExternalLink, CheckCircle2 } from "lucide-react";
+import { Calendar, AlertTriangle, Clock, FileText, Upload, ExternalLink, CheckCircle2, ArrowLeft } from "lucide-react";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -13,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export default function MentoriaTarefas() {
+  const navigate = useNavigate();
   const { tarefas, isLoading, updateTarefa, uploadEntrega, isUploading } = useMentoriaTarefas();
   const [entregaFile, setEntregaFile] = useState<File | null>(null);
   const [linkExterno, setLinkExterno] = useState("");
@@ -192,6 +194,11 @@ export default function MentoriaTarefas() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar para Mentoria
+      </Button>
+
       <div>
         <h1 className="text-3xl font-bold mb-2">Minhas Tarefas</h1>
         <p className="text-muted-foreground">Gerencie suas entregas e acompanhe seu progresso</p>

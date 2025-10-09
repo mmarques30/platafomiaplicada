@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wrench, Search, ExternalLink, Loader2, BookOpen } from "lucide-react";
+import { Wrench, Search, ExternalLink, Loader2, BookOpen, ArrowLeft } from "lucide-react";
 import { useMentoriaRecursos } from "@/hooks/useMentoriaRecursos";
 import {
   Collapsible,
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/collapsible";
 
 export default function MentoriaRecursos() {
+  const navigate = useNavigate();
   const { recursos, isLoading } = useMentoriaRecursos();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
@@ -35,6 +37,11 @@ export default function MentoriaRecursos() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
+      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar para Mentoria
+      </Button>
+
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-3">Recursos e Ferramentas</h1>
         <p className="text-muted-foreground text-lg">

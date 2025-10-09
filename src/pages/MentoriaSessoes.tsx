@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Video, FileText, Loader2 } from "lucide-react";
+import { Calendar, Clock, Video, FileText, Loader2, ArrowLeft } from "lucide-react";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function MentoriaSessoes() {
+  const navigate = useNavigate();
   const { sessoes, isLoading } = useMentoriaSessoes();
   const [selectedSessao, setSelectedSessao] = useState<any>(null);
 
@@ -88,6 +90,15 @@ export default function MentoriaSessoes() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
+      <Button
+        variant="ghost"
+        onClick={() => navigate("/mentoria")}
+        className="mb-6"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar para Mentoria
+      </Button>
+
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-3">Sessões de Mentoria</h1>
         <p className="text-muted-foreground text-lg">

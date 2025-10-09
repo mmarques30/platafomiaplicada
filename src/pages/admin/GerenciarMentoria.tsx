@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
+import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import RecursoModal from "@/components/admin/mentoria/RecursoModal";
@@ -152,7 +153,7 @@ export default function GerenciarMentoria() {
 
         {selectedUserId && (
           <Tabs defaultValue="diagnostico" className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="diagnostico">
                 <FileText className="h-4 w-4 mr-2" />
                 Diagnóstico
@@ -164,6 +165,9 @@ export default function GerenciarMentoria() {
               <TabsTrigger value="tarefas">
                 <CheckSquare className="h-4 w-4 mr-2" />
                 Tarefas
+              </TabsTrigger>
+              <TabsTrigger value="duvidas">
+                Dúvidas
               </TabsTrigger>
               <TabsTrigger value="sessoes">
                 <Calendar className="h-4 w-4 mr-2" />
@@ -186,6 +190,10 @@ export default function GerenciarMentoria() {
 
             <TabsContent value="tarefas" className="space-y-4">
               <TarefasAdmin userId={selectedUserId} />
+            </TabsContent>
+
+            <TabsContent value="duvidas" className="space-y-4">
+              <GerenciarDuvidas userId={selectedUserId} />
             </TabsContent>
 
             <TabsContent value="objetivos" className="space-y-4">

@@ -246,6 +246,78 @@ export type Database = {
           },
         ]
       }
+      duvidas_mentoria: {
+        Row: {
+          atrasada: boolean | null
+          contexto: string | null
+          created_at: string | null
+          duvida: string
+          horas_para_vencer: number | null
+          id: string
+          prazo_sla: string
+          prioridade: string
+          respondida_em: string | null
+          respondida_por: string | null
+          resposta_mentor: string | null
+          status: string
+          tags: Json | null
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          atrasada?: boolean | null
+          contexto?: string | null
+          created_at?: string | null
+          duvida: string
+          horas_para_vencer?: number | null
+          id?: string
+          prazo_sla: string
+          prioridade?: string
+          respondida_em?: string | null
+          respondida_por?: string | null
+          resposta_mentor?: string | null
+          status?: string
+          tags?: Json | null
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          atrasada?: boolean | null
+          contexto?: string | null
+          created_at?: string | null
+          duvida?: string
+          horas_para_vencer?: number | null
+          id?: string
+          prazo_sla?: string
+          prioridade?: string
+          respondida_em?: string | null
+          respondida_por?: string | null
+          resposta_mentor?: string | null
+          status?: string
+          tags?: Json | null
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duvidas_mentoria_respondida_por_fkey"
+            columns: ["respondida_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duvidas_mentoria_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exercicios_praticos: {
         Row: {
           ativo: boolean | null
@@ -1407,6 +1479,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calcular_prazo_sla: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

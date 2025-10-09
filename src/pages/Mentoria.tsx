@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, Target, Calendar, FileText, BookOpen, ArrowRight } from "lucide-react";
+import { Brain, Target, Calendar, FileText, BookOpen, ArrowRight, Loader2, ListTodo, MessageCircle } from "lucide-react";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
-import { Loader2 } from "lucide-react";
+import { ResumoProgresso } from "@/components/mentoria/ResumoProgresso";
+import { PendenciasUrgentes } from "@/components/mentoria/PendenciasUrgentes";
+import { DuvidasMentorado } from "@/components/mentoria/DuvidasMentorado";
 
 export default function Mentoria() {
   const navigate = useNavigate();
@@ -37,6 +39,14 @@ export default function Mentoria() {
       statusColor: "text-blue-600"
     },
     {
+      title: "Tarefas",
+      description: "Acompanhe suas tarefas e entregas",
+      icon: ListTodo,
+      path: "/mentoria/tarefas",
+      status: "Disponível",
+      statusColor: "text-blue-600"
+    },
+    {
       title: "Sessões",
       description: "Acompanhe suas sessões, gravações e transcrições",
       icon: Calendar,
@@ -59,6 +69,14 @@ export default function Mentoria() {
       path: "/mentoria/projetos",
       status: "Disponível",
       statusColor: "text-blue-600"
+    },
+    {
+      title: "Dúvidas",
+      description: "Tire suas dúvidas com seu mentor",
+      icon: MessageCircle,
+      path: "/mentoria/duvidas",
+      status: "Disponível",
+      statusColor: "text-blue-600"
     }
   ];
 
@@ -69,6 +87,20 @@ export default function Mentoria() {
         <p className="text-muted-foreground text-lg">
           Seu programa personalizado de desenvolvimento em Inteligência Artificial
         </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2 space-y-6">
+          <ResumoProgresso />
+          <PendenciasUrgentes />
+        </div>
+        <div>
+          <DuvidasMentorado />
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-4">Acesso Rápido</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
