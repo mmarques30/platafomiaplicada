@@ -897,7 +897,10 @@ export type Database = {
           linkedin: string | null
           nome_completo: string
           plano_mentoria: Database["public"]["Enums"]["plano_mentoria"] | null
+          primeiro_acesso: boolean | null
           profissao: string | null
+          senha_alterada_em: string | null
+          senha_temporaria: boolean | null
           updated_at: string | null
         }
         Insert: {
@@ -907,7 +910,10 @@ export type Database = {
           linkedin?: string | null
           nome_completo: string
           plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
+          primeiro_acesso?: boolean | null
           profissao?: string | null
+          senha_alterada_em?: string | null
+          senha_temporaria?: boolean | null
           updated_at?: string | null
         }
         Update: {
@@ -917,7 +923,10 @@ export type Database = {
           linkedin?: string | null
           nome_completo?: string
           plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
+          primeiro_acesso?: boolean | null
           profissao?: string | null
+          senha_alterada_em?: string | null
+          senha_temporaria?: boolean | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1485,7 +1494,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      historico_completo: {
+        Row: {
+          campos_alterados: string[] | null
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          operacao: string | null
+          registro_id: string | null
+          tabela: string | null
+          usuario: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calcular_prazo_sla: {
@@ -1498,6 +1519,15 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      verificar_integridade_sistema: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          categoria: string
+          detalhes: string
+          item: string
+          status: string
+        }[]
       }
     }
     Enums: {

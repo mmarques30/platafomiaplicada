@@ -25,6 +25,7 @@ import {
   Database,
   GraduationCap,
   ArrowLeft,
+  FileSearch,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -37,6 +38,7 @@ const navItems = [
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
   { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },
   { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
+  { path: "/admin/auditoria", label: "Auditoria do Sistema", icon: FileSearch },
 ];
 
 export function AdminSidebar() {

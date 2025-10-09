@@ -115,15 +115,22 @@ export function useCreateUser() {
       if (authError) throw authError;
       if (!authData.user) throw new Error("Usuário não foi criado");
 
-      // Atualizar profile com plano_mentoria se fornecido
+      // Atualizar profile com plano_mentoria e marcar senha como temporária
+      const updateData: any = {
+        senha_temporaria: true,
+        primeiro_acesso: true
+      };
+      
       if (planoMentoria) {
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .update({ plano_mentoria: planoMentoria as any })
-          .eq("id", authData.user.id);
-        
-        if (profileError) throw profileError;
+        updateData.plano_mentoria = planoMentoria;
       }
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update(updateData)
+        .eq("id", authData.user.id);
+      
+      if (profileError) throw profileError;
 
       // Adicionar roles
       if (roles.length > 0) {
