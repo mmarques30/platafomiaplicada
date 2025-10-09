@@ -50,7 +50,7 @@ export const RespostasFormularioDrawer = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>📊 Respostas: {formulario.titulo}</SheetTitle>
+          <SheetTitle>Respostas: {formulario.titulo}</SheetTitle>
           <div className="flex gap-2 mt-2">
             <Badge variant="secondary">
               {respostas.length} {formulario.visibilidade === "especificos" && `de ${totalMentorados}`} respostas
@@ -94,18 +94,18 @@ export const RespostasFormularioDrawer = ({
               
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">📝 Resumo Geral</h4>
+                  <h4 className="font-medium mb-2">• Resumo Geral</h4>
                   <p className="text-sm text-muted-foreground">{analise.resumo}</p>
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-2">🔍 Padrões Identificados</h4>
+                  <h4 className="font-medium mb-2">• Padrões Identificados</h4>
                   <p className="text-sm text-muted-foreground">{analise.padrao_geral}</p>
                 </div>
 
                 {analise.mentorados_atencao.length > 0 && (
                   <div>
-                    <h4 className="font-medium mb-2">⚠️ Mentorados que Precisam de Atenção</h4>
+                    <h4 className="font-medium mb-2">• Atenção Necessária</h4>
                     <div className="space-y-2">
                       {analise.mentorados_atencao.map((m, i) => (
                         <div key={i} className="bg-background/50 p-3 rounded-lg">
@@ -118,7 +118,7 @@ export const RespostasFormularioDrawer = ({
                 )}
 
                 <div>
-                  <h4 className="font-medium mb-2">💡 Insights Acionáveis</h4>
+                  <h4 className="font-medium mb-2">• Insights</h4>
                   <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
                     {analise.insights.map((insight, i) => (
                       <li key={i}>{insight}</li>
@@ -127,7 +127,7 @@ export const RespostasFormularioDrawer = ({
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-2">🎯 Recomendações</h4>
+                  <h4 className="font-medium mb-2">➥ Recomendações</h4>
                   <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
                     {analise.recomendacoes.map((rec, i) => (
                       <li key={i}>{rec}</li>
@@ -167,7 +167,7 @@ export const RespostasFormularioDrawer = ({
                         <div key={resposta.id} className="border-l-2 border-primary/30 pl-4 py-2">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-medium text-sm">
-                              👤 {resposta.profiles.nome_completo}
+                              {resposta.profiles.nome_completo}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               ({format(new Date(respostaData.respondido_em), "dd/MM HH:mm", { locale: ptBR })})

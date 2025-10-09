@@ -179,10 +179,10 @@ export const FormularioCustomizadoModal = ({ open, onOpenChange }: FormularioCus
           <div className="space-y-4">
             <div className="flex gap-2 mb-4">
               <Badge variant="secondary">
-                📊 {perguntasGeradas.categoria}
+                Categoria: {perguntasGeradas.categoria}
               </Badge>
               <Badge variant="outline">
-                ⏱️ {perguntasGeradas.tempo_estimado}
+                Tempo: {perguntasGeradas.tempo_estimado}
               </Badge>
             </div>
 
@@ -303,7 +303,7 @@ export const FormularioCustomizadoModal = ({ open, onOpenChange }: FormularioCus
                     Criando...
                   </>
                 ) : (
-                  "✅ Criar Formulário"
+                  "Criar Formulário"
                 )}
               </Button>
             </div>

@@ -31,9 +31,9 @@ export const FormulariosCustomizados = () => {
   };
 
   const getStatusLabel = (status: string, dataExpiracao?: string) => {
-    if (status === "arquivado") return "🔴 Arquivado";
-    if (dataExpiracao && isPast(new Date(dataExpiracao))) return "🔴 Expirado";
-    return "🟢 Ativo";
+    if (status === "arquivado") return "Arquivado";
+    if (dataExpiracao && isPast(new Date(dataExpiracao))) return "Expirado";
+    return "Ativo";
   };
 
   const getDiasRestantes = (dataExpiracao?: string) => {
@@ -79,7 +79,7 @@ export const FormulariosCustomizados = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-lg font-semibold">
-                        📋 {formulario.titulo}
+                        {formulario.titulo}
                       </h3>
                       <Badge variant={getStatusColor(formulario.status, formulario.data_expiracao)}>
                         {getStatusLabel(formulario.status, formulario.data_expiracao)}
@@ -152,7 +152,7 @@ export const FormulariosCustomizados = () => {
                         size="sm"
                         onClick={() => handleReabrir(formulario.id)}
                       >
-                        ♻️ Reabrir
+                        Reabrir
                       </Button>
                     )}
                   </div>

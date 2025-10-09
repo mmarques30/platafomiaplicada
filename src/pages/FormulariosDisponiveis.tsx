@@ -36,7 +36,7 @@ const FormulariosDisponiveis = () => {
     <div className="min-h-screen bg-background">
       <div className="container max-w-4xl py-8 space-y-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">📋 Seus Formulários</h1>
+          <h1 className="text-3xl font-bold mb-2">Seus Formulários</h1>
           <p className="text-muted-foreground">
             Responda aos formulários para compartilhar seu progresso e feedback
           </p>
@@ -45,7 +45,7 @@ const FormulariosDisponiveis = () => {
         {/* Pendentes */}
         <div>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            ⏰ Pendentes ({formularios.filter(f => {
+            • Pendentes ({formularios.filter(f => {
               const jaRespondeu = false; // Simplificado por enquanto
               return !jaRespondeu;
             }).length})
@@ -74,12 +74,12 @@ const FormulariosDisponiveis = () => {
                             </h3>
                             {diasRestantes !== null && diasRestantes <= 3 && (
                               <Badge variant="destructive">
-                                🔴 Vence em {diasRestantes} {diasRestantes === 1 ? "dia" : "dias"}
+                                Vence em {diasRestantes} {diasRestantes === 1 ? "dia" : "dias"}
                               </Badge>
                             )}
                             {diasRestantes !== null && diasRestantes > 3 && (
                               <Badge variant="secondary">
-                                🟡 Vence em {diasRestantes} dias
+                                Vence em {diasRestantes} dias
                               </Badge>
                             )}
                           </div>
@@ -124,7 +124,7 @@ const FormulariosDisponiveis = () => {
         {/* Respondidos */}
         <div>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            ✅ Respondidos
+            ✱ Respondidos
           </h2>
           
           <div className="space-y-4">

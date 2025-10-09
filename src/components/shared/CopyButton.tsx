@@ -19,7 +19,7 @@ export function CopyButton({ content, variant = "outline", size = "sm", classNam
       await navigator.clipboard.writeText(content);
       setCopied(true);
       toast({
-        title: "✅ Copiado!",
+        title: "Copiado",
         description: "Conteúdo copiado para a área de transferência",
       });
       setTimeout(() => setCopied(false), 2000);
