@@ -130,7 +130,13 @@ export function useModulos() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("modulos")
-        .select("*, trilhas(titulo)")
+        .select(`
+          *,
+          trilha:trilhas!inner(
+            id,
+            titulo
+          )
+        `)
         .order("ordem");
       if (error) throw error;
       return data;
@@ -190,7 +196,17 @@ export function useVideos() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("videos")
-        .select("*, modulos(titulo, trilha_id, trilhas(titulo))")
+        .select(`
+          *,
+          modulo:modulos!inner(
+            id,
+            titulo,
+            trilha:trilhas!inner(
+              id,
+              titulo
+            )
+          )
+        `)
         .order("ordem");
       if (error) throw error;
       return data;

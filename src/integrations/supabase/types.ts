@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      auditoria_conteudo: {
+        Row: {
+          campos_alterados: string[] | null
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          id: string
+          operacao: string
+          registro_id: string
+          tabela: string
+          user_id: string | null
+        }
+        Insert: {
+          campos_alterados?: string[] | null
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          operacao: string
+          registro_id: string
+          tabela: string
+          user_id?: string | null
+        }
+        Update: {
+          campos_alterados?: string[] | null
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          operacao?: string
+          registro_id?: string
+          tabela?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       avisos: {
         Row: {
           ativo: boolean | null

@@ -41,7 +41,7 @@ export function VideosTab() {
             {videos?.map((video: any) => (
               <TableRow key={video.id}>
                 <TableCell className="font-medium">{video.titulo}</TableCell>
-                <TableCell>{video.modulos?.titulo}</TableCell>
+                <TableCell>{video.modulo?.titulo}</TableCell>
                 <TableCell>{video.duracao ? `${video.duracao}min` : "-"}</TableCell>
                 <TableCell>
                   <Badge variant={video.ativo ? "default" : "secondary"}>
