@@ -5,7 +5,7 @@ import { Brain, Target, Calendar, FileText, BookOpen, ArrowRight, Loader2, ListT
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { ResumoProgresso } from "@/components/mentoria/ResumoProgresso";
 import { PendenciasUrgentes } from "@/components/mentoria/PendenciasUrgentes";
-import { DuvidasMentorado } from "@/components/mentoria/DuvidasMentorado";
+
 
 export default function Mentoria() {
   const navigate = useNavigate();
@@ -89,14 +89,9 @@ export default function Mentoria() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 space-y-6">
-          <ResumoProgresso />
-          <PendenciasUrgentes />
-        </div>
-        <div>
-          <DuvidasMentorado />
-        </div>
+      <div className="space-y-6 mb-8">
+        <ResumoProgresso />
+        <PendenciasUrgentes />
       </div>
 
       <div className="mb-6">
