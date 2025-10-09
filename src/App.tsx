@@ -20,6 +20,7 @@ import MentoriaObjetivos from "./pages/MentoriaObjetivos";
 import MentoriaSessoes from "./pages/MentoriaSessoes";
 import MentoriaRecursos from "./pages/MentoriaRecursos";
 import MentoriaProjetos from "./pages/MentoriaProjetos";
+import MentoriaTarefas from "./pages/MentoriaTarefas";
 import IACopieUse from "./pages/IACopieUse";
 import BibliotecaFerramentas from "./pages/BibliotecaFerramentas";
 import BibliotecaPrompts from "./pages/BibliotecaPrompts";
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="/mentoria/sessoes" element={<MentoriaSessoes />} />
               <Route path="/mentoria/recursos" element={<MentoriaRecursos />} />
               <Route path="/mentoria/projetos" element={<MentoriaProjetos />} />
+              <Route path="/mentoria/tarefas" element={<MentoriaTarefas />} />
             <Route path="/ia-copie-use" element={<IACopieUse />} />
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
             <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />

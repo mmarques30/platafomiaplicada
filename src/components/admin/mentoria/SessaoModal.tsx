@@ -100,12 +100,25 @@ export default function SessaoModal({
           </div>
 
           <div>
-            <Label htmlFor="transcricao">Transcrição</Label>
+            <Label htmlFor="transcricao_url">URL ou Link da Transcrição</Label>
+            <Input
+              id="transcricao_url"
+              {...register("transcricao_url")}
+              placeholder="https://... (Google Docs, Notion, Drive, etc.)"
+              type="url"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Cole o link de um documento externo (Google Docs, Notion, Drive, etc.) contendo a transcrição
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="transcricao">Ou escreva uma transcrição curta</Label>
             <Textarea
               id="transcricao"
               {...register("transcricao")}
-              placeholder="Transcrição da sessão"
-              rows={5}
+              placeholder="Resumo ou transcrição breve da sessão"
+              rows={4}
             />
           </div>
 

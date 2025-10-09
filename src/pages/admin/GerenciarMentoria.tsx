@@ -9,8 +9,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText } from "lucide-react";
+import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
+import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import RecursoModal from "@/components/admin/mentoria/RecursoModal";
@@ -151,7 +152,7 @@ export default function GerenciarMentoria() {
 
         {selectedUserId && (
           <Tabs defaultValue="diagnostico" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="diagnostico">
                 <FileText className="h-4 w-4 mr-2" />
                 Diagnóstico
@@ -159,6 +160,10 @@ export default function GerenciarMentoria() {
               <TabsTrigger value="objetivos">
                 <Target className="h-4 w-4 mr-2" />
                 Objetivos
+              </TabsTrigger>
+              <TabsTrigger value="tarefas">
+                <CheckSquare className="h-4 w-4 mr-2" />
+                Tarefas
               </TabsTrigger>
               <TabsTrigger value="sessoes">
                 <Calendar className="h-4 w-4 mr-2" />
@@ -177,6 +182,10 @@ export default function GerenciarMentoria() {
             {/* Diagnóstico Tab */}
             <TabsContent value="diagnostico" className="space-y-4">
               <DiagnosticoAdmin userId={selectedUserId} />
+            </TabsContent>
+
+            <TabsContent value="tarefas" className="space-y-4">
+              <TarefasAdmin userId={selectedUserId} />
             </TabsContent>
 
             <TabsContent value="objetivos" className="space-y-4">
