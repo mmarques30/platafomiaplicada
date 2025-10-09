@@ -54,8 +54,7 @@ function AppContent() {
     <>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
+      <Routes>
           <Route path="/auth" element={<Auth />} />
           
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
@@ -97,7 +96,6 @@ function AppContent() {
           
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
 
       {user && precisaTrocarSenha && (
         <TrocarSenhaModal 
@@ -113,7 +111,9 @@ function AppContent() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AppContent />
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
