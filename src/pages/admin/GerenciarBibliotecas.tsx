@@ -4,6 +4,7 @@ import { FerramentasTab } from "@/components/admin/bibliotecas/FerramentasTab";
 import { PromptsTab } from "@/components/admin/bibliotecas/PromptsTab";
 import { IACopieUseTab } from "@/components/admin/bibliotecas/IACopieUseTab";
 import { MetodosTab } from "@/components/admin/bibliotecas/MetodosTab";
+import { FormulariosCustomizados } from "@/components/admin/formularios/FormulariosCustomizados";
 
 export default function GerenciarBibliotecas() {
   const [activeTab, setActiveTab] = useState("ferramentas");
@@ -13,11 +14,12 @@ export default function GerenciarBibliotecas() {
       <h1 className="text-3xl font-bold mb-8">Gerenciar Bibliotecas</h1>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="ferramentas">Ferramentas IA</TabsTrigger>
           <TabsTrigger value="prompts">Prompts</TabsTrigger>
           <TabsTrigger value="ia-copie-use">IA Copie e Use</TabsTrigger>
           <TabsTrigger value="metodos">Métodos</TabsTrigger>
+          <TabsTrigger value="formularios">Formulários</TabsTrigger>
         </TabsList>
 
         <TabsContent value="ferramentas">
@@ -34,6 +36,10 @@ export default function GerenciarBibliotecas() {
 
         <TabsContent value="metodos">
           <MetodosTab />
+        </TabsContent>
+
+        <TabsContent value="formularios">
+          <FormulariosCustomizados />
         </TabsContent>
       </Tabs>
     </div>

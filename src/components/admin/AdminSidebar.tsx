@@ -35,7 +35,6 @@ const navItems = [
   { path: "/admin/conteudo", label: "Gerenciar Conteúdo", icon: BookOpen },
   { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas", icon: Library },
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
-  { path: "/admin/formularios", label: "Formulários", icon: FileText },
   { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },
   { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
 ];
