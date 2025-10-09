@@ -55,7 +55,7 @@ export default function Trilhas() {
           </TabsList>
 
           <TabsContent value="todos" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trilhasPorNivel.todos.map((trilha) => (
                 <TrilhaCard
                   key={trilha.id}
@@ -68,7 +68,7 @@ export default function Trilhas() {
           </TabsContent>
 
           <TabsContent value="iniciante" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trilhasPorNivel.iniciante.map((trilha) => (
                 <TrilhaCard
                   key={trilha.id}
@@ -81,7 +81,7 @@ export default function Trilhas() {
           </TabsContent>
 
           <TabsContent value="intermediario" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trilhasPorNivel.intermediario.map((trilha) => (
                 <TrilhaCard
                   key={trilha.id}
@@ -94,7 +94,7 @@ export default function Trilhas() {
           </TabsContent>
 
           <TabsContent value="avancado" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trilhasPorNivel.avancado.map((trilha) => (
                 <TrilhaCard
                   key={trilha.id}

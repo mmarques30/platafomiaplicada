@@ -10,12 +10,12 @@ interface TrilhaCardProps {
 export function TrilhaCard({ id, titulo, imagem_url }: TrilhaCardProps) {
   return (
     <Link to={`/trilhas/${id}`} className="block group">
-      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative">
+      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative aspect-[4/3] max-h-[280px]">
         <img
           src={imagem_url || "/placeholder.svg"}
           alt={titulo}
           loading="lazy"
-          className="block w-full h-auto"
+          className="block w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center">
