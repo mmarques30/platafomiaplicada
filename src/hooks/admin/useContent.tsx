@@ -236,10 +236,11 @@ export function useCreateVideo() {
       const { error } = await supabase.from("videos").insert(videoData);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
-      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
+      await queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      await queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
+      await queryClient.refetchQueries({ queryKey: ["admin-videos"] });
       toast.success("Vídeo criado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
@@ -265,10 +266,13 @@ export function useUpdateVideo() {
       const { error } = await supabase.from("videos").update(videoData).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
-      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
+    onSuccess: async () => {
+      // Invalidar todas as queries relacionadas
+      await queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
+      await queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      await queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
+      // Forçar refetch imediato
+      await queryClient.refetchQueries({ queryKey: ["admin-videos"] });
       toast.success("Vídeo atualizado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
@@ -282,10 +286,11 @@ export function useDeleteVideo() {
       const { error } = await supabase.from("videos").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
-      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
+      await queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      await queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
+      await queryClient.refetchQueries({ queryKey: ["admin-videos"] });
       toast.success("Vídeo deletado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
