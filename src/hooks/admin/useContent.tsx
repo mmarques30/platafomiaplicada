@@ -153,6 +153,8 @@ export function useCreateModulo() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-modulos"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
       toast.success("Módulo criado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
@@ -168,6 +170,8 @@ export function useUpdateModulo() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-modulos"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
       toast.success("Módulo atualizado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
@@ -183,6 +187,8 @@ export function useDeleteModulo() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-modulos"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
       toast.success("Módulo deletado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
@@ -232,6 +238,8 @@ export function useCreateVideo() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
       toast.success("Vídeo criado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
@@ -259,6 +267,8 @@ export function useUpdateVideo() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
       toast.success("Vídeo atualizado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
@@ -274,6 +284,8 @@ export function useDeleteVideo() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
       toast.success("Vídeo deletado!");
     },
     onError: (error: any) => toast.error("Erro: " + error.message),
