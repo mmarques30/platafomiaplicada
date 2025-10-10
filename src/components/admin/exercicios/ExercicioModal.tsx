@@ -82,6 +82,8 @@ export function ExercicioModal({ open, onOpenChange, exercicio }: ExercicioModal
       }
 
       queryClient.invalidateQueries({ queryKey: ["exercicios"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["modulos-stats"] });
       onOpenChange(false);
     } catch (error: any) {
       toast.error("Erro: " + error.message);

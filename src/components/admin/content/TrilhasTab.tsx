@@ -54,6 +54,7 @@ export function TrilhasTab() {
               <TableHead>Módulos</TableHead>
               <TableHead>Vídeos</TableHead>
               <TableHead>Materiais</TableHead>
+              <TableHead>Exercícios</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -76,6 +77,9 @@ export function TrilhasTab() {
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{trilhaStat?.total_materiais || 0}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{trilhaStat?.total_exercicios || 0}</Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant={trilha.ativo ? "default" : "secondary"}>

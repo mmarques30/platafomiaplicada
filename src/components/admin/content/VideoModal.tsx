@@ -144,7 +144,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
     const submitData = { 
       ...data, 
       thumbnail_customizado_url: thumbnailUrl,
-      materiais: JSON.stringify(materiais)
+      materiais: materiais
     };
 
     if (video) {

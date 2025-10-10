@@ -1517,6 +1517,7 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           modulo_id: string
+          total_exercicios: number
           total_materiais: number
           total_videos: number
         }[]
@@ -1524,6 +1525,7 @@ export type Database = {
       get_trilhas_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
+          total_exercicios: number
           total_materiais: number
           total_modulos: number
           total_videos: number

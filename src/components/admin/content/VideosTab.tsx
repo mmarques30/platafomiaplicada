@@ -40,7 +40,14 @@ export function VideosTab() {
           </TableHeader>
           <TableBody>
             {videos?.map((video: any) => {
-              const totalMateriais = Array.isArray(video.materiais) ? video.materiais.length : 0;
+              let totalMateriais = 0;
+              if (Array.isArray(video.materiais)) {
+                totalMateriais = video.materiais.length;
+              } else if (typeof video.materiais === "string") {
+                try { 
+                  totalMateriais = (JSON.parse(video.materiais) || []).length; 
+                } catch {}
+              }
               return (
                 <TableRow key={video.id}>
                   <TableCell className="font-medium">{video.titulo}</TableCell>

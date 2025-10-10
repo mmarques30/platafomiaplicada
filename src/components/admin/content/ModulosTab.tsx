@@ -36,6 +36,7 @@ export function ModulosTab() {
               <TableHead>Ordem</TableHead>
               <TableHead>Vídeos</TableHead>
               <TableHead>Materiais</TableHead>
+              <TableHead>Exercícios</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -53,6 +54,9 @@ export function ModulosTab() {
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{moduloStat?.total_materiais || 0}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{moduloStat?.total_exercicios || 0}</Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant={modulo.ativo ? "default" : "secondary"}>
