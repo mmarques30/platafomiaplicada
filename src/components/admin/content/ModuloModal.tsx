@@ -29,9 +29,25 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
 
   useEffect(() => {
     if (modulo) {
-      reset(modulo);
+      reset({
+        titulo: modulo.titulo || "",
+        descricao: modulo.descricao || "",
+        trilha_id: modulo.trilha_id || "",
+        ordem: modulo.ordem || 0,
+        ativo: modulo.ativo !== undefined ? modulo.ativo : true,
+        data_inicio: modulo.data_inicio || null,
+        categoria: modulo.categoria || null,
+      });
     } else {
-      reset({ titulo: "", descricao: "", trilha_id: "", ordem: 0, ativo: true, data_inicio: null, categoria: null });
+      reset({ 
+        titulo: "", 
+        descricao: "", 
+        trilha_id: "", 
+        ordem: 0, 
+        ativo: true, 
+        data_inicio: null, 
+        categoria: null 
+      });
     }
   }, [modulo, reset, open]);
 
@@ -111,7 +127,10 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
           </div>
           <div className="space-y-2">
             <Label>Trilha</Label>
-            <Select onValueChange={(value) => setValue("trilha_id", value)} defaultValue={watch("trilha_id")}>
+            <Select 
+              value={watch("trilha_id") || undefined} 
+              onValueChange={(value) => setValue("trilha_id", value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione uma trilha" />
               </SelectTrigger>

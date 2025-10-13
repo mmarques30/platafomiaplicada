@@ -51,7 +51,7 @@ export function ModulosTab() {
               return (
               <TableRow key={modulo.id}>
                 <TableCell className="font-medium">{modulo.titulo}</TableCell>
-                <TableCell>{modulo.trilhas?.titulo}</TableCell>
+                <TableCell>{modulo.trilha?.titulo}</TableCell>
                 <TableCell>
                   {modulo.categoria ? (
                     <Badge variant="outline">
