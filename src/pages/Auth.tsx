@@ -91,12 +91,12 @@ export default function Auth() {
           <h1 className="text-6xl font-bold mb-6 leading-tight">
             Aprenda com
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
-              IA Aplicada
+              IAplicada
             </span>
           </h1>
           
           <p className="text-xl text-muted-foreground mb-8">
-            Trilhas personalizadas, conteúdos exclusivos e acompanhamento individual para acelerar seu crescimento profissional.
+            Trilhas de ensino aplicado, conteúdos para qualquer cargo e nível técnico e acompanhamento individual para acelerar seu crescimento profissional.
           </p>
         </div>
       </div>
