@@ -7,10 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useCreateVideo, useUpdateVideo, useModulos } from "@/hooks/admin/useContent";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { X, Plus, History } from "lucide-react";
+import { X, Plus, History, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import { Material } from "@/types/video";
 import { MaterialUpload } from "./MaterialUpload";
 import { MaterialList } from "./MaterialList";
@@ -61,7 +66,8 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
         duracao: 0, 
         ordem: 0, 
         ativo: true,
-        thumbnail_customizado_url: ""
+        thumbnail_customizado_url: "",
+        data_aula: null
       });
       setThumbnailPreview("");
       setThumbnailFile(null);
@@ -202,6 +208,37 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
           <div className="space-y-2">
             <Label>Duração (minutos)</Label>
             <Input type="number" {...register("duracao", { valueAsNumber: true })} />
+          </div>
+          <div className="space-y-2">
+            <Label>Data da Aula</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !watch("data_aula") && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {watch("data_aula") 
+                    ? format(new Date(watch("data_aula")), "dd/MM/yyyy", { locale: ptBR })
+                    : "Selecionar data"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={watch("data_aula") ? new Date(watch("data_aula")) : undefined}
+                  onSelect={(date) => setValue("data_aula", date?.toISOString().split('T')[0])}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+            <p className="text-xs text-muted-foreground">
+              Quando esta aula aconteceu (para orientação em revisões)
+            </p>
           </div>
           <div className="space-y-2">
             <Label>Ordem</Label>

@@ -791,7 +791,9 @@ export type Database = {
       modulos: {
         Row: {
           ativo: boolean | null
+          categoria: string | null
           created_at: string | null
+          data_inicio: string | null
           descricao: string | null
           id: string
           ordem: number
@@ -801,7 +803,9 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean | null
+          categoria?: string | null
           created_at?: string | null
+          data_inicio?: string | null
           descricao?: string | null
           id?: string
           ordem?: number
@@ -811,7 +815,9 @@ export type Database = {
         }
         Update: {
           ativo?: boolean | null
+          categoria?: string | null
           created_at?: string | null
+          data_inicio?: string | null
           descricao?: string | null
           id?: string
           ordem?: number
@@ -1442,6 +1448,7 @@ export type Database = {
         Row: {
           ativo: boolean | null
           created_at: string | null
+          data_aula: string | null
           data_disponibilidade: string | null
           descricao: string | null
           duracao: number | null
@@ -1460,6 +1467,7 @@ export type Database = {
         Insert: {
           ativo?: boolean | null
           created_at?: string | null
+          data_aula?: string | null
           data_disponibilidade?: string | null
           descricao?: string | null
           duracao?: number | null
@@ -1478,6 +1486,7 @@ export type Database = {
         Update: {
           ativo?: boolean | null
           created_at?: string | null
+          data_aula?: string | null
           data_disponibilidade?: string | null
           descricao?: string | null
           duracao?: number | null

@@ -7,6 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import { useCreateModulo, useUpdateModulo, useTrilhas } from "@/hooks/admin/useContent";
 
 interface ModuloModalProps {
@@ -25,7 +31,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
     if (modulo) {
       reset(modulo);
     } else {
-      reset({ titulo: "", descricao: "", trilha_id: "", ordem: 0, ativo: true });
+      reset({ titulo: "", descricao: "", trilha_id: "", ordem: 0, ativo: true, data_inicio: null, categoria: null });
     }
   }, [modulo, reset, open]);
 
@@ -51,6 +57,57 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
           <div className="space-y-2">
             <Label>Descrição</Label>
             <Textarea {...register("descricao")} rows={3} />
+          </div>
+          <div className="space-y-2">
+            <Label>Data de Início</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !watch("data_inicio") && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {watch("data_inicio") 
+                    ? format(new Date(watch("data_inicio")), "dd/MM/yyyy", { locale: ptBR })
+                    : "Selecionar data"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={watch("data_inicio") ? new Date(watch("data_inicio")) : undefined}
+                  onSelect={(date) => setValue("data_inicio", date?.toISOString().split('T')[0])}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+            <p className="text-xs text-muted-foreground">
+              Quando este módulo deve começar
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label>Categoria</Label>
+            <Select 
+              value={watch("categoria") || undefined}
+              onValueChange={(value) => setValue("categoria", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo de módulo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aula_ao_vivo">Aula ao Vivo</SelectItem>
+                <SelectItem value="gravacao_videos">Gravação de Vídeos</SelectItem>
+                <SelectItem value="conteudo_mentorados">Conteúdo Específico para Mentorados</SelectItem>
+                <SelectItem value="outro">Outro</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Classifique o tipo de conteúdo deste módulo
+            </p>
           </div>
           <div className="space-y-2">
             <Label>Trilha</Label>

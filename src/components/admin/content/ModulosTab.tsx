@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { ModuloModal } from "./ModuloModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export function ModulosTab() {
   const { data: modulos, isLoading } = useModulos();
@@ -33,6 +35,8 @@ export function ModulosTab() {
             <TableRow>
               <TableHead>Título</TableHead>
               <TableHead>Trilha</TableHead>
+              <TableHead>Categoria</TableHead>
+              <TableHead>Data Início</TableHead>
               <TableHead>Ordem</TableHead>
               <TableHead>Vídeos</TableHead>
               <TableHead>Materiais</TableHead>
@@ -45,10 +49,29 @@ export function ModulosTab() {
             {modulos?.map((modulo: any) => {
               const moduloStat = stats?.find((s: any) => s.modulo_id === modulo.id);
               return (
-                <TableRow key={modulo.id}>
-                  <TableCell className="font-medium">{modulo.titulo}</TableCell>
-                  <TableCell>{modulo.trilhas?.titulo}</TableCell>
-                  <TableCell>{modulo.ordem}</TableCell>
+              <TableRow key={modulo.id}>
+                <TableCell className="font-medium">{modulo.titulo}</TableCell>
+                <TableCell>{modulo.trilhas?.titulo}</TableCell>
+                <TableCell>
+                  {modulo.categoria ? (
+                    <Badge variant="outline">
+                      {modulo.categoria === 'aula_ao_vivo' && 'Aula ao Vivo'}
+                      {modulo.categoria === 'gravacao_videos' && 'Gravação'}
+                      {modulo.categoria === 'conteudo_mentorados' && 'Mentorados'}
+                      {modulo.categoria === 'outro' && 'Outro'}
+                    </Badge>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">-</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {modulo.data_inicio ? (
+                    format(new Date(modulo.data_inicio), "dd/MM/yyyy", { locale: ptBR })
+                  ) : (
+                    <span className="text-muted-foreground text-xs">-</span>
+                  )}
+                </TableCell>
+                <TableCell>{modulo.ordem}</TableCell>
                   <TableCell>
                     <Badge variant="secondary">{moduloStat?.total_videos || 0}</Badge>
                   </TableCell>
@@ -78,7 +101,14 @@ export function ModulosTab() {
         </Table>
       </div>
 
-      <ModuloModal open={isModalOpen} onOpenChange={setIsModalOpen} modulo={editingModulo} />
+      <ModuloModal 
+        open={isModalOpen} 
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) setEditingModulo(null);
+        }} 
+        modulo={editingModulo} 
+      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
