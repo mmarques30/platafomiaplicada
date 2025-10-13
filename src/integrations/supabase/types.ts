@@ -89,6 +89,7 @@ export type Database = {
           categoria: string
           created_at: string | null
           descricao: string
+          ferramentas_recomendadas: Json | null
           id: string
           prompt: string
           tags: Json | null
@@ -100,6 +101,7 @@ export type Database = {
           categoria: string
           created_at?: string | null
           descricao: string
+          ferramentas_recomendadas?: Json | null
           id?: string
           prompt: string
           tags?: Json | null
@@ -111,6 +113,7 @@ export type Database = {
           categoria?: string
           created_at?: string | null
           descricao?: string
+          ferramentas_recomendadas?: Json | null
           id?: string
           prompt?: string
           tags?: Json | null
@@ -675,6 +678,7 @@ export type Database = {
           conteudo: string
           created_at: string | null
           descricao: string
+          ferramentas_recomendadas: Json | null
           ia_recomendada: string | null
           id: string
           titulo: string
@@ -686,6 +690,7 @@ export type Database = {
           conteudo: string
           created_at?: string | null
           descricao: string
+          ferramentas_recomendadas?: Json | null
           ia_recomendada?: string | null
           id?: string
           titulo: string
@@ -697,6 +702,7 @@ export type Database = {
           conteudo?: string
           created_at?: string | null
           descricao?: string
+          ferramentas_recomendadas?: Json | null
           ia_recomendada?: string | null
           id?: string
           titulo?: string
@@ -750,6 +756,7 @@ export type Database = {
           created_at: string | null
           descricao: string
           exemplo: string | null
+          ferramentas_recomendadas: Json | null
           id: string
           template: string
           titulo: string
@@ -761,6 +768,7 @@ export type Database = {
           created_at?: string | null
           descricao: string
           exemplo?: string | null
+          ferramentas_recomendadas?: Json | null
           id?: string
           template: string
           titulo: string
@@ -772,6 +780,7 @@ export type Database = {
           created_at?: string | null
           descricao?: string
           exemplo?: string | null
+          ferramentas_recomendadas?: Json | null
           id?: string
           template?: string
           titulo?: string

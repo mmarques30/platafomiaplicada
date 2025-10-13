@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { useIACopieUse } from "@/hooks/useFerramentas";
-import { Sparkles, Search } from "lucide-react";
+import { Sparkles, Search, Cpu } from "lucide-react";
 
 export default function IACopieUse() {
   const { data: ias, isLoading } = useIACopieUse();
@@ -84,22 +84,43 @@ export default function IACopieUse() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredIAs.map((ia) => (
             <Card key={ia.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{ia.titulo}</CardTitle>
-                    <CardDescription>{ia.descricao}</CardDescription>
-                  </div>
-                  <Badge variant="secondary">{ia.categoria}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {ia.ia_recomendada && (
-                  <div className="text-sm">
-                    <span className="font-semibold">IA Recomendada:</span>{" "}
-                    {ia.ia_recomendada}
-                  </div>
-                )}
+               <CardHeader>
+                 <div className="flex items-start justify-between">
+                   <div className="flex-1">
+                     <CardTitle className="text-lg mb-2">{ia.titulo}</CardTitle>
+                     <CardDescription>{ia.descricao}</CardDescription>
+                   </div>
+                   <Badge variant="secondary">{ia.categoria}</Badge>
+                 </div>
+
+                 {Array.isArray(ia.ferramentas_recomendadas) && 
+                  ia.ferramentas_recomendadas.length > 0 && (
+                   <div className="mt-3 pt-3 border-t">
+                     <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                       <Cpu className="w-3 h-3" />
+                       Ferramentas onde aplicar:
+                     </p>
+                     <div className="flex gap-2 flex-wrap">
+                       {ia.ferramentas_recomendadas.map((ferramenta: string) => (
+                         <Badge 
+                           key={ferramenta} 
+                           variant="default" 
+                           className="text-xs bg-primary/10 text-primary hover:bg-primary/20"
+                         >
+                           {ferramenta}
+                         </Badge>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+               </CardHeader>
+               <CardContent className="space-y-4">
+                 {ia.ia_recomendada && (
+                   <div className="text-sm">
+                     <span className="font-semibold">IA Recomendada:</span>{" "}
+                     {ia.ia_recomendada}
+                   </div>
+                 )}
                 <div className="bg-muted p-3 rounded-md">
                   <code className="text-sm break-all">{ia.conteudo}</code>
                 </div>

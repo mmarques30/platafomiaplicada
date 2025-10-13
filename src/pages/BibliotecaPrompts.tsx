@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { usePrompts } from "@/hooks/useFerramentas";
-import { MessageSquare, Search } from "lucide-react";
+import { MessageSquare, Search, Cpu } from "lucide-react";
 
 export default function BibliotecaPrompts() {
   const { data: prompts, isLoading } = usePrompts();
@@ -102,11 +102,32 @@ export default function BibliotecaPrompts() {
                       <Badge key={index} variant="outline" className="text-xs">
                         {tag}
                       </Badge>
-                    ))}
-                  </div>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-4">
+                      ))}
+                    </div>
+                  )}
+
+                  {Array.isArray(prompt.ferramentas_recomendadas) && 
+                   prompt.ferramentas_recomendadas.length > 0 && (
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                        <Cpu className="w-3 h-3" />
+                        Ferramentas onde aplicar:
+                      </p>
+                      <div className="flex gap-2 flex-wrap">
+                        {prompt.ferramentas_recomendadas.map((ferramenta: string) => (
+                          <Badge 
+                            key={ferramenta} 
+                            variant="default" 
+                            className="text-xs bg-primary/10 text-primary hover:bg-primary/20"
+                          >
+                            {ferramenta}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
                 <div className="bg-muted p-4 rounded-md">
                   <pre className="text-sm whitespace-pre-wrap font-mono">
                     {prompt.prompt}

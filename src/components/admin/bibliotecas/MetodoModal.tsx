@@ -5,8 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCreateMetodo, useUpdateMetodo } from "@/hooks/admin/useBibliotecas";
+import { FerramentasSelector } from "./FerramentasSelector";
 
 interface MetodoModalProps {
   open: boolean;
@@ -16,12 +17,14 @@ interface MetodoModalProps {
 
 export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
   const { register, handleSubmit, reset, setValue } = useForm();
+  const [ferramentasRecomendadas, setFerramentasRecomendadas] = useState<string[]>([]);
   const createMetodo = useCreateMetodo();
   const updateMetodo = useUpdateMetodo();
 
   useEffect(() => {
     if (metodo) {
       reset(metodo);
+      setFerramentasRecomendadas(metodo.ferramentas_recomendadas || []);
     } else {
       reset({
         titulo: "",
@@ -29,19 +32,26 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
         categoria: "",
         template: "",
         exemplo: "",
+        ferramentas_recomendadas: [],
         ativo: true,
       });
+      setFerramentasRecomendadas([]);
     }
   }, [metodo, reset]);
 
   const onSubmit = (data: any) => {
+    const metodoData = {
+      ...data,
+      ferramentas_recomendadas: ferramentasRecomendadas,
+    };
+
     if (metodo) {
       updateMetodo.mutate(
-        { id: metodo.id, values: data },
+        { id: metodo.id, values: metodoData },
         { onSuccess: () => onOpenChange(false) }
       );
     } else {
-      createMetodo.mutate(data, { onSuccess: () => onOpenChange(false) });
+      createMetodo.mutate(metodoData, { onSuccess: () => onOpenChange(false) });
     }
   };
 
@@ -76,6 +86,11 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
             <Label htmlFor="exemplo">Exemplo (opcional)</Label>
             <Textarea id="exemplo" {...register("exemplo")} rows={6} />
           </div>
+
+          <FerramentasSelector
+            value={ferramentasRecomendadas}
+            onChange={setFerramentasRecomendadas}
+          />
 
           <div className="flex items-center space-x-2">
             <Switch

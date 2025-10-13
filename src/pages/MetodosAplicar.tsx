@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { useMetodos } from "@/hooks/useFerramentas";
-import { Target, Search, Lightbulb } from "lucide-react";
+import { Target, Search, Lightbulb, Cpu } from "lucide-react";
 
 export default function MetodosAplicar() {
   const { data: metodos, isLoading } = useMetodos();
@@ -88,15 +88,36 @@ export default function MetodosAplicar() {
         <div className="space-y-4">
           {filteredMetodos.map((metodo) => (
             <Card key={metodo.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-xl mb-2">{metodo.titulo}</CardTitle>
-                    <CardDescription>{metodo.descricao}</CardDescription>
-                  </div>
-                  <Badge variant="secondary">{metodo.categoria}</Badge>
-                </div>
-              </CardHeader>
+               <CardHeader>
+                 <div className="flex items-start justify-between">
+                   <div className="flex-1">
+                     <CardTitle className="text-xl mb-2">{metodo.titulo}</CardTitle>
+                     <CardDescription>{metodo.descricao}</CardDescription>
+                   </div>
+                   <Badge variant="secondary">{metodo.categoria}</Badge>
+                 </div>
+
+                 {Array.isArray(metodo.ferramentas_recomendadas) && 
+                  metodo.ferramentas_recomendadas.length > 0 && (
+                   <div className="mt-3 pt-3 border-t">
+                     <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                       <Cpu className="w-3 h-3" />
+                       Ferramentas onde aplicar:
+                     </p>
+                     <div className="flex gap-2 flex-wrap">
+                       {metodo.ferramentas_recomendadas.map((ferramenta: string) => (
+                         <Badge 
+                           key={ferramenta} 
+                           variant="default" 
+                           className="text-xs bg-primary/10 text-primary hover:bg-primary/20"
+                         >
+                           {ferramenta}
+                         </Badge>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+               </CardHeader>
               <CardContent className="space-y-4">
                 <Tabs defaultValue="template" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">

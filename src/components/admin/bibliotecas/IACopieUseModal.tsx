@@ -5,8 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCreateIACopieUse, useUpdateIACopieUse } from "@/hooks/admin/useBibliotecas";
+import { FerramentasSelector } from "./FerramentasSelector";
 
 interface IACopieUseModalProps {
   open: boolean;
@@ -16,12 +17,14 @@ interface IACopieUseModalProps {
 
 export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalProps) {
   const { register, handleSubmit, reset, setValue } = useForm();
+  const [ferramentasRecomendadas, setFerramentasRecomendadas] = useState<string[]>([]);
   const createItem = useCreateIACopieUse();
   const updateItem = useUpdateIACopieUse();
 
   useEffect(() => {
     if (item) {
       reset(item);
+      setFerramentasRecomendadas(item.ferramentas_recomendadas || []);
     } else {
       reset({
         titulo: "",
@@ -29,19 +32,26 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
         categoria: "",
         ia_recomendada: "",
         conteudo: "",
+        ferramentas_recomendadas: [],
         ativo: true,
       });
+      setFerramentasRecomendadas([]);
     }
   }, [item, reset]);
 
   const onSubmit = (data: any) => {
+    const itemData = {
+      ...data,
+      ferramentas_recomendadas: ferramentasRecomendadas,
+    };
+    
     if (item) {
       updateItem.mutate(
-        { id: item.id, values: data },
+        { id: item.id, values: itemData },
         { onSuccess: () => onOpenChange(false) }
       );
     } else {
-      createItem.mutate(data, { onSuccess: () => onOpenChange(false) });
+      createItem.mutate(itemData, { onSuccess: () => onOpenChange(false) });
     }
   };
 
@@ -76,6 +86,11 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
             <Label htmlFor="conteudo">Conteúdo (código/texto para copiar)</Label>
             <Textarea id="conteudo" {...register("conteudo", { required: true })} rows={10} />
           </div>
+
+          <FerramentasSelector
+            value={ferramentasRecomendadas}
+            onChange={setFerramentasRecomendadas}
+          />
 
           <div className="flex items-center space-x-2">
             <Switch

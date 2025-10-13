@@ -10,6 +10,7 @@ import { useCreatePrompt, useUpdatePrompt } from "@/hooks/admin/useBibliotecas";
 import { Badge } from "@/components/ui/badge";
 import { X, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { FerramentasSelector } from "./FerramentasSelector";
 import {
   Select,
   SelectContent,
@@ -44,6 +45,7 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
   const createPrompt = useCreatePrompt();
   const updatePrompt = useUpdatePrompt();
   const [tags, setTags] = useState<string[]>([]);
+  const [ferramentasRecomendadas, setFerramentasRecomendadas] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
@@ -52,6 +54,7 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
     if (prompt) {
       reset(prompt);
       setTags(prompt.tags || []);
+      setFerramentasRecomendadas(prompt.ferramentas_recomendadas || []);
     } else {
       reset({
         titulo: "",
@@ -59,9 +62,11 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
         categoria: "",
         prompt: "",
         tags: [],
+        ferramentas_recomendadas: [],
         ativo: true,
       });
       setTags([]);
+      setFerramentasRecomendadas([]);
     }
   }, [prompt, reset]);
 
@@ -130,7 +135,11 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
   };
 
   const onSubmit = (data: any) => {
-    const payload = { ...data, tags };
+    const payload = { 
+      ...data, 
+      tags,
+      ferramentas_recomendadas: ferramentasRecomendadas,
+    };
     if (prompt) {
       updatePrompt.mutate(
         { id: prompt.id, values: payload },
@@ -238,6 +247,11 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
               ))}
             </div>
           </div>
+
+          <FerramentasSelector
+            value={ferramentasRecomendadas}
+            onChange={setFerramentasRecomendadas}
+          />
 
           <div className="flex items-center space-x-2">
             <Switch
