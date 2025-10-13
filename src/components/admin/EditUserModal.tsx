@@ -93,7 +93,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         profissao: data.profissao || null,
         idade: data.idade ? parseInt(data.idade) : null,
         linkedin: data.linkedin || null,
-        plano_mentoria: selectedPlano || null,
+        plano_mentoria: selectedPlano === "" ? null : selectedPlano,
         data_expiracao_acesso: dataExpiracao?.toISOString() || null,
         conta_ativa: contaAtiva,
         roles: selectedRoles,

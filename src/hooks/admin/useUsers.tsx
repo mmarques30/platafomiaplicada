@@ -169,7 +169,7 @@ export function useUpdateUser() {
         profissao?: string | null;
         idade?: number | null;
         linkedin?: string | null;
-        plano_mentoria?: "intensivo_grupo" | "light" | "premium" | null;
+        plano_mentoria?: "intensivo_grupo" | "light" | "premium" | "" | null;
         data_expiracao_acesso?: string | null;
         conta_ativa?: boolean;
         roles?: AppRole[];
@@ -179,9 +179,17 @@ export function useUpdateUser() {
       
       // Atualizar profile
       if (Object.keys(profileUpdates).length > 0) {
+        // Normalizar plano_mentoria antes de enviar ao banco
+        const normalizedUpdates: any = { ...profileUpdates };
+        if ('plano_mentoria' in normalizedUpdates) {
+          normalizedUpdates.plano_mentoria = normalizedUpdates.plano_mentoria === "" 
+            ? null 
+            : normalizedUpdates.plano_mentoria;
+        }
+        
         const { error: profileError } = await supabase
           .from("profiles")
-          .update(profileUpdates)
+          .update(normalizedUpdates)
           .eq("id", userId);
           
         if (profileError) throw profileError;
