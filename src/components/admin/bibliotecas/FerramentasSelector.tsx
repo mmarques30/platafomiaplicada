@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useFerramentasIA } from "@/hooks/useFerramentas";
-import { Cpu, Loader2 } from "lucide-react";
+import { Cpu, Loader2, Check, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FerramentasSelectorProps {
   value: string[];
@@ -15,6 +19,7 @@ export function FerramentasSelector({
   onChange, 
   label = "Ferramentas Recomendadas" 
 }: FerramentasSelectorProps) {
+  const [open, setOpen] = useState(false);
   const { data: ferramentas, isLoading } = useFerramentasIA();
 
   const handleToggle = (ferramentaNome: string) => {
@@ -51,41 +56,71 @@ export function FerramentasSelector({
         Selecione em quais ferramentas de IA este conteúdo pode ser aplicado
       </p>
       
-      <div className="border rounded-lg p-4 max-h-64 overflow-y-auto space-y-2">
-        {ferramentas.map((ferramenta) => (
-          <div key={ferramenta.id} className="flex items-center space-x-2">
-            <Checkbox
-              id={`ferramenta-${ferramenta.id}`}
-              checked={value.includes(ferramenta.nome)}
-              onCheckedChange={() => handleToggle(ferramenta.nome)}
-            />
-            <label
-              htmlFor={`ferramenta-${ferramenta.id}`}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
-            >
-              {ferramenta.nome}
-            </label>
-          </div>
-        ))}
-      </div>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
+          >
+            {value.length === 0 ? (
+              <span className="text-muted-foreground">Selecionar ferramentas...</span>
+            ) : (
+              <span>
+                {value.length} ferramenta{value.length > 1 ? 's' : ''} selecionada{value.length > 1 ? 's' : ''}
+              </span>
+            )}
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        
+        <PopoverContent className="w-full p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Pesquisar ferramenta..." />
+            <CommandEmpty>Nenhuma ferramenta encontrada.</CommandEmpty>
+            <CommandList>
+              <CommandGroup>
+                {ferramentas.map((ferramenta) => {
+                  const isSelected = value.includes(ferramenta.nome);
+                  return (
+                    <CommandItem
+                      key={ferramenta.id}
+                      value={ferramenta.nome}
+                      onSelect={() => handleToggle(ferramenta.nome)}
+                    >
+                      <div
+                        className={cn(
+                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                          isSelected
+                            ? "bg-primary text-primary-foreground"
+                            : "opacity-50 [&_svg]:invisible"
+                        )}
+                      >
+                        <Check className="h-4 w-4" />
+                      </div>
+                      <span>{ferramenta.nome}</span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
 
       {value.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">
-            {value.length} ferramenta{value.length > 1 ? 's' : ''} selecionada{value.length > 1 ? 's' : ''}:
-          </p>
-          <div className="flex gap-2 flex-wrap">
-            {value.map((ferramenta) => (
-              <Badge 
-                key={ferramenta} 
-                variant="secondary"
-                className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                onClick={() => handleToggle(ferramenta)}
-              >
-                {ferramenta} ×
-              </Badge>
-            ))}
-          </div>
+        <div className="flex gap-2 flex-wrap">
+          {value.map((ferramenta) => (
+            <Badge 
+              key={ferramenta} 
+              variant="secondary"
+              className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
+              onClick={() => handleToggle(ferramenta)}
+            >
+              {ferramenta} ×
+            </Badge>
+          ))}
         </div>
       )}
     </div>
