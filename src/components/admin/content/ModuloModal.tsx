@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCreateModulo, useUpdateModulo, useTrilhas } from "@/hooks/admin/useContent";
+import { useCategorias } from "@/hooks/admin/useCategorias";
 
 interface ModuloModalProps {
   open: boolean;
@@ -23,6 +24,7 @@ interface ModuloModalProps {
 
 export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
   const { data: trilhas } = useTrilhas();
+  const { data: categorias } = useCategorias();
   const createModulo = useCreateModulo();
   const updateModulo = useUpdateModulo();
   const { register, handleSubmit, reset, setValue, watch } = useForm();
@@ -115,10 +117,11 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
                 <SelectValue placeholder="Selecione o tipo de módulo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="aula_ao_vivo">Aula ao Vivo</SelectItem>
-                <SelectItem value="gravacao_videos">Gravação de Vídeos</SelectItem>
-                <SelectItem value="conteudo_mentorados">Conteúdo Específico para Mentorados</SelectItem>
-                <SelectItem value="outro">Outro</SelectItem>
+                {categorias?.filter((cat: any) => cat.ativo).map((cat: any) => (
+                  <SelectItem key={cat.id} value={cat.slug}>
+                    {cat.nome}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">

@@ -3,6 +3,7 @@ import { TrilhasTab } from "@/components/admin/content/TrilhasTab";
 import { ModulosTab } from "@/components/admin/content/ModulosTab";
 import { VideosTab } from "@/components/admin/content/VideosTab";
 import { ExerciciosTab } from "@/components/admin/exercicios/ExerciciosTab";
+import { CategoriasTab } from "@/components/admin/content/CategoriasTab";
 
 export default function GerenciarConteudo() {
   return (
@@ -13,6 +14,7 @@ export default function GerenciarConteudo() {
         <TabsList>
           <TabsTrigger value="trilhas">Trilhas</TabsTrigger>
           <TabsTrigger value="modulos">Módulos</TabsTrigger>
+          <TabsTrigger value="categorias">Categorias</TabsTrigger>
           <TabsTrigger value="videos">Vídeos</TabsTrigger>
           <TabsTrigger value="exercicios">Exercícios Práticos</TabsTrigger>
         </TabsList>
@@ -23,6 +25,10 @@ export default function GerenciarConteudo() {
 
         <TabsContent value="modulos" className="mt-6">
           <ModulosTab />
+        </TabsContent>
+
+        <TabsContent value="categorias" className="mt-6">
+          <CategoriasTab />
         </TabsContent>
 
         <TabsContent value="videos" className="mt-6">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useModulos, useDeleteModulo, useModulosStats } from "@/hooks/admin/useContent";
+import { useCategorias } from "@/hooks/admin/useCategorias";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ import { ptBR } from "date-fns/locale";
 export function ModulosTab() {
   const { data: modulos, isLoading } = useModulos();
   const { data: stats } = useModulosStats();
+  const { data: categorias } = useCategorias();
   const deleteModulo = useDeleteModulo();
   const [editingModulo, setEditingModulo] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,12 +56,16 @@ export function ModulosTab() {
                 <TableCell>{modulo.trilha?.titulo}</TableCell>
                 <TableCell>
                   {modulo.categoria ? (
-                    <Badge variant="outline">
-                      {modulo.categoria === 'aula_ao_vivo' && 'Aula ao Vivo'}
-                      {modulo.categoria === 'gravacao_videos' && 'Gravação'}
-                      {modulo.categoria === 'conteudo_mentorados' && 'Mentorados'}
-                      {modulo.categoria === 'outro' && 'Outro'}
-                    </Badge>
+                    (() => {
+                      const cat = categorias?.find((c: any) => c.slug === modulo.categoria);
+                      return cat ? (
+                        <Badge variant="outline" style={{ backgroundColor: cat.cor + "20", borderColor: cat.cor }}>
+                          {cat.nome}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">{modulo.categoria}</Badge>
+                      );
+                    })()
                   ) : (
                     <span className="text-muted-foreground text-xs">-</span>
                   )}
