@@ -118,7 +118,8 @@ export function useCreateUser() {
       // Atualizar profile com plano_mentoria e marcar senha como temporária
       const updateData: any = {
         senha_temporaria: true,
-        primeiro_acesso: true
+        primeiro_acesso: true,
+        email: email,
       };
       
       if (planoMentoria) {
@@ -149,6 +150,112 @@ export function useCreateUser() {
     },
     onError: (error) => {
       toast.error("Erro ao criar usuário: " + error.message);
+    },
+  });
+}
+
+export function useUpdateUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      updates,
+    }: {
+      userId: string;
+      updates: {
+        nome_completo?: string;
+        email?: string;
+        profissao?: string | null;
+        idade?: number | null;
+        linkedin?: string | null;
+        plano_mentoria?: "intensivo_grupo" | "light" | "premium" | null;
+        data_expiracao_acesso?: string | null;
+        conta_ativa?: boolean;
+        roles?: AppRole[];
+      };
+    }) => {
+      const { roles, ...profileUpdates } = updates;
+      
+      // Atualizar profile
+      if (Object.keys(profileUpdates).length > 0) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update(profileUpdates)
+          .eq("id", userId);
+          
+        if (profileError) throw profileError;
+      }
+      
+      // Atualizar roles
+      if (roles !== undefined) {
+        // Deletar roles antigas
+        const { error: deleteError } = await supabase
+          .from("user_roles")
+          .delete()
+          .eq("user_id", userId);
+          
+        if (deleteError) throw deleteError;
+        
+        // Inserir novas roles
+        if (roles.length > 0) {
+          const { error: insertError } = await supabase
+            .from("user_roles")
+            .insert(roles.map(role => ({ user_id: userId, role })));
+            
+          if (insertError) throw insertError;
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("Usuário atualizado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar usuário: " + error.message);
+    },
+  });
+}
+
+export function useResetUserPassword() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      newPassword,
+      forcaAlteracao = false,
+    }: {
+      userId: string;
+      newPassword: string;
+      forcaAlteracao?: boolean;
+    }) => {
+      // Chamar edge function para resetar senha
+      const { error: functionError } = await supabase.functions.invoke("reset-user-password", {
+        body: { userId, newPassword },
+      });
+
+      if (functionError) throw functionError;
+      
+      // Marcar como senha temporária se forçar
+      if (forcaAlteracao) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            senha_temporaria: true,
+            primeiro_acesso: true,
+          })
+          .eq("id", userId);
+          
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("Senha resetada com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao resetar senha: " + error.message);
     },
   });
 }

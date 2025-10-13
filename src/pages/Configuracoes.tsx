@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Moon, Sun, Bell, Lock, Trash2 } from "lucide-react";
+import { Moon, Sun, Bell, Lock, Trash2, AlertTriangle } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
   AlertDialog,
@@ -29,6 +30,25 @@ export default function Configuracoes() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [senhaTemporaria, setSenhaTemporaria] = useState(false);
+
+  useEffect(() => {
+    const checkSenhaTemporaria = async () => {
+      if (!user) return;
+      
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("senha_temporaria")
+        .eq("id", user.id)
+        .single();
+        
+      if (profile?.senha_temporaria) {
+        setSenhaTemporaria(true);
+      }
+    };
+    
+    checkSenhaTemporaria();
+  }, [user]);
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -48,6 +68,19 @@ export default function Configuracoes() {
 
       if (error) throw error;
 
+      // Atualizar flag de senha temporária
+      if (user) {
+        await supabase
+          .from("profiles")
+          .update({
+            senha_temporaria: false,
+            primeiro_acesso: false,
+            senha_alterada_em: new Date().toISOString()
+          })
+          .eq("id", user.id);
+      }
+
+      setSenhaTemporaria(false);
       toast.success("Senha alterada com sucesso");
       setNewPassword("");
       setConfirmPassword("");
@@ -59,8 +92,6 @@ export default function Configuracoes() {
 
   const handleDeleteAccount = async () => {
     try {
-      // Aqui você implementaria a lógica de deletar a conta
-      // Por enquanto, apenas faz logout
       toast.success("Conta desativada com sucesso");
       await signOut();
     } catch (error) {
@@ -69,13 +100,10 @@ export default function Configuracoes() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Configurações</h1>
-        <p className="text-muted-foreground">Gerencie suas preferências e configurações da conta</p>
-      </div>
+    <div className="container max-w-4xl py-8">
+      <h1 className="text-3xl font-bold mb-8">Configurações</h1>
 
-      <div className="space-y-6 max-w-2xl">
+      <div className="space-y-6">
         {/* Aparência */}
         <Card>
           <CardHeader>
@@ -83,17 +111,18 @@ export default function Configuracoes() {
               {theme === "dark" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
               Aparência
             </CardTitle>
-            <CardDescription>Personalize a aparência da plataforma</CardDescription>
+            <CardDescription>Personalize a aparência do sistema</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>Tema Escuro</Label>
+                <Label htmlFor="dark-mode">Modo Escuro</Label>
                 <p className="text-sm text-muted-foreground">
-                  Ative o modo escuro para reduzir o brilho da tela
+                  Ative o tema escuro para melhor visualização
                 </p>
               </div>
               <Switch
+                id="dark-mode"
                 checked={theme === "dark"}
                 onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
               />
@@ -108,17 +137,18 @@ export default function Configuracoes() {
               <Bell className="h-5 w-5" />
               Notificações
             </CardTitle>
-            <CardDescription>Configure como você deseja receber notificações</CardDescription>
+            <CardDescription>Gerencie suas preferências de notificações</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>Notificações por Email</Label>
+                <Label htmlFor="email-notifications">Notificações por Email</Label>
                 <p className="text-sm text-muted-foreground">
-                  Receba atualizações importantes por email
+                  Receba atualizações por email
                 </p>
               </div>
               <Switch
+                id="email-notifications"
                 checked={notificacoesEmail}
                 onCheckedChange={setNotificacoesEmail}
               />
@@ -133,15 +163,18 @@ export default function Configuracoes() {
               <Lock className="h-5 w-5" />
               Segurança
             </CardTitle>
-            <CardDescription>Gerencie a segurança da sua conta</CardDescription>
+            <CardDescription>Altere sua senha de acesso</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label>Email da Conta</Label>
-              <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
-            </div>
-
-            <Separator />
+            {senhaTemporaria && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Senha Temporária</AlertTitle>
+                <AlertDescription>
+                  Você está usando uma senha temporária. Recomendamos alterá-la para uma senha pessoal agora.
+                </AlertDescription>
+              </Alert>
+            )}
 
             {!isChangingPassword ? (
               <Button onClick={() => setIsChangingPassword(true)} variant="outline">
@@ -150,9 +183,9 @@ export default function Configuracoes() {
             ) : (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">Nova Senha</Label>
+                  <Label htmlFor="new-password">Nova Senha</Label>
                   <Input
-                    id="newPassword"
+                    id="new-password"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -160,9 +193,9 @@ export default function Configuracoes() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                  <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
                   <Input
-                    id="confirmPassword"
+                    id="confirm-password"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -171,15 +204,15 @@ export default function Configuracoes() {
                 </div>
                 <div className="flex gap-2">
                   <Button onClick={handleChangePassword}>
-                    Salvar Nova Senha
+                    Confirmar Alteração
                   </Button>
                   <Button
+                    variant="outline"
                     onClick={() => {
                       setIsChangingPassword(false);
                       setNewPassword("");
                       setConfirmPassword("");
                     }}
-                    variant="outline"
                   >
                     Cancelar
                   </Button>
@@ -196,7 +229,7 @@ export default function Configuracoes() {
               <Trash2 className="h-5 w-5" />
               Zona de Perigo
             </CardTitle>
-            <CardDescription>Ações irreversíveis na sua conta</CardDescription>
+            <CardDescription>Ações irreversíveis da conta</CardDescription>
           </CardHeader>
           <CardContent>
             <AlertDialog>
@@ -205,16 +238,16 @@ export default function Configuracoes() {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                  <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta ação não pode ser desfeita. Isso irá desativar permanentemente sua
-                    conta e remover seus dados dos nossos servidores.
+                    Esta ação não pode ser desfeita. Sua conta será permanentemente
+                    desativada e você será desconectado do sistema.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive">
-                    Sim, desativar conta
+                  <AlertDialogAction onClick={handleDeleteAccount}>
+                    Desativar Conta
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

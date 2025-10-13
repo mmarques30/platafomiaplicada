@@ -891,7 +891,10 @@ export type Database = {
       }
       profiles: {
         Row: {
+          conta_ativa: boolean | null
           created_at: string | null
+          data_expiracao_acesso: string | null
+          email: string | null
           id: string
           idade: number | null
           linkedin: string | null
@@ -904,7 +907,10 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          conta_ativa?: boolean | null
           created_at?: string | null
+          data_expiracao_acesso?: string | null
+          email?: string | null
           id: string
           idade?: number | null
           linkedin?: string | null
@@ -917,7 +923,10 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          conta_ativa?: boolean | null
           created_at?: string | null
+          data_expiracao_acesso?: string | null
+          email?: string | null
           id?: string
           idade?: number | null
           linkedin?: string | null
