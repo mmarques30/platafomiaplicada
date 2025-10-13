@@ -81,7 +81,12 @@ export function VideosTab() {
         </Table>
       </div>
 
-      <VideoModal open={isModalOpen} onOpenChange={handleOpenChange} video={editingVideo} />
+      <VideoModal 
+        key={editingVideo?.id ?? "new"}
+        open={isModalOpen} 
+        onOpenChange={handleOpenChange} 
+        video={editingVideo} 
+      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

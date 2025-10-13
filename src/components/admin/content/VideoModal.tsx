@@ -211,6 +211,12 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
           </div>
           <div className="space-y-2">
             <Label>Data da Aula</Label>
+            <Input
+              type="date"
+              value={watch("data_aula") ?? ""}
+              onChange={(e) => setValue("data_aula", e.target.value)}
+              className="w-full"
+            />
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -231,7 +237,6 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
                   mode="single"
                   selected={watch("data_aula") ? new Date(watch("data_aula")) : undefined}
                   onSelect={(date) => setValue("data_aula", date ? format(date, "yyyy-MM-dd") : null)}
-                  disabled={false}
                   initialFocus
                 />
               </PopoverContent>
