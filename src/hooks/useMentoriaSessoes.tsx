@@ -23,14 +23,13 @@ export const useMentoriaSessoes = () => {
   const queryClient = useQueryClient();
 
   const { data: sessoes, isLoading } = useQuery({
-    queryKey: ["sessoes-mentoria", user?.id],
+    queryKey: ["sessoes-mentoria"],
     queryFn: async () => {
       if (!user) return [];
       
       const { data, error } = await supabase
         .from("sessoes_mentoria")
         .select("*")
-        .eq("user_id", user.id)
         .order("data_sessao", { ascending: false });
 
       if (error) throw error;
@@ -41,11 +40,9 @@ export const useMentoriaSessoes = () => {
 
   const createSessao = useMutation({
     mutationFn: async (sessao: Partial<SessaoMentoria>) => {
-      if (!user) throw new Error("Usuário não autenticado");
-
       const { data, error } = await supabase
         .from("sessoes_mentoria")
-        .insert([{ ...sessao, user_id: user.id } as any])
+        .insert([sessao as any])
         .select()
         .single();
 
