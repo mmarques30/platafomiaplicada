@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { VideoCardVertical } from "@/components/shared/VideoCardVertical";
-import { BookOpen, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Video {
@@ -24,7 +24,6 @@ export function TrilhaCarousel({ trilhaId, trilhaTitulo, videos }: TrilhaCarouse
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <BookOpen className="w-5 h-5 text-primary" />
           <h3 className="text-xl font-semibold">{trilhaTitulo}</h3>
           <Badge variant="secondary" className="text-xs">
             {videos.length} {videos.length === 1 ? 'vídeo' : 'vídeos'}
