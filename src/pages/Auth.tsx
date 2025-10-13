@@ -95,8 +95,12 @@ export default function Auth() {
             </span>
           </h1>
           
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-xl text-muted-foreground mb-4">
             Trilhas de ensino aplicado, conteúdos para qualquer cargo e nível técnico e acompanhamento individual para acelerar seu crescimento profissional.
+          </p>
+          
+          <p className="text-lg font-semibold text-accent">
+            #menoshypemaisentrega
           </p>
         </div>
       </div>
