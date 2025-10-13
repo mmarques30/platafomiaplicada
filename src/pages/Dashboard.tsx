@@ -1,13 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { MessageSquare, Sparkles, AlertCircle, X } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [question, setQuestion] = useState("");
+  const [mostrarAvisoSenha, setMostrarAvisoSenha] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    
+    const verificarSenhaTemporaria = async () => {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('senha_temporaria, primeiro_acesso')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.senha_temporaria || profile?.primeiro_acesso) {
+        setMostrarAvisoSenha(true);
+      }
+    };
+
+    verificarSenhaTemporaria();
+  }, [user]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +46,33 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-6 space-y-8">
+        {/* Aviso de senha temporária */}
+        {mostrarAvisoSenha && (
+          <Alert className="border-warning bg-warning/10">
+            <AlertCircle className="h-4 w-4 text-warning" />
+            <AlertDescription className="flex items-center justify-between">
+              <div className="flex-1">
+                <strong>Senha temporária detectada:</strong> Por segurança, recomendamos que você{" "}
+                <Link 
+                  to="/configuracoes" 
+                  className="underline font-medium hover:text-warning"
+                >
+                  altere sua senha em Configurações
+                </Link>
+                .
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ml-4"
+                onClick={() => setMostrarAvisoSenha(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Ask IA Aplicada */}
         <section className="flex items-center justify-center py-12">
           <div className="w-full max-w-3xl px-6">

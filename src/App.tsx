@@ -48,7 +48,7 @@ import Auditoria from "./pages/admin/Auditoria";
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const { user, precisaTrocarSenha, setPrecisaTrocarSenha } = useAuth();
+  const { user } = useAuth();
 
   return (
     <>
@@ -96,14 +96,6 @@ function AppContent() {
           
           <Route path="*" element={<NotFound />} />
         </Routes>
-
-      {user && precisaTrocarSenha && (
-        <TrocarSenhaModal 
-          open={precisaTrocarSenha}
-          userId={user.id}
-          onSuccess={() => setPrecisaTrocarSenha(false)}
-        />
-      )}
     </>
   );
 }
