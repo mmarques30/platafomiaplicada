@@ -10,6 +10,28 @@ import { useCreatePrompt, useUpdatePrompt } from "@/hooks/admin/useBibliotecas";
 import { Badge } from "@/components/ui/badge";
 import { X, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const CATEGORIAS_PROMPTS = [
+  "Liderança",
+  "Gestão de Projetos",
+  "Produtividade",
+  "Comunicação",
+  "Análise de Dados",
+  "Criação de Conteúdo",
+  "Desenvolvimento",
+  "Marketing",
+  "Vendas",
+  "RH e Pessoas",
+  "Estratégia",
+  "Outros",
+] as const;
 
 interface PromptModalProps {
   open: boolean;
@@ -18,7 +40,7 @@ interface PromptModalProps {
 }
 
 export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const { register, handleSubmit, reset, setValue, watch } = useForm();
   const createPrompt = useCreatePrompt();
   const updatePrompt = useUpdatePrompt();
   const [tags, setTags] = useState<string[]>([]);
@@ -138,7 +160,24 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
 
           <div>
             <Label htmlFor="categoria">Categoria</Label>
-            <Input id="categoria" {...register("categoria", { required: true })} />
+            <Select
+              value={watch("categoria") || ""}
+              onValueChange={(value) => setValue("categoria", value)}
+            >
+              <SelectTrigger id="categoria" className="w-full">
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                {CATEGORIAS_PROMPTS.map((categoria) => (
+                  <SelectItem key={categoria} value={categoria}>
+                    {categoria}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {!watch("categoria") && (
+              <p className="text-sm text-destructive mt-1">Categoria é obrigatória</p>
+            )}
           </div>
 
           <div>
