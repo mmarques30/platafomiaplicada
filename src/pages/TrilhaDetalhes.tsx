@@ -128,26 +128,29 @@ export default function TrilhaDetalhes() {
 
   const { averageRating, ratingCount, userRating, setRating } = useVideoRating(currentVideoId || "");
 
-  // Mutation para marcar vídeo como concluído
-  const marcarComoConcluidoMutation = useMutation({
+  // Mutation para toggle de conclusão de vídeo
+  const toggleConcluidoMutation = useMutation({
     mutationFn: async () => {
       if (!user || !currentVideoId) return;
 
       const { data: existing } = await supabase
         .from("progresso_videos")
-        .select("id")
+        .select("id, completado")
         .eq("user_id", user.id)
         .eq("video_id", currentVideoId)
         .maybeSingle();
 
       if (existing) {
+        // Toggle: inverte o estado atual
         const { error } = await supabase
           .from("progresso_videos")
-          .update({ completado: true })
+          .update({ completado: !existing.completado })
           .eq("id", existing.id);
 
         if (error) throw error;
+        return !existing.completado;
       } else {
+        // Primeiro acesso: marca como concluído
         const { error } = await supabase
           .from("progresso_videos")
           .insert({
@@ -158,14 +161,19 @@ export default function TrilhaDetalhes() {
           });
 
         if (error) throw error;
+        return true;
       }
     },
-    onSuccess: () => {
-      toast.success("Vídeo marcado como concluído!");
+    onSuccess: (novoEstado) => {
+      toast.success(
+        novoEstado 
+          ? "Vídeo marcado como concluído!" 
+          : "Vídeo desmarcado como concluído"
+      );
       queryClient.invalidateQueries({ queryKey: ["video-progress", user?.id] });
     },
     onError: () => {
-      toast.error("Erro ao marcar vídeo como concluído");
+      toast.error("Erro ao atualizar status do vídeo");
     },
   });
 
@@ -233,9 +241,13 @@ export default function TrilhaDetalhes() {
                       </div>
                       <Button
                         size="lg"
-                        onClick={() => marcarComoConcluidoMutation.mutate()}
-                        disabled={marcarComoConcluidoMutation.isPending || getVideoProgress(currentVideoId || '')?.completado}
-                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => toggleConcluidoMutation.mutate()}
+                        disabled={toggleConcluidoMutation.isPending}
+                        className={cn(
+                          getVideoProgress(currentVideoId || '')?.completado 
+                            ? "bg-green-600 hover:bg-green-700" 
+                            : "bg-primary hover:bg-primary/90"
+                        )}
                       >
                         <CheckCircle2 className="h-5 w-5 mr-2" />
                         {getVideoProgress(currentVideoId || '')?.completado ? "Concluída" : "Marcar como Concluída"}
