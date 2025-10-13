@@ -93,13 +93,13 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
                     : "Selecionar data"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
                 <Calendar
                   mode="single"
                   selected={watch("data_inicio") ? new Date(watch("data_inicio")) : undefined}
                   onSelect={(date) => setValue("data_inicio", date?.toISOString().split('T')[0])}
+                  disabled={false}
                   initialFocus
-                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
