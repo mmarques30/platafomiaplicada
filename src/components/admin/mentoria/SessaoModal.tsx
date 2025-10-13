@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
+
+const formatDateForInput = (dateString?: string) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
 
 type SessaoModalProps = {
   open: boolean;
@@ -25,14 +37,39 @@ export default function SessaoModal({
   isLoading
 }: SessaoModalProps) {
   const { register, handleSubmit, setValue, watch, reset } = useForm<Partial<SessaoMentoria>>({
-    defaultValues: sessao || {
+    defaultValues: {
       status: "agendada"
     }
   });
 
+  useEffect(() => {
+    if (open && sessao) {
+      reset({
+        titulo: sessao.titulo,
+        data_sessao: formatDateForInput(sessao.data_sessao),
+        duracao: sessao.duracao,
+        status: sessao.status,
+        video_url: sessao.video_url || "",
+        transcricao_url: sessao.transcricao_url || "",
+        transcricao: sessao.transcricao || "",
+        notas: sessao.notas || ""
+      });
+    } else if (open && !sessao) {
+      reset({
+        titulo: "",
+        data_sessao: "",
+        duracao: undefined,
+        status: "agendada",
+        video_url: "",
+        transcricao_url: "",
+        transcricao: "",
+        notas: ""
+      });
+    }
+  }, [open, sessao, reset]);
+
   const handleFormSubmit = (data: Partial<SessaoMentoria>) => {
     onSubmit({ ...data, user_id: userId || sessao?.user_id });
-    reset();
     onOpenChange(false);
   };
 
