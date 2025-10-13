@@ -14,13 +14,18 @@ export function VideosTab() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const handleOpenChange = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) setEditingVideo(null);
+  };
+
   if (isLoading) return <div>Carregando...</div>;
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Vídeos</h2>
-        <Button onClick={() => setIsModalOpen(true)}>
+        <Button onClick={() => { setEditingVideo(null); setIsModalOpen(true); }}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Vídeo
         </Button>
@@ -76,7 +81,7 @@ export function VideosTab() {
         </Table>
       </div>
 
-      <VideoModal open={isModalOpen} onOpenChange={setIsModalOpen} video={editingVideo} />
+      <VideoModal open={isModalOpen} onOpenChange={handleOpenChange} video={editingVideo} />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

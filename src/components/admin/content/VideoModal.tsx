@@ -226,13 +226,13 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
                     : "Selecionar data"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
                 <Calendar
                   mode="single"
                   selected={watch("data_aula") ? new Date(watch("data_aula")) : undefined}
-                  onSelect={(date) => setValue("data_aula", date?.toISOString().split('T')[0])}
+                  onSelect={(date) => setValue("data_aula", date ? format(date, "yyyy-MM-dd") : null)}
+                  disabled={false}
                   initialFocus
-                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
