@@ -8,7 +8,8 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useCreatePrompt, useUpdatePrompt } from "@/hooks/admin/useBibliotecas";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X, Upload } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PromptModalProps {
   open: boolean;
@@ -22,6 +23,8 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
   const updatePrompt = useUpdatePrompt();
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (prompt) {
@@ -49,6 +52,59 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
 
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validar extensão
+    const validExtensions = ['.txt', '.md', '.json'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    
+    if (!validExtensions.includes(fileExtension)) {
+      toast({
+        title: "Formato não suportado",
+        description: "Use arquivos .txt, .md ou .json",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validar tamanho (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "O tamanho máximo é 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      setValue("prompt", content);
+      toast({
+        title: "Prompt importado com sucesso!",
+        description: `${file.name} foi carregado. Você pode editar o conteúdo antes de salvar.`,
+      });
+      setIsImporting(false);
+    };
+    
+    reader.onerror = () => {
+      toast({
+        title: "Erro ao ler arquivo",
+        description: "Tente novamente ou digite o prompt manualmente.",
+        variant: "destructive",
+      });
+      setIsImporting(false);
+    };
+    
+    reader.readAsText(file);
+    event.target.value = "";
   };
 
   const onSubmit = (data: any) => {
@@ -86,8 +142,37 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
           </div>
 
           <div>
+            <Label htmlFor="file-upload">Importar Prompt de Arquivo (opcional)</Label>
+            <div className="flex gap-2">
+              <Input 
+                id="file-upload" 
+                type="file" 
+                accept=".txt,.md,.json"
+                onChange={handleFileUpload}
+                disabled={isImporting}
+                className="cursor-pointer"
+              />
+              <Button 
+                type="button" 
+                variant="outline" 
+                disabled={isImporting}
+                onClick={() => document.getElementById('file-upload')?.click()}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {isImporting ? "Importando..." : "Selecionar"}
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Formatos aceitos: .txt, .md, .json (máx. 5MB)
+            </p>
+          </div>
+
+          <div>
             <Label htmlFor="prompt">Prompt</Label>
             <Textarea id="prompt" {...register("prompt", { required: true })} rows={8} />
+            <p className="text-sm text-muted-foreground mt-1">
+              Digite o prompt ou importe de um arquivo acima
+            </p>
           </div>
 
           <div>
