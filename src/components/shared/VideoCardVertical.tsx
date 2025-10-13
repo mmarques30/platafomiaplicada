@@ -19,28 +19,20 @@ export function VideoCardVertical({
 
   return (
     <Link to={`/videos/${id}`} className="block group">
-      <div className="space-y-3">
-        {/* Card com imagem */}
-        <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative h-[400px] w-full bg-muted">
-          <img
-            src={thumbnailUrl}
-            alt={titulo}
-            loading="lazy"
-            className="block w-full h-full object-cover object-center"
-          />
-          
-          {/* Overlay com Play */}
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
-              <Play className="h-8 w-8 text-primary-foreground ml-1" fill="currentColor" />
-            </div>
+      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative h-[400px] w-full bg-muted">
+        <img
+          src={thumbnailUrl}
+          alt={titulo}
+          loading="lazy"
+          className="block w-full h-full object-cover object-center"
+        />
+        
+        {/* Overlay com Play */}
+        <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
+            <Play className="h-8 w-8 text-primary-foreground ml-1" fill="currentColor" />
           </div>
         </div>
-        
-        {/* Título do vídeo */}
-        <h3 className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors px-1">
-          {titulo}
-        </h3>
       </div>
     </Link>
   );
