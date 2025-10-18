@@ -238,7 +238,7 @@ export default function Chat() {
                     alt="Mariana Martins" 
                     className="w-20 h-20 rounded-full mx-auto mb-4 border-2 border-primary object-cover"
                   />
-                  <h3 className="text-lg font-semibold mb-2">Oi, Aplicado! 👋</h3>
+                  <h3 className="text-lg font-semibold mb-2">Oi, Aplicado!</h3>
                   <p className="text-muted-foreground">
                     Sou a Mari, sua mentora de IA. Como posso te ajudar hoje?
                   </p>
