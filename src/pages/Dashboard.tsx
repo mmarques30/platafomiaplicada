@@ -94,7 +94,7 @@ export default function Dashboard() {
 
         {/* Últimos Conteúdos Adicionados */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-center">Últimos Conteúdos Adicionados</h2>
+          <h2 className="text-2xl font-bold">Últimos Conteúdos Adicionados</h2>
           <UltimosConteudos />
         </section>
 
