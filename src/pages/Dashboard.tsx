@@ -7,6 +7,7 @@ import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import mariAvatar from "@/assets/mari-avatar.jpg";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -73,16 +74,37 @@ export default function Dashboard() {
           </Alert>
         )}
 
-        {/* Ask IA Aplicada */}
+        {/* Novidades da Semana */}
+        <section>
+          <NovidadesSemana />
+        </section>
+
+        {/* Últimos Conteúdos Adicionados */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-center">Últimos Conteúdos Adicionados</h2>
+          <UltimosConteudos />
+        </section>
+
+        {/* Aprenda com a Mari */}
         <section className="flex items-center justify-center py-12">
           <div className="w-full max-w-3xl px-6">
-            {/* Header */}
+            {/* Header com foto da Mari */}
             <div className="text-center mb-10">
-              <h1 className="text-5xl font-bold mb-4">
-                Ask <span className="text-accent">IAplicada</span>
-              </h1>
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <img 
+                    src={mariAvatar} 
+                    alt="Mariana Martins" 
+                    className="w-24 h-24 rounded-full object-cover border-4 border-primary shadow-lg"
+                  />
+                  <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 rounded-full border-4 border-background"></div>
+                </div>
+              </div>
+              <h2 className="text-4xl font-bold mb-3">
+                Aprenda com a <span className="text-accent">Mari</span>
+              </h2>
               <p className="text-muted-foreground text-lg">
-                Sua assistente inteligente para todas as dúvidas sobre os cursos
+                Sua mentora de IA está aqui pra tirar suas dúvidas sobre a plataforma e os cursos
               </p>
             </div>
             
@@ -97,7 +119,7 @@ export default function Dashboard() {
                       type="text"
                       value={question}
                       onChange={(e) => setQuestion(e.target.value)}
-                      placeholder="Ask IAplicada..."
+                      placeholder="Pergunte à Mari..."
                       className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground text-lg"
                     />
                   </div>
@@ -126,17 +148,6 @@ export default function Dashboard() {
               </Button>
             </div>
           </div>
-        </section>
-
-        {/* Novidades da Semana */}
-        <section>
-          <NovidadesSemana />
-        </section>
-
-        {/* Últimos Conteúdos Adicionados */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-center">Últimos Conteúdos Adicionados</h2>
-          <UltimosConteudos />
         </section>
       </main>
     </div>
