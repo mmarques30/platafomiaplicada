@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import mariAvatar from "@/assets/mari-avatar.jpg";
 
 interface Message {
   role: "user" | "assistant";
@@ -181,15 +182,22 @@ export default function Chat() {
   if (!session) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="p-8 max-w-md w-full text-center">
-          <h1 className="text-2xl font-bold mb-4">Chat com IA</h1>
-          <p className="text-muted-foreground mb-6">
-            Faça login para conversar com seu mentor especializado em IA
-          </p>
-          <Button onClick={() => window.location.href = '/auth'}>
-            Fazer Login
-          </Button>
-        </Card>
+      <Card className="p-8 max-w-md w-full text-center">
+        <div className="flex justify-center mb-4">
+          <img 
+            src={mariAvatar} 
+            alt="Mariana Martins" 
+            className="w-16 h-16 rounded-full border-2 border-primary object-cover"
+          />
+        </div>
+        <h1 className="text-2xl font-bold mb-4">Chat com a Mari</h1>
+        <p className="text-muted-foreground mb-6">
+          Faça login para conversar diretamente com a Mariana sobre sua jornada em IA
+        </p>
+        <Button onClick={() => window.location.href = '/auth'}>
+          Fazer Login
+        </Button>
+      </Card>
       </div>
     );
   }
@@ -198,44 +206,79 @@ export default function Chat() {
     <div className="min-h-screen bg-background flex flex-col">
       <main className="flex-1 container py-6 flex flex-col">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold">Chat com IA</h1>
-          <p className="text-muted-foreground">
-            Converse com um mentor especializado em IA
-          </p>
+        <h1 className="text-2xl font-bold">Chat com a Mari</h1>
+        <p className="text-muted-foreground">
+          Converse diretamente com a Mariana sobre sua jornada em IA
+        </p>
         </div>
 
         <Card className="flex-1 flex flex-col">
+          {/* Header fixo */}
+          <div className="p-4 border-b flex items-center gap-3 bg-card">
+            <div className="relative">
+              <img 
+                src={mariAvatar} 
+                alt="Mariana Martins" 
+                className="w-12 h-12 rounded-full object-cover border-2 border-primary"
+              />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+            </div>
+            <div className="flex-1">
+              <h2 className="font-semibold text-lg">Mariana Martins</h2>
+              <p className="text-sm text-muted-foreground">Mentora IA Aplicada</p>
+            </div>
+          </div>
+          
           <ScrollArea ref={scrollRef} className="flex-1 p-4">
             <div className="space-y-4">
               {messages.length === 0 && (
-                <div className="text-center text-muted-foreground py-12">
-                  Envie uma mensagem para começar a conversa
+                <div className="text-center py-12">
+                  <img 
+                    src={mariAvatar} 
+                    alt="Mariana Martins" 
+                    className="w-20 h-20 rounded-full mx-auto mb-4 border-2 border-primary object-cover"
+                  />
+                  <h3 className="text-lg font-semibold mb-2">Oi, Aplicado! 👋</h3>
+                  <p className="text-muted-foreground">
+                    Sou a Mari, sua mentora de IA. Como posso te ajudar hoje?
+                  </p>
                 </div>
               )}
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground px-4 py-2"
-                        : "ai-message-container"
-                    }`}
-                  >
-                    {message.role === "assistant" ? (
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                message.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              {message.role === "assistant" ? (
+                <div className="flex gap-3 items-start max-w-[80%]">
+                  <div className="flex-shrink-0">
+                    <img 
+                      src={mariAvatar} 
+                      alt="Mariana Martins" 
+                      className="w-10 h-10 rounded-full object-cover border-2 border-primary"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-semibold text-foreground">Mari</span>
+                      <span className="text-xs text-muted-foreground">Mentora IA Aplicada</span>
+                    </div>
+                    <div className="ai-message-container">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {message.content}
                       </ReactMarkdown>
-                    ) : (
-                      message.content
-                    )}
+                    </div>
                   </div>
                 </div>
-              ))}
+              ) : (
+                <div className="bg-primary text-primary-foreground px-4 py-2 rounded-lg max-w-[80%]">
+                  {message.content}
+                </div>
+              )}
+            </div>
+          ))}
               {isLoading && messages[messages.length - 1]?.role === "user" && (
                 <div className="flex justify-start">
                   <div className="bg-muted rounded-lg px-4 py-2">
