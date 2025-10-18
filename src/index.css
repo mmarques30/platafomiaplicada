@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* IAplicada Dark Theme - Branding 2025 */
-    --background: 72 6% 18%; /* #2F302B - Preto do branding */
+    --background: 75 5% 15%; /* #272824 - Background do branding */
     --foreground: 60 100% 97%; /* #FFFFF6 - Amarelo claro do branding */
     
     --card: 30 4% 24%;
