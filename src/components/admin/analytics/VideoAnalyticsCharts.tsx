@@ -1,7 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+import { getColorByIndex } from "@/lib/chartColors";
 
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+const COLORS = [
+  "hsl(var(--chart-1))", // Verde 900
+  "hsl(var(--chart-2))", // Verde 800
+  "hsl(var(--chart-3))", // Verde 700
+  "hsl(var(--chart-4))", // Verde 600
+  "hsl(var(--chart-5))", // Verde 500
+  "hsl(var(--chart-6))", // Verde 400
+];
 
 interface VideoAnalyticsChartsProps {
   topVideos: any[];
@@ -29,7 +37,7 @@ export function VideoAnalyticsCharts({ topVideos, distribuicaoTrilhas }: VideoAn
               />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="visualizacoes" fill="#3b82f6" />
+              <Bar dataKey="visualizacoes" fill="hsl(var(--chart-3))" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

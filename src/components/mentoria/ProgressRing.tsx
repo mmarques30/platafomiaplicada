@@ -1,8 +1,11 @@
+import { getPerformanceColor } from "@/lib/chartColors";
+
 interface ProgressRingProps {
   value: number; // 0-100
   size?: number;
   strokeWidth?: number;
   color?: string;
+  autoColor?: boolean; // Se true, usa cor baseada no valor de performance
   label: string;
   subtitle?: string;
 }
@@ -11,10 +14,12 @@ export function ProgressRing({
   value, 
   size = 120, 
   strokeWidth = 8,
-  color = "hsl(var(--primary))",
+  color,
+  autoColor = false,
   label,
   subtitle
 }: ProgressRingProps) {
+  const finalColor = autoColor ? getPerformanceColor(value) : (color || "hsl(var(--primary))");
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (value / 100) * circumference;
@@ -38,7 +43,7 @@ export function ProgressRing({
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={color}
+            stroke={finalColor}
             strokeWidth={strokeWidth}
             fill="none"
             strokeDasharray={circumference}
