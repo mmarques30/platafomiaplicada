@@ -39,6 +39,19 @@ All colors MUST be HSL.
     
     --radius: 0.75rem;
     
+    /* Chart Colors - Paleta Verde do Branding IAplicada */
+    --chart-1: 73 64% 32%; /* #738925 - Verde 900 */
+    --chart-2: 73 54% 39%; /* #889C2D - Verde 800 */
+    --chart-3: 73 55% 47%; /* #9EB038 - Verde 700 (primário) */
+    --chart-4: 73 43% 54%; /* #AFC040 - Verde 600 */
+    --chart-5: 73 37% 69%; /* #BCC95D - Verde 500 */
+    --chart-6: 73 35% 79%; /* #C8D27B - Verde 400 */
+
+    /* Estados Negativos/Medianos - Paleta Sóbria */
+    --chart-warning: 35 100% 55%; /* Laranja suave #F59E0B */
+    --chart-error: 0 70% 55%; /* Vermelho suave #E86A6A */
+    --chart-neutral: 0 0% 60%; /* Cinza neutro */
+    
     --sidebar-background: 72 6% 17%;
     --sidebar-foreground: 60 100% 97%;
     --sidebar-primary: 73 55% 47%;
@@ -80,6 +93,19 @@ All colors MUST be HSL.
     --ring: 73 55% 47%;
     
     --radius: 0.75rem;
+    
+    /* Chart Colors - Paleta Verde do Branding IAplicada */
+    --chart-1: 73 64% 32%; /* #738925 - Verde 900 */
+    --chart-2: 73 54% 39%; /* #889C2D - Verde 800 */
+    --chart-3: 73 55% 47%; /* #9EB038 - Verde 700 (primário) */
+    --chart-4: 73 43% 54%; /* #AFC040 - Verde 600 */
+    --chart-5: 73 37% 69%; /* #BCC95D - Verde 500 */
+    --chart-6: 73 35% 79%; /* #C8D27B - Verde 400 */
+
+    /* Estados Negativos/Medianos - Paleta Sóbria */
+    --chart-warning: 35 100% 55%; /* Laranja suave #F59E0B */
+    --chart-error: 0 70% 55%; /* Vermelho suave #E86A6A */
+    --chart-neutral: 0 0% 60%; /* Cinza neutro */
     
     --sidebar-background: 73 35% 95%;
     --sidebar-foreground: 30 4% 19%;
