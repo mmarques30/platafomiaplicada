@@ -83,7 +83,7 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium smooth-transition",
-              isActive ? "text-[#8B0A50]" : "text-white hover:text-[#8B0A50]"
+              isActive ? "text-primary" : "text-white hover:text-primary"
             )}
           >
             Início
@@ -95,7 +95,7 @@ export function TopHeader() {
                 variant="ghost" 
                 className={cn(
                   "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
-                  isCursosActive ? "text-[#8B0A50]" : "text-white hover:text-[#8B0A50]"
+                  isCursosActive ? "text-primary" : "text-white hover:text-primary"
                 )}
               >
                 Meus Cursos
@@ -124,7 +124,7 @@ export function TopHeader() {
                 variant="ghost" 
                 className={cn(
                   "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
-                  isFerramentasActive ? "text-[#8B0A50]" : "text-white hover:text-[#8B0A50]"
+                  isFerramentasActive ? "text-primary" : "text-white hover:text-primary"
                 )}
               >
                 Ferramentas
