@@ -16,7 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import logoAplicada from "@/assets/logo-aplicada.png";
+import logoAplicada from "@/assets/logo-aplicada-completa.png";
 import { useUserRole } from "@/hooks/useUserRole";
 
 const items = [
