@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* IAplicada Dark Theme - Branding 2025 */
-    --background: 30 5% 18%; /* #2F302B - Preto do branding */
+    --background: 72 6% 18%; /* #2F302B - Preto do branding */
     --foreground: 60 100% 97%; /* #FFFFF6 - Amarelo claro do branding */
     
     --card: 30 4% 24%;
@@ -39,7 +39,7 @@ All colors MUST be HSL.
     
     --radius: 0.75rem;
     
-    --sidebar-background: 30 4% 17%;
+    --sidebar-background: 72 6% 17%;
     --sidebar-foreground: 60 100% 97%;
     --sidebar-primary: 73 55% 47%;
     --sidebar-primary-foreground: 30 4% 19%;
@@ -52,7 +52,7 @@ All colors MUST be HSL.
   .light {
     /* IAplicada Light Theme - Branding 2025 */
     --background: 0 0% 100%; /* #FFFFFF - Branco do branding */
-    --foreground: 30 4% 19%; /* #2F302B - Preto do branding */
+    --foreground: 72 6% 18%; /* #2F302B - Preto do branding */
     
     --card: 60 100% 97%; /* #F6F7E9 - Verde 100 muito claro */
     --card-foreground: 30 4% 19%;
