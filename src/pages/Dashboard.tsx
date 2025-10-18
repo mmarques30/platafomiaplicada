@@ -14,6 +14,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [question, setQuestion] = useState("");
   const [mostrarAvisoSenha, setMostrarAvisoSenha] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -32,6 +33,18 @@ export default function Dashboard() {
 
     verificarSenhaTemporaria();
   }, [user]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('form') && showSuggestions) {
+        setShowSuggestions(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSuggestions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,41 +101,74 @@ export default function Dashboard() {
         {/* Aprenda com a Mari */}
         <section className="flex items-center justify-center py-12">
           <div className="w-full max-w-3xl px-6">
-            {/* Header com foto da Mari */}
-            <div className="text-center mb-10">
-              <div className="flex justify-center mb-6">
-                <div className="relative">
-                  <img 
-                    src={mariAvatar} 
-                    alt="Mariana Martins" 
-                    className="w-24 h-24 rounded-full object-cover border-4 border-primary shadow-lg"
-                  />
-                  <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 rounded-full border-4 border-background"></div>
-                </div>
-              </div>
-              <h2 className="text-4xl font-bold mb-3">
-                Aprenda com a <span className="text-accent">Mari</span>
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                Sua mentora de IA está aqui pra tirar suas dúvidas sobre a plataforma e os cursos
-              </p>
-            </div>
+            {/* Título simples centralizado */}
+            <h2 className="text-3xl font-bold text-center mb-8">
+              Aprenda com a <span className="text-accent">Mari</span>
+            </h2>
             
-            {/* Input com gradiente */}
+            {/* Input com foto da Mari como ícone à esquerda + dropdown de sugestões */}
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-accent/30 to-primary/20 rounded-2xl blur-xl"></div>
               <div className="relative bg-card border-2 border-accent/30 rounded-2xl p-2 shadow-2xl">
                 <form onSubmit={handleSubmit} className="flex items-center gap-3">
-                  <div className="flex-1 flex items-center gap-3 bg-background rounded-xl px-5 py-4">
-                    <MessageSquare className="h-5 w-5 text-accent flex-shrink-0" />
+                  {/* Avatar da Mari como ícone */}
+                  <img 
+                    src={mariAvatar} 
+                    alt="Mari" 
+                    className="w-12 h-12 rounded-full object-cover border-2 border-accent flex-shrink-0 ml-2"
+                  />
+                  
+                  {/* Input com dropdown de sugestões */}
+                  <div className="flex-1 relative">
                     <input
                       type="text"
                       value={question}
                       onChange={(e) => setQuestion(e.target.value)}
+                      onFocus={() => setShowSuggestions(true)}
                       placeholder="Pergunte à Mari..."
-                      className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground text-lg"
+                      className="w-full bg-background rounded-xl px-5 py-4 border-none outline-none text-foreground placeholder:text-muted-foreground text-lg"
                     />
+                    
+                    {/* Dropdown de sugestões (aparece no focus) */}
+                    {showSuggestions && !question && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-xl shadow-lg overflow-hidden z-50">
+                        <div className="p-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleQuickQuestion("Como funciona a plataforma?");
+                              setShowSuggestions(false);
+                            }}
+                            className="w-full text-left px-4 py-3 hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors text-sm"
+                          >
+                            Como funciona a plataforma?
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleQuickQuestion("Quais cursos disponíveis?");
+                              setShowSuggestions(false);
+                            }}
+                            className="w-full text-left px-4 py-3 hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors text-sm"
+                          >
+                            Quais cursos disponíveis?
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleQuickQuestion("Como usar as ferramentas de IA?");
+                              setShowSuggestions(false);
+                            }}
+                            className="w-full text-left px-4 py-3 hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors text-sm"
+                          >
+                            Como usar as ferramentas de IA?
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Botão de envio */}
                   <Button 
                     type="submit"
                     size="lg"
@@ -133,19 +179,6 @@ export default function Dashboard() {
                   </Button>
                 </form>
               </div>
-            </div>
-
-            {/* Sugestões rápidas */}
-            <div className="mt-8 flex flex-wrap gap-3 justify-center">
-              <Button variant="outline" size="sm" onClick={() => handleQuickQuestion("Como funciona a plataforma?")}>
-                Como funciona a plataforma?
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => handleQuickQuestion("Quais cursos disponíveis?")}>
-                Quais cursos disponíveis?
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => handleQuickQuestion("Como usar as ferramentas de IA?")}>
-                Como usar as ferramentas de IA?
-              </Button>
             </div>
           </div>
         </section>
