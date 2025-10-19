@@ -60,7 +60,7 @@ export default function Auth() {
               <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
             </div>
             
-            <h1 className="text-5xl lg:text-5xl font-bold mb-2 leading-tight text-[#F2F2F2]">
+            <h1 className="text-5xl lg:text-5xl font-bold mb-4 leading-tight text-[#F2F2F2]">
               IA que você <span className="text-[#9EB038]">usa hoje</span>
             </h1>
             
@@ -71,14 +71,12 @@ export default function Auth() {
         </div>
 
         {/* Seção Central/Inferior - Mantém centralização */}
-        <div className="w-full flex flex-col items-center gap-4 flex-grow justify-center">
+        <div className="w-full flex flex-col items-center gap-4 lg:gap-3 flex-grow justify-center">
           {/* Logo mobile - visível apenas em telas pequenas */}
           <div className="lg:hidden mb-8">
             <img src={logoAplicada} alt="IAplicada" className="h-8 w-auto mx-auto" />
           </div>
 
-          {/* Espaçador superior para equilibrar layout */}
-          <div className="hidden lg:block h-2" />
 
         {/* CENTRO - Card de Login */}
         <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
@@ -130,13 +128,12 @@ export default function Auth() {
 
         {/* INFERIOR - Espaço, descrição e hashtag agrupados (desktop) */}
         <div className="hidden lg:flex w-full flex-col items-center">
-          <div className="h-8" />
           <div className="text-center max-w-3xl px-8">
             <p className="text-lg lg:text-lg text-[#F2F2F2]/80 leading-relaxed">
               Ganhe horas por semana aplicando IA no seu fluxo real.
             </p>
           </div>
-          <div className="h-6" />
+          <div className="h-8" />
           <div className="w-full text-center">
             <p className="text-lg font-semibold text-[#9EB038]">
               #menoshypemaisentrega
