@@ -41,7 +41,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col items-center justify-between px-8 py-6 lg:px-24">
+    <div className="min-h-screen relative flex flex-col items-center justify-between px-8 py-6 lg:px-24 overflow-hidden">
       {/* Background com overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
