@@ -65,11 +65,6 @@ export default function Auth() {
           <p className="text-xl lg:text-2xl font-semibold text-[#AFC040] mb-4">
             Do raciocínio à ação
           </p>
-          
-          <p className="text-lg lg:text-xl text-[#F2F2F2]/80 leading-relaxed max-w-2xl">
-            Ganhe horas por semana aplicando IA no seu fluxo real. 
-            Casos práticos, ferramentas certas e entregáveis na mesma sessão.
-          </p>
         </div>
 
         {/* Logo mobile - visível apenas em telas pequenas */}
@@ -124,6 +119,14 @@ export default function Auth() {
             </form>
           </CardContent>
         </Card>
+
+        {/* DESCRIÇÃO - Abaixo do card (oculto no mobile) */}
+        <div className="hidden lg:block text-center max-w-2xl px-8">
+          <p className="text-lg lg:text-xl text-[#F2F2F2]/80 leading-relaxed">
+            Ganhe horas por semana aplicando IA no seu fluxo real. 
+            Casos práticos, ferramentas certas e entregáveis na mesma sessão.
+          </p>
+        </div>
 
         {/* RODAPÉ - Hashtag (oculto no mobile) */}
         <div className="hidden lg:block w-full text-center mt-12">
