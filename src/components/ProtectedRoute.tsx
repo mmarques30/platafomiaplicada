@@ -15,19 +15,6 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
   const { user, loading: authLoading } = useAuth();
   const { hasRole, roles, isLoading: roleLoading } = useUserRole();
 
-  // Move useEffect to the top, before any conditional returns
-  useEffect(() => {
-    if (!roleLoading && roles.length === 0 && user) {
-      toast({
-        variant: "destructive",
-        title: "Acesso Negado",
-        description: "Seu acesso está pendente de aprovação. Entre em contato com o administrador.",
-      });
-      
-      supabase.auth.signOut();
-    }
-  }, [roleLoading, roles, user]);
-
   if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
