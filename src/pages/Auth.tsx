@@ -126,7 +126,7 @@ export default function Auth() {
         </Card>
 
         {/* DESCRIÇÃO - Abaixo do card (oculto no mobile) */}
-        <div className="hidden lg:block text-center max-w-3xl px-8 mt-12">
+        <div className="hidden lg:block text-center max-w-3xl px-8 mt-20">
           <p className="text-lg lg:text-xl text-[#F2F2F2]/80 leading-relaxed">
             Ganhe horas por semana aplicando IA no seu fluxo real.
           </p>
