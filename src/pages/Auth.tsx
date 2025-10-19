@@ -79,7 +79,7 @@ export default function Auth() {
 
 
         {/* CENTRO - Card de Login */}
-        <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md mt-4">
+        <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md -mt-4">
           <CardHeader className="space-y-1 p-6 text-center">
             <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
               Bem-vindo à Aplicada
