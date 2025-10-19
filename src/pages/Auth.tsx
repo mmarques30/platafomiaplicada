@@ -77,6 +77,9 @@ export default function Auth() {
             <img src={logoAplicada} alt="IAplicada" className="h-8 w-auto mx-auto" />
           </div>
 
+          {/* Espaçador superior para equilibrar layout */}
+          <div className="hidden lg:block h-20" />
+
         {/* CENTRO - Card de Login */}
         <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
           <CardHeader className="space-y-1 p-8 text-center">
