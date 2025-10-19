@@ -127,7 +127,7 @@ export default function Auth() {
         </Card>
 
         {/* INFERIOR - Espaço, descrição e hashtag agrupados (desktop) */}
-        <div className="hidden lg:flex w-full flex-col items-center">
+        <div className="hidden lg:flex w-full flex-col items-center mt-20">
           <div className="text-center max-w-3xl px-8">
             <p className="text-lg lg:text-lg text-[#F2F2F2]/80 leading-relaxed">
               Ganhe horas por semana aplicando IA no seu fluxo real.
