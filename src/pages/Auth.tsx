@@ -125,8 +125,11 @@ export default function Auth() {
           </CardContent>
         </Card>
 
+        {/* Espaçador para manter distância sem afetar centralização */}
+        <div className="hidden lg:block h-20" />
+
         {/* DESCRIÇÃO - Abaixo do card (oculto no mobile) */}
-        <div className="hidden lg:block text-center max-w-3xl px-8 mt-20">
+        <div className="hidden lg:block text-center max-w-3xl px-8">
           <p className="text-lg lg:text-xl text-[#F2F2F2]/80 leading-relaxed">
             Ganhe horas por semana aplicando IA no seu fluxo real.
           </p>
