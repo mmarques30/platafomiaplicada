@@ -44,32 +44,42 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex bg-background">
       {/* Hero Section - 60% */}
-      <div className="hidden lg:flex lg:w-[60%] relative items-center justify-center overflow-hidden">
-        {/* Gradiente de fundo */}
-        <div className="absolute inset-0 gradient-bg" />
+      <div className="hidden lg:flex lg:w-[60%] relative items-center justify-center overflow-hidden bg-[#2F302B]">
+        {/* Grid pattern com acento verde */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#738925_1px,transparent_1px),linear-gradient(to_bottom,#738925_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-10 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)]" />
         
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)]" />
+        {/* Glow verde sutil */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#9EB03820_0%,transparent_70%)]" />
         
         {/* Conteúdo Hero */}
         <div className="relative z-10 max-w-2xl px-12 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-8">
-            <img src={logoAplicada} alt="Aplicada" className="h-6 w-auto" />
-            <span className="text-sm font-medium text-accent">Plataforma Prática</span>
+          {/* Barra verde de acento */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-48 bg-gradient-to-b from-transparent via-[#9EB038] to-transparent opacity-60" />
+          
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-8">
+            <img src={logoAplicada} alt="IAplicada" className="h-5 w-auto opacity-90" />
+            <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
           </div>
           
-          <h1 className="text-6xl font-bold mb-6 leading-tight">
-            Aprenda com
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
-              IAplicada
+          <h1 className="text-6xl font-bold mb-6 leading-tight text-[#F2F2F2]">
+            IA que você
+            <span className="block text-[#9EB038]">
+              usa hoje
             </span>
           </h1>
           
-          <p className="text-xl text-muted-foreground mb-4">
-            Trilhas de ensino aplicado, conteúdos para qualquer cargo e nível técnico e acompanhamento individual para acelerar seu crescimento profissional.
+          <p className="text-2xl font-semibold text-[#AFC040] mb-6">
+            Do raciocínio à ação
           </p>
           
-          <p className="text-lg font-semibold text-accent">
+          <p className="text-xl text-[#F2F2F2]/80 mb-8 leading-relaxed">
+            Ganhe horas por semana aplicando IA no seu fluxo real. 
+            <span className="block mt-2">
+              Casos práticos, ferramentas certas e entregáveis na mesma sessão.
+            </span>
+          </p>
+          
+          <p className="text-lg font-semibold text-[#9EB038]">
             #menoshypemaisentrega
           </p>
         </div>
