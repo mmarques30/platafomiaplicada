@@ -50,17 +50,16 @@ export default function Auth() {
       <div className="absolute inset-0 bg-[#2F302B]/70 backdrop-blur-sm" />
       
       {/* Conteúdo */}
-      <div className="relative z-10 w-full flex flex-col items-center justify-between min-h-screen">
+      <div className="relative z-10 w-full flex flex-col items-center justify-center min-h-screen gap-12">
         {/* TOPO - Branding (oculto no mobile) */}
-        <div className="hidden lg:block w-full max-w-4xl text-left mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-6">
+        <div className="hidden lg:flex flex-col items-center text-center mb-12 w-full px-8">
+          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-6 mx-auto">
             <img src={logoAplicada} alt="IAplicada" className="h-5 w-auto opacity-90" />
             <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
           </div>
           
           <h1 className="text-5xl lg:text-6xl font-bold mb-4 leading-tight text-[#F2F2F2]">
-            IA que você
-            <span className="block text-[#9EB038]">usa hoje</span>
+            IA que você <span className="text-[#9EB038]">usa hoje</span>
           </h1>
           
           <p className="text-xl lg:text-2xl font-semibold text-[#AFC040] mb-4">
@@ -69,9 +68,7 @@ export default function Auth() {
           
           <p className="text-lg lg:text-xl text-[#F2F2F2]/80 leading-relaxed max-w-2xl">
             Ganhe horas por semana aplicando IA no seu fluxo real. 
-            <span className="block mt-2">
-              Casos práticos, ferramentas certas e entregáveis na mesma sessão.
-            </span>
+            Casos práticos, ferramentas certas e entregáveis na mesma sessão.
           </p>
         </div>
 
@@ -81,8 +78,8 @@ export default function Auth() {
         </div>
 
         {/* CENTRO - Card de Login */}
-        <Card className="w-full max-w-md bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
-          <CardHeader className="space-y-1">
+        <Card className="w-full max-w-lg bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
+          <CardHeader className="space-y-1 p-8">
             <CardTitle className="text-2xl lg:text-3xl font-bold text-[#F2F2F2]">
               Bem-vindo à Aplicada
             </CardTitle>
@@ -91,7 +88,7 @@ export default function Auth() {
             </CardDescription>
           </CardHeader>
           
-          <CardContent>
+          <CardContent className="px-8 pb-8">
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="signin-email" className="text-[#F2F2F2]">Email</Label>
@@ -129,7 +126,7 @@ export default function Auth() {
         </Card>
 
         {/* RODAPÉ - Hashtag (oculto no mobile) */}
-        <div className="hidden lg:block w-full max-w-4xl text-left mt-12">
+        <div className="hidden lg:block w-full text-center mt-12">
           <p className="text-lg font-semibold text-[#9EB038]">
             #menoshypemaisentrega
           </p>
