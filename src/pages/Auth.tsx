@@ -50,19 +50,19 @@ export default function Auth() {
       <div className="absolute inset-0 bg-[#2F302B]/70 backdrop-blur-sm" />
       
       {/* Conteúdo */}
-      <div className="relative z-10 w-full flex flex-col items-center justify-center min-h-screen gap-12">
+      <div className="relative z-10 w-full flex flex-col items-center justify-center min-h-screen gap-6">
         {/* TOPO - Branding (oculto no mobile) */}
-        <div className="hidden lg:flex flex-col items-center text-center mb-12 w-full px-8">
-          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-6 mx-auto">
+        <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
+          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-4 mx-auto">
             <img src={logoAplicada} alt="IAplicada" className="h-5 w-auto opacity-90" />
             <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
           </div>
           
-          <h1 className="text-5xl lg:text-6xl font-bold mb-4 leading-tight text-[#F2F2F2]">
+          <h1 className="text-5xl lg:text-6xl font-bold mb-2 leading-tight text-[#F2F2F2]">
             IA que você <span className="text-[#9EB038]">usa hoje</span>
           </h1>
           
-          <p className="text-xl lg:text-2xl font-semibold text-[#AFC040] mb-4">
+          <p className="text-xl lg:text-2xl font-semibold text-[#AFC040]">
             Do raciocínio à ação
           </p>
         </div>
@@ -84,8 +84,8 @@ export default function Auth() {
           </CardHeader>
           
           <CardContent className="px-8 pb-8">
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div className="space-y-2">
+            <form onSubmit={handleSignIn} className="space-y-3">
+              <div className="space-y-1.5">
                 <Label htmlFor="signin-email" className="text-[#F2F2F2]">Email</Label>
                 <Input
                   id="signin-email"
@@ -97,7 +97,7 @@ export default function Auth() {
                 />
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="signin-password" className="text-[#F2F2F2]">Senha</Label>
                 <Input
                   id="signin-password"
@@ -129,7 +129,7 @@ export default function Auth() {
         </div>
 
         {/* RODAPÉ - Hashtag (oculto no mobile) */}
-        <div className="hidden lg:block w-full text-center mt-12">
+        <div className="hidden lg:block w-full text-center">
           <p className="text-lg font-semibold text-[#9EB038]">
             #menoshypemaisentrega
           </p>
