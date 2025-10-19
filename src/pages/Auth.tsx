@@ -50,27 +50,32 @@ export default function Auth() {
       <div className="absolute inset-0 bg-[#2F302B]/70 backdrop-blur-sm" />
       
       {/* Conteúdo */}
-      <div className="relative z-10 w-full flex flex-col items-center justify-center min-h-screen gap-8">
-        {/* TOPO - Branding (oculto no mobile) */}
-        <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
-          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-6 mx-auto">
-            <img src={logoAplicada} alt="IAplicada" className="h-5 w-auto opacity-90" />
-            <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
+      <div className="relative z-10 w-full flex flex-col items-center justify-between min-h-screen py-12">
+        {/* Seção Superior - Controlada independentemente */}
+        <div className="w-full flex-shrink-0 pt-8">
+          {/* TOPO - Branding (oculto no mobile) */}
+          <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
+            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-6 mx-auto">
+              <img src={logoAplicada} alt="IAplicada" className="h-5 w-auto opacity-90" />
+              <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
+            </div>
+            
+            <h1 className="text-5xl lg:text-6xl font-bold mb-3 leading-tight text-[#F2F2F2]">
+              IA que você <span className="text-[#9EB038]">usa hoje</span>
+            </h1>
+            
+            <p className="text-xl lg:text-2xl font-semibold text-[#AFC040]">
+              Do raciocínio à ação
+            </p>
           </div>
-          
-          <h1 className="text-5xl lg:text-6xl font-bold mb-3 leading-tight text-[#F2F2F2]">
-            IA que você <span className="text-[#9EB038]">usa hoje</span>
-          </h1>
-          
-          <p className="text-xl lg:text-2xl font-semibold text-[#AFC040]">
-            Do raciocínio à ação
-          </p>
         </div>
 
-        {/* Logo mobile - visível apenas em telas pequenas */}
-        <div className="lg:hidden mb-8">
-          <img src={logoAplicada} alt="IAplicada" className="h-8 w-auto mx-auto" />
-        </div>
+        {/* Seção Central/Inferior - Mantém centralização */}
+        <div className="w-full flex flex-col items-center gap-8 flex-grow justify-center">
+          {/* Logo mobile - visível apenas em telas pequenas */}
+          <div className="lg:hidden mb-8">
+            <img src={logoAplicada} alt="IAplicada" className="h-8 w-auto mx-auto" />
+          </div>
 
         {/* CENTRO - Card de Login */}
         <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
@@ -127,11 +132,12 @@ export default function Auth() {
           </p>
         </div>
 
-        {/* RODAPÉ - Hashtag (oculto no mobile) */}
-        <div className="hidden lg:block w-full text-center">
-          <p className="text-lg font-semibold text-[#9EB038]">
-            #menoshypemaisentrega
-          </p>
+          {/* RODAPÉ - Hashtag (oculto no mobile) */}
+          <div className="hidden lg:block w-full text-center">
+            <p className="text-lg font-semibold text-[#9EB038]">
+              #menoshypemaisentrega
+            </p>
+          </div>
         </div>
       </div>
     </div>
