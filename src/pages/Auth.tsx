@@ -78,7 +78,7 @@ export default function Auth() {
           </div>
 
           {/* Espaçador superior para equilibrar layout */}
-          <div className="hidden lg:block h-8" />
+          <div className="hidden lg:block h-2" />
 
         {/* CENTRO - Card de Login */}
         <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
@@ -136,6 +136,7 @@ export default function Auth() {
               Ganhe horas por semana aplicando IA no seu fluxo real.
             </p>
           </div>
+          <div className="h-6" />
           <div className="w-full text-center">
             <p className="text-lg font-semibold text-[#9EB038]">
               #menoshypemaisentrega
