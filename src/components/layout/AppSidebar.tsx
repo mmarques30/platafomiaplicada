@@ -52,9 +52,9 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border p-4">
         <div className="flex items-center justify-center">
           {!collapsed ? (
-            <img src={logoAplicada} alt="Aplicada" className="h-20 w-auto" />
+            <img src={logoAplicada} alt="Aplicada" className="h-10 w-auto" />
           ) : (
-            <img src={logoAplicada} alt="Aplicada" className="h-14 w-auto" />
+            <img src={logoAplicada} alt="Aplicada" className="h-8 w-auto" />
           )}
         </div>
       </SidebarHeader>
