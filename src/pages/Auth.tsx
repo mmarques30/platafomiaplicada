@@ -41,7 +41,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col items-center justify-between px-8 py-6 lg:px-24 overflow-hidden">
+    <div className="h-screen relative flex flex-col items-center justify-between px-8 py-4 lg:px-24 overflow-hidden">
       {/* Background com overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -50,9 +50,9 @@ export default function Auth() {
       <div className="absolute inset-0 bg-[#2F302B]/70 backdrop-blur-sm" />
       
       {/* Conteúdo */}
-      <div className="relative z-10 w-full flex flex-col items-center justify-between min-h-screen py-4">
+      <div className="relative z-10 w-full flex flex-col items-center justify-between h-full py-2">
         {/* Seção Superior - Controlada independentemente */}
-        <div className="w-full flex-shrink-0 pt-4">
+        <div className="w-full flex-shrink-0 pt-2">
           {/* TOPO - Branding (oculto no mobile) */}
           <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
             <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-3 mx-auto">
@@ -60,7 +60,7 @@ export default function Auth() {
               <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
             </div>
             
-            <h1 className="text-5xl lg:text-5xl font-bold mb-4 mt-12 leading-tight text-[#F2F2F2]">
+            <h1 className="text-4xl lg:text-5xl font-bold mb-3 mt-8 leading-tight text-[#F2F2F2]">
               IA que você <span className="text-[#9EB038]">usa hoje</span>
             </h1>
             
@@ -79,7 +79,7 @@ export default function Auth() {
 
 
         {/* CENTRO - Card de Login */}
-        <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md mt-8">
+        <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md mt-4">
           <CardHeader className="space-y-1 p-6 text-center">
             <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
               Bem-vindo à Aplicada
@@ -127,13 +127,13 @@ export default function Auth() {
         </Card>
 
         {/* INFERIOR - Espaço, descrição e hashtag agrupados (desktop) */}
-        <div className="hidden lg:flex w-full flex-col items-center mt-20">
+        <div className="hidden lg:flex w-full flex-col items-center mt-6 mb-2">
           <div className="text-center max-w-3xl px-8">
             <p className="text-lg lg:text-lg text-[#F2F2F2]/80 leading-relaxed">
               Ganhe horas por semana aplicando IA no seu fluxo real.
             </p>
           </div>
-          <div className="h-8" />
+          <div className="h-4" />
           <div className="w-full text-center">
             <p className="text-lg font-semibold text-[#9EB038]">
               #menoshypemaisentrega
