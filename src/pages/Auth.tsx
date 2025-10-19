@@ -50,15 +50,15 @@ export default function Auth() {
       <div className="absolute inset-0 bg-[#2F302B]/70 backdrop-blur-sm" />
       
       {/* Conteúdo */}
-      <div className="relative z-10 w-full flex flex-col items-center justify-center min-h-screen gap-6">
+      <div className="relative z-10 w-full flex flex-col items-center justify-center min-h-screen gap-8">
         {/* TOPO - Branding (oculto no mobile) */}
         <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
-          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-4 mx-auto">
+          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-6 mx-auto">
             <img src={logoAplicada} alt="IAplicada" className="h-5 w-auto opacity-90" />
             <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
           </div>
           
-          <h1 className="text-5xl lg:text-6xl font-bold mb-2 leading-tight text-[#F2F2F2]">
+          <h1 className="text-5xl lg:text-6xl font-bold mb-3 leading-tight text-[#F2F2F2]">
             IA que você <span className="text-[#9EB038]">usa hoje</span>
           </h1>
           
@@ -73,18 +73,18 @@ export default function Auth() {
         </div>
 
         {/* CENTRO - Card de Login */}
-        <Card className="w-full max-w-lg bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
-          <CardHeader className="space-y-1 p-8">
-            <CardTitle className="text-2xl lg:text-3xl font-bold text-[#F2F2F2]">
+        <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
+          <CardHeader className="space-y-1 p-8 text-center">
+            <CardTitle className="text-2xl lg:text-3xl font-bold text-[#F2F2F2] text-center">
               Bem-vindo à Aplicada
             </CardTitle>
-            <CardDescription className="text-[#F2F2F2]/60">
+            <CardDescription className="text-[#F2F2F2]/60 text-center">
               Entre com sua conta para acessar o conteúdo
             </CardDescription>
           </CardHeader>
           
           <CardContent className="px-8 pb-8">
-            <form onSubmit={handleSignIn} className="space-y-3">
+            <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="signin-email" className="text-[#F2F2F2]">Email</Label>
                 <Input
@@ -121,7 +121,7 @@ export default function Auth() {
         </Card>
 
         {/* DESCRIÇÃO - Abaixo do card (oculto no mobile) */}
-        <div className="hidden lg:block text-center max-w-2xl px-8">
+        <div className="hidden lg:block text-center max-w-3xl px-8">
           <p className="text-lg lg:text-xl text-[#F2F2F2]/80 leading-relaxed">
             Ganhe horas por semana aplicando IA no seu fluxo real. 
             Casos práticos, ferramentas certas e entregáveis na mesma sessão.
