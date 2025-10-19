@@ -41,7 +41,7 @@ export default function Auth() {
       if (error) throw error;
 
       toast.success("Login realizado com sucesso!");
-      navigate("/");
+      // O useEffect (linhas 19-23) fará o redirecionamento automaticamente
     } catch (error: any) {
       toast.error(error.message || "Erro ao fazer login");
     } finally {

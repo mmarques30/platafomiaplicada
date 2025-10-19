@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada.png";
 import { useLocation } from "react-router-dom";
@@ -23,18 +24,11 @@ import { useLocation } from "react-router-dom";
 export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   
   // Detectar rotas ativas para dropdowns
   const isCursosActive = ['/trilhas', '/mentoria'].some(path => location.pathname.startsWith(path));
   const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(path => location.pathname.startsWith(path));
-
-  const { data: user } = useQuery({
-    queryKey: ["current-user"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      return user;
-    },
-  });
 
   const { data: unreadCount } = useQuery({
     queryKey: ["unread-notifications"],
