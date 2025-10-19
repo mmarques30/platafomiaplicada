@@ -60,7 +60,7 @@ export default function Auth() {
               <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
             </div>
             
-            <h1 className="text-5xl lg:text-5xl font-bold mb-4 leading-tight text-[#F2F2F2]">
+            <h1 className="text-5xl lg:text-5xl font-bold mb-4 mt-12 leading-tight text-[#F2F2F2]">
               IA que você <span className="text-[#9EB038]">usa hoje</span>
             </h1>
             
