@@ -1350,6 +1350,36 @@ export type Database = {
           },
         ]
       }
+      tentativas_acesso_nao_autorizado: {
+        Row: {
+          email: string | null
+          id: string
+          ip_address: string | null
+          tentativa_acesso_a: string | null
+          timestamp: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          tentativa_acesso_a?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          tentativa_acesso_a?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       trilhas: {
         Row: {
           ativo: boolean | null

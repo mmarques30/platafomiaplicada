@@ -93,7 +93,7 @@ export default function Auth() {
               Bem-vindo à Aplicada
             </CardTitle>
             <CardDescription>
-              Entre ou crie sua conta para acessar o conteúdo
+              Entre com sua conta para acessar o conteúdo
             </CardDescription>
           </CardHeader>
           <CardContent>
