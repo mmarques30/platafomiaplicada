@@ -78,7 +78,7 @@ export default function Auth() {
           </div>
 
           {/* Espaçador superior para equilibrar layout */}
-          <div className="hidden lg:block h-20" />
+          <div className="hidden lg:block h-12" />
 
         {/* CENTRO - Card de Login */}
         <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
@@ -129,7 +129,7 @@ export default function Auth() {
         </Card>
 
         {/* Espaçador para manter distância sem afetar centralização */}
-        <div className="hidden lg:block h-20" />
+        <div className="hidden lg:block h-12" />
 
         {/* DESCRIÇÃO - Abaixo do card (oculto no mobile) */}
         <div className="hidden lg:block text-center max-w-3xl px-8">
