@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,15 @@ import authBackground from "@/assets/auth-background-new.png";
 
 export default function Auth() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirecionar usuários já autenticados
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/");
+    }
+  }, [user, loading, navigate]);
 
   // Cadastro público desabilitado - apenas admins podem criar usuários via /admin/usuarios/cadastrar
 
