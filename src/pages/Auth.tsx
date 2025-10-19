@@ -52,7 +52,7 @@ export default function Auth() {
       {/* Conteúdo */}
       <div className="relative z-10 w-full flex flex-col items-center justify-between h-full py-2">
         {/* Seção Superior - Controlada independentemente */}
-        <div className="w-full flex-shrink-0 pt-2">
+        <div className="w-full flex-shrink-0 pt-8">
           {/* TOPO - Branding (oculto no mobile) */}
           <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
             <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-3 mx-auto">
