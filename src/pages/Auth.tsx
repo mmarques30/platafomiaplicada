@@ -128,22 +128,20 @@ export default function Auth() {
           </CardContent>
         </Card>
 
-        {/* Espaçador para manter distância sem afetar centralização */}
-        <div className="hidden lg:block h-8" />
-
-        {/* DESCRIÇÃO - Abaixo do card (oculto no mobile) */}
-        <div className="hidden lg:block text-center max-w-3xl px-8">
-          <p className="text-lg lg:text-lg text-[#F2F2F2]/80 leading-relaxed">
-            Ganhe horas por semana aplicando IA no seu fluxo real.
-          </p>
-        </div>
-
-          {/* RODAPÉ - Hashtag (oculto no mobile) */}
-          <div className="hidden lg:block w-full text-center">
+        {/* INFERIOR - Espaço, descrição e hashtag agrupados (desktop) */}
+        <div className="hidden lg:flex w-full flex-col items-center">
+          <div className="h-8" />
+          <div className="text-center max-w-3xl px-8">
+            <p className="text-lg lg:text-lg text-[#F2F2F2]/80 leading-relaxed">
+              Ganhe horas por semana aplicando IA no seu fluxo real.
+            </p>
+          </div>
+          <div className="w-full text-center">
             <p className="text-lg font-semibold text-[#9EB038]">
               #menoshypemaisentrega
             </p>
           </div>
+        </div>
         </div>
       </div>
     </div>
