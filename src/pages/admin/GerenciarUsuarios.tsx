@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUsers } from "@/hooks/admin/useUsers";
+import { useUsers, useDeleteUser } from "@/hooks/admin/useUsers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -20,16 +20,19 @@ import {
 } from "@/components/ui/select";
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
-import { Search, Edit, UserPlus, AlertCircle } from "lucide-react";
+import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
+import { Search, Edit, UserPlus, AlertCircle, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
 export default function GerenciarUsuários() {
   const { data: users, isLoading } = useUsers();
+  const deleteUser = useDeleteUser();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [novoUsuarioOpen, setNovoUsuarioOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [deletingUser, setDeletingUser] = useState<{ id: string; nome: string } | null>(null);
 
   const filteredUsers = users?.filter((user) => {
     const matchesSearch =
@@ -84,6 +87,19 @@ export default function GerenciarUsuários() {
     }
     
     return <Badge variant="default" className="bg-green-600">Ativo</Badge>;
+  };
+
+  const handleDeleteUser = () => {
+    if (deletingUser) {
+      deleteUser.mutate(
+        { userId: deletingUser.id },
+        {
+          onSuccess: () => {
+            setDeletingUser(null);
+          },
+        }
+      );
+    }
   };
 
   if (isLoading) {
@@ -205,25 +221,36 @@ export default function GerenciarUsuários() {
                     ? format(new Date(user.created_at), "dd/MM/yyyy")
                     : "-"}
                 </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setEditingUser({
-                      ...user,
-                      email: (user as any).email,
-                      profissao: (user as any).profissao,
-                      idade: (user as any).idade,
-                      linkedin: (user as any).linkedin,
-                      plano_mentoria: (user as any).plano_mentoria,
-                      data_expiracao_acesso: (user as any).data_expiracao_acesso,
-                      conta_ativa: (user as any).conta_ativa,
-                    })}
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Editar
-                  </Button>
-                </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingUser({
+                          ...user,
+                          email: (user as any).email,
+                          profissao: (user as any).profissao,
+                          idade: (user as any).idade,
+                          linkedin: (user as any).linkedin,
+                          plano_mentoria: (user as any).plano_mentoria,
+                          data_expiracao_acesso: (user as any).data_expiracao_acesso,
+                          conta_ativa: (user as any).conta_ativa,
+                        })}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Editar
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeletingUser({ id: user.id, nome: user.nome_completo })}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
+                      </Button>
+                    </div>
+                  </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -240,6 +267,15 @@ export default function GerenciarUsuários() {
           open={!!editingUser}
           onOpenChange={(open) => !open && setEditingUser(null)}
           user={editingUser}
+        />
+      )}
+
+      {deletingUser && (
+        <DeleteUserDialog
+          open={!!deletingUser}
+          onOpenChange={(open) => !open && setDeletingUser(null)}
+          onConfirm={handleDeleteUser}
+          userName={deletingUser.nome}
         />
       )}
     </div>

@@ -14,37 +14,7 @@ export default function Auth() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("signup-email") as string;
-    const password = formData.get("signup-password") as string;
-    const nomeCompleto = formData.get("signup-nome") as string;
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            nome_completo: nomeCompleto
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      toast.success("Cadastro realizado com sucesso!");
-      navigate("/");
-    } catch (error: any) {
-      toast.error(error.message || "Erro ao fazer cadastro");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Cadastro público desabilitado - apenas admins podem criar usuários via /admin/usuarios/cadastrar
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -128,9 +98,8 @@ export default function Auth() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-1">
                 <TabsTrigger value="signin">Entrar</TabsTrigger>
-                <TabsTrigger value="signup">Cadastrar</TabsTrigger>
               </TabsList>
               
               <TabsContent value="signin">
@@ -157,45 +126,6 @@ export default function Auth() {
                   </div>
                   <Button type="submit" className="w-full glow-primary" disabled={isLoading}>
                     {isLoading ? "Entrando..." : "Entrar"}
-                  </Button>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-nome">Nome Completo</Label>
-                    <Input
-                      id="signup-nome"
-                      name="signup-nome"
-                      type="text"
-                      placeholder="Seu nome completo"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      name="signup-email"
-                      type="email"
-                      placeholder="seu@email.com"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Senha</Label>
-                    <Input
-                      id="signup-password"
-                      name="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full glow-primary" disabled={isLoading}>
-                    {isLoading ? "Cadastrando..." : "Cadastrar"}
                   </Button>
                 </form>
               </TabsContent>

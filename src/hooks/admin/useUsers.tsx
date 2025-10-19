@@ -267,3 +267,25 @@ export function useResetUserPassword() {
     },
   });
 }
+
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId }: { userId: string }) => {
+      const { data, error: functionError } = await supabase.functions.invoke("delete-user", {
+        body: { userId },
+      });
+
+      if (functionError) throw functionError;
+      if (data?.error) throw new Error(data.error);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("Usuário excluído com sucesso!");
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao excluir usuário: " + error.message);
+    },
+  });
+}
