@@ -1,9 +1,7 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole, UserRole } from "@/hooks/useUserRole";
-import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -13,9 +11,11 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requireRole, requireAnyRole }: ProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasRole, roles, isLoading: roleLoading } = useUserRole();
+  const { hasRole, isLoading: roleLoading } = useUserRole();
 
-  if (authLoading || roleLoading) {
+  const needsRoleCheck = Boolean(requireRole) || (Array.isArray(requireAnyRole) && requireAnyRole.length > 0);
+
+  if (authLoading || (needsRoleCheck && roleLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -24,10 +24,6 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (!roleLoading && roles.length === 0) {
     return <Navigate to="/auth" replace />;
   }
 
