@@ -133,14 +133,13 @@ export function useCreateUser() {
       
       if (profileError) throw profileError;
 
-      // Adicionar roles
-      if (roles.length > 0) {
-        const { error: rolesError } = await supabase
-          .from("user_roles")
-          .insert(roles.map((role) => ({ user_id: authData.user.id, role })));
+      // Adicionar roles - sempre atribui pelo menos aluno_trilha se nenhuma role for passada
+      const rolesToInsert = roles.length > 0 ? roles : ["aluno_trilha" as AppRole];
+      const { error: rolesError } = await supabase
+        .from("user_roles")
+        .insert(rolesToInsert.map((role) => ({ user_id: authData.user.id, role })));
 
-        if (rolesError) throw rolesError;
-      }
+      if (rolesError) throw rolesError;
 
       return authData.user;
     },

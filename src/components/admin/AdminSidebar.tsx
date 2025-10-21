@@ -32,7 +32,6 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { path: "/admin/usuarios", label: "Gerenciar Usuários", icon: Users },
-  { path: "/admin/usuarios/novo", label: "Cadastrar Usuário", icon: UserPlus },
   { path: "/admin/conteudo", label: "Gerenciar Conteúdo", icon: BookOpen },
   { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas", icon: Library },
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },

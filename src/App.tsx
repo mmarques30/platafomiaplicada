@@ -85,7 +85,6 @@ function AppContent() {
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="usuarios" element={<GerenciarUsuarios />} />
-            <Route path="usuarios/novo" element={<CadastrarUsuario />} />
             <Route path="conteudo" element={<GerenciarConteudo />} />
             <Route path="bibliotecas" element={<GerenciarBibliotecas />} />
             <Route path="avisos" element={<GerenciarAvisos />} />
