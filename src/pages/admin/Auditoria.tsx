@@ -68,7 +68,7 @@ export default function Auditoria() {
   return (
     <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">📊 Auditoria do Sistema</h1>
+          <h1 className="text-3xl font-bold">Auditoria do Sistema</h1>
           <p className="text-muted-foreground mt-2">
             Histórico completo de alterações no sistema
           </p>
