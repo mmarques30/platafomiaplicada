@@ -56,6 +56,8 @@ export default function TrilhaDetalhes() {
           )
         `)
         .eq("id", id)
+        .order("ordem", { foreignTable: "modulos" })
+        .order("ordem", { foreignTable: "modulos.videos" })
         .single();
       
       if (error) throw error;
