@@ -1602,12 +1602,9 @@ export type Database = {
       }
     }
     Functions: {
-      calcular_prazo_sla: {
-        Args: { p_user_id: string }
-        Returns: string
-      }
+      calcular_prazo_sla: { Args: { p_user_id: string }; Returns: string }
       get_modulos_stats: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           modulo_id: string
           total_exercicios: number
@@ -1616,7 +1613,7 @@ export type Database = {
         }[]
       }
       get_trilhas_stats: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           total_exercicios: number
           total_materiais: number
@@ -1633,7 +1630,7 @@ export type Database = {
         Returns: boolean
       }
       verificar_integridade_sistema: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           categoria: string
           detalhes: string
