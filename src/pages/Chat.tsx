@@ -73,7 +73,7 @@ export default function Chat() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat-user`,
         {
           method: "POST",
           headers: {

@@ -1,7 +1,10 @@
 project_id = "ocwpsanqtfubixerjive"
 
-[functions.ai-chat]
-verify_jwt = false
+[functions.ai-chat-admin]
+verify_jwt = true
+
+[functions.ai-chat-user]
+verify_jwt = true
 
 [functions.gerar-insight-mentoria]
 verify_jwt = false

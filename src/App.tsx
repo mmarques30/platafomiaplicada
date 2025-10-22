@@ -44,6 +44,7 @@ import VisualizarFormularios from "./pages/admin/VisualizarFormularios";
 import GerenciarConhecimento from "./pages/admin/GerenciarConhecimento";
 import GerenciarMentoria from "./pages/admin/GerenciarMentoria";
 import Auditoria from "./pages/admin/Auditoria";
+import AdminChat from "./pages/admin/AdminChat";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ function AppContent() {
           
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
+            <Route path="chat" element={<AdminChat />} />
             <Route path="usuarios" element={<GerenciarUsuarios />} />
             <Route path="conteudo" element={<GerenciarConteudo />} />
             <Route path="bibliotecas" element={<GerenciarBibliotecas />} />
