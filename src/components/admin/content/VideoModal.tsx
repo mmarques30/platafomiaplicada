@@ -217,30 +217,6 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
               onChange={(e) => setValue("data_aula", e.target.value)}
               className="w-full"
             />
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !watch("data_aula") && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watch("data_aula") 
-                    ? format(new Date(watch("data_aula")), "dd/MM/yyyy", { locale: ptBR })
-                    : "Selecionar data"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
-                <Calendar
-                  mode="single"
-                  selected={watch("data_aula") ? new Date(watch("data_aula")) : undefined}
-                  onSelect={(date) => setValue("data_aula", date ? format(date, "yyyy-MM-dd") : null)}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
             <p className="text-xs text-muted-foreground">
               Quando esta aula aconteceu (para orientação em revisões)
             </p>
