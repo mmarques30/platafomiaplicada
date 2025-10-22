@@ -26,13 +26,11 @@ import {
   GraduationCap,
   ArrowLeft,
   FileSearch,
-  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
   { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/admin/chat", label: "Chat Administrativo", icon: MessageSquare },
   { path: "/admin/usuarios", label: "Gerenciar Usuários", icon: Users },
   { path: "/admin/conteudo", label: "Gerenciar Conteúdo", icon: BookOpen },
   { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas", icon: Library },
