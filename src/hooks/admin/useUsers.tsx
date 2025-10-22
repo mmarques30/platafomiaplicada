@@ -101,47 +101,21 @@ export function useCreateUser() {
       roles: AppRole[];
       planoMentoria?: string | null;
     }) => {
-      // Criar usuário via Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            nome_completo: nomeCompleto,
-          },
+      // Chamar edge function ao invés de fazer diretamente
+      const { data, error } = await supabase.functions.invoke("create-user-admin", {
+        body: { 
+          email, 
+          password, 
+          nomeCompleto, 
+          roles,
+          planoMentoria 
         },
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Usuário não foi criado");
-
-      // Atualizar profile com plano_mentoria e marcar senha como temporária
-      const updateData: any = {
-        senha_temporaria: true,
-        primeiro_acesso: true,
-        email: email,
-      };
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       
-      if (planoMentoria) {
-        updateData.plano_mentoria = planoMentoria;
-      }
-
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update(updateData)
-        .eq("id", authData.user.id);
-      
-      if (profileError) throw profileError;
-
-      // Adicionar roles - sempre atribui pelo menos aluno_trilha se nenhuma role for passada
-      const rolesToInsert = roles.length > 0 ? roles : ["aluno_trilha" as AppRole];
-      const { error: rolesError } = await supabase
-        .from("user_roles")
-        .insert(rolesToInsert.map((role) => ({ user_id: authData.user.id, role })));
-
-      if (rolesError) throw rolesError;
-
-      return authData.user;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
