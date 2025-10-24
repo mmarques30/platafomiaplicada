@@ -91,6 +91,7 @@ export type Database = {
           descricao: string
           ferramentas_recomendadas: Json | null
           id: string
+          modulo_id: string | null
           prompt: string
           tags: Json | null
           titulo: string
@@ -103,6 +104,7 @@ export type Database = {
           descricao: string
           ferramentas_recomendadas?: Json | null
           id?: string
+          modulo_id?: string | null
           prompt: string
           tags?: Json | null
           titulo: string
@@ -115,12 +117,21 @@ export type Database = {
           descricao?: string
           ferramentas_recomendadas?: Json | null
           id?: string
+          modulo_id?: string | null
           prompt?: string
           tags?: Json | null
           titulo?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "biblioteca_prompts_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "modulos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       certificados: {
         Row: {
