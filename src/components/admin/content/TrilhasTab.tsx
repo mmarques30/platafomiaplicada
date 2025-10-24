@@ -110,14 +110,40 @@ export function TrilhasTab() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja deletar esta trilha? Esta ação não pode ser desfeita.
+            <AlertDialogTitle>Confirmar Exclusão Permanente</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p className="font-semibold text-destructive">
+                ⚠️ Esta ação é IRREVERSÍVEL e irá deletar PERMANENTEMENTE:
+              </p>
+              {deleteId && (() => {
+                const trilhaStat = stats?.find((s: any) => s.trilha_id === deleteId);
+                const trilha = trilhas?.find((t) => t.id === deleteId);
+                return (
+                  <>
+                    <div className="bg-muted p-3 rounded-md space-y-1 text-sm">
+                      <p><strong>Trilha:</strong> {trilha?.titulo}</p>
+                      <p><strong>• {trilhaStat?.total_modulos || 0}</strong> módulos</p>
+                      <p><strong>• {trilhaStat?.total_videos || 0}</strong> vídeos</p>
+                      <p><strong>• {trilhaStat?.total_materiais || 0}</strong> materiais</p>
+                      <p><strong>• {trilhaStat?.total_exercicios || 0}</strong> exercícios práticos</p>
+                      <p className="text-muted-foreground mt-2">+ Todo o progresso dos alunos nesta trilha</p>
+                    </div>
+                    <p className="text-sm">
+                      Todos esses dados serão deletados <span className="font-bold">permanentemente</span> do banco de dados.
+                    </p>
+                  </>
+                );
+              })()}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Deletar</AlertDialogAction>
+            <AlertDialogAction 
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Deletar Permanentemente
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
