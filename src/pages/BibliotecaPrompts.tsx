@@ -93,24 +93,24 @@ export default function BibliotecaPrompts() {
             </Badge>
             <Badge
               variant={selectedNivel === 'iniciante' ? "default" : "outline"}
-              className="cursor-pointer bg-green-100 text-green-800 hover:bg-green-200"
+              className="cursor-pointer bg-green-500 text-white hover:bg-green-600"
               onClick={() => setSelectedNivel('iniciante')}
             >
-              🟢 Iniciante
+              Iniciante
             </Badge>
             <Badge
               variant={selectedNivel === 'intermediario' ? "default" : "outline"}
-              className="cursor-pointer bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+              className="cursor-pointer bg-yellow-500 text-white hover:bg-yellow-600"
               onClick={() => setSelectedNivel('intermediario')}
             >
-              🟡 Intermediário
+              Intermediário
             </Badge>
             <Badge
               variant={selectedNivel === 'avancado' ? "default" : "outline"}
-              className="cursor-pointer bg-red-100 text-red-800 hover:bg-red-200"
+              className="cursor-pointer bg-red-500 text-white hover:bg-red-600"
               onClick={() => setSelectedNivel('avancado')}
             >
-              🔴 Avançado
+              Avançado
             </Badge>
           </div>
         </div>

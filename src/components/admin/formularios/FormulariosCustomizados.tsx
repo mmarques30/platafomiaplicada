@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { FormularioCustomizadoModal } from "./FormularioCustomizadoModal";
 import { RespostasFormularioDrawer } from "./RespostasFormularioDrawer";
 import { format, isPast, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { FilterBar } from "../content/FilterBar";
 
 export const FormulariosCustomizados = () => {
   const [showModal, setShowModal] = useState(false);
@@ -15,6 +16,10 @@ export const FormulariosCustomizados = () => {
   
   const { formularios, isLoading } = useFormulariosCustomizados();
   const updateFormulario = useUpdateFormulario();
+  
+  const [statusFilter, setStatusFilter] = useState('todos');
+  const [visibilidadeFilter, setVisibilidadeFilter] = useState('todas');
+  const [expiracaoFilter, setExpiracaoFilter] = useState('todos');
 
   const handleArquivar = async (id: string) => {
     await updateFormulario.mutateAsync({ id, status: "arquivado" });
@@ -43,6 +48,25 @@ export const FormulariosCustomizados = () => {
     return dias;
   };
 
+  const filteredFormularios = useMemo(() => {
+    return formularios.filter(f => {
+      const matchesStatus = statusFilter === 'todos' || 
+        (statusFilter === 'ativo' && f.status === 'ativo') || 
+        (statusFilter === 'arquivado' && f.status === 'arquivado');
+      
+      const matchesVisibilidade = visibilidadeFilter === 'todas' || 
+        (visibilidadeFilter === 'todos_mentorados' && f.visibilidade === 'todos') || 
+        (visibilidadeFilter === 'especificos' && f.visibilidade === 'especificos');
+      
+      const expirado = f.data_expiracao && isPast(new Date(f.data_expiracao));
+      const matchesExpiracao = expiracaoFilter === 'todos' || 
+        (expiracaoFilter === 'vigente' && !expirado) || 
+        (expiracaoFilter === 'expirado' && expirado);
+      
+      return matchesStatus && matchesVisibilidade && matchesExpiracao;
+    });
+  }, [formularios, statusFilter, visibilidadeFilter, expiracaoFilter]);
+
   if (isLoading) {
     return <div className="text-center py-8">Carregando formulários...</div>;
   }
@@ -57,8 +81,56 @@ export const FormulariosCustomizados = () => {
         </Button>
       </div>
 
+      <FilterBar
+        filters={[
+          {
+            id: 'status',
+            label: 'Status',
+            placeholder: 'Todos os status',
+            options: [
+              { value: 'todos', label: 'Todos os status' },
+              { value: 'ativo', label: 'Ativo' },
+              { value: 'arquivado', label: 'Arquivado' }
+            ],
+            value: statusFilter,
+            onChange: setStatusFilter
+          },
+          {
+            id: 'visibilidade',
+            label: 'Visibilidade',
+            placeholder: 'Todas',
+            options: [
+              { value: 'todas', label: 'Todas' },
+              { value: 'todos_mentorados', label: 'Todos os Mentorados' },
+              { value: 'especificos', label: 'Específicos' }
+            ],
+            value: visibilidadeFilter,
+            onChange: setVisibilidadeFilter
+          },
+          {
+            id: 'expiracao',
+            label: 'Expiração',
+            placeholder: 'Todos',
+            options: [
+              { value: 'todos', label: 'Todos' },
+              { value: 'vigente', label: 'Vigente' },
+              { value: 'expirado', label: 'Expirado' }
+            ],
+            value: expiracaoFilter,
+            onChange: setExpiracaoFilter
+          }
+        ]}
+        onClear={() => {
+          setStatusFilter('todos');
+          setVisibilidadeFilter('todas');
+          setExpiracaoFilter('todos');
+        }}
+        totalItems={formularios.length}
+        filteredItems={filteredFormularios.length}
+      />
+
       <div className="space-y-4">
-        {formularios.length === 0 ? (
+        {filteredFormularios.length === 0 ? (
           <Card className="p-8 text-center">
             <p className="text-muted-foreground mb-4">
               Nenhum formulário criado ainda

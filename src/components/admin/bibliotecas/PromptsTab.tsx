@@ -130,13 +130,13 @@ export function PromptsTab() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Título</TableHead>
-            <TableHead>Ordem</TableHead>
-            <TableHead>Nível</TableHead>
-            <TableHead>Categoria</TableHead>
-            <TableHead>Tags</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Ações</TableHead>
+            <TableHead className="w-[250px]">Título</TableHead>
+            <TableHead className="w-[80px]">Ordem</TableHead>
+            <TableHead className="w-[140px]">Nível</TableHead>
+            <TableHead className="w-[180px]">Categoria</TableHead>
+            <TableHead className="w-[200px]">Tags</TableHead>
+            <TableHead className="w-[120px]">Status</TableHead>
+            <TableHead className="w-[100px]">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -176,14 +176,14 @@ export function PromptsTab() {
                   )}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="w-[120px]">
                 {prompt.ativo ? (
-                  <Badge variant="default">Ativo</Badge>
+                  <Badge variant="default" className="whitespace-nowrap">Ativo</Badge>
                 ) : (
-                  <Badge variant="destructive">Inativo</Badge>
+                  <Badge variant="destructive" className="whitespace-nowrap">Inativo</Badge>
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className="w-[100px]">
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => handleEdit(prompt)}>
                     <Pencil className="h-4 w-4" />

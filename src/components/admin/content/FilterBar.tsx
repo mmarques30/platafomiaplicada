@@ -31,7 +31,7 @@ export function FilterBar({ filters, onClear, totalItems, filteredItems }: Filte
   return (
     <div className="space-y-3 bg-muted/30 p-4 rounded-lg border">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium text-muted-foreground mr-2">🔍 Filtros:</span>
+        <span className="text-sm font-medium text-muted-foreground mr-2">Filtros:</span>
         
         {filters.map((filter) => (
           <Select key={filter.id} value={filter.value} onValueChange={filter.onChange}>
