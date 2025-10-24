@@ -22,18 +22,20 @@ interface FilterBarProps {
   onClear: () => void;
   totalItems: number;
   filteredItems: number;
+  actionButton?: React.ReactNode;
 }
 
-export function FilterBar({ filters, onClear, totalItems, filteredItems }: FilterBarProps) {
+export function FilterBar({ filters, onClear, totalItems, filteredItems, actionButton }: FilterBarProps) {
   const hasActiveFilters = filters.some(f => f.value !== 'todos' && f.value !== 'todas');
   const showCounter = filteredItems !== totalItems;
 
   return (
     <div className="space-y-3 bg-muted/30 p-4 rounded-lg border">
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium text-muted-foreground mr-2">Filtros:</span>
-        
-        {filters.map((filter) => (
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-medium text-muted-foreground mr-2">Filtros:</span>
+          
+          {filters.map((filter) => (
           <Select key={filter.id} value={filter.value} onValueChange={filter.onChange}>
             <SelectTrigger className="w-[200px] bg-background">
               <SelectValue placeholder={filter.placeholder} />
@@ -48,16 +50,23 @@ export function FilterBar({ filters, onClear, totalItems, filteredItems }: Filte
           </Select>
         ))}
 
-        {hasActiveFilters && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onClear}
-            className="ml-2"
-          >
-            <X className="h-4 w-4 mr-1" />
-            Limpar Filtros
-          </Button>
+          {hasActiveFilters && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClear}
+              className="ml-2"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Limpar Filtros
+            </Button>
+          )}
+        </div>
+
+        {actionButton && (
+          <div className="flex-shrink-0">
+            {actionButton}
+          </div>
         )}
       </div>
 

@@ -69,14 +69,6 @@ export function FerramentasTab() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Ferramentas IA</h2>
-        <Button onClick={handleNew}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nova Ferramenta
-        </Button>
-      </div>
-
       <FilterBar
         filters={[
           {
@@ -122,6 +114,12 @@ export function FerramentasTab() {
         }}
         totalItems={ferramentas?.length || 0}
         filteredItems={filteredFerramentas.length}
+        actionButton={
+          <Button onClick={handleNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Ferramenta
+          </Button>
+        }
       />
 
       <Table>

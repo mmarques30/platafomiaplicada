@@ -68,14 +68,6 @@ export function MetodosTab() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Métodos para Aplicar</h2>
-        <Button onClick={handleNew}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Método
-        </Button>
-      </div>
-
       <FilterBar
         filters={[
           {
@@ -121,6 +113,12 @@ export function MetodosTab() {
         }}
         totalItems={metodos?.length || 0}
         filteredItems={filteredMetodos.length}
+        actionButton={
+          <Button onClick={handleNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo Método
+          </Button>
+        }
       />
 
       <Table>

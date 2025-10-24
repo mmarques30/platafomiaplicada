@@ -73,14 +73,6 @@ export const FormulariosCustomizados = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Formulários Customizados</h2>
-        <Button onClick={() => setShowModal(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Criar Formulário
-        </Button>
-      </div>
-
       <FilterBar
         filters={[
           {
@@ -127,6 +119,12 @@ export const FormulariosCustomizados = () => {
         }}
         totalItems={formularios.length}
         filteredItems={filteredFormularios.length}
+        actionButton={
+          <Button onClick={() => setShowModal(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Criar Formulário
+          </Button>
+        }
       />
 
       <div className="space-y-4">

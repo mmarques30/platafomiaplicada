@@ -125,6 +125,12 @@ export function PromptsTab() {
         onClear={clearFilters}
         totalItems={prompts?.length || 0}
         filteredItems={filteredPrompts.length}
+        actionButton={
+          <Button onClick={handleNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo Prompt
+          </Button>
+        }
       />
 
       <Table>

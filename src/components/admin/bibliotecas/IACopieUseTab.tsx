@@ -71,14 +71,6 @@ export function IACopieUseTab() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">IA Copie e Use</h2>
-        <Button onClick={handleNew}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Item
-        </Button>
-      </div>
-
       <FilterBar
         filters={[
           {
@@ -123,6 +115,12 @@ export function IACopieUseTab() {
         }}
         totalItems={items?.length || 0}
         filteredItems={filteredItems.length}
+        actionButton={
+          <Button onClick={handleNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo Item
+          </Button>
+        }
       />
 
       <Table>
