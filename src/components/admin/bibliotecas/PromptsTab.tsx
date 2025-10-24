@@ -79,14 +79,6 @@ export function PromptsTab() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Biblioteca de Prompts</h2>
-        <Button onClick={handleNew}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Prompt
-        </Button>
-      </div>
-
       <FilterBar
         filters={[
           {
