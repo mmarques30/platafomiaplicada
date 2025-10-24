@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,6 +7,7 @@ import { PromptModal } from "./PromptModal";
 import { usePromptsAdmin, useDeletePrompt } from "@/hooks/admin/useBibliotecas";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FilterBar } from "../content/FilterBar";
 
 export function PromptsTab() {
   const { data: prompts, isLoading } = usePromptsAdmin();
@@ -14,6 +15,10 @@ export function PromptsTab() {
   const [editingPrompt, setEditingPrompt] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const deletePrompt = useDeletePrompt();
+
+  const [filterNivel, setFilterNivel] = useState("");
+  const [filterCategoria, setFilterCategoria] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
   const handleEdit = (prompt: any) => {
     setEditingPrompt(prompt);
@@ -31,6 +36,36 @@ export function PromptsTab() {
       setDeleteId(null);
     }
   };
+
+  const niveis = useMemo(() => {
+    if (!prompts) return [];
+    return Array.from(new Set(prompts.map(p => p.nivel_complexidade).filter(Boolean)));
+  }, [prompts]);
+
+  const categorias = useMemo(() => {
+    if (!prompts) return [];
+    return Array.from(new Set(prompts.map(p => p.categoria)));
+  }, [prompts]);
+
+  const filteredPrompts = useMemo(() => {
+    if (!prompts) return [];
+    
+    return prompts.filter((prompt) => {
+      if (filterNivel && prompt.nivel_complexidade !== filterNivel) return false;
+      if (filterCategoria && prompt.categoria !== filterCategoria) return false;
+      if (filterStatus === "ativo" && !prompt.ativo) return false;
+      if (filterStatus === "inativo" && prompt.ativo) return false;
+      return true;
+    }).sort((a, b) => (a.ordem ?? 999) - (b.ordem ?? 999));
+  }, [prompts, filterNivel, filterCategoria, filterStatus]);
+
+  const clearFilters = () => {
+    setFilterNivel("");
+    setFilterCategoria("");
+    setFilterStatus("");
+  };
+
+  const hasActiveFilters = filterNivel || filterCategoria || filterStatus;
 
   if (isLoading) {
     return (
@@ -52,10 +87,52 @@ export function PromptsTab() {
         </Button>
       </div>
 
+      <FilterBar
+        filters={[
+          {
+            id: "nivel",
+            label: "Nível",
+            placeholder: "Todos os níveis",
+            options: niveis.map(n => ({ 
+              value: n, 
+              label: n === 'iniciante' ? '🟢 Iniciante' : 
+                     n === 'intermediario' ? '🟡 Intermediário' : 
+                     '🔴 Avançado' 
+            })),
+            value: filterNivel,
+            onChange: setFilterNivel,
+          },
+          {
+            id: "categoria",
+            label: "Categoria",
+            placeholder: "Todas as categorias",
+            options: categorias.map(c => ({ value: c, label: c })),
+            value: filterCategoria,
+            onChange: setFilterCategoria,
+          },
+          {
+            id: "status",
+            label: "Status",
+            placeholder: "Todos os status",
+            options: [
+              { value: "ativo", label: "Ativo" },
+              { value: "inativo", label: "Inativo" },
+            ],
+            value: filterStatus,
+            onChange: setFilterStatus,
+          },
+        ]}
+        onClear={clearFilters}
+        totalItems={prompts?.length || 0}
+        filteredItems={filteredPrompts.length}
+      />
+
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Título</TableHead>
+            <TableHead>Ordem</TableHead>
+            <TableHead>Nível</TableHead>
             <TableHead>Categoria</TableHead>
             <TableHead>Tags</TableHead>
             <TableHead>Status</TableHead>
@@ -63,9 +140,27 @@ export function PromptsTab() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {prompts?.map((prompt) => (
+          {filteredPrompts.map((prompt) => (
             <TableRow key={prompt.id}>
               <TableCell>{prompt.titulo}</TableCell>
+              <TableCell>
+                <Badge variant="outline">{prompt.ordem ?? '-'}</Badge>
+              </TableCell>
+              <TableCell>
+                {prompt.nivel_complexidade ? (
+                  <Badge 
+                    className={
+                      prompt.nivel_complexidade === 'iniciante' ? 'bg-green-500 text-white' :
+                      prompt.nivel_complexidade === 'intermediario' ? 'bg-yellow-500 text-white' :
+                      'bg-red-500 text-white'
+                    }
+                  >
+                    {prompt.nivel_complexidade === 'iniciante' ? '🟢 Iniciante' :
+                     prompt.nivel_complexidade === 'intermediario' ? '🟡 Intermediário' :
+                     '🔴 Avançado'}
+                  </Badge>
+                ) : '-'}
+              </TableCell>
               <TableCell>{prompt.categoria}</TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1">

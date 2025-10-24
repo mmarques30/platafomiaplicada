@@ -34,6 +34,12 @@ const CATEGORIAS_PROMPTS = [
   "Outros",
 ] as const;
 
+const NIVEIS_COMPLEXIDADE = [
+  { value: "iniciante", label: "🟢 Iniciante" },
+  { value: "intermediario", label: "🟡 Intermediário" },
+  { value: "avancado", label: "🔴 Avançado" },
+] as const;
+
 interface PromptModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -187,6 +193,41 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
             {!watch("categoria") && (
               <p className="text-sm text-destructive mt-1">Categoria é obrigatória</p>
             )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="ordem">Ordem de Apresentação</Label>
+              <Input
+                id="ordem"
+                type="number"
+                min="1"
+                placeholder="Ex: 1, 2, 3..."
+                {...register("ordem", { valueAsNumber: true })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Define a sequência de exibição
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="nivel">Nível de Complexidade</Label>
+              <Select
+                value={watch("nivel_complexidade") || ""}
+                onValueChange={(value) => setValue("nivel_complexidade", value)}
+              >
+                <SelectTrigger id="nivel">
+                  <SelectValue placeholder="Selecione o nível" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {NIVEIS_COMPLEXIDADE.map((nivel) => (
+                    <SelectItem key={nivel.value} value={nivel.value}>
+                      {nivel.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div>

@@ -92,6 +92,8 @@ export type Database = {
           ferramentas_recomendadas: Json | null
           id: string
           modulo_id: string | null
+          nivel_complexidade: string | null
+          ordem: number | null
           prompt: string
           tags: Json | null
           titulo: string
@@ -105,6 +107,8 @@ export type Database = {
           ferramentas_recomendadas?: Json | null
           id?: string
           modulo_id?: string | null
+          nivel_complexidade?: string | null
+          ordem?: number | null
           prompt: string
           tags?: Json | null
           titulo: string
@@ -118,6 +122,8 @@ export type Database = {
           ferramentas_recomendadas?: Json | null
           id?: string
           modulo_id?: string | null
+          nivel_complexidade?: string | null
+          ordem?: number | null
           prompt?: string
           tags?: Json | null
           titulo?: string

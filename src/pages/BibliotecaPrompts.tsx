@@ -11,9 +11,14 @@ export default function BibliotecaPrompts() {
   const { data: prompts, isLoading } = usePrompts();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
+  const [selectedNivel, setSelectedNivel] = useState<string | null>(null);
 
   const categorias = prompts
     ? Array.from(new Set(prompts.map((p) => p.categoria)))
+    : [];
+
+  const niveis = prompts
+    ? Array.from(new Set(prompts.map((p) => p.nivel_complexidade).filter(Boolean)))
     : [];
 
   const filteredPrompts = prompts?.filter((prompt) => {
@@ -23,8 +28,10 @@ export default function BibliotecaPrompts() {
       prompt.prompt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategoria =
       !selectedCategoria || prompt.categoria === selectedCategoria;
-    return matchesSearch && matchesCategoria;
-  });
+    const matchesNivel = 
+      !selectedNivel || prompt.nivel_complexidade === selectedNivel;
+    return matchesSearch && matchesCategoria && matchesNivel;
+  }).sort((a, b) => (a.ordem ?? 999) - (b.ordem ?? 999));
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -50,24 +57,63 @@ export default function BibliotecaPrompts() {
         </div>
       </div>
 
-      <div className="flex gap-2 flex-wrap mb-6">
-        <Badge
-          variant={selectedCategoria === null ? "default" : "outline"}
-          className="cursor-pointer"
-          onClick={() => setSelectedCategoria(null)}
-        >
-          Todas
-        </Badge>
-        {categorias.map((categoria) => (
-          <Badge
-            key={categoria}
-            variant={selectedCategoria === categoria ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setSelectedCategoria(categoria)}
-          >
-            {categoria}
-          </Badge>
-        ))}
+      <div className="space-y-3 mb-6">
+        <div>
+          <p className="text-sm font-medium mb-2">Filtrar por Categoria:</p>
+          <div className="flex gap-2 flex-wrap">
+            <Badge
+              variant={selectedCategoria === null ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => setSelectedCategoria(null)}
+            >
+              Todas
+            </Badge>
+            {categorias.map((categoria) => (
+              <Badge
+                key={categoria}
+                variant={selectedCategoria === categoria ? "default" : "outline"}
+                className="cursor-pointer"
+                onClick={() => setSelectedCategoria(categoria)}
+              >
+                {categoria}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm font-medium mb-2">Filtrar por Nível:</p>
+          <div className="flex gap-2 flex-wrap">
+            <Badge
+              variant={selectedNivel === null ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => setSelectedNivel(null)}
+            >
+              Todos os Níveis
+            </Badge>
+            <Badge
+              variant={selectedNivel === 'iniciante' ? "default" : "outline"}
+              className="cursor-pointer bg-green-100 text-green-800 hover:bg-green-200"
+              onClick={() => setSelectedNivel('iniciante')}
+            >
+              🟢 Iniciante
+            </Badge>
+            <Badge
+              variant={selectedNivel === 'intermediario' ? "default" : "outline"}
+              className="cursor-pointer bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+              onClick={() => setSelectedNivel('intermediario')}
+            >
+              🟡 Intermediário
+            </Badge>
+            <Badge
+              variant={selectedNivel === 'avancado' ? "default" : "outline"}
+              className="cursor-pointer bg-red-100 text-red-800 hover:bg-red-200"
+              onClick={() => setSelectedNivel('avancado')}
+            >
+              🔴 Avançado
+            </Badge>
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
@@ -89,12 +135,27 @@ export default function BibliotecaPrompts() {
           {filteredPrompts.map((prompt) => (
             <Card key={prompt.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <CardTitle className="text-xl mb-2">{prompt.titulo}</CardTitle>
                     <CardDescription>{prompt.descricao}</CardDescription>
                   </div>
-                  <Badge variant="secondary">{prompt.categoria}</Badge>
+                  <div className="flex flex-col gap-2">
+                    <Badge variant="secondary">{prompt.categoria}</Badge>
+                    {prompt.nivel_complexidade && (
+                      <Badge 
+                        className={
+                          prompt.nivel_complexidade === 'iniciante' ? 'bg-green-500 text-white' :
+                          prompt.nivel_complexidade === 'intermediario' ? 'bg-yellow-500 text-white' :
+                          'bg-red-500 text-white'
+                        }
+                      >
+                        {prompt.nivel_complexidade === 'iniciante' ? '🟢 Iniciante' :
+                         prompt.nivel_complexidade === 'intermediario' ? '🟡 Intermediário' :
+                         '🔴 Avançado'}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 {Array.isArray(prompt.tags) && prompt.tags.length > 0 && (
                   <div className="flex gap-2 flex-wrap mt-2">
