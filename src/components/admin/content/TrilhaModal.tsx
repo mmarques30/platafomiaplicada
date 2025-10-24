@@ -24,6 +24,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+  const [selectedCategoria, setSelectedCategoria] = useState<string>("núcleo");
   
   const { register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: {
@@ -40,6 +41,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
   useEffect(() => {
     if (trilha) {
       reset(trilha);
+      setSelectedCategoria(trilha.categoria || "núcleo");
       setImagePreview(trilha.imagem_url || "");
       setImageFile(null);
     } else {
@@ -52,6 +54,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         ativo: true,
         imagem_url: "",
       });
+      setSelectedCategoria("núcleo");
       setImagePreview("");
       setImageFile(null);
     }
@@ -160,7 +163,13 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
 
           <div className="space-y-2">
             <Label>Categoria da Trilha</Label>
-            <Select onValueChange={(value) => setValue("categoria", value)} defaultValue={watch("categoria")}>
+            <Select 
+              value={selectedCategoria} 
+              onValueChange={(value) => {
+                setSelectedCategoria(value);
+                setValue("categoria", value);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
