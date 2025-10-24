@@ -56,7 +56,14 @@ export function PromptsTab() {
       if (filterStatus === "ativo" && !prompt.ativo) return false;
       if (filterStatus === "inativo" && prompt.ativo) return false;
       return true;
-    }).sort((a, b) => (a.ordem ?? 999) - (b.ordem ?? 999));
+    }).sort((a, b) => {
+      // Primeiro ordena por categoria (alfabeticamente)
+      const categoriaCompare = a.categoria.localeCompare(b.categoria);
+      if (categoriaCompare !== 0) return categoriaCompare;
+      
+      // Dentro da mesma categoria, ordena por ordem
+      return (a.ordem ?? 999) - (b.ordem ?? 999);
+    });
   }, [prompts, filterNivel, filterCategoria, filterStatus]);
 
   const clearFilters = () => {
