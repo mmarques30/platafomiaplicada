@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTrilhas, useDeleteTrilha, useTrilhasStats } from "@/hooks/admin/useContent";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { TrilhaModal } from "./TrilhaModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { FilterBar } from "./FilterBar";
 
 export function TrilhasTab() {
   const { data: trilhas, isLoading } = useTrilhas();
@@ -14,6 +15,11 @@ export function TrilhasTab() {
   const [editingTrilha, setEditingTrilha] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  
+  // Estados de filtro
+  const [categoriaFilter, setCategoriaFilter] = useState<string>('todas');
+  const [nivelFilter, setNivelFilter] = useState<string>('todos');
+  const [statusFilter, setStatusFilter] = useState<string>('todos');
 
   const handleEdit = (trilha: any) => {
     setEditingTrilha(trilha);
@@ -32,6 +38,23 @@ export function TrilhasTab() {
     }
   };
 
+  const handleClearFilters = () => {
+    setCategoriaFilter('todas');
+    setNivelFilter('todos');
+    setStatusFilter('todos');
+  };
+
+  // Filtrar trilhas
+  const trilhasFiltradas = useMemo(() => {
+    return trilhas?.filter(trilha => {
+      if (categoriaFilter !== 'todas' && trilha.categoria !== categoriaFilter) return false;
+      if (nivelFilter !== 'todos' && trilha.nivel !== nivelFilter) return false;
+      if (statusFilter === 'ativo' && !trilha.ativo) return false;
+      if (statusFilter === 'inativo' && trilha.ativo) return false;
+      return true;
+    }) || [];
+  }, [trilhas, categoriaFilter, nivelFilter, statusFilter]);
+
   if (isLoading) return <div>Carregando...</div>;
 
   return (
@@ -43,6 +66,53 @@ export function TrilhasTab() {
           Nova Trilha
         </Button>
       </div>
+
+      <FilterBar
+        filters={[
+          {
+            id: 'categoria',
+            label: 'Categoria',
+            placeholder: 'Todas as categorias',
+            value: categoriaFilter,
+            onChange: setCategoriaFilter,
+            options: [
+              { value: 'todas', label: 'Todas as categorias' },
+              { value: 'núcleo', label: 'Núcleo' },
+              { value: 'ferramentas', label: 'Ferramentas' },
+              { value: 'profissão', label: 'Profissão' },
+              { value: 'aulas semanais', label: 'Aulas Semanais' },
+            ],
+          },
+          {
+            id: 'nivel',
+            label: 'Nível',
+            placeholder: 'Todos os níveis',
+            value: nivelFilter,
+            onChange: setNivelFilter,
+            options: [
+              { value: 'todos', label: 'Todos os níveis' },
+              { value: 'iniciante', label: 'Iniciante' },
+              { value: 'intermediário', label: 'Intermediário' },
+              { value: 'avançado', label: 'Avançado' },
+            ],
+          },
+          {
+            id: 'status',
+            label: 'Status',
+            placeholder: 'Todos os status',
+            value: statusFilter,
+            onChange: setStatusFilter,
+            options: [
+              { value: 'todos', label: 'Todos os status' },
+              { value: 'ativo', label: 'Ativo' },
+              { value: 'inativo', label: 'Inativo' },
+            ],
+          },
+        ]}
+        onClear={handleClearFilters}
+        totalItems={trilhas?.length || 0}
+        filteredItems={trilhasFiltradas.length}
+      />
 
       <div className="border rounded-lg">
         <Table>
@@ -61,7 +131,7 @@ export function TrilhasTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {trilhas?.map((trilha) => {
+            {trilhasFiltradas.map((trilha) => {
               const trilhaStat = stats?.find((s: any) => s.trilha_id === trilha.id);
               return (
                 <TableRow key={trilha.id}>

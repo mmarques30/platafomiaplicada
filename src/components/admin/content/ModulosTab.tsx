@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useModulos, useDeleteModulo, useModulosStats } from "@/hooks/admin/useContent";
+import { useState, useMemo } from "react";
+import { useModulos, useDeleteModulo, useModulosStats, useTrilhas } from "@/hooks/admin/useContent";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -8,14 +8,38 @@ import { ModuloModal } from "./ModuloModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { FilterBar } from "./FilterBar";
 
 export function ModulosTab() {
   const { data: modulos, isLoading } = useModulos();
   const { data: stats } = useModulosStats();
+  const { data: trilhas } = useTrilhas();
   const deleteModulo = useDeleteModulo();
   const [editingModulo, setEditingModulo] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  
+  // Estados de filtro
+  const [trilhaFilter, setTrilhaFilter] = useState<string>('todas');
+  const [categoriaFilter, setCategoriaFilter] = useState<string>('todas');
+  const [statusFilter, setStatusFilter] = useState<string>('todos');
+
+  const handleClearFilters = () => {
+    setTrilhaFilter('todas');
+    setCategoriaFilter('todas');
+    setStatusFilter('todos');
+  };
+
+  // Filtrar módulos
+  const modulosFiltrados = useMemo(() => {
+    return modulos?.filter(modulo => {
+      if (trilhaFilter !== 'todas' && modulo.trilha_id !== trilhaFilter) return false;
+      if (categoriaFilter !== 'todas' && modulo.categoria !== categoriaFilter) return false;
+      if (statusFilter === 'ativo' && !modulo.ativo) return false;
+      if (statusFilter === 'inativo' && modulo.ativo) return false;
+      return true;
+    }) || [];
+  }, [modulos, trilhaFilter, categoriaFilter, statusFilter]);
 
   if (isLoading) return <div>Carregando...</div>;
 
@@ -28,6 +52,51 @@ export function ModulosTab() {
           Novo Módulo
         </Button>
       </div>
+
+      <FilterBar
+        filters={[
+          {
+            id: 'trilha',
+            label: 'Trilha',
+            placeholder: 'Todas as trilhas',
+            value: trilhaFilter,
+            onChange: setTrilhaFilter,
+            options: [
+              { value: 'todas', label: 'Todas as trilhas' },
+              ...(trilhas?.map(t => ({ value: t.id, label: t.titulo })) || []),
+            ],
+          },
+          {
+            id: 'categoria',
+            label: 'Categoria',
+            placeholder: 'Todas as categorias',
+            value: categoriaFilter,
+            onChange: setCategoriaFilter,
+            options: [
+              { value: 'todas', label: 'Todas as categorias' },
+              { value: 'núcleo', label: 'Núcleo' },
+              { value: 'ferramentas', label: 'Ferramentas' },
+              { value: 'profissão', label: 'Profissão' },
+              { value: 'aulas semanais', label: 'Aulas Semanais' },
+            ],
+          },
+          {
+            id: 'status',
+            label: 'Status',
+            placeholder: 'Todos os status',
+            value: statusFilter,
+            onChange: setStatusFilter,
+            options: [
+              { value: 'todos', label: 'Todos os status' },
+              { value: 'ativo', label: 'Ativo' },
+              { value: 'inativo', label: 'Inativo' },
+            ],
+          },
+        ]}
+        onClear={handleClearFilters}
+        totalItems={modulos?.length || 0}
+        filteredItems={modulosFiltrados.length}
+      />
 
       <div className="border rounded-lg">
         <Table>
@@ -46,7 +115,7 @@ export function ModulosTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {modulos?.map((modulo: any) => {
+            {modulosFiltrados.map((modulo: any) => {
               const moduloStat = stats?.find((s: any) => s.modulo_id === modulo.id);
               return (
               <TableRow key={modulo.id}>
