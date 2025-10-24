@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useModulos, useDeleteModulo, useModulosStats } from "@/hooks/admin/useContent";
-import { useCategorias } from "@/hooks/admin/useCategorias";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +12,6 @@ import { ptBR } from "date-fns/locale";
 export function ModulosTab() {
   const { data: modulos, isLoading } = useModulos();
   const { data: stats } = useModulosStats();
-  const { data: categorias } = useCategorias();
   const deleteModulo = useDeleteModulo();
   const [editingModulo, setEditingModulo] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,19 +53,25 @@ export function ModulosTab() {
                 <TableCell className="font-medium">{modulo.titulo}</TableCell>
                 <TableCell>{modulo.trilha?.titulo}</TableCell>
                 <TableCell>
-                  {modulo.categoria ? (
-                    (() => {
-                      const cat = categorias?.find((c: any) => c.slug === modulo.categoria);
-                      return cat ? (
-                        <Badge variant="outline" style={{ backgroundColor: cat.cor + "20", borderColor: cat.cor }}>
-                          {cat.nome}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">{modulo.categoria}</Badge>
-                      );
-                    })()
-                  ) : (
-                    <span className="text-muted-foreground text-xs">-</span>
+                  {modulo.categoria === 'aulas semanais' && (
+                    <Badge variant="outline" style={{ backgroundColor: 'hsl(var(--primary) / 0.1)', borderColor: 'hsl(var(--primary))' }}>
+                      Aulas Semanais
+                    </Badge>
+                  )}
+                  {modulo.categoria === 'núcleo' && (
+                    <Badge variant="outline" style={{ backgroundColor: '#10B98120', borderColor: '#10B981' }}>
+                      NÚCLEO
+                    </Badge>
+                  )}
+                  {modulo.categoria === 'ferramentas' && (
+                    <Badge variant="outline" style={{ backgroundColor: '#F59E0B20', borderColor: '#F59E0B' }}>
+                      FERRAMENTAS
+                    </Badge>
+                  )}
+                  {modulo.categoria === 'profissão' && (
+                    <Badge variant="outline" style={{ backgroundColor: '#8B5CF620', borderColor: '#8B5CF6' }}>
+                      PROFISSÃO
+                    </Badge>
                   )}
                 </TableCell>
                 <TableCell>

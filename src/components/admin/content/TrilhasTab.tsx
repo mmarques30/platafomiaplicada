@@ -49,6 +49,7 @@ export function TrilhasTab() {
           <TableHeader>
             <TableRow>
               <TableHead>Título</TableHead>
+              <TableHead>Categoria</TableHead>
               <TableHead>Nível</TableHead>
               <TableHead>Ordem</TableHead>
               <TableHead>Módulos</TableHead>
@@ -65,6 +66,28 @@ export function TrilhasTab() {
               return (
                 <TableRow key={trilha.id}>
                   <TableCell className="font-medium">{trilha.titulo}</TableCell>
+                  <TableCell>
+                    {trilha.categoria === 'aulas semanais' && (
+                      <Badge variant="outline" style={{ backgroundColor: 'hsl(var(--primary) / 0.1)', borderColor: 'hsl(var(--primary))' }}>
+                        Aulas Semanais
+                      </Badge>
+                    )}
+                    {trilha.categoria === 'núcleo' && (
+                      <Badge variant="outline" style={{ backgroundColor: '#10B98120', borderColor: '#10B981' }}>
+                        NÚCLEO
+                      </Badge>
+                    )}
+                    {trilha.categoria === 'ferramentas' && (
+                      <Badge variant="outline" style={{ backgroundColor: '#F59E0B20', borderColor: '#F59E0B' }}>
+                        FERRAMENTAS
+                      </Badge>
+                    )}
+                    {trilha.categoria === 'profissão' && (
+                      <Badge variant="outline" style={{ backgroundColor: '#8B5CF620', borderColor: '#8B5CF6' }}>
+                        PROFISSÃO
+                      </Badge>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline">{trilha.nivel}</Badge>
                   </TableCell>

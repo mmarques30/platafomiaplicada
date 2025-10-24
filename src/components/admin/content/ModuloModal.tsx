@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCreateModulo, useUpdateModulo, useTrilhas } from "@/hooks/admin/useContent";
-import { useCategorias } from "@/hooks/admin/useCategorias";
+import { Badge } from "@/components/ui/badge";
 
 interface ModuloModalProps {
   open: boolean;
@@ -24,10 +24,10 @@ interface ModuloModalProps {
 
 export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
   const { data: trilhas } = useTrilhas();
-  const { data: categorias } = useCategorias();
   const createModulo = useCreateModulo();
   const updateModulo = useUpdateModulo();
   const { register, handleSubmit, reset, setValue, watch } = useForm();
+  const [selectedTrilhaCategoria, setSelectedTrilhaCategoria] = useState<string | null>(null);
 
   useEffect(() => {
     if (modulo) {
@@ -38,8 +38,10 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         ordem: modulo.ordem || 0,
         ativo: modulo.ativo !== undefined ? modulo.ativo : true,
         data_inicio: modulo.data_inicio || null,
-        categoria: modulo.categoria || null,
       });
+      // Encontrar categoria da trilha atual
+      const trilha = trilhas?.find((t: any) => t.id === modulo.trilha_id);
+      setSelectedTrilhaCategoria(trilha?.categoria || null);
     } else {
       reset({ 
         titulo: "", 
@@ -47,18 +49,28 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         trilha_id: "", 
         ordem: 0, 
         ativo: true, 
-        data_inicio: null, 
-        categoria: null 
+        data_inicio: null
       });
+      setSelectedTrilhaCategoria(null);
     }
-  }, [modulo, reset, open]);
+  }, [modulo, reset, open, trilhas]);
 
   const onSubmit = (data: any) => {
+    // Remove o campo categoria do payload (será definido pelo trigger)
+    const { categoria, ...submitData } = data;
+    
     if (modulo) {
-      updateModulo.mutate({ id: modulo.id, ...data }, { onSuccess: () => onOpenChange(false) });
+      updateModulo.mutate({ id: modulo.id, ...submitData }, { onSuccess: () => onOpenChange(false) });
     } else {
-      createModulo.mutate(data, { onSuccess: () => onOpenChange(false) });
+      createModulo.mutate(submitData, { onSuccess: () => onOpenChange(false) });
     }
+  };
+
+  // Atualizar categoria exibida quando trilha mudar
+  const handleTrilhaChange = (value: string) => {
+    setValue("trilha_id", value);
+    const trilha = trilhas?.find((t: any) => t.id === value);
+    setSelectedTrilhaCategoria(trilha?.categoria || null);
   };
 
   return (
@@ -108,31 +120,10 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
             </p>
           </div>
           <div className="space-y-2">
-            <Label>Categoria</Label>
-            <Select 
-              value={watch("categoria") || undefined}
-              onValueChange={(value) => setValue("categoria", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo de módulo" />
-              </SelectTrigger>
-              <SelectContent>
-                {categorias?.filter((cat: any) => cat.ativo).map((cat: any) => (
-                  <SelectItem key={cat.id} value={cat.slug}>
-                    {cat.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">
-              Classifique o tipo de conteúdo deste módulo
-            </p>
-          </div>
-          <div className="space-y-2">
             <Label>Trilha</Label>
             <Select 
               value={watch("trilha_id") || undefined} 
-              onValueChange={(value) => setValue("trilha_id", value)}
+              onValueChange={handleTrilhaChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione uma trilha" />
@@ -144,6 +135,38 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
               </SelectContent>
             </Select>
           </div>
+
+          {selectedTrilhaCategoria && (
+            <div className="space-y-2">
+              <Label>Categoria (herdada da trilha)</Label>
+              <div>
+                {selectedTrilhaCategoria === 'aulas semanais' && (
+                  <Badge variant="outline" style={{ backgroundColor: 'hsl(var(--primary) / 0.1)', borderColor: 'hsl(var(--primary))' }}>
+                    Aulas Semanais
+                  </Badge>
+                )}
+                {selectedTrilhaCategoria === 'núcleo' && (
+                  <Badge variant="outline" style={{ backgroundColor: '#10B98120', borderColor: '#10B981' }}>
+                    NÚCLEO
+                  </Badge>
+                )}
+                {selectedTrilhaCategoria === 'ferramentas' && (
+                  <Badge variant="outline" style={{ backgroundColor: '#F59E0B20', borderColor: '#F59E0B' }}>
+                    FERRAMENTAS
+                  </Badge>
+                )}
+                {selectedTrilhaCategoria === 'profissão' && (
+                  <Badge variant="outline" style={{ backgroundColor: '#8B5CF620', borderColor: '#8B5CF6' }}>
+                    PROFISSÃO
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                O módulo herda automaticamente a categoria da trilha selecionada
+              </p>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label>Ordem</Label>
             <Input type="number" {...register("ordem", { valueAsNumber: true })} />

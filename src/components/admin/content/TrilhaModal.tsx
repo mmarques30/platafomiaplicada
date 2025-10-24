@@ -30,6 +30,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       titulo: "",
       descricao: "",
       nivel: "iniciante",
+      categoria: "núcleo",
       ordem: 0,
       ativo: true,
       imagem_url: "",
@@ -46,6 +47,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         titulo: "",
         descricao: "",
         nivel: "iniciante",
+        categoria: "núcleo",
         ordem: 0,
         ativo: true,
         imagem_url: "",
@@ -152,6 +154,21 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
                 <SelectItem value="iniciante">Iniciante</SelectItem>
                 <SelectItem value="intermediario">Intermediário</SelectItem>
                 <SelectItem value="avancado">Avançado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Categoria da Trilha</Label>
+            <Select onValueChange={(value) => setValue("categoria", value)} defaultValue={watch("categoria")}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aulas semanais">Aulas Semanais</SelectItem>
+                <SelectItem value="núcleo">NÚCLEO</SelectItem>
+                <SelectItem value="ferramentas">FERRAMENTAS</SelectItem>
+                <SelectItem value="profissão">PROFISSÃO</SelectItem>
               </SelectContent>
             </Select>
           </div>
