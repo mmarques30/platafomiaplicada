@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useFerramentasIA } from "@/hooks/useFerramentas";
 import { Wrench, Search } from "lucide-react";
 import { FerramentaCard } from "@/components/bibliotecas/FerramentaCard";
+import { FerramentaDetalhesModal } from "@/components/bibliotecas/FerramentaDetalhesModal";
 import {
   FiltrosAvancadosSheet,
   FiltrosAvancados,
@@ -15,6 +16,7 @@ export default function BibliotecaFerramentas() {
   const { data: ferramentas, isLoading } = useFerramentasIA();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
+  const [ferramentaSelecionada, setFerramentaSelecionada] = useState<any>(null);
   const [filtrosAvancados, setFiltrosAvancados] = useState<FiltrosAvancados>({
     categoria: null,
     preco: "todas",
@@ -141,11 +143,23 @@ export default function BibliotecaFerramentas() {
           ))}
         </div>
       ) : filteredFerramentas && filteredFerramentas.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredFerramentas.map((ferramenta) => (
-            <FerramentaCard key={ferramenta.id} ferramenta={ferramenta} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredFerramentas.map((ferramenta) => (
+              <FerramentaCard 
+                key={ferramenta.id} 
+                ferramenta={ferramenta}
+                onVerMais={() => setFerramentaSelecionada(ferramenta)}
+              />
+            ))}
+          </div>
+
+          {/* Modal de Detalhes */}
+          <FerramentaDetalhesModal 
+            ferramenta={ferramentaSelecionada}
+            onClose={() => setFerramentaSelecionada(null)}
+          />
+        </>
       ) : (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">

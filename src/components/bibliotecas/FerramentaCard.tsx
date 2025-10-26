@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RatingStars } from "@/components/shared/RatingStars";
-import { Wrench, ExternalLink, CheckCircle } from "lucide-react";
+import { Wrench, ExternalLink, CheckCircle, ChevronRight } from "lucide-react";
 
 interface FerramentaCardProps {
   ferramenta: {
@@ -16,9 +16,10 @@ interface FerramentaCardProps {
     vale_a_pena?: boolean | null;
     link_ferramenta?: string | null;
   };
+  onVerMais?: () => void;
 }
 
-export function FerramentaCard({ ferramenta }: FerramentaCardProps) {
+export function FerramentaCard({ ferramenta, onVerMais }: FerramentaCardProps) {
   return (
     <Card className="hover:shadow-lg transition-shadow h-full flex flex-col">
       <CardContent className="p-4 flex flex-col gap-3 flex-1">
@@ -75,18 +76,27 @@ export function FerramentaCard({ ferramenta }: FerramentaCardProps) {
           </div>
         )}
 
-        {/* Botão Acessar */}
-        {ferramenta.link_ferramenta && (
+        {/* Botões de Ação */}
+        <div className="flex gap-2 w-full mt-auto">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="w-full mt-auto"
-            onClick={() => window.open(ferramenta.link_ferramenta!, "_blank")}
+            className="flex-1"
+            onClick={onVerMais}
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Acessar
+            Ver Detalhes
           </Button>
-        )}
+          
+          {ferramenta.link_ferramenta && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(ferramenta.link_ferramenta!, "_blank")}
+            >
+              <ExternalLink className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
