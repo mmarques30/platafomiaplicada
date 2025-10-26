@@ -1,35 +1,72 @@
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState, useMemo } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { RatingStars } from "@/components/shared/RatingStars";
+import { Badge } from "@/components/ui/badge";
 import { useFerramentasIA } from "@/hooks/useFerramentas";
-import { Wrench, Search, ExternalLink, CheckCircle, XCircle } from "lucide-react";
+import { Wrench, Search } from "lucide-react";
+import { FerramentaCard } from "@/components/bibliotecas/FerramentaCard";
+import {
+  FiltrosAvancadosSheet,
+  FiltrosAvancados,
+} from "@/components/bibliotecas/FiltrosAvancadosSheet";
 
 export default function BibliotecaFerramentas() {
   const { data: ferramentas, isLoading } = useFerramentasIA();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
-  const [showOnlyGratuitas, setShowOnlyGratuitas] = useState(false);
-
-  const categorias = ferramentas
-    ? Array.from(new Set(ferramentas.map((f) => f.categoria)))
-    : [];
-
-  const filteredFerramentas = ferramentas?.filter((ferramenta) => {
-    const matchesSearch =
-      ferramenta.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ferramenta.objetivo.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategoria =
-      !selectedCategoria || ferramenta.categoria === selectedCategoria;
-    const matchesGratuita = !showOnlyGratuitas || ferramenta.gratuito;
-    return matchesSearch && matchesCategoria && matchesGratuita;
+  const [filtrosAvancados, setFiltrosAvancados] = useState<FiltrosAvancados>({
+    categoria: null,
+    preco: "todas",
+    valeAPena: "todas",
   });
+
+  const categorias = useMemo(
+    () => (ferramentas ? Array.from(new Set(ferramentas.map((f) => f.categoria))) : []),
+    [ferramentas]
+  );
+
+  // Sincronizar categoria selecionada com filtros avançados
+  const handleCategoriaClick = (categoria: string | null) => {
+    setSelectedCategoria(categoria);
+    setFiltrosAvancados((prev) => ({ ...prev, categoria }));
+  };
+
+  const handleFiltrosChange = (novosFiltros: FiltrosAvancados) => {
+    setFiltrosAvancados(novosFiltros);
+    setSelectedCategoria(novosFiltros.categoria);
+  };
+
+  const filteredFerramentas = useMemo(() => {
+    return ferramentas?.filter((ferramenta) => {
+      // Busca por texto
+      const matchesSearch =
+        ferramenta.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ferramenta.objetivo.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Filtro de categoria (sincronizado com badges e filtro avançado)
+      const matchesCategoria =
+        !filtrosAvancados.categoria || ferramenta.categoria === filtrosAvancados.categoria;
+
+      // Filtro de preço
+      const matchesPreco =
+        filtrosAvancados.preco === "todas" ||
+        (filtrosAvancados.preco === "gratuitas" && ferramenta.gratuito) ||
+        (filtrosAvancados.preco === "pagas" && !ferramenta.gratuito);
+
+      // Filtro "Vale a pena"
+      const matchesValeAPena =
+        filtrosAvancados.valeAPena === "todas" ||
+        (filtrosAvancados.valeAPena === "sim" && ferramenta.vale_a_pena === true) ||
+        (filtrosAvancados.valeAPena === "nao" && ferramenta.vale_a_pena === false);
+
+      return matchesSearch && matchesCategoria && matchesPreco && matchesValeAPena;
+    });
+  }, [ferramentas, searchTerm, filtrosAvancados]);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      {/* Cabeçalho */}
       <div className="flex items-center gap-3 mb-8">
         <Wrench className="w-8 h-8 text-primary" />
         <div>
@@ -40,7 +77,8 @@ export default function BibliotecaFerramentas() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      {/* Barra de Busca + Filtro Avançado */}
+      <div className="flex gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
@@ -50,19 +88,19 @@ export default function BibliotecaFerramentas() {
             className="pl-10"
           />
         </div>
-        <Button
-          variant={showOnlyGratuitas ? "default" : "outline"}
-          onClick={() => setShowOnlyGratuitas(!showOnlyGratuitas)}
-        >
-          Apenas Gratuitas
-        </Button>
+        <FiltrosAvancadosSheet
+          filtros={filtrosAvancados}
+          onFiltrosChange={handleFiltrosChange}
+          categorias={categorias}
+        />
       </div>
 
-      <div className="flex gap-2 flex-wrap mb-6">
+      {/* Filtros de Categoria (Badges Horizontais) */}
+      <div className="flex gap-2 flex-wrap">
         <Badge
           variant={selectedCategoria === null ? "default" : "outline"}
           className="cursor-pointer"
-          onClick={() => setSelectedCategoria(null)}
+          onClick={() => handleCategoriaClick(null)}
         >
           Todas
         </Badge>
@@ -71,91 +109,41 @@ export default function BibliotecaFerramentas() {
             key={categoria}
             variant={selectedCategoria === categoria ? "default" : "outline"}
             className="cursor-pointer"
-            onClick={() => setSelectedCategoria(categoria)}
+            onClick={() => handleCategoriaClick(categoria)}
           >
             {categoria}
           </Badge>
         ))}
       </div>
 
+      {/* Contador de Resultados */}
+      {filteredFerramentas && (
+        <p className="text-sm text-muted-foreground">
+          Mostrando {filteredFerramentas.length} de {ferramentas?.length || 0}{" "}
+          {filteredFerramentas.length === 1 ? "ferramenta" : "ferramentas"}
+        </p>
+      )}
+
+      {/* Grid de Cards */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4 mb-2" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="h-[280px]">
+              <CardContent className="p-4 flex flex-col gap-3">
+                <Skeleton className="h-16 w-16 rounded-xl mx-auto" />
+                <Skeleton className="h-6 w-3/4 mx-auto" />
+                <Skeleton className="h-4 w-1/2 mx-auto" />
                 <Skeleton className="h-4 w-full" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-9 w-full mt-auto" />
               </CardContent>
             </Card>
           ))}
         </div>
       ) : filteredFerramentas && filteredFerramentas.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredFerramentas.map((ferramenta) => (
-            <Card key={ferramenta.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between mb-2">
-                  <CardTitle className="text-xl">{ferramenta.nome}</CardTitle>
-                  <div className="flex gap-2">
-                    <Badge variant="secondary">{ferramenta.categoria}</Badge>
-                    {ferramenta.gratuito && (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        Gratuita
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-                {ferramenta.avaliacao && (
-                  <RatingStars rating={ferramenta.avaliacao} />
-                )}
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-sm mb-1">Objetivo:</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {ferramenta.objetivo}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm mb-1">O que entrega:</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {ferramenta.o_que_entrega}
-                  </p>
-                </div>
-                {ferramenta.vale_a_pena !== null && (
-                  <div className="flex items-start gap-2 p-3 rounded-md bg-muted">
-                    {ferramenta.vale_a_pena ? (
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    )}
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">
-                        {ferramenta.vale_a_pena ? "Vale a pena!" : "Não vale a pena"}
-                      </p>
-                      {ferramenta.justificativa && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {ferramenta.justificativa}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {ferramenta.link_ferramenta && (
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => window.open(ferramenta.link_ferramenta!, "_blank")}
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Acessar Ferramenta
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+            <FerramentaCard key={ferramenta.id} ferramenta={ferramenta} />
           ))}
         </div>
       ) : (
