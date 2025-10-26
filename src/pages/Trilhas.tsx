@@ -95,7 +95,7 @@ export default function Trilhas() {
                           moduloId={modulo.id}
                           titulo={modulo.titulo}
                           descricao={modulo.descricao}
-                          imagem_url={modulo.imagem_url}
+                          imagem_url={modulo.imagem_url || trilha.imagem_url}
                         />
                       ))}
                     </div>
