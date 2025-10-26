@@ -49,17 +49,17 @@ export function WelcomeHeader() {
   const horario = formatInTimeZone(dataAtual, TIMEZONE, 'HH:mm');
 
   return (
-    <div className="w-full bg-gradient-to-r from-accent/5 to-primary/5 rounded-2xl p-6 md:p-8 mb-8 border border-accent/20">
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">
+    <div className="w-full bg-gradient-to-r from-accent/5 to-primary/5 rounded-2xl p-4 md:p-5 mb-6 border border-accent/20">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
         {/* Coluna Esquerda - Saudação e Tema */}
-        <div className="space-y-3">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+        <div className="space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             {saudacao}, {primeiroNome}!
           </h1>
           
           {aulaAtiva ? (
             <div className="space-y-1">
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 <span className="font-semibold text-foreground">Tema da aula:</span> {aulaAtiva.tema}
               </p>
               <p className="text-sm text-muted-foreground flex items-center gap-2">
@@ -68,7 +68,7 @@ export function WelcomeHeader() {
               </p>
             </div>
           ) : (
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Simplifique sua gestão com inteligência artificial
             </p>
           )}
@@ -76,17 +76,17 @@ export function WelcomeHeader() {
 
         {/* Coluna Direita - Card do Calendário */}
         <div className="flex justify-end">
-          <div className="bg-gradient-to-br from-accent to-primary rounded-2xl p-6 shadow-lg min-w-[140px] text-center">
+          <div className="bg-gradient-to-br from-accent to-primary rounded-2xl p-4 shadow-lg min-w-[120px] text-center">
             <div className="flex flex-col items-center gap-1">
               <Calendar className="w-6 h-6 text-white mb-2 opacity-90" />
-              <div className="text-5xl font-bold text-white">
+              <div className="text-4xl font-bold text-white">
                 {dia}
               </div>
-              <div className="text-lg font-semibold text-white/90 tracking-wider">
+              <div className="text-base font-semibold text-white/90 tracking-wider">
                 {mes}
               </div>
               <div className="h-px w-12 bg-white/30 my-2" />
-              <div className="text-2xl font-bold text-white flex items-center gap-1">
+              <div className="text-xl font-bold text-white flex items-center gap-1">
                 <Clock className="w-5 h-5" />
                 {horario}
               </div>
