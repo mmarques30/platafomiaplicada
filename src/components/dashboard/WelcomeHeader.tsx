@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAulaSemanal } from "@/hooks/useAulaSemanal";
 import { formatInTimeZone } from "date-fns-tz";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 const TIMEZONE = 'America/Sao_Paulo';
 
@@ -46,7 +46,6 @@ export function WelcomeHeader() {
   // Formatações de data/hora
   const dia = formatInTimeZone(dataAtual, TIMEZONE, 'dd');
   const mes = formatInTimeZone(dataAtual, TIMEZONE, 'MMM', { locale: ptBR }).toUpperCase();
-  const horario = formatInTimeZone(dataAtual, TIMEZONE, 'HH:mm');
 
   return (
     <div className="w-full bg-gradient-to-r from-accent/5 to-primary/5 rounded-xl px-4 py-3 md:px-6 md:py-4 mb-6 border border-accent/20">
@@ -77,12 +76,6 @@ export function WelcomeHeader() {
               <span className="text-lg font-bold text-white">{dia}</span>
               <span className="text-xs text-white/80 font-medium">{mes}</span>
             </div>
-          </div>
-          
-          {/* Horário */}
-          <div className="text-sm text-muted-foreground font-medium hidden md:flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            {horario}
           </div>
         </div>
       </div>
