@@ -1,4 +1,4 @@
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Brain } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -31,7 +31,7 @@ const items = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const navigate = useNavigate();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isMentorado } = useUserRole();
   const collapsed = state === "collapsed";
 
   const handleLogout = async () => {
@@ -74,6 +74,17 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              
+              {(isMentorado || isAdmin) && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/mentoria" className={getNavLinkClasses}>
+                      <Brain className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>Mentoria IA</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

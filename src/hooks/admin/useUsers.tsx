@@ -142,7 +142,7 @@ export function useUpdateUser() {
         profissao?: string | null;
         idade?: number | null;
         linkedin?: string | null;
-        plano_mentoria?: "intensivo_grupo" | "light" | "premium" | "" | null;
+        plano_mentoria?: "club" | "pro" | "" | null;
         data_expiracao_acesso?: string | null;
         conta_ativa?: boolean;
         roles?: AppRole[];

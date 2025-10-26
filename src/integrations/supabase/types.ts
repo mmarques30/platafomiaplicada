@@ -1655,7 +1655,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "mentorado" | "aluno_trilha"
-      plano_mentoria: "intensivo_grupo" | "light" | "premium"
+      plano_mentoria: "club" | "pro"
       status_projeto:
         | "planejamento"
         | "em_andamento"
@@ -1790,7 +1790,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "mentorado", "aluno_trilha"],
-      plano_mentoria: ["intensivo_grupo", "light", "premium"],
+      plano_mentoria: ["club", "pro"],
       status_projeto: [
         "planejamento",
         "em_andamento",

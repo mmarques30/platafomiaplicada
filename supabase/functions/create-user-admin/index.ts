@@ -17,6 +17,11 @@ Deno.serve(async (req) => {
 
     console.log('Creating user:', { email, nomeCompleto, roles, planoMentoria })
 
+    // Validar planoMentoria
+    if (planoMentoria && !['club', 'pro'].includes(planoMentoria)) {
+      throw new Error('Plano de mentoria inválido. Valores aceitos: club, pro')
+    }
+
     // 1. Criar usuário via Admin API
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,

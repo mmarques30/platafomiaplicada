@@ -180,24 +180,21 @@ export default function GerenciarUsuários() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {(user as any).plano_mentoria ? (
-                    <Badge 
-                      variant="outline"
-                      className={
-                        (user as any).plano_mentoria === "intensivo_grupo" 
-                          ? "border-blue-500 text-blue-700"
-                          : (user as any).plano_mentoria === "light"
-                          ? "border-green-500 text-green-700"
-                          : "border-purple-500 text-purple-700"
-                      }
-                    >
-                      {(user as any).plano_mentoria === "intensivo_grupo" && "Intensivo"}
-                      {(user as any).plano_mentoria === "light" && "Light"}
-                      {(user as any).plano_mentoria === "premium" && "Premium"}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">-</span>
-                  )}
+                {(user as any).plano_mentoria ? (
+                  <Badge 
+                    variant="outline"
+                    className={
+                      (user as any).plano_mentoria === "club" 
+                        ? "border-green-500 text-green-700"
+                        : "border-purple-500 text-purple-700"
+                    }
+                  >
+                    {(user as any).plano_mentoria === "club" && "IAplicada Club"}
+                    {(user as any).plano_mentoria === "pro" && "IAplicada Pro"}
+                  </Badge>
+                ) : (
+                  <span className="text-muted-foreground text-sm">-</span>
+                )}
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(user)}

@@ -42,9 +42,8 @@ interface EditUserModalProps {
 }
 
 const PLANOS = [
-  { value: "intensivo_grupo", label: "Intensivo em Grupo" },
-  { value: "light", label: "Light" },
-  { value: "premium", label: "Premium" },
+  { value: "club", label: "IAplicada Club" },
+  { value: "pro", label: "IAplicada Pro" },
 ];
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
@@ -53,7 +52,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const resetPassword = useResetUserPassword();
   
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
-  const [selectedPlano, setSelectedPlano] = useState<"intensivo_grupo" | "light" | "premium" | "">("");
+  const [selectedPlano, setSelectedPlano] = useState<"club" | "pro" | "">("");
   const [dataExpiracao, setDataExpiracao] = useState<Date | undefined>();
   const [contaAtiva, setContaAtiva] = useState(true);
   const [novaSenha, setNovaSenha] = useState("");
@@ -68,7 +67,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setValue("linkedin", user.linkedin || "");
       
       setSelectedRoles(user.roles as AppRole[]);
-      setSelectedPlano((user.plano_mentoria as "intensivo_grupo" | "light" | "premium") || "");
+      setSelectedPlano((user.plano_mentoria as "club" | "pro") || "");
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
     }
@@ -206,7 +205,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                             ? "border-primary bg-primary/10"
                             : "hover:border-primary/50"
                         )}
-                        onClick={() => setSelectedPlano(plano.value as "intensivo_grupo" | "light" | "premium")}
+                        onClick={() => setSelectedPlano(plano.value as "club" | "pro")}
                       >
                         <p className="font-medium">{plano.label}</p>
                       </Card>
