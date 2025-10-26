@@ -40,8 +40,8 @@ const getIconeCategoria = (categoria: string) => {
   return categoriaIcons[categoria]?.icon || FileText;
 };
 
-const getGradientCategoria = (categoria: string) => {
-  return categoriaIcons[categoria]?.gradient || 'bg-gradient-to-br from-gray-400 to-gray-600';
+const getGradientCategoria = (_categoria: string) => {
+  return 'bg-primary/10 border border-primary/20';
 };
 
 const getNivelColor = (nivel: string | null) => {
@@ -69,7 +69,7 @@ export function PromptDetalhesModal({ prompt, onClose }: PromptDetalhesModalProp
             <div className={`w-12 h-12 rounded-lg ${getGradientCategoria(prompt.categoria)} flex items-center justify-center shadow-md flex-shrink-0`}>
               {(() => {
                 const IconComponent = getIconeCategoria(prompt.categoria);
-                return <IconComponent className="w-6 h-6 text-white" />;
+                return <IconComponent className="w-6 h-6 text-primary" />;
               })()}
             </div>
             <div className="flex-1">

@@ -43,8 +43,8 @@ const getIconeCategoria = (categoria: string) => {
   return categoriaIcons[categoria]?.icon || FileText;
 };
 
-const getGradientCategoria = (categoria: string) => {
-  return categoriaIcons[categoria]?.gradient || 'bg-gradient-to-br from-gray-400 to-gray-600';
+const getGradientCategoria = (_categoria: string) => {
+  return 'bg-primary/10 border border-primary/20';
 };
 
 const getNivelColor = (nivel: string | null) => {
@@ -68,7 +68,7 @@ export function PromptCard({ prompt, onVerMais }: PromptCardProps) {
         <div className={`w-14 h-14 rounded-xl ${getGradientCategoria(prompt.categoria)} flex items-center justify-center shadow-md`}>
           {(() => {
             const IconComponent = getIconeCategoria(prompt.categoria);
-            return <IconComponent className="w-7 h-7 text-white" />;
+            return <IconComponent className="w-7 h-7 text-primary" />;
           })()}
         </div>
         
