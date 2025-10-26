@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CopyButton } from "@/components/shared/CopyButton";
 import { usePrompts } from "@/hooks/useFerramentas";
-import { MessageSquare, Search, Cpu } from "lucide-react";
+import { MessageSquare, Search } from "lucide-react";
+import { PromptCard } from "@/components/bibliotecas/PromptCard";
+import { PromptDetalhesModal } from "@/components/bibliotecas/PromptDetalhesModal";
 
 export default function BibliotecaPrompts() {
   const { data: prompts, isLoading } = usePrompts();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [selectedNivel, setSelectedNivel] = useState<string | null>(null);
+  const [promptSelecionado, setPromptSelecionado] = useState<any>(null);
 
   const categorias = prompts
     ? Array.from(new Set(prompts.map((p) => p.categoria)))
@@ -117,93 +119,43 @@ export default function BibliotecaPrompts() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4 mb-2" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="h-[240px]">
+              <CardContent className="p-5 flex flex-col gap-3">
+                <Skeleton className="h-14 w-14 rounded-xl" />
+                <Skeleton className="h-6 w-3/4" />
                 <Skeleton className="h-4 w-full" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-9 w-full mt-auto" />
               </CardContent>
             </Card>
           ))}
         </div>
       ) : filteredPrompts && filteredPrompts.length > 0 ? (
-        <div className="space-y-4">
-          {filteredPrompts.map((prompt) => (
-            <Card key={prompt.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <CardTitle className="text-xl mb-2">{prompt.titulo}</CardTitle>
-                    <CardDescription>{prompt.descricao}</CardDescription>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Badge variant="secondary">{prompt.categoria}</Badge>
-                    {prompt.nivel_complexidade && (
-                      <Badge 
-                        className={
-                          prompt.nivel_complexidade === 'iniciante' ? 'bg-green-500 text-white' :
-                          prompt.nivel_complexidade === 'intermediario' ? 'bg-yellow-500 text-white' :
-                          'bg-red-500 text-white'
-                        }
-                      >
-                        {prompt.nivel_complexidade === 'iniciante' ? '🟢 Iniciante' :
-                         prompt.nivel_complexidade === 'intermediario' ? '🟡 Intermediário' :
-                         '🔴 Avançado'}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-                {Array.isArray(prompt.tags) && prompt.tags.length > 0 && (
-                  <div className="flex gap-2 flex-wrap mt-2">
-                    {prompt.tags.map((tag: string, index: number) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                      ))}
-                    </div>
-                  )}
-
-                  {Array.isArray(prompt.ferramentas_recomendadas) && 
-                   prompt.ferramentas_recomendadas.length > 0 && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                        <Cpu className="w-3 h-3" />
-                        Ferramentas onde aplicar:
-                      </p>
-                      <div className="flex gap-2 flex-wrap">
-                        {prompt.ferramentas_recomendadas.map((ferramenta: string) => (
-                          <Badge 
-                            key={ferramenta} 
-                            variant="default" 
-                            className="text-xs bg-primary/10 text-primary hover:bg-primary/20"
-                          >
-                            {ferramenta}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardHeader>
-                <CardContent className="space-y-4">
-                <div className="bg-muted p-4 rounded-md">
-                  <pre className="text-sm whitespace-pre-wrap font-mono">
-                    {prompt.prompt}
-                  </pre>
-                </div>
-                <CopyButton
-                  content={prompt.prompt}
-                  variant="default"
-                  size="default"
-                  className="w-full"
-                />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <>
+          {/* Contador de Resultados */}
+          <p className="text-sm text-muted-foreground mb-4">
+            Mostrando {filteredPrompts.length} {filteredPrompts.length === 1 ? 'prompt' : 'prompts'}
+          </p>
+          
+          {/* Grid de Cards Compactos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredPrompts.map((prompt) => (
+              <PromptCard 
+                key={prompt.id} 
+                prompt={prompt}
+                onVerMais={() => setPromptSelecionado(prompt)}
+              />
+            ))}
+          </div>
+          
+          {/* Modal de Detalhes */}
+          <PromptDetalhesModal 
+            prompt={promptSelecionado}
+            onClose={() => setPromptSelecionado(null)}
+          />
+        </>
       ) : (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
