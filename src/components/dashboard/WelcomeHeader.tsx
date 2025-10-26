@@ -50,11 +50,11 @@ export function WelcomeHeader() {
 
   return (
     <div className="w-full bg-gradient-to-r from-accent/5 to-primary/5 rounded-2xl p-6 md:p-8 mb-8 border border-accent/20">
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">
         {/* Coluna Esquerda - Saudação e Tema */}
         <div className="space-y-3">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-            {saudacao}, {primeiroNome}! 👋
+            {saudacao}, {primeiroNome}!
           </h1>
           
           {aulaAtiva ? (
@@ -75,7 +75,7 @@ export function WelcomeHeader() {
         </div>
 
         {/* Coluna Direita - Card do Calendário */}
-        <div className="flex justify-center md:justify-end">
+        <div className="flex justify-end">
           <div className="bg-gradient-to-br from-accent to-primary rounded-2xl p-6 shadow-lg min-w-[140px] text-center">
             <div className="flex flex-col items-center gap-1">
               <Calendar className="w-6 h-6 text-white mb-2 opacity-90" />
