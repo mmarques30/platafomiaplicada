@@ -50,9 +50,9 @@ export function WelcomeHeader() {
 
   return (
     <div className="w-full bg-gradient-to-r from-accent/5 to-primary/5 rounded-xl px-4 py-3 md:px-6 md:py-4 mb-6 border border-accent/20">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div className="flex flex-row items-center justify-between gap-3">
         {/* Coluna Esquerda - Saudação e Tema */}
-        <div>
+        <div className="flex-1 min-w-0">
           <h1 className="text-xl md:text-2xl font-bold text-foreground">
             {saudacao}, {primeiroNome}!
           </h1>
@@ -69,7 +69,7 @@ export function WelcomeHeader() {
         </div>
 
         {/* Coluna Direita - Card Compacto */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0">
           {/* Card de calendário - novo design */}
           <div className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-200">
             {/* Ícone em círculo verde oliva */}
