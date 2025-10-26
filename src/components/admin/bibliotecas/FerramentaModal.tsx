@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useCreateFerramenta, useUpdateFerramenta } from "@/hooks/admin/useBibliotecas";
-import { Star } from "lucide-react";
+import { Star, Upload, X, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface FerramentaModalProps {
   open: boolean;
@@ -21,6 +23,8 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
   const createFerramenta = useCreateFerramenta();
   const updateFerramenta = useUpdateFerramenta();
   const [rating, setRating] = useState(5);
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const valeAPena = watch("vale_a_pena");
 
@@ -28,6 +32,7 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
     if (ferramenta) {
       reset(ferramenta);
       setRating(ferramenta.avaliacao || 5);
+      setPreviewUrl(ferramenta.logo_url || null);
     } else {
       reset({
         nome: "",
@@ -43,8 +48,55 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
         ativo: true,
       });
       setRating(5);
+      setPreviewUrl(null);
     }
   }, [ferramenta, reset]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Formato inválido. Use PNG, JPG ou WEBP');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Imagem muito grande. Máximo 2MB');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `logo_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `ferramentas/${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('ferramentas-logos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('ferramentas-logos')
+        .getPublicUrl(filePath);
+
+      setValue('logo_url', publicUrl);
+      setPreviewUrl(publicUrl);
+      toast.success('Logo enviado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+      toast.error('Erro ao enviar imagem');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const onSubmit = (data: any) => {
     if (ferramenta) {
@@ -78,18 +130,87 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
             </div>
 
             <div>
-              <Label htmlFor="logo_url">Logo da Ferramenta (URL)</Label>
-              <Input id="logo_url" {...register("logo_url")} type="url" placeholder="https://exemplo.com/logo.png" />
-              {watch("logo_url") && (
-                <div className="mt-3 flex items-center gap-3">
-                  <div className="w-20 h-20 rounded-xl bg-background border overflow-hidden flex items-center justify-center">
-                    <img src={watch("logo_url")} alt="Preview" className="w-full h-full object-contain" />
+              <Label htmlFor="logo_url">Logo da Ferramenta</Label>
+              
+              {(watch("logo_url") || previewUrl) && (
+                <div className="mt-3 mb-4 flex items-center gap-4">
+                  <div className="w-24 h-24 rounded-xl bg-background border-2 overflow-hidden flex items-center justify-center">
+                    <img 
+                      src={previewUrl || watch("logo_url")} 
+                      alt="Logo preview" 
+                      className="w-full h-full object-contain p-2" 
+                    />
                   </div>
-                  <p className="text-xs text-muted-foreground">Preview da logo</p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setValue('logo_url', '');
+                      setPreviewUrl(null);
+                    }}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Remover
+                  </Button>
                 </div>
               )}
-              <p className="text-xs text-muted-foreground mt-1">
-                Cole a URL da logo da ferramenta
+
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('logo-upload')?.click()}
+                  disabled={uploading}
+                  className="flex-1"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 mr-2" />
+                      Fazer Upload de Imagem
+                    </>
+                  )}
+                </Button>
+                
+                <input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </div>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">ou</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="logo_url_manual" className="text-sm text-muted-foreground">
+                  Cole uma URL externa (opcional)
+                </Label>
+                <Input 
+                  id="logo_url_manual" 
+                  {...register("logo_url")} 
+                  type="url" 
+                  placeholder="https://exemplo.com/logo.png"
+                  disabled={uploading}
+                />
+              </div>
+
+              <p className="text-xs text-muted-foreground mt-2">
+                Formatos aceitos: PNG, JPG, WEBP • Tamanho máximo: 2MB
               </p>
             </div>
           </div>
