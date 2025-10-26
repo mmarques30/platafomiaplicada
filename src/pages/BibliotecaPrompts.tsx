@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { usePrompts } from "@/hooks/useFerramentas";
 import { MessageSquare, Search } from "lucide-react";
 import { PromptRow } from "@/components/bibliotecas/PromptRow";
@@ -22,6 +23,7 @@ export default function BibliotecaPrompts() {
   const [filtroProfissao, setFiltroProfissao] = useState("todas");
   const [filtroFerramenta, setFiltroFerramenta] = useState("todas");
   const [promptSelecionado, setPromptSelecionado] = useState<any>(null);
+  const [itemsToShow, setItemsToShow] = useState(10);
 
   // Extrair valores únicos para os dropdowns
   const categorias = useMemo(() => 
@@ -66,6 +68,14 @@ export default function BibliotecaPrompts() {
              matchesProfissao && matchesFerramenta;
     }).sort((a, b) => (a.ordem ?? 999) - (b.ordem ?? 999));
   }, [prompts, searchTerm, filtroCategoria, filtroNivel, filtroProfissao, filtroFerramenta]);
+
+  const visiblePrompts = useMemo(() => {
+    return filteredPrompts?.slice(0, itemsToShow) || [];
+  }, [filteredPrompts, itemsToShow]);
+
+  useEffect(() => {
+    setItemsToShow(10);
+  }, [searchTerm, filtroCategoria, filtroNivel, filtroProfissao, filtroFerramenta]);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -159,7 +169,7 @@ export default function BibliotecaPrompts() {
       {/* Contador de Resultados */}
       {!isLoading && filteredPrompts && (
         <p className="text-sm text-muted-foreground">
-          Mostrando {filteredPrompts.length} {filteredPrompts.length === 1 ? 'prompt' : 'prompts'}
+          Mostrando {visiblePrompts.length} de {filteredPrompts.length} {filteredPrompts.length === 1 ? 'prompt' : 'prompts'}
         </p>
       )}
 
@@ -185,7 +195,7 @@ export default function BibliotecaPrompts() {
         <>
           <Card>
             <CardContent className="p-0">
-              {filteredPrompts.map((prompt) => (
+              {visiblePrompts.map((prompt) => (
                 <PromptRow
                   key={prompt.id}
                   prompt={prompt}
@@ -194,6 +204,20 @@ export default function BibliotecaPrompts() {
               ))}
             </CardContent>
           </Card>
+
+          {/* Botão Ver Mais */}
+          {filteredPrompts && visiblePrompts.length < filteredPrompts.length && (
+            <div className="flex justify-center mt-6">
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => setItemsToShow(prev => prev + 10)}
+                className="min-w-[200px]"
+              >
+                Ver Mais ({filteredPrompts.length - visiblePrompts.length} restantes)
+              </Button>
+            </div>
+          )}
 
           {/* Modal de Detalhes */}
           <PromptDetalhesModal

@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useFerramentasIA } from "@/hooks/useFerramentas";
 import { Wrench, Search } from "lucide-react";
 import { FerramentaCard } from "@/components/bibliotecas/FerramentaCard";
@@ -21,6 +22,7 @@ export default function BibliotecaFerramentas() {
     preco: "todas",
     valeAPena: "todas",
   });
+  const [itemsToShow, setItemsToShow] = useState(10);
 
   const categorias = useMemo(
     () => (ferramentas ? Array.from(new Set(ferramentas.map((f) => f.categoria))) : []),
@@ -58,6 +60,14 @@ export default function BibliotecaFerramentas() {
     });
   }, [ferramentas, searchTerm, filtrosAvancados]);
 
+  const visibleFerramentas = useMemo(() => {
+    return filteredFerramentas?.slice(0, itemsToShow) || [];
+  }, [filteredFerramentas, itemsToShow]);
+
+  useEffect(() => {
+    setItemsToShow(10);
+  }, [searchTerm, filtrosAvancados]);
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Cabeçalho */}
@@ -92,7 +102,7 @@ export default function BibliotecaFerramentas() {
       {/* Contador de Resultados */}
       {filteredFerramentas && (
         <p className="text-sm text-muted-foreground">
-          Mostrando {filteredFerramentas.length} de {ferramentas?.length || 0}{" "}
+          Mostrando {visibleFerramentas.length} de {filteredFerramentas.length}{" "}
           {filteredFerramentas.length === 1 ? "ferramenta" : "ferramentas"}
         </p>
       )}
@@ -116,7 +126,7 @@ export default function BibliotecaFerramentas() {
       ) : filteredFerramentas && filteredFerramentas.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredFerramentas.map((ferramenta) => (
+            {visibleFerramentas.map((ferramenta) => (
               <FerramentaCard 
                 key={ferramenta.id} 
                 ferramenta={ferramenta}
@@ -124,6 +134,20 @@ export default function BibliotecaFerramentas() {
               />
             ))}
           </div>
+
+          {/* Botão Ver Mais */}
+          {filteredFerramentas && visibleFerramentas.length < filteredFerramentas.length && (
+            <div className="flex justify-center mt-8">
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => setItemsToShow(prev => prev + 10)}
+                className="min-w-[200px]"
+              >
+                Ver Mais ({filteredFerramentas.length - visibleFerramentas.length} restantes)
+              </Button>
+            </div>
+          )}
 
           {/* Modal de Detalhes */}
           <FerramentaDetalhesModal 
