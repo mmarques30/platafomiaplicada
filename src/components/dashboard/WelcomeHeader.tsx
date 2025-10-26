@@ -46,6 +46,7 @@ export function WelcomeHeader() {
   // Formatações de data/hora
   const dia = formatInTimeZone(dataAtual, TIMEZONE, 'dd');
   const mes = formatInTimeZone(dataAtual, TIMEZONE, 'MMM', { locale: ptBR }).toUpperCase();
+  const diaSemana = formatInTimeZone(dataAtual, TIMEZONE, 'EEE', { locale: ptBR });
 
   return (
     <div className="w-full bg-gradient-to-r from-accent/5 to-primary/5 rounded-xl px-4 py-3 md:px-6 md:py-4 mb-6 border border-accent/20">
@@ -69,12 +70,17 @@ export function WelcomeHeader() {
 
         {/* Coluna Direita - Card Compacto */}
         <div className="flex items-center gap-3">
-          {/* Data compacta */}
-          <div className="flex items-center gap-2 bg-gradient-to-br from-accent to-primary rounded-xl px-3 py-2 shadow-md">
-            <Calendar className="w-5 h-5 text-white" />
-            <div className="flex flex-col items-start leading-none">
-              <span className="text-lg font-bold text-white">{dia}</span>
-              <span className="text-xs text-white/80 font-medium">{mes}</span>
+          {/* Card de calendário - novo design */}
+          <div className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-200">
+            {/* Ícone em círculo verde oliva */}
+            <div className="bg-[#6B7255] rounded-xl p-2.5 flex items-center justify-center">
+              <Calendar className="w-6 h-6 text-white" strokeWidth={2} />
+            </div>
+            
+            {/* Texto - Dia e Mês */}
+            <div className="flex flex-col items-start leading-tight">
+              <span className="text-2xl font-bold text-gray-900">{dia}</span>
+              <span className="text-sm text-gray-500 font-medium">{diaSemana}, {mes}</span>
             </div>
           </div>
         </div>
