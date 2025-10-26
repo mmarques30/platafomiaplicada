@@ -9,12 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, X } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCreateModulo, useUpdateModulo, useTrilhas } from "@/hooks/admin/useContent";
-import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ModuloModalProps {
   open: boolean;
@@ -27,7 +28,10 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
   const createModulo = useCreateModulo();
   const updateModulo = useUpdateModulo();
   const { register, handleSubmit, reset, setValue, watch } = useForm();
-  const [selectedTrilhaCategoria, setSelectedTrilhaCategoria] = useState<string | null>(null);
+  const [customCategoria, setCustomCategoria] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (modulo) {
@@ -35,29 +39,90 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         titulo: modulo.titulo || "",
         descricao: modulo.descricao || "",
         trilha_id: modulo.trilha_id || "",
+        categoria: modulo.categoria || "",
         ordem: modulo.ordem || 0,
         ativo: modulo.ativo !== undefined ? modulo.ativo : true,
         data_inicio: modulo.data_inicio || null,
       });
-      // Encontrar categoria da trilha atual
-      const trilha = trilhas?.find((t: any) => t.id === modulo.trilha_id);
-      setSelectedTrilhaCategoria(trilha?.categoria || null);
+      setCustomCategoria(modulo.categoria || "");
+      setImagePreview(modulo.imagem_url || "");
+      setImageFile(null);
     } else {
       reset({ 
         titulo: "", 
         descricao: "", 
         trilha_id: "", 
+        categoria: "",
         ordem: 0, 
         ativo: true, 
         data_inicio: null
       });
-      setSelectedTrilhaCategoria(null);
+      setCustomCategoria("");
+      setImagePreview("");
+      setImageFile(null);
     }
   }, [modulo, reset, open, trilhas]);
 
-  const onSubmit = (data: any) => {
-    // Remove o campo categoria do payload (será definido pelo trigger)
-    const { categoria, ...submitData } = data;
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Imagem muito grande. Máximo 2MB");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (): Promise<string | null> => {
+    if (!imageFile) return null;
+
+    setUploading(true);
+    try {
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('modulos-imagens')
+        .upload(filePath, imageFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('modulos-imagens')
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error("Erro ao fazer upload da imagem");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const onSubmit = async (data: any) => {
+    let imagemUrl = imagePreview;
+    
+    if (imageFile) {
+      const uploadedUrl = await uploadImage();
+      if (uploadedUrl) {
+        imagemUrl = uploadedUrl;
+      }
+    }
+
+    const submitData = { 
+      ...data, 
+      categoria: customCategoria,
+      imagem_url: imagemUrl 
+    };
     
     if (modulo) {
       updateModulo.mutate({ id: modulo.id, ...submitData }, { onSuccess: () => onOpenChange(false) });
@@ -66,12 +131,6 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
     }
   };
 
-  // Atualizar categoria exibida quando trilha mudar
-  const handleTrilhaChange = (value: string) => {
-    setValue("trilha_id", value);
-    const trilha = trilhas?.find((t: any) => t.id === value);
-    setSelectedTrilhaCategoria(trilha?.categoria || null);
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -87,6 +146,41 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
           <div className="space-y-2">
             <Label>Descrição</Label>
             <Textarea {...register("descricao")} rows={3} />
+          </div>
+          <div className="space-y-2">
+            <Label>Imagem do Módulo</Label>
+            <div className="flex flex-col gap-2">
+              {imagePreview && (
+                <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover" 
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview("");
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="cursor-pointer"
+              />
+              <p className="text-xs text-muted-foreground">
+                Imagem específica deste módulo. Recomendado: 1920x1080px, máximo 2MB
+              </p>
+            </div>
           </div>
           <div className="space-y-2">
             <Label>Data de Início</Label>
@@ -123,7 +217,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
             <Label>Trilha</Label>
             <Select 
               value={watch("trilha_id") || undefined} 
-              onValueChange={handleTrilhaChange}
+              onValueChange={(value) => setValue("trilha_id", value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione uma trilha" />
@@ -136,36 +230,21 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
             </Select>
           </div>
 
-          {selectedTrilhaCategoria && (
-            <div className="space-y-2">
-              <Label>Categoria (herdada da trilha)</Label>
-              <div>
-                {selectedTrilhaCategoria === 'aulas semanais' && (
-                  <Badge variant="outline" style={{ backgroundColor: 'hsl(var(--primary) / 0.1)', borderColor: 'hsl(var(--primary))' }}>
-                    Aulas Semanais
-                  </Badge>
-                )}
-                {selectedTrilhaCategoria === 'núcleo' && (
-                  <Badge variant="outline" style={{ backgroundColor: '#10B98120', borderColor: '#10B981' }}>
-                    NÚCLEO
-                  </Badge>
-                )}
-                {selectedTrilhaCategoria === 'ferramentas' && (
-                  <Badge variant="outline" style={{ backgroundColor: '#F59E0B20', borderColor: '#F59E0B' }}>
-                    FERRAMENTAS
-                  </Badge>
-                )}
-                {selectedTrilhaCategoria === 'profissão' && (
-                  <Badge variant="outline" style={{ backgroundColor: '#8B5CF620', borderColor: '#8B5CF6' }}>
-                    PROFISSÃO
-                  </Badge>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                O módulo herda automaticamente a categoria da trilha selecionada
-              </p>
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label>Categoria do Módulo</Label>
+            <Input
+              value={customCategoria}
+              onChange={(e) => {
+                const value = e.target.value;
+                setCustomCategoria(value);
+                setValue("categoria", value);
+              }}
+              placeholder="Ex: Apresentações, Automação, Comunicação..."
+            />
+            <p className="text-xs text-muted-foreground">
+              Defina uma categoria personalizada baseada no conteúdo deste módulo
+            </p>
+          </div>
 
           <div className="space-y-2">
             <Label>Ordem</Label>
@@ -177,7 +256,12 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button type="submit">{modulo ? "Atualizar" : "Criar"}</Button>
+            <Button 
+              type="submit" 
+              disabled={createModulo.isPending || updateModulo.isPending || uploading}
+            >
+              {uploading ? "Fazendo upload..." : modulo ? "Atualizar" : "Criar"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
