@@ -9,29 +9,26 @@ import { Wrench, Search } from "lucide-react";
 import { FerramentaCard } from "@/components/bibliotecas/FerramentaCard";
 import { FerramentaDetalhesModal } from "@/components/bibliotecas/FerramentaDetalhesModal";
 import {
-  FiltrosAvancadosSheet,
-  FiltrosAvancados,
-} from "@/components/bibliotecas/FiltrosAvancadosSheet";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function BibliotecaFerramentas() {
   const { data: ferramentas, isLoading } = useFerramentasIA();
   const [searchTerm, setSearchTerm] = useState("");
   const [ferramentaSelecionada, setFerramentaSelecionada] = useState<any>(null);
-  const [filtrosAvancados, setFiltrosAvancados] = useState<FiltrosAvancados>({
-    categoria: null,
-    preco: "todas",
-    valeAPena: "todas",
-  });
+  const [filtroCategoria, setFiltroCategoria] = useState("todas");
+  const [filtroPreco, setFiltroPreco] = useState("todas");
+  const [filtroValeAPena, setFiltroValeAPena] = useState("todas");
   const [itemsToShow, setItemsToShow] = useState(10);
 
   const categorias = useMemo(
     () => (ferramentas ? Array.from(new Set(ferramentas.map((f) => f.categoria))) : []),
     [ferramentas]
   );
-
-  const handleFiltrosChange = (novosFiltros: FiltrosAvancados) => {
-    setFiltrosAvancados(novosFiltros);
-  };
 
   const filteredFerramentas = useMemo(() => {
     return ferramentas?.filter((ferramenta) => {
@@ -40,25 +37,25 @@ export default function BibliotecaFerramentas() {
         ferramenta.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         ferramenta.objetivo.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Filtro de categoria (sincronizado com badges e filtro avançado)
+      // Filtro de categoria
       const matchesCategoria =
-        !filtrosAvancados.categoria || ferramenta.categoria === filtrosAvancados.categoria;
+        filtroCategoria === "todas" || ferramenta.categoria === filtroCategoria;
 
       // Filtro de preço
       const matchesPreco =
-        filtrosAvancados.preco === "todas" ||
-        (filtrosAvancados.preco === "gratuitas" && ferramenta.gratuito) ||
-        (filtrosAvancados.preco === "pagas" && !ferramenta.gratuito);
+        filtroPreco === "todas" ||
+        (filtroPreco === "gratuitas" && ferramenta.gratuito) ||
+        (filtroPreco === "pagas" && !ferramenta.gratuito);
 
       // Filtro "Vale a pena"
       const matchesValeAPena =
-        filtrosAvancados.valeAPena === "todas" ||
-        (filtrosAvancados.valeAPena === "sim" && ferramenta.vale_a_pena === true) ||
-        (filtrosAvancados.valeAPena === "nao" && ferramenta.vale_a_pena === false);
+        filtroValeAPena === "todas" ||
+        (filtroValeAPena === "sim" && ferramenta.vale_a_pena === true) ||
+        (filtroValeAPena === "nao" && ferramenta.vale_a_pena === false);
 
       return matchesSearch && matchesCategoria && matchesPreco && matchesValeAPena;
     });
-  }, [ferramentas, searchTerm, filtrosAvancados]);
+  }, [ferramentas, searchTerm, filtroCategoria, filtroPreco, filtroValeAPena]);
 
   const visibleFerramentas = useMemo(() => {
     return filteredFerramentas?.slice(0, itemsToShow) || [];
@@ -66,7 +63,7 @@ export default function BibliotecaFerramentas() {
 
   useEffect(() => {
     setItemsToShow(10);
-  }, [searchTerm, filtrosAvancados]);
+  }, [searchTerm, filtroCategoria, filtroPreco, filtroValeAPena]);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -81,10 +78,11 @@ export default function BibliotecaFerramentas() {
         </div>
       </div>
 
-      {/* Barra de Busca + Filtro Avançado */}
-      <div className="flex gap-3">
+      {/* Barra de Busca e Filtros Dropdown */}
+      <div className="flex flex-col md:flex-row gap-3">
+        {/* Campo de Busca */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Buscar ferramentas..."
             value={searchTerm}
@@ -92,11 +90,45 @@ export default function BibliotecaFerramentas() {
             className="pl-10"
           />
         </div>
-        <FiltrosAvancadosSheet
-          filtros={filtrosAvancados}
-          onFiltrosChange={handleFiltrosChange}
-          categorias={categorias}
-        />
+
+        {/* Filtro Categoria */}
+        <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Categoria" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas Categorias</SelectItem>
+            {categorias.map((categoria) => (
+              <SelectItem key={categoria} value={categoria}>
+                {categoria}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Filtro Preço */}
+        <Select value={filtroPreco} onValueChange={setFiltroPreco}>
+          <SelectTrigger className="w-full md:w-[180px]">
+            <SelectValue placeholder="Preço" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas</SelectItem>
+            <SelectItem value="gratuitas">Gratuitas</SelectItem>
+            <SelectItem value="pagas">Pagas</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Filtro Vale a Pena */}
+        <Select value={filtroValeAPena} onValueChange={setFiltroValeAPena}>
+          <SelectTrigger className="w-full md:w-[180px]">
+            <SelectValue placeholder="Recomendação" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas</SelectItem>
+            <SelectItem value="sim">Vale a Pena</SelectItem>
+            <SelectItem value="nao">Não Recomendado</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Contador de Resultados */}
