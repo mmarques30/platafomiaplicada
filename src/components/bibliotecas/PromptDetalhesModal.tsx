@@ -8,7 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/shared/CopyButton";
-import { Cpu } from "lucide-react";
+import { Cpu, TrendingUp, Megaphone, Settings, MessageSquare, BarChart3, Zap, PenTool, LineChart, Presentation, FileText, type LucideIcon } from "lucide-react";
 
 interface PromptDetalhesModalProps {
   prompt: {
@@ -24,20 +24,20 @@ interface PromptDetalhesModalProps {
   onClose: () => void;
 }
 
-const categoriaIcons: Record<string, { icon: string; gradient: string }> = {
-  'Vendas': { icon: '💰', gradient: 'bg-gradient-to-br from-green-400 to-green-600' },
-  'Marketing': { icon: '📢', gradient: 'bg-gradient-to-br from-purple-400 to-purple-600' },
-  'Automacao': { icon: '⚙️', gradient: 'bg-gradient-to-br from-blue-400 to-blue-600' },
-  'Comunicacao': { icon: '💬', gradient: 'bg-gradient-to-br from-teal-400 to-teal-600' },
-  'Gestao de Projetos': { icon: '📊', gradient: 'bg-gradient-to-br from-orange-400 to-orange-600' },
-  'Produtividade': { icon: '⚡', gradient: 'bg-gradient-to-br from-yellow-400 to-yellow-600' },
-  'Comunicação & Escrita': { icon: '✍️', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
-  'Análise de Dados': { icon: '📈', gradient: 'bg-gradient-to-br from-indigo-400 to-indigo-600' },
-  'Apresentações': { icon: '🎯', gradient: 'bg-gradient-to-br from-red-400 to-red-600' },
+const categoriaIcons: Record<string, { icon: LucideIcon; gradient: string }> = {
+  'Vendas': { icon: TrendingUp, gradient: 'bg-gradient-to-br from-green-400 to-green-600' },
+  'Marketing': { icon: Megaphone, gradient: 'bg-gradient-to-br from-purple-400 to-purple-600' },
+  'Automacao': { icon: Settings, gradient: 'bg-gradient-to-br from-blue-400 to-blue-600' },
+  'Comunicacao': { icon: MessageSquare, gradient: 'bg-gradient-to-br from-teal-400 to-teal-600' },
+  'Gestao de Projetos': { icon: BarChart3, gradient: 'bg-gradient-to-br from-orange-400 to-orange-600' },
+  'Produtividade': { icon: Zap, gradient: 'bg-gradient-to-br from-yellow-400 to-yellow-600' },
+  'Comunicação & Escrita': { icon: PenTool, gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
+  'Análise de Dados': { icon: LineChart, gradient: 'bg-gradient-to-br from-indigo-400 to-indigo-600' },
+  'Apresentações': { icon: Presentation, gradient: 'bg-gradient-to-br from-red-400 to-red-600' },
 };
 
 const getIconeCategoria = (categoria: string) => {
-  return categoriaIcons[categoria]?.icon || '📝';
+  return categoriaIcons[categoria]?.icon || FileText;
 };
 
 const getGradientCategoria = (categoria: string) => {
@@ -66,8 +66,11 @@ export function PromptDetalhesModal({ prompt, onClose }: PromptDetalhesModalProp
         <DialogHeader>
           {/* Ícone + Título */}
           <div className="flex items-start gap-3 mb-2">
-            <div className={`w-12 h-12 rounded-lg ${getGradientCategoria(prompt.categoria)} flex items-center justify-center text-2xl shadow-md flex-shrink-0`}>
-              {getIconeCategoria(prompt.categoria)}
+            <div className={`w-12 h-12 rounded-lg ${getGradientCategoria(prompt.categoria)} flex items-center justify-center shadow-md flex-shrink-0`}>
+              {(() => {
+                const IconComponent = getIconeCategoria(prompt.categoria);
+                return <IconComponent className="w-6 h-6 text-white" />;
+              })()}
             </div>
             <div className="flex-1">
               <DialogTitle className="text-2xl mb-2">{prompt.titulo}</DialogTitle>
