@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCard } from "@/components/shared/TrilhaCard";
 import { ModuloCard } from "@/components/shared/ModuloCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 export default function Trilhas() {
+  const [trilhasVisiveis, setTrilhasVisiveis] = useState(3);
+
   const { data: trilhas, isLoading } = useQuery({
     queryKey: ["trilhas-com-modulos"],
     queryFn: async () => {
@@ -17,7 +21,8 @@ export default function Trilhas() {
             titulo,
             descricao,
             ordem,
-            categoria
+            categoria,
+            imagem_url
           )
         `)
         .eq("ativo", true)
@@ -34,6 +39,9 @@ export default function Trilhas() {
     intermediario: trilhas?.filter(t => t.nivel === "intermediario") || [],
     avancado: trilhas?.filter(t => t.nivel === "avancado") || [],
   };
+
+  // Limitar número de trilhas visíveis
+  const trilhasVisiveisComModulos = trilhasPorNivel.todos.slice(0, trilhasVisiveis);
 
   if (isLoading) {
     return (
@@ -53,7 +61,7 @@ export default function Trilhas() {
           </p>
         </div>
 
-        <Tabs defaultValue="todos" className="w-full">
+        <Tabs defaultValue="todos" className="w-full" onValueChange={() => setTrilhasVisiveis(3)}>
           <TabsList>
             <TabsTrigger value="todos">Todos</TabsTrigger>
             <TabsTrigger value="iniciante">Iniciante</TabsTrigger>
@@ -63,7 +71,7 @@ export default function Trilhas() {
 
           <TabsContent value="todos" className="mt-6">
             <div className="space-y-12">
-              {trilhasPorNivel.todos.map((trilha) => (
+              {trilhasVisiveisComModulos.map((trilha) => (
                 <div key={trilha.id} className="space-y-6">
                   {/* Título da Trilha */}
                   <div>
@@ -87,7 +95,7 @@ export default function Trilhas() {
                           moduloId={modulo.id}
                           titulo={modulo.titulo}
                           descricao={modulo.descricao}
-                          imagem_url={trilha.imagem_url}
+                          imagem_url={modulo.imagem_url}
                         />
                       ))}
                     </div>
@@ -97,7 +105,21 @@ export default function Trilhas() {
                     </p>
                   )}
                 </div>
-              ))}
+                ))}
+              
+              {/* Botão Ver Mais Trilhas */}
+              {trilhasVisiveis < trilhasPorNivel.todos.length && (
+                <div className="flex justify-center mt-12">
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    onClick={() => setTrilhasVisiveis(prev => prev + 3)}
+                    className="min-w-[200px]"
+                  >
+                    Ver Mais Trilhas ({trilhasPorNivel.todos.length - trilhasVisiveis} restantes)
+                  </Button>
+                </div>
+              )}
             </div>
           </TabsContent>
 

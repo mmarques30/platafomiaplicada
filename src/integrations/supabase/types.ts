@@ -843,6 +843,7 @@ export type Database = {
           data_inicio: string | null
           descricao: string | null
           id: string
+          imagem_url: string | null
           ordem: number
           titulo: string
           trilha_id: string
@@ -855,6 +856,7 @@ export type Database = {
           data_inicio?: string | null
           descricao?: string | null
           id?: string
+          imagem_url?: string | null
           ordem?: number
           titulo: string
           trilha_id: string
@@ -867,6 +869,7 @@ export type Database = {
           data_inicio?: string | null
           descricao?: string | null
           id?: string
+          imagem_url?: string | null
           ordem?: number
           titulo?: string
           trilha_id?: string
