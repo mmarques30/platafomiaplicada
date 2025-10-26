@@ -50,6 +50,36 @@ export type Database = {
         }
         Relationships: []
       }
+      aulas_semanais: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          dia_semana: string | null
+          horario: string | null
+          id: string
+          tema: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          dia_semana?: string | null
+          horario?: string | null
+          id?: string
+          tema: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          dia_semana?: string | null
+          horario?: string | null
+          id?: string
+          tema?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       avisos: {
         Row: {
           ativo: boolean | null

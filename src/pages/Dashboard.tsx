@@ -4,6 +4,7 @@ import { MessageSquare, Sparkles, AlertCircle, X } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
+import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -86,6 +87,9 @@ export default function Dashboard() {
             </AlertDescription>
           </Alert>
         )}
+
+        {/* Header de Boas-Vindas */}
+        <WelcomeHeader />
 
         {/* Novidades da Semana */}
         <section>
