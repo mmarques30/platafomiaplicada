@@ -63,7 +63,7 @@ export function WelcomeHeader() {
             </p>
           ) : (
             <p className="text-sm text-muted-foreground mt-0.5">
-              Simplifique sua gestão com inteligência artificial
+              Aplique, replique e domine IA
             </p>
           )}
         </div>
