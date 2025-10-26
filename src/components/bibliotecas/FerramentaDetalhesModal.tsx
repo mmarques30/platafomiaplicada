@@ -54,17 +54,13 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
 
         {/* Seção: Objetivo */}
         <div className="mb-6">
-          <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-            <span>🎯</span> Objetivo
-          </h3>
+          <h3 className="font-semibold text-lg mb-2">Objetivo</h3>
           <p className="text-muted-foreground">{objetivo}</p>
         </div>
 
         {/* Seção: O que Entrega */}
         <div className="mb-6">
-          <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-            <span>📦</span> O que Entrega
-          </h3>
+          <h3 className="font-semibold text-lg mb-2">O que Entrega</h3>
           <p className="text-muted-foreground whitespace-pre-wrap">{o_que_entrega}</p>
         </div>
 
@@ -79,12 +75,12 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
               {vale_a_pena ? (
                 <>
                   <CheckCircle className="w-5 h-5 text-green-600" />
-                  <h3 className="font-semibold text-green-900 dark:text-green-100">✅ Vale a pena!</h3>
+                  <h3 className="font-semibold text-green-900 dark:text-green-100">Vale a pena!</h3>
                 </>
               ) : (
                 <>
                   <AlertCircle className="w-5 h-5 text-red-600" />
-                  <h3 className="font-semibold text-red-900 dark:text-red-100">⚠️ Não recomendado</h3>
+                  <h3 className="font-semibold text-red-900 dark:text-red-100">Não recomendado</h3>
                 </>
               )}
             </div>

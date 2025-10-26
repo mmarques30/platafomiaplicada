@@ -15,7 +15,6 @@ import {
 export default function BibliotecaFerramentas() {
   const { data: ferramentas, isLoading } = useFerramentasIA();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [ferramentaSelecionada, setFerramentaSelecionada] = useState<any>(null);
   const [filtrosAvancados, setFiltrosAvancados] = useState<FiltrosAvancados>({
     categoria: null,
@@ -28,15 +27,8 @@ export default function BibliotecaFerramentas() {
     [ferramentas]
   );
 
-  // Sincronizar categoria selecionada com filtros avançados
-  const handleCategoriaClick = (categoria: string | null) => {
-    setSelectedCategoria(categoria);
-    setFiltrosAvancados((prev) => ({ ...prev, categoria }));
-  };
-
   const handleFiltrosChange = (novosFiltros: FiltrosAvancados) => {
     setFiltrosAvancados(novosFiltros);
-    setSelectedCategoria(novosFiltros.categoria);
   };
 
   const filteredFerramentas = useMemo(() => {
@@ -95,27 +87,6 @@ export default function BibliotecaFerramentas() {
           onFiltrosChange={handleFiltrosChange}
           categorias={categorias}
         />
-      </div>
-
-      {/* Filtros de Categoria (Badges Horizontais) */}
-      <div className="flex gap-2 flex-wrap">
-        <Badge
-          variant={selectedCategoria === null ? "default" : "outline"}
-          className="cursor-pointer"
-          onClick={() => handleCategoriaClick(null)}
-        >
-          Todas
-        </Badge>
-        {categorias.map((categoria) => (
-          <Badge
-            key={categoria}
-            variant={selectedCategoria === categoria ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => handleCategoriaClick(categoria)}
-          >
-            {categoria}
-          </Badge>
-        ))}
       </div>
 
       {/* Contador de Resultados */}
