@@ -93,8 +93,17 @@ export default function TrilhaDetalhes() {
   // Set initial video from URL or first video
   useEffect(() => {
     const videoIdFromUrl = searchParams.get("video");
+    const moduloIdFromUrl = searchParams.get("modulo");
+    
     if (videoIdFromUrl && allVideos.some(v => v.id === videoIdFromUrl)) {
       setCurrentVideoId(videoIdFromUrl);
+    } else if (moduloIdFromUrl) {
+      // Se veio de um link de módulo, pega o primeiro vídeo daquele módulo
+      const moduloVideos = allVideos.filter(v => v.modulo.id === moduloIdFromUrl);
+      if (moduloVideos.length > 0) {
+        setCurrentVideoId(moduloVideos[0].id);
+        setSearchParams({ video: moduloVideos[0].id });
+      }
     } else if (allVideos.length > 0 && !currentVideoId) {
       setCurrentVideoId(allVideos[0].id);
       setSearchParams({ video: allVideos[0].id });
@@ -322,7 +331,14 @@ export default function TrilhaDetalhes() {
               {/* Video List */}
               <ScrollArea className="h-[600px] rounded-lg border bg-card">
                 <div className="p-4 space-y-2">
-                  <Accordion type="multiple" defaultValue={trilha.modulos?.map(m => `modulo-${m.id}`) || []}>
+                  <Accordion 
+                    type="multiple" 
+                    defaultValue={
+                      searchParams.get("modulo") 
+                        ? [`modulo-${searchParams.get("modulo")}`]
+                        : trilha.modulos?.map(m => `modulo-${m.id}`) || []
+                    }
+                  >
                     {trilha.modulos?.map((modulo, modIndex) => {
                         const moduloVideos = searchTerm 
                           ? filteredVideos.filter(v => v.modulo.id === modulo.id)
