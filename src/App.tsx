@@ -68,14 +68,14 @@ function AppContent() {
             <Route path="/favoritos" element={<Favoritos />} />
             <Route path="/notificacoes" element={<Notificacoes />} />
             <Route path="/evolucao" element={<Evolucao />} />
-              <Route path="/mentoria" element={<ProtectedRoute requireAnyRole={["admin", "mentorado"]}><Mentoria /></ProtectedRoute>} />
-              <Route path="/mentoria/diagnostico" element={<ProtectedRoute requireAnyRole={["admin", "mentorado"]}><MentoriaDiagnostico /></ProtectedRoute>} />
-              <Route path="/mentoria/objetivos" element={<ProtectedRoute requireAnyRole={["admin", "mentorado"]}><MentoriaObjetivos /></ProtectedRoute>} />
-              <Route path="/mentoria/sessoes" element={<ProtectedRoute requireAnyRole={["admin", "mentorado"]}><MentoriaSessoes /></ProtectedRoute>} />
-              <Route path="/mentoria/recursos" element={<ProtectedRoute requireAnyRole={["admin", "mentorado"]}><MentoriaRecursos /></ProtectedRoute>} />
-              <Route path="/mentoria/projetos" element={<ProtectedRoute requireAnyRole={["admin", "mentorado"]}><MentoriaProjetos /></ProtectedRoute>} />
-              <Route path="/mentoria/tarefas" element={<ProtectedRoute requireAnyRole={["admin", "mentorado"]}><MentoriaTarefas /></ProtectedRoute>} />
-              <Route path="/mentoria/duvidas" element={<ProtectedRoute requireAnyRole={["admin", "mentorado"]}><MentoriaDuvidas /></ProtectedRoute>} />
+            <Route path="/mentoria" element={<Mentoria />} />
+            <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
+            <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
+            <Route path="/mentoria/sessoes" element={<MentoriaSessoes />} />
+            <Route path="/mentoria/recursos" element={<MentoriaRecursos />} />
+            <Route path="/mentoria/projetos" element={<MentoriaProjetos />} />
+            <Route path="/mentoria/tarefas" element={<MentoriaTarefas />} />
+            <Route path="/mentoria/duvidas" element={<MentoriaDuvidas />} />
             <Route path="/ia-copie-use" element={<IACopieUse />} />
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
             <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />

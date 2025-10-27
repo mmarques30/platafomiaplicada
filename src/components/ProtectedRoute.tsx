@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole, UserRole } from "@/hooks/useUserRole";
@@ -11,9 +11,36 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requireRole, requireAnyRole }: ProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasRole, isLoading: roleLoading } = useUserRole();
+  const { hasRole, isLoading: roleLoading, roles } = useUserRole();
+  const [showTimeout, setShowTimeout] = useState(false);
 
   const needsRoleCheck = Boolean(requireRole) || (Array.isArray(requireAnyRole) && requireAnyRole.length > 0);
+
+  // Debug logs
+  useEffect(() => {
+    console.log("[ProtectedRoute] Auth Loading:", authLoading);
+    console.log("[ProtectedRoute] Role Loading:", roleLoading);
+    console.log("[ProtectedRoute] User:", user?.email);
+    console.log("[ProtectedRoute] Roles:", roles);
+    console.log("[ProtectedRoute] Require Role:", requireRole);
+    console.log("[ProtectedRoute] Require Any Role:", requireAnyRole);
+  }, [authLoading, roleLoading, user, roles, requireRole, requireAnyRole]);
+
+  // Timeout para evitar loading infinito
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (authLoading || (needsRoleCheck && roleLoading)) {
+        console.warn("[ProtectedRoute] Loading timeout - redirecting to auth");
+        setShowTimeout(true);
+      }
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [authLoading, roleLoading, needsRoleCheck]);
+
+  if (showTimeout) {
+    return <Navigate to="/auth" replace />;
+  }
 
   if (authLoading || (needsRoleCheck && roleLoading)) {
     return (
@@ -24,14 +51,17 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
   }
 
   if (!user) {
+    console.log("[ProtectedRoute] No user - redirecting to auth");
     return <Navigate to="/auth" replace />;
   }
 
   if (requireRole && !hasRole(requireRole)) {
+    console.log("[ProtectedRoute] Missing required role:", requireRole);
     return <Navigate to="/" replace />;
   }
 
   if (requireAnyRole && !requireAnyRole.some(role => hasRole(role))) {
+    console.log("[ProtectedRoute] Missing any of required roles:", requireAnyRole);
     return <Navigate to="/" replace />;
   }
 
