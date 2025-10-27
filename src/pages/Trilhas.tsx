@@ -6,6 +6,14 @@ import { ModuloCard } from "@/components/shared/ModuloCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 
+const formatDuracao = (minutos: number): string => {
+  const horas = Math.floor(minutos / 60);
+  const mins = minutos % 60;
+  if (horas === 0) return `${mins}min`;
+  if (mins === 0) return `${horas}h`;
+  return `${horas}h${mins.toString().padStart(2, '0')}min`;
+};
+
 export default function Trilhas() {
   const [trilhasVisiveis, setTrilhasVisiveis] = useState(3);
 
@@ -81,6 +89,9 @@ export default function Trilhas() {
                     {trilha.descricao && (
                       <p className="text-muted-foreground">
                         {trilha.descricao}
+                        {trilha.duracao_estimada && (
+                          <span> • {formatDuracao(trilha.duracao_estimada)}</span>
+                        )}
                       </p>
                     )}
                   </div>

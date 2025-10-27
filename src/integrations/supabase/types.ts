@@ -1400,6 +1400,7 @@ export type Database = {
           categoria: string
           created_at: string | null
           descricao: string | null
+          duracao_estimada: number | null
           id: string
           imagem_url: string | null
           nivel: string
@@ -1412,6 +1413,7 @@ export type Database = {
           categoria: string
           created_at?: string | null
           descricao?: string | null
+          duracao_estimada?: number | null
           id?: string
           imagem_url?: string | null
           nivel: string
@@ -1424,6 +1426,7 @@ export type Database = {
           categoria?: string
           created_at?: string | null
           descricao?: string | null
+          duracao_estimada?: number | null
           id?: string
           imagem_url?: string | null
           nivel?: string

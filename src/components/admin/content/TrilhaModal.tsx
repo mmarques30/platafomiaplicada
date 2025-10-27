@@ -41,6 +41,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       ordem: 0,
       ativo: true,
       imagem_url: "",
+      duracao_estimada: 0,
     },
   });
 
@@ -63,6 +64,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         ordem: 0,
         ativo: true,
         imagem_url: "",
+        duracao_estimada: 0,
       });
       setSelectedCategoria("núcleo");
       setImagePreview("");
@@ -176,8 +178,23 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>Descrição</Label>
-            <Textarea {...register("descricao")} rows={3} />
+            <Label>Descrição / Objetivo</Label>
+            <Textarea {...register("descricao")} rows={3} placeholder="Ex: Aprenda os fundamentos de IA do zero" />
+            <p className="text-xs text-muted-foreground">
+              Objetivo curto da trilha (será exibido junto com a duração)
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Duração Estimada (minutos)</Label>
+            <Input 
+              type="number" 
+              {...register("duracao_estimada", { valueAsNumber: true })} 
+              placeholder="Ex: 195 (será exibido como 3h15min)"
+            />
+            <p className="text-xs text-muted-foreground">
+              Duração total estimada em minutos
+            </p>
           </div>
 
           <div className="space-y-2">
