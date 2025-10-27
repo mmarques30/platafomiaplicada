@@ -76,21 +76,23 @@ export function NavegacaoRapida() {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Navegação Rápida</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="flex flex-col gap-3">
         {navOptions.map((option) => {
           const Icon = option.icon;
           return (
             <Card
               key={option.path}
-              className="cursor-pointer transition-all hover:shadow-md hover:scale-105 border-2 hover:border-primary/50"
+              className="cursor-pointer transition-all hover:shadow-md border-2 hover:border-primary/50 h-20"
               onClick={() => navigate(option.path)}
             >
-              <CardContent className="p-6 text-center">
-                <div className={`w-12 h-12 mx-auto mb-3 rounded-lg flex items-center justify-center ${option.color} transition-colors`}>
-                  <Icon className="h-6 w-6" />
+              <CardContent className="p-4 flex items-center h-full">
+                <div className={`w-10 h-10 mr-4 rounded-lg flex items-center justify-center ${option.color} transition-colors flex-shrink-0`}>
+                  <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="font-semibold mb-1">{option.title}</h3>
-                <p className="text-xs text-muted-foreground">{option.description}</p>
+                <div className="flex items-center justify-between flex-1">
+                  <h3 className="font-semibold text-base">{option.title}</h3>
+                  <p className="text-sm text-muted-foreground ml-4">{option.description}</p>
+                </div>
               </CardContent>
             </Card>
           );
