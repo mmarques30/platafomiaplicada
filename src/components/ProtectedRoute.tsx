@@ -33,7 +33,7 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
         console.warn("[ProtectedRoute] Loading timeout - redirecting to auth");
         setShowTimeout(true);
       }
-    }, 5000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [authLoading, roleLoading, needsRoleCheck]);

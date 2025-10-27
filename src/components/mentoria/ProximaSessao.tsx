@@ -12,7 +12,33 @@ export function ProximaSessao() {
   const { sessoes, isLoading } = useMentoriaSessoes();
 
   if (isLoading) {
-    return null;
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-lg bg-muted animate-pulse h-12 w-12" />
+              <div className="space-y-2">
+                <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-48 bg-muted animate-pulse rounded" />
+              </div>
+            </div>
+            <div className="h-6 w-20 bg-muted animate-pulse rounded-full" />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="h-4 bg-muted animate-pulse rounded" />
+            <div className="h-4 bg-muted animate-pulse rounded" />
+          </div>
+          <div className="h-4 bg-muted animate-pulse rounded w-full" />
+          <div className="flex gap-2">
+            <div className="h-10 bg-muted animate-pulse rounded flex-1" />
+            <div className="h-10 bg-muted animate-pulse rounded flex-1" />
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   // Buscar próxima sessão agendada
