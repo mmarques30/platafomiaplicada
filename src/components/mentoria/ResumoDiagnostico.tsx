@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface ResumoDiagnosticoProps {
   formulario: any;
-  onEditar: () => void;
+  onEditar?: () => void;
 }
 
 export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoProps) {
@@ -141,7 +141,9 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
           </div>
         </CardContent>
         <CardFooter className="flex gap-3">
-          <Button onClick={onEditar}>Editar Respostas</Button>
+          {onEditar && (
+            <Button onClick={onEditar}>Editar Respostas</Button>
+          )}
           <Button variant="outline" onClick={() => window.print()}>
             Imprimir
           </Button>

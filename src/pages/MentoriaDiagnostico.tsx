@@ -30,6 +30,7 @@ export default function MentoriaDiagnostico() {
 
   const naoPreencheu = !formulario?.completado;
   const preenchido = formulario?.completado && !modoEdicao && !criandoNovo;
+  const preenchidoPorAdmin = formulario?.preenchido_por === 'admin';
 
   const handleFormularioFinalizado = () => {
     setMostrarFormulario(false);
@@ -101,23 +102,25 @@ export default function MentoriaDiagnostico() {
             </Alert>
           )}
           
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertTitle>Deseja atualizar seu diagnóstico?</AlertTitle>
-            <AlertDescription className="mt-2 flex items-center gap-3 flex-wrap">
-              <span>Você pode editar o diagnóstico atual ou preencher um novo do zero.</span>
-              <Button 
-                variant="outline" 
-                onClick={() => setConfirmarNovoOpen(true)}
-              >
-                Preencher Novo Diagnóstico
-              </Button>
-            </AlertDescription>
-          </Alert>
+          {!preenchidoPorAdmin && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertTitle>Deseja atualizar seu diagnóstico?</AlertTitle>
+              <AlertDescription className="mt-2 flex items-center gap-3 flex-wrap">
+                <span>Você pode editar o diagnóstico atual ou preencher um novo do zero.</span>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setConfirmarNovoOpen(true)}
+                >
+                  Preencher Novo Diagnóstico
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
 
           <ResumoDiagnostico 
             formulario={formulario} 
-            onEditar={() => setModoEdicao(true)}
+            onEditar={preenchidoPorAdmin ? undefined : () => setModoEdicao(true)}
           />
           <InsightIA 
             formulario={formulario}
