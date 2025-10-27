@@ -16,6 +16,8 @@ import Configuracoes from "./pages/Configuracoes";
 import Favoritos from "./pages/Favoritos";
 import Notificacoes from "./pages/Notificacoes";
 import Evolucao from "./pages/Evolucao";
+import EvolucaoConquistas from "./pages/EvolucaoConquistas";
+import EvolucaoCertificados from "./pages/EvolucaoCertificados";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MentoriaObjetivos from "./pages/MentoriaObjetivos";
@@ -68,6 +70,8 @@ function AppContent() {
             <Route path="/favoritos" element={<Favoritos />} />
             <Route path="/notificacoes" element={<Notificacoes />} />
             <Route path="/evolucao" element={<Evolucao />} />
+            <Route path="/evolucao/conquistas" element={<EvolucaoConquistas />} />
+            <Route path="/evolucao/certificados" element={<EvolucaoCertificados />} />
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
             <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
