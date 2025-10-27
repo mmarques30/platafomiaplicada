@@ -35,13 +35,16 @@ export function TrilhaDisponivelCard({
   const getNivelColor = (nivel: string) => {
     switch (nivel.toLowerCase()) {
       case "iniciante":
-        return "bg-green-500/10 text-green-700 dark:text-green-400";
+        // Verde 500 - Claro e acolhedor
+        return "bg-[#BCC95D]/10 text-[#BCC95D] dark:text-[#C8D27B]";
       case "intermediario":
       case "intermediário":
-        return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
+        // Verde 700 - Primário (cor principal da marca)
+        return "bg-[#9EB038]/10 text-[#9EB038] dark:text-[#AFC040]";
       case "avancado":
       case "avançado":
-        return "bg-red-500/10 text-red-700 dark:text-red-400";
+        // Verde 900 - Escuro e profissional
+        return "bg-[#738925]/10 text-[#738925] dark:text-[#889C2D]";
       default:
         return "bg-muted";
     }
