@@ -46,7 +46,7 @@ export function ProgressCard({
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Sequência atual</p>
-            <p className="text-2xl font-bold">{sequencia} dias 🔥</p>
+            <p className="text-2xl font-bold">{sequencia} dias</p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Certificados</p>

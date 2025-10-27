@@ -15,13 +15,14 @@ import {
   useTrilhasDisponiveis,
 } from "@/hooks/useEvolucao";
 import { useNavigate } from "react-router-dom";
-import { Award, Trophy, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 export default function Evolucao() {
   const navigate = useNavigate();
   const [filtroNivel, setFiltroNivel] = useState<string>("todos");
   const [mostrarTodasConcluidas, setMostrarTodasConcluidas] = useState(false);
+  const [mostrarTodasDisponiveis, setMostrarTodasDisponiveis] = useState(false);
 
   const { data: progressoGeral, isLoading: loadingProgresso } = useProgressoGeral();
   const { data: sequencia, isLoading: loadingSequencia } = useSequenciaEstudo();
@@ -77,6 +78,10 @@ export default function Evolucao() {
           (t) => t.nivel.toLowerCase() === filtroNivel.toLowerCase()
         );
 
+  const trilhasDisponiveisExibidas = mostrarTodasDisponiveis
+    ? trilhasFiltradas
+    : trilhasFiltradas?.slice(0, 10);
+
   const trilhasConcluidasExibidas = mostrarTodasConcluidas
     ? trilhasConcluidas
     : trilhasConcluidas?.slice(0, 4);
@@ -107,8 +112,7 @@ export default function Evolucao() {
       {conquistasDesbloqueadas.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Trophy className="h-6 w-6" />
+            <h2 className="text-2xl font-bold">
               Conquistas Recentes
             </h2>
             <Button
@@ -146,8 +150,7 @@ export default function Evolucao() {
       {trilhasConcluidas && trilhasConcluidas.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Award className="h-6 w-6" />
+            <h2 className="text-2xl font-bold">
               Concluídas ({trilhasConcluidas.length})
             </h2>
             <Button
@@ -194,11 +197,24 @@ export default function Evolucao() {
 
             <TabsContent value={filtroNivel} className="mt-6">
               {trilhasFiltradas && trilhasFiltradas.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {trilhasFiltradas.map((trilha) => (
-                    <TrilhaDisponivelCard key={trilha.id} {...trilha} />
-                  ))}
-                </div>
+                <>
+                  <div className="flex flex-col gap-3">
+                    {trilhasDisponiveisExibidas?.map((trilha) => (
+                      <TrilhaDisponivelCard key={trilha.id} {...trilha} />
+                    ))}
+                  </div>
+                  
+                  {trilhasFiltradas && trilhasFiltradas.length > 10 && !mostrarTodasDisponiveis && (
+                    <div className="text-center mt-6">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setMostrarTodasDisponiveis(true)}
+                      >
+                        Ver todas as {trilhasFiltradas.length} trilhas disponíveis
+                      </Button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <Alert>
                   <AlertDescription>

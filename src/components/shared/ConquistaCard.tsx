@@ -26,8 +26,10 @@ export function ConquistaCard({
     <Card className={desbloqueada ? "" : "opacity-60"}>
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
-          <div className="text-3xl flex-shrink-0">
-            {desbloqueada ? "🏆" : "🔒"}
+          <div className="flex-shrink-0">
+            <Badge variant={desbloqueada ? "default" : "secondary"}>
+              {desbloqueada ? "Desbloqueada" : "Bloqueada"}
+            </Badge>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">

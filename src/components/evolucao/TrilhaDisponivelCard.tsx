@@ -48,35 +48,28 @@ export function TrilhaDisponivelCard({
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-lg font-bold">{titulo}</h3>
-              <Badge className={getNivelColor(nivel)}>{nivel}</Badge>
-            </div>
-            {descricao && (
-              <p className="text-sm text-muted-foreground line-clamp-2">{descricao}</p>
-            )}
+    <Card className="hover:shadow-md hover:bg-accent/50 transition-all">
+      <CardContent className="p-4 flex items-center justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-1 flex-wrap">
+            <h3 className="text-lg font-semibold">{titulo}</h3>
+            <Badge className={getNivelColor(nivel)}>{nivel}</Badge>
+            <span className="text-sm text-muted-foreground">
+              {categoria} • {formatDuracao(duracaoEstimada)} • {totalVideos} aulas
+            </span>
           </div>
-
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>📚 {categoria}</span>
-            <span>•</span>
-            <span>{formatDuracao(duracaoEstimada)}</span>
-            <span>•</span>
-            <span>{totalVideos} aulas</span>
-          </div>
-
-          <Button
-            className="w-full"
-            onClick={() => navigate(`/trilhas/${id}`)}
-          >
-            <PlayCircle className="mr-2 h-4 w-4" />
-            Iniciar trilha
-          </Button>
+          {descricao && (
+            <p className="text-sm text-muted-foreground line-clamp-1">{descricao}</p>
+          )}
         </div>
+        
+        <Button
+          className="flex-shrink-0"
+          onClick={() => navigate(`/trilhas/${id}`)}
+        >
+          <PlayCircle className="mr-2 h-4 w-4" />
+          Iniciar trilha
+        </Button>
       </CardContent>
     </Card>
   );
