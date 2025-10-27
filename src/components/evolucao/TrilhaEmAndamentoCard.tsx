@@ -51,7 +51,7 @@ export function TrilhaEmAndamentoCard({
       <CardContent className="p-6">
         <div className="space-y-4">
           <div>
-            <h3 className="text-xl font-bold mb-2">➥ {titulo}</h3>
+            <h3 className="text-xl font-bold mb-2">{titulo}</h3>
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium">Progresso: {progressoPercent}%</span>
             </div>
