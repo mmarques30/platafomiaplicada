@@ -21,7 +21,7 @@ export default function Mentoria() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2">
-          Olá, {user?.user_metadata?.nome_completo?.split(' ')[0] || 'Mentorado'}! 👋
+          Olá, {user?.user_metadata?.nome_completo?.split(' ')[0] || 'Mentorado'}!
         </h1>
         <p className="text-muted-foreground text-lg">
           Bem-vindo ao seu painel de mentoria personalizado
