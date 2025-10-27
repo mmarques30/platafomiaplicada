@@ -37,6 +37,13 @@ export default function Evolucao() {
     loadingConcluidas ||
     loadingDisponiveis;
 
+  const getMedalhaByTrilhas = (trilhasConcluidas: number): "bronze" | "prata" | "ouro" | undefined => {
+    if (trilhasConcluidas >= 10) return "ouro";
+    if (trilhasConcluidas >= 5) return "prata";
+    if (trilhasConcluidas >= 1) return "bronze";
+    return undefined;
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 space-y-6">
@@ -51,21 +58,38 @@ export default function Evolucao() {
     );
   }
 
+  const totalTrilhasConcluidas = progressoGeral?.trilhasConcluidas || 0;
+  const medalhaAtual = getMedalhaByTrilhas(totalTrilhasConcluidas);
+
   const conquistasRecentes = [
     {
       titulo: "Primeiro Passo",
       descricao: "Completou sua primeira aula",
-      desbloqueada: true,
+      desbloqueada: totalTrilhasConcluidas >= 1,
+      medalha: totalTrilhasConcluidas >= 1 ? ("bronze" as const) : undefined,
     },
     {
       titulo: "Maratonista",
-      descricao: "7 dias consecutivos estudando",
+      descricao: `${sequencia || 0} dias consecutivos estudando`,
       desbloqueada: (sequencia || 0) >= 7,
+      progresso: sequencia || 0,
+      progressoNecessario: 7,
     },
     {
       titulo: "Especialista",
       descricao: "Concluiu 5 trilhas completas",
-      desbloqueada: (progressoGeral?.trilhasConcluidas || 0) >= 5,
+      desbloqueada: totalTrilhasConcluidas >= 5,
+      medalha: totalTrilhasConcluidas >= 5 ? medalhaAtual : undefined,
+      progresso: totalTrilhasConcluidas < 5 ? totalTrilhasConcluidas : undefined,
+      progressoNecessario: totalTrilhasConcluidas < 5 ? 5 : undefined,
+    },
+    {
+      titulo: "Colecionador de Trilhas",
+      descricao: `${totalTrilhasConcluidas} trilha${totalTrilhasConcluidas !== 1 ? 's' : ''} concluída${totalTrilhasConcluidas !== 1 ? 's' : ''}`,
+      desbloqueada: totalTrilhasConcluidas >= 1,
+      medalha: medalhaAtual,
+      progresso: totalTrilhasConcluidas < 10 ? totalTrilhasConcluidas : undefined,
+      progressoNecessario: totalTrilhasConcluidas < 5 ? 5 : totalTrilhasConcluidas < 10 ? 10 : undefined,
     },
   ];
 
@@ -78,13 +102,15 @@ export default function Evolucao() {
           (t) => t.nivel.toLowerCase() === filtroNivel.toLowerCase()
         );
 
+  const trilhasConcluidasData = trilhasConcluidas;
+
   const trilhasDisponiveisExibidas = mostrarTodasDisponiveis
     ? trilhasFiltradas
     : trilhasFiltradas?.slice(0, 10);
 
   const trilhasConcluidasExibidas = mostrarTodasConcluidas
-    ? trilhasConcluidas
-    : trilhasConcluidas?.slice(0, 4);
+    ? trilhasConcluidasData
+    : trilhasConcluidasData?.slice(0, 4);
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -147,11 +173,11 @@ export default function Evolucao() {
       )}
 
       {/* Trilhas Concluídas */}
-      {trilhasConcluidas && trilhasConcluidas.length > 0 && (
+      {trilhasConcluidasData && trilhasConcluidasData.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">
-              Concluídas ({trilhasConcluidas.length})
+              Concluídas ({trilhasConcluidasData.length})
             </h2>
             <Button
               variant="ghost"
@@ -167,13 +193,13 @@ export default function Evolucao() {
               <TrilhaConcluidaCard key={trilha.id} {...trilha} />
             ))}
           </div>
-          {trilhasConcluidas.length > 4 && !mostrarTodasConcluidas && (
+          {trilhasConcluidasData.length > 4 && !mostrarTodasConcluidas && (
             <div className="text-center">
               <Button
                 variant="outline"
                 onClick={() => setMostrarTodasConcluidas(true)}
               >
-                Ver todas as {trilhasConcluidas.length} trilhas concluídas
+                Ver todas as {trilhasConcluidasData.length} trilhas concluídas
               </Button>
             </div>
           )}
@@ -229,7 +255,7 @@ export default function Evolucao() {
 
       {/* Estado vazio */}
       {!trilhasEmAndamento?.length &&
-        !trilhasConcluidas?.length &&
+        !trilhasConcluidasData?.length &&
         !trilhasDisponiveis?.length && (
           <Alert>
             <AlertDescription>

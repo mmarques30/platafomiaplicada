@@ -9,7 +9,34 @@ interface ConquistaCardProps {
   dataDesbloqueio?: string;
   progresso?: number;
   progressoNecessario?: number;
+  medalha?: "bronze" | "prata" | "ouro";
 }
+
+const getMedalhaColor = (medalha?: string) => {
+  switch (medalha) {
+    case "bronze":
+      return "bg-amber-700 text-white border-transparent";
+    case "prata":
+      return "bg-slate-400 text-white border-transparent";
+    case "ouro":
+      return "bg-yellow-500 text-white border-transparent";
+    default:
+      return "";
+  }
+};
+
+const getMedalhaLabel = (medalha?: string) => {
+  switch (medalha) {
+    case "bronze":
+      return "Bronze";
+    case "prata":
+      return "Prata";
+    case "ouro":
+      return "Ouro";
+    default:
+      return "Desbloqueada";
+  }
+};
 
 export function ConquistaCard({
   titulo,
@@ -18,6 +45,7 @@ export function ConquistaCard({
   dataDesbloqueio,
   progresso,
   progressoNecessario,
+  medalha,
 }: ConquistaCardProps) {
   const mostrarProgresso = !desbloqueada && progresso !== undefined && progressoNecessario !== undefined;
   const percentualProgresso = mostrarProgresso ? Math.round((progresso / progressoNecessario) * 100) : 0;
@@ -27,8 +55,11 @@ export function ConquistaCard({
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0">
-            <Badge variant={desbloqueada ? "default" : "secondary"}>
-              {desbloqueada ? "Desbloqueada" : "Bloqueada"}
+            <Badge 
+              variant={desbloqueada ? "default" : "secondary"}
+              className={desbloqueada && medalha ? getMedalhaColor(medalha) : ""}
+            >
+              {desbloqueada ? getMedalhaLabel(medalha) : "Bloqueada"}
             </Badge>
           </div>
           <div className="flex-1">
