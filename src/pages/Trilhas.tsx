@@ -34,6 +34,7 @@ export default function Trilhas() {
           )
         `)
         .eq("ativo", true)
+        .eq("visivel_mentorados", true)
         .order("ordem");
       
       if (error) throw error;

@@ -56,6 +56,7 @@ export default function TrilhaDetalhes() {
           )
         `)
         .eq("id", id)
+        .eq("visivel_mentorados", true)
         .order("ordem", { foreignTable: "modulos" })
         .order("ordem", { foreignTable: "modulos.videos" })
         .single();

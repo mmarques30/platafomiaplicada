@@ -17,6 +17,8 @@ export function UltimosConteudos() {
           trilha:trilhas!videos_trilha_id_fkey(id, titulo, imagem_url)
         `)
         .eq("ativo", true)
+        .eq("visivel_mentorados", true)
+        .eq("trilhas.visivel_mentorados", true)
         .order("created_at", { ascending: false })
         .limit(20);
 

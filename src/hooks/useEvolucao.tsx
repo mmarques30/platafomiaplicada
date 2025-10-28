@@ -14,6 +14,7 @@ export const useTrilhasEmAndamento = () => {
         .from("trilhas")
         .select("*")
         .eq("ativo", true)
+        .eq("visivel_mentorados", true)
         .order("ordem");
 
       if (!trilhas) return [];
@@ -24,7 +25,8 @@ export const useTrilhasEmAndamento = () => {
             .from("videos")
             .select("id")
             .eq("trilha_id", trilha.id)
-            .eq("ativo", true);
+            .eq("ativo", true)
+            .eq("visivel_mentorados", true);
 
           const totalVideos = videos?.length || 0;
 
@@ -52,6 +54,7 @@ export const useTrilhasEmAndamento = () => {
             .select("id, titulo, ordem")
             .eq("trilha_id", trilha.id)
             .eq("ativo", true)
+            .eq("visivel_mentorados", true)
             .not("id", "in", `(${progresso?.map(p => p.video_id).join(",") || "00000000-0000-0000-0000-000000000000"})`)
             .order("ordem")
             .limit(1)
@@ -89,6 +92,7 @@ export const useTrilhasConcluidas = () => {
         .from("trilhas")
         .select("*")
         .eq("ativo", true)
+        .eq("visivel_mentorados", true)
         .order("ordem");
 
       if (!trilhas) return [];
@@ -99,7 +103,8 @@ export const useTrilhasConcluidas = () => {
             .from("videos")
             .select("id")
             .eq("trilha_id", trilha.id)
-            .eq("ativo", true);
+            .eq("ativo", true)
+            .eq("visivel_mentorados", true);
 
           const totalVideos = videos?.length || 0;
 
@@ -152,6 +157,7 @@ export const useTrilhasDisponiveis = () => {
         .from("trilhas")
         .select("*")
         .eq("ativo", true)
+        .eq("visivel_mentorados", true)
         .order("ordem");
 
       if (!trilhas) return [];
@@ -162,7 +168,8 @@ export const useTrilhasDisponiveis = () => {
             .from("videos")
             .select("id")
             .eq("trilha_id", trilha.id)
-            .eq("ativo", true);
+            .eq("ativo", true)
+            .eq("visivel_mentorados", true);
 
           const totalVideos = videos?.length || 0;
 
@@ -247,7 +254,8 @@ export const useProgressoGeral = () => {
       const { data: trilhas } = await supabase
         .from("trilhas")
         .select("id")
-        .eq("ativo", true);
+        .eq("ativo", true)
+        .eq("visivel_mentorados", true);
 
       const totalTrilhas = trilhas?.length || 0;
 
