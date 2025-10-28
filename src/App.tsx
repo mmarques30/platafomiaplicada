@@ -26,6 +26,7 @@ import MentoriaRecursos from "./pages/MentoriaRecursos";
 import MentoriaProjetos from "./pages/MentoriaProjetos";
 import MentoriaTarefas from "./pages/MentoriaTarefas";
 import MentoriaDuvidas from "./pages/MentoriaDuvidas";
+import MentoriaPainelDiagnostico from "./pages/MentoriaPainelDiagnostico";
 import FormulariosDisponiveis from "./pages/FormulariosDisponiveis";
 import ResponderFormulario from "./pages/ResponderFormulario";
 import IACopieUse from "./pages/IACopieUse";
@@ -74,6 +75,7 @@ function AppContent() {
             <Route path="/evolucao/certificados" element={<EvolucaoCertificados />} />
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
+            <Route path="/mentoria/painel-diagnostico" element={<MentoriaPainelDiagnostico />} />
             <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
             <Route path="/mentoria/sessoes" element={<MentoriaSessoes />} />
             <Route path="/mentoria/recursos" element={<MentoriaRecursos />} />

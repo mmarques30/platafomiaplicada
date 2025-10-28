@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Eye } from "lucide-react";
 
 export function StatusDiagnostico() {
   const navigate = useNavigate();
@@ -78,13 +79,22 @@ export function StatusDiagnostico() {
                 </p>
               )}
             </div>
-            <Button 
-              onClick={() => navigate("/mentoria/diagnostico")}
-              variant="outline"
-              className="w-full mt-auto"
-            >
-              Ver Diagnóstico Completo
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button 
+                onClick={() => navigate("/mentoria/painel-diagnostico")}
+                className="w-full"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Ver Painel de Diagnóstico
+              </Button>
+              <Button 
+                onClick={() => navigate("/mentoria/diagnostico")}
+                variant="outline"
+                className="w-full"
+              >
+                Editar Diagnóstico
+              </Button>
+            </div>
           </>
         ) : (
           <>

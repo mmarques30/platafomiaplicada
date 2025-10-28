@@ -64,6 +64,23 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        aplicada: {
+          green: {
+            900: "#738925",
+            800: "#889C2D",
+            700: "#9EB038",
+            100: "#E9EBC6",
+          },
+          dark: "#2F302B",
+          light: "#FFFFFF",
+          gray: "#F2F2F2",
+          yellow: "#FFFFF6",
+        },
+        complexity: {
+          high: "#DC2626",
+          medium: "#F59E0B",
+          low: "#10B981",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
