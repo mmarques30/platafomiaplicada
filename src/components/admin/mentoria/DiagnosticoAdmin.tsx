@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
-import { FileText, Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Sparkles, Target, Calendar, Video } from "lucide-react";
+import { FileText, Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Sparkles, Target, Calendar, Video, PanelLeftOpen } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
@@ -16,12 +16,14 @@ import { GerarPlanoModal } from "./GerarPlanoModal";
 import { useMentoriaObjetivos } from "@/hooks/useMentoriaObjetivos";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
+import { useNavigate } from "react-router-dom";
 
 interface DiagnosticoAdminProps {
   userId?: string;
 }
 
 export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
+  const navigate = useNavigate();
   const { diagnostico, isLoading, deletarArquivo } = useDiagnosticoAdmin(userId);
   const { objetivos } = useMentoriaObjetivos(userId);
   const { tarefas } = useMentoriaTarefas(userId);
@@ -292,6 +294,10 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
           )}
 
           <div className="flex gap-2">
+            <Button onClick={() => navigate(`/mentoria/painel-diagnostico/${userId}`)}>
+              <PanelLeftOpen className="h-4 w-4 mr-2" />
+              Ver Painel Completo
+            </Button>
             <Button variant="outline" onClick={() => setViewModalOpen(true)}>
               <Eye className="h-4 w-4 mr-2" />
               Visualizar

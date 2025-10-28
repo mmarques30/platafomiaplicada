@@ -9,11 +9,12 @@ import { PontosAtencao } from "@/components/mentoria/painel/PontosAtencao";
 import { ProximaSessao } from "@/components/mentoria/painel/ProximaSessao";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function MentoriaPainelDiagnostico() {
   const navigate = useNavigate();
-  const { diagnostico, objetivos, projetos, sessoes, profile, isLoading } = usePainelDiagnostico();
+  const { userId } = useParams();
+  const { diagnostico, objetivos, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
 
   if (isLoading) {
     return (

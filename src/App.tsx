@@ -76,6 +76,7 @@ function AppContent() {
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
             <Route path="/mentoria/painel-diagnostico" element={<MentoriaPainelDiagnostico />} />
+            <Route path="/mentoria/painel-diagnostico/:userId" element={<MentoriaPainelDiagnostico />} />
             <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
             <Route path="/mentoria/sessoes" element={<MentoriaSessoes />} />
             <Route path="/mentoria/recursos" element={<MentoriaRecursos />} />
