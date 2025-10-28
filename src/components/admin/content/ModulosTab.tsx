@@ -23,11 +23,13 @@ export function ModulosTab() {
   const [trilhaFilter, setTrilhaFilter] = useState<string>('todas');
   const [categoriaFilter, setCategoriaFilter] = useState<string>('todas');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [statusVisibilidade, setStatusVisibilidade] = useState<string>('todos');
 
   const handleClearFilters = () => {
     setTrilhaFilter('todas');
     setCategoriaFilter('todas');
     setStatusFilter('todos');
+    setStatusVisibilidade('todos');
   };
 
   // Filtrar módulos
@@ -37,9 +39,15 @@ export function ModulosTab() {
       if (categoriaFilter !== 'todas' && modulo.categoria !== categoriaFilter) return false;
       if (statusFilter === 'ativo' && !modulo.ativo) return false;
       if (statusFilter === 'inativo' && modulo.ativo) return false;
+      
+      // Filtro de visibilidade
+      if (statusVisibilidade === 'publicado' && (!modulo.ativo || !modulo.visivel_mentorados)) return false;
+      if (statusVisibilidade === 'rascunho' && (!modulo.ativo || modulo.visivel_mentorados)) return false;
+      if (statusVisibilidade === 'arquivado' && modulo.ativo) return false;
+      
       return true;
     }) || [];
-  }, [modulos, trilhaFilter, categoriaFilter, statusFilter]);
+  }, [modulos, trilhaFilter, categoriaFilter, statusFilter, statusVisibilidade]);
 
   if (isLoading) return <div>Carregando...</div>;
 
@@ -90,6 +98,19 @@ export function ModulosTab() {
               { value: 'todos', label: 'Todos os status' },
               { value: 'ativo', label: 'Ativo' },
               { value: 'inativo', label: 'Inativo' },
+            ],
+          },
+          {
+            id: 'visibilidade',
+            label: 'Publicação',
+            placeholder: 'Todos',
+            value: statusVisibilidade,
+            onChange: setStatusVisibilidade,
+            options: [
+              { value: 'todos', label: 'Todos' },
+              { value: 'publicado', label: 'Publicados' },
+              { value: 'rascunho', label: 'Rascunhos' },
+              { value: 'arquivado', label: 'Arquivados' },
             ],
           },
         ]}
@@ -161,9 +182,21 @@ export function ModulosTab() {
                     <Badge variant="secondary">{moduloStat?.total_exercicios || 0}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={modulo.ativo ? "default" : "secondary"}>
-                      {modulo.ativo ? "Ativo" : "Inativo"}
-                    </Badge>
+                    <div className="flex gap-2">
+                      <Badge variant={modulo.ativo ? "default" : "secondary"}>
+                        {modulo.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
+                      {modulo.ativo && !modulo.visivel_mentorados && (
+                        <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/50">
+                          Rascunho
+                        </Badge>
+                      )}
+                      {modulo.ativo && modulo.visivel_mentorados && (
+                        <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/50">
+                          Publicado
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="ghost" size="sm" onClick={() => { setEditingModulo(modulo); setIsModalOpen(true); }}>

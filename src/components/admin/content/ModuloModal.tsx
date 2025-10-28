@@ -42,6 +42,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         categoria: modulo.categoria || "",
         ordem: modulo.ordem || 0,
         ativo: modulo.ativo !== undefined ? modulo.ativo : true,
+        visivel_mentorados: modulo.visivel_mentorados ?? false,
         data_inicio: modulo.data_inicio || null,
       });
       setCustomCategoria(modulo.categoria || "");
@@ -54,7 +55,8 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         trilha_id: "", 
         categoria: "",
         ordem: 0, 
-        ativo: true, 
+        ativo: true,
+        visivel_mentorados: false,
         data_inicio: null
       });
       setCustomCategoria("");
@@ -254,6 +256,18 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
             <Switch checked={watch("ativo")} onCheckedChange={(checked) => setValue("ativo", checked)} />
             <Label>Ativo</Label>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch 
+              checked={watch("visivel_mentorados")} 
+              onCheckedChange={(checked) => setValue("visivel_mentorados", checked)} 
+            />
+            <Label>Visível para Mentorados</Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Deixe desmarcado para preparar o módulo antes de publicá-lo
+          </p>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
             <Button 

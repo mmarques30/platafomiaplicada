@@ -20,6 +20,7 @@ export function TrilhasTab() {
   const [categoriaFilter, setCategoriaFilter] = useState<string>('todas');
   const [nivelFilter, setNivelFilter] = useState<string>('todos');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [statusVisibilidade, setStatusVisibilidade] = useState<string>('todos');
 
   const handleEdit = (trilha: any) => {
     setEditingTrilha(trilha);
@@ -42,6 +43,7 @@ export function TrilhasTab() {
     setCategoriaFilter('todas');
     setNivelFilter('todos');
     setStatusFilter('todos');
+    setStatusVisibilidade('todos');
   };
 
   // Filtrar trilhas
@@ -51,9 +53,15 @@ export function TrilhasTab() {
       if (nivelFilter !== 'todos' && trilha.nivel !== nivelFilter) return false;
       if (statusFilter === 'ativo' && !trilha.ativo) return false;
       if (statusFilter === 'inativo' && trilha.ativo) return false;
+      
+      // Filtro de visibilidade
+      if (statusVisibilidade === 'publicado' && (!trilha.ativo || !trilha.visivel_mentorados)) return false;
+      if (statusVisibilidade === 'rascunho' && (!trilha.ativo || trilha.visivel_mentorados)) return false;
+      if (statusVisibilidade === 'arquivado' && trilha.ativo) return false;
+      
       return true;
     }) || [];
-  }, [trilhas, categoriaFilter, nivelFilter, statusFilter]);
+  }, [trilhas, categoriaFilter, nivelFilter, statusFilter, statusVisibilidade]);
 
   if (isLoading) return <div>Carregando...</div>;
 
@@ -106,6 +114,19 @@ export function TrilhasTab() {
               { value: 'todos', label: 'Todos os status' },
               { value: 'ativo', label: 'Ativo' },
               { value: 'inativo', label: 'Inativo' },
+            ],
+          },
+          {
+            id: 'visibilidade',
+            label: 'Publicação',
+            placeholder: 'Todos',
+            value: statusVisibilidade,
+            onChange: setStatusVisibilidade,
+            options: [
+              { value: 'todos', label: 'Todos' },
+              { value: 'publicado', label: 'Publicados' },
+              { value: 'rascunho', label: 'Rascunhos' },
+              { value: 'arquivado', label: 'Arquivados' },
             ],
           },
         ]}
@@ -175,9 +196,21 @@ export function TrilhasTab() {
                     <Badge variant="secondary">{trilhaStat?.total_exercicios || 0}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={trilha.ativo ? "default" : "secondary"}>
-                      {trilha.ativo ? "Ativo" : "Inativo"}
-                    </Badge>
+                    <div className="flex gap-2">
+                      <Badge variant={trilha.ativo ? "default" : "secondary"}>
+                        {trilha.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
+                      {trilha.ativo && !trilha.visivel_mentorados && (
+                        <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/50">
+                          Rascunho
+                        </Badge>
+                      )}
+                      {trilha.ativo && trilha.visivel_mentorados && (
+                        <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/50">
+                          Publicado
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(trilha)}>

@@ -848,6 +848,7 @@ export type Database = {
           titulo: string
           trilha_id: string
           updated_at: string | null
+          visivel_mentorados: boolean | null
         }
         Insert: {
           ativo?: boolean | null
@@ -861,6 +862,7 @@ export type Database = {
           titulo: string
           trilha_id: string
           updated_at?: string | null
+          visivel_mentorados?: boolean | null
         }
         Update: {
           ativo?: boolean | null
@@ -874,6 +876,7 @@ export type Database = {
           titulo?: string
           trilha_id?: string
           updated_at?: string | null
+          visivel_mentorados?: boolean | null
         }
         Relationships: [
           {
@@ -1407,6 +1410,7 @@ export type Database = {
           ordem: number
           titulo: string
           updated_at: string | null
+          visivel_mentorados: boolean | null
         }
         Insert: {
           ativo?: boolean | null
@@ -1420,6 +1424,7 @@ export type Database = {
           ordem?: number
           titulo: string
           updated_at?: string | null
+          visivel_mentorados?: boolean | null
         }
         Update: {
           ativo?: boolean | null
@@ -1433,6 +1438,7 @@ export type Database = {
           ordem?: number
           titulo?: string
           updated_at?: string | null
+          visivel_mentorados?: boolean | null
         }
         Relationships: []
       }
@@ -1547,6 +1553,7 @@ export type Database = {
           titulo: string
           trilha_id: string | null
           updated_at: string | null
+          visivel_mentorados: boolean | null
           youtube_id: string
           youtube_url: string
         }
@@ -1566,6 +1573,7 @@ export type Database = {
           titulo: string
           trilha_id?: string | null
           updated_at?: string | null
+          visivel_mentorados?: boolean | null
           youtube_id: string
           youtube_url: string
         }
@@ -1585,6 +1593,7 @@ export type Database = {
           titulo?: string
           trilha_id?: string | null
           updated_at?: string | null
+          visivel_mentorados?: boolean | null
           youtube_id?: string
           youtube_url?: string
         }

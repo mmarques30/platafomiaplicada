@@ -21,6 +21,7 @@ export function VideosTab() {
   const [trilhaFilter, setTrilhaFilter] = useState<string>('todas');
   const [moduloFilter, setModuloFilter] = useState<string>('todos');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [statusVisibilidade, setStatusVisibilidade] = useState<string>('todos');
 
   const handleOpenChange = (open: boolean) => {
     setIsModalOpen(open);
@@ -31,6 +32,7 @@ export function VideosTab() {
     setTrilhaFilter('todas');
     setModuloFilter('todos');
     setStatusFilter('todos');
+    setStatusVisibilidade('todos');
   };
 
   // Resetar módulo quando trocar trilha
@@ -59,9 +61,15 @@ export function VideosTab() {
       // Filtro por status
       if (statusFilter === 'ativo' && !video.ativo) return false;
       if (statusFilter === 'inativo' && video.ativo) return false;
+      
+      // Filtro de visibilidade
+      if (statusVisibilidade === 'publicado' && (!video.ativo || !video.visivel_mentorados)) return false;
+      if (statusVisibilidade === 'rascunho' && (!video.ativo || video.visivel_mentorados)) return false;
+      if (statusVisibilidade === 'arquivado' && video.ativo) return false;
+      
       return true;
     }) || [];
-  }, [videos, modulos, trilhaFilter, moduloFilter, statusFilter]);
+  }, [videos, modulos, trilhaFilter, moduloFilter, statusFilter, statusVisibilidade]);
 
   if (isLoading) return <div>Carregando...</div>;
 
@@ -111,6 +119,19 @@ export function VideosTab() {
               { value: 'inativo', label: 'Inativo' },
             ],
           },
+          {
+            id: 'visibilidade',
+            label: 'Publicação',
+            placeholder: 'Todos',
+            value: statusVisibilidade,
+            onChange: setStatusVisibilidade,
+            options: [
+              { value: 'todos', label: 'Todos' },
+              { value: 'publicado', label: 'Publicados' },
+              { value: 'rascunho', label: 'Rascunhos' },
+              { value: 'arquivado', label: 'Arquivados' },
+            ],
+          },
         ]}
         onClear={handleClearFilters}
         totalItems={videos?.length || 0}
@@ -148,9 +169,21 @@ export function VideosTab() {
                     <Badge variant="secondary">{totalMateriais}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={video.ativo ? "default" : "secondary"}>
-                      {video.ativo ? "Ativo" : "Inativo"}
-                    </Badge>
+                    <div className="flex gap-2">
+                      <Badge variant={video.ativo ? "default" : "secondary"}>
+                        {video.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
+                      {video.ativo && !video.visivel_mentorados && (
+                        <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/50">
+                          Rascunho
+                        </Badge>
+                      )}
+                      {video.ativo && video.visivel_mentorados && (
+                        <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/50">
+                          Publicado
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="ghost" size="sm" onClick={() => { setEditingVideo(video); setIsModalOpen(true); }}>

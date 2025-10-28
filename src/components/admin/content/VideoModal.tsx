@@ -46,6 +46,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       reset(video);
       setThumbnailPreview(video.thumbnail_customizado_url || "");
       setThumbnailFile(null);
+      setValue("visivel_mentorados", video.visivel_mentorados ?? false);
       
       // Carregar materiais existentes
       try {
@@ -66,6 +67,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
         duracao: 0, 
         ordem: 0, 
         ativo: true,
+        visivel_mentorados: false,
         thumbnail_customizado_url: "",
         data_aula: null
       });
@@ -288,6 +290,17 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
             <Switch checked={watch("ativo")} onCheckedChange={(checked) => setValue("ativo", checked)} />
             <Label>Ativo</Label>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch 
+              checked={watch("visivel_mentorados")} 
+              onCheckedChange={(checked) => setValue("visivel_mentorados", checked)} 
+            />
+            <Label>Visível para Mentorados</Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Deixe desmarcado para preparar a aula antes de liberá-la
+          </p>
           </div>
         </div>
         <DialogFooter className="flex justify-between">

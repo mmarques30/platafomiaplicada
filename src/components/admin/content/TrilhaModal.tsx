@@ -40,6 +40,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       categoria: "núcleo",
       ordem: 0,
       ativo: true,
+      visivel_mentorados: false,
       imagem_url: "",
       duracao_estimada: 0,
     },
@@ -55,6 +56,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       setSelectedCategoria(trilha.categoria || "núcleo");
       setImagePreview(trilha.imagem_url || "");
       setImageFile(null);
+      setValue("visivel_mentorados", trilha.visivel_mentorados ?? false);
     } else {
       reset({
         titulo: "",
@@ -63,6 +65,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         categoria: "núcleo",
         ordem: 0,
         ativo: true,
+        visivel_mentorados: false,
         imagem_url: "",
         duracao_estimada: 0,
       });
@@ -315,6 +318,17 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
             <Switch checked={ativo} onCheckedChange={(checked) => setValue("ativo", checked)} />
             <Label>Ativo</Label>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch 
+              checked={watch("visivel_mentorados")} 
+              onCheckedChange={(checked) => setValue("visivel_mentorados", checked)} 
+            />
+            <Label>Visível para Mentorados</Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Marque para publicar este conteúdo. Deixe desmarcado para preparar como rascunho.
+          </p>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
