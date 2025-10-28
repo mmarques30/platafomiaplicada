@@ -170,7 +170,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{trilha ? "Editar Trilha" : "Nova Trilha"}</DialogTitle>
         </DialogHeader>
