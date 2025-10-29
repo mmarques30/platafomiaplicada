@@ -24,9 +24,8 @@ interface NovoUsuarioModalProps {
 }
 
 const PLANOS = [
-  { value: "intensivo_grupo", label: "Intensivo em Grupo", description: "Mentorias em grupo semanais" },
-  { value: "light", label: "Light", description: "Suporte assíncrono" },
-  { value: "premium", label: "Premium", description: "Mentorias individuais" },
+  { value: "club", label: "Club", description: "Mentorias em grupo semanais" },
+  { value: "pro", label: "Pro", description: "Mentorias individuais premium" },
 ];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {
@@ -164,7 +163,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
           {selectedRoles.includes("mentorado") && (
             <div>
               <Label className="mb-3 block">Plano de Mentoria *</Label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {PLANOS.map((plano) => (
                   <Card
                     key={plano.value}
