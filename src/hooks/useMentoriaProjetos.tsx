@@ -24,6 +24,7 @@ export type ProjetoMentoria = {
   progresso_preparacao?: number;
   created_at: string;
   updated_at: string;
+  objetivo_titulo?: string;
 };
 
 export const useMentoriaProjetos = () => {
@@ -37,12 +38,18 @@ export const useMentoriaProjetos = () => {
       
       const { data, error } = await supabase
         .from("projetos_mentoria")
-        .select("*")
+        .select(`
+          *,
+          objetivo:objetivos_mentoria(objetivo)
+        `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as ProjetoMentoria[];
+      return (data as any[]).map((p) => ({
+        ...p,
+        objetivo_titulo: p.objetivo?.objetivo,
+      })) as ProjetoMentoria[];
     },
     enabled: !!user,
   });

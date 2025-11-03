@@ -119,8 +119,34 @@ export const useMentoriaObjetivos = (userId?: string) => {
     }
   });
 
+  const { data: projetosPorObjetivo } = useQuery({
+    queryKey: ["projetos-por-objetivo", targetUserId],
+    queryFn: async () => {
+      if (!targetUserId) return {};
+      
+      const { data, error } = await supabase
+        .from("projetos_mentoria")
+        .select("*")
+        .eq("user_id", targetUserId)
+        .not("objetivo_id", "is", null);
+
+      if (error) throw error;
+      
+      const grouped = (data || []).reduce((acc: any, projeto: any) => {
+        const objId = projeto.objetivo_id;
+        if (!acc[objId]) acc[objId] = [];
+        acc[objId].push(projeto);
+        return acc;
+      }, {});
+      
+      return grouped;
+    },
+    enabled: !!targetUserId,
+  });
+
   return {
     objetivos: objetivos || [],
+    projetosPorObjetivo: projetosPorObjetivo || {},
     isLoading,
     createObjetivo: createObjetivo.mutate,
     updateObjetivo: updateObjetivo.mutate,

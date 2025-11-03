@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare } from "lucide-react";
+import { Plus, Users, Target as TargetIcon, Calendar, BookOpen, FolderKanban, FileText, CheckSquare } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
@@ -159,7 +159,7 @@ export default function GerenciarMentoria() {
                 Diagnóstico
               </TabsTrigger>
               <TabsTrigger value="objetivos">
-                <Target className="h-4 w-4 mr-2" />
+                <TargetIcon className="h-4 w-4 mr-2" />
                 Objetivos
               </TabsTrigger>
               <TabsTrigger value="tarefas">
@@ -311,8 +311,16 @@ export default function GerenciarMentoria() {
                 {userProjetos.map((projeto) => (
                   <Card key={projeto.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditProjeto(projeto)}>
                     <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg">{projeto.titulo}</CardTitle>
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{projeto.titulo}</CardTitle>
+                          {projeto.objetivo_titulo && (
+                            <div className="flex items-center gap-2 mt-2 text-sm text-primary">
+                              <TargetIcon className="h-4 w-4" />
+                              <span className="font-medium">{projeto.objetivo_titulo}</span>
+                            </div>
+                          )}
+                        </div>
                         <Badge variant={
                           projeto.status === "concluido" ? "default" : 
                           projeto.status === "em_andamento" ? "secondary" : 

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FolderKanban, Star, Loader2, MessageSquare, Calendar, Plus, ArrowLeft } from "lucide-react";
+import { FolderKanban, Star, Loader2, MessageSquare, Calendar, Plus, ArrowLeft, Target } from "lucide-react";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import ProjetoModal from "@/components/admin/mentoria/ProjetoModal";
 import { ProjetoPreparacaoCard } from "@/components/mentoria/ProjetoPreparacaoCard";
@@ -79,6 +79,12 @@ export default function MentoriaProjetos() {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-lg">{projeto.titulo}</CardTitle>
+            {projeto.objetivo_titulo && (
+              <div className="flex items-center gap-2 mt-2 text-sm text-primary">
+                <Target className="h-4 w-4" />
+                <span className="font-medium">{projeto.objetivo_titulo}</span>
+              </div>
+            )}
             <CardDescription className="mt-2 line-clamp-2">
               {projeto.descricao}
             </CardDescription>
@@ -205,6 +211,17 @@ export default function MentoriaProjetos() {
           
           {selectedProjeto && (
             <div className="space-y-6">
+              {/* Objetivo Estratégico Associado */}
+              {selectedProjeto.objetivo_titulo && (
+                <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Target className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold">Objetivo Estratégico</h3>
+                  </div>
+                  <p className="text-muted-foreground">{selectedProjeto.objetivo_titulo}</p>
+                </div>
+              )}
+              
               {/* Card de Preparação Recomendada */}
               {user && (
                 <ProjetoPreparacaoCard 
