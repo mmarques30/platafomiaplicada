@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { Briefcase } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ProjetoPreparacaoCard } from "../ProjetoPreparacaoCard";
@@ -29,19 +28,16 @@ export const ProjetoPreparacaoSection = ({ projeto, userId }: ProjetoPreparacaoS
       {/* Header do Projeto */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <Briefcase className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold text-foreground">
-              {formatProjetoTitulo(projeto.titulo)}
-            </h3>
-          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            {formatProjetoTitulo(projeto.titulo)}
+          </h3>
           <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
             <Badge variant="outline" className="capitalize">
               {STATUS_LABELS[projeto.status] || projeto.status}
             </Badge>
             {projeto.data_entrega && (
-              <span className="flex items-center gap-1">
-                📅 Entrega: {format(new Date(projeto.data_entrega), 'dd/MM/yyyy', { locale: ptBR })}
+              <span>
+                Entrega: {format(new Date(projeto.data_entrega), 'dd/MM/yyyy', { locale: ptBR })}
               </span>
             )}
           </div>
@@ -50,15 +46,15 @@ export const ProjetoPreparacaoSection = ({ projeto, userId }: ProjetoPreparacaoS
 
       {/* Conteúdos Recomendados */}
       <div className="pl-4 border-l-2 border-muted space-y-3">
-        <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
-          📚 Conteúdos de Preparação
+        <h4 className="text-sm font-medium text-foreground">
+          Conteúdos de Preparação
         </h4>
         {temConteudo ? (
           <ProjetoPreparacaoCard projetoId={projeto.id} userId={userId} />
         ) : (
           <div className="bg-muted/50 rounded-lg p-4 text-center border border-dashed border-muted-foreground/20">
             <p className="text-sm text-muted-foreground">
-              💡 Nenhum conteúdo de preparação associado a este projeto ainda
+              Nenhum conteúdo de preparação associado a este projeto ainda
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Configure trilhas e módulos recomendados na área administrativa

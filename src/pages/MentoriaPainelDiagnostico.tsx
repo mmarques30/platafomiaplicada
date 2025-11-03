@@ -160,17 +160,28 @@ export default function MentoriaPainelDiagnostico() {
                     Conteúdos recomendados para seus projetos ativos
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {projetos
-                    .filter(p => p.status !== 'concluido' && p.status !== 'cancelado')
-                    .map(projeto => (
-                      <ProjetoPreparacaoSection 
-                        key={projeto.id}
-                        projeto={projeto}
-                        userId={userId || ''}
-                      />
-                    ))}
-                </CardContent>
+            <CardContent className="space-y-6">
+              {projetos
+                .filter(p => p.status !== 'concluido' && p.status !== 'cancelado')
+                .sort((a, b) => {
+                  // Projetos com data de entrega primeiro, ordenados por proximidade
+                  if (a.data_entrega && b.data_entrega) {
+                    return new Date(a.data_entrega).getTime() - new Date(b.data_entrega).getTime();
+                  }
+                  // Projetos com data de entrega vêm antes dos sem data
+                  if (a.data_entrega && !b.data_entrega) return -1;
+                  if (!a.data_entrega && b.data_entrega) return 1;
+                  // Se ambos não têm data, manter ordem alfabética pelo título
+                  return a.titulo.localeCompare(b.titulo);
+                })
+                .map(projeto => (
+                  <ProjetoPreparacaoSection 
+                    key={projeto.id}
+                    projeto={projeto}
+                    userId={userId || ''}
+                  />
+                ))}
+            </CardContent>
               </Card>
             )}
           </div>
