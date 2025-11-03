@@ -77,9 +77,9 @@ export default {
           yellow: "hsl(60, 100%, 97%)", // #FFFFF6
         },
         complexity: {
-          high: "hsl(0, 73%, 50%)", // #DC2626
-          medium: "hsl(35, 100%, 55%)", // #F59E0B
-          low: "hsl(158, 64%, 52%)", // #10B981
+          high: "hsl(var(--complexity-high))",
+          medium: "hsl(var(--complexity-medium))",
+          low: "hsl(var(--complexity-low))",
         },
       },
       borderRadius: {

@@ -52,6 +52,11 @@ All colors MUST be HSL.
     --chart-error: 0 70% 55%; /* Vermelho suave #E86A6A */
     --chart-neutral: 0 0% 60%; /* Cinza neutro */
     
+    /* Complexidade de Projetos */
+    --complexity-high: 0 70% 55%; /* Vermelho - Alta complexidade */
+    --complexity-medium: 35 100% 55%; /* Laranja - Média complexidade */
+    --complexity-low: 73 55% 47%; /* Verde primário - Baixa complexidade */
+    
     --sidebar-background: 72 6% 17%;
     --sidebar-foreground: 60 100% 97%;
     --sidebar-primary: 73 55% 47%;
@@ -106,6 +111,11 @@ All colors MUST be HSL.
     --chart-warning: 35 100% 55%; /* Laranja suave #F59E0B */
     --chart-error: 0 70% 55%; /* Vermelho suave #E86A6A */
     --chart-neutral: 0 0% 60%; /* Cinza neutro */
+    
+    /* Complexidade de Projetos */
+    --complexity-high: 0 70% 55%; /* Vermelho - Alta complexidade */
+    --complexity-medium: 35 100% 55%; /* Laranja - Média complexidade */
+    --complexity-low: 73 55% 47%; /* Verde primário - Baixa complexidade */
     
     --sidebar-background: 73 35% 95%;
     --sidebar-foreground: 30 4% 19%;

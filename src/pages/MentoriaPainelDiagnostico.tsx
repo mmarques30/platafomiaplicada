@@ -9,7 +9,7 @@ import { RoadmapTimeline } from "@/components/mentoria/painel/RoadmapTimeline";
 import { PontosAtencao } from "@/components/mentoria/painel/PontosAtencao";
 import { ProximaSessao } from "@/components/mentoria/painel/ProximaSessao";
 import { ProjetoPreparacaoCard } from "@/components/mentoria/ProjetoPreparacaoCard";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, FileText, Edit, Target, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -67,6 +67,49 @@ export default function MentoriaPainelDiagnostico() {
           <p className="text-lg text-muted-foreground">
             {diagnostico.nome_completo || profile?.nome_completo}
           </p>
+        </div>
+      </div>
+
+      {/* Quick Actions Bar */}
+      <div className="container mx-auto px-4 max-w-7xl -mt-4 mb-8">
+        <div className="bg-white rounded-lg shadow-sm border-2 border-aplicada-green-100 p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/mentoria/diagnostico")}
+              className="gap-2 border-aplicada-green-100 hover:bg-aplicada-green-50 hover:border-aplicada-green-900"
+            >
+              <FileText className="w-4 h-4" />
+              Ver Diagnóstico Completo
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => navigate("/mentoria/diagnostico?edit=true")}
+              className="gap-2 border-aplicada-green-100 hover:bg-aplicada-green-50 hover:border-aplicada-green-900"
+            >
+              <Edit className="w-4 h-4" />
+              Editar Diagnóstico
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => navigate("/mentoria/objetivos")}
+              className="gap-2 border-aplicada-green-100 hover:bg-aplicada-green-50 hover:border-aplicada-green-900"
+            >
+              <Target className="w-4 h-4" />
+              Ver Todos Objetivos
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => navigate("/mentoria/projetos")}
+              className="gap-2 border-aplicada-green-100 hover:bg-aplicada-green-50 hover:border-aplicada-green-900"
+            >
+              <Briefcase className="w-4 h-4" />
+              Ver Todos Projetos
+            </Button>
+          </div>
         </div>
       </div>
 

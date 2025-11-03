@@ -35,24 +35,24 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
           <Table>
             <TableHeader>
               <TableRow className="bg-aplicada-green-900 hover:bg-aplicada-green-900">
-                <TableHead className="text-white">#</TableHead>
-                <TableHead className="text-white">Projeto</TableHead>
-                <TableHead className="text-white">Objetivo</TableHead>
-                <TableHead className="text-white">Complexidade</TableHead>
-                <TableHead className="text-white">Prazo</TableHead>
+                <TableHead className="text-white font-bold">#</TableHead>
+                <TableHead className="text-white font-bold">Projeto</TableHead>
+                <TableHead className="text-white font-bold">Objetivo</TableHead>
+                <TableHead className="text-white font-bold">Complexidade</TableHead>
+                <TableHead className="text-white font-bold">Prazo</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {projetos.map((projeto, index) => (
                 <TableRow 
                   key={projeto.id}
-                  className={index % 2 === 0 ? "bg-white" : "bg-aplicada-green-100"}
+                  className={index % 2 === 0 ? "bg-white hover:bg-aplicada-green-50" : "bg-aplicada-green-50 hover:bg-aplicada-green-100"}
                 >
-                  <TableCell className="font-medium text-aplicada-dark">{index + 1}</TableCell>
+                  <TableCell className="font-bold text-aplicada-dark">{index + 1}</TableCell>
                   <TableCell className="font-semibold text-aplicada-dark">{projeto.titulo}</TableCell>
                   <TableCell className="text-aplicada-dark">{projeto.objetivo_projeto}</TableCell>
                   <TableCell>{getComplexityBadge(index)}</TableCell>
-                  <TableCell className="text-aplicada-dark">
+                  <TableCell className="text-aplicada-dark font-medium">
                     {projeto.data_entrega 
                       ? new Date(projeto.data_entrega).toLocaleDateString('pt-BR')
                       : "A definir"}
@@ -66,10 +66,10 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
         {/* Mobile: Cards */}
         <div className="md:hidden space-y-3">
           {projetos.map((projeto, index) => (
-            <Card key={projeto.id} className="bg-aplicada-green-100">
+            <Card key={projeto.id} className="bg-white border-2 border-aplicada-green-100">
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3 mb-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-aplicada-green-900 text-white flex items-center justify-center text-sm font-semibold">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-aplicada-green-900 text-white flex items-center justify-center text-sm font-bold">
                     {index + 1}
                   </span>
                   <h3 className="font-semibold text-aplicada-dark flex-1">{projeto.titulo}</h3>
@@ -77,7 +77,7 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
                 <div className="space-y-2 text-sm">
                   <div>
                     <span className="text-aplicada-dark/70 font-medium">Objetivo:</span>
-                    <p className="text-aplicada-dark">{projeto.objetivo_projeto}</p>
+                    <p className="text-aplicada-dark mt-1">{projeto.objetivo_projeto}</p>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-aplicada-dark/70 font-medium">Complexidade:</span>
@@ -86,7 +86,7 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
                   {projeto.data_entrega && (
                     <div>
                       <span className="text-aplicada-dark/70 font-medium">Prazo:</span>
-                      <p className="text-aplicada-dark">{new Date(projeto.data_entrega).toLocaleDateString('pt-BR')}</p>
+                      <p className="text-aplicada-dark mt-1 font-medium">{new Date(projeto.data_entrega).toLocaleDateString('pt-BR')}</p>
                     </div>
                   )}
                 </div>
