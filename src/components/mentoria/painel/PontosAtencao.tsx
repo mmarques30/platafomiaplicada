@@ -56,7 +56,7 @@ export const PontosAtencao = ({ nome, diagnostico }: Props) => {
               <div className="space-y-2 text-left">
                 {ponto.items.map((item, itemIndex) => (
                   <div key={itemIndex} className="flex items-start gap-2 text-sm">
-                    <span className="text-aplicada-green-900 mt-0.5 flex-shrink-0 font-bold">➥</span>
+                    <span className="text-aplicada-green-900 mt-0.5 flex-shrink-0 font-bold">•</span>
                     <p className="flex-1 text-aplicada-dark leading-relaxed">{item}</p>
                   </div>
                 ))}

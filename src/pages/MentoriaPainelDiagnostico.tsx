@@ -50,7 +50,7 @@ export default function MentoriaPainelDiagnostico() {
   const proximaSessao = sessoes.find(s => new Date(s.data_sessao) > new Date() && s.status === 'agendada');
 
   return (
-    <div className="min-h-screen bg-aplicada-gray">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="bg-white border-b border-aplicada-green-100">
         <div className="container mx-auto py-6 px-4 max-w-7xl">

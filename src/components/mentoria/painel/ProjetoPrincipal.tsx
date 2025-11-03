@@ -28,7 +28,7 @@ export const ProjetoPrincipal = ({ projeto }: Props) => {
           <div className="space-y-2">
             {projeto.objetivo_projeto.split('\n').map((line, index) => (
               <div key={index} className="flex items-start gap-2">
-                <span className="text-aplicada-green-900 mt-1">✱</span>
+                <span className="text-aplicada-green-900 mt-1">•</span>
                 <p className="flex-1 text-aplicada-dark">{line}</p>
               </div>
             ))}
@@ -42,7 +42,7 @@ export const ProjetoPrincipal = ({ projeto }: Props) => {
           <div className="space-y-2">
             {projeto.contribuicao_plano.split('\n').map((line, index) => (
               <div key={index} className="flex items-start gap-2">
-                <span className="text-aplicada-green-900 mt-1">✱</span>
+                <span className="text-aplicada-green-900 mt-1">•</span>
                 <p className="flex-1 text-aplicada-dark">{line}</p>
               </div>
             ))}
@@ -56,7 +56,7 @@ export const ProjetoPrincipal = ({ projeto }: Props) => {
           <div className="space-y-2">
             {projeto.descricao.split('\n').map((line, index) => (
               <div key={index} className="flex items-start gap-2">
-                <span className="text-aplicada-green-900 mt-1">➥</span>
+                <span className="text-aplicada-green-900 mt-1">•</span>
                 <p className="flex-1 text-aplicada-dark">{line}</p>
               </div>
             ))}

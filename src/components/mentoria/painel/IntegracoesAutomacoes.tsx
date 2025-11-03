@@ -50,7 +50,7 @@ export const IntegracoesAutomacoes = ({ diagnostico }: Props) => {
                 <div className="space-y-3">
                   {categoria.items.map((item, index) => (
                     <div key={index} className="flex items-start gap-2">
-                      <span className="text-aplicada-green-900 mt-1 flex-shrink-0 font-bold">✱</span>
+                      <span className="text-aplicada-green-900 mt-1 flex-shrink-0 font-bold">•</span>
                       <p className="flex-1 text-aplicada-dark leading-relaxed">{item}</p>
                     </div>
                   ))}

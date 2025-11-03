@@ -33,7 +33,7 @@ export const ObjetivosEstrategicos = ({ objetivos }: Props) => {
                 <p className="text-aplicada-dark font-semibold text-base leading-relaxed">{objetivo.objetivo}</p>
                 {objetivo.prazo && (
                   <p className="text-sm text-aplicada-dark/60 mt-2 font-medium">
-                    📅 Prazo: {new Date(objetivo.prazo).toLocaleDateString('pt-BR')}
+                    Prazo: {new Date(objetivo.prazo).toLocaleDateString('pt-BR')}
                   </p>
                 )}
               </div>
