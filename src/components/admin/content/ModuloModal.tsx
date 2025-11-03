@@ -154,11 +154,11 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{modulo ? "Editar Módulo" : "Novo Módulo"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pr-2 pb-4">
           <div className="space-y-2">
             <Label>Título</Label>
             <Input {...register("titulo")} required />
