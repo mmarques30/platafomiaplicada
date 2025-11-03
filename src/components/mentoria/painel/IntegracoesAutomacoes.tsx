@@ -33,9 +33,9 @@ export const IntegracoesAutomacoes = ({ diagnostico }: Props) => {
   if (categoriasComConteudo.length === 0) return null;
 
   return (
-    <Card className="border-aplicada-green-100">
+    <Card className="bg-card text-card-foreground border border-border">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-aplicada-dark">
+        <CardTitle className="text-2xl font-bold text-foreground">
           Integrações e Automações Planejadas
         </CardTitle>
       </CardHeader>
@@ -43,15 +43,15 @@ export const IntegracoesAutomacoes = ({ diagnostico }: Props) => {
         <Accordion type="single" collapsible className="w-full">
           {categoriasComConteudo.map((categoria) => (
             <AccordionItem key={categoria.id} value={categoria.id} className="border-0">
-              <AccordionTrigger className="text-left font-semibold bg-white border-2 border-aplicada-green-100 text-aplicada-dark px-4 hover:bg-aplicada-green-50 rounded-lg data-[state=open]:rounded-b-none transition-colors">
+              <AccordionTrigger className="text-left font-semibold bg-card border border-border text-card-foreground px-4 hover:bg-muted rounded-lg data-[state=open]:rounded-b-none transition-colors">
                 {categoria.titulo}
               </AccordionTrigger>
-              <AccordionContent className="bg-white border-x-2 border-b-2 border-aplicada-green-100 px-4 py-4 rounded-b-lg">
+              <AccordionContent className="bg-card border-x border-b border-border px-4 py-4 rounded-b-lg">
                 <div className="space-y-3">
                   {categoria.items.map((item, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <span className="text-aplicada-green-900 mt-1 flex-shrink-0 font-bold">•</span>
-                      <p className="flex-1 text-aplicada-dark leading-relaxed">{item}</p>
+                      <p className="flex-1 text-card-foreground leading-relaxed">{item}</p>
                     </div>
                   ))}
                 </div>

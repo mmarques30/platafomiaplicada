@@ -27,9 +27,9 @@ export const RoadmapTimeline = ({ sessoes }: Props) => {
   }, {} as Record<string, typeof sessoes>);
 
   return (
-    <Card className="border-aplicada-green-100">
+    <Card className="bg-card text-card-foreground border border-border">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-aplicada-dark">
+        <CardTitle className="text-2xl font-bold text-foreground">
           Roadmap e Timeline
         </CardTitle>
       </CardHeader>
@@ -38,7 +38,7 @@ export const RoadmapTimeline = ({ sessoes }: Props) => {
         <div className="hidden md:block">
           <div className="relative">
             {/* Linha vertical */}
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-aplicada-green-100" />
+            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
 
             {Object.entries(sessoesPorMes).map(([mes, sessoesMes], mesIndex) => (
               <div key={mes} className="relative mb-8">
@@ -47,20 +47,20 @@ export const RoadmapTimeline = ({ sessoes }: Props) => {
                   <div className="relative z-10 w-8 h-8 rounded-full bg-aplicada-green-900 flex items-center justify-center">
                     <span className="text-white font-bold text-sm">{mesIndex + 1}</span>
                   </div>
-                  <h3 className="ml-4 text-lg font-bold text-aplicada-dark capitalize">{mes}</h3>
+                  <h3 className="ml-4 text-lg font-bold text-foreground capitalize">{mes}</h3>
                 </div>
 
                 {/* Sessões do mês */}
                 <div className="ml-12 space-y-3">
                   {sessoesMes.map((sessao) => (
-                    <Card key={sessao.id} className="bg-aplicada-green-100 border-aplicada-green-100">
+                    <Card key={sessao.id} className="bg-muted border border-border">
                       <CardContent className="pt-4">
-                        <h4 className="font-semibold text-aplicada-dark mb-1">{sessao.titulo}</h4>
-                        <p className="text-sm text-aplicada-dark/70">
+                        <h4 className="font-semibold text-card-foreground mb-1">{sessao.titulo}</h4>
+                        <p className="text-sm text-muted-foreground">
                           {format(new Date(sessao.data_sessao), "dd 'de' MMMM", { locale: ptBR })}
                         </p>
                         {sessao.notas && (
-                          <p className="text-sm mt-2 text-aplicada-dark">{sessao.notas}</p>
+                          <p className="text-sm mt-2 text-card-foreground">{sessao.notas}</p>
                         )}
                       </CardContent>
                     </Card>
@@ -76,7 +76,7 @@ export const RoadmapTimeline = ({ sessoes }: Props) => {
           <Accordion type="single" collapsible className="w-full">
             {Object.entries(sessoesPorMes).map(([mes, sessoesMes], mesIndex) => (
               <AccordionItem key={mes} value={mes}>
-                <AccordionTrigger className="text-left font-semibold bg-aplicada-green-100 text-aplicada-dark px-4 hover:bg-aplicada-green-100/80 rounded-t-lg data-[state=closed]:rounded-b-lg">
+                <AccordionTrigger className="text-left font-semibold bg-muted text-card-foreground px-4 hover:bg-muted/80 rounded-t-lg data-[state=closed]:rounded-b-lg">
                   <span className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-aplicada-green-900 text-white flex items-center justify-center text-sm">
                       {mesIndex + 1}
@@ -84,16 +84,16 @@ export const RoadmapTimeline = ({ sessoes }: Props) => {
                     <span className="capitalize">{mes}</span>
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="bg-white px-4 py-4 rounded-b-lg">
+                <AccordionContent className="bg-card px-4 py-4 rounded-b-lg border-x border-b border-border">
                   <div className="space-y-3">
                     {sessoesMes.map((sessao) => (
                       <div key={sessao.id} className="border-l-2 border-aplicada-green-900 pl-3">
-                        <h4 className="font-semibold text-aplicada-dark">{sessao.titulo}</h4>
-                        <p className="text-sm text-aplicada-dark/70">
+                        <h4 className="font-semibold text-card-foreground">{sessao.titulo}</h4>
+                        <p className="text-sm text-muted-foreground">
                           {format(new Date(sessao.data_sessao), "dd 'de' MMMM", { locale: ptBR })}
                         </p>
                         {sessao.notas && (
-                          <p className="text-sm mt-1 text-aplicada-dark">{sessao.notas}</p>
+                          <p className="text-sm mt-1 text-card-foreground">{sessao.notas}</p>
                         )}
                       </div>
                     ))}

@@ -52,7 +52,7 @@ export default function MentoriaPainelDiagnostico() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-aplicada-green-100">
+      <div className="bg-background border-b border-border">
         <div className="container mx-auto py-6 px-4 max-w-7xl">
           <Button
             variant="ghost"
@@ -62,7 +62,7 @@ export default function MentoriaPainelDiagnostico() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar para Mentoria
           </Button>
-          <h1 className="text-4xl font-bold text-aplicada-dark mb-2">
+          <h1 className="text-4xl font-bold text-foreground mb-2">
             Painel de Diagnóstico
           </h1>
           <p className="text-lg text-muted-foreground">
@@ -73,12 +73,12 @@ export default function MentoriaPainelDiagnostico() {
 
       {/* Quick Actions Bar */}
       <div className="container mx-auto px-4 max-w-7xl -mt-4 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border-2 border-aplicada-green-100 p-4">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-4">
           <div className="flex flex-wrap items-center gap-3">
             <Button
               variant="outline"
               onClick={() => navigate("/mentoria/diagnostico")}
-              className="gap-2 border-aplicada-green-100 hover:bg-aplicada-green-50 hover:border-aplicada-green-900"
+              className="gap-2"
             >
               <FileText className="w-4 h-4" />
               Ver Diagnóstico Completo
@@ -87,7 +87,7 @@ export default function MentoriaPainelDiagnostico() {
             <Button
               variant="outline"
               onClick={() => navigate("/mentoria/diagnostico?edit=true")}
-              className="gap-2 border-aplicada-green-100 hover:bg-aplicada-green-50 hover:border-aplicada-green-900"
+              className="gap-2"
             >
               <Edit className="w-4 h-4" />
               Editar Diagnóstico
@@ -96,7 +96,7 @@ export default function MentoriaPainelDiagnostico() {
             <Button
               variant="outline"
               onClick={() => navigate("/mentoria/objetivos")}
-              className="gap-2 border-aplicada-green-100 hover:bg-aplicada-green-50 hover:border-aplicada-green-900"
+              className="gap-2"
             >
               <Target className="w-4 h-4" />
               Ver Todos Objetivos
@@ -105,7 +105,7 @@ export default function MentoriaPainelDiagnostico() {
             <Button
               variant="outline"
               onClick={() => navigate("/mentoria/projetos")}
-              className="gap-2 border-aplicada-green-100 hover:bg-aplicada-green-50 hover:border-aplicada-green-900"
+              className="gap-2"
             >
               <Briefcase className="w-4 h-4" />
               Ver Todos Projetos

@@ -45,19 +45,19 @@ export const PontosAtencao = ({ nome, diagnostico }: Props) => {
       {pontos.map((ponto, index) => {
         const Icon = ponto.icon;
         return (
-          <Card key={index} className="border-2 border-aplicada-green-100 bg-white shadow-sm">
+          <Card key={index} className="bg-card text-card-foreground border border-border shadow-sm">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-aplicada-green-900 flex items-center justify-center mb-3">
                   <Icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-bold text-aplicada-dark text-lg">{ponto.titulo}</h3>
+                <h3 className="font-bold text-foreground text-lg">{ponto.titulo}</h3>
               </div>
               <div className="space-y-2 text-left">
                 {ponto.items.map((item, itemIndex) => (
                   <div key={itemIndex} className="flex items-start gap-2 text-sm">
                     <span className="text-aplicada-green-900 mt-0.5 flex-shrink-0 font-bold">•</span>
-                    <p className="flex-1 text-aplicada-dark leading-relaxed">{item}</p>
+                    <p className="flex-1 text-card-foreground leading-relaxed">{item}</p>
                   </div>
                 ))}
               </div>
