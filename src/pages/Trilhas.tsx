@@ -136,40 +136,124 @@ export default function Trilhas() {
           </TabsContent>
 
           <TabsContent value="iniciante" className="mt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="space-y-12">
               {trilhasPorNivel.iniciante.map((trilha) => (
-                <TrilhaCard
-                  key={trilha.id}
-                  id={trilha.id}
-                  titulo={trilha.titulo}
-                  imagem_url={trilha.imagem_url}
-                />
+                <div key={trilha.id} className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-bold uppercase tracking-wide mb-2">
+                      {trilha.titulo}
+                    </h2>
+                    {trilha.descricao && (
+                      <p className="text-muted-foreground">
+                        {trilha.descricao}
+                        {trilha.duracao_estimada && (
+                          <span> • {formatDuracao(trilha.duracao_estimada)}</span>
+                        )}
+                      </p>
+                    )}
+                  </div>
+
+                  {trilha.modulos && trilha.modulos.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {trilha.modulos.map((modulo: any) => (
+                        <ModuloCard
+                          key={modulo.id}
+                          trilhaId={trilha.id}
+                          moduloId={modulo.id}
+                          titulo={modulo.titulo}
+                          descricao={modulo.descricao}
+                          imagem_url={modulo.imagem_url || trilha.imagem_url}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground italic">
+                      Nenhum módulo disponível nesta trilha.
+                    </p>
+                  )}
+                </div>
               ))}
             </div>
           </TabsContent>
 
           <TabsContent value="intermediario" className="mt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="space-y-12">
               {trilhasPorNivel.intermediario.map((trilha) => (
-                <TrilhaCard
-                  key={trilha.id}
-                  id={trilha.id}
-                  titulo={trilha.titulo}
-                  imagem_url={trilha.imagem_url}
-                />
+                <div key={trilha.id} className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-bold uppercase tracking-wide mb-2">
+                      {trilha.titulo}
+                    </h2>
+                    {trilha.descricao && (
+                      <p className="text-muted-foreground">
+                        {trilha.descricao}
+                        {trilha.duracao_estimada && (
+                          <span> • {formatDuracao(trilha.duracao_estimada)}</span>
+                        )}
+                      </p>
+                    )}
+                  </div>
+
+                  {trilha.modulos && trilha.modulos.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {trilha.modulos.map((modulo: any) => (
+                        <ModuloCard
+                          key={modulo.id}
+                          trilhaId={trilha.id}
+                          moduloId={modulo.id}
+                          titulo={modulo.titulo}
+                          descricao={modulo.descricao}
+                          imagem_url={modulo.imagem_url || trilha.imagem_url}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground italic">
+                      Nenhum módulo disponível nesta trilha.
+                    </p>
+                  )}
+                </div>
               ))}
             </div>
           </TabsContent>
 
           <TabsContent value="avancado" className="mt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="space-y-12">
               {trilhasPorNivel.avancado.map((trilha) => (
-                <TrilhaCard
-                  key={trilha.id}
-                  id={trilha.id}
-                  titulo={trilha.titulo}
-                  imagem_url={trilha.imagem_url}
-                />
+                <div key={trilha.id} className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-bold uppercase tracking-wide mb-2">
+                      {trilha.titulo}
+                    </h2>
+                    {trilha.descricao && (
+                      <p className="text-muted-foreground">
+                        {trilha.descricao}
+                        {trilha.duracao_estimada && (
+                          <span> • {formatDuracao(trilha.duracao_estimada)}</span>
+                        )}
+                      </p>
+                    )}
+                  </div>
+
+                  {trilha.modulos && trilha.modulos.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {trilha.modulos.map((modulo: any) => (
+                        <ModuloCard
+                          key={modulo.id}
+                          trilhaId={trilha.id}
+                          moduloId={modulo.id}
+                          titulo={modulo.titulo}
+                          descricao={modulo.descricao}
+                          imagem_url={modulo.imagem_url || trilha.imagem_url}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground italic">
+                      Nenhum módulo disponível nesta trilha.
+                    </p>
+                  )}
+                </div>
               ))}
             </div>
           </TabsContent>
