@@ -37,6 +37,8 @@ export const useMentoriaProjetos = (userId?: string) => {
     queryFn: async () => {
       if (!targetUserId) return [];
       
+      console.log("🔍 Buscando projetos do usuário:", targetUserId);
+      
       const { data, error } = await supabase
         .from("projetos_mentoria")
         .select(`
@@ -59,6 +61,8 @@ export const useMentoriaProjetos = (userId?: string) => {
       })) as ProjetoMentoria[];
     },
     enabled: !!targetUserId,
+    staleTime: 0, // Sempre buscar dados frescos
+    gcTime: 0,    // Não manter cache
   });
 
   const createProjeto = useMutation({

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "@/hooks/admin/useUsers";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
@@ -25,6 +25,7 @@ import { ProjetoMentoria } from "@/hooks/useMentoriaProjetos";
 import { ObjetivoMentoria } from "@/hooks/useMentoriaObjetivos";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toast } from "@/hooks/use-toast";
 
 export default function GerenciarMentoria() {
   const queryClient = useQueryClient();
@@ -48,6 +49,14 @@ export default function GerenciarMentoria() {
   const [editingObjetivo, setEditingObjetivo] = useState<ObjetivoMentoria | undefined>();
 
   const selectedUser = users.find(u => u.id === selectedUserId);
+
+  // Auto-refresh ao trocar de usuário
+  useEffect(() => {
+    if (selectedUserId) {
+      console.log("🔄 Trocando usuário, invalidando cache de projetos...");
+      queryClient.invalidateQueries({ queryKey: ["projetos-mentoria", selectedUserId] });
+    }
+  }, [selectedUserId, queryClient]);
 
   const handleCreateSessao = (data: Partial<SessaoMentoria>) => {
     createSessao(data);
@@ -303,11 +312,21 @@ export default function GerenciarMentoria() {
                   <Button 
                     variant="outline"
                     onClick={() => {
+                      // Invalidar TODAS as queries de projetos
                       queryClient.invalidateQueries({ queryKey: ["projetos-mentoria"] });
+                      queryClient.invalidateQueries({ queryKey: ["projetos-mentoria", selectedUserId] });
+                      
+                      // Forçar refetch imediato
+                      queryClient.refetchQueries({ queryKey: ["projetos-mentoria", selectedUserId] });
+                      
+                      toast({ 
+                        title: "Cache limpo!", 
+                        description: "Dados recarregados do servidor"
+                      });
                     }}
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
-                    Atualizar
+                    Atualizar Cache
                   </Button>
                   <Button onClick={() => { setEditingProjeto(undefined); setProjetoModalOpen(true); }}>
                     <Plus className="h-4 w-4 mr-2" />
