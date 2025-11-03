@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { useGerarPlano } from "@/hooks/useGerarPlano";
 
 interface InsightIAProps {
   formulario: any;
@@ -15,16 +13,9 @@ interface InsightIAProps {
 }
 
 export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
-  const { user } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
-  const { gerarPlano, isGerando } = useGerarPlano();
   const planoJaCriado = formulario?.plano_gerado;
   const insight = formulario?.insight_ia;
-
-  const handleCriarPlano = () => {
-    if (!user) return;
-    gerarPlano(user.id);
-  };
 
   const gerarInsight = async () => {
     setIsGenerating(true);
@@ -206,26 +197,6 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-
-        {!planoJaCriado && (
-          <Alert className="mt-6">
-            <Sparkles className="h-4 w-4" />
-            <AlertDescription>
-              <div className="flex items-center justify-between">
-                <div>
-                  <strong>Próximo passo:</strong> Crie seu plano de mentoria personalizado
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Baseado nesta análise, podemos criar automaticamente seus objetivos e primeiras tarefas
-                  </p>
-                </div>
-                <Button onClick={handleCriarPlano} disabled={isGerando} className="ml-4 gap-2">
-                  <CheckCircle2 className="h-4 w-4" />
-                  {isGerando ? 'Criando...' : 'Criar Meu Plano'}
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
 
         {planoJaCriado && (
           <Alert className="mt-6 border-green-200 bg-green-50">

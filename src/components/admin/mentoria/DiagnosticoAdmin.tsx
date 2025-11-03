@@ -5,14 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
-import { FileText, Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Sparkles, Target, Calendar, Video, PanelLeftOpen } from "lucide-react";
+import { FileText, Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Target, Calendar, Video, PanelLeftOpen } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 import { DiagnosticoUploadModal } from "./DiagnosticoUploadModal";
 import { DiagnosticoFormModal } from "./DiagnosticoFormModal";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
-import { GerarPlanoModal } from "./GerarPlanoModal";
 import { useMentoriaObjetivos } from "@/hooks/useMentoriaObjetivos";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
@@ -31,7 +30,6 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [gerarPlanoModalOpen, setGerarPlanoModalOpen] = useState(false);
   const [viewTranscricao, setViewTranscricao] = useState<any>(null);
 
   const userSessoes = sessoes.filter(s => s.user_id === userId);
@@ -152,22 +150,6 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
               <AlertTitle>Observações do admin</AlertTitle>
               <AlertDescription className="mt-2">
                 {diagnostico.observacoes_admin}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {!diagnostico.plano_gerado && (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Plano de mentoria ainda não criado</AlertTitle>
-              <AlertDescription className="mt-2">
-                <p className="mb-3">
-                  Com base no diagnóstico, você pode gerar automaticamente um plano personalizado com objetivos e tarefas iniciais.
-                </p>
-                <Button onClick={() => setGerarPlanoModalOpen(true)} className="gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  Gerar Plano de Mentoria
-                </Button>
               </AlertDescription>
             </Alert>
           )}
@@ -327,14 +309,6 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
         userId={userId}
         diagnostico={diagnostico}
       />
-      {diagnostico && (
-        <GerarPlanoModal
-          open={gerarPlanoModalOpen}
-          onOpenChange={setGerarPlanoModalOpen}
-          userId={userId}
-          diagnostico={diagnostico}
-        />
-      )}
       {viewModalOpen && diagnostico && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
           <div className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg max-h-[90vh] overflow-y-auto">
