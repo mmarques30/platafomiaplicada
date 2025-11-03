@@ -46,13 +46,13 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
               {projetos.map((projeto, index) => (
                 <TableRow 
                   key={projeto.id}
-                  className={index % 2 === 0 ? "bg-white" : "bg-[#F6F7E9]"}
+                  className={index % 2 === 0 ? "bg-white" : "bg-aplicada-green-100"}
                 >
-                  <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell className="font-semibold">{projeto.titulo}</TableCell>
-                  <TableCell>{projeto.objetivo_projeto}</TableCell>
+                  <TableCell className="font-medium text-aplicada-dark">{index + 1}</TableCell>
+                  <TableCell className="font-semibold text-aplicada-dark">{projeto.titulo}</TableCell>
+                  <TableCell className="text-aplicada-dark">{projeto.objetivo_projeto}</TableCell>
                   <TableCell>{getComplexityBadge(index)}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-aplicada-dark">
                     {projeto.data_entrega 
                       ? new Date(projeto.data_entrega).toLocaleDateString('pt-BR')
                       : "A definir"}
@@ -66,7 +66,7 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
         {/* Mobile: Cards */}
         <div className="md:hidden space-y-3">
           {projetos.map((projeto, index) => (
-            <Card key={projeto.id} className="bg-[#F6F7E9]">
+            <Card key={projeto.id} className="bg-aplicada-green-100">
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3 mb-3">
                   <span className="flex-shrink-0 w-6 h-6 rounded-full bg-aplicada-green-900 text-white flex items-center justify-center text-sm font-semibold">
@@ -76,17 +76,17 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
                 </div>
                 <div className="space-y-2 text-sm">
                   <div>
-                    <span className="text-muted-foreground">Objetivo:</span>
-                    <p>{projeto.objetivo_projeto}</p>
+                    <span className="text-aplicada-dark/70 font-medium">Objetivo:</span>
+                    <p className="text-aplicada-dark">{projeto.objetivo_projeto}</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Complexidade:</span>
+                    <span className="text-aplicada-dark/70 font-medium">Complexidade:</span>
                     {getComplexityBadge(index)}
                   </div>
                   {projeto.data_entrega && (
                     <div>
-                      <span className="text-muted-foreground">Prazo:</span>
-                      <p>{new Date(projeto.data_entrega).toLocaleDateString('pt-BR')}</p>
+                      <span className="text-aplicada-dark/70 font-medium">Prazo:</span>
+                      <p className="text-aplicada-dark">{new Date(projeto.data_entrega).toLocaleDateString('pt-BR')}</p>
                     </div>
                   )}
                 </div>

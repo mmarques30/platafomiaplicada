@@ -24,7 +24,7 @@ export const ObjetivosEstrategicos = ({ objetivos }: Props) => {
           {objetivos.slice(0, 6).map((objetivo, index) => (
             <div
               key={objetivo.id}
-              className="flex items-start gap-4 p-4 rounded-lg bg-[#F6F7E9] hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+              className="flex items-start gap-4 p-4 rounded-lg bg-aplicada-green-100 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
             >
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-aplicada-green-900 text-white flex items-center justify-center font-semibold">
                 {index + 1}
@@ -32,7 +32,7 @@ export const ObjetivosEstrategicos = ({ objetivos }: Props) => {
               <div className="flex-1">
                 <p className="text-aplicada-dark font-medium">{objetivo.objetivo}</p>
                 {objetivo.prazo && (
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-aplicada-dark/70 mt-1">
                     Prazo: {new Date(objetivo.prazo).toLocaleDateString('pt-BR')}
                   </p>
                 )}

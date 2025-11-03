@@ -66,20 +66,20 @@ export default {
         },
         aplicada: {
           green: {
-            900: "#738925",
-            800: "#889C2D",
-            700: "#9EB038",
-            100: "#E9EBC6",
+            900: "hsl(73, 64%, 32%)", // #738925
+            800: "hsl(73, 54%, 39%)", // #889C2D
+            700: "hsl(73, 55%, 47%)", // #9EB038
+            100: "hsl(73, 48%, 85%)", // #E9EBC6
           },
-          dark: "#2F302B",
-          light: "#FFFFFF",
-          gray: "#F2F2F2",
-          yellow: "#FFFFF6",
+          dark: "hsl(72, 6%, 18%)", // #2F302B
+          light: "hsl(0, 0%, 100%)", // #FFFFFF
+          gray: "hsl(0, 0%, 95%)", // #F2F2F2
+          yellow: "hsl(60, 100%, 97%)", // #FFFFF6
         },
         complexity: {
-          high: "#DC2626",
-          medium: "#F59E0B",
-          low: "#10B981",
+          high: "hsl(0, 73%, 50%)", // #DC2626
+          medium: "hsl(35, 100%, 55%)", // #F59E0B
+          low: "hsl(158, 64%, 52%)", // #10B981
         },
       },
       borderRadius: {

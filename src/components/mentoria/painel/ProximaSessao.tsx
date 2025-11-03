@@ -14,8 +14,8 @@ interface Props {
 export const ProximaSessao = ({ sessao }: Props) => {
   if (!sessao) {
     return (
-      <Card className="bg-gradient-to-br from-[#F6F7E9] to-white border-aplicada-green-100">
-        <CardContent className="pt-6 text-center">
+      <Card className="bg-gradient-to-br from-aplicada-green-100 to-white border-aplicada-green-100">
+        <CardContent className="pt-6 text-center text-aplicada-dark">
           <Calendar className="w-12 h-12 mx-auto mb-3 text-aplicada-green-900" />
           <p className="text-muted-foreground">Nenhuma sessão agendada no momento</p>
         </CardContent>

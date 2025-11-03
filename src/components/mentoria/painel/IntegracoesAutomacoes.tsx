@@ -41,7 +41,7 @@ export const IntegracoesAutomacoes = ({ diagnostico }: Props) => {
         <Accordion type="single" collapsible className="w-full">
           {categoriasComConteudo.map((categoria) => (
             <AccordionItem key={categoria.id} value={categoria.id}>
-              <AccordionTrigger className="text-left font-semibold bg-[#F6F7E9] px-4 hover:bg-[#E9EBC6] rounded-t-lg data-[state=closed]:rounded-b-lg">
+              <AccordionTrigger className="text-left font-semibold bg-aplicada-green-100 text-aplicada-dark px-4 hover:bg-aplicada-green-100/80 rounded-t-lg data-[state=closed]:rounded-b-lg">
                 {categoria.titulo}
               </AccordionTrigger>
               <AccordionContent className="bg-white px-4 py-4 rounded-b-lg">
