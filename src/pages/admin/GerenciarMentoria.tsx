@@ -331,6 +331,22 @@ export default function GerenciarMentoria() {
                         {projeto.data_entrega && <p><strong>Entrega:</strong> {format(new Date(projeto.data_entrega), "dd/MM/yyyy", { locale: ptBR })}</p>}
                         {projeto.avaliacao_mentor && <p><strong>Avaliação Mentor:</strong> {projeto.avaliacao_mentor}/5</p>}
                         {projeto.devolutiva_mentor && <p className="text-muted-foreground line-clamp-2">{projeto.devolutiva_mentor}</p>}
+                        
+                        {/* Resumo de Módulos Associados */}
+                        {((projeto.trilhas_recomendadas as any[])?.length > 0 || (projeto.modulos_obrigatorios as any[])?.length > 0) && (
+                          <div className="pt-2 mt-2 border-t space-y-1">
+                            {(projeto.trilhas_recomendadas as any[])?.length > 0 && (
+                              <p className="text-xs">
+                                <strong>Trilhas Recomendadas:</strong> {(projeto.trilhas_recomendadas as any[]).length}
+                              </p>
+                            )}
+                            {(projeto.modulos_obrigatorios as any[])?.length > 0 && (
+                              <p className="text-xs">
+                                <strong>Módulos Associados:</strong> {(projeto.modulos_obrigatorios as any[]).length}
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>

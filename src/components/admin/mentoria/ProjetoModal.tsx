@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjetoMentoria } from "@/hooks/useMentoriaProjetos";
+import { ModulosAssociadosSelector } from "./ModulosAssociadosSelector";
 
 type ProjetoModalProps = {
   open: boolean;
@@ -32,20 +35,52 @@ export default function ProjetoModal({
     }
   });
 
+  const [trilhasRecomendadas, setTrilhasRecomendadas] = useState<any[]>([]);
+  const [modulosObrigatorios, setModulosObrigatorios] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (projeto) {
+      setTrilhasRecomendadas((projeto.trilhas_recomendadas as any[]) || []);
+      setModulosObrigatorios((projeto.modulos_obrigatorios as any[]) || []);
+    } else {
+      setTrilhasRecomendadas([]);
+      setModulosObrigatorios([]);
+    }
+  }, [projeto]);
+
   const handleFormSubmit = (data: Partial<ProjetoMentoria>) => {
-    onSubmit({ ...data, user_id: userId || projeto?.user_id });
+    onSubmit({ 
+      ...data, 
+      user_id: userId || projeto?.user_id,
+      trilhas_recomendadas: trilhasRecomendadas,
+      modulos_obrigatorios: modulosObrigatorios
+    });
     reset();
+    setTrilhasRecomendadas([]);
+    setModulosObrigatorios([]);
     onOpenChange(false);
+  };
+
+  const handleModulosChange = (trilhas: any[], modulos: any[]) => {
+    setTrilhasRecomendadas(trilhas);
+    setModulosObrigatorios(modulos);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{projeto ? "Editar Projeto" : "Novo Projeto"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+          <Tabs defaultValue="basico" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basico">Informações Básicas</TabsTrigger>
+              <TabsTrigger value="preparacao">Preparação Recomendada</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="basico" className="space-y-4 mt-4">
           <div>
             <Label htmlFor="titulo">Título *</Label>
             <Input
@@ -171,8 +206,18 @@ export default function ProjetoModal({
               </div>
             </>
           )}
+            </TabsContent>
 
-          <div className="flex justify-end gap-3">
+            <TabsContent value="preparacao" className="space-y-4 mt-4">
+              <ModulosAssociadosSelector
+                trilhasRecomendadas={trilhasRecomendadas}
+                modulosObrigatorios={modulosObrigatorios}
+                onChange={handleModulosChange}
+              />
+            </TabsContent>
+          </Tabs>
+
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>

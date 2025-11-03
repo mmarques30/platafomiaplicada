@@ -19,6 +19,9 @@ export type ProjetoMentoria = {
   comentarios_mentor?: string;
   anexos?: any[];
   data_entrega?: string;
+  trilhas_recomendadas?: any[];
+  modulos_obrigatorios?: any[];
+  progresso_preparacao?: number;
   created_at: string;
   updated_at: string;
 };
