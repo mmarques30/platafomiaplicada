@@ -18,24 +18,26 @@ export type SessaoMentoria = {
   updated_at: string;
 };
 
-export const useMentoriaSessoes = () => {
+export const useMentoriaSessoes = (userId?: string) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const targetUserId = userId || user?.id;
 
   const { data: sessoes, isLoading } = useQuery({
-    queryKey: ["sessoes-mentoria"],
+    queryKey: ["sessoes-mentoria", targetUserId],
     queryFn: async () => {
-      if (!user) return [];
+      if (!targetUserId) return [];
       
       const { data, error } = await supabase
         .from("sessoes_mentoria")
         .select("*")
+        .eq("user_id", targetUserId)
         .order("data_sessao", { ascending: false });
 
       if (error) throw error;
       return data as SessaoMentoria[];
     },
-    enabled: !!user,
+    enabled: !!targetUserId,
   });
 
   const createSessao = useMutation({

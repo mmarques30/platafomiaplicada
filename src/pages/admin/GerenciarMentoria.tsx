@@ -30,9 +30,9 @@ export default function GerenciarMentoria() {
   const users = usersQuery.data || [];
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   
-  const { sessoes, createSessao, updateSessao, isCreating: isCreatingSessao, isUpdating: isUpdatingSessao } = useMentoriaSessoes();
-  const { recursos, createRecurso, updateRecurso, deleteRecurso, isCreating: isCreatingRecurso, isUpdating: isUpdatingRecurso } = useMentoriaRecursos();
-  const { projetos, createProjeto, updateProjeto, isCreating: isCreatingProjeto, isUpdating: isUpdatingProjeto } = useMentoriaProjetos();
+  const { sessoes, createSessao, updateSessao, isCreating: isCreatingSessao, isUpdating: isUpdatingSessao } = useMentoriaSessoes(selectedUserId);
+  const { recursos, createRecurso, updateRecurso, deleteRecurso, isCreating: isCreatingRecurso, isUpdating: isUpdatingRecurso } = useMentoriaRecursos(selectedUserId);
+  const { projetos, createProjeto, updateProjeto, isCreating: isCreatingProjeto, isUpdating: isUpdatingProjeto } = useMentoriaProjetos(selectedUserId);
   const { objetivos, createObjetivo, updateObjetivo, deleteObjetivo, isCreating: isCreatingObjetivo, isUpdating: isUpdatingObjetivo } = useMentoriaObjetivos(selectedUserId);
 
   const [sessaoModalOpen, setSessaoModalOpen] = useState(false);
@@ -46,10 +46,6 @@ export default function GerenciarMentoria() {
   const [editingObjetivo, setEditingObjetivo] = useState<ObjetivoMentoria | undefined>();
 
   const selectedUser = users.find(u => u.id === selectedUserId);
-  
-  const userSessoes = sessoes.filter(s => s.user_id === selectedUserId);
-  const userRecursos = recursos.filter(r => r.user_id === selectedUserId);
-  const userProjetos = projetos.filter(p => p.user_id === selectedUserId);
 
   const handleCreateSessao = (data: Partial<SessaoMentoria>) => {
     createSessao(data);
@@ -242,7 +238,7 @@ export default function GerenciarMentoria() {
               </div>
 
               <div className="grid gap-4">
-                {userSessoes.map((sessao) => (
+                {sessoes.map((sessao) => (
                   <Card key={sessao.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditSessao(sessao)}>
                     <CardHeader>
                       <div className="flex justify-between items-start">
@@ -261,7 +257,7 @@ export default function GerenciarMentoria() {
                   </Card>
                 ))}
 
-                {userSessoes.length === 0 && (
+                {sessoes.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">Nenhuma sessão cadastrada</p>
                 )}
               </div>
@@ -277,7 +273,7 @@ export default function GerenciarMentoria() {
               </div>
 
               <div className="grid gap-4">
-                {userRecursos.map((recurso) => (
+                {recursos.map((recurso) => (
                   <Card key={recurso.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditRecurso(recurso)}>
                     <CardHeader>
                       <div className="flex justify-between items-start">
@@ -292,7 +288,7 @@ export default function GerenciarMentoria() {
                   </Card>
                 ))}
 
-                {userRecursos.length === 0 && (
+                {recursos.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">Nenhum recurso cadastrado</p>
                 )}
               </div>
@@ -308,7 +304,7 @@ export default function GerenciarMentoria() {
               </div>
 
               <div className="grid gap-4">
-                {userProjetos.map((projeto) => (
+                {projetos.map((projeto) => (
                   <Card key={projeto.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditProjeto(projeto)}>
                     <CardHeader>
                       <div className="flex justify-between items-start gap-4">
@@ -360,7 +356,7 @@ export default function GerenciarMentoria() {
                   </Card>
                 ))}
 
-                {userProjetos.length === 0 && (
+                {projetos.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">Nenhum projeto cadastrado</p>
                 )}
               </div>

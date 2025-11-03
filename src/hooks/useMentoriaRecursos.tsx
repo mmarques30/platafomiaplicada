@@ -16,25 +16,26 @@ export type RecursoMentoria = {
   updated_at: string;
 };
 
-export const useMentoriaRecursos = () => {
+export const useMentoriaRecursos = (userId?: string) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const targetUserId = userId || user?.id;
 
   const { data: recursos, isLoading } = useQuery({
-    queryKey: ["recursos-mentoria", user?.id],
+    queryKey: ["recursos-mentoria", targetUserId],
     queryFn: async () => {
-      if (!user) return [];
+      if (!targetUserId) return [];
       
       const { data, error } = await supabase
         .from("recursos_mentoria")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as RecursoMentoria[];
     },
-    enabled: !!user,
+    enabled: !!targetUserId,
   });
 
   const createRecurso = useMutation({

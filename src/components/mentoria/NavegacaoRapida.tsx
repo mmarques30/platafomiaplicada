@@ -17,8 +17,13 @@ export function NavegacaoRapida() {
       path: "/mentoria/diagnostico"
     },
     {
+      title: "Objetivos",
+      description: "Seus objetivos estratégicos",
+      path: "/mentoria/objetivos"
+    },
+    {
       title: "Projetos",
-      description: "Seus 6 projetos",
+      description: "Seus projetos práticos",
       path: "/mentoria/projetos"
     },
     {

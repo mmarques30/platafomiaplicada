@@ -27,14 +27,15 @@ export type ProjetoMentoria = {
   objetivo_titulo?: string;
 };
 
-export const useMentoriaProjetos = () => {
+export const useMentoriaProjetos = (userId?: string) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const targetUserId = userId || user?.id;
 
   const { data: projetos, isLoading } = useQuery({
-    queryKey: ["projetos-mentoria", user?.id],
+    queryKey: ["projetos-mentoria", targetUserId],
     queryFn: async () => {
-      if (!user) return [];
+      if (!targetUserId) return [];
       
       const { data, error } = await supabase
         .from("projetos_mentoria")
@@ -42,7 +43,7 @@ export const useMentoriaProjetos = () => {
           *,
           objetivo:objetivos_mentoria(objetivo)
         `)
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -51,7 +52,7 @@ export const useMentoriaProjetos = () => {
         objetivo_titulo: p.objetivo?.objetivo,
       })) as ProjetoMentoria[];
     },
-    enabled: !!user,
+    enabled: !!targetUserId,
   });
 
   const createProjeto = useMutation({
