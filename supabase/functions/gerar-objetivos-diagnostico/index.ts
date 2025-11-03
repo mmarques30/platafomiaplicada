@@ -81,12 +81,21 @@ Analise as informações do diagnóstico abaixo e crie um plano de mentoria estr
 
 Crie um plano estruturado com:
 
-1. **objetivos_principais**: Array de 3-5 objetivos SMART baseados nas metas declaradas. Cada objetivo deve ter:
-   - titulo: Nome claro e específico do objetivo
-   - prazo_dias: Número de dias para completar (baseado em meta_3_meses = 90 dias, meta_12_meses = 365 dias)
-   - observacoes: Breve descrição de como alcançar este objetivo
+1. **objetivos_principais**: Array de 3-6 objetivos estratégicos SMART. Cada objetivo deve ter:
+   - titulo: Nome claro e específico do objetivo estratégico
+   - prazo_dias: Número de dias para completar (90 para 3 meses, 365 para 12 meses)
+   - observacoes: Breve descrição do impacto esperado
 
-2. **quick_wins**: Array de 3-4 tarefas iniciais para começar imediatamente. Cada tarefa deve ter:
+2. **projetos**: Array de 4-8 projetos/módulos que implementam os objetivos. Cada projeto deve ter:
+   - titulo: Nome do projeto ou módulo
+   - descricao: Descrição detalhada do que será desenvolvido
+   - objetivo_projeto: O que este projeto entrega
+   - contribuicao_plano: Como contribui para os objetivos gerais
+   - objetivo_associado_index: Índice do objetivo em objetivos_principais (0-based)
+   - prazo_dias: Dias para completar (15-90 dias)
+   - status: "planejamento" para todos
+
+3. **quick_wins**: Array de 2-4 tarefas iniciais para começar imediatamente. Cada tarefa deve ter:
    - titulo: Nome da tarefa
    - descricao: Descrição detalhada do que fazer
    - prazo_dias: Número de dias (5-15 dias para quick wins)
@@ -100,6 +109,17 @@ Responda APENAS com um JSON válido neste formato:
       "titulo": "string",
       "prazo_dias": number,
       "observacoes": "string"
+    }
+  ],
+  "projetos": [
+    {
+      "titulo": "string",
+      "descricao": "string",
+      "objetivo_projeto": "string",
+      "contribuicao_plano": "string",
+      "objetivo_associado_index": number,
+      "prazo_dias": number,
+      "status": "planejamento"
     }
   ],
   "quick_wins": [
@@ -210,6 +230,45 @@ Responda APENAS com um JSON válido neste formato:
 
     console.log('Tarefas criadas:', tarefasCriadas);
 
+    // Criar projetos associados aos objetivos
+    const projetosData = plano.projetos?.map((proj: any) => {
+      const prazo = new Date();
+      prazo.setDate(prazo.getDate() + proj.prazo_dias);
+      
+      // Associar ao objetivo correto baseado no índice
+      const objetivoId = objetivosCriados?.[proj.objetivo_associado_index]?.id || null;
+      
+      return {
+        user_id: userId,
+        objetivo_id: objetivoId,
+        titulo: proj.titulo,
+        descricao: proj.descricao,
+        objetivo_projeto: proj.objetivo_projeto,
+        contribuicao_plano: proj.contribuicao_plano,
+        status: proj.status || 'planejamento',
+        data_entrega: prazo.toISOString().split('T')[0],
+        trilhas_recomendadas: [],
+        modulos_obrigatorios: [],
+        progresso_preparacao: 0,
+      };
+    }) || [];
+
+    let projetosCriados: any[] = [];
+    if (projetosData.length > 0) {
+      const { data: projData, error: projError } = await supabase
+        .from('projetos_mentoria')
+        .insert(projetosData)
+        .select();
+
+      if (projError) {
+        console.error('Erro ao criar projetos:', projError);
+        throw projError;
+      }
+
+      projetosCriados = projData || [];
+      console.log('Projetos criados:', projetosCriados);
+    }
+
     // Atualizar diagnóstico
     const { error: updateError } = await supabase
       .from('formulario_diagnostico')
@@ -231,7 +290,7 @@ Responda APENAS com um JSON válido neste formato:
         user_id: userId,
         tipo: 'mentoria',
         titulo: '✨ Seu plano de mentoria foi criado!',
-        mensagem: `${objetivosCriados?.length || 0} objetivos e ${tarefasCriadas?.length || 0} tarefas iniciais foram adicionados ao seu plano.`,
+        mensagem: `${objetivosCriados?.length || 0} objetivos, ${projetosCriados.length} projetos e ${tarefasCriadas?.length || 0} tarefas iniciais foram adicionados ao seu plano.`,
         link: '/mentoria/objetivos',
       });
 
@@ -239,8 +298,10 @@ Responda APENAS com um JSON válido neste formato:
       JSON.stringify({
         success: true,
         objetivos: objetivosCriados,
+        projetos: projetosCriados,
         tarefas: tarefasCriadas,
         total_objetivos: objetivosCriados?.length || 0,
+        total_projetos: projetosCriados.length,
         total_tarefas: tarefasCriadas?.length || 0,
       }),
       {
