@@ -5,11 +5,10 @@ export const useModulosDisponiveis = () => {
   const { data: trilhas, isLoading: isLoadingTrilhas } = useQuery({
     queryKey: ["trilhas-disponiveis"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("trilhas")
-        .select("id, titulo, categoria, imagem_url, ordem")
-        .eq("ativo", true)
-        .order("ordem");
+    const { data, error } = await supabase
+      .from("trilhas")
+      .select("id, titulo, categoria, imagem_url, ordem, ativo, visivel_mentorados, visivel_apenas_pro")
+      .order("ordem");
       
       if (error) throw error;
       return data;
@@ -19,9 +18,8 @@ export const useModulosDisponiveis = () => {
   const fetchModulosPorTrilha = async (trilhaId: string) => {
     const { data, error } = await supabase
       .from("modulos")
-      .select("id, titulo, descricao, categoria, ordem")
+      .select("id, titulo, descricao, categoria, ordem, ativo, visivel_mentorados, visivel_apenas_pro")
       .eq("trilha_id", trilhaId)
-      .eq("ativo", true)
       .order("ordem");
     
     if (error) throw error;
@@ -31,9 +29,8 @@ export const useModulosDisponiveis = () => {
   const fetchVideosPorModulo = async (moduloId: string) => {
     const { data, error } = await supabase
       .from("videos")
-      .select("id, titulo, duracao")
+      .select("id, titulo, duracao, ativo, visivel_mentorados, visivel_apenas_pro")
       .eq("modulo_id", moduloId)
-      .eq("ativo", true)
       .order("ordem");
     
     if (error) throw error;

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useCreateTrilha, useUpdateTrilha } from "@/hooks/admin/useContent";
@@ -41,6 +42,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       ordem: 0,
       ativo: true,
       visivel_mentorados: false,
+      visivel_apenas_pro: false,
       imagem_url: "",
       duracao_estimada: 0,
     },
@@ -57,6 +59,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       setImagePreview(trilha.imagem_url || "");
       setImageFile(null);
       setValue("visivel_mentorados", trilha.visivel_mentorados ?? false);
+      setValue("visivel_apenas_pro", trilha.visivel_apenas_pro ?? false);
     } else {
       reset({
         titulo: "",
@@ -66,6 +69,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         ordem: 0,
         ativo: true,
         visivel_mentorados: false,
+        visivel_apenas_pro: false,
         imagem_url: "",
         duracao_estimada: 0,
       });
@@ -328,6 +332,20 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
           </div>
           <p className="text-xs text-muted-foreground ml-6">
             Marque para publicar este conteúdo. Deixe desmarcado para preparar como rascunho.
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="visivel_apenas_pro"
+              checked={watch("visivel_apenas_pro")}
+              onCheckedChange={(checked) => setValue("visivel_apenas_pro", !!checked)}
+            />
+            <Label htmlFor="visivel_apenas_pro">
+              🔒 Conteúdo Exclusivo PRO
+            </Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Apenas mentorados com plano PRO terão acesso a esta trilha
           </p>
 
           <DialogFooter>

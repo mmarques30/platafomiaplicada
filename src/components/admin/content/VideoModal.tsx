@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useCreateVideo, useUpdateVideo, useModulos } from "@/hooks/admin/useContent";
@@ -300,6 +301,20 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
           </div>
           <p className="text-xs text-muted-foreground ml-6">
             Deixe desmarcado para preparar a aula antes de liberá-la
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="visivel_apenas_pro"
+              checked={watch("visivel_apenas_pro")}
+              onCheckedChange={(checked) => setValue("visivel_apenas_pro", !!checked)}
+            />
+            <Label htmlFor="visivel_apenas_pro">
+              🔒 Conteúdo Exclusivo PRO
+            </Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Apenas mentorados com plano PRO terão acesso a este vídeo
           </p>
           </div>
         </div>
