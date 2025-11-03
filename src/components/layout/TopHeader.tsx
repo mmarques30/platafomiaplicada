@@ -1,5 +1,5 @@
 import React from "react";
-import { Bell, ChevronDown, BookOpen, Settings, User, LogOut, Sparkles, Wrench, FileText, Target, Users } from "lucide-react";
+import { Bell, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -99,13 +99,11 @@ export function TopHeader() {
               <DropdownMenuContent align="center" className="w-64 bg-popover border-border">
                 <DropdownMenuItem asChild>
                   <Link to="/trilhas" className="cursor-pointer">
-                    <BookOpen className="mr-2 h-4 w-4" />
                     Aplicada Trilha
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/mentoria" className="cursor-pointer">
-                    <Users className="mr-2 h-4 w-4" />
                     Aplicada Mentoria
                   </Link>
                 </DropdownMenuItem>
@@ -128,25 +126,21 @@ export function TopHeader() {
             <DropdownMenuContent align="center" className="w-64 bg-popover border-border">
               <DropdownMenuItem asChild>
                 <Link to="/ia-copie-use" className="cursor-pointer">
-                  <Sparkles className="mr-2 h-4 w-4" />
                   IA "Copie e Use"
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/biblioteca-ferramentas" className="cursor-pointer">
-                  <Wrench className="mr-2 h-4 w-4" />
                   Biblioteca de Ferramentas
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/biblioteca-prompts" className="cursor-pointer">
-                  <FileText className="mr-2 h-4 w-4" />
                   Biblioteca de Prompts
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/metodos-aplicar" className="cursor-pointer">
-                  <Target className="mr-2 h-4 w-4" />
                   Métodos para Aplicar
                 </Link>
               </DropdownMenuItem>
@@ -190,19 +184,16 @@ export function TopHeader() {
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem asChild>
                 <Link to="/perfil" className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
                   Perfil
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/configuracoes" className="cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
                   Configurações
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
-                <LogOut className="mr-2 h-4 w-4" />
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
