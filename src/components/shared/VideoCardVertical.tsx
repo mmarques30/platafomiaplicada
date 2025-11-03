@@ -17,7 +17,7 @@ export function VideoCardVertical({
   thumbnail_customizado_url,
   trilha_id
 }: VideoCardVerticalProps) {
-  const thumbnailUrl = thumbnail_customizado_url || getYouTubeThumbnail(youtube_id);
+  const thumbnailUrl = getYouTubeThumbnail(youtube_id, thumbnail_customizado_url);
 
   return (
     <Link to={`/trilhas/${trilha_id}?video=${id}`} className="block group">

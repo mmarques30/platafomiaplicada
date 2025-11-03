@@ -17,7 +17,10 @@ export function extractYouTubeId(url: string): string | null {
   return null;
 }
 
-export function getYouTubeThumbnail(videoId: string): string {
+export function getYouTubeThumbnail(videoId: string, customThumbnail?: string | null): string {
+  if (customThumbnail && customThumbnail.trim() !== '') {
+    return customThumbnail;
+  }
   return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 }
 

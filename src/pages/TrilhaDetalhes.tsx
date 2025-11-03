@@ -50,13 +50,18 @@ export default function TrilhaDetalhes() {
         .from("trilhas")
         .select(`
           *,
-          modulos:modulos(
+          modulos:modulos!inner(
             *,
-            videos:videos(*)
+            videos:videos!inner(*)
           )
         `)
         .eq("id", id)
+        .eq("ativo", true)
         .eq("visivel_mentorados", true)
+        .eq("modulos.ativo", true)
+        .eq("modulos.visivel_mentorados", true)
+        .eq("modulos.videos.ativo", true)
+        .eq("modulos.videos.visivel_mentorados", true)
         .order("ordem", { foreignTable: "modulos" })
         .order("ordem", { foreignTable: "modulos.videos" })
         .single();
@@ -382,9 +387,9 @@ export default function TrilhaDetalhes() {
                                       )}
                                     >
                                       <div className="relative w-24 h-14 flex-shrink-0 rounded overflow-hidden">
-                                        <img
-                                          src={video.thumbnail_customizado_url || getYouTubeThumbnail(video.youtube_id)}
-                                          alt={video.titulo}
+                            <img
+                              src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)}
+                              alt={video.titulo}
                                           className="w-full h-full object-cover"
                                         />
                                         {isPlaying && (

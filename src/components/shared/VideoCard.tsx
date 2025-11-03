@@ -12,7 +12,7 @@ interface VideoCardProps {
 }
 
 export function VideoCard({ id, titulo, youtube_id, thumbnail_customizado_url, trilha_id }: VideoCardProps) {
-  const thumbnailUrl = thumbnail_customizado_url || getYouTubeThumbnail(youtube_id);
+  const thumbnailUrl = getYouTubeThumbnail(youtube_id, thumbnail_customizado_url);
 
   return (
     <Link to={`/trilhas/${trilha_id}?video=${id}`} className="block group">
