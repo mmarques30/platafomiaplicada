@@ -86,8 +86,13 @@ export default function TrilhaDetalhes() {
     enabled: !!user,
   });
 
+  // Filter modules that have videos
+  const modulosComVideos = trilha?.modulos?.filter(
+    (modulo: any) => modulo.videos && modulo.videos.length > 0
+  ) || [];
+
   // Get all videos from all modules
-  const allVideos = trilha?.modulos?.flatMap(modulo => 
+  const allVideos = modulosComVideos.flatMap(modulo => 
     modulo.videos?.map(video => ({ ...video, modulo })) || []
   ) || [];
 
@@ -342,10 +347,10 @@ export default function TrilhaDetalhes() {
                     defaultValue={
                       searchParams.get("modulo") 
                         ? [`modulo-${searchParams.get("modulo")}`]
-                        : trilha.modulos?.map(m => `modulo-${m.id}`) || []
+                        : modulosComVideos.map(m => `modulo-${m.id}`) || []
                     }
                   >
-                    {trilha.modulos?.map((modulo, modIndex) => {
+                    {modulosComVideos.map((modulo, modIndex) => {
                         const moduloVideos = searchTerm 
                           ? filteredVideos.filter(v => v.modulo.id === modulo.id)
                           : modulo.videos || [];
