@@ -116,9 +116,9 @@ export default function MentoriaPainelDiagnostico() {
 
       {/* Main Content */}
       <div className="container mx-auto py-8 px-4 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className={`grid gap-8 ${proximaSessao ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
           {/* Coluna Principal */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className={`space-y-8 ${proximaSessao ? 'lg:col-span-2' : 'lg:col-span-1'}`}>
             {/* Informações do Mentorado */}
             <InformacoesMentorado diagnostico={diagnostico} profile={profile} />
 
@@ -177,12 +177,14 @@ export default function MentoriaPainelDiagnostico() {
             )}
           </div>
 
-          {/* Sidebar - Próxima Sessão */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8">
-              <ProximaSessao sessao={proximaSessao} />
+          {/* Sidebar - só renderiza se houver sessão */}
+          {proximaSessao && (
+            <div className="lg:col-span-1">
+              <div className="sticky top-8">
+                <ProximaSessao sessao={proximaSessao} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
