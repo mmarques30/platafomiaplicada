@@ -40,11 +40,11 @@ export const useMentoriaRecursos = (userId?: string) => {
 
   const createRecurso = useMutation({
     mutationFn: async (recurso: Partial<RecursoMentoria>) => {
-      if (!user) throw new Error("Usuário não autenticado");
+      if (!targetUserId) throw new Error("Usuário não identificado");
 
       const { data, error } = await supabase
         .from("recursos_mentoria")
-        .insert([{ ...recurso, user_id: user.id } as any])
+        .insert([{ ...recurso, user_id: targetUserId } as any])
         .select()
         .single();
 
