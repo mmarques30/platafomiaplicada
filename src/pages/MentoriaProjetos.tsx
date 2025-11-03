@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { FolderKanban, Star, Loader2, MessageSquare, Calendar, Plus, ArrowLeft } from "lucide-react";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import ProjetoModal from "@/components/admin/mentoria/ProjetoModal";
+import { ProjetoPreparacaoCard } from "@/components/mentoria/ProjetoPreparacaoCard";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +21,7 @@ import { ptBR } from "date-fns/locale";
 
 export default function MentoriaProjetos() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { projetos, createProjeto, updateProjeto, isLoading, isCreating, isUpdating } = useMentoriaProjetos();
   const [selectedProjeto, setSelectedProjeto] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -202,6 +205,14 @@ export default function MentoriaProjetos() {
           
           {selectedProjeto && (
             <div className="space-y-6">
+              {/* Card de Preparação Recomendada */}
+              {user && (
+                <ProjetoPreparacaoCard 
+                  projetoId={selectedProjeto.id} 
+                  userId={user.id} 
+                />
+              )}
+              
               <div>
                 <h3 className="font-semibold mb-2">Descrição</h3>
                 <p className="text-sm text-muted-foreground">{selectedProjeto.descricao}</p>

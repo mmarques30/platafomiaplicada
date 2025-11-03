@@ -1,5 +1,6 @@
 import { usePainelDiagnostico } from "@/hooks/usePainelDiagnostico";
 import { InformacoesMentorado } from "@/components/mentoria/painel/InformacoesMentorado";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ObjetivosEstrategicos } from "@/components/mentoria/painel/ObjetivosEstrategicos";
 import { ProjetosPriorizados } from "@/components/mentoria/painel/ProjetosPriorizados";
 import { ProjetoPrincipal } from "@/components/mentoria/painel/ProjetoPrincipal";
@@ -7,6 +8,7 @@ import { IntegracoesAutomacoes } from "@/components/mentoria/painel/IntegracoesA
 import { RoadmapTimeline } from "@/components/mentoria/painel/RoadmapTimeline";
 import { PontosAtencao } from "@/components/mentoria/painel/PontosAtencao";
 import { ProximaSessao } from "@/components/mentoria/painel/ProximaSessao";
+import { ProjetoPreparacaoCard } from "@/components/mentoria/ProjetoPreparacaoCard";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
@@ -104,6 +106,31 @@ export default function MentoriaPainelDiagnostico() {
               nome={diagnostico.nome_completo || profile?.nome_completo || ''} 
               diagnostico={diagnostico} 
             />
+
+            {/* Preparação para Projetos */}
+            {projetos.filter(p => p.status !== 'concluido' && p.status !== 'cancelado').length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Preparação para Próximas Sessões</CardTitle>
+                  <CardDescription>
+                    Conteúdos recomendados para seus projetos ativos
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {projetos
+                    .filter(p => p.status !== 'concluido' && p.status !== 'cancelado')
+                    .map(projeto => (
+                      <div key={projeto.id}>
+                        <h4 className="font-medium mb-2">{projeto.titulo}</h4>
+                        <ProjetoPreparacaoCard 
+                          projetoId={projeto.id}
+                          userId={userId || ''}
+                        />
+                      </div>
+                    ))}
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar - Próxima Sessão */}

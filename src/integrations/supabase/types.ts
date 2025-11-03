@@ -1062,10 +1062,13 @@ export type Database = {
           descricao: string
           devolutiva_mentor: string | null
           id: string
+          modulos_obrigatorios: Json | null
           objetivo_id: string | null
           objetivo_projeto: string
+          progresso_preparacao: number | null
           status: Database["public"]["Enums"]["status_projeto"]
           titulo: string
+          trilhas_recomendadas: Json | null
           updated_at: string
           user_id: string
         }
@@ -1081,10 +1084,13 @@ export type Database = {
           descricao: string
           devolutiva_mentor?: string | null
           id?: string
+          modulos_obrigatorios?: Json | null
           objetivo_id?: string | null
           objetivo_projeto: string
+          progresso_preparacao?: number | null
           status?: Database["public"]["Enums"]["status_projeto"]
           titulo: string
+          trilhas_recomendadas?: Json | null
           updated_at?: string
           user_id: string
         }
@@ -1100,10 +1106,13 @@ export type Database = {
           descricao?: string
           devolutiva_mentor?: string | null
           id?: string
+          modulos_obrigatorios?: Json | null
           objetivo_id?: string | null
           objetivo_projeto?: string
+          progresso_preparacao?: number | null
           status?: Database["public"]["Enums"]["status_projeto"]
           titulo?: string
+          trilhas_recomendadas?: Json | null
           updated_at?: string
           user_id?: string
         }
@@ -1632,6 +1641,10 @@ export type Database = {
     }
     Functions: {
       calcular_prazo_sla: { Args: { p_user_id: string }; Returns: string }
+      calcular_progresso_preparacao: {
+        Args: { p_projeto_id: string; p_user_id: string }
+        Returns: number
+      }
       get_modulos_stats: {
         Args: never
         Returns: {
