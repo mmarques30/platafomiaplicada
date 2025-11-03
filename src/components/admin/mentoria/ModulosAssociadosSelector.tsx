@@ -40,6 +40,8 @@ export const ModulosAssociadosSelector = ({
   const [selectedTrilhaId, setSelectedTrilhaId] = useState<string>("");
   const [modulosDaTrilha, setModulosDaTrilha] = useState<any[]>([]);
   const [isLoadingModulos, setIsLoadingModulos] = useState(false);
+  const [videosDoModulo, setVideosDoModulo] = useState<any[]>([]);
+  const [moduloExpandido, setModuloExpandido] = useState<string | null>(null);
 
   const handleAddTrilha = async () => {
     if (!selectedTrilhaId) return;
@@ -115,6 +117,48 @@ export const ModulosAssociadosSelector = ({
       m.modulo_id === moduloId ? { ...m, prioridade } : m
     );
     onChange(trilhasRecomendadas, novosModulos);
+  };
+
+  const handleLoadVideos = async (moduloId: string) => {
+    try {
+      if (moduloExpandido === moduloId) {
+        setModuloExpandido(null);
+        setVideosDoModulo([]);
+      } else {
+        const videos = await fetchVideosPorModulo(moduloId);
+        setVideosDoModulo(videos);
+        setModuloExpandido(moduloId);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar vídeos:", error);
+    }
+  };
+
+  const handleToggleVideo = (videoId: string, moduloId: string) => {
+    const novosModulos = modulosObrigatorios.map(modulo => {
+      if (modulo.modulo_id === moduloId) {
+        const videoExiste = modulo.video_ids.includes(videoId);
+        
+        if (videoExiste) {
+          // Remover vídeo
+          return {
+            ...modulo,
+            video_ids: modulo.video_ids.filter(id => id !== videoId)
+          };
+        } else {
+          // Adicionar vídeo
+          return {
+            ...modulo,
+            video_ids: [...modulo.video_ids, videoId]
+          };
+        }
+      }
+      return modulo;
+    });
+    
+    // Remover módulos sem vídeos
+    const modulosFiltrados = novosModulos.filter(m => m.video_ids.length > 0);
+    onChange(trilhasRecomendadas, modulosFiltrados);
   };
 
   const getModulosSelecionadosPorTrilha = (trilhaId: string) => {
@@ -224,45 +268,91 @@ export const ModulosAssociadosSelector = ({
                     {modulosSelecionados.length > 0 && (
                       <div className="space-y-2">
                         <Label className="text-sm font-medium">Módulos Selecionados:</Label>
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {modulosSelecionados.map(modulo => (
-                            <div
-                              key={modulo.modulo_id}
-                              className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                            >
-                              <div className="flex-1">
-                                <p className="text-sm font-medium">{modulo.titulo}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {modulo.video_ids.length} vídeo(s)
-                                </p>
+                            <div key={modulo.modulo_id} className="space-y-2">
+                              {/* Card do Módulo */}
+                              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">{modulo.titulo}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {modulo.video_ids.length} vídeo(s) selecionado(s)
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleLoadVideos(modulo.modulo_id)}
+                                  >
+                                    {moduloExpandido === modulo.modulo_id ? "Ocultar Vídeos" : "Ver Vídeos"}
+                                  </Button>
+                                  <Select
+                                    value={modulo.prioridade || "média"}
+                                    onValueChange={(value) => handleUpdatePrioridadeModulo(modulo.modulo_id, value)}
+                                  >
+                                    <SelectTrigger className="w-32">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="essencial">Essencial</SelectItem>
+                                      <SelectItem value="alta">Alta</SelectItem>
+                                      <SelectItem value="média">Média</SelectItem>
+                                      <SelectItem value="baixa">Baixa</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleToggleModulo(
+                                      { id: modulo.modulo_id, titulo: modulo.titulo },
+                                      trilha.trilha_id,
+                                      trilha.titulo
+                                    )}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <Select
-                                  value={modulo.prioridade || "média"}
-                                  onValueChange={(value) => handleUpdatePrioridadeModulo(modulo.modulo_id, value)}
-                                >
-                                  <SelectTrigger className="w-32">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="essencial">Essencial</SelectItem>
-                                    <SelectItem value="alta">Alta</SelectItem>
-                                    <SelectItem value="média">Média</SelectItem>
-                                    <SelectItem value="baixa">Baixa</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleToggleModulo(
-                                    { id: modulo.modulo_id, titulo: modulo.titulo },
-                                    trilha.trilha_id,
-                                    trilha.titulo
-                                  )}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
+
+                              {/* Lista de Vídeos (expandível) */}
+                              {moduloExpandido === modulo.modulo_id && videosDoModulo.length > 0 && (
+                                <div className="ml-6 p-4 border-l-2 border-muted space-y-2">
+                                  <Label className="text-xs font-medium text-muted-foreground">
+                                    Selecionar Vídeos Específicos:
+                                  </Label>
+                                  <ScrollArea className="h-48">
+                                    <div className="space-y-2 pr-4">
+                                      {videosDoModulo.map(video => {
+                                        const isSelecionado = modulo.video_ids.includes(video.id);
+                                        
+                                        return (
+                                          <div
+                                            key={video.id}
+                                            className="flex items-center space-x-3 p-2 hover:bg-muted rounded cursor-pointer"
+                                            onClick={() => handleToggleVideo(video.id, modulo.modulo_id)}
+                                          >
+                                            <Checkbox
+                                              checked={isSelecionado}
+                                              onCheckedChange={() => handleToggleVideo(video.id, modulo.modulo_id)}
+                                            />
+                                            <div className="flex-1">
+                                              <Label className="cursor-pointer text-sm font-normal">
+                                                {video.titulo}
+                                              </Label>
+                                              {video.duracao && (
+                                                <p className="text-xs text-muted-foreground">
+                                                  {Math.floor(video.duracao / 60)} min
+                                                </p>
+                                              )}
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </ScrollArea>
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
