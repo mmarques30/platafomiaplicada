@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "@/hooks/admin/useUsers";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useMentoriaRecursos } from "@/hooks/useMentoriaRecursos";
@@ -9,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Target as TargetIcon, Calendar, BookOpen, FolderKanban, FileText, CheckSquare } from "lucide-react";
+import { Plus, Users, Target as TargetIcon, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
@@ -26,6 +27,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function GerenciarMentoria() {
+  const queryClient = useQueryClient();
   const usersQuery = useUsers();
   const users = usersQuery.data || [];
   const [selectedUserId, setSelectedUserId] = useState<string>("");
@@ -297,10 +299,21 @@ export default function GerenciarMentoria() {
             <TabsContent value="projetos" className="space-y-4">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">Projetos de {selectedUser?.nome_completo}</h2>
-                <Button onClick={() => { setEditingProjeto(undefined); setProjetoModalOpen(true); }}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Projeto
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      queryClient.invalidateQueries({ queryKey: ["projetos-mentoria"] });
+                    }}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Atualizar
+                  </Button>
+                  <Button onClick={() => { setEditingProjeto(undefined); setProjetoModalOpen(true); }}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Projeto
+                  </Button>
+                </div>
               </div>
 
               <div className="grid gap-4">

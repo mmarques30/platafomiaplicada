@@ -44,9 +44,15 @@ export const useMentoriaProjetos = (userId?: string) => {
           objetivo:objetivos_mentoria(objetivo)
         `)
         .eq("user_id", targetUserId)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: true });
 
       if (error) throw error;
+      
+      console.log("✅ Projetos carregados:", data?.length);
+      data?.forEach((p, i) => {
+        console.log(`  ${i + 1}. "${p.titulo}" (ID: ${p.id?.substring(0, 8)}...)`);
+      });
+      
       return (data as any[]).map((p) => ({
         ...p,
         objetivo_titulo: p.objetivo?.objetivo,
