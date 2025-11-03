@@ -7,18 +7,20 @@ interface VideoCardVerticalProps {
   titulo: string;
   youtube_id: string;
   thumbnail_customizado_url?: string;
+  trilha_id: string;
 }
 
 export function VideoCardVertical({ 
   id, 
   titulo, 
   youtube_id, 
-  thumbnail_customizado_url 
+  thumbnail_customizado_url,
+  trilha_id
 }: VideoCardVerticalProps) {
   const thumbnailUrl = thumbnail_customizado_url || getYouTubeThumbnail(youtube_id);
 
   return (
-    <Link to={`/videos/${id}`} className="block group">
+    <Link to={`/trilhas/${trilha_id}?video=${id}`} className="block group">
       <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative h-[400px] w-full bg-muted">
         <img
           src={thumbnailUrl}

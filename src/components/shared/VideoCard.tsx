@@ -8,13 +8,14 @@ interface VideoCardProps {
   titulo: string;
   youtube_id: string;
   thumbnail_customizado_url?: string;
+  trilha_id: string;
 }
 
-export function VideoCard({ id, titulo, youtube_id, thumbnail_customizado_url }: VideoCardProps) {
+export function VideoCard({ id, titulo, youtube_id, thumbnail_customizado_url, trilha_id }: VideoCardProps) {
   const thumbnailUrl = thumbnail_customizado_url || getYouTubeThumbnail(youtube_id);
 
   return (
-    <Link to={`/videos/${id}`} className="block group">
+    <Link to={`/trilhas/${trilha_id}?video=${id}`} className="block group">
       <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300">
         <AspectRatio ratio={16 / 9}>
           <div className="relative w-full h-full">

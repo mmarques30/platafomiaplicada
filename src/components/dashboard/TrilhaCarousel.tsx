@@ -10,6 +10,7 @@ interface Video {
   titulo: string;
   youtube_id: string;
   thumbnail_customizado_url?: string;
+  trilha_id?: string;
 }
 
 interface TrilhaCarouselProps {
@@ -51,7 +52,7 @@ export function TrilhaCarousel({ trilhaId, trilhaTitulo, videos }: TrilhaCarouse
               key={video.id}
               className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 lg:basis-1/4 xl:basis-1/5"
             >
-              <VideoCardVertical {...video} />
+              <VideoCardVertical {...video} trilha_id={trilhaId} />
             </CarouselItem>
           ))}
         </CarouselContent>

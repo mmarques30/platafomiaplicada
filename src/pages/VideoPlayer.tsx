@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, ArrowRight, CheckCircle2, Clock } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, List } from "lucide-react";
 import { toast } from "sonner";
 import { VideoFeedbackSection } from "@/components/video/VideoFeedbackSection";
 import { VideoRatingInput } from "@/components/video/VideoRatingInput";
@@ -18,6 +19,7 @@ import { getYouTubeThumbnail } from "@/lib/youtube";
 export default function VideoPlayer() {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { averageRating, ratingCount, userRating, setRating } = useVideoRating(id!);
 
@@ -144,7 +146,18 @@ export default function VideoPlayer() {
   }
 
   if (!video) {
-    return <div>Vídeo não encontrado</div>;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Alert className="max-w-md">
+          <AlertDescription className="text-center space-y-4">
+            <p>Vídeo não encontrado</p>
+            <Button onClick={() => navigate('/trilhas')}>
+              Ver Trilhas Disponíveis
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (
@@ -182,6 +195,22 @@ export default function VideoPlayer() {
                 />
               </CardContent>
             </Card>
+
+            {/* Botão Ver Trilha Completa */}
+            <Alert>
+              <List className="h-4 w-4" />
+              <AlertDescription className="flex items-center justify-between">
+                <span>Ver todos os vídeos desta trilha com navegação lateral</span>
+                <Button 
+                  onClick={() => navigate(`/trilhas/${video.modulo.trilha.id}?video=${id}`)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <List className="h-4 w-4 mr-2" />
+                  Ver Trilha Completa
+                </Button>
+              </AlertDescription>
+            </Alert>
 
             <Card>
               <CardHeader>

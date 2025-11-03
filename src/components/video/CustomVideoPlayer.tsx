@@ -30,13 +30,31 @@ export function CustomVideoPlayer({
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showThumbnail, setShowThumbnail] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const playerRef = useRef<CustomYouTubePlayer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hideControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const playerId = `youtube-player-${videoId}`;
+    
+    // Validar YouTube ID
+    if (!videoId || videoId.length < 10) {
+      setError("ID de vídeo inválido");
+      setIsLoading(false);
+      return;
+    }
+
+    // Timeout de 10 segundos para detectar falhas
+    loadingTimeoutRef.current = setTimeout(() => {
+      if (!playerReady) {
+        setError("Tempo esgotado ao carregar o vídeo");
+        setIsLoading(false);
+      }
+    }, 10000);
     
     if (!playerRef.current) {
       const player = new CustomYouTubePlayer(playerId, {
@@ -44,7 +62,11 @@ export function CustomVideoPlayer({
         startSeconds,
         onReady: (p) => {
           setPlayerReady(true);
+          setIsLoading(false);
           setDuration(p.getDuration());
+          if (loadingTimeoutRef.current) {
+            clearTimeout(loadingTimeoutRef.current);
+          }
         },
         onStateChange: (event) => {
           const state = event.data;
@@ -74,8 +96,11 @@ export function CustomVideoPlayer({
       if (hideControlsTimeoutRef.current) {
         clearTimeout(hideControlsTimeoutRef.current);
       }
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
     };
-  }, [videoId, startSeconds, onTimeUpdate, onEnded]);
+  }, [videoId, startSeconds, onTimeUpdate, onEnded, playerReady]);
 
   const handlePlayPause = () => {
     if (!playerRef.current) return;
@@ -152,6 +177,53 @@ export function CustomVideoPlayer({
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Render de erro
+  if (error) {
+    return (
+      <div className="relative w-full aspect-video bg-black overflow-hidden rounded-lg flex items-center justify-center">
+        {thumbnail && (
+          <img
+            src={thumbnail}
+            alt={title || "Video thumbnail"}
+            className="absolute inset-0 w-full h-full object-cover opacity-30"
+          />
+        )}
+        <div className="relative z-10 text-center space-y-4 p-6">
+          <div className="text-red-500 text-lg font-semibold">
+            Erro ao carregar vídeo
+          </div>
+          <p className="text-white/80 text-sm">{error}</p>
+          <Button
+            onClick={() => window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank')}
+            variant="outline"
+            className="bg-white/10 hover:bg-white/20 text-white border-white/30"
+          >
+            Abrir no YouTube
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Render de loading
+  if (isLoading) {
+    return (
+      <div className="relative w-full aspect-video bg-black overflow-hidden rounded-lg flex items-center justify-center">
+        {thumbnail && (
+          <img
+            src={thumbnail}
+            alt={title || "Video thumbnail"}
+            className="absolute inset-0 w-full h-full object-cover opacity-50"
+          />
+        )}
+        <div className="relative z-10 text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-white/80 text-sm">Carregando vídeo...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
