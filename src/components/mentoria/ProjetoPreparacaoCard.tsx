@@ -46,10 +46,6 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
       <Card className="border-l-4 border-l-primary">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <BookOpen className="h-5 w-5" />
-              Preparação Recomendada
-            </CardTitle>
             <Badge variant={preparacao.progressoGeral === 100 ? "default" : "secondary"}>
               {preparacao.progressoGeral}% concluído
             </Badge>

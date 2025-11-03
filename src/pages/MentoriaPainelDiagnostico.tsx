@@ -8,7 +8,7 @@ import { IntegracoesAutomacoes } from "@/components/mentoria/painel/IntegracoesA
 import { RoadmapTimeline } from "@/components/mentoria/painel/RoadmapTimeline";
 import { PontosAtencao } from "@/components/mentoria/painel/PontosAtencao";
 import { ProximaSessao } from "@/components/mentoria/painel/ProximaSessao";
-import { ProjetoPreparacaoCard } from "@/components/mentoria/ProjetoPreparacaoCard";
+import { ProjetoPreparacaoSection } from "@/components/mentoria/painel/ProjetoPreparacaoSection";
 import { Loader2, ArrowLeft, FileText, Edit, Target, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
@@ -153,24 +153,22 @@ export default function MentoriaPainelDiagnostico() {
 
             {/* Preparação para Projetos */}
             {projetos.filter(p => p.status !== 'concluido' && p.status !== 'cancelado').length > 0 && (
-              <Card>
+              <Card className="bg-card text-card-foreground border border-border">
                 <CardHeader>
-                  <CardTitle>Preparação para Próximas Sessões</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-foreground">Preparação para Próximas Sessões</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Conteúdos recomendados para seus projetos ativos
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   {projetos
                     .filter(p => p.status !== 'concluido' && p.status !== 'cancelado')
                     .map(projeto => (
-                      <div key={projeto.id}>
-                        <h4 className="font-medium mb-2">{formatProjetoTitulo(projeto.titulo)}</h4>
-                        <ProjetoPreparacaoCard 
-                          projetoId={projeto.id}
-                          userId={userId || ''}
-                        />
-                      </div>
+                      <ProjetoPreparacaoSection 
+                        key={projeto.id}
+                        projeto={projeto}
+                        userId={userId || ''}
+                      />
                     ))}
                 </CardContent>
               </Card>
