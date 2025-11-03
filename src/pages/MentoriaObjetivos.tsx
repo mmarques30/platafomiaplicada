@@ -11,6 +11,7 @@ import { ObjetivoMentoria } from "@/hooks/useMentoriaObjetivos";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { formatProjetoTitulo } from "@/lib/utils";
 
 export default function MentoriaObjetivos() {
   const navigate = useNavigate();
@@ -158,7 +159,7 @@ export default function MentoriaObjetivos() {
                                       ) : (
                                         <Clock className="h-4 w-4 text-orange-500" />
                                       )}
-                                      <span className="text-sm font-medium">{projeto.titulo}</span>
+                                      <span className="text-sm font-medium">{formatProjetoTitulo(projeto.titulo)}</span>
                                     </div>
                                     {projeto.data_entrega && (
                                       <span className="text-xs text-muted-foreground ml-6">

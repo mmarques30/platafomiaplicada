@@ -13,6 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatProjetoTitulo } from "@/lib/utils";
 
 interface TarefaModalProps {
   open: boolean;
@@ -138,7 +139,7 @@ export const TarefaModal = ({ open, onOpenChange, onSave, tarefa, userId }: Tare
                 <SelectContent>
                   <SelectItem value="none">Sem projeto vinculado</SelectItem>
                   {projetos.filter(p => p.user_id === userId).map(projeto => (
-                    <SelectItem key={projeto.id} value={projeto.id}>{projeto.titulo}</SelectItem>
+                    <SelectItem key={projeto.id} value={projeto.id}>{formatProjetoTitulo(projeto.titulo)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

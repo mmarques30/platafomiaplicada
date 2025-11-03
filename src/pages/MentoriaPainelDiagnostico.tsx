@@ -12,6 +12,7 @@ import { ProjetoPreparacaoCard } from "@/components/mentoria/ProjetoPreparacaoCa
 import { Loader2, ArrowLeft, FileText, Edit, Target, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
+import { formatProjetoTitulo } from "@/lib/utils";
 
 export default function MentoriaPainelDiagnostico() {
   const navigate = useNavigate();
@@ -164,7 +165,7 @@ export default function MentoriaPainelDiagnostico() {
                     .filter(p => p.status !== 'concluido' && p.status !== 'cancelado')
                     .map(projeto => (
                       <div key={projeto.id}>
-                        <h4 className="font-medium mb-2">{projeto.titulo}</h4>
+                        <h4 className="font-medium mb-2">{formatProjetoTitulo(projeto.titulo)}</h4>
                         <ProjetoPreparacaoCard 
                           projetoId={projeto.id}
                           userId={userId || ''}

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatProjetoTitulo } from "@/lib/utils";
 
 export default function MentoriaProjetos() {
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ export default function MentoriaProjetos() {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-lg">{projeto.titulo}</CardTitle>
+            <CardTitle className="text-lg">{formatProjetoTitulo(projeto.titulo)}</CardTitle>
             {projeto.objetivo_titulo && (
               <div className="flex items-center gap-2 mt-2 text-sm text-primary">
                 <Target className="h-4 w-4" />
@@ -203,7 +204,7 @@ export default function MentoriaProjetos() {
       <Dialog open={!!selectedProjeto} onOpenChange={() => setSelectedProjeto(null)}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl">{selectedProjeto?.titulo}</DialogTitle>
+            <DialogTitle className="text-2xl">{formatProjetoTitulo(selectedProjeto?.titulo)}</DialogTitle>
             <DialogDescription>
               {selectedProjeto && getStatusBadge(selectedProjeto.status)}
             </DialogDescription>

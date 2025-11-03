@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { formatProjetoTitulo } from "@/lib/utils";
 
 interface Props {
   projetos: Array<{
@@ -49,7 +50,7 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
                   className={index % 2 === 0 ? "bg-white hover:bg-aplicada-green-50" : "bg-aplicada-green-50 hover:bg-aplicada-green-100"}
                 >
                   <TableCell className="font-bold text-aplicada-dark">{index + 1}</TableCell>
-                  <TableCell className="font-semibold text-aplicada-dark">{projeto.titulo}</TableCell>
+                  <TableCell className="font-semibold text-aplicada-dark">{formatProjetoTitulo(projeto.titulo)}</TableCell>
                   <TableCell className="text-aplicada-dark">{projeto.objetivo_projeto}</TableCell>
                   <TableCell>{getComplexityBadge(index)}</TableCell>
                   <TableCell className="text-aplicada-dark font-medium">
@@ -72,7 +73,7 @@ export const ProjetosPriorizados = ({ projetos }: Props) => {
                   <span className="flex-shrink-0 w-6 h-6 rounded-full bg-aplicada-green-900 text-white flex items-center justify-center text-sm font-bold">
                     {index + 1}
                   </span>
-                  <h3 className="font-semibold text-aplicada-dark flex-1">{projeto.titulo}</h3>
+                  <h3 className="font-semibold text-aplicada-dark flex-1">{formatProjetoTitulo(projeto.titulo)}</h3>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div>

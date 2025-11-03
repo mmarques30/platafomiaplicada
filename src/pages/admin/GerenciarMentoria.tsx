@@ -26,6 +26,7 @@ import { ObjetivoMentoria } from "@/hooks/useMentoriaObjetivos";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
+import { formatProjetoTitulo } from "@/lib/utils";
 
 export default function GerenciarMentoria() {
   const queryClient = useQueryClient();
@@ -341,7 +342,7 @@ export default function GerenciarMentoria() {
                     <CardHeader>
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <CardTitle className="text-lg">{projeto.titulo}</CardTitle>
+                          <CardTitle className="text-lg">{formatProjetoTitulo(projeto.titulo)}</CardTitle>
                           {projeto.objetivo_titulo && (
                             <div className="flex items-center gap-2 mt-2 text-sm text-primary">
                               <TargetIcon className="h-4 w-4" />

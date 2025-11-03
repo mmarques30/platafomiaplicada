@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatProjetoTitulo } from "@/lib/utils";
 
 interface Props {
   projeto?: {
@@ -16,7 +17,7 @@ export const ProjetoPrincipal = ({ projeto }: Props) => {
     <Card className="border-l-4 border-l-aplicada-green-900 bg-aplicada-green-100">
       <CardHeader>
         <CardTitle className="text-3xl font-bold text-aplicada-dark">
-          {projeto.titulo}
+          {formatProjetoTitulo(projeto.titulo)}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 px-8">
