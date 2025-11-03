@@ -12,6 +12,8 @@ import { VideoFeedbackSection } from "@/components/video/VideoFeedbackSection";
 import { VideoRatingInput } from "@/components/video/VideoRatingInput";
 import { VideoMaterialsList } from "@/components/video/VideoMaterialsList";
 import { useVideoRating } from "@/hooks/useVideoRating";
+import { CustomVideoPlayer } from "@/components/video/CustomVideoPlayer";
+import { getYouTubeThumbnail } from "@/lib/youtube";
 
 export default function VideoPlayer() {
   const { id } = useParams();
@@ -117,6 +119,21 @@ export default function VideoPlayer() {
     },
   });
 
+  const handleTimeUpdate = (currentTime: number) => {
+    if (!user || !id) return;
+    
+    salvarProgressoMutation.mutate({
+      tempo: Math.floor(currentTime),
+      completado: false,
+    });
+  };
+
+  const handleVideoEnded = () => {
+    if (!progresso?.completado) {
+      marcarComoConcluidoMutation.mutate();
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -155,32 +172,14 @@ export default function VideoPlayer() {
           <div className="lg:col-span-2 space-y-4">
             <Card>
               <CardContent className="p-0">
-                {video.thumbnail_customizado_url ? (
-                  <div className="relative aspect-video bg-black cursor-pointer group">
-                    <img 
-                      src={video.thumbnail_customizado_url} 
-                      alt={video.titulo}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
-                      <iframe
-                        className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="aspect-video bg-black">
-                    <iframe
-                      className="w-full h-full"
-                      src={`https://www.youtube.com/embed/${video.youtube_id}?start=${progresso?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                )}
+                <CustomVideoPlayer
+                  videoId={video.youtube_id}
+                  startSeconds={progresso?.tempo_assistido || 0}
+                  onTimeUpdate={handleTimeUpdate}
+                  onEnded={handleVideoEnded}
+                  thumbnail={video.thumbnail_customizado_url || getYouTubeThumbnail(video.youtube_id)}
+                  title={video.titulo}
+                />
               </CardContent>
             </Card>
 

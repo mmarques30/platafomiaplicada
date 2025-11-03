@@ -256,4 +256,47 @@ All colors MUST be HSL.
     color: #738925; /* Verde 900 */
     text-decoration: underline;
   }
+
+  .ai-message-container a:hover {
+    @apply text-primary;
+    text-decoration: underline;
+  }
+}
+
+/* YouTube Player Customization - Hide branding elements */
+.ytp-watermark,
+.ytp-chrome-top-buttons,
+.ytp-show-cards-title,
+.ytp-pause-overlay,
+.ytp-recommended,
+.ytp-ce-element {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hide YouTube logo in modest branding mode */
+.ytp-chrome-top .ytp-title {
+  display: none !important;
+}
+
+/* Remove YouTube branding from video info */
+.ytp-title-text,
+.ytp-title-link {
+  display: none !important;
+}
+
+/* Custom focus styles for video player */
+iframe:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Smooth slider styling for video controls */
+[role="slider"] {
+  @apply transition-all duration-200;
+}
+
+[role="slider"]:hover {
+  @apply scale-105;
 }
