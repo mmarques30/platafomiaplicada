@@ -134,12 +134,16 @@ export function useModulos() {
           *,
           trilha:trilhas!inner(
             id,
-            titulo
+            titulo,
+            visivel_mentorados
           )
         `)
         .order("ordem");
       if (error) throw error;
-      return data;
+      return data.map(m => ({
+        ...m,
+        trilha_visivel: m.trilha?.visivel_mentorados
+      }));
     },
   });
 }

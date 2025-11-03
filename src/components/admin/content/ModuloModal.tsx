@@ -10,13 +10,15 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, X } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CalendarIcon, X, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCreateModulo, useUpdateModulo, useTrilhas } from "@/hooks/admin/useContent";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface ModuloModalProps {
   open: boolean;
@@ -33,6 +35,21 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+
+  // Buscar trilha do módulo selecionado para validação
+  const { data: trilha } = useQuery({
+    queryKey: ["trilha-do-modulo", watch("trilha_id")],
+    queryFn: async () => {
+      if (!watch("trilha_id")) return null;
+      const { data } = await supabase
+        .from("trilhas")
+        .select("visivel_mentorados")
+        .eq("id", watch("trilha_id"))
+        .single();
+      return data;
+    },
+    enabled: !!watch("trilha_id")
+  });
 
   useEffect(() => {
     if (modulo) {
@@ -268,6 +285,18 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
           <p className="text-xs text-muted-foreground ml-6">
             Deixe desmarcado para preparar o módulo antes de publicá-lo
           </p>
+
+          {trilha?.visivel_mentorados && !watch("visivel_mentorados") && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Inconsistência Detectada</AlertTitle>
+              <AlertDescription>
+                A trilha deste módulo está <strong>visível para mentorados</strong>, 
+                mas este módulo está <strong>invisível</strong>. Isso fará com que a trilha 
+                apareça vazia para os usuários. Marque como visível ou desative este módulo.
+              </AlertDescription>
+            </Alert>
+          )}
 
           <div className="flex items-center space-x-2">
             <Checkbox 

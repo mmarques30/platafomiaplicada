@@ -10,10 +10,11 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useCreateTrilha, useUpdateTrilha } from "@/hooks/admin/useContent";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, X, Check, ChevronsUpDown } from "lucide-react";
+import { Upload, X, Check, ChevronsUpDown, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TrilhaModalProps {
@@ -333,6 +334,18 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
           <p className="text-xs text-muted-foreground ml-6">
             Marque para publicar este conteúdo. Deixe desmarcado para preparar como rascunho.
           </p>
+
+          {watch("visivel_mentorados") && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Atenção</AlertTitle>
+              <AlertDescription>
+                Esta trilha está visível para mentorados. Certifique-se de que os módulos 
+                internos também estejam marcados como visíveis, caso contrário aparecerá 
+                como "trilha vazia" para os usuários.
+              </AlertDescription>
+            </Alert>
+          )}
 
           <div className="flex items-center space-x-2">
             <Checkbox 

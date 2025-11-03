@@ -182,7 +182,7 @@ export function ModulosTab() {
                     <Badge variant="secondary">{moduloStat?.total_exercicios || 0}</Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Badge variant={modulo.ativo ? "default" : "secondary"}>
                         {modulo.ativo ? "Ativo" : "Inativo"}
                       </Badge>
@@ -194,6 +194,11 @@ export function ModulosTab() {
                       {modulo.ativo && modulo.visivel_mentorados && (
                         <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/50">
                           Publicado
+                        </Badge>
+                      )}
+                      {modulo.trilha_visivel && !modulo.visivel_mentorados && (
+                        <Badge variant="destructive" className="text-xs">
+                          ⚠️ Invisível em trilha visível
                         </Badge>
                       )}
                     </div>
