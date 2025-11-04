@@ -118,7 +118,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
                 placeholder="Digite uma senha temporária"
                 required
               />
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-foreground/60 mt-1">
                 O usuário poderá alterar esta senha em Configurações
               </p>
             </div>
@@ -175,8 +175,22 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
                     )}
                     onClick={() => setSelectedPlano(plano.value)}
                   >
-                    <h4 className="font-semibold mb-1">{plano.label}</h4>
-                    <p className="text-sm text-muted-foreground">{plano.description}</p>
+                    <h4 className={cn(
+                      "font-semibold mb-1",
+                      selectedPlano === plano.value 
+                        ? "text-foreground" 
+                        : "text-card-foreground"
+                    )}>
+                      {plano.label}
+                    </h4>
+                    <p className={cn(
+                      "text-sm",
+                      selectedPlano === plano.value 
+                        ? "text-foreground/70"
+                        : "text-card-foreground/70"
+                    )}>
+                      {plano.description}
+                    </p>
                   </Card>
                 ))}
               </div>

@@ -34,7 +34,7 @@ All colors MUST be HSL.
     
     /* MUTED (backgrounds sutis) */
     --muted: 72 6% 20%; /* #333430 - entre #2F302B e o border */
-    --muted-foreground: 0 0% 70%; /* Cinza médio-claro para melhor legibilidade */
+    --muted-foreground: 0 0% 40%; /* Cinza escuro para contraste adequado sobre fundos claros */
     
     /* ACCENT (destaques) */
     --accent: 73 35% 79%; /* #C8D27B */
@@ -321,6 +321,11 @@ All colors MUST be HSL.
   .bg-card .text-muted-foreground {
     color: #FFFFFF !important;
     opacity: 1 !important;
+  }
+  
+  /* Garantir que inputs/elementos claros dentro de cards mantenham texto escuro */
+  .bg-card .bg-background {
+    color: hsl(var(--foreground));
   }
 }
 
