@@ -34,7 +34,7 @@ All colors MUST be HSL.
     
     /* MUTED (backgrounds sutis) */
     --muted: 72 6% 20%; /* #333430 - entre #2F302B e o border */
-    --muted-foreground: 63 45% 80%; /* Texto claro sobre muted */
+    --muted-foreground: 0 0% 70%; /* Cinza médio-claro para melhor legibilidade */
     
     /* ACCENT (destaques) */
     --accent: 73 35% 79%; /* #C8D27B */

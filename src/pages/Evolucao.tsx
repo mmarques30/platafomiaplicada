@@ -63,8 +63,8 @@ export default function Evolucao() {
                       <div className="flex items-center gap-3">
                         <Flame className="h-8 w-8 text-orange-500" />
                         <div>
-                          <h3 className="text-2xl font-bold">{sequencia} dias</h3>
-                          <p className="text-muted-foreground">Sequência de estudos</p>
+                          <h3 className="text-2xl font-bold text-foreground">{sequencia} dias</h3>
+                          <p className="text-sm text-foreground/70">Sequência de estudos</p>
                         </div>
                       </div>
                     </div>
