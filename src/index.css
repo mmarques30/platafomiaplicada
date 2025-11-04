@@ -10,44 +10,47 @@ All colors MUST be HSL.
   :root {
     /* IAplicada Light Theme - Branding 2025 */
     
-    /* BACKGROUND PRINCIPAL: #F6F7E9 */
-    --background: 63 45% 93%; /* #F6F7E9 convertido para HSL */
+    /* BACKGROUND PRINCIPAL: #FFFFFF - BRANCO PURO */
+    --background: 0 0% 100%; /* #FFFFFF */
     
     /* TEXTO PRINCIPAL: #2F302B */
     --foreground: 72 6% 18%; /* #2F302B */
     
     /* CARDS: #2F302B - cinza escuro */
     --card: 72 6% 18%; /* #2F302B */
-    --card-foreground: 0 0% 100%; /* #FFFFFF - branco puro para máximo contraste */
+    --card-foreground: 63 45% 93%; /* #F6F7E9 - texto claro nos cards */
     
-    /* POPOVERS */
+    /* POPOVERS - fundo escuro, texto claro */
     --popover: 72 6% 18%; /* #2F302B */
     --popover-foreground: 63 45% 93%; /* #F6F7E9 */
     
-    /* PRIMARY (mantém verde da marca) */
-    --primary: 73 54% 39%; /* #889C2D - Verde para destaque */
-    --primary-foreground: 0 0% 100%; /* Branco para contraste */
+    /* PRIMARY - BOTÕES PRINCIPAIS: #E9EBC6 */
+    --primary: 63 48% 85%; /* #E9EBC6 */
+    --primary-foreground: 72 6% 18%; /* #2F302B - texto escuro nos botões */
     
-    /* SECONDARY */
-    --secondary: 73 35% 79%; /* #C8D27B - Verde claro para ênfase */
+    /* SECONDARY - verde claro para ênfase */
+    --secondary: 73 35% 79%; /* #C8D27B */
     --secondary-foreground: 72 6% 18%; /* #2F302B */
     
-    /* MUTED (backgrounds sutis) */
-    --muted: 72 6% 20%; /* #333430 - entre #2F302B e o border */
-    --muted-foreground: 0 0% 40%; /* Cinza escuro para contraste adequado sobre fundos claros */
+    /* MUTED - backgrounds sutis */
+    --muted: 63 45% 93%; /* #F6F7E9 - usar para inputs */
+    --muted-foreground: 72 6% 35%; /* Cinza médio para placeholder */
     
-    /* ACCENT (destaques) */
-    --accent: 73 35% 79%; /* #C8D27B */
-    --accent-foreground: 72 6% 18%; /* #2F302B */
+    /* ACCENT - destaques interativos */
+    --accent: 63 48% 85%; /* #E9EBC6 - mesmo dos botões */
+    --accent-foreground: 72 6% 18%; /* #2F302B - texto escuro */
     
-    /* DESTRUCTIVE (erros - mantém vermelho) */
+    /* DESTRUCTIVE - erros */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     
     /* BORDERS E INPUTS */
-    --border: 72 6% 22%; /* #3A3B36 - ligeiramente mais claro para contraste */
-    --input: 72 6% 18%; /* #2F302B */
-    --ring: 73 54% 39%; /* #889C2D - Verde para focus */
+    --border: 72 6% 88%; /* #E8E8E6 - borda suave sobre branco */
+    --input: 63 45% 93%; /* #F6F7E9 - fundo dos inputs */
+    --ring: 73 54% 39%; /* #889C2D - verde para focus */
+    
+    /* SUBTÍTULOS */
+    --subtitle: 73 37% 69%; /* #BCC95D - verde-amarelo */
     
     --radius: 0.75rem;
     
@@ -70,13 +73,13 @@ All colors MUST be HSL.
     --complexity-low: 73 55% 47%; /* Verde primário - Baixa complexidade */
     
     /* SIDEBAR */
-    --sidebar-background: 63 45% 93%; /* #F6F7E9 - mesmo do background */
+    --sidebar-background: 0 0% 100%; /* #FFFFFF - mesmo do background */
     --sidebar-foreground: 72 6% 18%; /* #2F302B */
     --sidebar-primary: 73 54% 39%; /* #889C2D */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 72 6% 20%; /* #333430 - fundo do item ativo (escuro) */
+    --sidebar-accent: 63 45% 93%; /* #F6F7E9 - fundo do item ativo */
     --sidebar-accent-foreground: 73 54% 39%; /* #889C2D - texto do item ativo (verde) */
-    --sidebar-border: 72 6% 22%; /* #3A3B36 */
+    --sidebar-border: 72 6% 88%; /* #E8E8E6 - borda suave */
     --sidebar-ring: 73 54% 39%; /* #889C2D */
   }
 
@@ -214,7 +217,7 @@ All colors MUST be HSL.
   .ai-message-container h4,
   .ai-message-container h5,
   .ai-message-container h6 {
-    color: #889C2D; /* Verde para títulos */
+    color: #BCC95D; /* #BCC95D - verde-amarelo para subtítulos */
     font-weight: 500; /* Sora Medium */
     margin-top: 1.25rem;
     margin-bottom: 0.75rem;
@@ -289,6 +292,13 @@ All colors MUST be HSL.
     color: hsl(var(--foreground)); /* #2F302B */
   }
 
+  /* Classe específica para subtítulos */
+  .subtitle,
+  h2.subtitle,
+  h3.subtitle {
+    color: hsl(var(--subtitle)); /* #BCC95D - verde-amarelo */
+  }
+
   p, span, div {
     font-weight: 400; /* Sora Regular para texto normal */
   }
@@ -307,8 +317,9 @@ All colors MUST be HSL.
   }
 
   .card-emphasis {
-    background-color: hsl(73, 35%, 79%); /* #C8D27B - verde claro para ênfase */
-    border: 1px solid hsl(73, 35%, 75%);
+    background-color: hsl(63, 48%, 85%); /* #E9EBC6 - botão */
+    border: 1px solid hsl(63, 48%, 80%);
+    color: hsl(72, 6%, 18%); /* #2F302B - texto escuro */
   }
   
   .card-hover:hover {

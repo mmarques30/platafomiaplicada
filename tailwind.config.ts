@@ -70,12 +70,14 @@ export default {
             800: "hsl(73, 54%, 39%)", // #889C2D - COR DE DESTAQUE
             700: "hsl(73, 55%, 47%)", // #9EB038 - mantém
             400: "hsl(73, 35%, 79%)", // #C8D27B - COR DE ÊNFASE
-            100: "hsl(63, 45%, 93%)", // #F6F7E9 - BACKGROUND PRINCIPAL
+            100: "hsl(0, 0%, 100%)", // #FFFFFF - BACKGROUND BRANCO
           },
           dark: "hsl(72, 6%, 18%)", // #2F302B - COR DE TEXTO PRINCIPAL
           light: "hsl(0, 0%, 100%)", // #FFFFFF - mantém
-          gray: "hsl(72, 6%, 18%)", // #2F302B - COR DE CARDS (ATUALIZADO)
+          gray: "hsl(72, 6%, 18%)", // #2F302B - COR DE CARDS
           yellow: "hsl(60, 100%, 97%)", // #FFFFF6 - mantém
+          button: "hsl(63, 48%, 85%)", // #E9EBC6 - COR DE BOTÃO
+          subtitle: "hsl(73, 37%, 69%)", // #BCC95D - COR DE SUBTÍTULO
         },
         complexity: {
           high: "hsl(var(--complexity-high))",
