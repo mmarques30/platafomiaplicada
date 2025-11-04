@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
 import { useTrilhasNovas } from "@/hooks/useTrilhasNovas";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
@@ -31,15 +30,14 @@ export function TrilhasNovas() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
+        <CardTitle>
           Trilhas Novas Disponíveis
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {trilhas.map((trilha: any) => {
-          const videoCount = Array.isArray(trilha.videos) ? trilha.videos.length : trilha.videos?.[0]?.count || 0;
-          const dataFormatada = formatDistanceToNow(new Date(trilha.created_at), {
+          const videoCount = trilha.videos_count || 0;
+          const dataFormatada = formatDistanceToNow(new Date(trilha.data_mais_recente), {
             addSuffix: true,
             locale: ptBR,
           });

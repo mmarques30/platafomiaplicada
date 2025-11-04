@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Award } from "lucide-react";
 import { useProgressoCertificados } from "@/hooks/useProgressoCertificados";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
@@ -27,8 +26,7 @@ export function ProgressoCertificados() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-primary" />
+          <CardTitle>
             Progresso para Certificados
           </CardTitle>
         </CardHeader>
@@ -44,8 +42,7 @@ export function ProgressoCertificados() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Award className="h-5 w-5 text-primary" />
+        <CardTitle>
           Progresso para Certificados
         </CardTitle>
       </CardHeader>
