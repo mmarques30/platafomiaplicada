@@ -70,14 +70,11 @@ export default function BibliotecaFerramentas() {
   return (
     <div className="container mx-auto p-6 space-y-8">
       {/* Cabeçalho */}
-      <div className="flex items-center gap-3">
-        <Wrench className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Biblioteca de Ferramentas</h1>
-          <p className="text-muted-foreground">
-            Catálogo completo de ferramentas de IA com avaliações especializadas
-          </p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">Biblioteca de Ferramentas</h1>
+        <p className="text-muted-foreground">
+          Catálogo completo de ferramentas de IA com avaliações especializadas
+        </p>
       </div>
 
       {/* Ranking Top 3 */}
@@ -91,7 +88,7 @@ export default function BibliotecaFerramentas() {
       {/* Seção de Catálogo Completo */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">📚 Catálogo Completo</h2>
+          <h2 className="text-2xl font-bold">Catálogo Completo</h2>
           <div className="flex gap-2">
             <Button
               variant={viewMode === "horizontal" ? "default" : "outline"}

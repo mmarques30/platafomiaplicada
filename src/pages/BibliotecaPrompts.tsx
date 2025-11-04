@@ -80,14 +80,11 @@ export default function BibliotecaPrompts() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <MessageSquare className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Biblioteca de Prompts</h1>
-          <p className="text-muted-foreground">
-            Prompts prontos para cada tipo de situação
-          </p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">Biblioteca de Prompts</h1>
+        <p className="text-muted-foreground">
+          Prompts prontos para cada tipo de situação
+        </p>
       </div>
 
       {/* Barra de Busca e Filtros Dropdown */}

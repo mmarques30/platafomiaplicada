@@ -28,14 +28,11 @@ export default function MetodosAplicar() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-8">
-        <Target className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Métodos para Aplicar</h1>
-          <p className="text-muted-foreground">
-            Metodologias para alimentar a IA e obter resultados melhores
-          </p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Métodos para Aplicar</h1>
+        <p className="text-muted-foreground">
+          Metodologias para alimentar a IA e obter resultados melhores
+        </p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-6">
