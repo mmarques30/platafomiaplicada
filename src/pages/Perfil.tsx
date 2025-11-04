@@ -136,7 +136,7 @@ export default function Perfil() {
         <Card>
           <CardHeader>
             <CardTitle>Informações Pessoais</CardTitle>
-            <CardDescription>Seus dados cadastrais</CardDescription>
+            <CardDescription className="text-card-foreground/70">Seus dados cadastrais</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {isEditing ? (
@@ -191,29 +191,29 @@ export default function Perfil() {
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Nome</p>
-                    <p className="font-medium">{profile?.nome_completo || "Não informado"}</p>
+                    <p className="text-sm text-card-foreground/70">Nome</p>
+                    <p className="font-medium text-card-foreground">{profile?.nome_completo || "Não informado"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Briefcase className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Profissão</p>
-                    <p className="font-medium">{profile?.profissao || "Não informado"}</p>
+                    <p className="text-sm text-card-foreground/70">Profissão</p>
+                    <p className="font-medium text-card-foreground">{profile?.profissao || "Não informado"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Idade</p>
-                    <p className="font-medium">{profile?.idade || "Não informado"}</p>
+                    <p className="text-sm text-card-foreground/70">Idade</p>
+                    <p className="font-medium text-card-foreground">{profile?.idade || "Não informado"}</p>
                   </div>
                 </div>
                 {profile?.linkedin && (
                   <div className="flex items-center gap-3">
                     <Linkedin className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="text-sm text-muted-foreground">LinkedIn</p>
+                      <p className="text-sm text-card-foreground/70">LinkedIn</p>
                       <a 
                         href={profile.linkedin} 
                         target="_blank" 
@@ -234,15 +234,15 @@ export default function Perfil() {
         <Card>
           <CardHeader>
             <CardTitle>Conta</CardTitle>
-            <CardDescription>Informações da sua conta</CardDescription>
+            <CardDescription className="text-card-foreground/70">Informações da sua conta</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium">{user?.email}</p>
+              <p className="text-sm text-card-foreground/70">Email</p>
+              <p className="font-medium text-card-foreground">{user?.email}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-2">Permissões</p>
+              <p className="text-sm text-card-foreground/70 mb-2">Permissões</p>
               <div className="flex gap-2 flex-wrap">
                 {roles.length > 0 ? (
                   roles.map((role) => (
@@ -264,21 +264,21 @@ export default function Perfil() {
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>Suas Estatísticas</CardTitle>
-            <CardDescription>Acompanhe seu progresso na plataforma</CardDescription>
+            <CardDescription className="text-card-foreground/70">Acompanhe seu progresso na plataforma</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="text-4xl font-bold text-primary">{stats?.videosAssistidos || 0}</div>
-                <p className="text-sm text-muted-foreground mt-2">Vídeos Completados</p>
+                <p className="text-sm text-card-foreground/70 mt-2">Vídeos Completados</p>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-primary">{stats?.totalVideos || 0}</div>
-                <p className="text-sm text-muted-foreground mt-2">Total de Vídeos</p>
+                <p className="text-sm text-card-foreground/70 mt-2">Total de Vídeos</p>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-primary">{stats?.horasAssistidas || 0}h</div>
-                <p className="text-sm text-muted-foreground mt-2">Horas Assistidas</p>
+                <p className="text-sm text-card-foreground/70 mt-2">Horas Assistidas</p>
               </div>
             </div>
           </CardContent>
