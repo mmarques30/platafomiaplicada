@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, Users } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { FerramentaModal } from "./FerramentaModal";
@@ -8,7 +8,6 @@ import { useFerramentasAdmin, useDeleteFerramenta } from "@/hooks/admin/useBibli
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FilterBar } from "../content/FilterBar";
-import { RatingStars } from "@/components/shared/RatingStars";
 
 export function FerramentasTab() {
   const { data: ferramentas, isLoading } = useFerramentasAdmin();
@@ -126,29 +125,41 @@ export function FerramentasTab() {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[200px]">Nome</TableHead>
-            <TableHead className="w-[180px]">Categoria</TableHead>
-            <TableHead className="w-[100px]">Avaliação</TableHead>
-            <TableHead className="w-[100px]">Gratuito</TableHead>
-            <TableHead className="w-[120px]">Status</TableHead>
+            <TableHead className="w-[140px]">Categoria</TableHead>
+            <TableHead className="w-[120px]">⭐ Mari</TableHead>
+            <TableHead className="w-[140px]">👥 Comunidade</TableHead>
+            <TableHead className="w-[90px]">Tipo</TableHead>
+            <TableHead className="w-[90px]">Status</TableHead>
             <TableHead className="w-[100px]">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredFerramentas?.map((ferramenta) => (
             <TableRow key={ferramenta.id}>
-              <TableCell className="w-[200px]">{ferramenta.nome}</TableCell>
-              <TableCell className="w-[180px]">{ferramenta.categoria}</TableCell>
-              <TableCell className="w-[100px]">
-                <RatingStars rating={ferramenta.avaliacao || 0} size="sm" />
+              <TableCell className="font-medium">{ferramenta.nome}</TableCell>
+              <TableCell>{ferramenta.categoria}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <span className="font-semibold">{ferramenta.avaliacao_mari || ferramenta.avaliacao || 0}</span>
+                  <span className="text-xs text-muted-foreground">/5</span>
+                </div>
               </TableCell>
-              <TableCell className="w-[100px]">
+              <TableCell>
+                <div className="flex items-center gap-1">
+                  <Users className="w-4 h-4 text-blue-500" />
+                  <span className="font-semibold">{ferramenta.avaliacao_comunidade?.toFixed(1) || "0.0"}</span>
+                  <span className="text-xs text-muted-foreground">({ferramenta.total_avaliacoes_comunidade || 0})</span>
+                </div>
+              </TableCell>
+              <TableCell>
                 {ferramenta.gratuito ? (
-                  <Badge variant="secondary" className="whitespace-nowrap">Gratuito</Badge>
+                  <Badge variant="secondary" className="whitespace-nowrap">Gratuita</Badge>
                 ) : (
-                  <Badge variant="outline" className="whitespace-nowrap">Pago</Badge>
+                  <Badge variant="outline" className="whitespace-nowrap">Paga</Badge>
                 )}
               </TableCell>
-              <TableCell className="w-[120px]">
+              <TableCell>
                 {ferramenta.ativo ? (
                   <Badge variant="default" className="whitespace-nowrap">Ativo</Badge>
                 ) : (

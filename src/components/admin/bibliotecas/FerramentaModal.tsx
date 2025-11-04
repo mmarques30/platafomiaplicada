@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
@@ -22,7 +23,7 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const createFerramenta = useCreateFerramenta();
   const updateFerramenta = useUpdateFerramenta();
-  const [rating, setRating] = useState(5);
+  const [ratingMari, setRatingMari] = useState(5);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -31,7 +32,7 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
   useEffect(() => {
     if (ferramenta) {
       reset(ferramenta);
-      setRating(ferramenta.avaliacao || 5);
+      setRatingMari(ferramenta.avaliacao_mari || ferramenta.avaliacao || 5);
       setPreviewUrl(ferramenta.logo_url || null);
     } else {
       reset({
@@ -41,13 +42,13 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
         o_que_entrega: "",
         link_ferramenta: "",
         logo_url: "",
-        avaliacao: 5,
+        avaliacao_mari: 5,
         gratuito: false,
         vale_a_pena: null,
         justificativa: "",
         ativo: true,
       });
-      setRating(5);
+      setRatingMari(5);
       setPreviewUrl(null);
     }
   }, [ferramenta, reset]);
@@ -252,21 +253,21 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
             <h3 className="font-semibold text-base">Avaliação</h3>
 
             <div>
-              <Label htmlFor="avaliacao">Avaliação (1-5 estrelas)</Label>
+              <Label htmlFor="avaliacao_mari">⭐ Avaliação da Mari (1-5 estrelas)</Label>
               <div className="flex gap-1 py-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() => {
-                      setRating(star);
-                      setValue("avaliacao", star);
+                      setRatingMari(star);
+                      setValue("avaliacao_mari", star);
                     }}
                     className="transition-all hover:scale-110 focus:outline-none"
                   >
                     <Star
                       className={`w-6 h-6 ${
-                        star <= rating
+                        star <= ratingMari
                           ? "fill-yellow-400 text-yellow-400"
                           : "text-muted hover:text-yellow-200"
                       }`}
@@ -274,10 +275,34 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
                   </button>
                 ))}
                 <span className="ml-3 text-sm text-muted-foreground">
-                  {rating}/5
+                  {ratingMari}/5
                 </span>
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Esta avaliação será usada no ranking Top 3 (peso 60%)
+              </p>
             </div>
+
+            {/* Avaliação da Comunidade (Read-Only) */}
+            {ferramenta && (
+              <div className="p-3 bg-muted rounded-lg border">
+                <Label className="text-sm">👥 Avaliação da Comunidade (somente visualização)</Label>
+                <div className="flex items-center gap-4 mt-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-bold">
+                      {ferramenta.avaliacao_comunidade?.toFixed(2) || "0.00"}
+                    </span>
+                    <span className="text-sm text-muted-foreground">/5.00</span>
+                  </div>
+                  <Badge variant="secondary">
+                    {ferramenta.total_avaliacoes_comunidade || 0} avaliações
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Esta avaliação é calculada automaticamente pelas avaliações dos usuários (peso 40% no ranking)
+                </p>
+              </div>
+            )}
 
             <div>
               <Label htmlFor="vale_a_pena">Vale a Pena?</Label>

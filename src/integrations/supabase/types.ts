@@ -437,6 +437,8 @@ export type Database = {
         Row: {
           ativo: boolean | null
           avaliacao: number | null
+          avaliacao_comunidade: number | null
+          avaliacao_mari: number | null
           categoria: string
           created_at: string | null
           gratuito: boolean | null
@@ -447,12 +449,15 @@ export type Database = {
           nome: string
           o_que_entrega: string
           objetivo: string
+          total_avaliacoes_comunidade: number | null
           updated_at: string | null
           vale_a_pena: boolean | null
         }
         Insert: {
           ativo?: boolean | null
           avaliacao?: number | null
+          avaliacao_comunidade?: number | null
+          avaliacao_mari?: number | null
           categoria: string
           created_at?: string | null
           gratuito?: boolean | null
@@ -463,12 +468,15 @@ export type Database = {
           nome: string
           o_que_entrega: string
           objetivo: string
+          total_avaliacoes_comunidade?: number | null
           updated_at?: string | null
           vale_a_pena?: boolean | null
         }
         Update: {
           ativo?: boolean | null
           avaliacao?: number | null
+          avaliacao_comunidade?: number | null
+          avaliacao_mari?: number | null
           categoria?: string
           created_at?: string | null
           gratuito?: boolean | null
@@ -479,6 +487,7 @@ export type Database = {
           nome?: string
           o_que_entrega?: string
           objetivo?: string
+          total_avaliacoes_comunidade?: number | null
           updated_at?: string | null
           vale_a_pena?: boolean | null
         }
