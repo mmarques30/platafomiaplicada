@@ -116,7 +116,7 @@ export default function Dashboard() {
                     onChange={(e) => setQuestion(e.target.value)}
                     onFocus={() => setShowSuggestions(true)}
                     placeholder="Pergunte à Mari..."
-                    className="w-full bg-background rounded-xl px-5 py-3 border-none outline-none text-foreground placeholder:text-muted-foreground"
+                    className="w-full bg-background rounded-xl px-5 py-3 border-none outline-none placeholder:text-muted-foreground"
                   />
                   
                   {/* Dropdown de sugestões */}
