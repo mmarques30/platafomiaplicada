@@ -317,6 +317,11 @@ All colors MUST be HSL.
     transition: all 0.3s ease;
   }
   
+  /* Forçar texto branco em elementos text-foreground dentro de cards escuros */
+  .bg-card .text-foreground {
+    color: #FFFFFF !important;
+  }
+  
   /* Garantir contraste em text-muted-foreground dentro de cards escuros */
   .bg-card .text-muted-foreground {
     color: #FFFFFF !important;
