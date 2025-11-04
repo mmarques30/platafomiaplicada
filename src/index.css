@@ -322,6 +322,12 @@ All colors MUST be HSL.
   .bg-card textarea.bg-background {
     color: hsl(var(--foreground)) !important;
   }
+
+  /* REGRA SUPER ESPECÍFICA - máxima especificidade para inputs/textareas com ambas as classes */
+  .bg-card input.bg-background.text-foreground,
+  .bg-card textarea.bg-background.text-foreground {
+    color: hsl(var(--foreground)) !important;
+  }
   
   /* Forçar texto branco em elementos text-foreground dentro de cards escuros */
   .bg-card .text-foreground {
@@ -362,6 +368,25 @@ All colors MUST be HSL.
   /* Garantir que inputs/elementos claros dentro de cards mantenham texto escuro */
   .bg-card .bg-background {
     color: hsl(var(--foreground));
+  }
+
+  /* Garantir texto claro em popovers escuros */
+  .bg-popover {
+    color: hsl(var(--popover-foreground)) !important;
+  }
+
+  .bg-popover button,
+  .bg-popover a,
+  .bg-popover p,
+  .bg-popover span,
+  .bg-popover div {
+    color: hsl(var(--popover-foreground));
+  }
+
+  /* Garantir que elementos interativos tenham cor adequada */
+  .bg-popover button:hover,
+  .bg-popover a:hover {
+    color: inherit;
   }
 }
 
