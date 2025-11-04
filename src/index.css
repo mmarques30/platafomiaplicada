@@ -327,6 +327,31 @@ All colors MUST be HSL.
   .bg-card .text-foreground {
     color: #FFFFFF !important;
   }
+
+  /* Textos em elementos com fundo claro dentro de cards devem ser escuros */
+  .bg-card .bg-background {
+    color: hsl(var(--foreground)) !important;
+  }
+  /* Quando há text-foreground junto com bg claro, garantir texto escuro */
+  .bg-card .bg-background.text-foreground,
+  .bg-card .bg-background .text-foreground {
+    color: hsl(var(--foreground)) !important;
+  }
+  /* Cobrir casos comuns de fundos "claros" usados no design */
+  .bg-card .bg-secondary,
+  .bg-card .bg-accent {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  /* Forçar títulos claros dentro de cards escuros */
+  .bg-card h1,
+  .bg-card h2,
+  .bg-card h3,
+  .bg-card h4,
+  .bg-card h5,
+  .bg-card h6 {
+    color: hsl(var(--card-foreground)) !important;
+  }
   
   /* Garantir contraste em text-muted-foreground dentro de cards escuros */
   .bg-card .text-muted-foreground {
