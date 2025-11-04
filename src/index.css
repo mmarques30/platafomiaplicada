@@ -8,7 +8,80 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* IAplicada Dark Theme - Branding 2025 */
+    /* IAplicada Light Theme - Branding 2025 */
+    
+    /* BACKGROUND PRINCIPAL: #F6F7E9 */
+    --background: 63 45% 93%; /* #F6F7E9 convertido para HSL */
+    
+    /* TEXTO PRINCIPAL: #2F302B */
+    --foreground: 72 6% 18%; /* #2F302B */
+    
+    /* CARDS: #F2F2F2 */
+    --card: 0 0% 95%; /* #F2F2F2 */
+    --card-foreground: 72 6% 18%; /* #2F302B */
+    
+    /* POPOVERS */
+    --popover: 0 0% 95%; /* #F2F2F2 */
+    --popover-foreground: 72 6% 18%; /* #2F302B */
+    
+    /* PRIMARY (mantém verde da marca) */
+    --primary: 73 54% 39%; /* #889C2D - Verde para destaque */
+    --primary-foreground: 0 0% 100%; /* Branco para contraste */
+    
+    /* SECONDARY */
+    --secondary: 73 35% 79%; /* #C8D27B - Verde claro para ênfase */
+    --secondary-foreground: 72 6% 18%; /* #2F302B */
+    
+    /* MUTED (backgrounds sutis) */
+    --muted: 0 0% 95%; /* #F2F2F2 */
+    --muted-foreground: 72 6% 35%; /* Cinza médio para texto secundário */
+    
+    /* ACCENT (destaques) */
+    --accent: 73 35% 79%; /* #C8D27B */
+    --accent-foreground: 72 6% 18%; /* #2F302B */
+    
+    /* DESTRUCTIVE (erros - mantém vermelho) */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* BORDERS E INPUTS */
+    --border: 0 0% 90%; /* #E5E5E5 - Bordas suaves */
+    --input: 0 0% 95%; /* #F2F2F2 */
+    --ring: 73 54% 39%; /* #889C2D - Verde para focus */
+    
+    --radius: 0.75rem;
+    
+    /* Chart Colors - Ajustados para tema claro */
+    --chart-1: 73 64% 32%; /* #738925 */
+    --chart-2: 73 54% 39%; /* #889C2D */
+    --chart-3: 73 55% 47%; /* #9EB038 */
+    --chart-4: 73 43% 54%; /* #AFC040 */
+    --chart-5: 73 37% 69%; /* #BCC95D */
+    --chart-6: 73 35% 79%; /* #C8D27B */
+
+    /* Estados Negativos/Medianos - Paleta Sóbria */
+    --chart-warning: 35 100% 55%; /* Laranja suave #F59E0B */
+    --chart-error: 0 70% 55%; /* Vermelho suave #E86A6A */
+    --chart-neutral: 0 0% 60%; /* Cinza neutro */
+    
+    /* Complexidade de Projetos */
+    --complexity-high: 0 70% 55%; /* Vermelho - Alta complexidade */
+    --complexity-medium: 35 100% 55%; /* Laranja - Média complexidade */
+    --complexity-low: 73 55% 47%; /* Verde primário - Baixa complexidade */
+    
+    /* SIDEBAR */
+    --sidebar-background: 63 45% 93%; /* #F6F7E9 - mesmo do background */
+    --sidebar-foreground: 72 6% 18%; /* #2F302B */
+    --sidebar-primary: 73 54% 39%; /* #889C2D */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 95%; /* #F2F2F2 */
+    --sidebar-accent-foreground: 72 6% 18%;
+    --sidebar-border: 0 0% 90%; /* #E5E5E5 */
+    --sidebar-ring: 73 54% 39%; /* #889C2D */
+  }
+
+  .dark {
+    /* IAplicada Dark Theme - Configuração anterior */
     --background: 75 5% 15%; /* #272824 - Background do branding */
     --foreground: 60 100% 97%; /* #FFFFF6 - Amarelo claro do branding */
     
@@ -66,66 +139,6 @@ All colors MUST be HSL.
     --sidebar-border: 30 4% 25%;
     --sidebar-ring: 73 55% 47%;
   }
-
-  .light {
-    /* IAplicada Light Theme - Branding 2025 */
-    --background: 0 0% 100%; /* #FFFFFF - Branco do branding */
-    --foreground: 72 6% 18%; /* #2F302B - Preto do branding */
-    
-    --card: 60 100% 97%; /* #F6F7E9 - Verde 100 muito claro */
-    --card-foreground: 30 4% 19%;
-    
-    --popover: 0 0% 100%;
-    --popover-foreground: 30 4% 19%;
-    
-    --primary: 73 55% 47%; /* #9EB038 - Verde 600 */
-    --primary-foreground: 0 0% 100%;
-    
-    --secondary: 73 37% 69%; /* #BCC95D - Verde 500 */
-    --secondary-foreground: 30 4% 19%;
-    
-    --muted: 73 35% 93%; /* #F6F7E9 - Verde 100 */
-    --muted-foreground: 30 4% 45%;
-    
-    --accent: 73 55% 47%; /* Verde primário */
-    --accent-foreground: 0 0% 100%;
-    
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-    
-    --border: 73 20% 85%;
-    --input: 0 0% 100%;
-    --ring: 73 55% 47%;
-    
-    --radius: 0.75rem;
-    
-    /* Chart Colors - Paleta Verde do Branding IAplicada */
-    --chart-1: 73 64% 32%; /* #738925 - Verde 900 */
-    --chart-2: 73 54% 39%; /* #889C2D - Verde 800 */
-    --chart-3: 73 55% 47%; /* #9EB038 - Verde 700 (primário) */
-    --chart-4: 73 43% 54%; /* #AFC040 - Verde 600 */
-    --chart-5: 73 37% 69%; /* #BCC95D - Verde 500 */
-    --chart-6: 73 35% 79%; /* #C8D27B - Verde 400 */
-
-    /* Estados Negativos/Medianos - Paleta Sóbria */
-    --chart-warning: 35 100% 55%; /* Laranja suave #F59E0B */
-    --chart-error: 0 70% 55%; /* Vermelho suave #E86A6A */
-    --chart-neutral: 0 0% 60%; /* Cinza neutro */
-    
-    /* Complexidade de Projetos */
-    --complexity-high: 0 70% 55%; /* Vermelho - Alta complexidade */
-    --complexity-medium: 35 100% 55%; /* Laranja - Média complexidade */
-    --complexity-low: 73 55% 47%; /* Verde primário - Baixa complexidade */
-    
-    --sidebar-background: 73 35% 95%;
-    --sidebar-foreground: 30 4% 19%;
-    --sidebar-primary: 73 55% 47%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 73 35% 88%;
-    --sidebar-accent-foreground: 30 4% 19%;
-    --sidebar-border: 73 20% 85%;
-    --sidebar-ring: 73 55% 47%;
-  }
 }
 
 @layer base {
@@ -140,8 +153,8 @@ All colors MUST be HSL.
   
   /* Gradientes de fundo modernos */
   .gradient-bg {
-    background: radial-gradient(circle at 20% 50%, rgba(158, 176, 56, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(115, 137, 37, 0.06) 0%, transparent 50%);
+    background: radial-gradient(circle at 20% 50%, rgba(136, 156, 45, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(200, 210, 123, 0.06) 0%, transparent 50%);
   }
   
   /* Efeito glow para elementos especiais (Chat AI) */
@@ -161,11 +174,12 @@ All colors MUST be HSL.
   
   /* Estilo customizado para mensagens da IA no chat */
   .ai-message-container {
-    background-color: #D9DFA1; /* Verde 300 */
-    color: #2F302B; /* Preto do branding */
+    background-color: #F2F2F2; /* Cinza claro em vez de verde */
+    color: #2F302B; /* Texto principal */
     border-radius: 0.75rem;
     padding: 1rem;
     line-height: 1.6;
+    border: 1px solid #E5E5E5; /* Adicionar borda sutil */
   }
 
   .ai-message-container p {
@@ -181,27 +195,29 @@ All colors MUST be HSL.
     margin-bottom: 0;
   }
 
+  /* Destaques em negrito */
   .ai-message-container strong,
   .ai-message-container b {
-    color: #738925; /* Verde 900 */
-    font-weight: 600;
+    color: #889C2D; /* Verde para destaque */
+    font-weight: 600; /* Sora SemiBold */
   }
 
   .ai-message-container em,
   .ai-message-container i {
-    color: #889C2D; /* Verde 800 */
+    color: #889C2D; /* Verde para itálico */
   }
 
+  /* Títulos */
   .ai-message-container h1,
   .ai-message-container h2,
   .ai-message-container h3,
   .ai-message-container h4,
   .ai-message-container h5,
   .ai-message-container h6 {
-    color: #738925; /* Verde 900 */
+    color: #889C2D; /* Verde para títulos */
+    font-weight: 500; /* Sora Medium */
     margin-top: 1.25rem;
     margin-bottom: 0.75rem;
-    font-weight: 600;
   }
 
   .ai-message-container h1:first-child,
@@ -215,7 +231,7 @@ All colors MUST be HSL.
 
   .ai-message-container ol,
   .ai-message-container ul {
-    color: #1C1C1C;
+    color: #2F302B;
     margin-top: 0.75rem;
     margin-bottom: 0.75rem;
     padding-left: 1.5rem;
@@ -226,25 +242,29 @@ All colors MUST be HSL.
     margin-bottom: 0.25rem;
   }
 
+  /* Marcadores de lista */
   .ai-message-container li::marker {
-    color: #9EB038; /* Verde 600 */
+    color: #C8D27B; /* Verde claro */
   }
 
+  /* Código inline */
   .ai-message-container code {
-    background-color: rgba(0, 0, 0, 0.2);
-    color: #1C1C1C;
+    background-color: rgba(136, 156, 45, 0.1); /* Verde transparente */
+    color: #2F302B;
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
     font-size: 0.9em;
   }
 
+  /* Blocos de código */
   .ai-message-container pre {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(136, 156, 45, 0.15);
     padding: 1rem;
     border-radius: 0.5rem;
     overflow-x: auto;
     margin-top: 0.75rem;
     margin-bottom: 0.75rem;
+    border: 1px solid rgba(136, 156, 45, 0.2);
   }
 
   .ai-message-container pre code {
@@ -252,14 +272,48 @@ All colors MUST be HSL.
     padding: 0;
   }
 
+  /* Links */
   .ai-message-container a {
-    color: #738925; /* Verde 900 */
+    color: #889C2D; /* Verde */
     text-decoration: underline;
   }
 
   .ai-message-container a:hover {
     @apply text-primary;
     text-decoration: underline;
+  }
+  
+  /* Tipografia global */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 500; /* Sora Medium para todos os títulos */
+    color: hsl(var(--foreground)); /* #2F302B */
+  }
+
+  p, span, div {
+    font-weight: 400; /* Sora Regular para texto normal */
+  }
+
+  strong, b {
+    font-weight: 600; /* Sora SemiBold para ênfase */
+    color: #889C2D; /* Verde destaque */
+  }
+  
+  /* Classes utilitárias para cards */
+  .card-enhanced {
+    background-color: hsl(0, 0%, 95%); /* #F2F2F2 */
+    border: 1px solid hsl(0, 0%, 90%); /* #E5E5E5 */
+    box-shadow: 0 1px 3px rgba(47, 48, 43, 0.05); /* Sombra sutil */
+  }
+
+  .card-emphasis {
+    background-color: hsl(73, 35%, 79%); /* #C8D27B - verde claro para ênfase */
+    border: 1px solid hsl(73, 35%, 75%);
+  }
+  
+  .card-hover:hover {
+    border-color: hsl(73, 54%, 39%); /* #889C2D */
+    box-shadow: 0 4px 12px rgba(136, 156, 45, 0.15);
+    transition: all 0.3s ease;
   }
 }
 
