@@ -94,10 +94,11 @@ export default function Evolucao() {
                   {certificados.map((cert) => (
                     <CertificadoCard
                       key={cert.id}
-                      title={cert.titulo}
-                      issueDate={cert.data_emissao || ""}
-                      verificationCode={cert.codigo_verificacao || ""}
-                      pdfUrl={cert.url_pdf}
+                      trilhaTitulo={cert.titulo}
+                      nomeCompleto="Usuário"
+                      dataConclusao={cert.data_emissao || ""}
+                      progresso={100}
+                      certificadoUrl={cert.url_pdf}
                     />
                   ))}
                 </div>
@@ -110,22 +111,19 @@ export default function Evolucao() {
             <h2 className="text-2xl font-bold mb-4">Conquistas</h2>
             <div className="grid gap-4 md:grid-cols-3">
               <ConquistaCard
-                title="Primeira Trilha"
-                description="Complete sua primeira trilha de aprendizado"
-                icon="🎯"
-                unlocked={progressoGeral ? progressoGeral.trilhasConcluidas > 0 : false}
+                titulo="Primeira Trilha"
+                descricao="Complete sua primeira trilha de aprendizado"
+                desbloqueada={progressoGeral ? progressoGeral.trilhasConcluidas > 0 : false}
               />
               <ConquistaCard
-                title="Estudante Dedicado"
-                description="Mantenha uma sequência de 7 dias de estudos"
-                icon="🔥"
-                unlocked={sequencia ? sequencia >= 7 : false}
+                titulo="Estudante Dedicado"
+                descricao="Mantenha uma sequência de 7 dias de estudos"
+                desbloqueada={sequencia ? sequencia >= 7 : false}
               />
               <ConquistaCard
-                title="Expert"
-                description="Complete 5 trilhas de aprendizado"
-                icon="🏆"
-                unlocked={progressoGeral ? progressoGeral.trilhasConcluidas >= 5 : false}
+                titulo="Expert"
+                descricao="Complete 5 trilhas de aprendizado"
+                desbloqueada={progressoGeral ? progressoGeral.trilhasConcluidas >= 5 : false}
               />
             </div>
           </div>
