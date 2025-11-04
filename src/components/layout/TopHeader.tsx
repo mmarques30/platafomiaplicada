@@ -77,7 +77,7 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium smooth-transition",
-              isActive ? "text-primary" : "text-white hover:text-primary"
+              isActive ? "text-primary" : "text-foreground hover:text-primary"
             )}
           >
             Início
@@ -89,14 +89,14 @@ export function TopHeader() {
                 variant="ghost" 
                 className={cn(
                   "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
-                  isCursosActive ? "text-primary" : "text-white hover:text-primary"
+                  isCursosActive ? "text-primary" : "text-foreground hover:text-primary"
                 )}
               >
                 Meus Cursos
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-64 bg-popover border-border">
+              <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
                 <DropdownMenuItem asChild>
                   <Link to="/trilhas" className="cursor-pointer">
                     Aplicada Trilha
@@ -116,14 +116,14 @@ export function TopHeader() {
                 variant="ghost" 
                 className={cn(
                   "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
-                  isFerramentasActive ? "text-primary" : "text-white hover:text-primary"
+                  isFerramentasActive ? "text-primary" : "text-foreground hover:text-primary"
                 )}
               >
                 Ferramentas
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-64 bg-popover border-border">
+            <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
               <DropdownMenuItem asChild>
                 <Link to="/ia-copie-use" className="cursor-pointer">
                   IA "Copie e Use"
@@ -179,7 +179,7 @@ export function TopHeader() {
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-popover border-border">
+            <DropdownMenuContent align="end" className="w-56 bg-popover border-border text-popover-foreground">
               <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem asChild>

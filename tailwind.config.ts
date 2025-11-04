@@ -74,7 +74,7 @@ export default {
           },
           dark: "hsl(72, 6%, 18%)", // #2F302B - COR DE TEXTO PRINCIPAL
           light: "hsl(0, 0%, 100%)", // #FFFFFF - mantém
-          gray: "hsl(0, 0%, 95%)", // #F2F2F2 - COR DE CARDS
+          gray: "hsl(72, 6%, 18%)", // #2F302B - COR DE CARDS (ATUALIZADO)
           yellow: "hsl(60, 100%, 97%)", // #FFFFF6 - mantém
         },
         complexity: {
