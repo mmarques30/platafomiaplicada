@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Sparkles, AlertCircle, X } from "lucide-react";
+import { MessageSquare, Sparkles, ArrowRight, AlertCircle, X } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
@@ -165,7 +165,7 @@ export default function Dashboard() {
                   disabled={!question.trim()}
                   className="bg-accent hover:bg-accent/90 text-accent-foreground px-5 rounded-xl"
                 >
-                  <Sparkles className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </form>
             </div>

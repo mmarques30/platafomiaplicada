@@ -317,6 +317,12 @@ All colors MUST be HSL.
     transition: all 0.3s ease;
   }
   
+  /* Inputs/textareas com fundo claro dentro de cards devem ter texto escuro */
+  .bg-card input.bg-background,
+  .bg-card textarea.bg-background {
+    color: hsl(var(--foreground)) !important;
+  }
+  
   /* Forçar texto branco em elementos text-foreground dentro de cards escuros */
   .bg-card .text-foreground {
     color: #FFFFFF !important;
