@@ -55,16 +55,16 @@ export function MinhaEvolucaoDetalhada() {
           {stats.map((stat, index) => (
             <div key={index} className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{stat.label}</p>
+                <p className="font-medium text-card-foreground">{stat.label}</p>
                 {stat.extra && (
-                  <p className="text-xs text-muted-foreground">{stat.extra}</p>
+                  <p className="text-xs text-card-foreground/60">{stat.extra}</p>
                 )}
               </div>
-              <span className="text-2xl font-bold">{stat.value}</span>
+              <span className="text-2xl font-bold text-card-foreground">{stat.value}</span>
             </div>
           ))}
 
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t border-border">
             <Button 
               onClick={() => setModalOpen(true)}
               className="w-full"
