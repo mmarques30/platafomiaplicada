@@ -18,7 +18,7 @@ All colors MUST be HSL.
     
     /* CARDS: #2F302B - cinza escuro */
     --card: 72 6% 18%; /* #2F302B */
-    --card-foreground: 63 45% 93%; /* #F6F7E9 - texto claro sobre fundo escuro */
+    --card-foreground: 0 0% 100%; /* #FFFFFF - branco puro para máximo contraste */
     
     /* POPOVERS */
     --popover: 72 6% 18%; /* #2F302B */
@@ -315,6 +315,12 @@ All colors MUST be HSL.
     border-color: hsl(73, 54%, 39%); /* #889C2D */
     box-shadow: 0 4px 12px rgba(136, 156, 45, 0.15);
     transition: all 0.3s ease;
+  }
+  
+  /* Garantir contraste em text-muted-foreground dentro de cards escuros */
+  .bg-card .text-muted-foreground {
+    color: #FFFFFF !important;
+    opacity: 1 !important;
   }
 }
 
