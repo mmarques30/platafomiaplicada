@@ -50,9 +50,9 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
   };
 
   const getPodiumHeight = (index: number) => {
-    if (index === 1) return "h-[380px]"; // 1º mais alto
-    if (index === 0) return "h-[340px]"; // 2º médio
-    return "h-[300px]"; // 3º menor
+    if (index === 1) return "h-[500px]"; // 1º mais alto
+    if (index === 0) return "h-[470px]"; // 2º médio
+    return "h-[440px]"; // 3º menor
   };
 
   return (
