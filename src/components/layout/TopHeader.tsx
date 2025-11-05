@@ -66,7 +66,7 @@ export function TopHeader() {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <Link to="/" className="flex items-center">
-            <img src={logoAplicada} alt="Aplicada" className="h-16 w-auto" />
+            <img src={logoAplicada} alt="Aplicada" className="h-12 w-auto" />
           </Link>
         </div>
 
