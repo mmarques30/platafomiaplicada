@@ -163,7 +163,7 @@ export default function Dashboard() {
                   type="submit"
                   size="default"
                   disabled={!question.trim()}
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground px-5 rounded-xl"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 rounded-xl"
                 >
                   <ArrowRight className="h-4 w-4" />
                 </Button>

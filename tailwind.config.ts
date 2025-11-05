@@ -67,17 +67,18 @@ export default {
         aplicada: {
           green: {
             900: "hsl(73, 64%, 32%)", // #738925 - mantém
-            800: "hsl(73, 54%, 39%)", // #889C2D - COR DE DESTAQUE
+            800: "hsl(73, 54%, 39%)", // #889C2D - mantém
             700: "hsl(73, 55%, 47%)", // #9EB038 - mantém
-            400: "hsl(73, 35%, 79%)", // #C8D27B - COR DE ÊNFASE
-            100: "hsl(0, 0%, 100%)", // #FFFFFF - BACKGROUND BRANCO
+            400: "hsl(73, 35%, 79%)", // #C8D27B - BOTÕES PRIMÁRIOS
+            100: "hsl(0, 0%, 100%)", // #FFFFFF - mantém
           },
-          dark: "hsl(72, 6%, 18%)", // #2F302B - COR DE TEXTO PRINCIPAL
+          dark: "hsl(72, 6%, 18%)", // #2F302B - mantém
           light: "hsl(0, 0%, 100%)", // #FFFFFF - mantém
-          gray: "hsl(72, 6%, 18%)", // #2F302B - COR DE CARDS
+          gray: "hsl(72, 6%, 18%)", // #2F302B - mantém
           yellow: "hsl(60, 100%, 97%)", // #FFFFF6 - mantém
-          button: "hsl(63, 48%, 85%)", // #E9EBC6 - COR DE BOTÃO
-          subtitle: "hsl(73, 37%, 69%)", // #BCC95D - COR DE SUBTÍTULO
+          button: "hsl(73, 35%, 79%)", // #C8D27B - NOVA COR DE BOTÃO
+          subtitle: "hsl(73, 37%, 69%)", // #BCC95D - mantém
+          input: "hsl(63, 45%, 93%)", // #F6F7E9 - ADICIONAR
         },
         complexity: {
           high: "hsl(var(--complexity-high))",

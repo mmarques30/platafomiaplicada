@@ -8,59 +8,59 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* IAplicada Light Theme - Branding 2025 */
+    /* IAplicada Dark Theme - Branding 2025 */
     
-    /* BACKGROUND PRINCIPAL: #FFFFFF - BRANCO PURO */
-    --background: 0 0% 100%; /* #FFFFFF */
+    /* BACKGROUND PRINCIPAL: #2F302B - ESCURO */
+    --background: 72 6% 18%; /* #2F302B - MUDANÇA CRÍTICA */
     
-    /* TEXTO PRINCIPAL: #2F302B */
-    --foreground: 72 6% 18%; /* #2F302B */
+    /* TEXTO PRINCIPAL: #FFFFFF - BRANCO */
+    --foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA CRÍTICA */
     
-    /* CARDS: #2F302B - cinza escuro */
-    --card: 72 6% 18%; /* #2F302B */
-    --card-foreground: 63 45% 93%; /* #F6F7E9 - texto claro nos cards */
+    /* CARDS: #2F302B - mesmo do background, usar bordas para contraste */
+    --card: 72 6% 18%; /* #2F302B - mantém */
+    --card-foreground: 63 48% 85%; /* #E9EBC6 - MUDANÇA (era #F6F7E9) */
     
     /* POPOVERS - fundo escuro, texto claro */
-    --popover: 72 6% 18%; /* #2F302B */
-    --popover-foreground: 63 45% 93%; /* #F6F7E9 */
+    --popover: 72 6% 18%; /* #2F302B - mantém */
+    --popover-foreground: 63 48% 85%; /* #E9EBC6 - MUDANÇA */
     
-    /* PRIMARY - BOTÕES PRINCIPAIS: #E9EBC6 */
-    --primary: 63 48% 85%; /* #E9EBC6 */
-    --primary-foreground: 72 6% 18%; /* #2F302B - texto escuro nos botões */
+    /* PRIMARY - BOTÕES PRINCIPAIS: #C8D27B */
+    --primary: 73 35% 79%; /* #C8D27B - MUDANÇA (era #E9EBC6) */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA (era #2F302B) */
     
-    /* SECONDARY - verde claro para ênfase */
-    --secondary: 73 35% 79%; /* #C8D27B */
-    --secondary-foreground: 72 6% 18%; /* #2F302B */
+    /* SECONDARY - mantém para ênfase */
+    --secondary: 73 35% 79%; /* #C8D27B - mantém */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA */
     
-    /* MUTED - backgrounds sutis */
-    --muted: 63 45% 93%; /* #F6F7E9 - usar para inputs */
-    --muted-foreground: 72 6% 35%; /* Cinza médio para placeholder */
+    /* MUTED - backgrounds claros (inputs) */
+    --muted: 63 45% 93%; /* #F6F7E9 - mantém */
+    --muted-foreground: 72 6% 35%; /* Cinza médio - mantém */
     
-    /* ACCENT - destaques interativos */
-    --accent: 63 48% 85%; /* #E9EBC6 - mesmo dos botões */
-    --accent-foreground: 72 6% 18%; /* #2F302B - texto escuro */
+    /* ACCENT - ações secundárias */
+    --accent: 73 35% 79%; /* #C8D27B - usar para botões secundários */
+    --accent-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA */
     
     /* DESTRUCTIVE - erros */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     
-    /* BORDERS E INPUTS */
-    --border: 72 6% 88%; /* #E8E8E6 - borda suave sobre branco */
-    --input: 63 45% 93%; /* #F6F7E9 - fundo dos inputs */
-    --ring: 73 54% 39%; /* #889C2D - verde para focus */
+    /* BORDERS - precisam ser visíveis sobre fundo escuro */
+    --border: 72 6% 25%; /* #3D3E39 - MUDANÇA (era #E8E8E6) - mais claro que o background */
+    --input: 63 45% 93%; /* #F6F7E9 - mantém */
+    --ring: 73 54% 39%; /* #889C2D - mantém */
     
     /* SUBTÍTULOS */
-    --subtitle: 73 37% 69%; /* #BCC95D - verde-amarelo */
+    --subtitle: 73 37% 69%; /* #BCC95D - mantém */
     
     --radius: 0.75rem;
     
-    /* Chart Colors - Ajustados para tema claro */
-    --chart-1: 73 64% 32%; /* #738925 */
-    --chart-2: 73 54% 39%; /* #889C2D */
-    --chart-3: 73 55% 47%; /* #9EB038 */
-    --chart-4: 73 43% 54%; /* #AFC040 */
-    --chart-5: 73 37% 69%; /* #BCC95D */
-    --chart-6: 73 35% 79%; /* #C8D27B */
+    /* Chart Colors - mantém */
+    --chart-1: 73 64% 32%;
+    --chart-2: 73 54% 39%;
+    --chart-3: 73 55% 47%;
+    --chart-4: 73 43% 54%;
+    --chart-5: 73 37% 69%;
+    --chart-6: 73 35% 79%;
 
     /* Estados Negativos/Medianos - Paleta Sóbria */
     --chart-warning: 35 100% 55%; /* Laranja suave #F59E0B */
@@ -72,15 +72,15 @@ All colors MUST be HSL.
     --complexity-medium: 35 100% 55%; /* Laranja - Média complexidade */
     --complexity-low: 73 55% 47%; /* Verde primário - Baixa complexidade */
     
-    /* SIDEBAR */
-    --sidebar-background: 0 0% 100%; /* #FFFFFF - mesmo do background */
-    --sidebar-foreground: 72 6% 18%; /* #2F302B */
-    --sidebar-primary: 73 54% 39%; /* #889C2D */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 63 45% 93%; /* #F6F7E9 - fundo do item ativo */
-    --sidebar-accent-foreground: 73 54% 39%; /* #889C2D - texto do item ativo (verde) */
-    --sidebar-border: 72 6% 88%; /* #E8E8E6 - borda suave */
-    --sidebar-ring: 73 54% 39%; /* #889C2D */
+    /* SIDEBAR - sobre fundo escuro */
+    --sidebar-background: 72 6% 18%; /* #2F302B - MUDANÇA */
+    --sidebar-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA */
+    --sidebar-primary: 73 35% 79%; /* #C8D27B - MUDANÇA */
+    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA */
+    --sidebar-accent: 72 6% 22%; /* #35362F - fundo do item ativo (ligeiramente mais claro) */
+    --sidebar-accent-foreground: 73 35% 79%; /* #C8D27B - texto do item ativo */
+    --sidebar-border: 72 6% 25%; /* #3D3E39 - borda visível */
+    --sidebar-ring: 73 35% 79%; /* #C8D27B */
   }
 
   .dark {
@@ -177,12 +177,12 @@ All colors MUST be HSL.
   
   /* Estilo customizado para mensagens da IA no chat */
   .ai-message-container {
-    background-color: #2F302B; /* Fundo escuro */
-    color: #F6F7E9; /* Texto claro */
+    background-color: #2F302B;
+    color: #E9EBC6; /* #E9EBC6 - MUDANÇA (era #F6F7E9) */
     border-radius: 0.75rem;
     padding: 1rem;
     line-height: 1.6;
-    border: 1px solid #3A3B36; /* Borda ligeiramente mais clara */
+    border: 1px solid #3D3E39; /* Borda mais clara */
   }
 
   .ai-message-container p {
@@ -288,76 +288,69 @@ All colors MUST be HSL.
   
   /* Tipografia global */
   h1, h2, h3, h4, h5, h6 {
-    font-weight: 500; /* Sora Medium para todos os títulos */
-    color: hsl(var(--foreground)); /* #2F302B */
+    font-weight: 500; /* Sora Medium */
+    color: hsl(var(--foreground)); /* #FFFFFF - texto branco */
   }
 
   /* Classe específica para subtítulos */
   .subtitle,
   h2.subtitle,
   h3.subtitle {
-    color: hsl(var(--subtitle)); /* #BCC95D - verde-amarelo */
+    color: hsl(var(--subtitle)); /* #BCC95D - verde-amarelo - mantém */
   }
 
   p, span, div {
-    font-weight: 400; /* Sora Regular para texto normal */
+    font-weight: 400; /* Sora Regular */
   }
 
   strong, b {
-    font-weight: 600; /* Sora SemiBold para ênfase */
-    color: #889C2D; /* Verde destaque */
+    font-weight: 600; /* Sora SemiBold */
+    color: #889C2D; /* Verde destaque - mantém */
   }
   
   /* Classes utilitárias para cards */
   .card-enhanced {
-    background-color: hsl(72, 6%, 18%); /* #2F302B */
-    border: 1px solid hsl(72, 6%, 22%); /* #3A3B36 - borda mais clara */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Sombra mais escura */
-    color: hsl(63, 45%, 93%); /* #F6F7E9 - texto claro */
+    background-color: hsl(72, 6%, 18%); /* #2F302B - mantém */
+    border: 1px solid hsl(72, 6%, 25%); /* #3D3E39 - borda mais clara */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); /* sombra mais forte */
+    color: hsl(63, 48%, 85%); /* #E9EBC6 - texto claro */
   }
 
   .card-emphasis {
-    background-color: hsl(63, 48%, 85%); /* #E9EBC6 - botão */
-    border: 1px solid hsl(63, 48%, 80%);
+    background-color: hsl(63, 45%, 93%); /* #F6F7E9 - áreas claras */
+    border: 1px solid hsl(63, 45%, 88%);
     color: hsl(72, 6%, 18%); /* #2F302B - texto escuro */
   }
   
   .card-hover:hover {
-    border-color: hsl(73, 54%, 39%); /* #889C2D */
-    box-shadow: 0 4px 12px rgba(136, 156, 45, 0.15);
+    border-color: hsl(73, 35%, 79%); /* #C8D27B - verde claro */
+    box-shadow: 0 4px 12px rgba(200, 210, 123, 0.25);
     transition: all 0.3s ease;
   }
   
-  /* Inputs/textareas com fundo claro dentro de cards devem ter texto escuro */
-  .bg-card input.bg-background,
-  .bg-card textarea.bg-background {
-    color: hsl(var(--foreground)) !important;
+  /* Garantir texto claro em cards escuros */
+  .bg-card {
+    color: hsl(var(--card-foreground)) !important; /* #E9EBC6 */
   }
 
-  /* REGRA SUPER ESPECÍFICA - máxima especificidade para inputs/textareas com ambas as classes */
-  .bg-card input.bg-background.text-foreground,
-  .bg-card textarea.bg-background.text-foreground {
-    color: hsl(var(--foreground)) !important;
-  }
-  
-  /* Forçar texto branco em elementos text-foreground dentro de cards escuros */
-  .bg-card .text-foreground {
-    color: #FFFFFF !important;
+  /* Inputs claros dentro de cards - manter texto escuro */
+  .bg-card input.bg-muted,
+  .bg-card textarea.bg-muted,
+  .bg-card input.bg-input,
+  .bg-card textarea.bg-input {
+    color: hsl(72, 6%, 18%) !important; /* #2F302B - texto escuro */
   }
 
-  /* Textos em elementos com fundo claro dentro de cards devem ser escuros */
-  .bg-card .bg-background {
-    color: hsl(var(--foreground)) !important;
+  /* Garantir que áreas claras tenham texto escuro */
+  .bg-muted,
+  .bg-input {
+    color: hsl(72, 6%, 18%) !important; /* #2F302B */
   }
-  /* Quando há text-foreground junto com bg claro, garantir texto escuro */
-  .bg-card .bg-background.text-foreground,
-  .bg-card .bg-background .text-foreground {
-    color: hsl(var(--foreground)) !important;
-  }
-  /* Cobrir casos comuns de fundos "claros" usados no design */
-  .bg-card .bg-secondary,
-  .bg-card .bg-accent {
-    color: hsl(var(--foreground)) !important;
+
+  /* Placeholders em inputs claros */
+  .bg-muted::placeholder,
+  .bg-input::placeholder {
+    color: hsl(72, 6%, 45%) !important; /* Cinza médio */
   }
 
   /* Forçar títulos claros dentro de cards escuros */
@@ -368,17 +361,6 @@ All colors MUST be HSL.
   .bg-card h5,
   .bg-card h6 {
     color: hsl(var(--card-foreground)) !important;
-  }
-  
-  /* Garantir contraste em text-muted-foreground dentro de cards escuros */
-  .bg-card .text-muted-foreground {
-    color: #FFFFFF !important;
-    opacity: 1 !important;
-  }
-  
-  /* Garantir que inputs/elementos claros dentro de cards mantenham texto escuro */
-  .bg-card .bg-background {
-    color: hsl(var(--foreground));
   }
 
   /* Garantir texto claro em popovers escuros */
