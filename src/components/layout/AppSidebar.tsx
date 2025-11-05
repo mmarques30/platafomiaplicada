@@ -29,12 +29,12 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { open } = useSidebar();
   const navigate = useNavigate();
   const { isAdmin, isMentorado } = useUserRole();
   console.log("[AppSidebar] isAdmin:", isAdmin);
   console.log("[AppSidebar] isMentorado:", isMentorado);
-  const collapsed = state === "collapsed";
+  const collapsed = !open;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
