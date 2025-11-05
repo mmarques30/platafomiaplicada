@@ -286,27 +286,49 @@ All colors MUST be HSL.
     text-decoration: underline;
   }
   
-  /* Tipografia global */
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: 500; /* Sora Medium */
-    color: hsl(var(--foreground)); /* #FFFFFF - texto branco */
-  }
+/* Tipografia global */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500; /* Sora Medium */
+  color: hsl(var(--foreground)); /* #FFFFFF - texto branco */
+}
 
-  /* Classe específica para subtítulos */
-  .subtitle,
-  h2.subtitle,
-  h3.subtitle {
-    color: hsl(var(--subtitle)); /* #BCC95D - verde-amarelo - mantém */
-  }
+/* Classe específica para subtítulos */
+.subtitle,
+h2.subtitle,
+h3.subtitle {
+  color: hsl(var(--subtitle)); /* #BCC95D - verde-amarelo - mantém */
+  font-weight: 500; /* Sora Medium */
+}
 
-  p, span, div {
-    font-weight: 400; /* Sora Regular */
-  }
+p, span, div, label {
+  font-weight: 300; /* Sora Light */
+}
 
-  strong, b {
-    font-weight: 600; /* Sora SemiBold */
-    color: #889C2D; /* Verde destaque - mantém */
-  }
+strong, b {
+  font-weight: 600; /* Sora SemiBold */
+  color: #889C2D; /* Verde destaque - mantém */
+}
+
+/* Pesos específicos da fonte Sora */
+.font-sora-light {
+  font-family: 'Sora', system-ui, -apple-system, sans-serif;
+  font-weight: 300; /* Sora Light */
+}
+
+.font-sora-regular {
+  font-family: 'Sora', system-ui, -apple-system, sans-serif;
+  font-weight: 400; /* Sora Regular */
+}
+
+.font-sora-medium {
+  font-family: 'Sora', system-ui, -apple-system, sans-serif;
+  font-weight: 500; /* Sora Medium */
+}
+
+.font-sora-semibold {
+  font-family: 'Sora', system-ui, -apple-system, sans-serif;
+  font-weight: 600; /* Sora SemiBold */
+}
   
   /* Classes utilitárias para cards */
   .card-enhanced {

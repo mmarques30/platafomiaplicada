@@ -64,14 +64,14 @@ export function ConquistaCard({
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold">{titulo}</h3>
+              <h3 className="font-sora-medium text-card-foreground">{titulo}</h3>
               {mostrarProgresso && (
                 <Badge variant="secondary" className="text-xs">
                   {progresso}/{progressoNecessario}
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-muted-foreground mb-2">{descricao}</p>
+            <p className="text-sm font-sora-light text-card-foreground mb-2">{descricao}</p>
             {desbloqueada && dataDesbloqueio && (
               <p className="text-xs text-muted-foreground">
                 Desbloqueada em: {new Date(dataDesbloqueio).toLocaleDateString("pt-BR")}

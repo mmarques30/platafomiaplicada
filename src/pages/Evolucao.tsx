@@ -24,8 +24,8 @@ export default function Evolucao() {
     <div className="container mx-auto p-6 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">Evolução</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-sora-medium mb-2">Evolução</h1>
+        <p className="font-sora-light text-foreground">
           Acompanhe sua evolução e a da comunidade
         </p>
       </div>
@@ -63,8 +63,8 @@ export default function Evolucao() {
                       <div className="flex items-center gap-3">
                         <Flame className="h-8 w-8 text-orange-500" />
                         <div>
-                          <h3 className="text-2xl font-bold text-foreground">{sequencia} dias</h3>
-                          <p className="text-sm text-foreground/70">Sequência de estudos</p>
+                          <h3 className="text-2xl font-sora-semibold text-foreground">{sequencia} dias</h3>
+                          <p className="text-sm font-sora-light text-foreground">Sequência de estudos</p>
                         </div>
                       </div>
                     </div>
@@ -89,7 +89,7 @@ export default function Evolucao() {
           ) : (
             certificados && certificados.length > 0 && (
               <div>
-                <h2 className="text-2xl font-bold mb-4">Meus Certificados</h2>
+                <h2 className="text-2xl font-sora-medium mb-4 text-foreground">Meus Certificados</h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   {certificados.map((cert) => (
                     <CertificadoCard
@@ -108,7 +108,7 @@ export default function Evolucao() {
 
           {/* Conquistas */}
           <div>
-            <h2 className="text-2xl font-bold mb-4">Conquistas</h2>
+            <h2 className="text-2xl font-sora-medium mb-4 text-foreground">Conquistas</h2>
             <div className="grid gap-4 md:grid-cols-3">
               <ConquistaCard
                 titulo="Primeira Trilha"
