@@ -23,20 +23,28 @@ export default function Evolucao() {
   return (
     <div className="container mx-auto p-6 space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-sora-medium mb-2">Evolução</h1>
-        <p className="font-sora-light text-foreground">
-          Acompanhe sua evolução e a da comunidade
+      <div className="space-y-3">
+        <h1 className="text-4xl font-bold tracking-tight text-foreground">
+          Minha <span className="text-primary">Evolução</span>
+        </h1>
+        <p className="text-lg text-muted-foreground font-medium">
+          Acompanhe seu progresso e conquistas
         </p>
       </div>
 
       {/* Sistema de Abas */}
       <Tabs defaultValue="minha-evolucao" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="minha-evolucao">
+        <TabsList className="w-full justify-start bg-muted/30 rounded-xl p-1 h-auto border-2 border-primary/10">
+          <TabsTrigger 
+            value="minha-evolucao"
+            className="rounded-lg px-8 py-3 text-base font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+          >
             Minha Evolução
           </TabsTrigger>
-          <TabsTrigger value="comunidade">
+          <TabsTrigger 
+            value="comunidade"
+            className="rounded-lg px-8 py-3 text-base font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+          >
             Evolução da Comunidade
           </TabsTrigger>
         </TabsList>

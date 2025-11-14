@@ -8,138 +8,105 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* IAplicada Dark Theme - Branding 2025 */
+    /* Light Mode - Inspired by LP */
+    --background: 0 0% 100%;
+    --foreground: 72 6% 18%;
     
-    /* BACKGROUND PRINCIPAL: #2F302B - ESCURO */
-    --background: 72 6% 18%; /* #2F302B - MUDANÇA CRÍTICA */
+    --card: 60 45% 97%;
+    --card-foreground: 72 6% 18%;
     
-    /* TEXTO PRINCIPAL: #FFFFFF - BRANCO */
-    --foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA CRÍTICA */
+    --popover: 0 0% 100%;
+    --popover-foreground: 72 6% 18%;
     
-    /* CARDS: #2F302B - mesmo do background, usar bordas para contraste */
-    --card: 72 6% 18%; /* #2F302B - mantém */
-    --card-foreground: 63 48% 85%; /* #E9EBC6 - MUDANÇA (era #F6F7E9) */
+    --primary: 73 55% 47%;
+    --primary-foreground: 0 0% 100%;
     
-    /* POPOVERS - fundo escuro, texto claro */
-    --popover: 72 6% 18%; /* #2F302B - mantém */
-    --popover-foreground: 63 48% 85%; /* #E9EBC6 - MUDANÇA */
+    --secondary: 73 35% 79%;
+    --secondary-foreground: 72 6% 18%;
     
-    /* PRIMARY - BOTÕES PRINCIPAIS: #C8D27B */
-    --primary: 73 35% 79%; /* #C8D27B - MUDANÇA (era #E9EBC6) */
-    --primary-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA (era #2F302B) */
+    --muted: 63 45% 93%;
+    --muted-foreground: 72 6% 50%;
     
-    /* SECONDARY - mantém para ênfase */
-    --secondary: 73 35% 79%; /* #C8D27B - mantém */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA */
+    --accent: 73 37% 69%;
+    --accent-foreground: 72 6% 18%;
     
-    /* MUTED - backgrounds claros (inputs) */
-    --muted: 63 45% 93%; /* #F6F7E9 - mantém */
-    --muted-foreground: 72 6% 35%; /* Cinza médio - mantém */
-    
-    /* ACCENT - ações secundárias */
-    --accent: 73 35% 79%; /* #C8D27B - usar para botões secundários */
-    --accent-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA */
-    
-    /* DESTRUCTIVE - erros */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     
-    /* BORDERS - precisam ser visíveis sobre fundo escuro */
-    --border: 72 6% 25%; /* #3D3E39 - MUDANÇA (era #E8E8E6) - mais claro que o background */
-    --input: 63 45% 93%; /* #F6F7E9 - mantém */
-    --ring: 73 54% 39%; /* #889C2D - mantém */
-    
-    /* SUBTÍTULOS */
-    --subtitle: 73 37% 69%; /* #BCC95D - mantém */
-    
-    --radius: 0.75rem;
-    
-    /* Chart Colors - mantém */
-    --chart-1: 73 64% 32%;
-    --chart-2: 73 54% 39%;
-    --chart-3: 73 55% 47%;
-    --chart-4: 73 43% 54%;
-    --chart-5: 73 37% 69%;
-    --chart-6: 73 35% 79%;
-
-    /* Estados Negativos/Medianos - Paleta Sóbria */
-    --chart-warning: 35 100% 55%; /* Laranja suave #F59E0B */
-    --chart-error: 0 70% 55%; /* Vermelho suave #E86A6A */
-    --chart-neutral: 0 0% 60%; /* Cinza neutro */
-    
-    /* Complexidade de Projetos */
-    --complexity-high: 0 70% 55%; /* Vermelho - Alta complexidade */
-    --complexity-medium: 35 100% 55%; /* Laranja - Média complexidade */
-    --complexity-low: 73 55% 47%; /* Verde primário - Baixa complexidade */
-    
-    /* SIDEBAR - sobre fundo escuro */
-    --sidebar-background: 72 6% 18%; /* #2F302B - MUDANÇA */
-    --sidebar-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA */
-    --sidebar-primary: 73 35% 79%; /* #C8D27B - MUDANÇA */
-    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - MUDANÇA */
-    --sidebar-accent: 72 6% 22%; /* #35362F - fundo do item ativo (ligeiramente mais claro) */
-    --sidebar-accent-foreground: 73 35% 79%; /* #C8D27B - texto do item ativo */
-    --sidebar-border: 72 6% 25%; /* #3D3E39 - borda visível */
-    --sidebar-ring: 73 35% 79%; /* #C8D27B */
-  }
-
-  .dark {
-    /* IAplicada Dark Theme - Configuração anterior */
-    --background: 75 5% 15%; /* #272824 - Background do branding */
-    --foreground: 60 100% 97%; /* #FFFFF6 - Amarelo claro do branding */
-    
-    --card: 30 4% 24%;
-    --card-foreground: 60 100% 97%;
-    
-    --popover: 30 4% 24%;
-    --popover-foreground: 60 100% 97%;
-    
-    --primary: 73 55% 47%; /* #9EB038 - Verde 600 */
-    --primary-foreground: 30 4% 19%;
-    
-    --secondary: 73 37% 69%; /* #BCC95D - Verde 500 */
-    --secondary-foreground: 30 4% 19%;
-    
-    --muted: 30 4% 28%;
-    --muted-foreground: 0 0% 60%;
-    
-    --accent: 73 55% 47%; /* Verde primário para destaques */
-    --accent-foreground: 30 4% 19%;
-    
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 100% 97%;
-    
-    --border: 30 4% 30%;
-    --input: 30 4% 24%;
+    --border: 73 35% 85%;
+    --input: 73 35% 85%;
     --ring: 73 55% 47%;
     
     --radius: 0.75rem;
     
-    /* Chart Colors - Paleta Verde do Branding IAplicada */
-    --chart-1: 73 64% 32%; /* #738925 - Verde 900 */
-    --chart-2: 73 54% 39%; /* #889C2D - Verde 800 */
-    --chart-3: 73 55% 47%; /* #9EB038 - Verde 700 (primário) */
-    --chart-4: 73 43% 54%; /* #AFC040 - Verde 600 */
-    --chart-5: 73 37% 69%; /* #BCC95D - Verde 500 */
-    --chart-6: 73 35% 79%; /* #C8D27B - Verde 400 */
-
-    /* Estados Negativos/Medianos - Paleta Sóbria */
-    --chart-warning: 35 100% 55%; /* Laranja suave #F59E0B */
-    --chart-error: 0 70% 55%; /* Vermelho suave #E86A6A */
-    --chart-neutral: 0 0% 60%; /* Cinza neutro */
-    
-    /* Complexidade de Projetos */
-    --complexity-high: 0 70% 55%; /* Vermelho - Alta complexidade */
-    --complexity-medium: 35 100% 55%; /* Laranja - Média complexidade */
-    --complexity-low: 73 55% 47%; /* Verde primário - Baixa complexidade */
-    
-    --sidebar-background: 72 6% 17%;
-    --sidebar-foreground: 60 100% 97%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 72 6% 18%;
     --sidebar-primary: 73 55% 47%;
-    --sidebar-primary-foreground: 30 4% 19%;
-    --sidebar-accent: 30 4% 22%;
-    --sidebar-accent-foreground: 60 100% 97%;
-    --sidebar-border: 30 4% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 63 45% 93%;
+    --sidebar-accent-foreground: 72 6% 18%;
+    --sidebar-border: 73 35% 90%;
+    --sidebar-ring: 73 55% 47%;
+    
+    --complexity-high: 0 100% 65%;
+    --complexity-medium: 35 90% 55%;
+    --complexity-low: 73 55% 47%;
+    
+    --chart-1: 73 55% 47%;
+    --chart-2: 73 35% 79%;
+    --chart-3: 73 37% 69%;
+    --chart-4: 72 6% 18%;
+    --chart-5: 63 45% 93%;
+  }
+
+  .dark {
+    --background: 72 6% 15%;
+    --foreground: 0 0% 95%;
+    
+    --card: 72 6% 18%;
+    --card-foreground: 73 37% 85%;
+    
+    --popover: 72 6% 16%;
+    --popover-foreground: 0 0% 95%;
+    
+    --primary: 73 55% 47%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 72 6% 25%;
+    --secondary-foreground: 73 37% 85%;
+    
+    --muted: 72 6% 22%;
+    --muted-foreground: 73 20% 65%;
+    
+    --accent: 73 37% 35%;
+    --accent-foreground: 73 37% 85%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 72 6% 25%;
+    --input: 72 6% 25%;
+    --ring: 73 55% 47%;
+    
+    --radius: 0.75rem;
+    
+    --chart-1: 73 55% 47%;
+    --chart-2: 73 35% 79%;
+    --chart-3: 73 37% 69%;
+    --chart-4: 72 6% 18%;
+    --chart-5: 63 45% 93%;
+    
+    --complexity-high: 0 100% 65%;
+    --complexity-medium: 35 90% 55%;
+    --complexity-low: 73 55% 47%;
+    
+    --sidebar-background: 72 6% 16%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 73 55% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 72 6% 22%;
+    --sidebar-accent-foreground: 73 37% 85%;
+    --sidebar-border: 72 6% 25%;
     --sidebar-ring: 73 55% 47%;
   }
 }
@@ -153,11 +120,58 @@ All colors MUST be HSL.
     @apply bg-background text-foreground antialiased;
     font-family: 'Sora', system-ui, -apple-system, sans-serif;
   }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, hsla(73, 55%, 47%, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, hsla(73, 37%, 69%, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Card Variants */
+  .card-enhanced {
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 2px 8px hsla(var(--foreground), 0.04);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-enhanced:hover {
+    box-shadow: 0 8px 24px hsla(var(--foreground), 0.08);
+    transform: translateY(-2px);
+  }
+
+  .card-primary {
+    background: linear-gradient(135deg, hsla(73, 55%, 47%, 0.05) 0%, hsla(73, 37%, 69%, 0.05) 100%);
+    border: 1px solid hsla(73, 55%, 47%, 0.2);
+    box-shadow: 0 2px 8px hsla(73, 55%, 47%, 0.08);
+  }
+
+  .card-glassmorphism {
+    background: hsla(var(--card), 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsla(var(--border), 0.5);
+  }
   
   /* Gradientes de fundo modernos */
   .gradient-bg {
-    background: radial-gradient(circle at 20% 50%, rgba(136, 156, 45, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(200, 210, 123, 0.06) 0%, transparent 50%);
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(73, 55%, 47%) 0%, hsl(73, 37%, 69%) 100%);
   }
   
   /* Efeito glow para elementos especiais (Chat AI) */

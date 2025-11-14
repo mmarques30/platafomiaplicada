@@ -25,18 +25,19 @@ export function ProgressCard({
   };
 
   return (
-    <Card>
+    <Card className="card-enhanced">
       <CardHeader>
-        <CardTitle className="font-sora-medium text-card-foreground">Seu Progresso Geral</CardTitle>
+        <CardTitle className="font-bold text-foreground text-xl">Progresso Geral</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-sora-regular text-card-foreground">
-              Trilhas concluídas: {trilhasConcluidas}/{totalTrilhas} ({percentualConclusao}%)
+          <h3 className="text-base font-semibold mb-3 text-foreground">Conclusão de Trilhas</h3>
+          <div className="flex items-center gap-3">
+            <Progress value={percentualConclusao} className="flex-1 h-3" />
+            <span className="text-base text-primary font-bold min-w-[3rem] text-right">
+              {percentualConclusao}%
             </span>
           </div>
-          <Progress value={percentualConclusao} className="h-3" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">

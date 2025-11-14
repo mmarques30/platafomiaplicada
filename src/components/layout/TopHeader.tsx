@@ -60,23 +60,23 @@ export function TopHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
+    <header className="sticky top-0 z-50 w-full border-b-2 border-primary/10 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="flex h-16 items-center justify-between px-6 max-w-7xl mx-auto">
         {/* ESQUERDA: SidebarTrigger + Logo */}
         <div className="flex items-center gap-4">
-          <SidebarTrigger />
-          <Link to="/" className="flex items-center">
+          <SidebarTrigger className="hover:bg-accent/50 transition-colors" />
+          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img src={logoAplicada} alt="Aplicada" className="h-12 w-auto" />
           </Link>
         </div>
 
-        {/* CENTRO: Menu de Navegação Horizontal */}
-        <nav className="hidden lg:flex items-center gap-6 flex-1 justify-center">
+        {/* CENTRO: Menu de Navegação Horizontal - Tech Executive */}
+        <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
           <NavLink 
             to="/" 
             end
             className={({ isActive }) => cn(
-              "text-sm font-medium smooth-transition",
+              "text-sm font-semibold smooth-transition",
               isActive ? "text-primary" : "text-foreground hover:text-primary"
             )}
           >

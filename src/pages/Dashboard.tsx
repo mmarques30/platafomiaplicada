@@ -63,14 +63,14 @@ export default function Dashboard() {
       <main className="container py-6 space-y-8">
         {/* Aviso de senha temporária */}
         {mostrarAvisoSenha && (
-          <Alert className="border-warning bg-warning/10">
-            <AlertCircle className="h-4 w-4 text-warning" />
+          <Alert className="border-2 border-primary bg-primary/5 shadow-md">
+            <AlertCircle className="h-4 w-4 text-primary" />
             <AlertDescription className="flex items-center justify-between">
               <div className="flex-1">
-                <strong>Senha temporária detectada:</strong> Por segurança, recomendamos que você{" "}
+                <strong className="text-primary">Senha temporária detectada:</strong> Por segurança, recomendamos que você{" "}
                 <Link 
                   to="/configuracoes" 
-                  className="underline font-medium hover:text-warning"
+                  className="underline font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
                   altere sua senha em Configurações
                 </Link>
@@ -79,7 +79,7 @@ export default function Dashboard() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="ml-4"
+                className="ml-4 hover:bg-primary/10"
                 onClick={() => setMostrarAvisoSenha(false)}
               >
                 <X className="h-4 w-4" />
@@ -88,25 +88,35 @@ export default function Dashboard() {
           </Alert>
         )}
 
-        {/* Header de Boas-Vindas */}
-        <WelcomeHeader />
+        {/* Hero Section - Inspirado na LP */}
+        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-accent/5 border-2 border-primary/10 p-8 md:p-12 shadow-lg">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10">
+            <WelcomeHeader />
+          </div>
+        </section>
 
         {/* Novidades da Semana */}
         <section>
           <NovidadesSemana />
         </section>
 
-        {/* Chat da Mari - Discreto e centralizado */}
+        {/* Chat da Mari - Tech Executive */}
         <section className="flex items-center justify-center">
           <div className="w-full max-w-4xl px-6">
-            <div className="relative bg-card border border-accent/20 rounded-2xl p-2 shadow-lg">
-              <form onSubmit={handleSubmit} className="flex items-center gap-3">
+            <div className="relative card-glassmorphism rounded-2xl p-3 shadow-xl border-2 border-primary/10">
+              <form onSubmit={handleSubmit} className="flex items-center gap-4">
                 {/* Avatar da Mari */}
-                <img 
-                  src={mariAvatar} 
-                  alt="Mari" 
-                  className="w-10 h-10 rounded-full object-cover border-2 border-accent/40 flex-shrink-0 ml-2"
-                />
+                <div className="relative">
+                  <img 
+                    src={mariAvatar} 
+                    alt="Mari" 
+                    className="w-12 h-12 rounded-full object-cover border-2 border-primary shadow-md flex-shrink-0"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-background"></div>
+                </div>
                 
                 {/* Input com dropdown de sugestões */}
                 <div className="flex-1 relative">

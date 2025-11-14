@@ -49,38 +49,37 @@ export function WelcomeHeader() {
   const diaSemana = formatInTimeZone(dataAtual, TIMEZONE, 'EEE', { locale: ptBR });
 
   return (
-    <div className="w-full bg-gradient-to-r from-accent/5 to-primary/5 rounded-xl px-4 py-3 md:px-6 md:py-4 mb-6 border border-accent/20">
-      <div className="flex flex-row items-center justify-between gap-3">
+    <div className="w-full">
+      <div className="flex flex-row items-center justify-between gap-4">
         {/* Coluna Esquerda - Saudação e Tema */}
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl md:text-2xl font-bold text-foreground">
-            {saudacao}, {primeiroNome}!
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            {saudacao}, <span className="text-primary">{primeiroNome}</span>!
           </h1>
           
           {aulaAtiva ? (
-            <p className="text-sm text-muted-foreground mt-0.5">
-              <span className="font-semibold text-foreground">Tema:</span> {aulaAtiva.tema} • às {aulaAtiva.horario} - {aulaAtiva.dia_semana}
+            <p className="text-base md:text-lg text-muted-foreground">
+              <span className="font-semibold text-foreground">Próxima aula:</span> {aulaAtiva.tema} • {aulaAtiva.horario} - {aulaAtiva.dia_semana}
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground mt-0.5">
+            <p className="text-base md:text-lg text-muted-foreground font-medium">
               Aplique, replique e domine IA
             </p>
           )}
         </div>
 
-        {/* Coluna Direita - Card Compacto */}
+        {/* Coluna Direita - Card Compacto Tech */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Card de calendário - novo design */}
-          <div className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-200">
-            {/* Ícone em círculo verde oliva */}
-            <div className="bg-[#6B7255] rounded-xl p-2.5 flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-white" strokeWidth={2} />
+          <div className="flex items-center gap-3 bg-card rounded-2xl px-5 py-4 shadow-md border-2 border-primary/10 card-enhanced">
+            {/* Ícone em círculo primary */}
+            <div className="bg-primary rounded-xl p-3 flex items-center justify-center shadow-sm">
+              <Calendar className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
             </div>
             
             {/* Texto - Dia e Mês */}
             <div className="flex flex-col items-start leading-tight">
-              <span className="text-2xl font-bold text-gray-900">{dia}</span>
-              <span className="text-sm text-gray-500 font-medium">{diaSemana}, {mes}</span>
+              <span className="text-2xl font-bold text-foreground">{dia}</span>
+              <span className="text-sm text-muted-foreground font-medium uppercase tracking-wide">{diaSemana}, {mes}</span>
             </div>
           </div>
         </div>
