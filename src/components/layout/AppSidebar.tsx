@@ -16,7 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import logoAplicada from "@/assets/logo-aplicada-completa.png";
+import logoAplicada from "@/assets/logo-aplicada-marca-completa.png";
 import { useUserRole } from "@/hooks/useUserRole";
 import { cn } from "@/lib/utils";
 
@@ -55,9 +55,9 @@ export function AppSidebar() {
       <SidebarHeader className="border-b-2 border-primary/10">
         <div className="flex h-16 items-center justify-center px-4 bg-gradient-to-br from-primary/5 to-transparent">
           {!collapsed ? (
-            <img src={logoAplicada} alt="Aplicada" className="h-10 w-auto drop-shadow-md" />
+            <img src={logoAplicada} alt="IAplicada" className="h-12 w-auto drop-shadow-md" />
           ) : (
-            <img src={logoAplicada} alt="Aplicada" className="h-8 w-auto drop-shadow-sm" />
+            <img src={logoAplicada} alt="IAplicada" className="h-10 w-auto drop-shadow-sm" />
           )}
         </div>
       </SidebarHeader>
