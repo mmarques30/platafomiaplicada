@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import {
   Sidebar,
   SidebarContent,
@@ -63,12 +64,19 @@ export function AdminSidebar() {
             <SidebarMenu>
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.path;
 
                 return (
                   <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
-                      <NavLink to={item.path}>
+                    <SidebarMenuButton asChild tooltip={item.label}>
+                      <NavLink 
+                        to={item.path}
+                        className={({ isActive }) => cn(
+                          "font-medium transition-colors duration-200",
+                          isActive 
+                            ? "text-primary font-semibold" 
+                            : "text-foreground hover:text-primary"
+                        )}
+                      >
                         <Icon />
                         <span>{item.label}</span>
                       </NavLink>
@@ -87,7 +95,7 @@ export function AdminSidebar() {
             <SidebarMenuButton asChild tooltip="Voltar para o Site">
               <Button
                 variant="ghost"
-                className="w-full justify-start"
+                className="w-full justify-start text-foreground hover:text-primary font-medium transition-colors"
                 onClick={() => navigate("/")}
               >
                 <ArrowLeft />
