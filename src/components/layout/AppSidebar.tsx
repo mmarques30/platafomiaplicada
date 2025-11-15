@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import logoAplicada from "@/assets/logo-aplicada-marca-completa.png";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -33,14 +34,14 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
   const { isAdmin, isMentorado } = useUserRole();
+  const { signOut } = useAuth();
   console.log("[AppSidebar] isAdmin:", isAdmin);
   console.log("[AppSidebar] isMentorado:", isMentorado);
   const collapsed = !open;
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     toast.success("Logout realizado com sucesso");
-    navigate("/auth");
   };
 
   const getNavLinkClasses = ({ isActive }: { isActive: boolean }) =>
