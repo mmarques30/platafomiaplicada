@@ -21,6 +21,8 @@ export function useUserRole() {
       return data.map(r => r.role as UserRole);
     },
     enabled: !!user,
+    staleTime: 0, // Sempre revalidar
+    gcTime: 0,    // Limpar cache imediatamente quando desabilitado
   });
 
   const hasRole = (role: UserRole) => {

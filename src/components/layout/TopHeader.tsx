@@ -24,7 +24,7 @@ import { useLocation } from "react-router-dom";
 export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   
   // Detectar rotas ativas para dropdowns
   const isCursosActive = ['/trilhas', '/mentoria'].some(path => location.pathname.startsWith(path));
@@ -42,9 +42,8 @@ export function TopHeader() {
   });
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     toast.success("Logout realizado com sucesso");
-    navigate("/auth");
   };
 
   const getInitials = (email?: string | null, nome?: string | null) => {
