@@ -97,27 +97,47 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
 
   const uploadThumbnail = async (): Promise<string | null> => {
     if (!thumbnailFile) return null;
-
-    setUploading(true);
+    
     try {
-      const fileExt = thumbnailFile.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const ext = thumbnailFile.name.split('.').pop()?.toLowerCase() || 'png';
+      const basePath = video?.id ? `videos/${video.id}` : `temp/${Date.now()}`;
+      const filePath = `${basePath}/thumbnail-${Date.now()}.${ext}`;
+
+      console.info("[VideoModal] Uploading thumbnail to:", filePath);
 
       const { error: uploadError } = await supabase.storage
         .from('video-thumbnails')
-        .upload(filePath, thumbnailFile);
+        .upload(filePath, thumbnailFile, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: thumbnailFile.type || 'image/*',
+        });
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage
+      // Tenta URL pública
+      const { data: publicData } = supabase.storage
         .from('video-thumbnails')
         .getPublicUrl(filePath);
 
-      return data.publicUrl;
+      let finalUrl = publicData?.publicUrl;
+
+      // Fallback para URL assinada caso bucket não seja público
+      if (!finalUrl) {
+        const { data: signed, error: signedErr } = await supabase.storage
+          .from('video-thumbnails')
+          .createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 ano
+        if (signedErr) throw signedErr;
+        finalUrl = signed?.signedUrl || null;
+      }
+
+      console.info("[VideoModal] Thumbnail URL:", finalUrl);
+      if (finalUrl) setThumbnailPreview(finalUrl);
+
+      return finalUrl || null;
     } catch (error) {
-      console.error('Error uploading thumbnail:', error);
-      toast.error("Erro ao fazer upload do thumbnail");
+      console.error("[VideoModal] Error uploading thumbnail:", error);
+      toast.error("Erro ao enviar o thumbnail. Tente novamente.");
       return null;
     } finally {
       setUploading(false);
@@ -135,6 +155,11 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
   };
 
   const onSubmit = async (data: any) => {
+    if (uploading) {
+      toast.info("Aguarde o upload do thumbnail finalizar");
+      return;
+    }
+
     // Validar se módulo foi selecionado
     if (!data.modulo_id) {
       toast.error("Selecione um módulo");
@@ -146,6 +171,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
     
     // Só atualizar se houver novo upload
     if (thumbnailFile) {
+      setUploading(true);
       const uploadedUrl = await uploadThumbnail();
       if (uploadedUrl) {
         thumbnailUrl = uploadedUrl;
@@ -157,6 +183,8 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       thumbnail_customizado_url: thumbnailUrl,
       materiais: materiais
     };
+
+    console.info("[VideoModal] Submitting video data:", submitData);
 
     if (video) {
       updateVideo.mutate({ id: video.id, ...submitData }, { onSuccess: () => onOpenChange(false) });
@@ -337,7 +365,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
           <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
             <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={uploading}>
-              {uploading ? "Fazendo upload..." : video ? "Atualizar" : "Criar"}
+              {uploading ? "Enviando thumbnail..." : video ? "Atualizar" : "Criar"}
             </Button>
           </div>
         </DialogFooter>
