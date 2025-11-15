@@ -48,6 +48,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       setThumbnailPreview(video.thumbnail_customizado_url || "");
       setThumbnailFile(null);
       setValue("visivel_mentorados", video.visivel_mentorados ?? false);
+      setValue("thumbnail_customizado_url", video.thumbnail_customizado_url || "");
       
       // Carregar materiais existentes
       try {
@@ -98,6 +99,8 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
   const uploadThumbnail = async (): Promise<string | null> => {
     if (!thumbnailFile) return null;
     
+    setUploading(true);
+    
     try {
       const ext = thumbnailFile.name.split('.').pop()?.toLowerCase() || 'png';
       const basePath = video?.id ? `videos/${video.id}` : `temp/${Date.now()}`;
@@ -132,7 +135,11 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       }
 
       console.info("[VideoModal] Thumbnail URL:", finalUrl);
-      if (finalUrl) setThumbnailPreview(finalUrl);
+      
+      if (finalUrl) {
+        setThumbnailPreview(finalUrl);
+        setValue("thumbnail_customizado_url", finalUrl, { shouldDirty: true });
+      }
 
       return finalUrl || null;
     } catch (error) {
@@ -166,17 +173,18 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       return;
     }
 
-    // Preservar thumbnail existente ao editar, ou null para novos vídeos
-    let thumbnailUrl = video?.thumbnail_customizado_url || null;
-    
-    // Só atualizar se houver novo upload
+    // Se houver novo upload, fazer upload primeiro
     if (thumbnailFile) {
-      setUploading(true);
       const uploadedUrl = await uploadThumbnail();
-      if (uploadedUrl) {
-        thumbnailUrl = uploadedUrl;
+      if (!uploadedUrl) {
+        // Upload falhou, não continuar
+        return;
       }
     }
+
+    // Obter thumbnail do form (já foi setado pelo uploadThumbnail)
+    const formThumb = watch("thumbnail_customizado_url")?.trim();
+    const thumbnailUrl = formThumb || video?.thumbnail_customizado_url || null;
 
     const submitData = { 
       ...data, 
