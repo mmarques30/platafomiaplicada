@@ -12,7 +12,6 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, requireRole, requireAnyRole }: ProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { hasRole, isLoading: roleLoading, roles } = useUserRole();
-  const [showTimeout, setShowTimeout] = useState(false);
 
   const needsRoleCheck = Boolean(requireRole) || (Array.isArray(requireAnyRole) && requireAnyRole.length > 0);
 
@@ -26,22 +25,7 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
     console.log("[ProtectedRoute] Require Any Role:", requireAnyRole);
   }, [authLoading, roleLoading, user, roles, requireRole, requireAnyRole]);
 
-  // Timeout para evitar loading infinito
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (authLoading || (needsRoleCheck && roleLoading)) {
-        console.warn("[ProtectedRoute] Loading timeout - redirecting to auth");
-        setShowTimeout(true);
-      }
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [authLoading, roleLoading, needsRoleCheck]);
-
-  if (showTimeout) {
-    return <Navigate to="/auth" replace />;
-  }
-
+  // Enquanto estiver carregando auth ou papéis (quando necessário), apenas mostra loader
   if (authLoading || (needsRoleCheck && roleLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -50,11 +34,13 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
     );
   }
 
+  // Após carregar auth, se não houver usuário, redireciona para /auth
   if (!user) {
     console.log("[ProtectedRoute] No user - redirecting to auth");
     return <Navigate to="/auth" replace />;
   }
 
+  // Checagem de papéis somente quando necessário
   if (requireRole && !hasRole(requireRole)) {
     console.log("[ProtectedRoute] Missing required role:", requireRole);
     return <Navigate to="/" replace />;
