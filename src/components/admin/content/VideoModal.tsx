@@ -141,8 +141,10 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       return;
     }
 
-    let thumbnailUrl = data.thumbnail_customizado_url;
+    // Preservar thumbnail existente ao editar, ou null para novos vídeos
+    let thumbnailUrl = video?.thumbnail_customizado_url || null;
     
+    // Só atualizar se houver novo upload
     if (thumbnailFile) {
       const uploadedUrl = await uploadThumbnail();
       if (uploadedUrl) {
