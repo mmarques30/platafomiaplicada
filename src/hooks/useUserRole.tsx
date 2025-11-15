@@ -11,7 +11,6 @@ export function useUserRole() {
     queryKey: ["user-roles", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
@@ -21,8 +20,10 @@ export function useUserRole() {
       return data.map(r => r.role as UserRole);
     },
     enabled: !!user,
-    staleTime: 0, // Sempre revalidar
-    gcTime: 0,    // Limpar cache imediatamente quando desabilitado
+    staleTime: 1000 * 60 * 5,   // 5 minutos
+    gcTime: 1000 * 60 * 10,     // 10 minutos
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   const hasRole = (role: UserRole) => {
