@@ -44,12 +44,6 @@ export function AppSidebar() {
     toast.success("Logout realizado com sucesso");
   };
 
-  const getNavLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-3 py-2 rounded-lg smooth-transition ${
-      isActive
-        ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-        : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-    }`;
 
   return (
     <Sidebar className="border-r-2 border-primary/10 bg-background/50 backdrop-blur-sm">
@@ -74,10 +68,10 @@ export function AppSidebar() {
                       to={item.url} 
                       end 
                       className={({ isActive }) => cn(
-                        "relative rounded-lg transition-all duration-200",
+                        "relative rounded-lg transition-all duration-200 font-medium",
                         isActive 
-                          ? "bg-primary/10 text-primary font-semibold shadow-sm before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-8 before:w-1 before:bg-primary before:rounded-r" 
-                          : "text-foreground hover:bg-accent/50 hover:text-primary"
+                          ? "text-primary font-semibold" 
+                          : "text-foreground hover:text-primary"
                       )}
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
@@ -102,10 +96,10 @@ export function AppSidebar() {
                     <NavLink 
                       to="/admin" 
                       className={({ isActive }) => cn(
-                        "relative rounded-lg transition-all duration-200",
+                        "relative rounded-lg transition-all duration-200 font-medium",
                         isActive 
-                          ? "bg-primary/10 text-primary font-semibold shadow-sm before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-8 before:w-1 before:bg-primary before:rounded-r" 
-                          : "text-foreground hover:bg-accent/50 hover:text-primary"
+                          ? "text-primary font-semibold" 
+                          : "text-foreground hover:text-primary"
                       )}
                     >
                       <Shield className="h-4 w-4 shrink-0" />
@@ -123,7 +117,13 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-        <NavLink to="/configuracoes" className={getNavLinkClasses}>
+        <NavLink 
+          to="/configuracoes" 
+          className={({ isActive }) => cn(
+            "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors font-medium",
+            isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
+          )}
+        >
           <Settings className="h-4 w-4 shrink-0" />
           {!collapsed && <span>Configurações</span>}
         </NavLink>
