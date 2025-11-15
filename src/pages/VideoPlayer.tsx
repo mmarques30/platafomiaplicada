@@ -221,7 +221,7 @@ export default function VideoPlayer() {
                     {video.duracao && (
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>{Math.floor(video.duracao / 60)} min</span>
+                        <span>{video.duracao} min</span>
                       </div>
                     )}
                     <div className="flex items-center gap-2">

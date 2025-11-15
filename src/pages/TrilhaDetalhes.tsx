@@ -1,6 +1,8 @@
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { useState, useEffect, useRef } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -142,10 +144,18 @@ export default function TrilhaDetalhes() {
     return progressData?.find(p => p.video_id === videoId);
   };
 
-  const formatDuration = (seconds?: number) => {
-    if (!seconds) return "N/A";
-    const mins = Math.floor(seconds / 60);
-    return `${mins} min`;
+  const formatDuration = (minutos?: number) => {
+    if (!minutos) return "N/A";
+    return `${minutos} min`;
+  };
+
+  const formatDataAula = (dataAula?: string | null) => {
+    if (!dataAula) return null;
+    try {
+      return format(new Date(dataAula), "dd/MM/yyyy", { locale: ptBR });
+    } catch {
+      return null;
+    }
   };
 
   const { averageRating, ratingCount, userRating, setRating } = useVideoRating(currentVideoId || "");
@@ -237,13 +247,18 @@ export default function TrilhaDetalhes() {
                 </div>
 
                 {/* Título e duração */}
-                <div>
-                  <h1 className="text-2xl font-bold mb-2">{currentVideo.titulo}</h1>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div>
+                <h1 className="text-2xl font-bold mb-2">{currentVideo.titulo}</h1>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     <span>{formatDuration(currentVideo.duracao)}</span>
                   </div>
+                  {formatDataAula(currentVideo.data_aula) && (
+                    <span>• Data da aula: {formatDataAula(currentVideo.data_aula)}</span>
+                  )}
                 </div>
+              </div>
 
                 {/* Avaliação e Botão Concluir */}
                 <Card>
@@ -404,24 +419,29 @@ export default function TrilhaDetalhes() {
                                         )}
                                       </div>
                                       
-                                      <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-medium line-clamp-2 mb-1">
-                                          {video.titulo}
-                                        </h4>
-                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                          <span>{formatDuration(video.duracao)}</span>
-                                          {isCompleted ? (
-                                            <CheckCircle2 className="h-3 w-3 text-green-500" />
-                                          ) : (
-                                            <Circle className="h-3 w-3" />
-                                          )}
-                                        </div>
-                                        {isPlaying && (
-                                          <Badge variant="default" className="mt-1 text-xs">
-                                            Tocando agora
-                                          </Badge>
-                                        )}
-                                      </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium line-clamp-2 mb-1">
+                            {video.titulo}
+                          </h4>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>{formatDuration(video.duracao)}</span>
+                            {isCompleted ? (
+                              <CheckCircle2 className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <Circle className="h-3 w-3" />
+                            )}
+                          </div>
+                          {formatDataAula(video.data_aula) && (
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              {formatDataAula(video.data_aula)}
+                            </div>
+                          )}
+                          {isPlaying && (
+                            <Badge variant="default" className="mt-1 text-xs">
+                              Tocando agora
+                            </Badge>
+                          )}
+                        </div>
                                     </div>
                                   );
                                 })}
