@@ -107,7 +107,7 @@ export default function Dashboard() {
         <section className="flex items-center justify-center">
           <div className="w-full max-w-4xl px-6">
             <div className="relative card-glassmorphism rounded-2xl p-3 shadow-xl border-2 border-primary/10">
-              <form onSubmit={handleSubmit} className="flex items-center gap-4">
+              <form onSubmit={handleSubmit} autoComplete="off" role="search" className="flex items-center gap-4">
                 {/* Avatar da Mari */}
                 <div className="relative">
                   <img 
@@ -121,7 +121,17 @@ export default function Dashboard() {
                 {/* Input com dropdown de sugestões */}
                 <div className="flex-1 relative">
                   <input
-                    type="text"
+                    type="search"
+                    id="mari-question"
+                    name="mari-question"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    inputMode="search"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-bwignore="true"
+                    aria-label="Pergunte à Mari"
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     onFocus={() => setShowSuggestions(true)}

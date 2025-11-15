@@ -297,12 +297,18 @@ export default function Chat() {
               }}
               className="flex gap-2"
             >
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Digite sua mensagem..."
-                disabled={isLoading}
-              />
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Digite sua mensagem..."
+              disabled={isLoading}
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore="true"
+            />
               <Button type="submit" disabled={isLoading || !input.trim()}>
                 <Send className="h-4 w-4" />
               </Button>
