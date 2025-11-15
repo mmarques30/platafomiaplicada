@@ -83,16 +83,26 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Imagem muito grande. Máximo 2MB");
+      // Aumentado limite para 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Imagem muito grande. Máximo 5MB");
+        setThumbnailFile(null);
+        setThumbnailPreview("");
         return;
       }
+
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      console.info("[VideoModal] Arquivo selecionado:", file.name, `(${fileSizeMB}MB)`);
+      
+      toast.success(`Arquivo selecionado: ${file.name} (${fileSizeMB}MB)`);
+      
       setThumbnailFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setThumbnailPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      // Limpar URL customizada anterior ao selecionar novo arquivo
+      setValue("thumbnail_customizado_url", "");
+      
+      // Preview imediato usando URL.createObjectURL
+      const previewUrl = URL.createObjectURL(file);
+      setThumbnailPreview(previewUrl);
     }
   };
 
@@ -141,10 +151,18 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
         setValue("thumbnail_customizado_url", finalUrl, { shouldDirty: true });
       }
 
+      toast.success("Thumbnail enviado com sucesso!");
       return finalUrl || null;
-    } catch (error) {
+    } catch (error: any) {
       console.error("[VideoModal] Error uploading thumbnail:", error);
-      toast.error("Erro ao enviar o thumbnail. Tente novamente.");
+      
+      const errorMsg = error?.message || "";
+      
+      if (errorMsg.includes("row-level security") || errorMsg.includes("permission denied")) {
+        toast.error("Permissão negada para enviar ao armazenamento. Verifique se você está logado como admin.");
+      } else {
+        toast.error(`Erro ao enviar thumbnail: ${errorMsg || "Tente novamente"}`);
+      }
       return null;
     } finally {
       setUploading(false);
@@ -270,6 +288,9 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
           <div className="space-y-2">
             <Label>Thumbnail Customizado (Opcional)</Label>
             <div className="flex flex-col gap-2">
+              {/* Input hidden para registrar o campo no formulário */}
+              <input type="hidden" {...register("thumbnail_customizado_url")} />
+              
               {thumbnailPreview && (
                 <div className="relative w-full h-48 rounded-lg overflow-hidden border">
                   <img src={thumbnailPreview} alt="Preview" className="w-full h-full object-cover" />
@@ -294,8 +315,13 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
                 onChange={handleThumbnailChange}
                 className="cursor-pointer"
               />
+              {thumbnailFile && (
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                  Selecionado: {thumbnailFile.name} — {(thumbnailFile.size / (1024 * 1024)).toFixed(2)}MB
+                </p>
+              )}
               <p className="text-xs text-muted-foreground">
-                Formato horizontal recomendado (16:9), máximo 2MB
+                Formato horizontal recomendado (16:9), máximo 5MB
               </p>
             </div>
           </div>
