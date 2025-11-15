@@ -7,6 +7,7 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { VideoModal } from "./VideoModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { FilterBar } from "./FilterBar";
+import { getYouTubeThumbnail } from "@/lib/youtube";
 
 export function VideosTab() {
   const { data: videos, isLoading } = useVideos();
@@ -142,6 +143,7 @@ export function VideosTab() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[100px]">Thumb</TableHead>
               <TableHead>Título</TableHead>
               <TableHead>Módulo</TableHead>
               <TableHead>Duração</TableHead>
@@ -162,6 +164,13 @@ export function VideosTab() {
               }
               return (
                 <TableRow key={video.id}>
+                  <TableCell>
+                    <img 
+                      src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)} 
+                      alt={video.titulo}
+                      className="w-20 h-11 object-cover rounded border"
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{video.titulo}</TableCell>
                   <TableCell>{video.modulo?.titulo}</TableCell>
                   <TableCell>{video.duracao ? `${video.duracao}min` : "-"}</TableCell>
