@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
-const IDLE_MS = 10 * 60 * 1000; // 10 minutos
+const IDLE_MS = 60 * 60 * 1000; // 60 minutos (1 hora)
 const CHANNEL = "idle-session";
 const KEY = "last-activity-ts";
 
