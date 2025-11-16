@@ -92,6 +92,56 @@ export function useCreateComment(videoId: string) {
   });
 }
 
+export function useUpdateComment(videoId: string) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ commentId, comentario }: { commentId: string; comentario: string }) => {
+      if (!user) throw new Error("Usuário não autenticado");
+
+      const { error } = await supabase
+        .from("video_feedbacks")
+        .update({ comentario, updated_at: new Date().toISOString() })
+        .eq("id", commentId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["video-feedbacks", videoId] });
+      toast.success("Comentário editado!");
+    },
+    onError: () => {
+      toast.error("Erro ao editar comentário");
+    },
+  });
+}
+
+export function useDeleteComment(videoId: string) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (commentId: string) => {
+      if (!user) throw new Error("Usuário não autenticado");
+
+      const { error } = await supabase
+        .from("video_feedbacks")
+        .delete()
+        .eq("id", commentId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["video-feedbacks", videoId] });
+      toast.success("Comentário excluído!");
+    },
+    onError: () => {
+      toast.error("Erro ao excluir comentário");
+    },
+  });
+}
+
 export function useUserLikeStatus(videoId: string) {
   const { user } = useAuth();
 
