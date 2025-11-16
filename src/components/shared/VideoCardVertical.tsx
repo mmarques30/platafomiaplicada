@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Play } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface VideoCardVerticalProps {
   id: string;
@@ -28,6 +29,16 @@ export function VideoCardVertical({
           loading="lazy"
           className="block w-full h-full object-cover object-center"
         />
+        
+        {/* Botão de Favoritar */}
+        <div className="absolute top-2 right-2">
+          <FavoriteButton 
+            tipo="video" 
+            itemId={id} 
+            variant="icon-only"
+            size="md"
+          />
+        </div>
         
         {/* Overlay com Play */}
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">

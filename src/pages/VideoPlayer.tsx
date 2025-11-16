@@ -14,6 +14,7 @@ import { VideoRatingInput } from "@/components/video/VideoRatingInput";
 import { VideoMaterialsList } from "@/components/video/VideoMaterialsList";
 import { useVideoRating } from "@/hooks/useVideoRating";
 import { CustomVideoPlayer } from "@/components/video/CustomVideoPlayer";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { getYouTubeThumbnail } from "@/lib/youtube";
 
 export default function VideoPlayer() {
@@ -214,7 +215,17 @@ export default function VideoPlayer() {
 
             <Card>
               <CardHeader>
-                <CardTitle>{video.titulo}</CardTitle>
+                <div className="flex items-start justify-between gap-4 mb-2">
+                  <div className="flex-1">
+                    <CardTitle>{video.titulo}</CardTitle>
+                  </div>
+                  <FavoriteButton 
+                    tipo="video" 
+                    itemId={video.id}
+                    variant="default"
+                    showLabel
+                  />
+                </div>
                 <CardDescription className="space-y-2">
                   <div>{video.modulo.titulo}</div>
                   <div className="flex items-center gap-4 text-sm">

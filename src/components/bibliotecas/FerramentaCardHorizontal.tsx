@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { Star, Users, ExternalLink, CheckCircle, XCircle } from "lucide-react";
 
 interface FerramentaCardHorizontalProps {
@@ -101,6 +102,12 @@ export function FerramentaCardHorizontal({ ferramenta, onVerMais }: FerramentaCa
 
             {/* Ações */}
             <div className="flex gap-2 mt-3">
+              <FavoriteButton 
+                tipo="ferramenta" 
+                itemId={ferramenta.id}
+                variant="ghost"
+                size="sm"
+              />
               <Button
                 variant="default"
                 size="sm"

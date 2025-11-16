@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RatingStars } from "@/components/shared/RatingStars";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { Wrench, ExternalLink, CheckCircle, ChevronRight } from "lucide-react";
 
 interface FerramentaCardProps {
@@ -78,6 +79,12 @@ export function FerramentaCard({ ferramenta, onVerMais }: FerramentaCardProps) {
 
         {/* Botões de Ação */}
         <div className="flex gap-2 w-full mt-auto">
+          <FavoriteButton 
+            tipo="ferramenta" 
+            itemId={ferramenta.id}
+            variant="ghost"
+            size="sm"
+          />
           <Button
             variant="ghost"
             size="sm"

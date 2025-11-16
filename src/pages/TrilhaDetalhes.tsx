@@ -19,6 +19,7 @@ import { VideoFeedbackSection } from "@/components/video/VideoFeedbackSection";
 import { VideoRatingInput } from "@/components/video/VideoRatingInput";
 import { VideoMaterialsList } from "@/components/video/VideoMaterialsList";
 import { useVideoRating } from "@/hooks/useVideoRating";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { toast } from "sonner";
 
 export default function TrilhaDetalhes() {
@@ -419,29 +420,35 @@ export default function TrilhaDetalhes() {
                                         )}
                                       </div>
                                       
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium line-clamp-2 mb-1">
-                            {video.titulo}
-                          </h4>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <span>{formatDuration(video.duracao)}</span>
-                            {isCompleted ? (
-                              <CheckCircle2 className="h-3 w-3 text-green-500" />
-                            ) : (
-                              <Circle className="h-3 w-3" />
-                            )}
-                          </div>
-                          {formatDataAula(video.data_aula) && (
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              {formatDataAula(video.data_aula)}
-                            </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium line-clamp-2 mb-1">
+                          {video.titulo}
+                        </h4>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{formatDuration(video.duracao)}</span>
+                          {isCompleted ? (
+                            <CheckCircle2 className="h-3 w-3 text-green-500" />
+                          ) : (
+                            <Circle className="h-3 w-3" />
                           )}
-                          {isPlaying && (
-                            <Badge variant="default" className="mt-1 text-xs">
-                              Tocando agora
-                            </Badge>
-                          )}
+                          <FavoriteButton 
+                            tipo="video" 
+                            itemId={video.id}
+                            variant="ghost"
+                            size="sm"
+                          />
                         </div>
+                        {formatDataAula(video.data_aula) && (
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            {formatDataAula(video.data_aula)}
+                          </div>
+                        )}
+                        {isPlaying && (
+                          <Badge variant="default" className="mt-1 text-xs">
+                            Tocando agora
+                          </Badge>
+                        )}
+                      </div>
                                     </div>
                                   );
                                 })}

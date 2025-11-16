@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { 
   ChevronRight, 
   TrendingUp, 
@@ -91,18 +92,26 @@ export function PromptRow({ prompt, onClick }: PromptRowProps) {
         )}
       </div>
 
-      {/* Botão Ver */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="flex-shrink-0 group-hover:text-primary"
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick();
-        }}
-      >
-        <ChevronRight className="w-5 h-5" />
-      </Button>
+      {/* Ações */}
+      <div className="flex items-center gap-1 shrink-0">
+        <FavoriteButton 
+          tipo="prompt" 
+          itemId={prompt.id}
+          variant="ghost"
+          size="sm"
+        />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+        >
+          Ver
+          <ChevronRight className="w-4 h-4 ml-1" />
+        </Button>
+      </div>
     </div>
   );
 }
