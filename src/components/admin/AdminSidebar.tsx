@@ -64,19 +64,26 @@ export function AdminSidebar() {
             <SidebarMenu>
               {navItems.map((item) => {
                 const Icon = item.icon;
+                const isActive = location.pathname === item.path;
 
                 return (
                   <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton asChild tooltip={item.label}>
+                    <SidebarMenuButton asChild tooltip={item.label} className="group">
                       <NavLink 
                         to={item.path}
-                        className={({ isActive }) => cn(
-                          "font-medium transition-colors duration-200",
+                        className={cn(
+                          "relative font-medium transition-colors duration-200 pl-4",
                           isActive 
                             ? "text-primary font-semibold" 
                             : "text-foreground hover:text-primary"
                         )}
                       >
+                        <span className={cn(
+                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                          isActive 
+                            ? "bg-aplicada-green-700 opacity-100" 
+                            : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                        )} />
                         <Icon />
                         <span>{item.label}</span>
                       </NavLink>
@@ -95,9 +102,10 @@ export function AdminSidebar() {
             <SidebarMenuButton asChild tooltip="Voltar para o Site">
               <Button
                 variant="ghost"
-                className="w-full justify-start text-foreground hover:text-primary font-medium transition-colors"
+                className="relative w-full justify-start text-foreground hover:text-primary font-medium transition-colors pl-4 group"
                 onClick={() => navigate("/")}
               >
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-aplicada-green-400 opacity-0 group-hover:opacity-60 transition-all duration-200" />
                 <ArrowLeft />
                 <span>Voltar para o Site</span>
               </Button>

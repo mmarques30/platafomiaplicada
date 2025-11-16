@@ -1,5 +1,5 @@
 import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +33,7 @@ const items = [
 export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAdmin, isMentorado } = useUserRole();
   const { signOut } = useAuth();
   console.log("[AppSidebar] isAdmin:", isAdmin);
@@ -61,25 +62,35 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1 px-2">
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end 
-                      className={({ isActive }) => cn(
-                        "relative rounded-lg transition-all duration-200 font-medium",
-                        isActive 
-                          ? "text-primary font-semibold" 
-                          : "text-foreground hover:text-primary"
-                      )}
-                    >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const isActive = location.pathname === item.url;
+                
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className="group">
+                      <NavLink 
+                        to={item.url} 
+                        end 
+                        className={cn(
+                          "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                          isActive 
+                            ? "text-primary font-semibold" 
+                            : "text-foreground hover:text-primary"
+                        )}
+                      >
+                        <span className={cn(
+                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                          isActive 
+                            ? "bg-aplicada-green-700 opacity-100" 
+                            : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                        )} />
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -92,18 +103,28 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1 px-2">
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="group">
                     <NavLink 
                       to="/admin" 
                       className={({ isActive }) => cn(
-                        "relative rounded-lg transition-all duration-200 font-medium",
+                        "relative rounded-lg transition-all duration-200 font-medium pl-4",
                         isActive 
                           ? "text-primary font-semibold" 
                           : "text-foreground hover:text-primary"
                       )}
                     >
-                      <Shield className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>Painel Admin</span>}
+                      {({ isActive }) => (
+                        <>
+                          <span className={cn(
+                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                            isActive 
+                              ? "bg-aplicada-green-700 opacity-100" 
+                              : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                          )} />
+                          <Shield className="h-4 w-4 shrink-0" />
+                          {!collapsed && <span>Painel Admin</span>}
+                        </>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -116,17 +137,27 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-        <NavLink 
-          to="/configuracoes" 
-          className={({ isActive }) => cn(
-            "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors font-medium",
-            isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
-          )}
-        >
-          <Settings className="h-4 w-4 shrink-0" />
-          {!collapsed && <span>Configurações</span>}
-        </NavLink>
+            <SidebarMenuButton asChild className="group">
+              <NavLink 
+                to="/configuracoes" 
+                className={({ isActive }) => cn(
+                  "relative flex items-center gap-3 px-3 py-2 rounded-lg transition-colors font-medium pl-4",
+                  isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
+                )}
+              >
+                {({ isActive }) => (
+                  <>
+                    <span className={cn(
+                      "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                      isActive 
+                        ? "bg-aplicada-green-700 opacity-100" 
+                        : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                    )} />
+                    <Settings className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span>Configurações</span>}
+                  </>
+                )}
+              </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
