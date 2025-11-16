@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CopyButton } from "@/components/shared/CopyButton";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useIACopieUse } from "@/hooks/useFerramentas";
 import { Sparkles, Search, Cpu } from "lucide-react";
 
@@ -82,12 +83,19 @@ export default function IACopieUse() {
           {filteredIAs.map((ia) => (
             <Card key={ia.id} className="hover:shadow-lg transition-shadow">
                <CardHeader>
-                 <div className="flex items-start justify-between">
+                 <div className="flex items-start justify-between gap-3">
                    <div className="flex-1">
                      <CardTitle className="text-lg mb-2">{ia.titulo}</CardTitle>
                      <CardDescription>{ia.descricao}</CardDescription>
                    </div>
-                   <Badge variant="secondary">{ia.categoria}</Badge>
+                   <div className="flex items-center gap-2">
+                     <Badge variant="secondary">{ia.categoria}</Badge>
+                     <FavoriteButton 
+                       tipo="ia_copie_use" 
+                       itemId={ia.id}
+                       variant="ghost"
+                     />
+                   </div>
                  </div>
 
                  {Array.isArray(ia.ferramentas_recomendadas) && 

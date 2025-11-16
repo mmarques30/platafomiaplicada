@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyButton } from "@/components/shared/CopyButton";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useMetodos } from "@/hooks/useFerramentas";
 import { Target, Search, Lightbulb, Cpu } from "lucide-react";
 
@@ -86,12 +87,19 @@ export default function MetodosAplicar() {
           {filteredMetodos.map((metodo) => (
             <Card key={metodo.id} className="hover:shadow-lg transition-shadow">
                <CardHeader>
-                 <div className="flex items-start justify-between">
+                 <div className="flex items-start justify-between gap-3">
                    <div className="flex-1">
                      <CardTitle className="text-xl mb-2">{metodo.titulo}</CardTitle>
                      <CardDescription>{metodo.descricao}</CardDescription>
                    </div>
-                   <Badge variant="secondary">{metodo.categoria}</Badge>
+                   <div className="flex items-center gap-2">
+                     <Badge variant="secondary">{metodo.categoria}</Badge>
+                     <FavoriteButton 
+                       tipo="metodo" 
+                       itemId={metodo.id}
+                       variant="ghost"
+                     />
+                   </div>
                  </div>
 
                  {Array.isArray(metodo.ferramentas_recomendadas) && 

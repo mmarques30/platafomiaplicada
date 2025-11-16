@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { 
   ChevronRight,
   TrendingUp,
@@ -83,7 +84,7 @@ export function PromptCard({ prompt, onVerMais }: PromptCardProps) {
         </p>
         
         {/* Badges de Categoria e Nível */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
           <Badge variant="secondary" className="text-xs">
             {prompt.categoria}
           </Badge>
@@ -92,6 +93,13 @@ export function PromptCard({ prompt, onVerMais }: PromptCardProps) {
               {prompt.nivel_complexidade.charAt(0).toUpperCase() + prompt.nivel_complexidade.slice(1)}
             </Badge>
           )}
+          <FavoriteButton 
+            tipo="prompt" 
+            itemId={prompt.id}
+            variant="ghost"
+            size="sm"
+            className="ml-auto"
+          />
         </div>
         
         {/* Botão Ver Prompt */}

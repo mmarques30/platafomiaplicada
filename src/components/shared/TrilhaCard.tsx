@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface TrilhaCardProps {
   id: string;
@@ -17,6 +18,14 @@ export function TrilhaCard({ id, titulo, imagem_url, visivel_apenas_pro }: Trilh
             🔒 PRO
           </div>
         )}
+        <div className="absolute top-4 right-4 z-10">
+          <FavoriteButton 
+            tipo="trilha" 
+            itemId={id}
+            variant="icon-only"
+            size="md"
+          />
+        </div>
         <img
           src={imagem_url || "/placeholder.svg"}
           alt={titulo}
