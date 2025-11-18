@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-const IDLE_MS = 60 * 60 * 1000; // 60 minutos (1 hora)
-const WARNING_MS = 55 * 60 * 1000; // 55 minutos (aviso 5 min antes)
+const IDLE_MS = 3 * 60 * 60 * 1000; // 3 horas de inatividade
+const FIVE_MIN_MS = 5 * 60 * 1000; // 5 minutos
 const CHANNEL = "idle-session";
 const KEY = "last-activity-ts";
 
@@ -15,6 +15,8 @@ export function useIdleLogout(idleMs = IDLE_MS) {
   const bcRef = useRef<BroadcastChannel | null>(null);
 
   const showWarning = () => {
+    console.log("[IdleLogout] showWarning - aviso de sessão expira em 5 min");
+    
     if (warningToastIdRef.current) {
       toast.dismiss(warningToastIdRef.current);
     }
@@ -26,6 +28,7 @@ export function useIdleLogout(idleMs = IDLE_MS) {
         action: {
           label: "Continuar conectado",
           onClick: () => {
+            console.log("[IdleLogout] Usuário clicou em 'Continuar conectado'");
             resetTimer();
             bcRef.current?.postMessage({ type: "extend-session" });
           },
@@ -40,6 +43,7 @@ export function useIdleLogout(idleMs = IDLE_MS) {
   const resetTimer = () => {
     const now = Date.now();
     localStorage.setItem(KEY, String(now));
+    console.log("[IdleLogout] resetTimer chamado em", new Date().toISOString());
     
     if (warningToastIdRef.current) {
       toast.dismiss(warningToastIdRef.current);
@@ -49,12 +53,17 @@ export function useIdleLogout(idleMs = IDLE_MS) {
     if (timerRef.current) window.clearTimeout(timerRef.current);
     if (warningTimerRef.current) window.clearTimeout(warningTimerRef.current);
     
+    // Calcular warning dinamicamente (idleMs - 5 minutos)
+    const warningMs = Math.max(idleMs - FIVE_MIN_MS, 0);
+    
     warningTimerRef.current = window.setTimeout(() => {
+      console.log("[IdleLogout] Aviso disparado pelo TIMER após", warningMs, "ms");
       showWarning();
       bcRef.current?.postMessage({ type: "show-warning" });
-    }, WARNING_MS);
+    }, warningMs);
     
     timerRef.current = window.setTimeout(() => {
+      console.log("[IdleLogout] Logout disparado pelo TIMER (idleMs)", { idleMs });
       bcRef.current?.postMessage({ type: "logout" });
       signOut();
     }, idleMs);
@@ -67,6 +76,8 @@ export function useIdleLogout(idleMs = IDLE_MS) {
     bcRef.current = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHANNEL) : null;
 
     const onMessage = (ev: MessageEvent<any>) => {
+      console.log("[IdleLogout] Mensagem recebida no BroadcastChannel:", ev.data);
+      
       if (ev.data?.type === "activity") {
         resetTimer();
       }
@@ -77,6 +88,7 @@ export function useIdleLogout(idleMs = IDLE_MS) {
         showWarning();
       }
       if (ev.data?.type === "logout") {
+        console.log("[IdleLogout] Logout recebido via BroadcastChannel");
         signOut();
       }
     };
@@ -101,15 +113,20 @@ export function useIdleLogout(idleMs = IDLE_MS) {
     resetTimer();
 
     // Verificação periódica via localStorage (fallback para sincronização entre abas)
+    const warningMs = Math.max(idleMs - FIVE_MIN_MS, 0);
+    
     const checkInterval = window.setInterval(() => {
       const ts = Number(localStorage.getItem(KEY) || "0");
       const elapsed = Date.now() - ts;
+      console.log("[IdleLogout] checkInterval", { ts, elapsed, warningMs, idleMs });
       
-      if (elapsed > WARNING_MS && elapsed < idleMs && !warningToastIdRef.current) {
+      if (elapsed > warningMs && elapsed < idleMs && !warningToastIdRef.current) {
+        console.log("[IdleLogout] Aviso disparado pelo INTERVALO", { elapsed, warningMs, idleMs });
         showWarning();
       }
       
       if (ts && elapsed > idleMs) {
+        console.log("[IdleLogout] Logout disparado pelo INTERVALO (elapsed > idleMs)", { elapsed, idleMs });
         bcRef.current?.postMessage({ type: "logout" });
         signOut();
       }
