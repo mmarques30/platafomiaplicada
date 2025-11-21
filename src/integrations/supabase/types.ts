@@ -409,6 +409,69 @@ export type Database = {
           },
         ]
       }
+      fases_processo_mentoria: {
+        Row: {
+          created_at: string | null
+          data_conclusao: string | null
+          data_inicio: string | null
+          descricao: string | null
+          fase_numero: number
+          id: string
+          nome_fase: string
+          observacoes: string | null
+          projeto_associado_id: string | null
+          sessao_associada_id: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data_conclusao?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          fase_numero: number
+          id?: string
+          nome_fase: string
+          observacoes?: string | null
+          projeto_associado_id?: string | null
+          sessao_associada_id?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data_conclusao?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          fase_numero?: number
+          id?: string
+          nome_fase?: string
+          observacoes?: string | null
+          projeto_associado_id?: string | null
+          sessao_associada_id?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fases_processo_mentoria_projeto_associado_id_fkey"
+            columns: ["projeto_associado_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_mentoria"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fases_processo_mentoria_sessao_associada_id_fkey"
+            columns: ["sessao_associada_id"]
+            isOneToOne: false
+            referencedRelation: "sessoes_mentoria"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favoritos: {
         Row: {
           created_at: string | null
@@ -1651,6 +1714,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      inicializar_fases_processo: {
+        Args: { p_user_id: string }
+        Returns: undefined
       }
       verificar_integridade_sistema: {
         Args: never
