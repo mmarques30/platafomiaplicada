@@ -1289,6 +1289,7 @@ export type Database = {
           created_at: string
           data_sessao: string
           duracao: number | null
+          feedback_entregas: string | null
           id: string
           notas: string | null
           status: Database["public"]["Enums"]["status_sessao"]
@@ -1303,6 +1304,7 @@ export type Database = {
           created_at?: string
           data_sessao: string
           duracao?: number | null
+          feedback_entregas?: string | null
           id?: string
           notas?: string | null
           status?: Database["public"]["Enums"]["status_sessao"]
@@ -1317,6 +1319,7 @@ export type Database = {
           created_at?: string
           data_sessao?: string
           duracao?: number | null
+          feedback_entregas?: string | null
           id?: string
           notas?: string | null
           status?: Database["public"]["Enums"]["status_sessao"]
