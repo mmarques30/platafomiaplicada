@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -114,10 +115,9 @@ export default function Auth() {
               
               <div className="space-y-1.5">
                 <Label htmlFor="signin-password" className="text-[#F2F2F2]">Senha</Label>
-                <Input
+                <PasswordInput
                   id="signin-password"
                   name="signin-password"
-                  type="password"
                   placeholder="••••••••"
                   required
                   className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
