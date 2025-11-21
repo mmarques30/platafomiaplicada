@@ -23,22 +23,6 @@ export const usePainelDiagnostico = (userId?: string) => {
     enabled: !!targetUserId,
   });
 
-  const { data: objetivos, isLoading: isLoadingObjetivos } = useQuery({
-    queryKey: ["objetivos-mentoria", targetUserId],
-    queryFn: async () => {
-      if (!targetUserId) return [];
-      
-      const { data, error } = await supabase
-        .from("objetivos_mentoria")
-        .select("*")
-        .eq("user_id", targetUserId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!targetUserId,
-  });
 
   const { data: projetos, isLoading: isLoadingProjetos } = useQuery({
     queryKey: ["projetos-mentoria", targetUserId],
@@ -110,12 +94,11 @@ export const usePainelDiagnostico = (userId?: string) => {
 
   return {
     diagnostico,
-    objetivos: objetivos || [],
     projetos: projetos || [],
     sessoes: sessoes || [],
     tarefas: tarefas || [],
     profile,
-    isLoading: isLoadingDiagnostico || isLoadingObjetivos || isLoadingProjetos || 
+    isLoading: isLoadingDiagnostico || isLoadingProjetos || 
                isLoadingSessoes || isLoadingTarefas || isLoadingProfile,
   };
 };
