@@ -1075,10 +1075,10 @@ export type Database = {
           devolutiva_mentor: string | null
           id: string
           modulos_obrigatorios: Json | null
-          objetivo_id: string | null
           objetivo_projeto: string
           progresso_preparacao: number | null
           status: Database["public"]["Enums"]["status_projeto"]
+          tipo: string
           titulo: string
           trilhas_recomendadas: Json | null
           updated_at: string
@@ -1097,10 +1097,10 @@ export type Database = {
           devolutiva_mentor?: string | null
           id?: string
           modulos_obrigatorios?: Json | null
-          objetivo_id?: string | null
           objetivo_projeto: string
           progresso_preparacao?: number | null
           status?: Database["public"]["Enums"]["status_projeto"]
+          tipo?: string
           titulo: string
           trilhas_recomendadas?: Json | null
           updated_at?: string
@@ -1119,24 +1119,16 @@ export type Database = {
           devolutiva_mentor?: string | null
           id?: string
           modulos_obrigatorios?: Json | null
-          objetivo_id?: string | null
           objetivo_projeto?: string
           progresso_preparacao?: number | null
           status?: Database["public"]["Enums"]["status_projeto"]
+          tipo?: string
           titulo?: string
           trilhas_recomendadas?: Json | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "projetos_mentoria_objetivo_id_fkey"
-            columns: ["objetivo_id"]
-            isOneToOne: false
-            referencedRelation: "objetivos_mentoria"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       recursos_mentoria: {
         Row: {

@@ -12,7 +12,7 @@ import { useState } from "react";
 import { DiagnosticoUploadModal } from "./DiagnosticoUploadModal";
 import { DiagnosticoFormModal } from "./DiagnosticoFormModal";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
-import { useMentoriaObjetivos } from "@/hooks/useMentoriaObjetivos";
+import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useNavigate } from "react-router-dom";
@@ -24,8 +24,10 @@ interface DiagnosticoAdminProps {
 export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
   const navigate = useNavigate();
   const { diagnostico, isLoading, deletarArquivo } = useDiagnosticoAdmin(userId);
-  const { objetivos } = useMentoriaObjetivos(userId);
+  const { projetos } = useMentoriaProjetos(userId);
   const { tarefas } = useMentoriaTarefas(userId);
+  
+  const objetivosEstrategicos = projetos.filter(p => p.tipo === "estrategico");
   const { sessoes } = useMentoriaSessoes();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -166,7 +168,7 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
                   <div className="flex items-center gap-4 mt-2">
                     <div className="flex items-center gap-2">
                       <Target className="h-4 w-4" />
-                      <span className="font-semibold">{objetivos.length}</span> objetivos
+                      <span className="font-semibold">{objetivosEstrategicos.length}</span> objetivos estratégicos
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />

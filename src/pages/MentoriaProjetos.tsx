@@ -52,6 +52,8 @@ export default function MentoriaProjetos() {
     );
   }
 
+  const projetosEstrategicos = projetos.filter(p => p.tipo === "estrategico");
+  const projetosOperacionais = projetos.filter(p => p.tipo === "operacional");
   const projetosAndamento = projetos.filter(p => p.status === "em_andamento");
   const projetosConcluidos = projetos.filter(p => p.status === "concluido");
 
@@ -71,21 +73,29 @@ export default function MentoriaProjetos() {
     return <Badge variant={variants[status] || "default"}>{labels[status]}</Badge>;
   };
 
+  const getTipoBadge = (tipo: string) => {
+    return tipo === "estrategico" ? (
+      <Badge variant="default" className="bg-primary">🎯 Estratégico</Badge>
+    ) : (
+      <Badge variant="secondary">🔧 Operacional</Badge>
+    );
+  };
+
   const ProjetoCard = ({ projeto }: { projeto: any }) => (
     <Card 
       className="cursor-pointer hover:shadow-lg transition-all hover:border-primary"
       onClick={() => setSelectedProjeto(projeto)}
     >
       <CardHeader>
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
-            <CardTitle className="text-lg">{formatProjetoTitulo(projeto.titulo)}</CardTitle>
-            {projeto.objetivo_titulo && (
-              <div className="flex items-center gap-2 mt-2 text-sm text-primary">
-                <Target className="h-4 w-4" />
-                <span className="font-medium">{projeto.objetivo_titulo}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2 mb-2">
+              <CardTitle className="text-lg">{formatProjetoTitulo(projeto.titulo)}</CardTitle>
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              {getTipoBadge(projeto.tipo)}
+              {getStatusBadge(projeto.status)}
+            </div>
             <CardDescription className="mt-2 line-clamp-2">
               {projeto.descricao}
             </CardDescription>
@@ -96,7 +106,6 @@ export default function MentoriaProjetos() {
               </div>
             )}
           </div>
-          {getStatusBadge(projeto.status)}
         </div>
       </CardHeader>
       <CardContent>
@@ -143,11 +152,53 @@ export default function MentoriaProjetos() {
       </div>
 
       <Tabs defaultValue="todos" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsList className="grid w-full grid-cols-5 max-w-4xl">
+          <TabsTrigger value="estrategicos">🎯 Estratégicos ({projetosEstrategicos.length})</TabsTrigger>
+          <TabsTrigger value="operacionais">🔧 Operacionais ({projetosOperacionais.length})</TabsTrigger>
           <TabsTrigger value="andamento">Em Andamento ({projetosAndamento.length})</TabsTrigger>
           <TabsTrigger value="concluidos">Concluídos ({projetosConcluidos.length})</TabsTrigger>
           <TabsTrigger value="todos">Todos ({projetos.length})</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="estrategicos" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {projetosEstrategicos.length > 0 ? (
+              projetosEstrategicos.map((projeto) => (
+                <ProjetoCard key={projeto.id} projeto={projeto} />
+              ))
+            ) : (
+              <Card className="col-span-2">
+                <CardContent className="py-12 text-center">
+                  <Target className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">Nenhum objetivo estratégico definido</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Objetivos estratégicos são metas de alto nível que orientam seu desenvolvimento
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="operacionais" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {projetosOperacionais.length > 0 ? (
+              projetosOperacionais.map((projeto) => (
+                <ProjetoCard key={projeto.id} projeto={projeto} />
+              ))
+            ) : (
+              <Card className="col-span-2">
+                <CardContent className="py-12 text-center">
+                  <FolderKanban className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">Nenhum projeto operacional cadastrado</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Projetos operacionais são entregas específicas e práticas
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </TabsContent>
 
         <TabsContent value="andamento" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -212,16 +263,10 @@ export default function MentoriaProjetos() {
           
           {selectedProjeto && (
             <div className="space-y-6">
-              {/* Objetivo Estratégico Associado */}
-              {selectedProjeto.objetivo_titulo && (
-                <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Target className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold">Objetivo Estratégico</h3>
-                  </div>
-                  <p className="text-muted-foreground">{selectedProjeto.objetivo_titulo}</p>
-                </div>
-              )}
+              {/* Tipo do Projeto */}
+              <div className="flex items-center gap-2">
+                {getTipoBadge(selectedProjeto.tipo)}
+              </div>
               
               {/* Card de Preparação Recomendada */}
               {user && (

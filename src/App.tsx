@@ -20,7 +20,7 @@ import EvolucaoConquistas from "./pages/EvolucaoConquistas";
 import EvolucaoCertificados from "./pages/EvolucaoCertificados";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
-import MentoriaObjetivos from "./pages/MentoriaObjetivos";
+
 import MentoriaSessoes from "./pages/MentoriaSessoes";
 import MentoriaRecursos from "./pages/MentoriaRecursos";
 import MentoriaProjetos from "./pages/MentoriaProjetos";
@@ -77,7 +77,7 @@ function AppContent() {
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
             <Route path="/mentoria/painel-diagnostico" element={<MentoriaPainelDiagnostico />} />
             <Route path="/mentoria/painel-diagnostico/:userId" element={<MentoriaPainelDiagnostico />} />
-            <Route path="/mentoria/objetivos" element={<MentoriaObjetivos />} />
+            
             <Route path="/mentoria/sessoes" element={<MentoriaSessoes />} />
             <Route path="/mentoria/recursos" element={<MentoriaRecursos />} />
             <Route path="/mentoria/projetos" element={<MentoriaProjetos />} />
