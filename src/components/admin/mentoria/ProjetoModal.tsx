@@ -31,7 +31,8 @@ export default function ProjetoModal({
 }: ProjetoModalProps) {
   const { register, handleSubmit, setValue, watch, reset } = useForm<Partial<ProjetoMentoria>>({
     defaultValues: projeto || {
-      status: "planejamento"
+      status: "planejamento",
+      tipo: "operacional"
     }
   });
 
@@ -81,6 +82,22 @@ export default function ProjetoModal({
             </TabsList>
 
             <TabsContent value="basico" className="space-y-4 mt-4">
+          <div>
+            <Label htmlFor="tipo">Tipo de Projeto *</Label>
+            <Select
+              value={watch("tipo") || "operacional"}
+              onValueChange={(value) => setValue("tipo", value as any)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="estrategico">🎯 Estratégico - Objetivo de Alto Nível</SelectItem>
+                <SelectItem value="operacional">🔧 Operacional - Entrega Específica</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div>
             <Label htmlFor="titulo">Título *</Label>
             <Input

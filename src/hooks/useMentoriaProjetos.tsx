@@ -6,7 +6,7 @@ import { useAuth } from "./useAuth";
 export type ProjetoMentoria = {
   id: string;
   user_id: string;
-  objetivo_id?: string;
+  tipo: "estrategico" | "operacional";
   titulo: string;
   descricao: string;
   objetivo_projeto: string;
@@ -24,7 +24,6 @@ export type ProjetoMentoria = {
   progresso_preparacao?: number;
   created_at: string;
   updated_at: string;
-  objetivo_titulo?: string;
 };
 
 export const useMentoriaProjetos = (userId?: string) => {
@@ -41,10 +40,7 @@ export const useMentoriaProjetos = (userId?: string) => {
       
       const { data, error } = await supabase
         .from("projetos_mentoria")
-        .select(`
-          *,
-          objetivo:objetivos_mentoria(objetivo)
-        `)
+        .select("*")
         .eq("user_id", targetUserId)
         .order("created_at", { ascending: true });
 
@@ -52,13 +48,10 @@ export const useMentoriaProjetos = (userId?: string) => {
       
       console.log("✅ Projetos carregados:", data?.length);
       data?.forEach((p, i) => {
-        console.log(`  ${i + 1}. "${p.titulo}" (ID: ${p.id?.substring(0, 8)}...)`);
+        console.log(`  ${i + 1}. "${p.titulo}" (${p.tipo}) - ID: ${p.id?.substring(0, 8)}...`);
       });
       
-      return (data as any[]).map((p) => ({
-        ...p,
-        objetivo_titulo: p.objetivo?.objetivo,
-      })) as ProjetoMentoria[];
+      return data as ProjetoMentoria[];
     },
     enabled: !!targetUserId,
     staleTime: 0, // Sempre buscar dados frescos

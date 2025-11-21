@@ -4,7 +4,6 @@ import { useUsers } from "@/hooks/admin/useUsers";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useMentoriaRecursos } from "@/hooks/useMentoriaRecursos";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
-import { useMentoriaObjetivos } from "@/hooks/useMentoriaObjetivos";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,11 +17,9 @@ import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import RecursoModal from "@/components/admin/mentoria/RecursoModal";
 import ProjetoModal from "@/components/admin/mentoria/ProjetoModal";
-import ObjetivoModal from "@/components/admin/mentoria/ObjetivoModal";
 import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
 import { RecursoMentoria } from "@/hooks/useMentoriaRecursos";
 import { ProjetoMentoria } from "@/hooks/useMentoriaProjetos";
-import { ObjetivoMentoria } from "@/hooks/useMentoriaObjetivos";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
@@ -37,17 +34,14 @@ export default function GerenciarMentoria() {
   const { sessoes, createSessao, updateSessao, isCreating: isCreatingSessao, isUpdating: isUpdatingSessao } = useMentoriaSessoes(selectedUserId);
   const { recursos, createRecurso, updateRecurso, deleteRecurso, isCreating: isCreatingRecurso, isUpdating: isUpdatingRecurso } = useMentoriaRecursos(selectedUserId);
   const { projetos, createProjeto, updateProjeto, isCreating: isCreatingProjeto, isUpdating: isUpdatingProjeto } = useMentoriaProjetos(selectedUserId);
-  const { objetivos, createObjetivo, updateObjetivo, deleteObjetivo, isCreating: isCreatingObjetivo, isUpdating: isUpdatingObjetivo } = useMentoriaObjetivos(selectedUserId);
 
   const [sessaoModalOpen, setSessaoModalOpen] = useState(false);
   const [recursoModalOpen, setRecursoModalOpen] = useState(false);
   const [projetoModalOpen, setProjetoModalOpen] = useState(false);
-  const [objetivoModalOpen, setObjetivoModalOpen] = useState(false);
 
   const [editingSessao, setEditingSessao] = useState<SessaoMentoria | undefined>();
   const [editingRecurso, setEditingRecurso] = useState<RecursoMentoria | undefined>();
   const [editingProjeto, setEditingProjeto] = useState<ProjetoMentoria | undefined>();
-  const [editingObjetivo, setEditingObjetivo] = useState<ObjetivoMentoria | undefined>();
 
   const selectedUser = users.find(u => u.id === selectedUserId);
 
@@ -107,22 +101,6 @@ export default function GerenciarMentoria() {
     }
   };
 
-  const handleCreateObjetivo = (data: Partial<ObjetivoMentoria>) => {
-    createObjetivo(data);
-  };
-
-  const handleEditObjetivo = (objetivo: ObjetivoMentoria) => {
-    setEditingObjetivo(objetivo);
-    setObjetivoModalOpen(true);
-  };
-
-  const handleUpdateObjetivo = (data: Partial<ObjetivoMentoria>) => {
-    if (editingObjetivo) {
-      updateObjetivo({ ...data, id: editingObjetivo.id });
-      setEditingObjetivo(undefined);
-    }
-  };
-
   return (
     <>
       <div className="space-y-6">
@@ -161,14 +139,10 @@ export default function GerenciarMentoria() {
 
         {selectedUserId && (
           <Tabs defaultValue="diagnostico" className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="diagnostico">
                 <FileText className="h-4 w-4 mr-2" />
                 Diagnóstico
-              </TabsTrigger>
-              <TabsTrigger value="objetivos">
-                <TargetIcon className="h-4 w-4 mr-2" />
-                Objetivos
               </TabsTrigger>
               <TabsTrigger value="tarefas">
                 <CheckSquare className="h-4 w-4 mr-2" />
@@ -202,42 +176,6 @@ export default function GerenciarMentoria() {
 
             <TabsContent value="duvidas" className="space-y-4">
               <GerenciarDuvidas userId={selectedUserId} />
-            </TabsContent>
-
-            <TabsContent value="objetivos" className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Objetivos de {selectedUser?.nome_completo}</h2>
-                <Button onClick={() => { setEditingObjetivo(undefined); setObjetivoModalOpen(true); }}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Objetivo
-                </Button>
-              </div>
-
-              <div className="grid gap-4">
-                {objetivos.map((objetivo) => (
-                  <Card key={objetivo.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditObjetivo(objetivo)}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg">{objetivo.objetivo}</CardTitle>
-                        <Badge variant={objetivo.status === "concluido" ? "default" : objetivo.status === "em_andamento" ? "secondary" : "destructive"}>
-                          {objetivo.status === "em_andamento" ? "Em Andamento" : objetivo.status === "concluido" ? "Concluído" : "Cancelado"}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 text-sm">
-                        {objetivo.prazo && <p><strong>Prazo:</strong> {format(new Date(objetivo.prazo), "dd/MM/yyyy", { locale: ptBR })}</p>}
-                        {objetivo.progresso !== undefined && <p><strong>Progresso:</strong> {objetivo.progresso}%</p>}
-                        {objetivo.observacoes && <p className="text-muted-foreground">{objetivo.observacoes}</p>}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-
-                {objetivos.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Nenhum objetivo cadastrado</p>
-                )}
-              </div>
             </TabsContent>
 
             <TabsContent value="sessoes" className="space-y-4">
@@ -342,13 +280,12 @@ export default function GerenciarMentoria() {
                     <CardHeader>
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <CardTitle className="text-lg">{formatProjetoTitulo(projeto.titulo)}</CardTitle>
-                          {projeto.objetivo_titulo && (
-                            <div className="flex items-center gap-2 mt-2 text-sm text-primary">
-                              <TargetIcon className="h-4 w-4" />
-                              <span className="font-medium">{projeto.objetivo_titulo}</span>
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2 mb-2">
+                            <CardTitle className="text-lg">{formatProjetoTitulo(projeto.titulo)}</CardTitle>
+                            {projeto.tipo === "estrategico" && (
+                              <Badge variant="default" className="bg-primary">🎯 Estratégico</Badge>
+                            )}
+                          </div>
                         </div>
                         <Badge variant={
                           projeto.status === "concluido" ? "default" : 
@@ -433,18 +370,6 @@ export default function GerenciarMentoria() {
         userId={selectedUserId}
         isLoading={isCreatingProjeto || isUpdatingProjeto}
         isAdmin={true}
-      />
-
-      <ObjetivoModal
-        open={objetivoModalOpen}
-        onOpenChange={(open) => {
-          setObjetivoModalOpen(open);
-          if (!open) setEditingObjetivo(undefined);
-        }}
-        onSubmit={editingObjetivo ? handleUpdateObjetivo : handleCreateObjetivo}
-        objetivo={editingObjetivo}
-        userId={selectedUserId}
-        isLoading={isCreatingObjetivo || isUpdatingObjetivo}
       />
     </>
   );
