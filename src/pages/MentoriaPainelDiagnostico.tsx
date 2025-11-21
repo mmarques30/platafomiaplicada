@@ -1,7 +1,6 @@
 import { usePainelDiagnostico } from "@/hooks/usePainelDiagnostico";
 import { InformacoesMentorado } from "@/components/mentoria/painel/InformacoesMentorado";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ObjetivosEstrategicos } from "@/components/mentoria/painel/ObjetivosEstrategicos";
 import { ProjetosPriorizados } from "@/components/mentoria/painel/ProjetosPriorizados";
 import { ProjetoPrincipal } from "@/components/mentoria/painel/ProjetoPrincipal";
 import { IntegracoesAutomacoes } from "@/components/mentoria/painel/IntegracoesAutomacoes";
@@ -17,7 +16,7 @@ import { formatProjetoTitulo } from "@/lib/utils";
 export default function MentoriaPainelDiagnostico() {
   const navigate = useNavigate();
   const { userId } = useParams();
-  const { diagnostico, objetivos, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
+  const { diagnostico, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
 
   if (isLoading) {
     return (
@@ -93,14 +92,6 @@ export default function MentoriaPainelDiagnostico() {
               Editar Diagnóstico
             </Button>
             
-            <Button
-              variant="outline"
-              onClick={() => navigate("/mentoria/objetivos")}
-              className="gap-2"
-            >
-              <Target className="w-4 h-4" />
-              Ver Todos Objetivos
-            </Button>
             
             <Button
               variant="outline"
@@ -121,11 +112,6 @@ export default function MentoriaPainelDiagnostico() {
           <div className={`space-y-8 ${proximaSessao ? 'lg:col-span-2' : 'lg:col-span-1'}`}>
             {/* Informações do Mentorado */}
             <InformacoesMentorado diagnostico={diagnostico} profile={profile} />
-
-            {/* Objetivos Estratégicos */}
-            {objetivos.length > 0 && (
-              <ObjetivosEstrategicos objetivos={objetivos} />
-            )}
 
             {/* Projetos Priorizados */}
             {projetosPrioritarios.length > 0 && (

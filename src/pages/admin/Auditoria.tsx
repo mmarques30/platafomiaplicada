@@ -88,7 +88,6 @@ export default function Auditoria() {
                   <SelectItem value="trilhas">Trilhas</SelectItem>
                   <SelectItem value="modulos">Módulos</SelectItem>
                   <SelectItem value="tarefas_mentoria">Tarefas</SelectItem>
-                  <SelectItem value="objetivos_mentoria">Objetivos</SelectItem>
                   <SelectItem value="formularios_customizados">Formulários</SelectItem>
                 </SelectContent>
               </Select>

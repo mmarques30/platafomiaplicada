@@ -933,42 +933,6 @@ export type Database = {
         }
         Relationships: []
       }
-      objetivos_mentoria: {
-        Row: {
-          created_at: string | null
-          id: string
-          objetivo: string
-          observacoes: string | null
-          prazo: string | null
-          progresso: number | null
-          status: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          objetivo: string
-          observacoes?: string | null
-          prazo?: string | null
-          progresso?: number | null
-          status?: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          objetivo?: string
-          observacoes?: string | null
-          prazo?: string | null
-          progresso?: number | null
-          status?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           conta_ativa: boolean | null
