@@ -144,6 +144,10 @@ export default function GerenciarMentoria() {
                 <FileText className="h-4 w-4 mr-2" />
                 Diagnóstico
               </TabsTrigger>
+              <TabsTrigger value="projetos">
+                <FolderKanban className="h-4 w-4 mr-2" />
+                Projetos
+              </TabsTrigger>
               <TabsTrigger value="tarefas">
                 <CheckSquare className="h-4 w-4 mr-2" />
                 Tarefas
@@ -159,89 +163,11 @@ export default function GerenciarMentoria() {
                 <BookOpen className="h-4 w-4 mr-2" />
                 Recursos
               </TabsTrigger>
-              <TabsTrigger value="projetos">
-                <FolderKanban className="h-4 w-4 mr-2" />
-                Projetos
-              </TabsTrigger>
             </TabsList>
 
             {/* Diagnóstico Tab */}
             <TabsContent value="diagnostico" className="space-y-4">
               <DiagnosticoAdmin userId={selectedUserId} />
-            </TabsContent>
-
-            <TabsContent value="tarefas" className="space-y-4">
-              <TarefasAdmin userId={selectedUserId} />
-            </TabsContent>
-
-            <TabsContent value="duvidas" className="space-y-4">
-              <GerenciarDuvidas userId={selectedUserId} />
-            </TabsContent>
-
-            <TabsContent value="sessoes" className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Sessões de {selectedUser?.nome_completo}</h2>
-                <Button onClick={() => { setEditingSessao(undefined); setSessaoModalOpen(true); }}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova Sessão
-                </Button>
-              </div>
-
-              <div className="grid gap-4">
-                {sessoes.map((sessao) => (
-                  <Card key={sessao.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditSessao(sessao)}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg">{sessao.titulo}</CardTitle>
-                        <Badge variant={sessao.status === "realizada" ? "default" : sessao.status === "agendada" ? "secondary" : "destructive"}>
-                          {sessao.status === "agendada" ? "Agendada" : sessao.status === "realizada" ? "Realizada" : "Cancelada"}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-1 text-sm">
-                        <p><strong>Data:</strong> {format(new Date(sessao.data_sessao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
-                        {sessao.duracao && <p><strong>Duração:</strong> {sessao.duracao} minutos</p>}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-
-                {sessoes.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Nenhuma sessão cadastrada</p>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="recursos" className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Recursos de {selectedUser?.nome_completo}</h2>
-                <Button onClick={() => { setEditingRecurso(undefined); setRecursoModalOpen(true); }}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Recurso
-                </Button>
-              </div>
-
-              <div className="grid gap-4">
-                {recursos.map((recurso) => (
-                  <Card key={recurso.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditRecurso(recurso)}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg">{recurso.nome}</CardTitle>
-                        <Badge>{recurso.categoria}</Badge>
-                      </div>
-                      <CardDescription>{recurso.descricao}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">{recurso.para_que_serve}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-
-                {recursos.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Nenhum recurso cadastrado</p>
-                )}
-              </div>
             </TabsContent>
 
             <TabsContent value="projetos" className="space-y-4">
@@ -328,6 +254,80 @@ export default function GerenciarMentoria() {
 
                 {projetos.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">Nenhum projeto cadastrado</p>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="tarefas" className="space-y-4">
+              <TarefasAdmin userId={selectedUserId} />
+            </TabsContent>
+
+            <TabsContent value="duvidas" className="space-y-4">
+              <GerenciarDuvidas userId={selectedUserId} />
+            </TabsContent>
+
+            <TabsContent value="sessoes" className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Sessões de {selectedUser?.nome_completo}</h2>
+                <Button onClick={() => { setEditingSessao(undefined); setSessaoModalOpen(true); }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nova Sessão
+                </Button>
+              </div>
+
+              <div className="grid gap-4">
+                {sessoes.map((sessao) => (
+                  <Card key={sessao.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditSessao(sessao)}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{sessao.titulo}</CardTitle>
+                        <Badge variant={sessao.status === "realizada" ? "default" : sessao.status === "agendada" ? "secondary" : "destructive"}>
+                          {sessao.status === "agendada" ? "Agendada" : sessao.status === "realizada" ? "Realizada" : "Cancelada"}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-1 text-sm">
+                        <p><strong>Data:</strong> {format(new Date(sessao.data_sessao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
+                        {sessao.duracao && <p><strong>Duração:</strong> {sessao.duracao} minutos</p>}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
+                {sessoes.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">Nenhuma sessão cadastrada</p>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="recursos" className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Recursos de {selectedUser?.nome_completo}</h2>
+                <Button onClick={() => { setEditingRecurso(undefined); setRecursoModalOpen(true); }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Recurso
+                </Button>
+              </div>
+
+              <div className="grid gap-4">
+                {recursos.map((recurso) => (
+                  <Card key={recurso.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditRecurso(recurso)}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{recurso.nome}</CardTitle>
+                        <Badge>{recurso.categoria}</Badge>
+                      </div>
+                      <CardDescription>{recurso.descricao}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{recurso.para_que_serve}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+
+                {recursos.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">Nenhum recurso cadastrado</p>
                 )}
               </div>
             </TabsContent>
