@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useFasesProcesso, FaseProcesso } from "@/hooks/useFasesProcesso";
 import { FaseCard } from "./FaseCard";
 import { FaseEditModal } from "./FaseEditModal";
-import { RefreshCw, Calendar, CheckCircle2, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProcessoRoadmapProps {
@@ -72,72 +73,40 @@ export const ProcessoRoadmap = ({ userId }: ProcessoRoadmapProps) => {
       {/* Estatísticas Gerais */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Visão Geral do Processo
-          </CardTitle>
+          <CardTitle>Visão Geral do Processo</CardTitle>
+          <Separator className="mt-2" />
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Progresso Geral */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Progresso Geral</span>
-                <span className="font-bold text-lg">{progressoGeral}%</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Card 1: Progresso */}
+            <div className="text-center p-6 bg-muted/30 rounded-lg space-y-3">
+              <div className="text-4xl font-bold">{progressoGeral}%</div>
+              <Progress value={progressoGeral} className="h-2" />
+              <p className="text-sm text-muted-foreground">
+                {fasesConcluidas}/{fases.length} fases concluídas
+              </p>
+            </div>
+
+            {/* Card 2: Tempo */}
+            <div className="text-center p-6 bg-muted/30 rounded-lg space-y-3">
+              <div className="text-4xl font-bold">{diasMentoria}</div>
+              <p className="text-sm text-muted-foreground">
+                {diasMentoria === 1 ? "dia" : "dias"} em mentoria
+              </p>
+            </div>
+
+            {/* Card 3: Próxima Fase */}
+            <div className="text-center p-6 bg-muted/30 rounded-lg space-y-3">
+              <div className="text-2xl font-semibold">
+                {proximaFase ? `Fase ${proximaFase.fase_numero}` : "Completo ✓"}
               </div>
-              <Progress value={progressoGeral} className="h-3" />
-              <p className="text-xs text-muted-foreground">
-                {fasesConcluidas} de {fases.length} fases concluídas
+              <p className="text-sm text-muted-foreground truncate px-2">
+                {proximaFase?.nome_fase || "Processo finalizado"}
               </p>
+              {proximaFase && (
+                <Badge variant="outline" className="mt-2">Próxima</Badge>
+              )}
             </div>
-
-            {/* Tempo de Mentoria */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Calendar className="h-4 w-4" />
-                Tempo de Mentoria
-              </div>
-              <p className="text-2xl font-bold">{diasMentoria} dias</p>
-              <p className="text-xs text-muted-foreground">
-                Desde a primeira sessão
-              </p>
-            </div>
-
-            {/* Fase Atual */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <CheckCircle2 className="h-4 w-4" />
-                Fase Atual
-              </div>
-              <p className="text-lg font-semibold">
-                {faseAtual ? `${faseAtual.fase_numero}. ${faseAtual.nome_fase}` : "Nenhuma em andamento"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {faseAtual ? `${faseAtual.progresso_tarefas}% concluído` : ""}
-              </p>
-            </div>
-
-            {/* Próximo Marco */}
-            <div className="space-y-2">
-              <div className="text-muted-foreground text-sm">Próximo Marco</div>
-              <p className="text-lg font-semibold">
-                {proximaFase ? `${proximaFase.fase_numero}. ${proximaFase.nome_fase}` : "Processo completo"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {proximaFase ? proximaFase.descricao : "Todas as fases concluídas"}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.location.reload()}
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar Dados
-            </Button>
           </div>
         </CardContent>
       </Card>
