@@ -3,7 +3,7 @@ import { useTrilhas, useDeleteTrilha, useTrilhasStats } from "@/hooks/admin/useC
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
 import { TrilhaModal } from "./TrilhaModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { FilterBar } from "./FilterBar";
@@ -238,8 +238,9 @@ export function TrilhasTab() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão Permanente</AlertDialogTitle>
             <AlertDialogDescription className="space-y-3">
-              <p className="font-semibold text-destructive">
-                ⚠️ Esta ação é IRREVERSÍVEL e irá deletar PERMANENTEMENTE:
+              <p className="font-semibold text-destructive flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Esta ação é IRREVERSÍVEL e irá deletar PERMANENTEMENTE:
               </p>
               {deleteId && (() => {
                 const trilhaStat = stats?.find((s: any) => s.trilha_id === deleteId);

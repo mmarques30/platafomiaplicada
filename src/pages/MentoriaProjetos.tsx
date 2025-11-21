@@ -75,9 +75,15 @@ export default function MentoriaProjetos() {
 
   const getTipoBadge = (tipo: string) => {
     return tipo === "estrategico" ? (
-      <Badge variant="default" className="bg-primary">🎯 Estratégico</Badge>
+      <Badge variant="default" className="bg-primary flex items-center gap-1.5">
+        <Target className="h-3.5 w-3.5" />
+        Estratégico
+      </Badge>
     ) : (
-      <Badge variant="secondary">🔧 Operacional</Badge>
+      <Badge variant="secondary" className="flex items-center gap-1.5">
+        <FolderKanban className="h-3.5 w-3.5" />
+        Operacional
+      </Badge>
     );
   };
 
@@ -153,8 +159,8 @@ export default function MentoriaProjetos() {
 
       <Tabs defaultValue="todos" className="w-full">
         <TabsList className="grid w-full grid-cols-5 max-w-4xl">
-          <TabsTrigger value="estrategicos">🎯 Estratégicos ({projetosEstrategicos.length})</TabsTrigger>
-          <TabsTrigger value="operacionais">🔧 Operacionais ({projetosOperacionais.length})</TabsTrigger>
+          <TabsTrigger value="estrategicos">Estratégicos ({projetosEstrategicos.length})</TabsTrigger>
+          <TabsTrigger value="operacionais">Operacionais ({projetosOperacionais.length})</TabsTrigger>
           <TabsTrigger value="andamento">Em Andamento ({projetosAndamento.length})</TabsTrigger>
           <TabsTrigger value="concluidos">Concluídos ({projetosConcluidos.length})</TabsTrigger>
           <TabsTrigger value="todos">Todos ({projetos.length})</TabsTrigger>

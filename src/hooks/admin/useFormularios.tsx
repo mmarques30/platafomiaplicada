@@ -5,7 +5,7 @@ export function useFormularios() {
   return useQuery({
     queryKey: ["admin-formularios"],
     queryFn: async () => {
-      console.log("🔍 Fetching formularios for admin...");
+      console.log("Fetching formularios for admin...");
       
       const { data, error } = await supabase
         .from("formulario_diagnostico")
@@ -13,11 +13,11 @@ export function useFormularios() {
         .order("created_at", { ascending: false });
       
       if (error) {
-        console.error("❌ Error fetching formularios:", error);
+        console.error("Error fetching formularios:", error);
         throw error;
       }
       
-      console.log("✅ Formularios fetched:", data?.length, "forms");
+      console.log("Formularios fetched:", data?.length, "forms");
       return data;
     },
     refetchOnWindowFocus: true,

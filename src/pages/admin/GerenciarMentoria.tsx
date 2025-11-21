@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Target as TargetIcon, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw } from "lucide-react";
+import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
@@ -209,7 +209,10 @@ export default function GerenciarMentoria() {
                           <div className="flex items-center gap-2 mb-2">
                             <CardTitle className="text-lg">{formatProjetoTitulo(projeto.titulo)}</CardTitle>
                             {projeto.tipo === "estrategico" && (
-                              <Badge variant="default" className="bg-primary">🎯 Estratégico</Badge>
+                              <Badge variant="default" className="bg-primary flex items-center gap-1.5">
+                                <Target className="h-3.5 w-3.5" />
+                                Estratégico
+                              </Badge>
                             )}
                           </div>
                         </div>

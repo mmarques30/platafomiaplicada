@@ -11,7 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { useFormulariosDisponiveis, useResponderFormulario } from "@/hooks/useFormulariosCustomizados";
-import { CalendarIcon, Loader2, Save, Send } from "lucide-react";
+import { CalendarIcon, Loader2, Save, Send, FileText, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -87,16 +87,18 @@ const ResponderFormulario = () => {
       <div className="container max-w-3xl py-8">
         <Card className="p-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">
-              📋 {formulario.titulo}
+            <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <FileText className="h-6 w-6 text-primary" />
+              {formulario.titulo}
             </h1>
             {formulario.descricao && (
               <p className="text-muted-foreground mb-4">
                 {formulario.descricao}
               </p>
             )}
-            <Badge variant="secondary">
-              ⏱️ Tempo estimado: {formulario.perguntas_geradas.tempo_estimado}
+            <Badge variant="secondary" className="flex items-center gap-2 w-fit">
+              <Clock className="h-4 w-4" />
+              Tempo estimado: {formulario.perguntas_geradas.tempo_estimado}
             </Badge>
           </div>
 

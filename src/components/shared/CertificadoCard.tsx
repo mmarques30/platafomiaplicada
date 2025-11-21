@@ -27,7 +27,7 @@ export function CertificadoCard({
   };
 
   const handleShare = () => {
-    const texto = `Acabei de concluir a trilha "${trilhaTitulo}" com ${progresso}% de aproveitamento! 🎉`;
+    const texto = `Acabei de concluir a trilha "${trilhaTitulo}" com ${progresso}% de aproveitamento!`;
     if (navigator.share) {
       navigator.share({
         title: "Certificado de Conclusão",

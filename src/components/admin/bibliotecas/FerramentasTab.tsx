@@ -126,8 +126,8 @@ export function FerramentasTab() {
           <TableRow>
             <TableHead className="w-[200px]">Nome</TableHead>
             <TableHead className="w-[140px]">Categoria</TableHead>
-            <TableHead className="w-[120px]">⭐ Mari</TableHead>
-            <TableHead className="w-[140px]">👥 Comunidade</TableHead>
+            <TableHead className="w-[120px]">Mari</TableHead>
+            <TableHead className="w-[140px]">Comunidade</TableHead>
             <TableHead className="w-[90px]">Tipo</TableHead>
             <TableHead className="w-[90px]">Status</TableHead>
             <TableHead className="w-[100px]">Ações</TableHead>
