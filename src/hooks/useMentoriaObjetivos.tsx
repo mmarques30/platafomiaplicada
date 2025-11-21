@@ -73,9 +73,10 @@ export const useMentoriaObjetivos = (userId?: string) => {
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("Objetivo não encontrado");
       return data;
     },
     onSuccess: () => {
