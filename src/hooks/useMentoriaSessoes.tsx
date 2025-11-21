@@ -74,9 +74,10 @@ export const useMentoriaSessoes = (userId?: string) => {
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("Sessão não encontrada");
       return data;
     },
     onSuccess: () => {

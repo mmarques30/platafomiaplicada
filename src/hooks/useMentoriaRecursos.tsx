@@ -74,9 +74,10 @@ export const useMentoriaRecursos = (userId?: string) => {
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("Recurso não encontrado");
       return data;
     },
     onSuccess: () => {
