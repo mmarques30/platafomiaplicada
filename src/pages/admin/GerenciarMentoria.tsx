@@ -9,10 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw } from "lucide-react";
+import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw, Route } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
+import { ProcessoRoadmap } from "@/components/admin/mentoria/ProcessoRoadmap";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import RecursoModal from "@/components/admin/mentoria/RecursoModal";
@@ -139,10 +140,14 @@ export default function GerenciarMentoria() {
 
         {selectedUserId && (
           <Tabs defaultValue="diagnostico" className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="diagnostico">
                 <FileText className="h-4 w-4 mr-2" />
                 Diagnóstico
+              </TabsTrigger>
+              <TabsTrigger value="roadmap">
+                <Route className="h-4 w-4 mr-2" />
+                Roadmap
               </TabsTrigger>
               <TabsTrigger value="projetos">
                 <FolderKanban className="h-4 w-4 mr-2" />
@@ -168,6 +173,11 @@ export default function GerenciarMentoria() {
             {/* Diagnóstico Tab */}
             <TabsContent value="diagnostico" className="space-y-4">
               <DiagnosticoAdmin userId={selectedUserId} />
+            </TabsContent>
+
+            {/* Roadmap Tab */}
+            <TabsContent value="roadmap" className="space-y-4">
+              <ProcessoRoadmap userId={selectedUserId} />
             </TabsContent>
 
             <TabsContent value="projetos" className="space-y-4">
