@@ -169,6 +169,21 @@ export default function SessaoModal({
             />
           </div>
 
+          <div>
+            <Label htmlFor="feedback_entregas">
+              Mudanças, Melhorias e Feedbacks das Entregas
+            </Label>
+            <Textarea
+              id="feedback_entregas"
+              {...register("feedback_entregas")}
+              placeholder="Descreva as mudanças implementadas, melhorias sugeridas e feedbacks sobre as entregas apresentadas nesta sessão..."
+              rows={4}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Use este espaço para documentar evoluções, ajustes e avaliações das entregas
+            </p>
+          </div>
+
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar

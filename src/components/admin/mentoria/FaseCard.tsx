@@ -169,13 +169,28 @@ export const FaseCard = ({ fase, onEdit }: FaseCardProps) => {
                     <Calendar className="h-4 w-4" />
                     Sessão Associada
                   </div>
-                  <div className="pl-6 text-sm space-y-1">
-                    <p><strong>Título:</strong> {fase.sessao.titulo}</p>
-                    <p><strong>Data:</strong> {format(new Date(fase.sessao.data_sessao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
-                    {fase.sessao.duracao && <p><strong>Duração:</strong> {fase.sessao.duracao} min</p>}
-                    <Badge variant={fase.sessao.status === "realizada" ? "default" : "secondary"}>
-                      {fase.sessao.status === "realizada" ? "Realizada" : "Agendada"}
-                    </Badge>
+                  <div className="pl-6 text-sm space-y-3">
+                    <div className="space-y-1">
+                      <p><strong>Título:</strong> {fase.sessao.titulo}</p>
+                      <p><strong>Data:</strong> {format(new Date(fase.sessao.data_sessao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
+                      {fase.sessao.duracao && <p><strong>Duração:</strong> {fase.sessao.duracao} min</p>}
+                      <Badge variant={fase.sessao.status === "realizada" ? "default" : "secondary"}>
+                        {fase.sessao.status === "realizada" ? "Realizada" : "Agendada"}
+                      </Badge>
+                    </div>
+
+                    {/* Feedbacks das Entregas */}
+                    {fase.sessao.feedback_entregas && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-md dark:bg-blue-950/30 dark:border-blue-800">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                          <strong className="text-sm text-blue-900 dark:text-blue-100">Feedbacks das Entregas</strong>
+                        </div>
+                        <p className="text-sm text-blue-800 dark:text-blue-200 whitespace-pre-wrap">
+                          {fase.sessao.feedback_entregas}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
