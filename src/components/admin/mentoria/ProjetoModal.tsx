@@ -29,12 +29,7 @@ export default function ProjetoModal({
   isLoading,
   isAdmin = false
 }: ProjetoModalProps) {
-  const { register, handleSubmit, setValue, watch, reset } = useForm<Partial<ProjetoMentoria>>({
-    defaultValues: projeto || {
-      status: "planejamento",
-      tipo: "operacional"
-    }
-  });
+  const { register, handleSubmit, setValue, watch, reset } = useForm<Partial<ProjetoMentoria>>();
 
   const [trilhasRecomendadas, setTrilhasRecomendadas] = useState<any[]>([]);
   const [modulosObrigatorios, setModulosObrigatorios] = useState<any[]>([]);
@@ -48,6 +43,30 @@ export default function ProjetoModal({
       setModulosObrigatorios([]);
     }
   }, [projeto]);
+
+  useEffect(() => {
+    if (open && projeto) {
+      reset({
+        tipo: projeto.tipo,
+        titulo: projeto.titulo,
+        descricao: projeto.descricao,
+        objetivo_projeto: projeto.objetivo_projeto,
+        contribuicao_plano: projeto.contribuicao_plano,
+        status: projeto.status,
+        data_entrega: projeto.data_entrega,
+        devolutiva_mentor: projeto.devolutiva_mentor,
+        avaliacao_mentor: projeto.avaliacao_mentor,
+        comentarios_mentor: projeto.comentarios_mentor,
+        avaliacao_mentorado: projeto.avaliacao_mentorado,
+        comentarios_mentorado: projeto.comentarios_mentorado
+      });
+    } else if (open && !projeto) {
+      reset({
+        status: "planejamento",
+        tipo: "operacional"
+      });
+    }
+  }, [open, projeto, reset]);
 
   const handleFormSubmit = (data: Partial<ProjetoMentoria>) => {
     onSubmit({ 
