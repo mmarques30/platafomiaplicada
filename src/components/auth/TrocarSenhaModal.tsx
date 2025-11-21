@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useTrocarSenha } from "@/hooks/useTrocarSenha";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
@@ -59,9 +60,8 @@ export function TrocarSenhaModal({ open, userId, onSuccess }: TrocarSenhaModalPr
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="nova-senha">Nova Senha</Label>
-            <Input
+            <PasswordInput
               id="nova-senha"
-              type="password"
               value={novaSenha}
               onChange={(e) => setNovaSenha(e.target.value)}
               placeholder="Digite sua nova senha"
@@ -71,9 +71,8 @@ export function TrocarSenhaModal({ open, userId, onSuccess }: TrocarSenhaModalPr
 
           <div className="space-y-2">
             <Label htmlFor="confirmar-senha">Confirmar Senha</Label>
-            <Input
+            <PasswordInput
               id="confirmar-senha"
-              type="password"
               value={confirmarSenha}
               onChange={(e) => setConfirmarSenha(e.target.value)}
               placeholder="Digite novamente"
