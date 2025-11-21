@@ -36,7 +36,7 @@ export const useMentoriaProjetos = (userId?: string) => {
     queryFn: async () => {
       if (!targetUserId) return [];
       
-      console.log("🔍 Buscando projetos do usuário:", targetUserId);
+      console.log("Buscando projetos do usuário:", targetUserId);
       
       const { data, error } = await supabase
         .from("projetos_mentoria")
@@ -46,7 +46,7 @@ export const useMentoriaProjetos = (userId?: string) => {
 
       if (error) throw error;
       
-      console.log("✅ Projetos carregados:", data?.length);
+      console.log("Projetos carregados:", data?.length);
       data?.forEach((p, i) => {
         console.log(`  ${i + 1}. "${p.titulo}" (${p.tipo}) - ID: ${p.id?.substring(0, 8)}...`);
       });

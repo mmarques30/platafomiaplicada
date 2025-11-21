@@ -69,7 +69,7 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
       // Mostrar toast informando sobre geração de insight
       toast({
         title: "Gerando sua análise personalizada...",
-        description: "Aguarde alguns segundos enquanto a IA analisa seu perfil ✨"
+        description: "Aguarde alguns segundos enquanto a IA analisa seu perfil"
       });
 
       // Auto-gerar insight após finalização

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useCreateFerramenta, useUpdateFerramenta } from "@/hooks/admin/useBibliotecas";
-import { Star, Upload, X, Loader2 } from "lucide-react";
+import { Star, Upload, X, Loader2, CheckCircle2, AlertTriangle, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -253,7 +253,10 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
             <h3 className="font-semibold text-base">Avaliação</h3>
 
             <div>
-              <Label htmlFor="avaliacao_mari">⭐ Avaliação da Mari (1-5 estrelas)</Label>
+              <Label htmlFor="avaliacao_mari" className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-yellow-500" />
+                Avaliação da Mari (1-5 estrelas)
+              </Label>
               <div className="flex gap-1 py-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -286,7 +289,10 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
             {/* Avaliação da Comunidade (Read-Only) */}
             {ferramenta && (
               <div className="p-3 bg-muted rounded-lg border">
-                <Label className="text-sm">👥 Avaliação da Comunidade (somente visualização)</Label>
+                <Label className="text-sm flex items-center gap-2">
+                  <Users className="h-4 w-4 text-primary" />
+                  Avaliação da Comunidade (somente visualização)
+                </Label>
                 <div className="flex items-center gap-4 mt-2">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl font-bold">
@@ -318,8 +324,18 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="nao_avaliado">Não Avaliado</SelectItem>
-                  <SelectItem value="sim">✅ Sim - Recomendo</SelectItem>
-                  <SelectItem value="nao">⚠️ Não - Não Recomendo</SelectItem>
+                  <SelectItem value="sim">
+                    <span className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      Sim - Recomendo
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="nao">
+                    <span className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      Não - Não Recomendo
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

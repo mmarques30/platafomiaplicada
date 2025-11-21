@@ -17,7 +17,7 @@ export const useInsightIA = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["formulario-diagnostico"] });
       toast({
-        title: "Insight gerado com sucesso! ✨",
+        title: "Insight gerado com sucesso!",
         description: "Sua análise personalizada está pronta"
       });
     },

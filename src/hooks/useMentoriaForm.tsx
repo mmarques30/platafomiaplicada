@@ -102,7 +102,7 @@ export const useMentoriaForm = () => {
       queryClient.invalidateQueries({ queryKey: ["formulario-diagnostico"] });
       queryClient.invalidateQueries({ queryKey: ["admin-formularios"] });
       toast({
-        title: "Formulário enviado com sucesso! 🎉",
+        title: "Formulário enviado com sucesso!",
         description: "Obrigado por compartilhar suas informações.",
       });
     },

@@ -47,7 +47,7 @@ export default function EvolucaoCertificados() {
         <Alert>
           <AlertDescription>
             Nenhum certificado disponível ainda. Continue estudando para obter seus
-            certificados! 🎓
+            certificados!
           </AlertDescription>
         </Alert>
       ) : (

@@ -3,7 +3,7 @@ import { useModulos, useDeleteModulo, useModulosStats, useTrilhas } from "@/hook
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
 import { ModuloModal } from "./ModuloModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
@@ -197,8 +197,9 @@ export function ModulosTab() {
                         </Badge>
                       )}
                       {modulo.trilha_visivel && !modulo.visivel_mentorados && (
-                        <Badge variant="destructive" className="text-xs">
-                          ⚠️ Invisível em trilha visível
+                        <Badge variant="destructive" className="text-xs flex items-center gap-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          Invisível em trilha visível
                         </Badge>
                       )}
                     </div>

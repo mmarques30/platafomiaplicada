@@ -27,7 +27,7 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
       if (error) throw error;
       
       toast({
-        title: "Insight gerado com sucesso! ✨",
+        title: "Insight gerado com sucesso!",
         description: "Confira abaixo a análise personalizada"
       });
 

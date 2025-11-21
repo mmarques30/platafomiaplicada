@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjetoMentoria } from "@/hooks/useMentoriaProjetos";
 import { ModulosAssociadosSelector } from "./ModulosAssociadosSelector";
+import { Target, FolderKanban } from "lucide-react";
 
 type ProjetoModalProps = {
   open: boolean;
@@ -111,8 +112,18 @@ export default function ProjetoModal({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="estrategico">🎯 Estratégico - Objetivo de Alto Nível</SelectItem>
-                <SelectItem value="operacional">🔧 Operacional - Entrega Específica</SelectItem>
+                <SelectItem value="estrategico">
+                  <span className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-primary" />
+                    Estratégico - Objetivo de Alto Nível
+                  </span>
+                </SelectItem>
+                <SelectItem value="operacional">
+                  <span className="flex items-center gap-2">
+                    <FolderKanban className="h-4 w-4 text-secondary" />
+                    Operacional - Entrega Específica
+                  </span>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
