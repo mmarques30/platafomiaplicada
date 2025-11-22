@@ -24,10 +24,11 @@ import { cn } from "@/lib/utils";
 
 interface FaseCardProps {
   fase: FaseProcesso;
-  onEdit: (fase: FaseProcesso) => void;
+  onEdit?: (fase: FaseProcesso) => void;
+  readonly?: boolean;
 }
 
-export const FaseCard = ({ fase, onEdit }: FaseCardProps) => {
+export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getStatusIcon = () => {
@@ -101,13 +102,15 @@ export const FaseCard = ({ fase, onEdit }: FaseCardProps) => {
               </div>
               <div className="flex items-center gap-2">
                 {getStatusBadge()}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEdit(fase)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
+                {!readonly && onEdit && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(fase)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </div>
 

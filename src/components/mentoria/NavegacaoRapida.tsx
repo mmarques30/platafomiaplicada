@@ -17,6 +17,11 @@ export function NavegacaoRapida() {
       path: "/mentoria/diagnostico"
     },
     {
+      title: "Meu Processo",
+      description: "Roadmap de fases",
+      path: "/mentoria/processo"
+    },
+    {
       title: "Objetivos",
       description: "Seus objetivos estratégicos",
       path: "/mentoria/objetivos"
