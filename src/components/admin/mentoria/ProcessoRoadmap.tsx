@@ -11,9 +11,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProcessoRoadmapProps {
   userId: string;
+  readonly?: boolean;
 }
 
-export const ProcessoRoadmap = ({ userId }: ProcessoRoadmapProps) => {
+export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapProps) => {
   const { fases, isLoading, updateFase, inicializarFases, isUpdating } = useFasesProcesso(userId);
   const [editingFase, setEditingFase] = useState<FaseProcesso | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -56,14 +57,19 @@ export const ProcessoRoadmap = ({ userId }: ProcessoRoadmapProps) => {
         <CardHeader>
           <CardTitle>Roadmap não inicializado</CardTitle>
           <CardDescription>
-            Este mentorado ainda não possui um roadmap de processo. Clique no botão abaixo para criar.
+            {readonly 
+              ? "Seu roadmap de processo ainda não foi criado pelo mentor."
+              : "Este mentorado ainda não possui um roadmap de processo. Clique no botão abaixo para criar."
+            }
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button onClick={() => inicializarFases(userId)}>
-            Inicializar Roadmap
-          </Button>
-        </CardContent>
+        {!readonly && (
+          <CardContent>
+            <Button onClick={() => inicializarFases(userId)}>
+              Inicializar Roadmap
+            </Button>
+          </CardContent>
+        )}
       </Card>
     );
   }
@@ -116,7 +122,12 @@ export const ProcessoRoadmap = ({ userId }: ProcessoRoadmapProps) => {
         <h3 className="text-lg font-semibold">Timeline do Processo</h3>
         <div className="relative space-y-4">
           {fases.map((fase) => (
-            <FaseCard key={fase.id} fase={fase} onEdit={handleEditFase} />
+            <FaseCard 
+              key={fase.id} 
+              fase={fase} 
+              onEdit={readonly ? undefined : handleEditFase}
+              readonly={readonly}
+            />
           ))}
         </div>
       </div>
