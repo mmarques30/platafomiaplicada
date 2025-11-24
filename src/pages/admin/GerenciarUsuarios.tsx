@@ -186,11 +186,14 @@ export default function GerenciarUsuários() {
                     className={
                       (user as any).plano_mentoria === "club" 
                         ? "border-green-500 text-green-700"
+                        : (user as any).plano_mentoria === "boost"
+                        ? "border-blue-500 text-blue-700"
                         : "border-purple-500 text-purple-700"
                     }
                   >
-                    {(user as any).plano_mentoria === "club" && "IAplicada Club"}
-                    {(user as any).plano_mentoria === "pro" && "IAplicada Pro"}
+                    {(user as any).plano_mentoria === "club" && "Club"}
+                    {(user as any).plano_mentoria === "boost" && "Boost"}
+                    {(user as any).plano_mentoria === "legacy" && "Legacy"}
                   </Badge>
                 ) : (
                   <span className="text-muted-foreground text-sm">-</span>

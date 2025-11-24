@@ -48,6 +48,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       setThumbnailPreview(video.thumbnail_customizado_url || "");
       setThumbnailFile(null);
       setValue("visivel_mentorados", video.visivel_mentorados ?? false);
+      setValue("nivel_minimo_acesso", video.nivel_minimo_acesso || "club");
       setValue("thumbnail_customizado_url", video.thumbnail_customizado_url || "");
       
       // Carregar materiais existentes
@@ -70,6 +71,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
         ordem: 0, 
         ativo: true,
         visivel_mentorados: false,
+        nivel_minimo_acesso: "club",
         thumbnail_customizado_url: "",
         data_aula: null
       });
@@ -367,19 +369,25 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
             Deixe desmarcado para preparar a aula antes de liberá-la
           </p>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="visivel_apenas_pro"
-              checked={watch("visivel_apenas_pro")}
-              onCheckedChange={(checked) => setValue("visivel_apenas_pro", !!checked)}
-            />
-            <Label htmlFor="visivel_apenas_pro">
-              🔒 Conteúdo Exclusivo PRO
-            </Label>
+          <div className="space-y-2">
+            <Label>Nível Mínimo de Acesso</Label>
+            <Select 
+              value={watch("nivel_minimo_acesso") || "club"}
+              onValueChange={(value) => setValue("nivel_minimo_acesso", value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="club">🌱 Club (todos)</SelectItem>
+                <SelectItem value="boost">🚀 Boost (Boost + Legacy)</SelectItem>
+                <SelectItem value="legacy">👑 Legacy (apenas Legacy)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Define qual plano mínimo pode acessar este vídeo
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground ml-6">
-            Apenas mentorados com plano PRO terão acesso a este vídeo
-          </p>
           </div>
         </div>
         <DialogFooter className="flex justify-between">

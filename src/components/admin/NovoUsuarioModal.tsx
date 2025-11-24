@@ -24,8 +24,9 @@ interface NovoUsuarioModalProps {
 }
 
 const PLANOS = [
-  { value: "club", label: "Club", description: "Mentorias em grupo semanais" },
-  { value: "pro", label: "Pro", description: "Mentorias individuais premium" },
+  { value: "club", label: "IAplicada Club", description: "Acesso à plataforma de conteúdo" },
+  { value: "boost", label: "IAplicada Boost", description: "Plataforma + painel simplificado + conteúdo Boost" },
+  { value: "legacy", label: "IAplicada Legacy", description: "Acesso completo (Club + Boost + Legacy + painel completo)" },
 ];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {

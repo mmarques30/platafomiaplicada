@@ -916,6 +916,9 @@ export type Database = {
           descricao: string | null
           id: string
           imagem_url: string | null
+          nivel_minimo_acesso:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem: number
           titulo: string
           trilha_id: string
@@ -931,6 +934,9 @@ export type Database = {
           descricao?: string | null
           id?: string
           imagem_url?: string | null
+          nivel_minimo_acesso?:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem?: number
           titulo: string
           trilha_id: string
@@ -946,6 +952,9 @@ export type Database = {
           descricao?: string | null
           id?: string
           imagem_url?: string | null
+          nivel_minimo_acesso?:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem?: number
           titulo?: string
           trilha_id?: string
@@ -1450,6 +1459,9 @@ export type Database = {
           id: string
           imagem_url: string | null
           nivel: string
+          nivel_minimo_acesso:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem: number
           titulo: string
           updated_at: string | null
@@ -1465,6 +1477,9 @@ export type Database = {
           id?: string
           imagem_url?: string | null
           nivel: string
+          nivel_minimo_acesso?:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem?: number
           titulo: string
           updated_at?: string | null
@@ -1480,6 +1495,9 @@ export type Database = {
           id?: string
           imagem_url?: string | null
           nivel?: string
+          nivel_minimo_acesso?:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem?: number
           titulo?: string
           updated_at?: string | null
@@ -1600,6 +1618,9 @@ export type Database = {
           id: string
           materiais: Json | null
           modulo_id: string
+          nivel_minimo_acesso:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem: number
           thumbnail_customizado_url: string | null
           thumbnail_url: string | null
@@ -1621,6 +1642,9 @@ export type Database = {
           id?: string
           materiais?: Json | null
           modulo_id: string
+          nivel_minimo_acesso?:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem?: number
           thumbnail_customizado_url?: string | null
           thumbnail_url?: string | null
@@ -1642,6 +1666,9 @@ export type Database = {
           id?: string
           materiais?: Json | null
           modulo_id?: string
+          nivel_minimo_acesso?:
+            | Database["public"]["Enums"]["nivel_acesso_plano"]
+            | null
           ordem?: number
           thumbnail_customizado_url?: string | null
           thumbnail_url?: string | null
@@ -1722,6 +1749,12 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      user_has_access_level: {
+        Args: {
+          required_level: Database["public"]["Enums"]["nivel_acesso_plano"]
+        }
+        Returns: boolean
+      }
       verificar_integridade_sistema: {
         Args: never
         Returns: {
@@ -1734,7 +1767,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "mentorado" | "aluno_trilha"
-      plano_mentoria: "club" | "pro"
+      nivel_acesso_plano: "club" | "boost" | "legacy"
+      plano_mentoria: "club" | "pro" | "boost" | "legacy"
       status_projeto:
         | "planejamento"
         | "em_andamento"
@@ -1869,7 +1903,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "mentorado", "aluno_trilha"],
-      plano_mentoria: ["club", "pro"],
+      nivel_acesso_plano: ["club", "boost", "legacy"],
+      plano_mentoria: ["club", "pro", "boost", "legacy"],
       status_projeto: [
         "planejamento",
         "em_andamento",
