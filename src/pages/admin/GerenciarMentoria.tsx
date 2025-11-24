@@ -9,9 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw, Route } from "lucide-react";
+import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw, Route, User } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
+import { MinhasTarefasAdmin } from "@/components/admin/mentoria/MinhasTarefasAdmin";
 import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
 import { ProcessoRoadmap } from "@/components/admin/mentoria/ProcessoRoadmap";
 import { Badge } from "@/components/ui/badge";
@@ -138,9 +139,12 @@ export default function GerenciarMentoria() {
           </CardContent>
         </Card>
 
-        {selectedUserId && (
-          <Tabs defaultValue="diagnostico" className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
+        <Tabs defaultValue="minhas-tarefas" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-8">
+            <TabsTrigger value="minhas-tarefas">
+              <User className="h-4 w-4 mr-2" />
+              Minhas Tarefas
+            </TabsTrigger>
               <TabsTrigger value="diagnostico">
                 <FileText className="h-4 w-4 mr-2" />
                 Diagnóstico
@@ -170,8 +174,14 @@ export default function GerenciarMentoria() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Diagnóstico Tab */}
-            <TabsContent value="diagnostico" className="space-y-4">
+            <TabsContent value="minhas-tarefas" className="space-y-4">
+              <MinhasTarefasAdmin />
+            </TabsContent>
+
+            {selectedUserId && (
+              <>
+                {/* Diagnóstico Tab */}
+                <TabsContent value="diagnostico" className="space-y-4">
               <DiagnosticoAdmin userId={selectedUserId} />
             </TabsContent>
 
@@ -344,8 +354,9 @@ export default function GerenciarMentoria() {
                 )}
               </div>
             </TabsContent>
+              </>
+            )}
           </Tabs>
-        )}
       </div>
 
       <SessaoModal
