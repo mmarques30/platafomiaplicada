@@ -12,7 +12,7 @@ export function NavegacaoRapida() {
 
   const navOptions: NavOption[] = [
     {
-      title: "🗺️ Meu Processo",
+      title: "Meu Processo",
       description: "Roadmap de fases e progresso",
       path: "/mentoria/processo"
     },
@@ -57,7 +57,7 @@ export function NavegacaoRapida() {
             <Card
               key={option.path}
               className={`cursor-pointer transition-all hover:shadow-md border-2 hover:border-primary/50 h-20 ${
-                option.title.includes("🗺️") ? "border-primary/30 bg-primary/5" : ""
+                option.title === "Meu Processo" ? "border-primary/30 bg-primary/5" : ""
               }`}
               onClick={() => navigate(option.path)}
             >
