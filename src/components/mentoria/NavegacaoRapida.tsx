@@ -12,23 +12,18 @@ export function NavegacaoRapida() {
 
   const navOptions: NavOption[] = [
     {
+      title: "🗺️ Meu Processo",
+      description: "Roadmap de fases e progresso",
+      path: "/mentoria/processo"
+    },
+    {
       title: "Diagnóstico",
       description: "Seu perfil e análise",
       path: "/mentoria/diagnostico"
     },
     {
-      title: "Meu Processo",
-      description: "Roadmap de fases",
-      path: "/mentoria/processo"
-    },
-    {
-      title: "Objetivos",
-      description: "Seus objetivos estratégicos",
-      path: "/mentoria/objetivos"
-    },
-    {
-      title: "Projetos",
-      description: "Seus projetos práticos",
+      title: "Projetos e Entregas",
+      description: "Acompanhe suas entregas",
       path: "/mentoria/projetos"
     },
     {
@@ -47,11 +42,6 @@ export function NavegacaoRapida() {
       path: "/mentoria/recursos"
     },
     {
-      title: "Gravações",
-      description: "Sessões gravadas",
-      path: "/mentoria/sessoes?filter=gravacoes"
-    },
-    {
       title: "Dúvidas",
       description: "Tire suas dúvidas",
       path: "/mentoria/duvidas"
@@ -66,7 +56,9 @@ export function NavegacaoRapida() {
           return (
             <Card
               key={option.path}
-              className="cursor-pointer transition-all hover:shadow-md border-2 hover:border-primary/50 h-20"
+              className={`cursor-pointer transition-all hover:shadow-md border-2 hover:border-primary/50 h-20 ${
+                option.title.includes("🗺️") ? "border-primary/30 bg-primary/5" : ""
+              }`}
               onClick={() => navigate(option.path)}
             >
               <CardContent className="p-4 flex items-center justify-between h-full">

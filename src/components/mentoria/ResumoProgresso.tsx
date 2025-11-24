@@ -1,28 +1,30 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, FolderKanban } from "lucide-react";
-import { useMentoriaForm } from "@/hooks/useMentoriaForm";
-import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
+import { useFasesProcesso } from "@/hooks/useFasesProcesso";
 import { ProgressRing } from "./ProgressRing";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useAuth } from "@/hooks/useAuth";
 
 export function ResumoProgresso() {
-  const { formulario } = useMentoriaForm();
-  const { tarefas } = useMentoriaTarefas();
+  const { user } = useAuth();
+  const { fases } = useFasesProcesso(user?.id);
   const { sessoes } = useMentoriaSessoes();
   const { projetos } = useMentoriaProjetos();
 
-  const objetivosEstrategicos = projetos.filter(p => p.tipo === "estrategico");
-  const objetivosCompletos = objetivosEstrategicos.filter(o => o.status === "concluido").length;
-  const progressoObjetivos = objetivosEstrategicos.length > 0 ? (objetivosCompletos / objetivosEstrategicos.length) * 100 : 0;
+  // Calcular progresso baseado em fases
+  const fasesConcluidas = fases.filter(f => f.status === "concluida").length;
+  const progressoFases = fases.length > 0 ? (fasesConcluidas / fases.length) * 100 : 0;
   
-  const tarefasConcluidas = tarefas.filter(t => t.status === "concluida").length;
-  const progressoTarefas = tarefas.length > 0 ? (tarefasConcluidas / tarefas.length) * 100 : 0;
+  // Calcular tarefas de todas as fases
+  const todasTarefas = fases.flatMap(f => f.tarefas || []);
+  const tarefasConcluidas = todasTarefas.filter(t => t.status === "concluida").length;
+  const progressoTarefas = todasTarefas.length > 0 ? (tarefasConcluidas / todasTarefas.length) * 100 : 0;
   
-  const diagnosticoCompleto = formulario?.completado ? 1 : 0;
-  const progressoGeral = ((diagnosticoCompleto + (objetivosEstrategicos.length > 0 ? 1 : 0) + (tarefas.length > 0 ? 1 : 0)) / 3) * 100;
+  // Progresso geral (média ponderada)
+  const progressoGeral = fases.length > 0 ? (progressoFases + progressoTarefas) / 2 : 0;
   
   const proximaSessao = sessoes.find(s => s.status === "agendada" && new Date(s.data_sessao) > new Date());
   const projetosEmAndamento = projetos.filter(p => p.status === "em_andamento").length;
@@ -36,21 +38,21 @@ export function ResumoProgresso() {
         {/* Progress Rings */}
         <div className="grid grid-cols-3 gap-6">
           <ProgressRing
-            value={progressoObjetivos}
-            label="Objetivos"
-            subtitle={`${objetivosCompletos} de ${objetivosEstrategicos.length}`}
+            value={progressoFases}
+            label="Fases"
+            subtitle={`${fasesConcluidas} de ${fases.length}`}
             color="hsl(var(--primary))"
           />
           <ProgressRing
             value={progressoTarefas}
             label="Tarefas"
-            subtitle={`${tarefasConcluidas} de ${tarefas.length}`}
+            subtitle={`${tarefasConcluidas} de ${todasTarefas.length}`}
             color="hsl(var(--chart-2))"
           />
           <ProgressRing
             value={progressoGeral}
-            label="Geral"
-            subtitle={formulario?.completado ? "Diagnóstico OK" : "Diagnóstico pendente"}
+            label="Roadmap"
+            subtitle={`${Math.round(progressoGeral)}% completo`}
             color="hsl(var(--chart-3))"
           />
         </div>
