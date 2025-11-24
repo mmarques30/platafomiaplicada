@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Calendar, AlertTriangle, CheckCircle2, Clock, Pencil, Trash2, ExternalLink, FileText } from "lucide-react";
+import { Plus, Calendar, AlertTriangle, CheckCircle2, Clock, Pencil, Trash2, ExternalLink, FileText, User } from "lucide-react";
 import { useMentoriaTarefas, TarefaMentoria } from "@/hooks/useMentoriaTarefas";
 import { TarefaModal } from "./TarefaModal";
 import { format, differenceInDays } from "date-fns";
@@ -93,6 +93,10 @@ export const TarefasAdmin = ({ userId }: TarefasAdminProps) => {
             <div className="flex items-center gap-2 mb-2">
               {getPrioridadeBadge(tarefa.prioridade)}
               <Badge variant="outline">{tarefa.tipo}</Badge>
+              <Badge variant="secondary" className="gap-1">
+                <User className="h-3 w-3" />
+                {tarefa.nome_completo || "Sem nome"}
+              </Badge>
               <Badge variant={tarefa.status === "concluida" ? "default" : "secondary"}>
                 {tarefa.status}
               </Badge>
