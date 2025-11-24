@@ -11,14 +11,6 @@ import { differenceInDays } from "date-fns";
 export default function MinhasTarefas() {
   const { data: tarefas, isLoading } = useMentoriaTodasTarefas();
   const [filtroStatus, setFiltroStatus] = useState<"todas" | "pendente" | "em_andamento" | "concluida">("todas");
-  
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Carregando tarefas...</p>
-      </div>
-    );
-  }
 
   // Agrupar por status
   const pendentes = tarefas?.filter(t => t.status === 'pendente') || [];
@@ -36,6 +28,14 @@ export default function MinhasTarefas() {
     if (filtroStatus === "todas") return tarefas;
     return tarefas.filter(t => t.status === filtroStatus);
   }, [tarefas, filtroStatus]);
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Carregando tarefas...</p>
+      </div>
+    );
+  }
 
   const getStatusBadge = (status: string) => {
     const config = {
