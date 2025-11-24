@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Users, ExternalLink, Award, Sparkles } from "lucide-react";
+import { Star, Users, ExternalLink } from "lucide-react";
 
 interface Ferramenta {
   id: string;
@@ -54,8 +54,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 justify-center">
-        <Award className="w-6 h-6 text-primary" />
+      <div className="flex items-center justify-center">
         <h2 className="text-2xl font-bold text-center">Top 3 Ferramentas Recomendadas</h2>
       </div>
 
@@ -75,15 +74,8 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
               </div>
 
               <CardContent className="p-4 pt-16 flex flex-col h-full">
-                {/* Ícone */}
-                <div className="flex justify-center mb-3">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-primary" />
-                  </div>
-                </div>
-
                 {/* Nome e Categoria */}
-                <h3 className="text-lg font-bold text-center mb-1 line-clamp-2">
+                <h3 className="text-lg font-bold text-center mb-4 line-clamp-2">
                   {ferramenta.nome}
                 </h3>
                 <div className="flex justify-center gap-2 mb-3">
