@@ -186,13 +186,13 @@ export default function Chat() {
         <div className="flex justify-center mb-4">
           <img 
             src={mariAvatar} 
-            alt="Mariana Martins" 
+            alt="Mariana Marques" 
             className="w-16 h-16 rounded-full border-2 border-primary object-cover"
           />
         </div>
         <h1 className="text-2xl font-bold mb-4">Chat com a Mari</h1>
         <p className="text-muted-foreground mb-6">
-          Faça login para conversar diretamente com a Mariana sobre sua jornada em IA
+          Faça login para conversar diretamente com a Mariana Marques sobre sua jornada em IA
         </p>
         <Button onClick={() => window.location.href = '/auth'}>
           Fazer Login
@@ -218,13 +218,13 @@ export default function Chat() {
             <div className="relative">
               <img 
                 src={mariAvatar} 
-                alt="Mariana Martins" 
+                alt="Mariana Marques" 
                 className="w-12 h-12 rounded-full object-cover border-2 border-primary"
               />
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
             </div>
             <div className="flex-1">
-              <h2 className="font-semibold text-lg">Mariana Martins</h2>
+              <h2 className="font-semibold text-lg">Mariana Marques</h2>
               <p className="text-sm text-muted-foreground">Mentora IA Aplicada</p>
             </div>
           </div>
@@ -235,12 +235,12 @@ export default function Chat() {
                 <div className="text-center py-12">
                   <img 
                     src={mariAvatar} 
-                    alt="Mariana Martins" 
+                    alt="Mariana Marques" 
                     className="w-20 h-20 rounded-full mx-auto mb-4 border-2 border-primary object-cover"
                   />
                   <h3 className="text-lg font-semibold mb-2">Oi, Aplicado!</h3>
                   <p className="text-muted-foreground">
-                    Sou a Mari, sua mentora de IA. Como posso te ajudar hoje?
+                    Sou a MarIAna, sua mentora de IA. Como posso te ajudar hoje?
                   </p>
                 </div>
               )}
@@ -256,7 +256,7 @@ export default function Chat() {
                   <div className="flex-shrink-0">
                     <img 
                       src={mariAvatar} 
-                      alt="Mariana Martins" 
+                      alt="Mariana Marques" 
                       className="w-10 h-10 rounded-full object-cover border-2 border-primary"
                     />
                   </div>
