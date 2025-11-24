@@ -6,6 +6,7 @@ import { useAuth } from "./useAuth";
 export type TarefaMentoria = {
   id: string;
   user_id: string;
+  nome_completo?: string;
   projeto_id?: string;
   sessao_id?: string;
   titulo: string;
@@ -36,12 +37,19 @@ export const useMentoriaTarefas = (userId?: string) => {
       
       const { data, error } = await supabase
         .from("tarefas_mentoria")
-        .select("*")
+        .select(`
+          *,
+          profiles!inner(nome_completo)
+        `)
         .eq("user_id", targetUserId)
         .order("prazo_entrega", { ascending: true });
 
       if (error) throw error;
-      return data as TarefaMentoria[];
+      
+      return (data || []).map((item: any) => ({
+        ...item,
+        nome_completo: item.profiles?.nome_completo
+      })) as TarefaMentoria[];
     },
     enabled: !!targetUserId,
   });
