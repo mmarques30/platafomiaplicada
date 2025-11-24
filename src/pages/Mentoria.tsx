@@ -9,6 +9,7 @@ import { TarefasUrgentes } from "@/components/mentoria/TarefasUrgentes";
 import { NavegacaoRapida } from "@/components/mentoria/NavegacaoRapida";
 import { ResumoProgresso } from "@/components/mentoria/ResumoProgresso";
 import { PendenciasUrgentes } from "@/components/mentoria/PendenciasUrgentes";
+import { FaseAtualCard } from "@/components/mentoria/FaseAtualCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -31,6 +32,11 @@ export default function Mentoria() {
       {/* Seção de Alertas/Pendências Urgentes */}
       <div className="mb-8">
         <PendenciasUrgentes />
+      </div>
+
+      {/* Card Destaque - Fase Atual */}
+      <div className="mb-8">
+        <FaseAtualCard />
       </div>
 
       {/* Grid Principal - Cards de Destaque */}
