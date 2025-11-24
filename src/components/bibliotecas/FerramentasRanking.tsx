@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Users, ExternalLink, Trophy } from "lucide-react";
+import { Star, Users, ExternalLink, Award, Sparkles } from "lucide-react";
 
 interface Ferramenta {
   id: string;
@@ -28,20 +28,17 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
     return (mariScore * 0.6) + (comunidadeScore * 0.4);
   };
 
-  const top3 = ferramentas
-    .sort((a, b) => calcularPontuacao(b) - calcularPontuacao(a))
-    .slice(0, 3);
+  // Ranking fixo: Claude (1º), Manus (2º), Gamma (3º)
+  const top3 = [
+    ferramentas.find(f => f.nome.toLowerCase().includes('claude')),
+    ferramentas.find(f => f.nome.toLowerCase().includes('manus')),
+    ferramentas.find(f => f.nome.toLowerCase().includes('gamma'))
+  ].filter(Boolean) as Ferramenta[];
 
   if (top3.length === 0) return null;
 
   // Organizar como: [2º, 1º, 3º] para efeito pódio
   const podio = [top3[1], top3[0], top3[2]].filter(Boolean);
-
-  const getMedalEmoji = (index: number) => {
-    if (index === 1) return "🥇"; // Centro (1º)
-    if (index === 0) return "🥈"; // Esquerda (2º)
-    return "🥉"; // Direita (3º)
-  };
 
   const getMedalColor = (index: number) => {
     if (index === 1) return "from-yellow-400 to-yellow-600"; // 1º
@@ -58,7 +55,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 justify-center">
-        <Trophy className="w-6 h-6 text-yellow-500" />
+        <Award className="w-6 h-6 text-primary" />
         <h2 className="text-2xl font-bold text-center">Top 3 Ferramentas Recomendadas</h2>
       </div>
 
@@ -74,26 +71,15 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
             >
               {/* Badge de posição */}
               <div className={`absolute top-0 left-0 right-0 h-12 bg-gradient-to-r ${getMedalColor(idx)} flex items-center justify-center`}>
-                <span className="text-3xl">{getMedalEmoji(idx)}</span>
-                <span className="ml-2 text-white font-bold text-lg">{posicaoReal}º Lugar</span>
+                <span className="text-white font-bold text-lg">{posicaoReal}º Lugar</span>
               </div>
 
               <CardContent className="p-4 pt-16 flex flex-col h-full">
-                {/* Logo */}
+                {/* Ícone */}
                 <div className="flex justify-center mb-3">
-                  {ferramenta.logo_url ? (
-                    <img
-                      src={ferramenta.logo_url}
-                      alt={ferramenta.nome}
-                      className="w-20 h-20 rounded-xl object-cover shadow-md"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-md">
-                      <span className="text-3xl font-bold text-primary-foreground">
-                        {ferramenta.nome.charAt(0)}
-                      </span>
-                    </div>
-                  )}
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                  </div>
                 </div>
 
                 {/* Nome e Categoria */}
