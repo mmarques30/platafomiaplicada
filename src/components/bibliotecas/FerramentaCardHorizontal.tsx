@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
-import { Star, Users, ExternalLink, CheckCircle, XCircle } from "lucide-react";
+import { Star, Users, ExternalLink, CheckCircle, XCircle, Cpu } from "lucide-react";
 
 interface FerramentaCardHorizontalProps {
   ferramenta: {
@@ -26,28 +26,14 @@ export function FerramentaCardHorizontal({ ferramenta, onVerMais }: FerramentaCa
     <Card className="hover:shadow-lg transition-all">
       <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row gap-4 items-start">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            {ferramenta.logo_url ? (
-              <img
-                src={ferramenta.logo_url}
-                alt={ferramenta.nome}
-                className="w-16 h-16 rounded-lg object-cover"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">
-                  {ferramenta.nome.charAt(0)}
-                </span>
-              </div>
-            )}
-          </div>
-
           {/* Informações Principais */}
           <div className="flex-grow min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
               <div className="flex-grow">
-                <h3 className="text-lg font-bold mb-1">{ferramenta.nome}</h3>
+                <h3 className="text-lg font-bold mb-1 flex items-center gap-2">
+                  <Cpu className="w-5 h-5 text-primary" />
+                  {ferramenta.nome}
+                </h3>
                 <div className="flex flex-wrap gap-2 mb-2">
                   <Badge variant="outline" className="text-xs">
                     {ferramenta.categoria}

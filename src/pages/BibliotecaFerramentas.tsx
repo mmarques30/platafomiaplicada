@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useFerramentasIA } from "@/hooks/useFerramentas";
-import { Wrench, Search, LayoutGrid, LayoutList } from "lucide-react";
+import { Wrench, Search, LayoutGrid, LayoutList, Zap, ExternalLink } from "lucide-react";
 import { FerramentasRanking } from "@/components/bibliotecas/FerramentasRanking";
 import { FerramentaCardHorizontal } from "@/components/bibliotecas/FerramentaCardHorizontal";
 import { FerramentaDetalhesModal } from "@/components/bibliotecas/FerramentaDetalhesModal";
@@ -201,33 +201,43 @@ export default function BibliotecaFerramentas() {
                 {visibleFerramentas.map((ferramenta) => (
                   <Card key={ferramenta.id} className="hover:shadow-lg transition-all">
                     <CardContent className="p-4 flex flex-col h-full">
-                      {ferramenta.logo_url ? (
-                        <img
-                          src={ferramenta.logo_url}
-                          alt={ferramenta.nome}
-                          className="w-16 h-16 rounded-xl object-cover mx-auto mb-3"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center mx-auto mb-3">
-                          <span className="text-2xl font-bold text-primary-foreground">
-                            {ferramenta.nome.charAt(0)}
-                          </span>
+                      {/* Ícone */}
+                      <div className="flex justify-center mb-3">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Zap className="w-6 h-6 text-primary" />
                         </div>
-                      )}
+                      </div>
                       <h3 className="text-lg font-bold text-center mb-2 line-clamp-2">
                         {ferramenta.nome}
                       </h3>
                       <p className="text-sm text-muted-foreground text-center mb-4 line-clamp-2 flex-grow">
                         {ferramenta.objetivo}
                       </p>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => setFerramentaSelecionada(ferramenta)}
-                      >
-                        Ver Detalhes
-                      </Button>
+                      <div className="flex gap-2 w-full">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setFerramentaSelecionada(ferramenta)}
+                        >
+                          Ver Detalhes
+                        </Button>
+                        {ferramenta.link_ferramenta && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                          >
+                            <a
+                              href={ferramenta.link_ferramenta}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}

@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
-import { Wrench, ExternalLink, CheckCircle, ChevronRight } from "lucide-react";
+import { ExternalLink, CheckCircle, Box } from "lucide-react";
 
 interface FerramentaCardProps {
   ferramenta: {
@@ -24,17 +24,11 @@ export function FerramentaCard({ ferramenta, onVerMais }: FerramentaCardProps) {
   return (
     <Card className="hover:shadow-lg transition-shadow h-full flex flex-col">
       <CardContent className="p-4 flex flex-col gap-3 flex-1">
-        {/* Logo da Ferramenta */}
-        <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-white/5 backdrop-blur overflow-hidden mx-auto">
-          {ferramenta.logo_url ? (
-            <img
-              src={ferramenta.logo_url}
-              alt={ferramenta.nome}
-              className="w-full h-full object-contain"
-            />
-          ) : (
-            <Wrench className="w-8 h-8 text-muted-foreground" />
-          )}
+        {/* Ícone */}
+        <div className="flex justify-center mb-3">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Box className="w-6 h-6 text-primary" />
+          </div>
         </div>
 
         {/* Nome da Ferramenta */}
