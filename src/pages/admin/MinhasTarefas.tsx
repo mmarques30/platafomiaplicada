@@ -1,14 +1,16 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CheckSquare, User, Calendar, AlertTriangle, Clock, CheckCircle2, AlertCircle, Flame } from "lucide-react";
 import { useMentoriaTodasTarefas } from "@/hooks/useMentoriaTodasTarefas";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { differenceInDays } from "date-fns";
-import { TarefaMentoria } from "@/hooks/useMentoriaTarefas";
 
 export default function MinhasTarefas() {
   const { data: tarefas, isLoading } = useMentoriaTodasTarefas();
+  const [filtroStatus, setFiltroStatus] = useState<"todas" | "pendente" | "em_andamento" | "concluida">("todas");
   
   if (isLoading) {
     return (
@@ -27,6 +29,29 @@ export default function MinhasTarefas() {
   const atrasadas = pendentes.filter(t => 
     new Date(t.prazo_entrega) < new Date()
   );
+
+  // Filtrar tarefas baseado no filtro ativo
+  const tarefasFiltradas = useMemo(() => {
+    if (!tarefas) return [];
+    if (filtroStatus === "todas") return tarefas;
+    return tarefas.filter(t => t.status === filtroStatus);
+  }, [tarefas, filtroStatus]);
+
+  const getStatusBadge = (status: string) => {
+    const config = {
+      pendente: { color: "text-yellow-600", bg: "bg-yellow-50", label: "Pendente", icon: AlertTriangle },
+      em_andamento: { color: "text-blue-600", bg: "bg-blue-50", label: "Em Andamento", icon: Clock },
+      concluida: { color: "text-green-600", bg: "bg-green-50", label: "Concluída", icon: CheckCircle2 },
+    }[status] || { color: "text-muted-foreground", bg: "bg-muted", label: status, icon: AlertCircle };
+    
+    const Icon = config.icon;
+    return (
+      <Badge variant="outline" className={`${config.bg} ${config.color} border-0`}>
+        <Icon className="h-3 w-3 mr-1" />
+        {config.label}
+      </Badge>
+    );
+  };
 
   const getPrioridadeBadge = (prioridade: string) => {
     const config = {
@@ -59,166 +84,187 @@ export default function MinhasTarefas() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <CheckSquare className="h-8 w-8" />
-          Todas as Tarefas dos Mentorados
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Visão geral de todas as tarefas de todos os mentorados
-        </p>
-      </div>
-
-      {/* Cards de estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              Pendentes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-yellow-600">{pendentes.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              Atrasadas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-red-600">{atrasadas.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-600" />
-              Em Andamento
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-600">{emAndamento.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              Concluídas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-600">{concluidas.length}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Board Kanban */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Coluna Pendentes */}
+        {/* Header */}
         <div>
-          <h3 className="font-semibold mb-4 flex items-center gap-2 text-lg">
-            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <CheckSquare className="h-8 w-8" />
+            Todas as Tarefas dos Mentorados
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Visão geral de todas as tarefas de todos os mentorados
+          </p>
+        </div>
+
+        {/* Cards de estatísticas - Clicáveis para filtrar */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card 
+            className={`cursor-pointer hover:shadow-md transition-all ${filtroStatus === 'pendente' ? 'ring-2 ring-yellow-600' : ''}`}
+            onClick={() => setFiltroStatus('pendente')}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                Pendentes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-yellow-600">{pendentes.length}</div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-md transition-all"
+            onClick={() => setFiltroStatus('pendente')}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                Atrasadas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-red-600">{atrasadas.length}</div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className={`cursor-pointer hover:shadow-md transition-all ${filtroStatus === 'em_andamento' ? 'ring-2 ring-blue-600' : ''}`}
+            onClick={() => setFiltroStatus('em_andamento')}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-600" />
+                Em Andamento
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600">{emAndamento.length}</div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className={`cursor-pointer hover:shadow-md transition-all ${filtroStatus === 'concluida' ? 'ring-2 ring-green-600' : ''}`}
+            onClick={() => setFiltroStatus('concluida')}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                Concluídas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">{concluidas.length}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Barra de Filtros */}
+        <div className="flex gap-2 flex-wrap items-center">
+          <span className="text-sm font-medium text-muted-foreground">Filtrar por:</span>
+          <Badge 
+            variant={filtroStatus === "todas" ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => setFiltroStatus("todas")}
+          >
+            Todas ({tarefas?.length || 0})
+          </Badge>
+          <Badge 
+            variant={filtroStatus === "pendente" ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => setFiltroStatus("pendente")}
+          >
             Pendentes ({pendentes.length})
-          </h3>
-          <div className="space-y-3">
-            {pendentes.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Nenhuma tarefa pendente
-              </p>
-            ) : (
-              pendentes.map(tarefa => (
-                <TarefaCard key={tarefa.id} tarefa={tarefa} getPrioridadeBadge={getPrioridadeBadge} getDiasRestantes={getDiasRestantes} />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Coluna Em Andamento */}
-        <div>
-          <h3 className="font-semibold mb-4 flex items-center gap-2 text-lg">
-            <Clock className="h-5 w-5 text-blue-600" />
+          </Badge>
+          <Badge 
+            variant={filtroStatus === "em_andamento" ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => setFiltroStatus("em_andamento")}
+          >
             Em Andamento ({emAndamento.length})
-          </h3>
-          <div className="space-y-3">
-            {emAndamento.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Nenhuma tarefa em andamento
-              </p>
-            ) : (
-              emAndamento.map(tarefa => (
-                <TarefaCard key={tarefa.id} tarefa={tarefa} getPrioridadeBadge={getPrioridadeBadge} getDiasRestantes={getDiasRestantes} />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Coluna Concluídas */}
-        <div>
-          <h3 className="font-semibold mb-4 flex items-center gap-2 text-lg">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
+          </Badge>
+          <Badge 
+            variant={filtroStatus === "concluida" ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => setFiltroStatus("concluida")}
+          >
             Concluídas ({concluidas.length})
-          </h3>
-          <div className="space-y-3">
-            {concluidas.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Nenhuma tarefa concluída
-              </p>
-            ) : (
-              concluidas.map(tarefa => (
-                <TarefaCard key={tarefa.id} tarefa={tarefa} getPrioridadeBadge={getPrioridadeBadge} getDiasRestantes={getDiasRestantes} />
-              ))
-            )}
-          </div>
+          </Badge>
         </div>
-      </div>
-    </div>
-  );
-}
 
-// Componente para cada card de tarefa
-function TarefaCard({ tarefa, getPrioridadeBadge, getDiasRestantes }: {
-  tarefa: TarefaMentoria & { nome_completo: string };
-  getPrioridadeBadge: (prioridade: string) => JSX.Element;
-  getDiasRestantes: (prazo: string) => JSX.Element;
-}) {
-  return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium">{tarefa.titulo}</CardTitle>
-        <CardDescription className="text-xs line-clamp-2">{tarefa.descricao}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {/* Badge com nome do mentorado */}
-        <Badge variant="secondary" className="gap-1">
-          <User className="h-3 w-3" />
-          {tarefa.nome_completo}
-        </Badge>
-        
-        {/* Prazo */}
-        <div className="flex items-center gap-2 text-xs">
-          <Calendar className="h-3 w-3 text-muted-foreground" />
-          <span className="text-muted-foreground">
-            {format(new Date(tarefa.prazo_entrega), "dd/MM/yyyy", { locale: ptBR })}
-          </span>
-          {" · "}
-          {getDiasRestantes(tarefa.prazo_entrega)}
-        </div>
-        
-        {/* Badges de tipo e prioridade */}
-        <div className="flex gap-2 flex-wrap">
-          <Badge variant="outline" className="text-xs">{tarefa.tipo}</Badge>
-          {getPrioridadeBadge(tarefa.prioridade)}
-        </div>
-      </CardContent>
-    </Card>
+        {/* Tabela de Tarefas */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">
+              Lista de Tarefas ({tarefasFiltradas.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tarefa</TableHead>
+                    <TableHead>Mentorado</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Prazo</TableHead>
+                    <TableHead>Prioridade</TableHead>
+                    <TableHead>Tipo</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tarefasFiltradas.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        Nenhuma tarefa encontrada para este filtro
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    tarefasFiltradas.map((tarefa) => (
+                      <TableRow key={tarefa.id} className="hover:bg-muted/50">
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{tarefa.titulo}</div>
+                            <div className="text-sm text-muted-foreground line-clamp-1">
+                              {tarefa.descricao}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="gap-1">
+                            <User className="h-3 w-3" />
+                            {tarefa.nome_completo}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(tarefa.status)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Calendar className="h-3 w-3" />
+                              {format(new Date(tarefa.prazo_entrega), "dd/MM/yyyy", { locale: ptBR })}
+                            </div>
+                            <div className="text-xs">
+                              {getDiasRestantes(tarefa.prazo_entrega)}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {getPrioridadeBadge(tarefa.prioridade)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-xs">
+                            {tarefa.tipo}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
   );
 }
