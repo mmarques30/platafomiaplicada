@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,34 @@ export const TarefaModal = ({ open, onOpenChange, onSave, tarefa, userId }: Tare
     link_externo: tarefa?.link_externo || "",
     user_id: userId
   });
+
+  useEffect(() => {
+    if (open && tarefa) {
+      setFormData({
+        titulo: tarefa.titulo || "",
+        descricao: tarefa.descricao || "",
+        tipo: tarefa.tipo || "entrega",
+        prioridade: tarefa.prioridade || "media",
+        prazo_entrega: tarefa.prazo_entrega || "",
+        projeto_id: tarefa.projeto_id || undefined,
+        sessao_id: tarefa.sessao_id || undefined,
+        link_externo: tarefa.link_externo || "",
+        user_id: userId
+      });
+    } else if (open && !tarefa) {
+      setFormData({
+        titulo: "",
+        descricao: "",
+        tipo: "entrega",
+        prioridade: "media",
+        prazo_entrega: "",
+        projeto_id: undefined,
+        sessao_id: undefined,
+        link_externo: "",
+        user_id: userId
+      });
+    }
+  }, [open, tarefa, userId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
