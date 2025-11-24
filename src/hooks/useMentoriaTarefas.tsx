@@ -35,20 +35,30 @@ export const useMentoriaTarefas = (userId?: string) => {
     queryFn: async () => {
       if (!targetUserId) return [];
       
-      const { data, error } = await supabase
+      // Query 1: Buscar tarefas
+      const { data: tarefasData, error: tarefasError } = await supabase
         .from("tarefas_mentoria")
-        .select(`
-          *,
-          profiles!inner(nome_completo)
-        `)
+        .select("*")
         .eq("user_id", targetUserId)
         .order("prazo_entrega", { ascending: true });
 
-      if (error) throw error;
-      
-      return (data || []).map((item: any) => ({
+      if (tarefasError) throw tarefasError;
+
+      // Query 2: Buscar perfil
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("nome_completo")
+        .eq("id", targetUserId)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+
+      const nome = profile?.nome_completo || "Sem nome";
+
+      // Combinar dados
+      return (tarefasData || []).map(item => ({
         ...item,
-        nome_completo: item.profiles?.nome_completo
+        nome_completo: nome
       })) as TarefaMentoria[];
     },
     enabled: !!targetUserId,
