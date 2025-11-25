@@ -135,7 +135,7 @@ export default function Auth() {
         <div className="hidden lg:flex w-full flex-col items-center mt-16 mb-2">
           <div className="text-center max-w-3xl px-8">
             <p className="text-lg lg:text-lg text-[#F2F2F2]/80 leading-relaxed">
-              Ganhe horas por semana aplicando IA no seu fluxo real.
+              IA só tem valor quando se aplica.
             </p>
           </div>
           <div className="h-4" />
