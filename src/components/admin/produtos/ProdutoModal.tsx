@@ -26,11 +26,15 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
     formato: "",
     valor: "",
     valor_com_desconto: "",
+    valor_minimo: "",
+    valor_maximo: "",
     periodicidade: "",
     duracao: "",
     descricao_curta: "",
     descricao_completa: "",
     beneficios: [] as string[],
+    is_consultoria: false,
+    licencas_minimas: "",
     ordem: "",
     ativo: true,
   });
@@ -46,11 +50,15 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
         formato: produto.formato,
         valor: produto.valor.toString(),
         valor_com_desconto: produto.valor_com_desconto?.toString() || "",
+        valor_minimo: produto.valor_minimo?.toString() || "",
+        valor_maximo: produto.valor_maximo?.toString() || "",
         periodicidade: produto.periodicidade || "",
         duracao: produto.duracao || "",
         descricao_curta: produto.descricao_curta,
         descricao_completa: produto.descricao_completa,
         beneficios: produto.beneficios,
+        is_consultoria: produto.is_consultoria || false,
+        licencas_minimas: produto.licencas_minimas?.toString() || "",
         ordem: produto.ordem.toString(),
         ativo: produto.ativo,
       });
@@ -62,15 +70,20 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
         formato: "",
         valor: "",
         valor_com_desconto: "",
+        valor_minimo: "",
+        valor_maximo: "",
         periodicidade: "",
         duracao: "",
         descricao_curta: "",
         descricao_completa: "",
         beneficios: [],
+        is_consultoria: false,
+        licencas_minimas: "",
         ordem: "",
         ativo: true,
       });
     }
+    setBeneficioInput("");
   }, [produto, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,11 +96,15 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
       formato: formData.formato,
       valor: parseFloat(formData.valor),
       valor_com_desconto: formData.valor_com_desconto ? parseFloat(formData.valor_com_desconto) : undefined,
+      valor_minimo: formData.valor_minimo ? parseFloat(formData.valor_minimo) : undefined,
+      valor_maximo: formData.valor_maximo ? parseFloat(formData.valor_maximo) : undefined,
       periodicidade: formData.periodicidade || undefined,
       duracao: formData.duracao || undefined,
       descricao_curta: formData.descricao_curta,
       descricao_completa: formData.descricao_completa,
       beneficios: formData.beneficios,
+      is_consultoria: formData.is_consultoria,
+      licencas_minimas: formData.licencas_minimas ? parseInt(formData.licencas_minimas) : undefined,
       ordem: parseInt(formData.ordem),
       ativo: formData.ativo,
     };
@@ -178,41 +195,101 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="valor">Valor (R$)</Label>
-              <Input
-                id="valor"
-                type="number"
-                step="0.01"
-                value={formData.valor}
-                onChange={(e) => setFormData({ ...formData, valor: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="valor_com_desconto">Valor com Desconto</Label>
-              <Input
-                id="valor_com_desconto"
-                type="number"
-                step="0.01"
-                value={formData.valor_com_desconto}
-                onChange={(e) => setFormData({ ...formData, valor_com_desconto: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="ordem">Ordem</Label>
-              <Input
-                id="ordem"
-                type="number"
-                value={formData.ordem}
-                onChange={(e) => setFormData({ ...formData, ordem: e.target.value })}
-                required
-              />
-            </div>
+          <div className="flex items-center space-x-2 pb-4">
+            <Switch
+              id="is_consultoria"
+              checked={formData.is_consultoria}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, is_consultoria: checked })
+              }
+            />
+            <Label htmlFor="is_consultoria">É consultoria?</Label>
           </div>
+
+          {!formData.is_consultoria ? (
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="valor">Valor (R$)</Label>
+                <Input
+                  id="valor"
+                  type="number"
+                  step="0.01"
+                  value={formData.valor}
+                  onChange={(e) => setFormData({ ...formData, valor: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="valor_com_desconto">Valor com Desconto</Label>
+                <Input
+                  id="valor_com_desconto"
+                  type="number"
+                  step="0.01"
+                  value={formData.valor_com_desconto}
+                  onChange={(e) => setFormData({ ...formData, valor_com_desconto: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="ordem">Ordem</Label>
+                <Input
+                  id="ordem"
+                  type="number"
+                  value={formData.ordem}
+                  onChange={(e) => setFormData({ ...formData, ordem: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <Label htmlFor="valor_minimo">Valor Mínimo (R$)</Label>
+                <Input
+                  id="valor_minimo"
+                  type="number"
+                  step="0.01"
+                  value={formData.valor_minimo}
+                  onChange={(e) => setFormData({ ...formData, valor_minimo: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="valor_maximo">Valor Máximo (R$)</Label>
+                <Input
+                  id="valor_maximo"
+                  type="number"
+                  step="0.01"
+                  value={formData.valor_maximo}
+                  onChange={(e) => setFormData({ ...formData, valor_maximo: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="licencas_minimas">Licenças Mín.</Label>
+                <Input
+                  id="licencas_minimas"
+                  type="number"
+                  value={formData.licencas_minimas}
+                  onChange={(e) => setFormData({ ...formData, licencas_minimas: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="ordem">Ordem</Label>
+                <Input
+                  id="ordem"
+                  type="number"
+                  value={formData.ordem}
+                  onChange={(e) => setFormData({ ...formData, ordem: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
