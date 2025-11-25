@@ -42,8 +42,11 @@ interface EditUserModalProps {
 }
 
 const PLANOS = [
+  { value: "academy", label: "IAplicada Academy" },
+  { value: "lab", label: "IAplicada Lab" },
+  { value: "skills", label: "IAplicada Skills" },
   { value: "club", label: "IAplicada Club" },
-  { value: "boost", label: "IAplicada Boost" },
+  { value: "boost", label: "IAplicada Boost (Legacy)" },
   { value: "legacy", label: "IAplicada Legacy" },
 ];
 
@@ -53,7 +56,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const resetPassword = useResetUserPassword();
   
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
-  const [selectedPlano, setSelectedPlano] = useState<"club" | "boost" | "legacy" | "">("");
+  const [selectedPlano, setSelectedPlano] = useState<"academy" | "lab" | "skills" | "club" | "boost" | "legacy" | null>(null);
   const [dataExpiracao, setDataExpiracao] = useState<Date | undefined>();
   const [contaAtiva, setContaAtiva] = useState(true);
   const [novaSenha, setNovaSenha] = useState("");
@@ -68,7 +71,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setValue("linkedin", user.linkedin || "");
       
       setSelectedRoles(user.roles as AppRole[]);
-      setSelectedPlano((user.plano_mentoria as "club" | "boost" | "legacy") || "");
+      setSelectedPlano((user.plano_mentoria as "academy" | "lab" | "skills" | "club" | "boost" | "legacy") || null);
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
     }
@@ -93,7 +96,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         profissao: data.profissao || null,
         idade: data.idade ? parseInt(data.idade) : null,
         linkedin: data.linkedin || null,
-        plano_mentoria: selectedPlano === "" ? null : selectedPlano,
+        plano_mentoria: selectedPlano || null,
         data_expiracao_acesso: dataExpiracao?.toISOString() || null,
         conta_ativa: contaAtiva,
         roles: selectedRoles,

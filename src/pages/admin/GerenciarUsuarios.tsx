@@ -184,13 +184,22 @@ export default function GerenciarUsuários() {
                   <Badge 
                     variant="outline"
                     className={
-                      (user as any).plano_mentoria === "club" 
+                      (user as any).plano_mentoria === "academy"
+                        ? "border-purple-500 text-purple-700"
+                        : (user as any).plano_mentoria === "lab"
+                        ? "border-blue-500 text-blue-700"
+                        : (user as any).plano_mentoria === "skills"
+                        ? "border-orange-500 text-orange-700"
+                        : (user as any).plano_mentoria === "club" 
                         ? "border-green-500 text-green-700"
                         : (user as any).plano_mentoria === "boost"
-                        ? "border-blue-500 text-blue-700"
-                        : "border-purple-500 text-purple-700"
+                        ? "border-cyan-500 text-cyan-700"
+                        : "border-gray-500 text-gray-700"
                     }
                   >
+                    {(user as any).plano_mentoria === "academy" && "Academy"}
+                    {(user as any).plano_mentoria === "lab" && "Lab"}
+                    {(user as any).plano_mentoria === "skills" && "Skills"}
                     {(user as any).plano_mentoria === "club" && "Club"}
                     {(user as any).plano_mentoria === "boost" && "Boost"}
                     {(user as any).plano_mentoria === "legacy" && "Legacy"}

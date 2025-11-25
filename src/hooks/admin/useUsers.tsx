@@ -142,7 +142,7 @@ export function useUpdateUser() {
         profissao?: string | null;
         idade?: number | null;
         linkedin?: string | null;
-        plano_mentoria?: "club" | "boost" | "legacy" | "" | null;
+        plano_mentoria?: "academy" | "lab" | "skills" | "club" | "boost" | "legacy" | null;
         data_expiracao_acesso?: string | null;
         conta_ativa?: boolean;
         roles?: AppRole[];
@@ -155,9 +155,7 @@ export function useUpdateUser() {
         // Normalizar plano_mentoria antes de enviar ao banco
         const normalizedUpdates: any = { ...profileUpdates };
         if ('plano_mentoria' in normalizedUpdates) {
-          normalizedUpdates.plano_mentoria = normalizedUpdates.plano_mentoria === "" 
-            ? null 
-            : normalizedUpdates.plano_mentoria;
+          normalizedUpdates.plano_mentoria = normalizedUpdates.plano_mentoria || null;
         }
         
         const { error: profileError } = await supabase
