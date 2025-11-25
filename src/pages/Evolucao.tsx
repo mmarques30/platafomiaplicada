@@ -13,12 +13,17 @@ import { TrilhasNovas } from "@/components/evolucao/TrilhasNovas";
 import { ProgressoCertificados } from "@/components/evolucao/ProgressoCertificados";
 import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { AbaAcompanhamento } from "@/components/evolucao/AbaAcompanhamento";
 
 export default function Evolucao() {
   const { data: progressoGeral, isLoading: loadingProgresso } = useProgressoGeral();
   const { data: sequencia } = useSequenciaEstudo();
   const { data: certificados, isLoading: loadingCertificados } = useMeusCertificados();
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
+  const { plan } = useUserPlan();
+  
+  const showAcompanhamento = plan === 'academy';
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -47,6 +52,14 @@ export default function Evolucao() {
           >
             Evolução da Comunidade
           </TabsTrigger>
+          {showAcompanhamento && (
+            <TabsTrigger 
+              value="acompanhamento"
+              className="rounded-lg px-8 py-3 text-base font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+            >
+              Meu Acompanhamento
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* ABA 1: MINHA EVOLUÇÃO */}
@@ -154,6 +167,13 @@ export default function Evolucao() {
             </>
           )}
         </TabsContent>
+
+        {/* ABA 3: MEU ACOMPANHAMENTO (Apenas Academy) */}
+        {showAcompanhamento && (
+          <TabsContent value="acompanhamento" className="space-y-6 mt-6">
+            <AbaAcompanhamento />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
