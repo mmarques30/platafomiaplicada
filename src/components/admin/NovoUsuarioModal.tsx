@@ -24,9 +24,10 @@ interface NovoUsuarioModalProps {
 }
 
 const PLANOS = [
-  { value: "club", label: "IAplicada Club", description: "Acesso à plataforma de conteúdo" },
-  { value: "boost", label: "IAplicada Boost", description: "Plataforma + painel simplificado + conteúdo Boost" },
-  { value: "legacy", label: "IAplicada Legacy", description: "Acesso completo (Club + Boost + Legacy + painel completo)" },
+  { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
+  { value: "lab", label: "Lab", description: "B2C Grupo - Mentoria em grupo" },
+  { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
+  { value: "club", label: "Club", description: "B2C Premium - Mentoria 1:1" },
 ];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {
@@ -54,11 +55,6 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (selectedRoles.includes("mentorado") && !selectedPlano) {
-      toast.error("Selecione um plano de mentoria para mentorados");
-      return;
-    }
 
     await createUser.mutateAsync({
       email,
@@ -161,47 +157,43 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
             </div>
           </div>
 
-          {selectedRoles.includes("mentorado") && (
-            <div>
-              <Label className="mb-3 block">Plano de Mentoria *</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {PLANOS.map((plano) => (
-                  <Card
-                    key={plano.value}
-                    className={cn(
-                      "p-4 cursor-pointer transition-colors",
-                      selectedPlano === plano.value
-                        ? "border-primary bg-primary/10"
-                        : "hover:border-primary/50"
-                    )}
-                    onClick={() => setSelectedPlano(plano.value)}
-                  >
-                    <h4 className={cn(
-                      "font-semibold mb-1",
-                      selectedPlano === plano.value 
-                        ? "text-foreground" 
-                        : "text-card-foreground"
-                    )}>
-                      {plano.label}
-                    </h4>
-                    <p className={cn(
-                      "text-sm",
-                      selectedPlano === plano.value 
-                        ? "text-foreground/70"
-                        : "text-card-foreground/70"
-                    )}>
-                      {plano.description}
-                    </p>
-                  </Card>
-                ))}
-              </div>
-              {selectedRoles.includes("mentorado") && !selectedPlano && (
-                <p className="text-sm text-destructive mt-2">
-                  Selecione um plano de mentoria
-                </p>
-              )}
+          <div>
+            <Label className="mb-3 block">Produto / Plano (opcional)</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {PLANOS.map((plano) => (
+                <Card
+                  key={plano.value}
+                  className={cn(
+                    "p-4 cursor-pointer transition-colors",
+                    selectedPlano === plano.value
+                      ? "border-primary bg-primary/10"
+                      : "hover:border-primary/50"
+                  )}
+                  onClick={() => setSelectedPlano(plano.value)}
+                >
+                  <h4 className={cn(
+                    "font-semibold mb-1 text-sm",
+                    selectedPlano === plano.value 
+                      ? "text-foreground" 
+                      : "text-card-foreground"
+                  )}>
+                    {plano.label}
+                  </h4>
+                  <p className={cn(
+                    "text-xs",
+                    selectedPlano === plano.value 
+                      ? "text-foreground/70"
+                      : "text-card-foreground/70"
+                  )}>
+                    {plano.description}
+                  </p>
+                </Card>
+              ))}
             </div>
-          )}
+            <p className="text-sm text-muted-foreground mt-2">
+              Selecione o produto/plano que este usuário terá acesso
+            </p>
+          </div>
 
           <DialogFooter>
             <Button
