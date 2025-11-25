@@ -66,18 +66,14 @@ export default function Auth() {
         <div className="w-full flex-shrink-0 pt-8">
           {/* TOPO - Branding (oculto no mobile) */}
           <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
-            <div className="flex items-center justify-center mb-3 mx-auto">
+            <div className="flex items-center justify-center mx-auto">
               <img src={logoMarcaCompleta} alt="IAplicada" className="h-12 w-auto" />
             </div>
-            
-            <h1 className="text-4xl lg:text-5xl font-bold mb-3 mt-12 leading-tight">
-              <span className="font-bold text-[#9EB038]">IA</span> <span className="font-bold text-[#F2F2F2]">de verdade</span>
-            </h1>
           </div>
         </div>
 
         {/* Seção Central/Inferior - Mantém centralização */}
-        <div className="w-full flex flex-col items-center gap-4 lg:gap-3 flex-grow justify-center">
+        <div className="w-full flex flex-col items-center gap-4 lg:gap-8 flex-grow justify-center">
           {/* Logo mobile - visível apenas em telas pequenas */}
           <div className="lg:hidden mb-8">
             <img src={logoAplicada} alt="IAplicada" className="h-8 w-auto mx-auto" />
