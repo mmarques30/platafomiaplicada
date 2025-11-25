@@ -10,11 +10,17 @@ export interface Produto {
   formato: string;
   valor: number;
   valor_com_desconto?: number;
+  valor_minimo?: number;
+  valor_maximo?: number;
   periodicidade?: string;
   duracao?: string;
   descricao_curta: string;
   descricao_completa: string;
   beneficios: string[];
+  produtos_inclusos?: any[];
+  licencas_minimas?: number;
+  is_consultoria?: boolean;
+  fases?: any[];
   ordem: number;
   ativo: boolean;
   created_at?: string;
@@ -239,6 +245,7 @@ export function useEstatisticasProdutos() {
         lab: 0,
         skills: 0,
         club: 0,
+        consult: 0,
         total: data.length,
       };
 

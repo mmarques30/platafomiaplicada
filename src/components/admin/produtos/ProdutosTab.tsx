@@ -62,7 +62,12 @@ export function ProdutosTab() {
           <Card key={produto.id} className="p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-xl font-bold">{produto.nome}</h3>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-bold">{produto.nome}</h3>
+                  {produto.is_consultoria && (
+                    <Badge className="bg-emerald-500 text-white">Consultoria</Badge>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground">{produto.formato}</p>
               </div>
               <div className="flex gap-2">
@@ -76,11 +81,23 @@ export function ProdutosTab() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="font-semibold">
-                  R$ {produto.valor.toFixed(2)}
-                  {produto.periodicidade && ` / ${produto.periodicidade}`}
-                </span>
+                {produto.is_consultoria ? (
+                  <span className="font-semibold">
+                    R$ {produto.valor_minimo?.toFixed(0)} - R$ {produto.valor_maximo?.toFixed(0)}
+                  </span>
+                ) : (
+                  <span className="font-semibold">
+                    R$ {produto.valor.toFixed(2)}
+                    {produto.periodicidade && ` / ${produto.periodicidade}`}
+                  </span>
+                )}
               </div>
+
+              {produto.licencas_minimas && (
+                <p className="text-xs text-muted-foreground">
+                  Mínimo: {produto.licencas_minimas} licenças
+                </p>
+              )}
 
               <p className="text-sm text-muted-foreground">{produto.descricao_curta}</p>
 

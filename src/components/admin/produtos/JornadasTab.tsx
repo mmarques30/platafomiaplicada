@@ -27,6 +27,18 @@ export function JornadasTab() {
       ],
     },
     {
+      id: "consult",
+      titulo: "Jornada Consult",
+      descricao: "Transformação digital completa",
+      icon: Building2,
+      etapas: [
+        { produto: "Consult (Projeto)", valor: "R$15-50k", tipo: "inicial" },
+        { produto: "Skills (Recorrência)", valor: "R$297/mês", tipo: "upsell" },
+        { produto: "Lab (Equipe)", valor: "+R$1.100", economia: "R$2.397", tipo: "upsell" },
+        { produto: "Club (Líder)", valor: "R$7.997", tipo: "premium" },
+      ],
+    },
+    {
       id: "renovacao",
       titulo: "Jornada Renovação",
       descricao: "Para clientes recorrentes",

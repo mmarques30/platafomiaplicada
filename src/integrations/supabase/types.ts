@@ -1058,16 +1058,22 @@ export type Database = {
           descricao_completa: string
           descricao_curta: string
           duracao: string | null
+          fases: Json | null
           formato: string
           id: string
+          is_consultoria: boolean | null
+          licencas_minimas: number | null
           nome: string
           ordem: number
           periodicidade: string | null
+          produtos_inclusos: Json | null
           slug: string
           tipo: string
           updated_at: string | null
           valor: number
           valor_com_desconto: number | null
+          valor_maximo: number | null
+          valor_minimo: number | null
         }
         Insert: {
           ativo?: boolean | null
@@ -1076,16 +1082,22 @@ export type Database = {
           descricao_completa: string
           descricao_curta: string
           duracao?: string | null
+          fases?: Json | null
           formato: string
           id?: string
+          is_consultoria?: boolean | null
+          licencas_minimas?: number | null
           nome: string
           ordem?: number
           periodicidade?: string | null
+          produtos_inclusos?: Json | null
           slug: string
           tipo: string
           updated_at?: string | null
           valor: number
           valor_com_desconto?: number | null
+          valor_maximo?: number | null
+          valor_minimo?: number | null
         }
         Update: {
           ativo?: boolean | null
@@ -1094,16 +1106,22 @@ export type Database = {
           descricao_completa?: string
           descricao_curta?: string
           duracao?: string | null
+          fases?: Json | null
           formato?: string
           id?: string
+          is_consultoria?: boolean | null
+          licencas_minimas?: number | null
           nome?: string
           ordem?: number
           periodicidade?: string | null
+          produtos_inclusos?: Json | null
           slug?: string
           tipo?: string
           updated_at?: string | null
           valor?: number
           valor_com_desconto?: number | null
+          valor_maximo?: number | null
+          valor_minimo?: number | null
         }
         Relationships: []
       }
