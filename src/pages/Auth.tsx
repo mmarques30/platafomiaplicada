@@ -92,10 +92,10 @@ export default function Auth() {
         <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md -mt-8">
           <CardHeader className="space-y-1 p-6 text-center">
             <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
-              Bem-vindo à Aplicada
+              Pronto para aplicar?
             </CardTitle>
             <CardDescription className="text-[#F2F2F2]/60 text-center">
-              Entre com sua conta para acessar o conteúdo
+              Faça login para continuar aplicando IA no seu fluxo real
             </CardDescription>
           </CardHeader>
           
