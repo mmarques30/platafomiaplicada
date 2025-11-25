@@ -65,7 +65,7 @@ export default function Auth() {
         {/* Seção Superior - Controlada independentemente */}
         <div className="w-full flex-shrink-0 pt-8">
           {/* TOPO - Branding (oculto no mobile) */}
-          <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
+          <div className="hidden lg:flex flex-col items-center text-center w-full px-8 mt-32">
             <div className="flex items-center justify-center mx-auto">
               <img src={logoMarcaCompleta} alt="IAplicada" className="h-12 w-auto" />
             </div>
@@ -73,7 +73,7 @@ export default function Auth() {
         </div>
 
         {/* Seção Central/Inferior - Mantém centralização */}
-        <div className="w-full flex flex-col items-center gap-4 lg:gap-8 flex-grow justify-center">
+        <div className="w-full flex flex-col items-center gap-4 lg:gap-3 flex-grow justify-center">
           {/* Logo mobile - visível apenas em telas pequenas */}
           <div className="lg:hidden mb-8">
             <img src={logoAplicada} alt="IAplicada" className="h-8 w-auto mx-auto" />
