@@ -2,13 +2,11 @@ import { useState } from "react";
 import { useFavoritos, useToggleFavorito } from "@/hooks/useFavoritos";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Heart, Search, ExternalLink, Trash2, Wrench, MessageSquare, Target, Sparkles, Play } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Heart, Search } from "lucide-react";
+import FavoritoRow from "@/components/favoritos/FavoritoRow";
 
 export default function Favoritos() {
   const { data: favoritos, isLoading } = useFavoritos();
@@ -140,46 +138,36 @@ export default function Favoritos() {
         </TabsList>
         <TabsContent value={activeTab} className="space-y-4">
           {!filteredFavoritos || filteredFavoritos.length === 0 ? (
-            <Card><CardContent className="flex flex-col items-center justify-center py-12">
-              <Heart className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Nenhum favorito encontrado</h3>
-              <p className="text-muted-foreground text-center">{searchTerm ? "Tente ajustar sua busca" : "Comece a favoritar conteúdos"}</p>
-            </CardContent></Card>
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Heart className="h-16 w-16 text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Nenhum favorito encontrado</h3>
+                <p className="text-muted-foreground text-center">
+                  {searchTerm ? "Tente ajustar sua busca" : "Comece a favoritar conteúdos"}
+                </p>
+              </CardContent>
+            </Card>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredFavoritos.map((favorito) => {
-                const { item, link } = getFavoritoDetails(favorito);
-                if (!item) return null;
-                return (
-                  <Card key={favorito.id}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3 flex-1">
-                          {favorito.tipo === "ferramenta" && <Wrench className="h-5 w-5 text-primary mt-1" />}
-                          {favorito.tipo === "prompt" && <MessageSquare className="h-5 w-5 text-primary mt-1" />}
-                          {favorito.tipo === "metodo" && <Target className="h-5 w-5 text-primary mt-1" />}
-                          {favorito.tipo === "ia_copie_use" && <Sparkles className="h-5 w-5 text-primary mt-1" />}
-                          {favorito.tipo === "video" && <Play className="h-5 w-5 text-primary mt-1" />}
-                          <div className="flex-1 min-w-0">
-                            <CardTitle className="line-clamp-1">{item?.titulo || item?.nome}</CardTitle>
-                            <CardDescription className="line-clamp-2">{item?.descricao || item?.objetivo || "Sem descrição"}</CardDescription>
-                          </div>
-                        </div>
-                        <Badge variant="outline" className="ml-2 shrink-0">{favorito.tipo === "ia_copie_use" ? "IA" : favorito.tipo}</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex gap-2">
-                        <Button variant="outline" className="flex-1" asChild><Link to={link}><ExternalLink className="h-4 w-4 mr-2" />Ver</Link></Button>
-                        <Button variant="ghost" size="icon" onClick={() => toggleFavorito.mutate({ tipo: favorito.tipo, item_id: favorito.item_id })} disabled={toggleFavorito.isPending}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            <Card>
+              <CardContent className="p-0">
+                {filteredFavoritos.map((favorito) => {
+                  const { item, link } = getFavoritoDetails(favorito);
+                  if (!item) return null;
+                  
+                  return (
+                    <FavoritoRow
+                      key={favorito.id}
+                      tipo={favorito.tipo}
+                      titulo={item?.titulo || item?.nome}
+                      descricao={item?.descricao || item?.objetivo || "Sem descrição"}
+                      link={link}
+                      onRemove={() => toggleFavorito.mutate({ tipo: favorito.tipo, item_id: favorito.item_id })}
+                      isRemoving={toggleFavorito.isPending}
+                    />
+                  );
+                })}
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
       </Tabs>
