@@ -29,6 +29,7 @@ import {
   FileSearch,
   CheckSquare,
   Package,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -42,6 +43,7 @@ const navItems = [
   { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
   { path: "/admin/produtos", label: "Produtos", icon: Package },
   { path: "/admin/minhas-tarefas", label: "Minhas Tarefas", icon: CheckSquare },
+  { path: "/admin/menus", label: "Menus", icon: Settings },
   { path: "/admin/auditoria", label: "Auditoria do Sistema", icon: FileSearch },
 ];
 

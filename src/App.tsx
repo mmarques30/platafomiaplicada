@@ -51,6 +51,7 @@ import GerenciarMentoria from "./pages/admin/GerenciarMentoria";
 import GerenciarProdutos from "./pages/admin/GerenciarProdutos";
 import MinhasTarefas from "./pages/admin/MinhasTarefas";
 import Auditoria from "./pages/admin/Auditoria";
+import GerenciarMenus from "./pages/admin/GerenciarMenus";
 
 const queryClient = new QueryClient();
 
@@ -103,10 +104,12 @@ function AppContent() {
             <Route path="avisos" element={<GerenciarAvisos />} />
             <Route path="conhecimento" element={<GerenciarConhecimento />} />
             <Route path="mentoria" element={<GerenciarMentoria />} />
-              <Route path="produtos" element={<GerenciarProdutos />} />
-              <Route path="minhas-tarefas" element={<MinhasTarefas />} />
-              <Route path="auditoria" element={<Auditoria />} />
-            </Route>
+            <Route path="produtos" element={<GerenciarProdutos />} />
+            <Route path="formularios" element={<VisualizarFormularios />} />
+            <Route path="minhas-tarefas" element={<MinhasTarefas />} />
+            <Route path="menus" element={<GerenciarMenus />} />
+            <Route path="auditoria" element={<Auditoria />} />
+          </Route>
           
           <Route path="*" element={<NotFound />} />
         </Routes>
