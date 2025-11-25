@@ -35,9 +35,9 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
         isUserPlan ? 'border-primary/40 bg-primary/5' : 'hover:border-primary/20'
       }`}
     >
-      <CardContent className="p-6 space-y-4">
+      <CardContent className="p-8 space-y-5">
         {produto.imagem_url ? (
-          <div className="aspect-video w-full overflow-hidden rounded-lg bg-gradient-to-br from-primary/10 to-primary/5">
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-gradient-to-br from-primary/10 to-primary/5">
             <img
               src={produto.imagem_url}
               alt={produto.nome}
@@ -45,7 +45,7 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
             />
           </div>
         ) : (
-          <div className="aspect-video w-full rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+          <div className="aspect-[4/3] w-full rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
             <span className="text-4xl font-bold text-primary/30">
               {produto.nome.charAt(0)}
             </span>
@@ -54,7 +54,7 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
 
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-lg font-semibold">{produto.nome}</h3>
+            <h3 className="text-xl font-semibold">{produto.nome}</h3>
             {isUserPlan && (
               <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                 Seu Plano
@@ -62,13 +62,13 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
             )}
           </div>
 
-          <p className="text-2xl font-bold text-primary">{getPrecoExibicao()}</p>
+          <p className="text-3xl font-bold text-primary">{getPrecoExibicao()}</p>
           
           {produto.periodicidade && (
             <p className="text-xs text-muted-foreground">{produto.periodicidade}</p>
           )}
 
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <p className="text-sm text-muted-foreground line-clamp-3">
             {produto.descricao_curta}
           </p>
         </div>
