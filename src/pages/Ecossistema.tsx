@@ -43,17 +43,19 @@ export default function Ecossistema() {
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Para profissional solo</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {produtosB2C.map((produto) => (
-                  <ProdutoCard
-                    key={produto.id}
-                    produto={produto}
-                    isUserPlan={
-                      produto.slug === profile?.plano_mentoria ||
-                      produto.nome.toLowerCase().includes(profile?.plano_mentoria || "")
-                    }
-                    onSaibaMais={() => setSelectedProduto(produto)}
-                  />
-                ))}
+              {produtosB2C.map((produto) => (
+                <ProdutoCard
+                  key={produto.id}
+                  produto={produto}
+                  isUserPlan={
+                    profile?.plano_mentoria
+                      ? (produto.slug === profile.plano_mentoria ||
+                         produto.nome.toLowerCase().includes(profile.plano_mentoria.toLowerCase()))
+                      : false
+                  }
+                  onSaibaMais={() => setSelectedProduto(produto)}
+                />
+              ))}
               </div>
             </div>
           )}
@@ -62,17 +64,19 @@ export default function Ecossistema() {
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Para empresas</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {produtosB2B.map((produto) => (
-                  <ProdutoCard
-                    key={produto.id}
-                    produto={produto}
-                    isUserPlan={
-                      produto.slug === profile?.plano_mentoria ||
-                      produto.nome.toLowerCase().includes(profile?.plano_mentoria || "")
-                    }
-                    onSaibaMais={() => setSelectedProduto(produto)}
-                  />
-                ))}
+              {produtosB2B.map((produto) => (
+                <ProdutoCard
+                  key={produto.id}
+                  produto={produto}
+                  isUserPlan={
+                    profile?.plano_mentoria
+                      ? (produto.slug === profile.plano_mentoria ||
+                         produto.nome.toLowerCase().includes(profile.plano_mentoria.toLowerCase()))
+                      : false
+                  }
+                  onSaibaMais={() => setSelectedProduto(produto)}
+                />
+              ))}
               </div>
             </div>
           )}
