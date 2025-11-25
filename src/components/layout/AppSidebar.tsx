@@ -50,14 +50,7 @@ export function AppSidebar() {
     <Sidebar className="border-r-2 border-primary/10 bg-background/50 backdrop-blur-sm">
       <SidebarHeader className="border-b-2 border-primary/10">
         <div className="flex h-16 items-center justify-center px-4 bg-gradient-to-br from-primary/5 to-transparent">
-          {!collapsed ? (
-            <div className="flex items-center gap-2">
-              <img src={logoSimbolo} alt="IAplicada" className="h-8 w-8 drop-shadow-md" />
-              <span className="text-xl font-bold text-primary">IAplicada</span>
-            </div>
-          ) : (
-            <img src={logoSimbolo} alt="IAplicada" className="h-8 w-8 drop-shadow-sm" />
-          )}
+          <img src={logoSimbolo} alt="IAplicada" className="h-10 w-10 drop-shadow-md" />
         </div>
       </SidebarHeader>
 
