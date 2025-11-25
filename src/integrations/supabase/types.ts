@@ -1061,6 +1061,7 @@ export type Database = {
           fases: Json | null
           formato: string
           id: string
+          imagem_url: string | null
           is_consultoria: boolean | null
           licencas_minimas: number | null
           nome: string
@@ -1085,6 +1086,7 @@ export type Database = {
           fases?: Json | null
           formato: string
           id?: string
+          imagem_url?: string | null
           is_consultoria?: boolean | null
           licencas_minimas?: number | null
           nome: string
@@ -1109,6 +1111,7 @@ export type Database = {
           fases?: Json | null
           formato?: string
           id?: string
+          imagem_url?: string | null
           is_consultoria?: boolean | null
           licencas_minimas?: number | null
           nome?: string

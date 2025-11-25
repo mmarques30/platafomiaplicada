@@ -35,6 +35,7 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
     beneficios: [] as string[],
     is_consultoria: false,
     licencas_minimas: "",
+    imagem_url: "",
     ordem: "",
     ativo: true,
   });
@@ -59,6 +60,7 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
         beneficios: produto.beneficios,
         is_consultoria: produto.is_consultoria || false,
         licencas_minimas: produto.licencas_minimas?.toString() || "",
+        imagem_url: produto.imagem_url || "",
         ordem: produto.ordem.toString(),
         ativo: produto.ativo,
       });
@@ -79,6 +81,7 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
         beneficios: [],
         is_consultoria: false,
         licencas_minimas: "",
+        imagem_url: "",
         ordem: "",
         ativo: true,
       });
@@ -105,6 +108,7 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
       beneficios: formData.beneficios,
       is_consultoria: formData.is_consultoria,
       licencas_minimas: formData.licencas_minimas ? parseInt(formData.licencas_minimas) : undefined,
+      imagem_url: formData.imagem_url || undefined,
       ordem: parseInt(formData.ordem),
       ativo: formData.ativo,
     };
@@ -310,6 +314,16 @@ export function ProdutoModal({ open, onOpenChange, produto }: ProdutoModalProps)
                 onChange={(e) => setFormData({ ...formData, duracao: e.target.value })}
               />
             </div>
+          </div>
+
+          <div>
+            <Label htmlFor="imagem_url">URL da Imagem</Label>
+            <Input
+              id="imagem_url"
+              value={formData.imagem_url}
+              onChange={(e) => setFormData({ ...formData, imagem_url: e.target.value })}
+              placeholder="https://..."
+            />
           </div>
 
           <div>

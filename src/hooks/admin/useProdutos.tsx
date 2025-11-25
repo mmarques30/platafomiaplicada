@@ -21,6 +21,7 @@ export interface Produto {
   licencas_minimas?: number;
   is_consultoria?: boolean;
   fases?: any[];
+  imagem_url?: string;
   ordem: number;
   ativo: boolean;
   created_at?: string;
