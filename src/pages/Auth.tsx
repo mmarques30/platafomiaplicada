@@ -71,7 +71,7 @@ export default function Auth() {
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold mb-3 mt-12 leading-tight">
-              <span className="text-[#9EB038]">IA</span> <span className="text-[#F2F2F2]">de verdade</span>
+              <span className="font-bold text-[#9EB038]">IA</span> <span className="font-bold text-[#F2F2F2]">de verdade</span>
             </h1>
           </div>
         </div>
