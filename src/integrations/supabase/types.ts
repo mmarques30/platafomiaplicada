@@ -1005,6 +1005,63 @@ export type Database = {
         }
         Relationships: []
       }
+      produtos: {
+        Row: {
+          ativo: boolean | null
+          beneficios: Json | null
+          created_at: string | null
+          descricao_completa: string
+          descricao_curta: string
+          duracao: string | null
+          formato: string
+          id: string
+          nome: string
+          ordem: number
+          periodicidade: string | null
+          slug: string
+          tipo: string
+          updated_at: string | null
+          valor: number
+          valor_com_desconto: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          beneficios?: Json | null
+          created_at?: string | null
+          descricao_completa: string
+          descricao_curta: string
+          duracao?: string | null
+          formato: string
+          id?: string
+          nome: string
+          ordem?: number
+          periodicidade?: string | null
+          slug: string
+          tipo: string
+          updated_at?: string | null
+          valor: number
+          valor_com_desconto?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          beneficios?: Json | null
+          created_at?: string | null
+          descricao_completa?: string
+          descricao_curta?: string
+          duracao?: string | null
+          formato?: string
+          id?: string
+          nome?: string
+          ordem?: number
+          periodicidade?: string | null
+          slug?: string
+          tipo?: string
+          updated_at?: string | null
+          valor?: number
+          valor_com_desconto?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           conta_ativa: boolean | null
@@ -1204,6 +1261,57 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      regras_upsell: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          descricao_oferta: string
+          economia: number
+          id: string
+          produto_destino_id: string | null
+          produto_origem_id: string | null
+          updated_at: string | null
+          valor_desconto: number
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao_oferta: string
+          economia: number
+          id?: string
+          produto_destino_id?: string | null
+          produto_origem_id?: string | null
+          updated_at?: string | null
+          valor_desconto: number
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao_oferta?: string
+          economia?: number
+          id?: string
+          produto_destino_id?: string | null
+          produto_origem_id?: string | null
+          updated_at?: string | null
+          valor_desconto?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regras_upsell_produto_destino_id_fkey"
+            columns: ["produto_destino_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "regras_upsell_produto_origem_id_fkey"
+            columns: ["produto_origem_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       respostas_exercicios: {
         Row: {
@@ -1768,7 +1876,14 @@ export type Database = {
     Enums: {
       app_role: "admin" | "mentorado" | "aluno_trilha"
       nivel_acesso_plano: "club" | "boost" | "legacy"
-      plano_mentoria: "club" | "pro" | "boost" | "legacy"
+      plano_mentoria:
+        | "club"
+        | "pro"
+        | "boost"
+        | "legacy"
+        | "academy"
+        | "lab"
+        | "skills"
       status_projeto:
         | "planejamento"
         | "em_andamento"
@@ -1904,7 +2019,15 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "mentorado", "aluno_trilha"],
       nivel_acesso_plano: ["club", "boost", "legacy"],
-      plano_mentoria: ["club", "pro", "boost", "legacy"],
+      plano_mentoria: [
+        "club",
+        "pro",
+        "boost",
+        "legacy",
+        "academy",
+        "lab",
+        "skills",
+      ],
       status_projeto: [
         "planejamento",
         "em_andamento",
