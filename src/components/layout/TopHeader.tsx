@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada.png";
@@ -25,6 +26,8 @@ export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
+  const { hasAccessTo } = useUserPlan();
   
   // Detectar rotas ativas para dropdowns
   const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
@@ -98,21 +101,30 @@ export function TopHeader() {
                       Trilhas
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/lab" className="cursor-pointer">
-                      Lab
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/mentoria" className="cursor-pointer">
-                      Club
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/skills" className="cursor-pointer">
-                      Skills
-                    </Link>
-                  </DropdownMenuItem>
+                  
+                  {(hasAccessTo("lab") || isAdmin) && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/lab" className="cursor-pointer">
+                        Lab
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  
+                  {(hasAccessTo("club") || isAdmin) && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/mentoria" className="cursor-pointer">
+                        Club
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  
+                  {(hasAccessTo("skills") || isAdmin) && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/skills" className="cursor-pointer">
+                        Skills
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
           </DropdownMenu>
           
