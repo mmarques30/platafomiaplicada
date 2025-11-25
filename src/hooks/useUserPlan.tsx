@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
-export type UserPlan = "academy" | "lab" | "skills" | "club" | "legacy" | "boost" | null;
+export type UserPlan = "academy" | "lab" | "skills" | "club" | null;
 
 export function useUserPlan() {
   const { user } = useAuth();
@@ -31,13 +31,9 @@ export function useUserPlan() {
   // Lab = trilhas + mentoria em grupo
   // Club = trilhas + mentoria 1:1 + lab
   // Skills = trilhas (B2B)
-  // Legacy/Boost = acesso completo (planos antigos)
   
   const hasAccessTo = (product: "trilhas" | "lab" | "club" | "skills") => {
     if (!plan) return false;
-    
-    // Legacy e Boost têm acesso a tudo
-    if (plan === "legacy" || plan === "boost") return true;
     
     switch (product) {
       case "trilhas":
@@ -65,7 +61,5 @@ export function useUserPlan() {
     isLab: plan === "lab",
     isClub: plan === "club",
     isSkills: plan === "skills",
-    isLegacy: plan === "legacy",
-    isBoost: plan === "boost",
   };
 }

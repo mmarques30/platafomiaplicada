@@ -42,12 +42,10 @@ interface EditUserModalProps {
 }
 
 const PLANOS = [
-  { value: "academy", label: "IAplicada Academy" },
-  { value: "lab", label: "IAplicada Lab" },
-  { value: "skills", label: "IAplicada Skills" },
-  { value: "club", label: "IAplicada Club" },
-  { value: "boost", label: "IAplicada Boost (Legacy)" },
-  { value: "legacy", label: "IAplicada Legacy" },
+  { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
+  { value: "lab", label: "Lab", description: "B2C Grupo - Mentoria em grupo" },
+  { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
+  { value: "club", label: "Club", description: "B2C Premium - Mentoria 1:1" },
 ];
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
@@ -56,7 +54,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const resetPassword = useResetUserPassword();
   
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
-  const [selectedPlano, setSelectedPlano] = useState<"academy" | "lab" | "skills" | "club" | "boost" | "legacy" | null>(null);
+  const [selectedPlano, setSelectedPlano] = useState<"academy" | "lab" | "skills" | "club" | null>(null);
   const [dataExpiracao, setDataExpiracao] = useState<Date | undefined>();
   const [contaAtiva, setContaAtiva] = useState(true);
   const [novaSenha, setNovaSenha] = useState("");
@@ -71,7 +69,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setValue("linkedin", user.linkedin || "");
       
       setSelectedRoles(user.roles as AppRole[]);
-      setSelectedPlano((user.plano_mentoria as "academy" | "lab" | "skills" | "club" | "boost" | "legacy") || null);
+      setSelectedPlano((user.plano_mentoria as "academy" | "lab" | "skills" | "club") || null);
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
     }
@@ -196,27 +194,61 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                 </div>
               </div>
 
-              {selectedRoles.includes("mentorado") && (
-                <div>
-                  <Label className="mb-2 block">Plano de Mentoria</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {PLANOS.map((plano) => (
-                      <Card
-                        key={plano.value}
-                        className={cn(
-                          "p-4 cursor-pointer transition-colors text-center",
-                          selectedPlano === plano.value
-                            ? "border-primary bg-primary/10"
-                            : "hover:border-primary/50"
-                        )}
-                        onClick={() => setSelectedPlano(plano.value as "club" | "boost" | "legacy")}
-                      >
-                        <p className="font-medium">{plano.label}</p>
-                      </Card>
-                    ))}
-                  </div>
+              <div>
+                <Label className="mb-3 block">Produto / Plano</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <Card
+                    className={cn(
+                      "p-4 cursor-pointer transition-colors",
+                      selectedPlano === null
+                        ? "border-primary bg-primary/10"
+                        : "hover:border-primary/50"
+                    )}
+                    onClick={() => setSelectedPlano(null)}
+                  >
+                    <p className={cn(
+                      "font-semibold mb-1 text-sm",
+                      selectedPlano === null ? "text-foreground" : "text-card-foreground"
+                    )}>
+                      Sem plano
+                    </p>
+                    <p className={cn(
+                      "text-xs",
+                      selectedPlano === null ? "text-foreground/70" : "text-card-foreground/70"
+                    )}>
+                      Usuário sem produto ativo
+                    </p>
+                  </Card>
+                  {PLANOS.map((plano) => (
+                    <Card
+                      key={plano.value}
+                      className={cn(
+                        "p-4 cursor-pointer transition-colors",
+                        selectedPlano === plano.value
+                          ? "border-primary bg-primary/10"
+                          : "hover:border-primary/50"
+                      )}
+                      onClick={() => setSelectedPlano(plano.value as "academy" | "lab" | "skills" | "club")}
+                    >
+                      <p className={cn(
+                        "font-semibold mb-1 text-sm",
+                        selectedPlano === plano.value ? "text-foreground" : "text-card-foreground"
+                      )}>
+                        {plano.label}
+                      </p>
+                      <p className={cn(
+                        "text-xs",
+                        selectedPlano === plano.value ? "text-foreground/70" : "text-card-foreground/70"
+                      )}>
+                        {plano.description}
+                      </p>
+                    </Card>
+                  ))}
                 </div>
-              )}
+                <p className="text-sm text-muted-foreground mt-2">
+                  Selecione o produto/plano deste usuário
+                </p>
+              </div>
 
               <div>
                 <Label className="mb-2 block">Data de Expiração do Acesso</Label>
