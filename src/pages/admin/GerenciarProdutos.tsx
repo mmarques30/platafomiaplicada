@@ -3,7 +3,8 @@ import { ProdutosTab } from "@/components/admin/produtos/ProdutosTab";
 import { UpsellsTab } from "@/components/admin/produtos/UpsellsTab";
 import { JornadasTab } from "@/components/admin/produtos/JornadasTab";
 import { EstatisticasProdutos } from "@/components/admin/produtos/EstatisticasProdutos";
-import { Package, TrendingUp, Map, BarChart3 } from "lucide-react";
+import { DescontosTab } from "@/components/admin/produtos/DescontosTab";
+import { Package, TrendingUp, Map, BarChart3, Percent } from "lucide-react";
 
 export default function GerenciarProdutos() {
   return (
@@ -16,7 +17,7 @@ export default function GerenciarProdutos() {
       </div>
 
       <Tabs defaultValue="produtos" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8">
+        <TabsList className="grid w-full grid-cols-5 mb-8">
           <TabsTrigger value="produtos" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Produtos
@@ -28,6 +29,10 @@ export default function GerenciarProdutos() {
           <TabsTrigger value="jornadas" className="flex items-center gap-2">
             <Map className="h-4 w-4" />
             Jornadas
+          </TabsTrigger>
+          <TabsTrigger value="descontos" className="flex items-center gap-2">
+            <Percent className="h-4 w-4" />
+            Descontos
           </TabsTrigger>
           <TabsTrigger value="estatisticas" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -45,6 +50,10 @@ export default function GerenciarProdutos() {
 
         <TabsContent value="jornadas">
           <JornadasTab />
+        </TabsContent>
+
+        <TabsContent value="descontos">
+          <DescontosTab />
         </TabsContent>
 
         <TabsContent value="estatisticas">

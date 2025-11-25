@@ -296,6 +296,51 @@ export type Database = {
           },
         ]
       }
+      descontos: {
+        Row: {
+          ativo: boolean | null
+          codigo: string | null
+          created_at: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          id: string
+          motivo: string
+          nome: string
+          produtos_ids: Json | null
+          tipo_desconto: string
+          updated_at: string | null
+          valor: number
+        }
+        Insert: {
+          ativo?: boolean | null
+          codigo?: string | null
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          id?: string
+          motivo: string
+          nome: string
+          produtos_ids?: Json | null
+          tipo_desconto: string
+          updated_at?: string | null
+          valor: number
+        }
+        Update: {
+          ativo?: boolean | null
+          codigo?: string | null
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          id?: string
+          motivo?: string
+          nome?: string
+          produtos_ids?: Json | null
+          tipo_desconto?: string
+          updated_at?: string | null
+          valor?: number
+        }
+        Relationships: []
+      }
       duvidas_mentoria: {
         Row: {
           atrasada: boolean | null

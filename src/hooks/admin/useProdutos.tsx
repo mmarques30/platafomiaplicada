@@ -33,6 +33,21 @@ export interface RegraUpsell {
   produto_destino?: Produto;
 }
 
+export interface Desconto {
+  id: string;
+  nome: string;
+  codigo?: string;
+  motivo: string;
+  tipo_desconto: 'percentual' | 'valor_fixo';
+  valor: number;
+  produtos_ids: string[];
+  data_inicio?: string;
+  data_fim?: string;
+  ativo: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export function useProdutos() {
   return useQuery({
     queryKey: ["produtos"],
@@ -234,6 +249,92 @@ export function useEstatisticasProdutos() {
       });
 
       return stats;
+    },
+  });
+}
+
+export function useDescontos() {
+  return useQuery({
+    queryKey: ["descontos"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("descontos")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data as Desconto[];
+    },
+  });
+}
+
+export function useCreateDesconto() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (desconto: Omit<Desconto, "id" | "created_at" | "updated_at">) => {
+      const { data, error } = await supabase
+        .from("descontos")
+        .insert(desconto)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["descontos"] });
+      toast.success("Desconto criado com sucesso!");
+    },
+    onError: (error: Error) => {
+      toast.error("Erro ao criar desconto: " + error.message);
+    },
+  });
+}
+
+export function useUpdateDesconto() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...desconto }: Partial<Desconto> & { id: string }) => {
+      const { data, error } = await supabase
+        .from("descontos")
+        .update(desconto)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["descontos"] });
+      toast.success("Desconto atualizado com sucesso!");
+    },
+    onError: (error: Error) => {
+      toast.error("Erro ao atualizar desconto: " + error.message);
+    },
+  });
+}
+
+export function useDeleteDesconto() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("descontos")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["descontos"] });
+      toast.success("Desconto excluído com sucesso!");
+    },
+    onError: (error: Error) => {
+      toast.error("Erro ao excluir desconto: " + error.message);
     },
   });
 }
