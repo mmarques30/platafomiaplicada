@@ -37,9 +37,9 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
           : 'hover:border-primary/20'
       }`}
     >
-      <CardContent className="p-8 space-y-5">
+      <CardContent className="p-6 space-y-6">
         {produto.imagem_url ? (
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-gradient-to-br from-primary/10 to-primary/5">
+          <div className="aspect-[16/10] w-full overflow-hidden rounded-lg bg-gradient-to-br from-primary/10 to-primary/5">
             <img
               src={produto.imagem_url}
               alt={produto.nome}
@@ -47,14 +47,14 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
             />
           </div>
         ) : (
-          <div className="aspect-[4/3] w-full rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+          <div className="aspect-[16/10] w-full rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
             <span className="text-4xl font-bold text-primary/30">
               {produto.nome.charAt(0)}
             </span>
           </div>
         )}
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h3 className={`text-xl font-semibold ${isUserPlan ? 'text-white' : ''}`}>
             {produto.nome}
           </h3>
