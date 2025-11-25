@@ -71,12 +71,8 @@ export default function Auth() {
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold mb-3 mt-12 leading-tight text-[#F2F2F2]">
-              IA que você <span className="text-[#9EB038]">usa hoje</span>
+              Aplique <span className="text-[#9EB038]">IA de verdade</span>
             </h1>
-            
-            <p className="text-xl lg:text-xl font-semibold text-[#AFC040]">
-              Do raciocínio à ação
-            </p>
           </div>
         </div>
 
