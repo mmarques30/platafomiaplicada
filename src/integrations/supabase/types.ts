@@ -913,6 +913,54 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_config: {
+        Row: {
+          created_at: string | null
+          editavel: boolean | null
+          icon: string | null
+          id: string
+          label: string
+          menu_key: string
+          ordem: number | null
+          parent_key: string | null
+          planos_permitidos: string[] | null
+          tipo: string
+          updated_at: string | null
+          url: string | null
+          visivel: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          editavel?: boolean | null
+          icon?: string | null
+          id?: string
+          label: string
+          menu_key: string
+          ordem?: number | null
+          parent_key?: string | null
+          planos_permitidos?: string[] | null
+          tipo?: string
+          updated_at?: string | null
+          url?: string | null
+          visivel?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          editavel?: boolean | null
+          icon?: string | null
+          id?: string
+          label?: string
+          menu_key?: string
+          ordem?: number | null
+          parent_key?: string | null
+          planos_permitidos?: string[] | null
+          tipo?: string
+          updated_at?: string | null
+          url?: string | null
+          visivel?: boolean | null
+        }
+        Relationships: []
+      }
       metodos_aplicar: {
         Row: {
           ativo: boolean | null

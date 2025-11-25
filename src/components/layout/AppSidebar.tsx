@@ -20,16 +20,8 @@ import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-
-const items = [
-  { title: "Início", url: "/", icon: Home },
-  { title: "Trilhas", url: "/trilhas", icon: GraduationCap },
-  { title: "Minha Evolução", url: "/evolucao", icon: TrendingUp },
-  { title: "Ecossistema", url: "/ecossistema", icon: Layers },
-  { title: "Favoritos", url: "/favoritos", icon: Star },
-  { title: "Chat IA", url: "/chat", icon: MessageSquare },
-  { title: "Notificações", url: "/notificacoes", icon: Bell },
-];
+import { useMenuConfig } from "@/hooks/useMenuConfig";
+import * as LucideIcons from "lucide-react";
 
 export function AppSidebar() {
   const { open } = useSidebar();
@@ -37,6 +29,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin, isMentorado } = useUserRole();
   const { signOut } = useAuth();
+  const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
   console.log("[AppSidebar] isAdmin:", isAdmin);
   console.log("[AppSidebar] isMentorado:", isMentorado);
   const collapsed = !open;
@@ -45,6 +38,14 @@ export function AppSidebar() {
     await signOut();
     toast.success("Logout realizado com sucesso");
   };
+
+  const getIconComponent = (iconName: string | null) => {
+    if (!iconName) return Home;
+    const IconComponent = (LucideIcons as any)[iconName];
+    return IconComponent || Home;
+  };
+
+  const sidebarMenus = getSidebarMenus();
 
 
   return (
@@ -59,14 +60,15 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1 px-2">
-              {items.map((item) => {
-                const isActive = location.pathname === item.url;
+              {!menuLoading && sidebarMenus.map((menu) => {
+                const isActive = location.pathname === menu.url;
+                const IconComponent = getIconComponent(menu.icon);
                 
                 return (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={menu.menu_key}>
                     <SidebarMenuButton asChild className="group">
                       <NavLink 
-                        to={item.url} 
+                        to={menu.url || "/"} 
                         end 
                         className={cn(
                           "relative rounded-lg transition-all duration-200 font-medium pl-4",
@@ -81,8 +83,8 @@ export function AppSidebar() {
                             ? "bg-aplicada-green-700 opacity-100" 
                             : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
                         )} />
-                        <item.icon className="h-4 w-4 shrink-0" />
-                        {!collapsed && <span>{item.title}</span>}
+                        <IconComponent className="h-4 w-4 shrink-0" />
+                        {!collapsed && <span>{menu.label}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
