@@ -19,6 +19,10 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
   };
 
   const getPrecoExibicao = () => {
+    // Produtos B2B mostram "Sob consulta"
+    if (produto.tipo === 'b2b') {
+      return 'Sob consulta';
+    }
     if (produto.is_consultoria) {
       return `${formatPreco(produto.valor_minimo || 0)} - ${formatPreco(produto.valor_maximo || 0)}`;
     }
