@@ -35,6 +35,7 @@ export interface RegraUpsell {
   valor_desconto: number;
   economia: number;
   descricao_oferta: string;
+  tipo: 'upsell' | 'renovacao';
   ativo: boolean;
   produto_origem?: Produto;
   produto_destino?: Produto;

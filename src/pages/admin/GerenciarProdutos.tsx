@@ -1,10 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProdutosTab } from "@/components/admin/produtos/ProdutosTab";
 import { UpsellsTab } from "@/components/admin/produtos/UpsellsTab";
+import { RenovacoesTab } from "@/components/admin/produtos/RenovacoesTab";
 import { JornadasTab } from "@/components/admin/produtos/JornadasTab";
 import { EstatisticasProdutos } from "@/components/admin/produtos/EstatisticasProdutos";
 import { DescontosTab } from "@/components/admin/produtos/DescontosTab";
-import { Package, TrendingUp, Map, BarChart3, Percent } from "lucide-react";
+import { Package, TrendingUp, RefreshCw, Map, BarChart3, Percent } from "lucide-react";
 
 export default function GerenciarProdutos() {
   return (
@@ -17,7 +18,7 @@ export default function GerenciarProdutos() {
       </div>
 
       <Tabs defaultValue="produtos" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-8">
+        <TabsList className="grid w-full grid-cols-6 mb-8">
           <TabsTrigger value="produtos" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Produtos
@@ -25,6 +26,10 @@ export default function GerenciarProdutos() {
           <TabsTrigger value="upsells" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             Upsells
+          </TabsTrigger>
+          <TabsTrigger value="renovacoes" className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Renovações
           </TabsTrigger>
           <TabsTrigger value="jornadas" className="flex items-center gap-2">
             <Map className="h-4 w-4" />
@@ -46,6 +51,10 @@ export default function GerenciarProdutos() {
 
         <TabsContent value="upsells">
           <UpsellsTab />
+        </TabsContent>
+
+        <TabsContent value="renovacoes">
+          <RenovacoesTab />
         </TabsContent>
 
         <TabsContent value="jornadas">

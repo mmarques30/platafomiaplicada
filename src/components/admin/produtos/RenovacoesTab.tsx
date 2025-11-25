@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRegrasUpsell, useDeleteRegraUpsell, RegraUpsell } from "@/hooks/admin/useProdutos";
 import { UpsellModal } from "./UpsellModal";
-import { Plus, Edit, Trash2, TrendingUp } from "lucide-react";
+import { Plus, Edit, Trash2, RefreshCw } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export function UpsellsTab() {
+export function RenovacoesTab() {
   const { data: regras, isLoading } = useRegrasUpsell();
   const deleteRegra = useDeleteRegraUpsell();
 
@@ -32,8 +32,8 @@ export function UpsellsTab() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [regraToDelete, setRegraToDelete] = useState<string | null>(null);
 
-  // Filtrar apenas upsells (não renovações)
-  const upsells = regras?.filter(regra => regra.tipo === 'upsell') || [];
+  // Filtrar apenas renovações
+  const renovacoes = regras?.filter(regra => regra.tipo === 'renovacao') || [];
 
   const handleEdit = (regra: RegraUpsell) => {
     setSelectedRegra(regra);
@@ -61,33 +61,31 @@ export function UpsellsTab() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
-          <h2 className="text-2xl font-bold">Regras de Upsell</h2>
+          <RefreshCw className="h-5 w-5" />
+          <h2 className="text-2xl font-bold">Regras de Renovação</h2>
         </div>
         <Button onClick={() => { setSelectedRegra(null); setModalOpen(true); }}>
           <Plus className="h-4 w-4 mr-2" />
-          Nova Regra
+          Nova Renovação
         </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>De</TableHead>
-            <TableHead>Para</TableHead>
-            <TableHead>Valor com Desconto</TableHead>
+            <TableHead>Produto</TableHead>
+            <TableHead>Valor Renovação</TableHead>
             <TableHead>Economia</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {upsells.map((regra) => (
+          {renovacoes.map((regra) => (
             <TableRow key={regra.id}>
               <TableCell className="font-medium">
                 {regra.produto_origem?.nome || "N/A"}
               </TableCell>
-              <TableCell>{regra.produto_destino?.nome || "N/A"}</TableCell>
               <TableCell>R$ {regra.valor_desconto.toFixed(2)}</TableCell>
               <TableCell className="text-green-600">
                 - R$ {regra.economia.toFixed(2)}
@@ -131,7 +129,7 @@ export function UpsellsTab() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir esta regra de upsell?
+              Tem certeza que deseja excluir esta regra de renovação?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
