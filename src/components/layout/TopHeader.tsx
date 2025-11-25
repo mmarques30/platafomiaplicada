@@ -27,7 +27,7 @@ export function TopHeader() {
   const { user, signOut } = useAuth();
   
   // Detectar rotas ativas para dropdowns
-  const isCursosActive = ['/trilhas', '/mentoria'].some(path => location.pathname.startsWith(path));
+  const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
   const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(path => location.pathname.startsWith(path));
 
   const { data: unreadCount } = useQuery({
@@ -92,18 +92,28 @@ export function TopHeader() {
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
-                <DropdownMenuItem asChild>
-                  <Link to="/trilhas" className="cursor-pointer">
-                    Aplicada Trilha
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/mentoria" className="cursor-pointer">
-                    Aplicada Mentoria
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
+                <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
+                  <DropdownMenuItem asChild>
+                    <Link to="/trilhas" className="cursor-pointer">
+                      Trilhas
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/lab" className="cursor-pointer">
+                      Lab
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/mentoria" className="cursor-pointer">
+                      Club
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/skills" className="cursor-pointer">
+                      Skills
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
           </DropdownMenu>
           
           <DropdownMenu>
