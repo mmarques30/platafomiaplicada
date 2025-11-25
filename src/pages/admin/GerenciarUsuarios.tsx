@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUsers, useDeleteUser } from "@/hooks/admin/useUsers";
+import { useUsers, useDeleteUser, useImportUsersBatch } from "@/hooks/admin/useUsers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -21,13 +21,14 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2 } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
 export default function GerenciarUsuários() {
   const { data: users, isLoading } = useUsers();
   const deleteUser = useDeleteUser();
+  const importUsersBatch = useImportUsersBatch();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [novoUsuarioOpen, setNovoUsuarioOpen] = useState(false);
@@ -102,6 +103,27 @@ export default function GerenciarUsuários() {
     }
   };
 
+  const handleImportAcademy2025 = () => {
+    const academyUsers = [
+      { email: "alice.phsp@gmail.com", nomeCompleto: "Alice Generoso", password: "aplica2025" },
+      { email: "gessinazaniboni@gmail.com", nomeCompleto: "Géssina Zaniboni Feltrin", password: "aplica2025" },
+      { email: "elivelton.bosco@gmail.com", nomeCompleto: "Elivelton Bosco", password: "aplica2025" },
+      { email: "robcad1981@gmail.com", nomeCompleto: "Robson Caiado", password: "aplica2025" },
+      { email: "oliveirapietra98@gmail.com", nomeCompleto: "Pietra Oliveira", password: "aplica2025" },
+      { email: "thaa.rodriigues@hotmail.com", nomeCompleto: "Thais Palmeira Rodrigues", password: "aplica2025" },
+      { email: "claudemeo@gmail.com", nomeCompleto: "Claudia De Meo", password: "aplica2025" },
+      { email: "arquivosdebora2009@gmail.com", nomeCompleto: "Debora Franco", password: "aplica2025" },
+      { email: "renata.acacia.couto@gmail.com", nomeCompleto: "Renata Couto Lima", password: "aplica2025" },
+      { email: "ingbarbosao@gmail.com", nomeCompleto: "Ingrid Barbosa Oliveira", password: "aplica2025" }
+    ];
+
+    importUsersBatch.mutate({
+      users: academyUsers,
+      planoMentoria: "academy",
+      roles: ["aluno_trilha"]
+    });
+  };
+
   if (isLoading) {
     return (
       <div>
@@ -115,10 +137,20 @@ export default function GerenciarUsuários() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
-        <Button onClick={() => setNovoUsuarioOpen(true)}>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Novo Usuário
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleImportAcademy2025}
+            variant="outline"
+            disabled={importUsersBatch.isPending}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            {importUsersBatch.isPending ? "Importando..." : "Importar Academy 2025"}
+          </Button>
+          <Button onClick={() => setNovoUsuarioOpen(true)}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Novo Usuário
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-4 mb-6">
