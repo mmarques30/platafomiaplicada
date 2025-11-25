@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import logoAplicada from "@/assets/logo-aplicada.png";
+import logoMarcaCompleta from "@/assets/logo-aplicada-marca-completa.png";
 import authBackground from "@/assets/auth-background-new.png";
 
 export default function Auth() {
@@ -65,9 +66,8 @@ export default function Auth() {
         <div className="w-full flex-shrink-0 pt-8">
           {/* TOPO - Branding (oculto no mobile) */}
           <div className="hidden lg:flex flex-col items-center text-center w-full px-8">
-            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#9EB038]/15 border border-[#9EB038]/30 mb-3 mx-auto">
-              <img src={logoAplicada} alt="IAplicada" className="h-5 w-auto opacity-90" />
-              <span className="text-sm font-medium text-[#BCC95D]">Inteligência em ação</span>
+            <div className="flex items-center justify-center mb-3 mx-auto">
+              <img src={logoMarcaCompleta} alt="IAplicada" className="h-12 w-auto" />
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold mb-3 mt-12 leading-tight text-[#F2F2F2]">
