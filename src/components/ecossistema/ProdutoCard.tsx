@@ -32,7 +32,9 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
   return (
     <Card 
       className={`group transition-all duration-200 hover:shadow-lg ${
-        isUserPlan ? 'border-primary/40 bg-primary/5' : 'hover:border-primary/20'
+        isUserPlan 
+          ? 'bg-zinc-900 border-zinc-700 text-white' 
+          : 'hover:border-primary/20'
       }`}
     >
       <CardContent className="p-8 space-y-5">
@@ -53,30 +55,33 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
         )}
 
         <div className="space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="text-xl font-semibold">{produto.nome}</h3>
-            {isUserPlan && (
-              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                Seu Plano
-              </Badge>
-            )}
-          </div>
+          <h3 className={`text-xl font-semibold ${isUserPlan ? 'text-white' : ''}`}>
+            {produto.nome}
+          </h3>
 
-          <p className="text-3xl font-bold text-primary">{getPrecoExibicao()}</p>
+          <p className={`text-2xl font-bold ${isUserPlan ? 'text-white' : 'text-primary'}`}>
+            {getPrecoExibicao()}
+          </p>
           
           {produto.periodicidade && (
-            <p className="text-xs text-muted-foreground">{produto.periodicidade}</p>
+            <p className={`text-xs ${isUserPlan ? 'text-zinc-400' : 'text-muted-foreground'}`}>
+              {produto.periodicidade}
+            </p>
           )}
 
-          <p className="text-sm text-muted-foreground line-clamp-3">
+          <p className={`text-sm line-clamp-2 ${isUserPlan ? 'text-zinc-300' : 'text-muted-foreground'}`}>
             {produto.descricao_curta}
           </p>
         </div>
 
         <Button
           onClick={onSaibaMais}
-          variant="outline"
-          className="w-full group-hover:bg-primary/5"
+          variant={isUserPlan ? "secondary" : "outline"}
+          className={`w-full ${
+            isUserPlan 
+              ? 'bg-white text-zinc-900 hover:bg-zinc-100' 
+              : 'group-hover:bg-primary/5'
+          }`}
         >
           Saiba mais
           <ArrowRight className="ml-2 h-4 w-4" />
