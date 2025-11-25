@@ -260,3 +260,43 @@ export function useDeleteUser() {
     },
   });
 }
+
+export function useImportUsersBatch() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      users,
+      planoMentoria,
+      roles,
+    }: {
+      users: Array<{
+        email: string;
+        nomeCompleto: string;
+        password: string;
+      }>;
+      planoMentoria?: string;
+      roles?: AppRole[];
+    }) => {
+      const { data, error } = await supabase.functions.invoke("import-users-batch", {
+        body: { 
+          users, 
+          planoMentoria,
+          roles 
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success(`${data.imported} usuários importados com sucesso! ${data.failed > 0 ? `(${data.failed} falharam)` : ''}`);
+    },
+    onError: (error) => {
+      toast.error("Erro ao importar usuários: " + error.message);
+    },
+  });
+}

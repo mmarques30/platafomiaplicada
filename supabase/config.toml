@@ -3,6 +3,9 @@ project_id = "ocwpsanqtfubixerjive"
 [functions.create-user-admin]
 verify_jwt = true
 
+[functions.import-users-batch]
+verify_jwt = true
+
 [functions.ai-chat-user]
 verify_jwt = true
 

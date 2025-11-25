@@ -18,8 +18,9 @@ Deno.serve(async (req) => {
     console.log('Creating user:', { email, nomeCompleto, roles, planoMentoria })
 
     // Validar planoMentoria
-    if (planoMentoria && !['club', 'pro'].includes(planoMentoria)) {
-      throw new Error('Plano de mentoria inválido. Valores aceitos: club, pro')
+    const planosValidos = ['academy', 'lab', 'skills', 'club', 'legacy', 'boost'];
+    if (planoMentoria && !planosValidos.includes(planoMentoria)) {
+      throw new Error(`Plano de mentoria inválido. Valores aceitos: ${planosValidos.join(', ')}`)
     }
 
     // 1. Criar usuário via Admin API
