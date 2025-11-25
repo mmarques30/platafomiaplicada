@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Layers } from "lucide-react";
-import { MeuPlanoCard } from "@/components/ecossistema/MeuPlanoCard";
 import { ProdutoCard } from "@/components/ecossistema/ProdutoCard";
 import { ProdutoDetalhesModal } from "@/components/ecossistema/ProdutoDetalhesModal";
 import { useProdutos, Produto } from "@/hooks/admin/useProdutos";
@@ -25,11 +24,6 @@ export default function Ecossistema() {
             Conheça todos os produtos e escolha o melhor para você
           </p>
         </div>
-      </div>
-
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Meu Plano</h2>
-        <MeuPlanoCard />
       </div>
 
       {isLoading ? (
