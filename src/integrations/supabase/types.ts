@@ -1337,6 +1337,7 @@ export type Database = {
           id: string
           produto_destino_id: string | null
           produto_origem_id: string | null
+          tipo: string
           updated_at: string | null
           valor_desconto: number
         }
@@ -1348,6 +1349,7 @@ export type Database = {
           id?: string
           produto_destino_id?: string | null
           produto_origem_id?: string | null
+          tipo?: string
           updated_at?: string | null
           valor_desconto: number
         }
@@ -1359,6 +1361,7 @@ export type Database = {
           id?: string
           produto_destino_id?: string | null
           produto_origem_id?: string | null
+          tipo?: string
           updated_at?: string | null
           valor_desconto?: number
         }

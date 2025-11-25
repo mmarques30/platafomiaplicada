@@ -25,6 +25,7 @@ export function UpsellModal({ open, onOpenChange, regra }: UpsellModalProps) {
     valor_desconto: "",
     economia: "",
     descricao_oferta: "",
+    tipo: "upsell" as "upsell" | "renovacao",
     ativo: true,
   });
 
@@ -36,6 +37,7 @@ export function UpsellModal({ open, onOpenChange, regra }: UpsellModalProps) {
         valor_desconto: regra.valor_desconto.toString(),
         economia: regra.economia.toString(),
         descricao_oferta: regra.descricao_oferta,
+        tipo: regra.tipo,
         ativo: regra.ativo,
       });
     } else {
@@ -45,6 +47,7 @@ export function UpsellModal({ open, onOpenChange, regra }: UpsellModalProps) {
         valor_desconto: "",
         economia: "",
         descricao_oferta: "",
+        tipo: "upsell",
         ativo: true,
       });
     }
@@ -55,10 +58,11 @@ export function UpsellModal({ open, onOpenChange, regra }: UpsellModalProps) {
 
     const data = {
       produto_origem_id: formData.produto_origem_id,
-      produto_destino_id: formData.produto_destino_id,
+      produto_destino_id: formData.tipo === 'renovacao' ? formData.produto_origem_id : formData.produto_destino_id,
       valor_desconto: parseFloat(formData.valor_desconto),
       economia: parseFloat(formData.economia),
       descricao_oferta: formData.descricao_oferta,
+      tipo: formData.tipo,
       ativo: formData.ativo,
     };
 
@@ -76,13 +80,31 @@ export function UpsellModal({ open, onOpenChange, regra }: UpsellModalProps) {
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {regra ? "Editar Regra de Upsell" : "Nova Regra de Upsell"}
+            {regra ? `Editar ${regra.tipo === 'renovacao' ? 'Renovação' : 'Upsell'}` : "Nova Regra"}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="produto_origem">Produto de Origem</Label>
+            <Label htmlFor="tipo">Tipo de Regra</Label>
+            <Select
+              value={formData.tipo}
+              onValueChange={(value: "upsell" | "renovacao") => setFormData({ ...formData, tipo: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="upsell">Upsell</SelectItem>
+                <SelectItem value="renovacao">Renovação</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="produto_origem">
+              {formData.tipo === 'renovacao' ? 'Produto' : 'Produto de Origem'}
+            </Label>
             <Select
               value={formData.produto_origem_id}
               onValueChange={(value) => setFormData({ ...formData, produto_origem_id: value })}
@@ -100,28 +122,32 @@ export function UpsellModal({ open, onOpenChange, regra }: UpsellModalProps) {
             </Select>
           </div>
 
-          <div>
-            <Label htmlFor="produto_destino">Produto de Destino</Label>
-            <Select
-              value={formData.produto_destino_id}
-              onValueChange={(value) => setFormData({ ...formData, produto_destino_id: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o produto" />
-              </SelectTrigger>
-              <SelectContent>
-                {produtos?.map((produto) => (
-                  <SelectItem key={produto.id} value={produto.id}>
-                    {produto.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {formData.tipo === 'upsell' && (
+            <div>
+              <Label htmlFor="produto_destino">Produto de Destino</Label>
+              <Select
+                value={formData.produto_destino_id}
+                onValueChange={(value) => setFormData({ ...formData, produto_destino_id: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o produto" />
+                </SelectTrigger>
+                <SelectContent>
+                  {produtos?.map((produto) => (
+                    <SelectItem key={produto.id} value={produto.id}>
+                      {produto.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="valor_desconto">Valor com Desconto (R$)</Label>
+              <Label htmlFor="valor_desconto">
+                {formData.tipo === 'renovacao' ? 'Valor Renovação (R$)' : 'Valor com Desconto (R$)'}
+              </Label>
               <Input
                 id="valor_desconto"
                 type="number"
