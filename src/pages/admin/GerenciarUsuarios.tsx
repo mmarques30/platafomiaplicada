@@ -114,7 +114,8 @@ export default function GerenciarUsuários() {
       { email: "claudemeo@gmail.com", nomeCompleto: "Claudia De Meo", password: "aplica2025" },
       { email: "arquivosdebora2009@gmail.com", nomeCompleto: "Debora Franco", password: "aplica2025" },
       { email: "renata.acacia.couto@gmail.com", nomeCompleto: "Renata Couto Lima", password: "aplica2025" },
-      { email: "ingbarbosao@gmail.com", nomeCompleto: "Ingrid Barbosa Oliveira", password: "aplica2025" }
+      { email: "ingbarbosao@gmail.com", nomeCompleto: "Ingrid Barbosa Oliveira", password: "aplica2025" },
+      { email: "luanac.gz@gmail.com", nomeCompleto: "Luana Gimenez", password: "aplica2025" }
     ];
 
     importUsersBatch.mutate({
