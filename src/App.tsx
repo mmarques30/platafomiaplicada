@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Trilhas from "./pages/Trilhas";
 import TrilhaDetalhes from "./pages/TrilhaDetalhes";
+import TrilhasNovidades from "./pages/TrilhasNovidades";
 import VideoPlayer from "./pages/VideoPlayer";
 import Chat from "./pages/Chat";
 import Perfil from "./pages/Perfil";
@@ -68,6 +69,7 @@ function AppContent() {
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/trilhas" element={<Trilhas />} />
+            <Route path="/trilhas/novidades" element={<TrilhasNovidades />} />
             <Route path="/trilhas/:id" element={<TrilhaDetalhes />} />
             <Route path="/videos/:id" element={<VideoPlayer />} />
             <Route path="/chat" element={<Chat />} />
