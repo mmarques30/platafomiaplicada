@@ -461,3 +461,21 @@ iframe:focus {
 [role="slider"]:hover {
   @apply scale-105;
 }
+
+/* Scrollbar customizada para lista de vídeos */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgb(161, 161, 170);
+  border-radius: 9999px;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgb(82, 82, 91);
+}
