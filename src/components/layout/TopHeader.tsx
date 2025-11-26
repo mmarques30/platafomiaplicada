@@ -62,7 +62,7 @@ export function TopHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b-2 border-primary/10 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="flex h-16 items-center justify-between px-6 max-w-7xl mx-auto">
         {/* ESQUERDA: SidebarTrigger + Logo */}
           <div className="flex items-center gap-4">

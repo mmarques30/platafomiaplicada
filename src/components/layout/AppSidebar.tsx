@@ -49,8 +49,8 @@ export function AppSidebar() {
 
 
   return (
-    <Sidebar className="border-r-2 border-primary/10 bg-background/50 backdrop-blur-sm">
-      <SidebarHeader className="border-b-2 border-primary/10">
+    <Sidebar className="border-r border-border bg-background/50 backdrop-blur-sm">
+      <SidebarHeader>
         <div className="flex h-16 items-center justify-center px-4 bg-gradient-to-br from-primary/5 to-transparent">
           <img src={logoSimbolo} alt="IAplicada" className="h-12 w-12 drop-shadow-md" />
         </div>
