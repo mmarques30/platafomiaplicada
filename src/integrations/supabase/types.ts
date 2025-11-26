@@ -1178,10 +1178,12 @@ export type Database = {
       }
       profiles: {
         Row: {
+          adicionado_grupo_whatsapp: boolean | null
           conta_ativa: boolean | null
           created_at: string | null
           data_expiracao_acesso: string | null
           email: string | null
+          email_acesso_enviado: boolean | null
           id: string
           idade: number | null
           linkedin: string | null
@@ -1194,10 +1196,12 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          adicionado_grupo_whatsapp?: boolean | null
           conta_ativa?: boolean | null
           created_at?: string | null
           data_expiracao_acesso?: string | null
           email?: string | null
+          email_acesso_enviado?: boolean | null
           id: string
           idade?: number | null
           linkedin?: string | null
@@ -1210,10 +1214,12 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          adicionado_grupo_whatsapp?: boolean | null
           conta_ativa?: boolean | null
           created_at?: string | null
           data_expiracao_acesso?: string | null
           email?: string | null
+          email_acesso_enviado?: boolean | null
           id?: string
           idade?: number | null
           linkedin?: string | null

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useUsers, useDeleteUser, useImportUsersBatch } from "@/hooks/admin/useUsers";
+import { useUsers, useDeleteUser, useImportUsersBatch, useUpdateOnboardingStatus } from "@/hooks/admin/useUsers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -21,7 +22,7 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
@@ -29,6 +30,7 @@ export default function GerenciarUsuários() {
   const { data: users, isLoading } = useUsers();
   const deleteUser = useDeleteUser();
   const importUsersBatch = useImportUsersBatch();
+  const updateOnboardingStatus = useUpdateOnboardingStatus();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [novoUsuarioOpen, setNovoUsuarioOpen] = useState(false);
@@ -103,25 +105,16 @@ export default function GerenciarUsuários() {
     }
   };
 
-  const handleImportAcademy2025 = () => {
-    const academyUsers = [
-      { email: "alice.phsp@gmail.com", nomeCompleto: "Alice Generoso", password: "aplica2025" },
-      { email: "gessinazaniboni@gmail.com", nomeCompleto: "Géssina Zaniboni Feltrin", password: "aplica2025" },
-      { email: "elivelton.bosco@gmail.com", nomeCompleto: "Elivelton Bosco", password: "aplica2025" },
-      { email: "robcad1981@gmail.com", nomeCompleto: "Robson Caiado", password: "aplica2025" },
-      { email: "oliveirapietra98@gmail.com", nomeCompleto: "Pietra Oliveira", password: "aplica2025" },
-      { email: "thaa.rodriigues@hotmail.com", nomeCompleto: "Thais Palmeira Rodrigues", password: "aplica2025" },
-      { email: "claudemeo@gmail.com", nomeCompleto: "Claudia De Meo", password: "aplica2025" },
-      { email: "arquivosdebora2009@gmail.com", nomeCompleto: "Debora Franco", password: "aplica2025" },
-      { email: "renata.acacia.couto@gmail.com", nomeCompleto: "Renata Couto Lima", password: "aplica2025" },
-      { email: "ingbarbosao@gmail.com", nomeCompleto: "Ingrid Barbosa Oliveira", password: "aplica2025" },
-      { email: "luanac.gz@gmail.com", nomeCompleto: "Luana Gimenez", password: "aplica2025" }
+  const handleImportClub2025 = () => {
+    const clubUsers = [
+      { email: "requenabruna@gmail.com", nomeCompleto: "Bruna Requena Mahtuk", password: "aplica2025" },
+      { email: "luk_0602@hotmail.com", nomeCompleto: "Lucas Gonçalves Lima De Melo", password: "aplica2025" }
     ];
 
     importUsersBatch.mutate({
-      users: academyUsers,
-      planoMentoria: "academy",
-      roles: ["aluno_trilha"]
+      users: clubUsers,
+      planoMentoria: "club",
+      roles: ["mentorado"]
     });
   };
 
@@ -140,12 +133,12 @@ export default function GerenciarUsuários() {
         <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
         <div className="flex gap-2">
           <Button 
-            onClick={handleImportAcademy2025}
+            onClick={handleImportClub2025}
             variant="outline"
             disabled={importUsersBatch.isPending}
           >
             <Upload className="h-4 w-4 mr-2" />
-            {importUsersBatch.isPending ? "Importando..." : "Importar Academy 2025"}
+            {importUsersBatch.isPending ? "Importando..." : "Importar Club 2025"}
           </Button>
           <Button onClick={() => setNovoUsuarioOpen(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
@@ -189,6 +182,8 @@ export default function GerenciarUsuários() {
               <TableHead>Status</TableHead>
               <TableHead>Expira em</TableHead>
               <TableHead>Cadastro</TableHead>
+              <TableHead className="text-center">✉️ Email</TableHead>
+              <TableHead className="text-center">📱 Grupo</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -262,6 +257,42 @@ export default function GerenciarUsuários() {
                   {user.created_at
                     ? format(new Date(user.created_at), "dd/MM/yyyy")
                     : "-"}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-center gap-2">
+                    <Switch
+                      checked={(user as any).email_acesso_enviado || false}
+                      onCheckedChange={(checked) => {
+                        updateOnboardingStatus.mutate({
+                          userId: user.id,
+                          field: 'email_acesso_enviado',
+                          value: checked
+                        });
+                      }}
+                      disabled={updateOnboardingStatus.isPending}
+                    />
+                    {(user as any).email_acesso_enviado && (
+                      <Mail className="h-3 w-3 text-green-600" />
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-center gap-2">
+                    <Switch
+                      checked={(user as any).adicionado_grupo_whatsapp || false}
+                      onCheckedChange={(checked) => {
+                        updateOnboardingStatus.mutate({
+                          userId: user.id,
+                          field: 'adicionado_grupo_whatsapp',
+                          value: checked
+                        });
+                      }}
+                      disabled={updateOnboardingStatus.isPending}
+                    />
+                    {(user as any).adicionado_grupo_whatsapp && (
+                      <MessageCircle className="h-3 w-3 text-green-600" />
+                    )}
+                  </div>
                 </TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
