@@ -95,7 +95,10 @@ export function VitrineConquistas() {
               >
                 {/* Título e descrição */}
                 <div>
-                  <h3 className="font-semibold text-sm conquista-title">
+                  <h3
+                    className="font-semibold text-sm"
+                    style={{ color: "#FFFFFF" }}
+                  >
                     {conquista.titulo}
                   </h3>
                   <p className="text-xs text-zinc-300 mt-1">
