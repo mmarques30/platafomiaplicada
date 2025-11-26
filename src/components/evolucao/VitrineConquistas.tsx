@@ -96,11 +96,11 @@ export function VitrineConquistas() {
                 {/* Título e descrição */}
                 <div>
                   <h3
-                    className={`font-semibold text-sm ${
+                    className={
                       conquista.desbloqueada
-                        ? "text-primary"
-                        : "text-white"
-                    }`}
+                        ? "font-semibold text-sm text-primary"
+                        : "font-semibold text-sm text-white"
+                    }
                   >
                     {conquista.titulo}
                   </h3>
