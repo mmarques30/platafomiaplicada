@@ -34,23 +34,23 @@ export function HeroComunidade() {
         {/* Mini Cards de Estatísticas */}
         <div className="grid grid-cols-3 gap-3">
           <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-            <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Sua Posição</span>
+            <span className="text-xs text-white uppercase tracking-wide block mb-2">Sua Posição</span>
             <p className="text-xl font-semibold text-white">
               {posicao > 0 ? `#${posicao}º` : '-'}
             </p>
-            <p className="text-xs text-zinc-400">no ranking</p>
+            <p className="text-xs text-zinc-300">no ranking</p>
           </div>
 
           <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-            <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Pontos Totais</span>
+            <span className="text-xs text-white uppercase tracking-wide block mb-2">Pontos Totais</span>
             <p className="text-xl font-semibold text-white">{meusPontos.toLocaleString()}</p>
-            <p className="text-xs text-zinc-400">XP acumulado</p>
+            <p className="text-xs text-zinc-300">XP acumulado</p>
           </div>
 
           <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-            <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Comunidade</span>
+            <span className="text-xs text-white uppercase tracking-wide block mb-2">Comunidade</span>
             <p className="text-xl font-semibold text-white">{totalMembros}</p>
-            <p className="text-xs text-zinc-400">membros ativos</p>
+            <p className="text-xs text-zinc-300">membros ativos</p>
           </div>
         </div>
       </div>
