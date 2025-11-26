@@ -9,15 +9,15 @@ export default function TrilhasNovidades() {
         <div className="flex items-center gap-3">
           <Sparkles className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold text-white">Novidades do Mês</h1>
-            <p className="text-zinc-300 mt-1">
-              Últimos conteúdos adicionados organizados por trilha
+            <h1 className="text-3xl font-bold text-foreground">Novidades do Mês</h1>
+            <p className="text-muted-foreground mt-1">
+              Últimos conteúdos adicionados nos últimos 15 dias, organizados por trilha
             </p>
           </div>
         </div>
 
-        {/* Conteúdos */}
-        <UltimosConteudos />
+        {/* Conteúdos - Filtrando apenas últimos 15 dias */}
+        <UltimosConteudos apenasRecentes />
       </main>
     </div>
   );
