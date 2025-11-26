@@ -306,13 +306,18 @@ h1, h2, h3, h4, h5, h6 {
   color: hsl(var(--foreground)); /* #FFFFFF - texto branco */
 }
 
-/* Classe específica para subtítulos */
-.subtitle,
-h2.subtitle,
-h3.subtitle {
-  color: hsl(var(--subtitle)); /* #BCC95D - verde-amarelo - mantém */
-  font-weight: 500; /* Sora Medium */
-}
+  /* Classe específica para subtítulos */
+  .subtitle,
+  h2.subtitle,
+  h3.subtitle {
+    color: hsl(var(--subtitle)); /* #BCC95D - verde-amarelo - mantém */
+    font-weight: 500; /* Sora Medium */
+  }
+
+  /* Títulos das conquistas na aba Evolução */
+  .conquista-title {
+    color: hsl(0 0% 100%) !important; /* branco puro para máximo contraste */
+  }
 
 p, span, div, label {
   font-weight: 300; /* Sora Light */
