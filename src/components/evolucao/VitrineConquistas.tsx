@@ -89,8 +89,8 @@ export function VitrineConquistas() {
                 key={conquista.id}
                 className={`rounded-lg border p-4 space-y-3 transition-all ${
                   conquista.desbloqueada
-                    ? "border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5"
-                    : "border-zinc-700 bg-zinc-800/50 opacity-60"
+                    ? "border-primary/40 bg-zinc-700"
+                    : "border-zinc-600 bg-zinc-700"
                 }`}
               >
                 {/* Título e descrição */}
@@ -99,12 +99,12 @@ export function VitrineConquistas() {
                     className={`font-semibold text-sm ${
                       conquista.desbloqueada
                         ? "text-primary"
-                        : "text-zinc-400"
+                        : "text-zinc-300"
                     }`}
                   >
                     {conquista.titulo}
                   </h3>
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-zinc-300 mt-1">
                     {conquista.descricao}
                   </p>
                 </div>
@@ -113,10 +113,10 @@ export function VitrineConquistas() {
                 {!conquista.desbloqueada && (
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-400">
+                      <span className="text-zinc-300">
                         {conquista.progresso} / {conquista.meta}
                       </span>
-                      <span className="text-zinc-400">
+                      <span className="text-zinc-300">
                         {porcentagem.toFixed(0)}%
                       </span>
                     </div>
