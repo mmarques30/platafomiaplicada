@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Users, Trophy, Flame } from "lucide-react";
+import { Users } from "lucide-react";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -34,30 +34,21 @@ export function HeroComunidade() {
         {/* Mini Cards de Estatísticas */}
         <div className="grid grid-cols-3 gap-3">
           <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Trophy className="h-4 w-4 text-primary" />
-              <span className="text-xs text-zinc-400">Sua Posição</span>
-            </div>
+            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Sua Posição</span>
             <p className="text-xl font-semibold text-white">
-              {posicao > 0 ? `${posicao}º` : '-'}
+              {posicao > 0 ? `#${posicao}º` : '-'}
             </p>
             <p className="text-xs text-zinc-500">no ranking</p>
           </div>
 
           <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Flame className="h-4 w-4 text-primary" />
-              <span className="text-xs text-zinc-400">Pontos Totais</span>
-            </div>
-            <p className="text-xl font-semibold text-white">{meusPontos}</p>
-            <p className="text-xs text-zinc-500">acumulados</p>
+            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Pontos Totais</span>
+            <p className="text-xl font-semibold text-white">{meusPontos.toLocaleString()}</p>
+            <p className="text-xs text-zinc-500">XP acumulado</p>
           </div>
 
           <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-primary" />
-              <span className="text-xs text-zinc-400">Comunidade</span>
-            </div>
+            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Comunidade</span>
             <p className="text-xl font-semibold text-white">{totalMembros}</p>
             <p className="text-xs text-zinc-500">membros ativos</p>
           </div>

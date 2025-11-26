@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Video, Wrench, MessageCircle } from "lucide-react";
 
 interface EstatisticasEngajamentoProps {
   ranking: any[];
@@ -15,22 +14,18 @@ export function EstatisticasEngajamento({ ranking }: EstatisticasEngajamentoProp
     {
       label: "Usuários Ativos",
       value: totalUsuarios,
-      icon: Users,
     },
     {
       label: "Vídeos Assistidos",
       value: totalVideos,
-      icon: Video,
     },
     {
       label: "Ferramentas Compartilhadas",
       value: totalFerramentas,
-      icon: Wrench,
     },
     {
       label: "Comentários",
       value: totalComentarios,
-      icon: MessageCircle,
     },
   ];
 
@@ -41,19 +36,15 @@ export function EstatisticasEngajamento({ ranking }: EstatisticasEngajamentoProp
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={index}
-                className="p-4 rounded-lg bg-zinc-800/50 border border-aplicada-green-900/30 space-y-2"
-              >
-                <Icon className="h-5 w-5 text-primary/60 mb-2" />
-                <p className="text-2xl font-bold text-white">{stat.value}</p>
-                <p className="text-sm text-zinc-400">{stat.label}</p>
-              </div>
-            );
-          })}
+          {stats.map((stat, index) => (
+            <div
+              key={index}
+              className="p-4 rounded-lg bg-zinc-800/50 border border-aplicada-green-900/30 space-y-2"
+            >
+              <p className="text-xs text-zinc-400 uppercase tracking-wide">{stat.label}</p>
+              <p className="text-2xl font-bold text-white">{stat.value}</p>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>

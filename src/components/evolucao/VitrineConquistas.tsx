@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Star, Flame, Award, Zap, Target, Trophy } from "lucide-react";
 import { useMinhaEvolucao } from "@/hooks/useMinhaEvolucao";
 import { useSequenciaEstudo } from "@/hooks/useEvolucao";
 import { useMeusCertificados } from "@/hooks/useCertificados";
@@ -9,7 +8,6 @@ interface Conquista {
   id: string;
   titulo: string;
   descricao: string;
-  icone: React.ComponentType<{ className?: string }>;
   meta: number;
   progresso: number;
   desbloqueada: boolean;
@@ -27,7 +25,6 @@ export function VitrineConquistas() {
       id: "primeira-trilha",
       titulo: "Primeira Trilha",
       descricao: "Complete sua primeira trilha",
-      icone: Award,
       meta: 1,
       progresso: totalCertificados,
       desbloqueada: totalCertificados >= 1,
@@ -36,7 +33,6 @@ export function VitrineConquistas() {
       id: "sequencia-7",
       titulo: "Dedicado",
       descricao: "Estude por 7 dias seguidos",
-      icone: Flame,
       meta: 7,
       progresso: sequencia || 0,
       desbloqueada: (sequencia || 0) >= 7,
@@ -45,7 +41,6 @@ export function VitrineConquistas() {
       id: "50-videos",
       titulo: "Maratonista",
       descricao: "Assista 50 vídeos completos",
-      icone: Star,
       meta: 50,
       progresso: evolucao?.totalVideos || 0,
       desbloqueada: (evolucao?.totalVideos || 0) >= 50,
@@ -54,7 +49,6 @@ export function VitrineConquistas() {
       id: "5-certificados",
       titulo: "Colecionador",
       descricao: "Conquiste 5 certificados",
-      icone: Trophy,
       meta: 5,
       progresso: totalCertificados,
       desbloqueada: totalCertificados >= 5,
@@ -63,7 +57,6 @@ export function VitrineConquistas() {
       id: "primeira-ferramenta",
       titulo: "Inovador",
       descricao: "Compartilhe sua primeira ferramenta",
-      icone: Zap,
       meta: 1,
       progresso: evolucao?.totalFerramentas || 0,
       desbloqueada: (evolucao?.totalFerramentas || 0) >= 1,
@@ -72,7 +65,6 @@ export function VitrineConquistas() {
       id: "sequencia-30",
       titulo: "Disciplinado",
       descricao: "Estude por 30 dias seguidos",
-      icone: Target,
       meta: 30,
       progresso: sequencia || 0,
       desbloqueada: (sequencia || 0) >= 30,
@@ -87,7 +79,6 @@ export function VitrineConquistas() {
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {conquistas.map((conquista) => {
-            const IconeConquista = conquista.icone;
             const porcentagem = Math.min(
               (conquista.progresso / conquista.meta) * 100,
               100
@@ -98,39 +89,22 @@ export function VitrineConquistas() {
                 key={conquista.id}
                 className={`rounded-lg border p-4 space-y-3 transition-all ${
                   conquista.desbloqueada
-                    ? "border-primary/30 bg-primary/5"
-                    : "border-border bg-muted/30 opacity-50"
+                    ? "border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5"
+                    : "border-zinc-700 bg-zinc-800/50 opacity-60"
                 }`}
               >
-                {/* Ícone */}
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    conquista.desbloqueada
-                      ? "bg-primary/20"
-                      : "bg-muted"
-                  }`}
-                >
-                  <IconeConquista
-                    className={`h-6 w-6 ${
-                      conquista.desbloqueada
-                        ? "text-primary"
-                        : "text-muted-foreground"
-                    }`}
-                  />
-                </div>
-
                 {/* Título e descrição */}
                 <div>
                   <h3
-                    className={`font-medium text-sm ${
+                    className={`font-semibold text-sm ${
                       conquista.desbloqueada
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                        ? "text-primary"
+                        : "text-zinc-400"
                     }`}
                   >
                     {conquista.titulo}
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-zinc-400 mt-1">
                     {conquista.descricao}
                   </p>
                 </div>
@@ -139,10 +113,10 @@ export function VitrineConquistas() {
                 {!conquista.desbloqueada && (
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">
+                      <span className="text-zinc-400">
                         {conquista.progresso} / {conquista.meta}
                       </span>
-                      <span className="text-muted-foreground">
+                      <span className="text-zinc-400">
                         {porcentagem.toFixed(0)}%
                       </span>
                     </div>

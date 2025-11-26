@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, Flame, Video, Award } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { useNivelUsuario } from "@/hooks/useNivelUsuario";
 import { useMinhaEvolucao } from "@/hooks/useMinhaEvolucao";
 import { useSequenciaEstudo } from "@/hooks/useEvolucao";
@@ -47,28 +47,19 @@ export function HeroEvolucao() {
           {/* Mini Cards de Estatísticas */}
           <div className="grid grid-cols-3 gap-3 pt-2">
             <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Flame className="h-4 w-4 text-primary" />
-                <span className="text-xs text-zinc-400">Sequência</span>
-              </div>
+              <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Sequência</span>
               <p className="text-xl font-semibold text-white">{sequencia || 0}</p>
               <p className="text-xs text-zinc-500">dias seguidos</p>
             </div>
 
             <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Video className="h-4 w-4 text-primary" />
-                <span className="text-xs text-zinc-400">Vídeos</span>
-              </div>
+              <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Vídeos</span>
               <p className="text-xl font-semibold text-white">{evolucao?.totalVideos || 0}</p>
               <p className="text-xs text-zinc-500">completos</p>
             </div>
 
             <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Award className="h-4 w-4 text-primary" />
-                <span className="text-xs text-zinc-400">Certificados</span>
-              </div>
+              <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Certificados</span>
               <p className="text-xl font-semibold text-white">{totalCertificados}</p>
               <p className="text-xs text-zinc-500">conquistados</p>
             </div>
