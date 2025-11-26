@@ -105,9 +105,12 @@ export default function GerenciarUsuários() {
     }
   };
 
-  const handleImportClub2025 = () => {
+  const handleImportAcademyNov2025 = () => {
     const academyUsers = [
-      { email: "rosilannysoares@hotmail.com", nomeCompleto: "Rosilanny Carvalho Araujo", password: "aplica2025" }
+      { email: "ana_ps26@hotmail.com", nomeCompleto: "Ana Paula De Souza", password: "aplica2025" },
+      { email: "elilorocha@hotmail.com", nomeCompleto: "Elisangela Lo Rocha", password: "aplica2025" },
+      { email: "wagner.sillva@outlook.com", nomeCompleto: "Wagner Sillva", password: "aplica2025" },
+      { email: "renatoscher@gmail.com", nomeCompleto: "Renato Schervinski", password: "aplica2025" }
     ];
 
     importUsersBatch.mutate({
@@ -132,12 +135,12 @@ export default function GerenciarUsuários() {
         <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
         <div className="flex gap-2">
           <Button 
-            onClick={handleImportClub2025}
+            onClick={handleImportAcademyNov2025}
             variant="outline"
             disabled={importUsersBatch.isPending}
           >
             <Upload className="h-4 w-4 mr-2" />
-            {importUsersBatch.isPending ? "Importando..." : "Importar Club 2025"}
+            {importUsersBatch.isPending ? "Importando..." : "Importar Academy Nov/2025"}
           </Button>
           <Button onClick={() => setNovoUsuarioOpen(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
