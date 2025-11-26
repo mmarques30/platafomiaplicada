@@ -47,21 +47,21 @@ export function HeroEvolucao() {
           {/* Mini Cards de Estatísticas */}
           <div className="grid grid-cols-3 gap-3 pt-2">
             <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-              <span className="text-xs text-white uppercase tracking-wide block mb-2">Sequência</span>
-              <p className="text-xl font-semibold text-white">{sequencia || 0}</p>
-              <p className="text-xs text-zinc-300">dias seguidos</p>
+              <span style={{ color: '#FFFFFF' }} className="text-xs uppercase tracking-wide block mb-2">Sequência</span>
+              <p style={{ color: '#FFFFFF' }} className="text-xl font-semibold">{sequencia || 0}</p>
+              <p style={{ color: '#D4D4D8' }} className="text-xs">dias seguidos</p>
             </div>
 
             <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-              <span className="text-xs text-white uppercase tracking-wide block mb-2">Vídeos</span>
-              <p className="text-xl font-semibold text-white">{evolucao?.totalVideos || 0}</p>
-              <p className="text-xs text-zinc-300">completos</p>
+              <span style={{ color: '#FFFFFF' }} className="text-xs uppercase tracking-wide block mb-2">Vídeos</span>
+              <p style={{ color: '#FFFFFF' }} className="text-xl font-semibold">{evolucao?.totalVideos || 0}</p>
+              <p style={{ color: '#D4D4D8' }} className="text-xs">completos</p>
             </div>
 
             <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-              <span className="text-xs text-white uppercase tracking-wide block mb-2">Certificados</span>
-              <p className="text-xl font-semibold text-white">{totalCertificados}</p>
-              <p className="text-xs text-zinc-300">conquistados</p>
+              <span style={{ color: '#FFFFFF' }} className="text-xs uppercase tracking-wide block mb-2">Certificados</span>
+              <p style={{ color: '#FFFFFF' }} className="text-xl font-semibold">{totalCertificados}</p>
+              <p style={{ color: '#D4D4D8' }} className="text-xs">conquistados</p>
             </div>
           </div>
         </div>
