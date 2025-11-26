@@ -97,9 +97,9 @@ export function TopHeader() {
             </DropdownMenuTrigger>
                 <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
                   <DropdownMenuItem asChild>
-                    <Link to="/trilhas" className="cursor-pointer">
-                      Trilhas
-                    </Link>
+              <Link to="/trilhas" className="cursor-pointer">
+                Academy
+              </Link>
                   </DropdownMenuItem>
                   
                   {(hasAccessTo("lab") || isAdmin) && (
