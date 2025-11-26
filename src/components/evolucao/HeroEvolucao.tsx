@@ -46,31 +46,31 @@ export function HeroEvolucao() {
 
           {/* Mini Cards de Estatísticas */}
           <div className="grid grid-cols-3 gap-3 pt-2">
-            <div className="rounded-lg border border-border bg-background/50 p-3">
+            <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
               <div className="flex items-center gap-2 mb-1">
-                <Flame className="h-4 w-4 text-primary/60" />
-                <span className="text-xs text-muted-foreground">Sequência</span>
+                <Flame className="h-4 w-4 text-primary" />
+                <span className="text-xs text-zinc-400">Sequência</span>
               </div>
-              <p className="text-xl font-semibold text-foreground">{sequencia || 0}</p>
-              <p className="text-xs text-muted-foreground">dias seguidos</p>
+              <p className="text-xl font-semibold text-white">{sequencia || 0}</p>
+              <p className="text-xs text-zinc-500">dias seguidos</p>
             </div>
 
-            <div className="rounded-lg border border-border bg-background/50 p-3">
+            <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
               <div className="flex items-center gap-2 mb-1">
-                <Video className="h-4 w-4 text-primary/60" />
-                <span className="text-xs text-muted-foreground">Vídeos</span>
+                <Video className="h-4 w-4 text-primary" />
+                <span className="text-xs text-zinc-400">Vídeos</span>
               </div>
-              <p className="text-xl font-semibold text-foreground">{evolucao?.totalVideos || 0}</p>
-              <p className="text-xs text-muted-foreground">completos</p>
+              <p className="text-xl font-semibold text-white">{evolucao?.totalVideos || 0}</p>
+              <p className="text-xs text-zinc-500">completos</p>
             </div>
 
-            <div className="rounded-lg border border-border bg-background/50 p-3">
+            <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
               <div className="flex items-center gap-2 mb-1">
-                <Award className="h-4 w-4 text-primary/60" />
-                <span className="text-xs text-muted-foreground">Certificados</span>
+                <Award className="h-4 w-4 text-primary" />
+                <span className="text-xs text-zinc-400">Certificados</span>
               </div>
-              <p className="text-xl font-semibold text-foreground">{totalCertificados}</p>
-              <p className="text-xs text-muted-foreground">conquistados</p>
+              <p className="text-xl font-semibold text-white">{totalCertificados}</p>
+              <p className="text-xs text-zinc-500">conquistados</p>
             </div>
           </div>
         </div>
