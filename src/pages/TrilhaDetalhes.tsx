@@ -366,8 +366,8 @@ export default function TrilhaDetalhes() {
               <h2 className="font-semibold text-foreground">Trilha de conhecimento</h2>
 
               {/* Video List */}
-              <ScrollArea className="flex-1 min-h-[400px] max-h-[calc(100vh-200px)] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
-                <div className="p-4 space-y-2">
+            <ScrollArea className="flex-1 min-h-[400px] max-h-[calc(100vh-180px)] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
+              <div className="p-4 pb-6 space-y-2">
                   <Accordion 
                     type="multiple" 
                     defaultValue={
