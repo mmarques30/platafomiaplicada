@@ -29,28 +29,28 @@ export function HeroAcompanhamento() {
         <div className="grid grid-cols-3 gap-3">
           <div className={`rounded-lg border p-3 ${
             diagnosticoCompleto 
-              ? "border-primary/30 bg-zinc-800/50" 
-              : "border-orange-500/30 bg-orange-500/5"
+              ? "border-primary/30 bg-zinc-700" 
+              : "border-orange-500/30 bg-orange-500/10"
           }`}>
-            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Diagnóstico</span>
+            <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Diagnóstico</span>
             <p className={`text-xl font-semibold ${
-              diagnosticoCompleto ? "text-primary" : "text-orange-500"
+              diagnosticoCompleto ? "text-primary" : "text-orange-400"
             }`}>
               {diagnosticoCompleto ? "Completo" : "Pendente"}
             </p>
-            <p className="text-xs text-zinc-500">diagnóstico IA</p>
+            <p className="text-xs text-zinc-400">diagnóstico IA</p>
           </div>
 
-          <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Projetos Ativos</span>
+          <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
+            <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Projetos Ativos</span>
             <p className="text-xl font-semibold text-white">{projetosAtivos}</p>
-            <p className="text-xs text-zinc-500">em andamento</p>
+            <p className="text-xs text-zinc-400">em andamento</p>
           </div>
 
-          <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Concluídos</span>
+          <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
+            <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Concluídos</span>
             <p className="text-xl font-semibold text-white">{projetosConcluidos}</p>
-            <p className="text-xs text-zinc-500">finalizados</p>
+            <p className="text-xs text-zinc-400">finalizados</p>
           </div>
         </div>
       </div>

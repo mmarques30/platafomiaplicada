@@ -63,7 +63,7 @@ export function FerramentasCompartilhadasList() {
           {ferramentas.slice(0, 5).map((ferramenta: any) => (
             <div
               key={ferramenta.id}
-              className="p-4 rounded-lg border border-aplicada-green-900/20 bg-zinc-800/30 hover:bg-zinc-800/50 hover:border-primary/20 transition-all"
+              className="p-4 rounded-lg border border-zinc-600 bg-zinc-700 hover:bg-zinc-600 hover:border-primary/20 transition-all"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 flex-1">

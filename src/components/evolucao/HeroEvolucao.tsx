@@ -46,22 +46,22 @@ export function HeroEvolucao() {
 
           {/* Mini Cards de Estatísticas */}
           <div className="grid grid-cols-3 gap-3 pt-2">
-            <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-              <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Sequência</span>
+            <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
+              <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Sequência</span>
               <p className="text-xl font-semibold text-white">{sequencia || 0}</p>
-              <p className="text-xs text-zinc-500">dias seguidos</p>
+              <p className="text-xs text-zinc-400">dias seguidos</p>
             </div>
 
-            <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-              <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Vídeos</span>
+            <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
+              <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Vídeos</span>
               <p className="text-xl font-semibold text-white">{evolucao?.totalVideos || 0}</p>
-              <p className="text-xs text-zinc-500">completos</p>
+              <p className="text-xs text-zinc-400">completos</p>
             </div>
 
-            <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-              <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Certificados</span>
+            <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
+              <span className="text-xs text-zinc-300 uppercase tracking-wide block mb-2">Certificados</span>
               <p className="text-xl font-semibold text-white">{totalCertificados}</p>
-              <p className="text-xs text-zinc-500">conquistados</p>
+              <p className="text-xs text-zinc-400">conquistados</p>
             </div>
           </div>
         </div>
