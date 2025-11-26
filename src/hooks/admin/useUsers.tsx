@@ -10,7 +10,7 @@ export function useUsers() {
     queryFn: async () => {
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("*, plano_mentoria")
+        .select("*, plano_mentoria, email_acesso_enviado, adicionado_grupo_whatsapp")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
@@ -297,6 +297,35 @@ export function useImportUsersBatch() {
     },
     onError: (error) => {
       toast.error("Erro ao importar usuários: " + error.message);
+    },
+  });
+}
+
+export function useUpdateOnboardingStatus() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ 
+      userId, 
+      field, 
+      value 
+    }: { 
+      userId: string; 
+      field: 'email_acesso_enviado' | 'adicionado_grupo_whatsapp'; 
+      value: boolean 
+    }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ [field]: value })
+        .eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("Status atualizado!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar status: " + error.message);
     },
   });
 }
