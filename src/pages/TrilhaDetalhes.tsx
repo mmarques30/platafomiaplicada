@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Search, Play, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Search, Play, CheckCircle2, Clock } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -270,7 +270,7 @@ export default function TrilhaDetalhes() {
                 <Card className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 flex-1 flex flex-col">
                   <CardContent className="p-6 flex-1 flex flex-col">
                     {/* Avaliação e Botão Concluir */}
-                    <div className="flex items-center justify-between flex-wrap gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-700">
+                    <div className="space-y-4 pb-6 border-b border-zinc-200 dark:border-zinc-700">
                       <div className="space-y-2">
                         <div className="text-sm font-medium">Avalie esta aula</div>
                         <div className="flex items-center gap-3">
@@ -283,18 +283,23 @@ export default function TrilhaDetalhes() {
                           </span>
                         </div>
                       </div>
+                      
                       <Button
                         size="lg"
                         variant="default"
                         onClick={() => toggleConcluidoMutation.mutate()}
                         disabled={toggleConcluidoMutation.isPending}
                         className={cn(
-                          "transition-colors",
-                          getVideoProgress(currentVideoId || '')?.completado && 
-                            "!bg-green-700 hover:!bg-green-800 !text-white"
+                          "w-full transition-colors",
+                          getVideoProgress(currentVideoId || '')?.completado 
+                            ? "!bg-green-700 hover:!bg-green-800 !text-white" 
+                            : "!bg-[#C4D47C] hover:!bg-[#b5c56d] !text-zinc-800"
                         )}
                       >
-                        <CheckCircle2 className="h-5 w-5 mr-2" />
+                        {getVideoProgress(currentVideoId || '')?.completado 
+                          ? <CheckCircle2 className="h-5 w-5 mr-2" />
+                          : <Clock className="h-5 w-5 mr-2" />
+                        }
                         {getVideoProgress(currentVideoId || '')?.completado ? "Concluída" : "Marcar como Concluída"}
                       </Button>
                     </div>
