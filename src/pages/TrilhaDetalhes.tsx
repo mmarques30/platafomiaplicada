@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Search, BookOpen, Play, CheckCircle2, Circle, Clock } from "lucide-react";
+import { ArrowLeft, Search, Play, CheckCircle2 } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -251,10 +251,7 @@ export default function TrilhaDetalhes() {
               <div>
                 <h1 className="text-2xl font-bold mb-2">{currentVideo.titulo}</h1>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{formatDuration(currentVideo.duracao)}</span>
-                  </div>
+                  <span>{formatDuration(currentVideo.duracao)}</span>
                   {formatDataAula(currentVideo.data_aula) && (
                     <span>• Data da aula: {formatDataAula(currentVideo.data_aula)}</span>
                   )}
@@ -262,7 +259,7 @@ export default function TrilhaDetalhes() {
               </div>
 
                 {/* Avaliação e Botão Concluir */}
-                <Card>
+                <Card className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between flex-wrap gap-4">
                       <div className="space-y-2">
@@ -282,8 +279,9 @@ export default function TrilhaDetalhes() {
                         onClick={() => toggleConcluidoMutation.mutate()}
                         disabled={toggleConcluidoMutation.isPending}
                         className={cn(
+                          "transition-colors",
                           getVideoProgress(currentVideoId || '')?.completado 
-                            ? "bg-green-600 hover:bg-green-700" 
+                            ? "bg-green-700 hover:bg-green-800" 
                             : "bg-primary hover:bg-primary/90"
                         )}
                       >
@@ -350,13 +348,10 @@ export default function TrilhaDetalhes() {
               </div>
 
               {/* Header */}
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                <h2 className="font-semibold">Trilha de conhecimento</h2>
-              </div>
+              <h2 className="font-semibold text-foreground">Trilha de conhecimento</h2>
 
               {/* Video List */}
-              <ScrollArea className="h-[600px] rounded-lg border bg-card">
+              <ScrollArea className="h-[600px] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
                 <div className="p-4 space-y-2">
                   <Accordion 
                     type="multiple" 
@@ -398,13 +393,15 @@ export default function TrilhaDetalhes() {
                                   const isCompleted = progress?.completado;
 
                                   return (
-                                    <div
+                                     <div
                                       key={video.id}
                                       ref={(el) => { videoRefs.current[video.id] = el; }}
                                       onClick={() => handleVideoSelect(video.id)}
                                       className={cn(
-                                        "flex gap-3 p-2 rounded-lg cursor-pointer transition-colors",
-                                        isPlaying ? "bg-primary/10 border-2 border-primary" : "hover:bg-muted",
+                                        "flex gap-3 p-3 rounded-lg cursor-pointer transition-colors border",
+                                        isPlaying 
+                                          ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700" 
+                                          : "hover:bg-zinc-100 dark:hover:bg-zinc-800 border-transparent"
                                       )}
                                     >
                                       <div className="relative w-24 h-14 flex-shrink-0 rounded overflow-hidden">
@@ -421,16 +418,14 @@ export default function TrilhaDetalhes() {
                                       </div>
                                       
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium line-clamp-2 mb-1">
-                          {video.titulo}
-                        </h4>
+                        <div className="flex items-center gap-2 mb-1">
+                          {isCompleted && <CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0" />}
+                          <h4 className="text-sm font-medium line-clamp-2">
+                            {video.titulo}
+                          </h4>
+                        </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span>{formatDuration(video.duracao)}</span>
-                          {isCompleted ? (
-                            <CheckCircle2 className="h-3 w-3 text-green-500" />
-                          ) : (
-                            <Circle className="h-3 w-3" />
-                          )}
                           <FavoriteButton 
                             tipo="video" 
                             itemId={video.id}
@@ -444,7 +439,7 @@ export default function TrilhaDetalhes() {
                           </div>
                         )}
                         {isPlaying && (
-                          <Badge variant="default" className="mt-1 text-xs">
+                          <Badge variant="secondary" className="mt-1 text-xs bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300">
                             Tocando agora
                           </Badge>
                         )}
