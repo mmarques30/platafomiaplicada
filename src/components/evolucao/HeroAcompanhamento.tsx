@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { Brain, FolderKanban, CheckCircle2, AlertCircle } from "lucide-react";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 
@@ -28,40 +27,28 @@ export function HeroAcompanhamento() {
 
         {/* Mini Cards de Estatísticas */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Brain className="h-4 w-4 text-primary" />
-              <span className="text-xs text-zinc-400">Diagnóstico</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {diagnosticoCompleto ? (
-                <>
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <p className="text-base font-semibold text-white">Completo</p>
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="h-5 w-5 text-orange-500" />
-                  <p className="text-base font-semibold text-white">Pendente</p>
-                </>
-              )}
-            </div>
+          <div className={`rounded-lg border p-3 ${
+            diagnosticoCompleto 
+              ? "border-primary/30 bg-zinc-800/50" 
+              : "border-orange-500/30 bg-orange-500/5"
+          }`}>
+            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Diagnóstico</span>
+            <p className={`text-xl font-semibold ${
+              diagnosticoCompleto ? "text-primary" : "text-orange-500"
+            }`}>
+              {diagnosticoCompleto ? "Completo" : "Pendente"}
+            </p>
+            <p className="text-xs text-zinc-500">diagnóstico IA</p>
           </div>
 
           <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <FolderKanban className="h-4 w-4 text-primary" />
-              <span className="text-xs text-zinc-400">Projetos Ativos</span>
-            </div>
+            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Projetos Ativos</span>
             <p className="text-xl font-semibold text-white">{projetosAtivos}</p>
             <p className="text-xs text-zinc-500">em andamento</p>
           </div>
 
           <div className="rounded-lg border border-aplicada-green-900/30 bg-zinc-800/50 p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <CheckCircle2 className="h-4 w-4 text-primary" />
-              <span className="text-xs text-zinc-400">Concluídos</span>
-            </div>
+            <span className="text-xs text-zinc-400 uppercase tracking-wide block mb-2">Concluídos</span>
             <p className="text-xl font-semibold text-white">{projetosConcluidos}</p>
             <p className="text-xs text-zinc-500">finalizados</p>
           </div>

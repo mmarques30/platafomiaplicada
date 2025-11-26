@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Trophy, Medal } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 interface RankingItem {
@@ -26,11 +25,11 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
   const outros = ranking?.slice(3) || [];
   const minhaposicao = ranking?.find(r => r.user_id === user?.id);
 
-  const getMedalIcon = (posicao: number) => {
-    if (posicao === 1) return <Trophy className="h-8 w-8 text-yellow-500" />;
-    if (posicao === 2) return <Medal className="h-7 w-7 text-gray-400" />;
-    if (posicao === 3) return <Medal className="h-6 w-6 text-orange-600" />;
-    return null;
+  const getBorderColor = (posicao: number) => {
+    if (posicao === 1) return "border-yellow-500";
+    if (posicao === 2) return "border-zinc-400";
+    if (posicao === 3) return "border-orange-600";
+    return "border-aplicada-green-900/30";
   };
 
   const getInitials = (name: string) => {
@@ -47,51 +46,36 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
       <CardContent className="space-y-6">
         {/* Top 3 - Pódio */}
         {top3.length > 0 && (
-          <div className="flex items-end justify-center gap-4 pb-6 border-b border-aplicada-green-900/20">
-            {/* 2º Lugar */}
-            {top3[1] && (
-              <div className="flex flex-col items-center flex-1">
-                <div className="mb-2">{getMedalIcon(2)}</div>
-                <Avatar className="h-16 w-16 border-2 border-zinc-400">
-                  <AvatarImage src={top3[1].avatar_url} />
-                  <AvatarFallback className="bg-zinc-800">{getInitials(top3[1].nome_completo)}</AvatarFallback>
-                </Avatar>
-                <p className="font-semibold text-sm mt-2 text-center line-clamp-1 text-white">
-                  {top3[1].nome_completo}
-                </p>
-                <p className="text-xs text-zinc-500">{top3[1].total_pontos} pts</p>
-              </div>
-            )}
-            
-            {/* 1º Lugar */}
-            {top3[0] && (
-              <div className="flex flex-col items-center flex-1">
-                <div className="mb-2">{getMedalIcon(1)}</div>
-                <Avatar className="h-20 w-20 border-4 border-yellow-500">
-                  <AvatarImage src={top3[0].avatar_url} />
-                  <AvatarFallback className="bg-zinc-800">{getInitials(top3[0].nome_completo)}</AvatarFallback>
-                </Avatar>
-                <p className="font-bold text-base mt-2 text-center line-clamp-1 text-white">
-                  {top3[0].nome_completo}
-                </p>
-                <p className="text-sm font-semibold text-primary">{top3[0].total_pontos} pts</p>
-              </div>
-            )}
-            
-            {/* 3º Lugar */}
-            {top3[2] && (
-              <div className="flex flex-col items-center flex-1">
-                <div className="mb-2">{getMedalIcon(3)}</div>
-                <Avatar className="h-14 w-14 border-2 border-orange-600">
-                  <AvatarImage src={top3[2].avatar_url} />
-                  <AvatarFallback className="bg-zinc-800">{getInitials(top3[2].nome_completo)}</AvatarFallback>
-                </Avatar>
-                <p className="font-semibold text-xs mt-2 text-center line-clamp-1 text-white">
-                  {top3[2].nome_completo}
-                </p>
-                <p className="text-xs text-zinc-500">{top3[2].total_pontos} pts</p>
-              </div>
-            )}
+          <div className="grid grid-cols-3 gap-4 pb-6 border-b border-aplicada-green-900/20">
+            {top3.map((item, index) => {
+              const posicao = index + 1;
+              return (
+                <div
+                  key={item.user_id}
+                  className={`relative p-4 rounded-lg border ${getBorderColor(posicao)} bg-zinc-800/50`}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="relative">
+                      <Avatar className="h-16 w-16 border-2 border-background">
+                        <AvatarImage src={item.avatar_url || undefined} />
+                        <AvatarFallback>{getInitials(item.nome_completo)}</AvatarFallback>
+                      </Avatar>
+                      {posicao === 1 && (
+                        <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
+                          <Trophy className="h-5 w-5 text-yellow-500" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-center">
+                      <p className="font-semibold text-white">{item.nome_completo}</p>
+                      <p className="text-sm text-primary font-medium">
+                        {item.total_pontos?.toLocaleString() || 0} pontos
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 

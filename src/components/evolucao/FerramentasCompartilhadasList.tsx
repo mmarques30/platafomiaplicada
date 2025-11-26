@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Copy, Eye, Heart, Share2 } from "lucide-react";
+import { Copy } from "lucide-react";
 import { useFerramentasCompartilhadas } from "@/hooks/useFerramentasCompartilhadas";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -42,7 +42,6 @@ export function FerramentasCompartilhadasList() {
           <CardTitle className="text-2xl">Ferramentas Compartilhadas</CardTitle>
         </CardHeader>
         <CardContent className="text-center py-12 text-zinc-500">
-          <Share2 className="h-12 w-12 mx-auto mb-3 opacity-30" />
           <p className="text-sm">
             Nenhuma ferramenta compartilhada ainda. Seja o primeiro!
           </p>
@@ -79,15 +78,10 @@ export function FerramentasCompartilhadasList() {
                     <p className="text-sm text-zinc-400 line-clamp-2 mb-2">
                       {ferramenta.descricao}
                     </p>
-                    <div className="flex items-center gap-4 text-xs text-zinc-500">
-                      <span className="flex items-center gap-1">
-                        <Eye className="h-3 w-3 text-primary/60" />
-                        {ferramenta.visualizacoes || 0}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Heart className="h-3 w-3 text-primary/60" />
-                        {ferramenta.curtidas || 0}
-                      </span>
+                    <div className="flex items-center gap-3 text-xs text-zinc-400">
+                      <span>{ferramenta.visualizacoes || 0} visualizações</span>
+                      <span>•</span>
+                      <span>{ferramenta.curtidas || 0} curtidas</span>
                     </div>
                   </div>
                 </div>
