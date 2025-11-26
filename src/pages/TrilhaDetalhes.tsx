@@ -258,10 +258,11 @@ export default function TrilhaDetalhes() {
                 </div>
               </div>
 
-                {/* Avaliação e Botão Concluir */}
+                {/* Card Unificado: Avaliação + Informações */}
                 <Card className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
+                  <CardContent className="p-6">
+                    {/* Avaliação e Botão Concluir */}
+                    <div className="flex items-center justify-between flex-wrap gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-700">
                       <div className="space-y-2">
                         <div className="text-sm font-medium">Avalie esta aula</div>
                         <div className="flex items-center gap-3">
@@ -289,16 +290,22 @@ export default function TrilhaDetalhes() {
                         {getVideoProgress(currentVideoId || '')?.completado ? "Concluída" : "Marcar como Concluída"}
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
 
-                {/* Tabs: Descrição e Comentários */}
-                <Card>
-                  <CardContent className="p-6">
-                    <Tabs defaultValue="descricao" className="w-full">
-                      <TabsList className="mb-4 w-full grid grid-cols-2">
-                        <TabsTrigger value="descricao">Informações da aula</TabsTrigger>
-                        <TabsTrigger value="comentarios">Comentários</TabsTrigger>
+                    {/* Tabs: Descrição e Comentários */}
+                    <Tabs defaultValue="descricao" className="w-full mt-6">
+                      <TabsList className="w-full justify-start bg-transparent border-b border-zinc-200 dark:border-zinc-700 rounded-none p-0 h-auto">
+                        <TabsTrigger 
+                          value="descricao"
+                          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                        >
+                          Informações da aula
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="comentarios"
+                          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                        >
+                          Comentários
+                        </TabsTrigger>
                       </TabsList>
 
                       <TabsContent value="descricao" className="space-y-6 mt-4">
