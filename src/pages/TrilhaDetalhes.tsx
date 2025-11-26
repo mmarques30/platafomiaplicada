@@ -243,9 +243,9 @@ export default function TrilhaDetalhes() {
           {/* Left: Video Player e Informações */}
           <div className="flex-1 lg:w-[65%] flex flex-col">
             {currentVideo ? (
-              <div className="flex-1 flex flex-col gap-6">
+              <div className="flex flex-col gap-6">
                 {/* Player */}
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                <div className="aspect-video w-full rounded-lg overflow-hidden bg-black flex-shrink-0">
                   <iframe
                     src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
                     title={currentVideo.titulo}
