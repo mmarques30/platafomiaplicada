@@ -14,6 +14,7 @@ import { ProgressoCertificados } from "@/components/evolucao/ProgressoCertificad
 import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { AbaAcompanhamento } from "@/components/evolucao/AbaAcompanhamento";
 
 export default function Evolucao() {
@@ -22,8 +23,9 @@ export default function Evolucao() {
   const { data: certificados, isLoading: loadingCertificados } = useMeusCertificados();
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
   const { plan } = useUserPlan();
+  const { isAdmin } = useUserRole();
   
-  const showAcompanhamento = plan === 'academy';
+  const showAcompanhamento = plan === 'academy' || isAdmin;
 
   return (
     <div className="container mx-auto p-6 space-y-8">
