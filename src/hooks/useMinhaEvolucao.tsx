@@ -8,7 +8,17 @@ export const useMinhaEvolucao = () => {
   return useQuery({
     queryKey: ["minha-evolucao", user?.id],
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!user?.id) {
+        return {
+          totalVideos: 0,
+          totalProjetos: 0,
+          totalFerramentas: 0,
+          totalComentarios: 0,
+          ferramentas: [],
+          totalVisualizacoes: 0,
+          totalCurtidas: 0,
+        };
+      }
       
       const [videos, projetos, ferramentas, comentarios] = await Promise.all([
         supabase
