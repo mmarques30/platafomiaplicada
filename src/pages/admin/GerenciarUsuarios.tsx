@@ -22,7 +22,7 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Building2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
@@ -207,33 +207,49 @@ export default function GerenciarUsuários() {
                   </div>
                 </TableCell>
                 <TableCell>
-                {(user as any).plano_mentoria ? (
-                  <Badge 
-                    variant="outline"
-                    className={
-                      (user as any).plano_mentoria === "academy"
-                        ? "border-purple-500 text-purple-700"
-                        : (user as any).plano_mentoria === "lab"
-                        ? "border-blue-500 text-blue-700"
-                        : (user as any).plano_mentoria === "skills"
-                        ? "border-orange-500 text-orange-700"
-                        : (user as any).plano_mentoria === "club" 
-                        ? "border-green-500 text-green-700"
-                        : (user as any).plano_mentoria === "boost"
-                        ? "border-cyan-500 text-cyan-700"
-                        : "border-gray-500 text-gray-700"
-                    }
-                  >
-                    {(user as any).plano_mentoria === "academy" && "Academy"}
-                    {(user as any).plano_mentoria === "lab" && "Lab"}
-                    {(user as any).plano_mentoria === "skills" && "Skills"}
-                    {(user as any).plano_mentoria === "club" && "Club"}
-                    {(user as any).plano_mentoria === "boost" && "Boost"}
-                    {(user as any).plano_mentoria === "legacy" && "Legacy"}
-                  </Badge>
-                ) : (
-                  <span className="text-muted-foreground text-sm">-</span>
-                )}
+                  <div className="flex items-center gap-2">
+                    {(user as any).plano_mentoria ? (
+                      <Badge 
+                        variant="outline"
+                        className={
+                          (user as any).plano_mentoria === "academy"
+                            ? "border-purple-500 text-purple-700"
+                            : (user as any).plano_mentoria === "lab"
+                            ? "border-blue-500 text-blue-700"
+                            : (user as any).plano_mentoria === "skills"
+                            ? "border-orange-500 text-orange-700"
+                            : (user as any).plano_mentoria === "club" 
+                            ? "border-green-500 text-green-700"
+                            : (user as any).plano_mentoria === "boost"
+                            ? "border-cyan-500 text-cyan-700"
+                            : "border-gray-500 text-gray-700"
+                        }
+                      >
+                        {(user as any).plano_mentoria === "academy" && "Academy"}
+                        {(user as any).plano_mentoria === "lab" && "Lab"}
+                        {(user as any).plano_mentoria === "skills" && "Skills"}
+                        {(user as any).plano_mentoria === "club" && "Club"}
+                        {(user as any).plano_mentoria === "boost" && "Boost"}
+                        {(user as any).plano_mentoria === "legacy" && "Legacy"}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">-</span>
+                    )}
+                    {(user as any).origem_consultoria && (
+                      <Badge 
+                        variant="outline"
+                        className="border-amber-500 text-amber-700 gap-1"
+                        title={
+                          (user as any).empresa_consultoria 
+                            ? `Consultoria: ${(user as any).empresa_consultoria}` 
+                            : "Acesso via Consultoria"
+                        }
+                      >
+                        <Building2 className="h-3 w-3" />
+                        Consult
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(user)}

@@ -36,6 +36,8 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
   const [selectedPlano, setSelectedPlano] = useState<string>("");
+  const [origemConsultoria, setOrigemConsultoria] = useState(false);
+  const [empresaConsultoria, setEmpresaConsultoria] = useState("");
   
   const createUser = useCreateUser();
 
@@ -62,6 +64,8 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
       nomeCompleto,
       roles: selectedRoles,
       planoMentoria: selectedPlano || null,
+      origemConsultoria,
+      empresaConsultoria: empresaConsultoria || null,
     });
 
     // Resetar form
@@ -70,6 +74,8 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     setNomeCompleto("");
     setSelectedRoles([]);
     setSelectedPlano("");
+    setOrigemConsultoria(false);
+    setEmpresaConsultoria("");
     onOpenChange(false);
   };
 
@@ -193,6 +199,34 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
             <p className="text-sm text-muted-foreground mt-2">
               Selecione o produto/plano que este usuário terá acesso
             </p>
+          </div>
+
+          <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+            <div className="flex items-center justify-between space-x-2">
+              <div>
+                <Label htmlFor="origem-consultoria">Veio de Consultoria</Label>
+                <p className="text-sm text-muted-foreground">
+                  Marcar se o acesso veio de um projeto Consult
+                </p>
+              </div>
+              <Checkbox
+                id="origem-consultoria"
+                checked={origemConsultoria}
+                onCheckedChange={(checked) => setOrigemConsultoria(checked as boolean)}
+              />
+            </div>
+
+            {origemConsultoria && (
+              <div>
+                <Label htmlFor="empresa-consultoria">Empresa/Projeto (opcional)</Label>
+                <Input
+                  id="empresa-consultoria"
+                  value={empresaConsultoria}
+                  onChange={(e) => setEmpresaConsultoria(e.target.value)}
+                  placeholder="Ex: Empresa XYZ - Projeto Transformação Digital"
+                />
+              </div>
+            )}
           </div>
 
           <DialogFooter>

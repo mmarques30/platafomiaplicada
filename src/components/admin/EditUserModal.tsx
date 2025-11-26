@@ -37,6 +37,8 @@ interface EditUserModalProps {
     plano_mentoria?: string;
     data_expiracao_acesso?: string;
     conta_ativa?: boolean;
+    origem_consultoria?: boolean;
+    empresa_consultoria?: string;
     roles: string[];
   } | null;
 }
@@ -57,6 +59,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const [selectedPlano, setSelectedPlano] = useState<"academy" | "lab" | "skills" | "club" | null>(null);
   const [dataExpiracao, setDataExpiracao] = useState<Date | undefined>();
   const [contaAtiva, setContaAtiva] = useState(true);
+  const [origemConsultoria, setOrigemConsultoria] = useState(false);
+  const [empresaConsultoria, setEmpresaConsultoria] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
   const [forcarTroca, setForcarTroca] = useState(false);
 
@@ -72,6 +76,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setSelectedPlano((user.plano_mentoria as "academy" | "lab" | "skills" | "club") || null);
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
+      setOrigemConsultoria(user.origem_consultoria ?? false);
+      setEmpresaConsultoria(user.empresa_consultoria || "");
     }
   }, [user, setValue]);
 
@@ -97,6 +103,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         plano_mentoria: selectedPlano || null,
         data_expiracao_acesso: dataExpiracao?.toISOString() || null,
         conta_ativa: contaAtiva,
+        origem_consultoria: origemConsultoria,
+        empresa_consultoria: empresaConsultoria || null,
         roles: selectedRoles,
       },
     });
@@ -282,6 +290,34 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                     </Button>
                   </PopoverContent>
                 </Popover>
+              </div>
+
+              <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+                <div className="flex items-center justify-between space-x-2">
+                  <div>
+                    <Label htmlFor="origem-consultoria">Veio de Consultoria</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Marcar se o acesso veio de um projeto Consult
+                    </p>
+                  </div>
+                  <Switch
+                    id="origem-consultoria"
+                    checked={origemConsultoria}
+                    onCheckedChange={setOrigemConsultoria}
+                  />
+                </div>
+
+                {origemConsultoria && (
+                  <div>
+                    <Label htmlFor="empresa-consultoria">Empresa/Projeto (opcional)</Label>
+                    <Input
+                      id="empresa-consultoria"
+                      value={empresaConsultoria}
+                      onChange={(e) => setEmpresaConsultoria(e.target.value)}
+                      placeholder="Ex: Empresa XYZ - Projeto Transformação Digital"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-between space-x-2">
