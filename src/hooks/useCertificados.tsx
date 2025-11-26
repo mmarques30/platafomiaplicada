@@ -1,19 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "./useAuth";
 
 export function useMeusCertificados() {
+  const { user } = useAuth();
+  
   return useQuery({
-    queryKey: ["meus-certificados"],
+    queryKey: ["meus-certificados", user?.id],
     queryFn: async () => {
+      if (!user?.id) return [];
+      
       const { data, error } = await supabase
         .from("certificados")
         .select("*, trilhas(titulo)")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
       
       if (error) throw error;
       return data;
     },
+    enabled: !!user?.id,
   });
 }
 
