@@ -6,11 +6,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useMemo } from "react";
 
-export function UltimosConteudos() {
+interface UltimosConteudosProps {
+  apenasRecentes?: boolean; // Se true, filtra apenas últimos 15 dias
+}
+
+export function UltimosConteudos({ apenasRecentes = false }: UltimosConteudosProps) {
   const { data: videos, isLoading } = useQuery({
-    queryKey: ["ultimos-videos-por-trilha"],
+    queryKey: ["ultimos-videos-por-trilha", apenasRecentes],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("videos")
         .select(`
           *,
@@ -18,7 +22,16 @@ export function UltimosConteudos() {
         `)
         .eq("ativo", true)
         .eq("visivel_mentorados", true)
-        .eq("trilhas.visivel_mentorados", true)
+        .eq("trilhas.visivel_mentorados", true);
+
+      // Se apenasRecentes, filtrar pelos últimos 15 dias
+      if (apenasRecentes) {
+        const quinzeDiasAtras = new Date();
+        quinzeDiasAtras.setDate(quinzeDiasAtras.getDate() - 15);
+        query = query.gte("created_at", quinzeDiasAtras.toISOString());
+      }
+
+      const { data, error } = await query
         .order("created_at", { ascending: false })
         .limit(20);
 

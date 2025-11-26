@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles, ArrowRight, AlertCircle, X } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
+import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
@@ -100,6 +101,12 @@ export default function Dashboard() {
         {/* Novidades da Semana */}
         <section>
           <NovidadesSemana />
+        </section>
+
+        {/* Últimos Conteúdos Adicionados */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-foreground">Últimos Conteúdos Adicionados</h2>
+          <UltimosConteudos />
         </section>
 
         {/* Chat da Mari - Tech Executive */}
