@@ -97,36 +97,36 @@ export function AppSidebar() {
                     </SidebarMenuItem>
                     
                     {/* Renderizar subitens com indentação */}
-                    {subMenus.length > 0 && subMenus.map((subMenu) => {
-                      const subIsActive = location.pathname === subMenu.url;
-                      const SubIconComponent = getIconComponent(subMenu.icon);
-                      
-                      return (
-                        <SidebarMenuItem key={subMenu.menu_key}>
-                          <SidebarMenuButton asChild className="group">
-                            <NavLink 
-                              to={subMenu.url || "/"} 
-                              end 
-                              className={cn(
-                                "relative rounded-lg transition-all duration-200 font-medium pl-8",
-                                subIsActive 
-                                  ? "text-primary font-semibold" 
-                                  : "text-foreground hover:text-primary"
-                              )}
-                            >
-                              <span className={cn(
-                                "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                                subIsActive 
-                                  ? "bg-aplicada-green-700 opacity-100" 
-                                  : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
-                              )} />
-                              <SubIconComponent className="h-4 w-4 shrink-0" />
-                              {!collapsed && <span>{subMenu.label}</span>}
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      );
-                    })}
+                {subMenus.length > 0 && subMenus.map((subMenu) => {
+                  const subIsActive = location.pathname === subMenu.url;
+                  const SubIconComponent = subMenu.icon ? getIconComponent(subMenu.icon) : null;
+                  
+                  return (
+                    <SidebarMenuItem key={subMenu.menu_key}>
+                      <SidebarMenuButton asChild className="group">
+                        <NavLink 
+                          to={subMenu.url || "/"} 
+                          end 
+                          className={cn(
+                            "relative rounded-lg transition-all duration-200 font-medium pl-8",
+                            subIsActive 
+                              ? "text-primary font-semibold" 
+                              : "text-foreground hover:text-primary"
+                          )}
+                        >
+                          <span className={cn(
+                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                            subIsActive 
+                              ? "bg-aplicada-green-700 opacity-100" 
+                              : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                          )} />
+                          {SubIconComponent && <SubIconComponent className="h-4 w-4 shrink-0" />}
+                          {!collapsed && <span>{subMenu.label}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
                   </div>
                 );
               })}
