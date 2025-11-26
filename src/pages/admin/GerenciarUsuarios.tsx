@@ -106,15 +106,14 @@ export default function GerenciarUsuários() {
   };
 
   const handleImportClub2025 = () => {
-    const clubUsers = [
-      { email: "requenabruna@gmail.com", nomeCompleto: "Bruna Requena Mahtuk", password: "aplica2025" },
-      { email: "luk_0602@hotmail.com", nomeCompleto: "Lucas Gonçalves Lima De Melo", password: "aplica2025" }
+    const academyUsers = [
+      { email: "rosilannysoares@hotmail.com", nomeCompleto: "Rosilanny Carvalho Araujo", password: "aplica2025" }
     ];
 
     importUsersBatch.mutate({
-      users: clubUsers,
-      planoMentoria: "club",
-      roles: ["mentorado"]
+      users: academyUsers,
+      planoMentoria: "academy",
+      roles: ["aluno_trilha"]
     });
   };
 
