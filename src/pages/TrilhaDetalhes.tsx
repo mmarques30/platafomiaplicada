@@ -243,7 +243,7 @@ export default function TrilhaDetalhes() {
           {/* Left: Video Player e Informações */}
           <div className="flex-1 lg:w-[65%] flex flex-col">
             {currentVideo ? (
-              <div className="space-y-6 flex-1 flex flex-col">
+              <div className="flex-1 flex flex-col gap-6">
                 {/* Player */}
                 <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
                   <iframe
@@ -285,13 +285,13 @@ export default function TrilhaDetalhes() {
                       </div>
                       <Button
                         size="lg"
+                        variant="default"
                         onClick={() => toggleConcluidoMutation.mutate()}
                         disabled={toggleConcluidoMutation.isPending}
                         className={cn(
                           "transition-colors",
-                          getVideoProgress(currentVideoId || '')?.completado 
-                            ? "bg-green-700 hover:bg-green-800" 
-                            : "bg-primary hover:bg-primary/90"
+                          getVideoProgress(currentVideoId || '')?.completado && 
+                            "!bg-green-700 hover:!bg-green-800 !text-white"
                         )}
                       >
                         <CheckCircle2 className="h-5 w-5 mr-2" />
@@ -349,7 +349,7 @@ export default function TrilhaDetalhes() {
           </div>
 
           {/* Right: Sidebar with video list */}
-          <div className="lg:w-[35%] flex flex-col gap-4">
+          <div className="lg:w-[35%] flex flex-col gap-4 flex-1">
             <div className="sticky top-4 space-y-4">
               {/* Search */}
               <div className="relative">
@@ -366,7 +366,7 @@ export default function TrilhaDetalhes() {
               <h2 className="font-semibold text-foreground">Trilha de conhecimento</h2>
 
               {/* Video List */}
-              <ScrollArea className="h-[600px] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
+              <ScrollArea className="flex-1 min-h-[400px] max-h-[calc(100vh-200px)] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
                 <div className="p-4 space-y-2">
                   <Accordion 
                     type="multiple" 
