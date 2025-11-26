@@ -17,7 +17,7 @@ export function ResumoProjetos() {
   const concluidos = projetos?.filter(p => p.status === 'concluido').length || 0;
 
   return (
-    <Card>
+    <Card className="border-aplicada-green-900/20">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-xl">
@@ -34,36 +34,36 @@ export function ResumoProjetos() {
       </CardHeader>
       <CardContent className="space-y-4">
         {total === 0 ? (
-          <div className="text-center py-6 text-muted-foreground">
+          <div className="text-center py-6 text-zinc-500">
             <FolderKanban className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p className="text-sm">Nenhum projeto cadastrado ainda</p>
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+            <div className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-aplicada-green-900/30">
               <div className="flex items-center gap-2">
                 <Target className="h-4 w-4 text-blue-500" />
-                <span className="text-sm font-medium">Planejamento</span>
+                <span className="text-sm font-medium text-white">Planejamento</span>
               </div>
               <Badge variant="outline" className="border-blue-500/30 text-blue-500">
                 {planejamento}
               </Badge>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
+            <div className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-aplicada-green-900/30">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-orange-500" />
-                <span className="text-sm font-medium">Em Andamento</span>
+                <span className="text-sm font-medium text-white">Em Andamento</span>
               </div>
               <Badge variant="outline" className="border-orange-500/30 text-orange-500">
                 {emAndamento}
               </Badge>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+            <div className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-aplicada-green-900/30">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <span className="text-sm font-medium">Concluídos</span>
+                <span className="text-sm font-medium text-white">Concluídos</span>
               </div>
               <Badge variant="outline" className="border-green-500/30 text-green-500">
                 {concluidos}

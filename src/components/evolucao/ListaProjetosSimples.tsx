@@ -30,7 +30,7 @@ export function ListaProjetosSimples() {
   };
 
   return (
-    <Card>
+    <Card className="border-aplicada-green-900/20">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -51,9 +51,9 @@ export function ListaProjetosSimples() {
       <CardContent>
         {!projetos || projetos.length === 0 ? (
           <div className="text-center py-12">
-            <FolderKanban className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <h3 className="text-lg font-semibold mb-2">Nenhum projeto ainda</h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <FolderKanban className="h-16 w-16 mx-auto mb-4 text-zinc-500 opacity-50" />
+            <h3 className="text-lg font-semibold mb-2 text-white">Nenhum projeto ainda</h3>
+            <p className="text-sm text-zinc-400 mb-4">
               Crie seu primeiro projeto para começar a aplicar seus conhecimentos
             </p>
             <Button onClick={() => navigate("/mentoria/projetos")}>
@@ -66,23 +66,23 @@ export function ListaProjetosSimples() {
             {projetos.map((projeto) => (
               <div
                 key={projeto.id}
-                className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                className="p-4 border border-aplicada-green-900/20 bg-zinc-800/30 hover:bg-zinc-800/50 hover:border-primary/20 rounded-lg transition-all cursor-pointer"
                 onClick={() => navigate("/mentoria/projetos")}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-base">{projeto.titulo}</h4>
+                      <h4 className="font-semibold text-base text-white">{projeto.titulo}</h4>
                       {getStatusBadge(projeto.status)}
                     </div>
                     
-                    <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <Target className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-2 text-sm text-zinc-400">
+                      <Target className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary/60" />
                       <p className="line-clamp-2">{projeto.objetivo_projeto}</p>
                     </div>
 
                     {projeto.data_entrega && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1 text-xs text-zinc-500">
                         <Calendar className="h-3 w-3" />
                         <span>
                           Prazo: {format(new Date(projeto.data_entrega), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}

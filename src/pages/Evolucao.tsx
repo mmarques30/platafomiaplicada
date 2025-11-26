@@ -4,6 +4,7 @@ import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
 import { EstatisticasEngajamento } from "@/components/evolucao/EstatisticasEngajamento";
 import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
 import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
+import { HeroComunidade } from "@/components/evolucao/HeroComunidade";
 import { TimelineJornada } from "@/components/evolucao/TimelineJornada";
 import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndamentoCards";
 import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
@@ -80,6 +81,9 @@ export default function Evolucao() {
             <Skeleton className="h-96 w-full" />
           ) : (
             <>
+              {/* Hero Comunidade */}
+              <HeroComunidade />
+
               {/* Ranking Top 3 + Lista */}
               <RankingComunidade ranking={ranking as any || []} />
 
