@@ -1,26 +1,18 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProgressCard } from "@/components/shared/ProgressCard";
-import { ConquistaCard } from "@/components/shared/ConquistaCard";
-import { CertificadoCard } from "@/components/shared/CertificadoCard";
-import { useProgressoGeral, useSequenciaEstudo } from "@/hooks/useEvolucao";
-import { useMeusCertificados } from "@/hooks/useCertificados";
-import { Flame } from "lucide-react";
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
 import { EstatisticasEngajamento } from "@/components/evolucao/EstatisticasEngajamento";
-import { MinhaEvolucaoDetalhada } from "@/components/evolucao/MinhaEvolucaoDetalhada";
-import { TrilhasNovas } from "@/components/evolucao/TrilhasNovas";
-import { ProgressoCertificados } from "@/components/evolucao/ProgressoCertificados";
 import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
-import { useRankingComunidade } from "@/hooks/useRankingComunidade";
+import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
+import { TimelineJornada } from "@/components/evolucao/TimelineJornada";
+import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndamentoCards";
+import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { AbaAcompanhamento } from "@/components/evolucao/AbaAcompanhamento";
+import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 
 export default function Evolucao() {
-  const { data: progressoGeral, isLoading: loadingProgresso } = useProgressoGeral();
-  const { data: sequencia } = useSequenciaEstudo();
-  const { data: certificados, isLoading: loadingCertificados } = useMeusCertificados();
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
   const { plan } = useUserPlan();
   const { isAdmin } = useUserRole();
@@ -66,90 +58,20 @@ export default function Evolucao() {
 
         {/* ABA 1: MINHA EVOLUÇÃO */}
         <TabsContent value="minha-evolucao" className="space-y-6 mt-6">
-          {/* Progresso Geral */}
-          {loadingProgresso ? (
-            <Skeleton className="h-32 w-full" />
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {progressoGeral && (
-                <>
-                  <ProgressCard
-                    totalTrilhas={progressoGeral.totalTrilhas}
-                    trilhasConcluidas={progressoGeral.trilhasConcluidas}
-                    percentualConclusao={progressoGeral.percentualConclusao}
-                    tempoTotal={progressoGeral.tempoTotal}
-                    sequencia={sequencia || 0}
-                    totalCertificados={progressoGeral.totalCertificados}
-                  />
-                  {sequencia !== undefined && (
-                    <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg p-6">
-                      <div className="flex items-center gap-3">
-                        <Flame className="h-8 w-8 text-orange-500" />
-                        <div>
-                          <h3 className="text-2xl font-sora-semibold text-foreground">{sequencia} dias</h3>
-                          <p className="text-sm font-sora-light text-foreground">Sequência de estudos</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
+          {/* Hero com nível e XP */}
+          <HeroEvolucao />
 
-          {/* Evolução Detalhada por Categorias */}
-          <MinhaEvolucaoDetalhada />
-
-          {/* Trilhas Novas Disponíveis */}
-          <TrilhasNovas />
-
-          {/* Progresso para Certificados */}
-          <ProgressoCertificados />
-
-          {/* Certificados */}
-          {loadingCertificados ? (
-            <Skeleton className="h-32 w-full" />
-          ) : (
-            certificados && certificados.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-sora-medium mb-4 text-foreground">Meus Certificados</h2>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {certificados.map((cert) => (
-                    <CertificadoCard
-                      key={cert.id}
-                      trilhaTitulo={cert.titulo}
-                      nomeCompleto="Usuário"
-                      dataConclusao={cert.data_emissao || ""}
-                      progresso={100}
-                      certificadoUrl={cert.url_pdf}
-                    />
-                  ))}
-                </div>
-              </div>
-            )
-          )}
-
-          {/* Conquistas */}
-          <div>
-            <h2 className="text-2xl font-sora-medium mb-4 text-foreground">Conquistas</h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              <ConquistaCard
-                titulo="Primeira Trilha"
-                descricao="Complete sua primeira trilha de aprendizado"
-                desbloqueada={progressoGeral ? progressoGeral.trilhasConcluidas > 0 : false}
-              />
-              <ConquistaCard
-                titulo="Estudante Dedicado"
-                descricao="Mantenha uma sequência de 7 dias de estudos"
-                desbloqueada={sequencia ? sequencia >= 7 : false}
-              />
-              <ConquistaCard
-                titulo="Expert"
-                descricao="Complete 5 trilhas de aprendizado"
-                desbloqueada={progressoGeral ? progressoGeral.trilhasConcluidas >= 5 : false}
-              />
+          {/* Grid com Timeline e Trilhas em Andamento */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <TimelineJornada />
+            <div className="space-y-3">
+              <h2 className="text-xl font-semibold">Trilhas em Andamento</h2>
+              <TrilhasEmAndamentoCards />
             </div>
           </div>
+
+          {/* Conquistas */}
+          <VitrineConquistas />
         </TabsContent>
 
         {/* ABA 2: EVOLUÇÃO DA COMUNIDADE */}
