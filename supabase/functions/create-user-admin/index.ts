@@ -13,9 +13,9 @@ Deno.serve(async (req) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     )
 
-    const { email, password, nomeCompleto, roles, planoMentoria } = await req.json()
+    const { email, password, nomeCompleto, roles, planoMentoria, origemConsultoria, empresaConsultoria } = await req.json()
 
-    console.log('Creating user:', { email, nomeCompleto, roles, planoMentoria })
+    console.log('Creating user:', { email, nomeCompleto, roles, planoMentoria, origemConsultoria, empresaConsultoria })
 
     // Validar planoMentoria
     const planosValidos = ['academy', 'lab', 'skills', 'club', 'legacy', 'boost'];
@@ -69,6 +69,14 @@ Deno.serve(async (req) => {
     
     if (planoMentoria) {
       updateData.plano_mentoria = planoMentoria
+    }
+    
+    if (origemConsultoria !== undefined) {
+      updateData.origem_consultoria = origemConsultoria
+    }
+    
+    if (empresaConsultoria) {
+      updateData.empresa_consultoria = empresaConsultoria
     }
 
     const { error: profileError } = await supabaseAdmin

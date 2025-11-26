@@ -1184,10 +1184,12 @@ export type Database = {
           data_expiracao_acesso: string | null
           email: string | null
           email_acesso_enviado: boolean | null
+          empresa_consultoria: string | null
           id: string
           idade: number | null
           linkedin: string | null
           nome_completo: string
+          origem_consultoria: boolean | null
           plano_mentoria: Database["public"]["Enums"]["plano_mentoria"] | null
           primeiro_acesso: boolean | null
           profissao: string | null
@@ -1202,10 +1204,12 @@ export type Database = {
           data_expiracao_acesso?: string | null
           email?: string | null
           email_acesso_enviado?: boolean | null
+          empresa_consultoria?: string | null
           id: string
           idade?: number | null
           linkedin?: string | null
           nome_completo: string
+          origem_consultoria?: boolean | null
           plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
           primeiro_acesso?: boolean | null
           profissao?: string | null
@@ -1220,10 +1224,12 @@ export type Database = {
           data_expiracao_acesso?: string | null
           email?: string | null
           email_acesso_enviado?: boolean | null
+          empresa_consultoria?: string | null
           id?: string
           idade?: number | null
           linkedin?: string | null
           nome_completo?: string
+          origem_consultoria?: boolean | null
           plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
           primeiro_acesso?: boolean | null
           profissao?: string | null
