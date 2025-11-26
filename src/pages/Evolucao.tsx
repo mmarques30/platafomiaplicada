@@ -34,23 +34,23 @@ export default function Evolucao() {
 
       {/* Sistema de Abas */}
       <Tabs defaultValue="minha-evolucao" className="w-full">
-        <TabsList className="w-full justify-start bg-muted/30 rounded-xl p-1 h-auto border-2 border-primary/10">
+        <TabsList className="w-full justify-start bg-transparent h-auto border-b border-border gap-2">
           <TabsTrigger 
             value="minha-evolucao"
-            className="rounded-lg px-8 py-3 text-base font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
           >
             Minha Evolução
           </TabsTrigger>
           <TabsTrigger 
             value="comunidade"
-            className="rounded-lg px-8 py-3 text-base font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
           >
             Evolução da Comunidade
           </TabsTrigger>
           {showAcompanhamento && (
             <TabsTrigger 
               value="acompanhamento"
-              className="rounded-lg px-8 py-3 text-base font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+              className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
             >
               Meu Acompanhamento
             </TabsTrigger>
