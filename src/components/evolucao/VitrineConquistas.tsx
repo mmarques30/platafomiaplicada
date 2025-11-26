@@ -99,7 +99,7 @@ export function VitrineConquistas() {
                     className={`font-semibold text-sm ${
                       conquista.desbloqueada
                         ? "text-primary"
-                        : "text-zinc-300"
+                        : "text-white"
                     }`}
                   >
                     {conquista.titulo}
@@ -113,10 +113,10 @@ export function VitrineConquistas() {
                 {!conquista.desbloqueada && (
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-300">
+                      <span className="text-white">
                         {conquista.progresso} / {conquista.meta}
                       </span>
-                      <span className="text-zinc-300">
+                      <span className="text-white">
                         {porcentagem.toFixed(0)}%
                       </span>
                     </div>

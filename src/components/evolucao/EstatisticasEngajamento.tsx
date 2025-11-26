@@ -41,7 +41,7 @@ export function EstatisticasEngajamento({ ranking }: EstatisticasEngajamentoProp
             key={index}
             className="p-4 rounded-lg bg-zinc-700 border border-zinc-600 space-y-2"
           >
-            <p className="text-xs text-zinc-300 uppercase tracking-wide">{stat.label}</p>
+            <p className="text-xs text-white uppercase tracking-wide">{stat.label}</p>
             <p className="text-2xl font-bold text-white">{stat.value}</p>
           </div>
           ))}
