@@ -231,11 +231,11 @@ export default function TrilhaDetalhes() {
           </Button>
         </Link>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
           {/* Left: Video Player e Informações */}
-          <div className="flex-1 lg:w-[65%]">
+          <div className="flex-1 lg:w-[65%] flex flex-col">
             {currentVideo ? (
-              <div className="space-y-6">
+              <div className="space-y-6 flex-1 flex flex-col">
                 {/* Player */}
                 <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
                   <iframe
@@ -259,8 +259,8 @@ export default function TrilhaDetalhes() {
               </div>
 
                 {/* Card Unificado: Avaliação + Informações */}
-                <Card className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                  <CardContent className="p-6">
+                <Card className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 flex-1 flex flex-col">
+                  <CardContent className="p-6 flex-1 flex flex-col">
                     {/* Avaliação e Botão Concluir */}
                     <div className="flex items-center justify-between flex-wrap gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-700">
                       <div className="space-y-2">
@@ -292,7 +292,7 @@ export default function TrilhaDetalhes() {
                     </div>
 
                     {/* Tabs: Descrição e Comentários */}
-                    <Tabs defaultValue="descricao" className="w-full mt-6">
+                    <Tabs defaultValue="descricao" className="w-full mt-6 flex-1 flex flex-col">
                       <TabsList className="w-full justify-start bg-transparent border-b border-zinc-200 dark:border-zinc-700 rounded-none p-0 h-auto">
                         <TabsTrigger 
                           value="descricao"

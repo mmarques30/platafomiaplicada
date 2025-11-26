@@ -52,11 +52,31 @@ export default function Trilhas() {
         </div>
 
         <Tabs defaultValue="todos" className="w-full" onValueChange={() => setTrilhasVisiveis(3)}>
-          <TabsList>
-            <TabsTrigger value="todos">Todos</TabsTrigger>
-            <TabsTrigger value="iniciante">Iniciante</TabsTrigger>
-            <TabsTrigger value="intermediario">Intermediário</TabsTrigger>
-            <TabsTrigger value="avancado">Avançado</TabsTrigger>
+          <TabsList className="w-full justify-start bg-transparent border-b border-zinc-200 dark:border-zinc-700 rounded-none p-0 h-auto">
+            <TabsTrigger 
+              value="todos"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+            >
+              Todos
+            </TabsTrigger>
+            <TabsTrigger 
+              value="iniciante"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+            >
+              Iniciante
+            </TabsTrigger>
+            <TabsTrigger 
+              value="intermediario"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+            >
+              Intermediário
+            </TabsTrigger>
+            <TabsTrigger 
+              value="avancado"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+            >
+              Avançado
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="todos" className="mt-6">
