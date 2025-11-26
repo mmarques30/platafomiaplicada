@@ -52,7 +52,7 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
               return (
                 <div
                   key={item.user_id}
-                  className={`relative p-4 rounded-lg border ${getBorderColor(posicao)} bg-zinc-800/50`}
+                  className={`relative p-4 rounded-lg border ${getBorderColor(posicao)} bg-zinc-700`}
                 >
                   <div className="flex flex-col items-center gap-3">
                     <div className="relative">
