@@ -103,28 +103,26 @@ export function AppSidebar() {
                     >
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
-                          <SidebarMenuButton className="group w-full">
-                            <div className={cn(
-                              "relative flex items-center justify-between w-full rounded-lg transition-all duration-200 font-medium pl-4",
-                              isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
-                            )}>
-                              <div className="flex items-center gap-2">
-                                <span className={cn(
-                                  "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                                  isActive 
-                                    ? "bg-aplicada-green-700 opacity-100" 
-                                    : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
-                                )} />
-                                <IconComponent className="h-4 w-4 shrink-0" />
-                                {!collapsed && <span>{menu.label}</span>}
-                              </div>
-                              {!collapsed && (
-                                <ChevronDown className={cn(
-                                  "h-4 w-4 transition-transform duration-200",
+                          <SidebarMenuButton className={cn(
+                            "group relative rounded-lg transition-all duration-200 font-medium pl-4 w-full justify-between",
+                            isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
+                          )}>
+                            <span className={cn(
+                              "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                              isActive 
+                                ? "bg-aplicada-green-700 opacity-100" 
+                                : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                            )} />
+                            <IconComponent className="h-4 w-4 shrink-0" />
+                            {!collapsed && <span>{menu.label}</span>}
+                            {!collapsed && (
+                              <ChevronDown 
+                                className={cn(
+                                  "h-4 w-4 ml-auto transition-transform duration-200",
                                   isExpanded && "rotate-180"
-                                )} />
-                              )}
-                            </div>
+                                )} 
+                              />
+                            )}
                           </SidebarMenuButton>
                         </CollapsibleTrigger>
                       </SidebarMenuItem>
