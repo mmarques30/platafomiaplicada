@@ -289,12 +289,7 @@ export default function TrilhaDetalhes() {
                         variant="default"
                         onClick={() => toggleConcluidoMutation.mutate()}
                         disabled={toggleConcluidoMutation.isPending}
-                        className={cn(
-                          "w-full transition-colors",
-                          getVideoProgress(currentVideoId || '')?.completado 
-                            ? "!bg-green-700 hover:!bg-green-800 !text-white" 
-                            : "!bg-[#C4D47C] hover:!bg-[#b5c56d] !text-zinc-800"
-                        )}
+                        className="w-full transition-colors !bg-[#2F302B] hover:!bg-[#3D3E39] !text-white"
                       >
                         {getVideoProgress(currentVideoId || '')?.completado 
                           ? <CheckCircle2 className="h-5 w-5 mr-2" />
