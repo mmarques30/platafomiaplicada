@@ -105,24 +105,32 @@ export default function TrilhaDetalhes() {
   );
 
   // Set initial video from URL or first video
+  const initializedRef = useRef(false);
+  
   useEffect(() => {
+    // Só inicializa uma vez quando allVideos estiver disponível
+    if (allVideos.length === 0 || initializedRef.current) return;
+    
     const videoIdFromUrl = searchParams.get("video");
     const moduloIdFromUrl = searchParams.get("modulo");
     
     if (videoIdFromUrl && allVideos.some(v => v.id === videoIdFromUrl)) {
       setCurrentVideoId(videoIdFromUrl);
+      initializedRef.current = true;
     } else if (moduloIdFromUrl) {
       // Se veio de um link de módulo, pega o primeiro vídeo daquele módulo
       const moduloVideos = allVideos.filter(v => v.modulo.id === moduloIdFromUrl);
       if (moduloVideos.length > 0) {
         setCurrentVideoId(moduloVideos[0].id);
-        setSearchParams({ video: moduloVideos[0].id });
+        setSearchParams({ video: moduloVideos[0].id }, { replace: true });
+        initializedRef.current = true;
       }
-    } else if (allVideos.length > 0 && !currentVideoId) {
+    } else if (!currentVideoId) {
       setCurrentVideoId(allVideos[0].id);
-      setSearchParams({ video: allVideos[0].id });
+      setSearchParams({ video: allVideos[0].id }, { replace: true });
+      initializedRef.current = true;
     }
-  }, [allVideos, searchParams, currentVideoId, setSearchParams]);
+  }, [allVideos]);
 
   // Scroll to active video in sidebar
   useEffect(() => {
