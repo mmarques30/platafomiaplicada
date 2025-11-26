@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ResumoProjetos } from "./ResumoProjetos";
 import { ListaProjetosSimples } from "./ListaProjetosSimples";
+import { HeroAcompanhamento } from "./HeroAcompanhamento";
 
 export function AbaAcompanhamento() {
   const navigate = useNavigate();
@@ -22,6 +23,9 @@ export function AbaAcompanhamento() {
 
   return (
     <div className="space-y-6">
+      {/* Hero Acompanhamento */}
+      <HeroAcompanhamento />
+
       {/* Grid com Diagnóstico e Resumo */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Card Diagnóstico */}

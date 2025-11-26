@@ -38,28 +38,28 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
   };
 
   return (
-    <Card>
+    <Card className="border-aplicada-green-900/20">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="text-2xl">
           Ranking da Comunidade
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Top 3 - Pódio */}
         {top3.length > 0 && (
-          <div className="flex items-end justify-center gap-4 pb-6 border-b">
+          <div className="flex items-end justify-center gap-4 pb-6 border-b border-aplicada-green-900/20">
             {/* 2º Lugar */}
             {top3[1] && (
               <div className="flex flex-col items-center flex-1">
                 <div className="mb-2">{getMedalIcon(2)}</div>
-                <Avatar className="h-16 w-16 border-2 border-gray-400">
+                <Avatar className="h-16 w-16 border-2 border-zinc-400">
                   <AvatarImage src={top3[1].avatar_url} />
-                  <AvatarFallback>{getInitials(top3[1].nome_completo)}</AvatarFallback>
+                  <AvatarFallback className="bg-zinc-800">{getInitials(top3[1].nome_completo)}</AvatarFallback>
                 </Avatar>
-                <p className="font-semibold text-sm mt-2 text-center line-clamp-1">
+                <p className="font-semibold text-sm mt-2 text-center line-clamp-1 text-white">
                   {top3[1].nome_completo}
                 </p>
-                <p className="text-xs text-muted-foreground">{top3[1].total_pontos} pts</p>
+                <p className="text-xs text-zinc-500">{top3[1].total_pontos} pts</p>
               </div>
             )}
             
@@ -69,9 +69,9 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
                 <div className="mb-2">{getMedalIcon(1)}</div>
                 <Avatar className="h-20 w-20 border-4 border-yellow-500">
                   <AvatarImage src={top3[0].avatar_url} />
-                  <AvatarFallback>{getInitials(top3[0].nome_completo)}</AvatarFallback>
+                  <AvatarFallback className="bg-zinc-800">{getInitials(top3[0].nome_completo)}</AvatarFallback>
                 </Avatar>
-                <p className="font-bold text-base mt-2 text-center line-clamp-1">
+                <p className="font-bold text-base mt-2 text-center line-clamp-1 text-white">
                   {top3[0].nome_completo}
                 </p>
                 <p className="text-sm font-semibold text-primary">{top3[0].total_pontos} pts</p>
@@ -84,12 +84,12 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
                 <div className="mb-2">{getMedalIcon(3)}</div>
                 <Avatar className="h-14 w-14 border-2 border-orange-600">
                   <AvatarImage src={top3[2].avatar_url} />
-                  <AvatarFallback>{getInitials(top3[2].nome_completo)}</AvatarFallback>
+                  <AvatarFallback className="bg-zinc-800">{getInitials(top3[2].nome_completo)}</AvatarFallback>
                 </Avatar>
-                <p className="font-semibold text-xs mt-2 text-center line-clamp-1">
+                <p className="font-semibold text-xs mt-2 text-center line-clamp-1 text-white">
                   {top3[2].nome_completo}
                 </p>
-                <p className="text-xs text-muted-foreground">{top3[2].total_pontos} pts</p>
+                <p className="text-xs text-zinc-500">{top3[2].total_pontos} pts</p>
               </div>
             )}
           </div>
@@ -97,29 +97,35 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
 
         {/* Lista do 4º em diante */}
         <div className="space-y-2">
+          <h3 className="font-semibold text-sm text-zinc-400 mb-3">Demais posições</h3>
           {outros.map((item) => (
             <div
               key={item.user_id}
-              className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                item.user_id === user?.id ? 'bg-primary/10 border border-primary' : 'hover:bg-accent'
+              className={`flex items-center gap-3 p-4 rounded-lg border transition-all ${
+                item.user_id === user?.id 
+                  ? 'bg-aplicada-dark border-primary/40 ring-1 ring-primary/30' 
+                  : 'bg-zinc-800/30 border-aplicada-green-900/20 hover:bg-zinc-800/50 hover:border-primary/20'
               }`}
             >
-              <span className="font-bold text-muted-foreground w-8">{item.posicao}º</span>
-              <Avatar className="h-10 w-10">
+              <span className="font-mono text-sm text-zinc-400 w-8">{item.posicao}º</span>
+              <Avatar className="h-10 w-10 border border-aplicada-green-900/30">
                 <AvatarImage src={item.avatar_url} />
-                <AvatarFallback>{getInitials(item.nome_completo)}</AvatarFallback>
+                <AvatarFallback className="bg-zinc-800">{getInitials(item.nome_completo)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{item.nome_completo}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className={`font-medium truncate ${item.user_id === user?.id ? 'text-primary' : 'text-white'}`}>
+                  {item.nome_completo}
+                  {item.user_id === user?.id && (
+                    <span className="ml-2 text-xs text-primary">(Você)</span>
+                  )}
+                </p>
+                <p className="text-xs text-zinc-500">
                   {item.total_videos_assistidos} vídeos • {item.total_ferramentas_compartilhadas} ferramentas
                 </p>
               </div>
               <div className="text-right">
-                <p className="font-semibold">{item.total_pontos} pts</p>
-                {item.user_id === user?.id && (
-                  <Badge variant="secondary" className="text-xs">Você</Badge>
-                )}
+                <p className="font-semibold text-lg text-white">{item.total_pontos}</p>
+                <p className="text-xs text-zinc-500">pontos</p>
               </div>
             </div>
           ))}
@@ -127,18 +133,21 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
 
         {/* Minha posição (se não estiver no top) */}
         {minhaposicao && minhaposicao.posicao > 10 && (
-          <div className="border-t pt-4">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary">
-              <span className="font-bold w-8">{minhaposicao.posicao}º</span>
-              <Avatar className="h-10 w-10">
+          <div className="border-t border-aplicada-green-900/20 pt-4">
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-aplicada-dark border border-primary/40 ring-1 ring-primary/30">
+              <span className="font-mono text-sm text-zinc-400 w-8">{minhaposicao.posicao}º</span>
+              <Avatar className="h-10 w-10 border border-primary">
                 <AvatarImage src={minhaposicao.avatar_url} />
-                <AvatarFallback>{getInitials(minhaposicao.nome_completo)}</AvatarFallback>
+                <AvatarFallback className="bg-zinc-800">{getInitials(minhaposicao.nome_completo)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="font-medium">Você - {minhaposicao.nome_completo}</p>
-                <p className="text-xs text-muted-foreground">Sua posição atual</p>
+                <p className="font-medium text-primary">Você - {minhaposicao.nome_completo}</p>
+                <p className="text-xs text-zinc-500">Sua posição atual</p>
               </div>
-              <p className="font-semibold">{minhaposicao.total_pontos} pts</p>
+              <div className="text-right">
+                <p className="font-semibold text-lg text-white">{minhaposicao.total_pontos}</p>
+                <p className="text-xs text-zinc-500">pontos</p>
+              </div>
             </div>
           </div>
         )}
