@@ -1,4 +1,5 @@
 import { usePainelDiagnostico } from "@/hooks/usePainelDiagnostico";
+import { useUserPlan } from "@/hooks/useUserPlan";
 import { InformacoesMentorado } from "@/components/mentoria/painel/InformacoesMentorado";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProjetosPriorizados } from "@/components/mentoria/painel/ProjetosPriorizados";
@@ -17,6 +18,10 @@ export default function MentoriaPainelDiagnostico() {
   const navigate = useNavigate();
   const { userId } = useParams();
   const { diagnostico, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
+  const { plan } = useUserPlan();
+  
+  const voltarUrl = plan === 'academy' ? '/evolucao' : '/mentoria';
+  const voltarLabel = plan === 'academy' ? 'Voltar para Minha Evolução' : 'Voltar para Mentoria';
 
   if (isLoading) {
     return (
@@ -55,11 +60,11 @@ export default function MentoriaPainelDiagnostico() {
         <div className="container mx-auto py-6 px-4 max-w-7xl">
           <Button
             variant="ghost"
-            onClick={() => navigate("/mentoria")}
+            onClick={() => navigate(voltarUrl)}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar para Mentoria
+            {voltarLabel}
           </Button>
           <h1 className="text-4xl font-bold text-foreground mb-2">
             Painel de Diagnóstico

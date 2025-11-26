@@ -5,6 +5,7 @@ import { Form } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
 import { formSchema, type FormData } from "./schema";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
+import { useUserPlan } from "@/hooks/useUserPlan";
 import { ProgressBar } from "./ProgressBar";
 import { Step1InformacoesPessoais } from "./Step1InformacoesPessoais";
 import { Step2ExperienciaIA } from "./Step2ExperienciaIA";
@@ -27,6 +28,7 @@ interface FormularioWizardProps {
 export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const { formulario, finalizarFormulario, isSaving } = useMentoriaForm();
+  const { plan } = useUserPlan();
   const navigate = useNavigate();
 
   const form = useForm<FormData>({
@@ -92,8 +94,9 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
       if (onFinalizado) {
         onFinalizado();
       } else {
+        const destino = plan === 'academy' ? '/evolucao' : '/mentoria';
         setTimeout(() => {
-          navigate("/mentoria");
+          navigate(destino);
         }, 1500);
       }
     } catch (error) {
