@@ -184,8 +184,8 @@ export default function GerenciarUsuários() {
               <TableHead>Status</TableHead>
               <TableHead>Expira em</TableHead>
               <TableHead>Cadastro</TableHead>
-              <TableHead className="text-center">✉️ Email</TableHead>
-              <TableHead className="text-center">📱 Grupo</TableHead>
+              <TableHead className="text-center">Email Enviado</TableHead>
+              <TableHead className="text-center">Grupo WhatsApp</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
