@@ -254,12 +254,23 @@ All colors MUST be HSL.
     padding-left: 1.5rem;
   }
 
+  /* Listas não ordenadas com bullet points */
+  .ai-message-container ul {
+    list-style-type: disc;
+  }
+
+  /* Listas ordenadas com números */
+  .ai-message-container ol {
+    list-style-type: decimal;
+  }
+
   .ai-message-container li {
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
+    padding-left: 0.25rem;
   }
 
-  /* Marcadores de lista */
+  /* Marcadores de lista - cor verde clara */
   .ai-message-container li::marker {
     color: #C8D27B; /* Verde claro */
   }
