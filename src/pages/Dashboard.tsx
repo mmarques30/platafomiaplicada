@@ -88,30 +88,22 @@ export default function Dashboard() {
           </Alert>
         )}
 
-        {/* Hero Section - Inspirado na LP */}
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-accent/5 border-2 border-primary/10 p-8 md:p-12 shadow-lg">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl"></div>
-          
-          <div className="relative z-10">
-            <WelcomeHeader />
+        {/* Bloco centralizado: Bom dia + Chat da Mari */}
+        <section className="flex flex-col items-center gap-4">
+          {/* Hero Section - largura reduzida */}
+          <div className="w-full max-w-3xl">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-accent/5 border-2 border-primary/10 p-6 md:p-8 shadow-lg">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl"></div>
+              
+              <div className="relative z-10">
+                <WelcomeHeader />
+              </div>
+            </div>
           </div>
-        </section>
 
-        {/* Novidades da Semana */}
-        <section>
-          <NovidadesSemana />
-        </section>
-
-        {/* Últimos Conteúdos Adicionados */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Últimos Conteúdos Adicionados</h2>
-          <UltimosConteudos />
-        </section>
-
-        {/* Chat da Mari - Tech Executive */}
-        <section className="flex items-center justify-center">
-          <div className="w-full max-w-4xl px-6">
+          {/* Chat da Mari - logo abaixo, mesma largura */}
+          <div className="w-full max-w-3xl">
             <div className="relative card-glassmorphism rounded-2xl p-3 shadow-xl border-2 border-primary/10">
               <form onSubmit={handleSubmit} autoComplete="off" role="search" className="flex items-center gap-4">
                 {/* Avatar da Mari */}
@@ -196,6 +188,17 @@ export default function Dashboard() {
               </form>
             </div>
           </div>
+        </section>
+
+        {/* Novidades da Semana */}
+        <section>
+          <NovidadesSemana />
+        </section>
+
+        {/* Últimos Conteúdos Adicionados */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-foreground">Últimos Conteúdos Adicionados</h2>
+          <UltimosConteudos />
         </section>
 
       </main>
