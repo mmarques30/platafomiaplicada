@@ -1,92 +1,187 @@
-import { useUsers } from "@/hooks/admin/useUsers";
-import { useAvisos } from "@/hooks/admin/useAvisos";
-import { useVideoAnalytics } from "@/hooks/useVideoAnalytics";
+import { useNavigate } from "react-router-dom";
+import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 import { StatsCard } from "@/components/admin/StatsCard";
-import { Users, GraduationCap, Bell, Clock, TrendingUp, Video, Award } from "lucide-react";
+import { AlertCard } from "@/components/admin/AlertCard";
+import { DistribuicaoPlanos } from "@/components/admin/DistribuicaoPlanos";
+import { TopUsuariosTable } from "@/components/admin/TopUsuariosTable";
+import {
+  Users,
+  TrendingUp,
+  CheckSquare,
+  AlertTriangle,
+  HelpCircle,
+  FileText,
+  FolderKanban,
+  Calendar,
+  Video,
+  Layers,
+  Sparkles,
+  Star,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminDashboard() {
-  const { data: users, isLoading: loadingUsers } = useUsers();
-  const { data: avisos, isLoading: loadingAvisos } = useAvisos();
-  const { data: analytics, isLoading: loadingAnalytics } = useVideoAnalytics();
+  const navigate = useNavigate();
+  const { data, isLoading } = useAdminDashboard();
 
-  const isLoading = loadingUsers || loadingAvisos || loadingAnalytics;
-
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <div>
         <h1 className="text-3xl font-bold mb-8">Dashboard Administrativo</h1>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <Skeleton key={i} className="h-32" />
-          ))}
+        <div className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-32" />
+            ))}
+          </div>
+          <div className="grid gap-4 md:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-32" />
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
-  const totalMentorados = users?.filter((u) => u.roles.includes("mentorado")).length || 0;
-  const totalAlunosTrilha = users?.filter((u) => u.roles.includes("aluno_trilha")).length || 0;
-
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">Dashboard Administrativo</h1>
-      
-      {/* KPIs de Usuários */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <StatsCard
-          title="Total de Usuários"
-          value={users?.length || 0}
-          description="Usuários cadastrados"
-          icon={Users}
-        />
-        <StatsCard
-          title="Mentorados"
-          value={totalMentorados}
-          description="Com acesso à mentoria"
-          icon={Users}
-        />
-        <StatsCard
-          title="Alunos Trilha"
-          value={totalAlunosTrilha}
-          description="Cursando trilhas"
-          icon={GraduationCap}
-        />
-        <StatsCard
-          title="Avisos Ativos"
-          value={avisos?.filter((a) => a.ativo).length || 0}
-          description="Avisos publicados"
-          icon={Bell}
-        />
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold">Dashboard Administrativo</h1>
+
+      {/* Seção 1: Alertas */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">⚠️ Requer Atenção</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          <AlertCard
+            title="Tarefas Atrasadas"
+            value={data.alertas.tarefasAtrasadas}
+            icon={AlertTriangle}
+            severity="error"
+            onClick={() => navigate("/admin/minhas-tarefas")}
+          />
+          <AlertCard
+            title="Dúvidas Pendentes"
+            value={data.alertas.duvidasPendentes}
+            icon={HelpCircle}
+            severity="warning"
+            onClick={() => navigate("/admin/mentoria")}
+          />
+          <AlertCard
+            title="Diagnósticos Incompletos"
+            value={data.alertas.diagnosticosIncompletos}
+            icon={FileText}
+            severity="warning"
+            onClick={() => navigate("/admin/mentoria")}
+          />
+        </div>
       </div>
 
-      {/* KPIs de Analytics de Conteúdo */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <StatsCard
-          title="Total de Horas Assistidas"
-          value={`${analytics?.totalHoras || 0}h`}
-          description="Tempo total de vídeos"
-          icon={Clock}
-        />
-        <StatsCard
-          title="Taxa de Conclusão"
-          value={`${analytics?.taxaConclusao || 0}%`}
-          description="Vídeos completados"
-          icon={TrendingUp}
-        />
-        <StatsCard
-          title="Vídeo Mais Assistido"
-          value={(analytics?.videoMaisAssistido as any)?.visualizacoes || 0}
-          description={(analytics?.videoMaisAssistido as any)?.titulo?.substring(0, 30) || "Nenhum"}
-          icon={Video}
-        />
-        <StatsCard
-          title="Trilha Mais Popular"
-          value={`${(analytics?.trilhaMaisPopular as any)?.alunos || 0} alunos`}
-          description={(analytics?.trilhaMaisPopular as any)?.nome || "Nenhuma"}
-          icon={Award}
-        />
+      {/* Seção 2: Crescimento & Engajamento */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">📈 Crescimento & Engajamento</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatsCard
+            title="Novos Usuários (7d)"
+            value={data.crescimento.novosUsuarios7d}
+            description={`${data.crescimento.novosUsuarios30d} nos últimos 30 dias`}
+            icon={Users}
+          />
+          <StatsCard
+            title="Usuários Ativos (7d)"
+            value={data.crescimento.usuariosAtivos7d}
+            description={`${data.crescimento.usuariosAtivos30d} nos últimos 30 dias`}
+            icon={TrendingUp}
+          />
+          <StatsCard
+            title="Total de Usuários"
+            value={data.crescimento.totalUsuarios}
+            description={`${data.crescimento.usuariosAtivos} contas ativas`}
+            icon={Users}
+          />
+          <StatsCard
+            title="Taxa de Engajamento"
+            value={`${data.crescimento.totalUsuarios > 0 ? Math.round((data.crescimento.usuariosAtivos7d / data.crescimento.totalUsuarios) * 100) : 0}%`}
+            description="Ativos nos últimos 7 dias"
+            icon={TrendingUp}
+          />
+        </div>
       </div>
+
+      {/* Seção 3: Distribuição por Plano */}
+      <DistribuicaoPlanos distribuicao={data.distribuicaoPlanos} />
+
+      {/* Seção 4: Saúde da Mentoria */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">🎯 Saúde da Mentoria</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatsCard
+            title="Projetos em Andamento"
+            value={data.mentoria.projetosEmAndamento}
+            description="Planejamento + Em andamento"
+            icon={FolderKanban}
+          />
+          <StatsCard
+            title="Tarefas Pendentes"
+            value={data.mentoria.tarefasPorStatus.pendente}
+            description={`${data.mentoria.tarefasPorStatus.em_andamento} em andamento`}
+            icon={CheckSquare}
+          />
+          <StatsCard
+            title="Tarefas Concluídas"
+            value={data.mentoria.tarefasPorStatus.concluida}
+            description="Total concluído"
+            icon={CheckSquare}
+          />
+          <StatsCard
+            title="Sessões Agendadas"
+            value={data.mentoria.sessoesAgendadas}
+            description="Próximas sessões"
+            icon={Calendar}
+          />
+        </div>
+      </div>
+
+      {/* Seção 5: Inventário de Conteúdo */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">📚 Inventário de Conteúdo</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          <StatsCard
+            title="Trilhas Ativas"
+            value={data.conteudo.trilhasAtivas}
+            description="Trilhas disponíveis"
+            icon={Layers}
+          />
+          <StatsCard
+            title="Módulos Ativos"
+            value={data.conteudo.modulosAtivos}
+            description="Módulos disponíveis"
+            icon={Layers}
+          />
+          <StatsCard
+            title="Vídeos Ativos"
+            value={data.conteudo.videosAtivos}
+            description="Vídeos disponíveis"
+            icon={Video}
+          />
+          <StatsCard
+            title="Ferramentas IA"
+            value={data.conteudo.ferramentasAtivas}
+            description="Ferramentas catalogadas"
+            icon={Sparkles}
+          />
+          <StatsCard
+            title="Média Avaliações"
+            value={data.conteudo.mediaAvaliacoes}
+            description="Nota média dos vídeos"
+            icon={Star}
+          />
+        </div>
+      </div>
+
+      {/* Seção 6: Top Usuários */}
+      {data.topUsuarios.length > 0 && (
+        <TopUsuariosTable usuarios={data.topUsuarios} />
+      )}
     </div>
   );
 }
