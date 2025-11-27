@@ -106,29 +106,30 @@ export default function Auth() {
       
       {/* Conteúdo centralizado */}
       <div className="relative z-10 w-full max-w-xl flex flex-col items-center gap-6">
-        {/* Logo */}
-        <img 
-          src={logoMarcaCompleta} 
-          alt="IAplicada" 
-          className="h-12 w-auto hidden lg:block" 
-        />
-        <img 
-          src={logoAplicada} 
-          alt="IAplicada" 
-          className="h-8 w-auto lg:hidden" 
-        />
+      {/* Logo */}
+      <img 
+        src={logoMarcaCompleta} 
+        alt="IAplicada" 
+        className="h-10 md:h-12 w-auto" 
+      />
 
         {/* Card de Auth com altura mínima fixa */}
         <Card className="w-full min-h-[420px] bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
           <Tabs defaultValue="aplicados" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] mb-4">
-              <TabsTrigger value="aplicados" className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]">
-                Aplicados
-              </TabsTrigger>
-              <TabsTrigger value="visitantes" className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]">
-                Visitantes
-              </TabsTrigger>
-            </TabsList>
+          <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] p-1 rounded-lg mb-4">
+            <TabsTrigger 
+              value="aplicados"
+              className="rounded-md data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B] data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#F2F2F2]/60"
+            >
+              Aplicados
+            </TabsTrigger>
+            <TabsTrigger 
+              value="visitantes"
+              className="rounded-md data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B] data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#F2F2F2]/60"
+            >
+              Visitantes
+            </TabsTrigger>
+          </TabsList>
 
             {/* Aba Aplicados */}
             <TabsContent value="aplicados">
@@ -272,15 +273,15 @@ export default function Auth() {
           </Tabs>
         </Card>
 
-        {/* Tagline */}
-        <div className="text-center hidden lg:block">
-          <p className="text-lg text-[#F2F2F2]/80">
-            IA só tem valor quando se aplica.
-          </p>
-          <p className="text-lg font-semibold text-[#9EB038] mt-2">
-            #menoshypemaisentrega
-          </p>
-        </div>
+      {/* Tagline */}
+      <div className="text-center">
+        <p className="text-lg text-[#F2F2F2]/80">
+          IA só tem valor quando se aplica.
+        </p>
+        <p className="text-lg font-semibold text-[#9EB038] mt-2">
+          #menoshypemaisentrega
+        </p>
+      </div>
       </div>
     </div>
   );
