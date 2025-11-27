@@ -1024,6 +1024,7 @@ export type Database = {
           updated_at: string | null
           visivel_apenas_pro: boolean | null
           visivel_mentorados: boolean | null
+          visivel_visitantes: boolean | null
         }
         Insert: {
           ativo?: boolean | null
@@ -1042,6 +1043,7 @@ export type Database = {
           updated_at?: string | null
           visivel_apenas_pro?: boolean | null
           visivel_mentorados?: boolean | null
+          visivel_visitantes?: boolean | null
         }
         Update: {
           ativo?: boolean | null
@@ -1060,6 +1062,7 @@ export type Database = {
           updated_at?: string | null
           visivel_apenas_pro?: boolean | null
           visivel_mentorados?: boolean | null
+          visivel_visitantes?: boolean | null
         }
         Relationships: [
           {
@@ -1193,6 +1196,7 @@ export type Database = {
           empresa_consultoria: string | null
           id: string
           idade: number | null
+          is_visitante: boolean | null
           linkedin: string | null
           nome_completo: string
           origem_consultoria: boolean | null
@@ -1201,6 +1205,7 @@ export type Database = {
           profissao: string | null
           senha_alterada_em: string | null
           senha_temporaria: boolean | null
+          telefone: string | null
           updated_at: string | null
         }
         Insert: {
@@ -1213,6 +1218,7 @@ export type Database = {
           empresa_consultoria?: string | null
           id: string
           idade?: number | null
+          is_visitante?: boolean | null
           linkedin?: string | null
           nome_completo: string
           origem_consultoria?: boolean | null
@@ -1221,6 +1227,7 @@ export type Database = {
           profissao?: string | null
           senha_alterada_em?: string | null
           senha_temporaria?: boolean | null
+          telefone?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -1233,6 +1240,7 @@ export type Database = {
           empresa_consultoria?: string | null
           id?: string
           idade?: number | null
+          is_visitante?: boolean | null
           linkedin?: string | null
           nome_completo?: string
           origem_consultoria?: boolean | null
@@ -1241,6 +1249,7 @@ export type Database = {
           profissao?: string | null
           senha_alterada_em?: string | null
           senha_temporaria?: boolean | null
+          telefone?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1710,6 +1719,7 @@ export type Database = {
           updated_at: string | null
           visivel_apenas_pro: boolean | null
           visivel_mentorados: boolean | null
+          visivel_visitantes: boolean | null
         }
         Insert: {
           ativo?: boolean | null
@@ -1728,6 +1738,7 @@ export type Database = {
           updated_at?: string | null
           visivel_apenas_pro?: boolean | null
           visivel_mentorados?: boolean | null
+          visivel_visitantes?: boolean | null
         }
         Update: {
           ativo?: boolean | null
@@ -1746,6 +1757,7 @@ export type Database = {
           updated_at?: string | null
           visivel_apenas_pro?: boolean | null
           visivel_mentorados?: boolean | null
+          visivel_visitantes?: boolean | null
         }
         Relationships: []
       }
@@ -1872,6 +1884,7 @@ export type Database = {
           updated_at: string | null
           visivel_apenas_pro: boolean | null
           visivel_mentorados: boolean | null
+          visivel_visitantes: boolean | null
           youtube_id: string
           youtube_url: string
         }
@@ -1896,6 +1909,7 @@ export type Database = {
           updated_at?: string | null
           visivel_apenas_pro?: boolean | null
           visivel_mentorados?: boolean | null
+          visivel_visitantes?: boolean | null
           youtube_id: string
           youtube_url: string
         }
@@ -1920,6 +1934,7 @@ export type Database = {
           updated_at?: string | null
           visivel_apenas_pro?: boolean | null
           visivel_mentorados?: boolean | null
+          visivel_visitantes?: boolean | null
           youtube_id?: string
           youtube_url?: string
         }
@@ -2009,7 +2024,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "mentorado" | "aluno_trilha"
+      app_role: "admin" | "mentorado" | "aluno_trilha" | "visitante"
       nivel_acesso_plano: "academy" | "lab" | "skills" | "club"
       plano_mentoria:
         | "club"
@@ -2152,7 +2167,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "mentorado", "aluno_trilha"],
+      app_role: ["admin", "mentorado", "aluno_trilha", "visitante"],
       nivel_acesso_plano: ["academy", "lab", "skills", "club"],
       plano_mentoria: [
         "club",

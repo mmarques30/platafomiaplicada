@@ -1,7 +1,8 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole, UserRole } from "@/hooks/useUserRole";
+import { VisitanteLayout } from "@/components/layout/VisitanteLayout";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -11,7 +12,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requireRole, requireAnyRole }: ProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasRole, isLoading: roleLoading, roles } = useUserRole();
+  const { hasRole, isLoading: roleLoading, roles, isVisitante } = useUserRole();
 
   const needsRoleCheck = Boolean(requireRole) || (Array.isArray(requireAnyRole) && requireAnyRole.length > 0);
 
@@ -49,6 +50,11 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
   if (requireAnyRole && !requireAnyRole.some(role => hasRole(role))) {
     console.log("[ProtectedRoute] Missing any of required roles:", requireAnyRole);
     return <Navigate to="/" replace />;
+  }
+
+  // Se for visitante, usar VisitanteLayout
+  if (isVisitante) {
+    return <VisitanteLayout>{children}</VisitanteLayout>;
   }
 
   return <>{children}</>;
