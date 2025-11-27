@@ -55,6 +55,9 @@ import MinhasTarefas from "./pages/admin/MinhasTarefas";
 import Auditoria from "./pages/admin/Auditoria";
 import GerenciarMenus from "./pages/admin/GerenciarMenus";
 import ImportarUsuarios from "./pages/admin/ImportarUsuarios";
+import Comunidade from "./pages/Comunidade";
+import DashboardVisitante from "./pages/DashboardVisitante";
+import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
 
 const queryClient = new QueryClient();
 
@@ -99,11 +102,17 @@ function AppContent() {
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
             <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />
             <Route path="/metodos-aplicar" element={<MetodosAplicar />} />
+            <Route path="/comunidade" element={<Comunidade />} />
+          </Route>
+          
+          <Route element={<ProtectedRoute><DashboardVisitante /></ProtectedRoute>}>
+            <Route path="/visitante" element={<DashboardVisitante />} />
           </Route>
           
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="usuarios" element={<GerenciarUsuarios />} />
+            <Route path="visitantes" element={<GerenciarVisitantes />} />
             <Route path="conteudo" element={<GerenciarConteudo />} />
             <Route path="bibliotecas" element={<GerenciarBibliotecas />} />
             <Route path="avisos" element={<GerenciarAvisos />} />
