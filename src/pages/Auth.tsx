@@ -96,7 +96,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="h-screen relative flex flex-col items-center justify-between px-8 py-4 lg:px-24 overflow-hidden">
+    <div className="min-h-screen relative flex items-center justify-center px-8 py-8 lg:px-24">
       {/* Background com overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -104,192 +104,182 @@ export default function Auth() {
       />
       <div className="absolute inset-0 bg-[#2F302B]/70 backdrop-blur-sm" />
       
-      {/* Conteúdo */}
-      <div className="relative z-10 w-full flex flex-col items-center justify-between h-full py-2">
-        {/* Seção Superior */}
-        <div className="w-full flex-shrink-0 pt-8">
-          <div className="hidden lg:flex flex-col items-center text-center w-full px-8 mt-32">
-            <div className="flex items-center justify-center mx-auto">
-              <img src={logoMarcaCompleta} alt="IAplicada" className="h-12 w-auto" />
-            </div>
-          </div>
-        </div>
+      {/* Conteúdo centralizado */}
+      <div className="relative z-10 w-full max-w-xl flex flex-col items-center gap-6">
+        {/* Logo */}
+        <img 
+          src={logoMarcaCompleta} 
+          alt="IAplicada" 
+          className="h-12 w-auto hidden lg:block" 
+        />
+        <img 
+          src={logoAplicada} 
+          alt="IAplicada" 
+          className="h-8 w-auto lg:hidden" 
+        />
 
-        {/* Seção Central/Inferior */}
-        <div className="w-full flex flex-col items-center gap-4 lg:gap-3 flex-grow justify-center">
-          {/* Logo mobile */}
-          <div className="lg:hidden mb-8">
-            <img src={logoAplicada} alt="IAplicada" className="h-8 w-auto mx-auto" />
-          </div>
+        {/* Card de Auth com altura mínima fixa */}
+        <Card className="w-full min-h-[420px] bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
+          <Tabs defaultValue="aplicados" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] mb-4">
+              <TabsTrigger value="aplicados" className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]">
+                Aplicados
+              </TabsTrigger>
+              <TabsTrigger value="visitantes" className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]">
+                Visitantes
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Card de Auth com Abas */}
-          <Card className="w-full max-w-xl bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md -mt-8">
-            <Tabs defaultValue="aplicados" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] mb-4">
-                <TabsTrigger value="aplicados" className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]">
-                  Aplicados
-                </TabsTrigger>
-                <TabsTrigger value="visitantes" className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]">
-                  Visitantes
-                </TabsTrigger>
-              </TabsList>
+            {/* Aba Aplicados */}
+            <TabsContent value="aplicados">
+              <CardHeader className="space-y-1 p-6 pt-0 text-center">
+                <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
+                  Pronto para aplicar?
+                </CardTitle>
+                <CardDescription className="text-[#F2F2F2]/60 text-center">
+                  Faça login para continuar aplicando IA no seu fluxo real
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="px-6 pb-6">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signin-email" className="text-[#F2F2F2]">Email</Label>
+                    <Input
+                      id="signin-email"
+                      name="signin-email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      required
+                      className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signin-password" className="text-[#F2F2F2]">Senha</Label>
+                    <PasswordInput
+                      id="signin-password"
+                      name="signin-password"
+                      placeholder="••••••••"
+                      required
+                      className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
+                    />
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Entrando..." : "Entrar"}
+                  </Button>
+                </form>
+              </CardContent>
+            </TabsContent>
 
-              {/* Aba Aplicados */}
-              <TabsContent value="aplicados">
-                <CardHeader className="space-y-1 p-6 pt-0 text-center">
-                  <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
-                    Pronto para aplicar?
-                  </CardTitle>
-                  <CardDescription className="text-[#F2F2F2]/60 text-center">
-                    Faça login para continuar aplicando IA no seu fluxo real
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="px-6 pb-6">
-                  <form onSubmit={handleSignIn} className="space-y-4">
+            {/* Aba Visitantes */}
+            <TabsContent value="visitantes">
+              <CardHeader className="space-y-1 p-6 pt-0 text-center">
+                <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
+                  {isVisitorSignup ? "Explore a plataforma" : "Bem-vindo de volta"}
+                </CardTitle>
+                <CardDescription className="text-[#F2F2F2]/60 text-center">
+                  {isVisitorSignup 
+                    ? "Crie uma conta grátis e conheça a comunidade IAplicada" 
+                    : "Acesse sua conta de visitante"}
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="px-6 pb-6">
+                <form onSubmit={handleVisitorAuth} className="space-y-4">
+                  {isVisitorSignup && (
                     <div className="space-y-1.5">
-                      <Label htmlFor="signin-email" className="text-[#F2F2F2]">Email</Label>
+                      <Label htmlFor="visitor-name" className="text-[#F2F2F2]">Nome Completo</Label>
                       <Input
-                        id="signin-email"
-                        name="signin-email"
-                        type="email"
-                        placeholder="seu@email.com"
+                        id="visitor-name"
+                        name="visitor-name"
+                        type="text"
+                        placeholder="Seu nome"
                         required
                         className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
                       />
                     </div>
-                    
-                    <div className="space-y-1.5">
-                      <Label htmlFor="signin-password" className="text-[#F2F2F2]">Senha</Label>
-                      <PasswordInput
-                        id="signin-password"
-                        name="signin-password"
-                        placeholder="••••••••"
-                        required
-                        className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
-                      />
-                    </div>
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold" 
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Entrando..." : "Entrar"}
-                    </Button>
-                  </form>
-                </CardContent>
-              </TabsContent>
+                  )}
 
-              {/* Aba Visitantes */}
-              <TabsContent value="visitantes">
-                <CardHeader className="space-y-1 p-6 pt-0 text-center">
-                  <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
-                    {isVisitorSignup ? "Explore a plataforma" : "Bem-vindo de volta"}
-                  </CardTitle>
-                  <CardDescription className="text-[#F2F2F2]/60 text-center">
-                    {isVisitorSignup 
-                      ? "Crie uma conta grátis e conheça a comunidade IAplicada" 
-                      : "Acesse sua conta de visitante"}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="px-6 pb-6">
-                  <form onSubmit={handleVisitorAuth} className="space-y-4">
-                    {isVisitorSignup && (
-                      <div className="space-y-1.5">
-                        <Label htmlFor="visitor-name" className="text-[#F2F2F2]">Nome Completo</Label>
-                        <Input
-                          id="visitor-name"
-                          name="visitor-name"
-                          type="text"
-                          placeholder="Seu nome"
-                          required
-                          className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
-                        />
-                      </div>
-                    )}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="visitor-email" className="text-[#F2F2F2]">Email</Label>
+                    <Input
+                      id="visitor-email"
+                      name="visitor-email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      required
+                      className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
+                    />
+                  </div>
 
+                  {isVisitorSignup && (
                     <div className="space-y-1.5">
-                      <Label htmlFor="visitor-email" className="text-[#F2F2F2]">Email</Label>
+                      <Label htmlFor="visitor-phone" className="text-[#F2F2F2]">Telefone</Label>
                       <Input
-                        id="visitor-email"
-                        name="visitor-email"
-                        type="email"
-                        placeholder="seu@email.com"
+                        id="visitor-phone"
+                        name="visitor-phone"
+                        type="tel"
+                        placeholder="(00) 00000-0000"
                         required
                         className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
                       />
                     </div>
-
+                  )}
+                  
+                  <div className="space-y-1.5">
+                    <Label htmlFor="visitor-password" className="text-[#F2F2F2]">
+                      {isVisitorSignup ? "Crie uma senha simples" : "Senha"}
+                    </Label>
+                    <PasswordInput
+                      id="visitor-password"
+                      name="visitor-password"
+                      placeholder="Mínimo 6 caracteres"
+                      required
+                      minLength={6}
+                      className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
+                    />
                     {isVisitorSignup && (
-                      <div className="space-y-1.5">
-                        <Label htmlFor="visitor-phone" className="text-[#F2F2F2]">Telefone</Label>
-                        <Input
-                          id="visitor-phone"
-                          name="visitor-phone"
-                          type="tel"
-                          placeholder="(00) 00000-0000"
-                          required
-                          className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
-                        />
-                      </div>
+                      <p className="text-xs text-[#F2F2F2]/50">
+                        Você vai usar essa senha para acessar depois
+                      </p>
                     )}
-                    
-                    <div className="space-y-1.5">
-                      <Label htmlFor="visitor-password" className="text-[#F2F2F2]">
-                        {isVisitorSignup ? "Crie uma senha simples" : "Senha"}
-                      </Label>
-                      <PasswordInput
-                        id="visitor-password"
-                        name="visitor-password"
-                        placeholder="Mínimo 6 caracteres"
-                        required
-                        minLength={6}
-                        className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
-                      />
-                      {isVisitorSignup && (
-                        <p className="text-xs text-[#F2F2F2]/50">
-                          Você vai usar essa senha para acessar depois
-                        </p>
-                      )}
-                    </div>
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold" 
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Processando..." : (isVisitorSignup ? "Criar conta grátis" : "Entrar")}
-                    </Button>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Processando..." : (isVisitorSignup ? "Criar conta grátis" : "Entrar")}
+                  </Button>
 
-                    <button
-                      type="button"
-                      onClick={() => setIsVisitorSignup(!isVisitorSignup)}
-                      className="w-full text-sm text-[#9EB038] hover:underline"
-                    >
-                      {isVisitorSignup ? "Já tenho conta" : "Primeiro acesso"}
-                    </button>
-                  </form>
-                </CardContent>
-              </TabsContent>
-            </Tabs>
-          </Card>
+                  <button
+                    type="button"
+                    onClick={() => setIsVisitorSignup(!isVisitorSignup)}
+                    className="w-full text-sm text-[#9EB038] hover:underline"
+                  >
+                    {isVisitorSignup ? "Já tenho conta" : "Primeiro acesso"}
+                  </button>
+                </form>
+              </CardContent>
+            </TabsContent>
+          </Tabs>
+        </Card>
 
-          {/* Descrição e hashtag (desktop) */}
-          <div className="hidden lg:flex w-full flex-col items-center mt-16 mb-2">
-            <div className="text-center max-w-3xl px-8">
-              <p className="text-lg lg:text-lg text-[#F2F2F2]/80 leading-relaxed">
-                IA só tem valor quando se aplica.
-              </p>
-            </div>
-            <div className="h-4" />
-            <div className="w-full text-center">
-              <p className="text-lg font-semibold text-[#9EB038]">
-                #menoshypemaisentrega
-              </p>
-            </div>
-          </div>
+        {/* Tagline */}
+        <div className="text-center hidden lg:block">
+          <p className="text-lg text-[#F2F2F2]/80">
+            IA só tem valor quando se aplica.
+          </p>
+          <p className="text-lg font-semibold text-[#9EB038] mt-2">
+            #menoshypemaisentrega
+          </p>
         </div>
       </div>
     </div>
