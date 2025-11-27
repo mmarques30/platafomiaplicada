@@ -54,6 +54,8 @@ export type Database = {
         Row: {
           ativo: boolean | null
           created_at: string | null
+          data_aula: string | null
+          descricao: string | null
           dia_semana: string | null
           horario: string | null
           id: string
@@ -63,6 +65,8 @@ export type Database = {
         Insert: {
           ativo?: boolean | null
           created_at?: string | null
+          data_aula?: string | null
+          descricao?: string | null
           dia_semana?: string | null
           horario?: string | null
           id?: string
@@ -72,6 +76,8 @@ export type Database = {
         Update: {
           ativo?: boolean | null
           created_at?: string | null
+          data_aula?: string | null
+          descricao?: string | null
           dia_semana?: string | null
           horario?: string | null
           id?: string

@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Trilhas from "./pages/Trilhas";
 import TrilhaDetalhes from "./pages/TrilhaDetalhes";
 import TrilhasNovidades from "./pages/TrilhasNovidades";
+import Calendario from "./pages/Calendario";
 import VideoPlayer from "./pages/VideoPlayer";
 import Chat from "./pages/Chat";
 import Perfil from "./pages/Perfil";
@@ -78,6 +79,7 @@ function AppContent() {
             <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/favoritos" element={<Favoritos />} />
             <Route path="/notificacoes" element={<Notificacoes />} />
+            <Route path="/notificacoes/calendario" element={<Calendario />} />
             <Route path="/evolucao" element={<Evolucao />} />
             <Route path="/evolucao/conquistas" element={<EvolucaoConquistas />} />
             <Route path="/evolucao/certificados" element={<EvolucaoCertificados />} />
