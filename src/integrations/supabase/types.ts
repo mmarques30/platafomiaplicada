@@ -2004,7 +2004,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "mentorado" | "aluno_trilha"
-      nivel_acesso_plano: "club" | "boost" | "legacy"
+      nivel_acesso_plano: "academy" | "lab" | "skills" | "club"
       plano_mentoria:
         | "club"
         | "pro"
@@ -2147,7 +2147,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "mentorado", "aluno_trilha"],
-      nivel_acesso_plano: ["club", "boost", "legacy"],
+      nivel_acesso_plano: ["academy", "lab", "skills", "club"],
       plano_mentoria: [
         "club",
         "pro",

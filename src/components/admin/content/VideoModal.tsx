@@ -48,7 +48,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       setThumbnailPreview(video.thumbnail_customizado_url || "");
       setThumbnailFile(null);
       setValue("visivel_mentorados", video.visivel_mentorados ?? false);
-      setValue("nivel_minimo_acesso", video.nivel_minimo_acesso || "club");
+      setValue("nivel_minimo_acesso", video.nivel_minimo_acesso || "academy");
       setValue("thumbnail_customizado_url", video.thumbnail_customizado_url || "");
       
       // Carregar materiais existentes
@@ -71,7 +71,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
         ordem: 0, 
         ativo: true,
         visivel_mentorados: false,
-        nivel_minimo_acesso: "club",
+        nivel_minimo_acesso: "academy",
         thumbnail_customizado_url: "",
         data_aula: null
       });
@@ -372,16 +372,17 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
           <div className="space-y-2">
             <Label>Nível Mínimo de Acesso</Label>
             <Select 
-              value={watch("nivel_minimo_acesso") || "club"}
+              value={watch("nivel_minimo_acesso") || "academy"}
               onValueChange={(value) => setValue("nivel_minimo_acesso", value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="club">🌱 Club (todos)</SelectItem>
-                <SelectItem value="boost">🚀 Boost (Boost + Legacy)</SelectItem>
-                <SelectItem value="legacy">👑 Legacy (apenas Legacy)</SelectItem>
+                <SelectItem value="academy">🎓 Academy (todos os planos)</SelectItem>
+                <SelectItem value="lab">🔬 Lab (Lab + Club)</SelectItem>
+                <SelectItem value="skills">🏢 Skills (Skills + Club)</SelectItem>
+                <SelectItem value="club">⭐ Club (apenas Club)</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
