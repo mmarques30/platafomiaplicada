@@ -1,15 +1,14 @@
-import { useState, useEffect, useRef } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useRef, useEffect } from "react";
+import { flushSync } from "react-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { useLocation } from "react-router-dom";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Send, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import mariAvatar from "@/assets/mari-avatar.jpg";
 
 interface Message {
@@ -17,61 +16,55 @@ interface Message {
   content: string;
 }
 
-export default function Chat() {
-  const { user, session } = useAuth();
+const Chat = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Handle initial message from Dashboard
   useEffect(() => {
-    const initialMessage = location.state?.initialMessage;
-    if (initialMessage && messages.length === 0) {
-      setInput(initialMessage);
+    if (location.state?.initialMessages) {
+      setMessages(location.state.initialMessages);
     }
-  }, [location.state?.initialMessage]);
+  }, [location.state]);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      const behavior = isStreaming ? 'smooth' : 'auto';
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior
+      });
     }
-  }, [messages]);
+  }, [messages, isStreaming]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (messageToSend: string) => {
+    if (!messageToSend.trim() || !user) return;
 
-    if (!session) {
-      toast.error("Você precisa estar autenticado para usar o chat");
-      return;
-    }
-
-    const userMessage: Message = {
-      role: "user",
-      content: input,
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    // Abort previous request if still running
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
     abortControllerRef.current = new AbortController();
-
-    // Set timeout (60 seconds)
     const timeoutId = setTimeout(() => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        toast.error("Tempo limite excedido. Tente novamente.");
-      }
-    }, 60000);
+      abortControllerRef.current?.abort();
+    }, 120000);
+
+    setIsLoading(true);
+    setIsStreaming(false);
+    setInput("");
+
+    const userMessage: Message = { role: "user", content: messageToSend };
+    setMessages((prev) => [...prev, userMessage]);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Não autenticado");
+
+      const messagesToSend = [...messages, userMessage];
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat-user`,
         {
@@ -81,7 +74,10 @@ export default function Chat() {
             Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
-            messages: [...messages, userMessage],
+            messages: messagesToSend.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+            })),
           }),
           signal: abortControllerRef.current.signal,
         }
@@ -89,233 +85,287 @@ export default function Chat() {
 
       clearTimeout(timeoutId);
 
-      if (!response.ok || !response.body) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
         if (response.status === 429) {
-          toast.error("Limite de requisições excedido. Aguarde alguns minutos e tente novamente.");
-          setMessages((prev) => prev.slice(0, -1));
-          return;
+          throw new Error("Você atingiu o limite de requisições. Aguarde um momento e tente novamente.");
         }
+        
         if (response.status === 402) {
-          toast.error("Créditos insuficientes. Entre em contato com o suporte.");
-          setMessages((prev) => prev.slice(0, -1));
-          return;
+          throw new Error("Créditos insuficientes para processar esta requisição.");
         }
-        throw new Error("Erro ao enviar mensagem");
+        
+        throw new Error(errorData.error || `Erro ${response.status}: ${response.statusText}`);
       }
 
-      // Process streaming response
-      const reader = response.body.getReader();
+      const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      let textBuffer = '';
-      let streamDone = false;
-      let assistantContent = '';
+      let assistantContent = "";
 
-      while (!streamDone) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-        textBuffer += decoder.decode(value, { stream: true });
+          const chunk = decoder.decode(value);
+          const lines = chunk.split("\n");
 
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const data = line.slice(6);
+              if (data === "[DONE]") continue;
 
-          if (line.endsWith('\r')) line = line.slice(0, -1);
-          if (line.startsWith(':') || line.trim() === '') continue;
-          if (!line.startsWith('data: ')) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === '[DONE]') {
-            streamDone = true;
-            break;
-          }
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              assistantContent += content;
-              setMessages((prev) => {
-                const lastMsg = prev[prev.length - 1];
-                if (lastMsg?.role === 'assistant') {
-                  return prev.map((m, i) =>
-                    i === prev.length - 1 ? { ...m, content: assistantContent } : m
-                  );
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content;
+                
+                if (content) {
+                  assistantContent += content;
+                  
+                  // Primeira vez que recebemos conteúdo, ativar streaming
+                  if (!isStreaming) {
+                    setIsLoading(false);
+                    setIsStreaming(true);
+                  }
+                  
+                  // Usar flushSync para forçar atualizações progressivas
+                  flushSync(() => {
+                    setMessages((prev) => {
+                      const newMessages = [...prev];
+                      if (newMessages[newMessages.length - 1]?.role === "assistant") {
+                        newMessages[newMessages.length - 1].content = assistantContent;
+                      } else {
+                        newMessages.push({ role: "assistant", content: assistantContent });
+                      }
+                      return newMessages;
+                    });
+                  });
                 }
-                return [...prev, { role: 'assistant', content: assistantContent }];
-              });
+              } catch (e) {
+                console.error("Error parsing SSE data:", e);
+              }
             }
-          } catch {
-            textBuffer = line + '\n' + textBuffer;
-            break;
           }
         }
       }
 
-      // Save to history (non-blocking)
-      if (user && assistantContent) {
-        try {
-          await supabase.from("chat_messages").insert([
-            { user_id: user.id, role: "user", content: userMessage.content },
-            { user_id: user.id, role: "assistant", content: assistantContent },
-          ]);
-        } catch (error) {
-          console.error("Erro ao salvar histórico:", error);
-        }
+      // Salvar histórico no banco após conclusão
+      if (assistantContent) {
+        const finalMessages = [...messagesToSend, { role: "assistant" as const, content: assistantContent }];
+        
+        await Promise.all(
+          finalMessages.map((msg) =>
+            supabase.from("chat_messages").insert({
+              user_id: user.id,
+              role: msg.role,
+              content: msg.content,
+            })
+          )
+        );
       }
+      
+      setIsStreaming(false);
     } catch (error: any) {
-      clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
-        console.log("Request aborted");
-        return;
-      }
-      console.error("Erro no chat:", error);
-      toast.error(error.message || "Erro ao enviar mensagem. Tente novamente.");
+      console.error("Erro ao enviar mensagem:", error);
+      
+      // Remove a mensagem do usuário em caso de erro
       setMessages((prev) => prev.slice(0, -1));
+      
+      if (error.name === "AbortError") {
+        toast.error("A requisição demorou muito e foi cancelada. Tente novamente.", {
+          duration: 5000,
+        });
+      } else if (error.message.includes("limite de requisições")) {
+        toast.error(error.message, {
+          duration: 6000,
+        });
+      } else if (error.message.includes("Créditos insuficientes")) {
+        toast.error(error.message, {
+          duration: 6000,
+        });
+      } else if (error.message.includes("Failed to fetch")) {
+        toast.error(
+          "Erro de conexão. Verifique sua internet e tente novamente.",
+          {
+            duration: 5000,
+          }
+        );
+      } else {
+        toast.error(
+          error.message || "Erro ao enviar mensagem. Tente novamente.",
+          {
+            duration: 5000,
+          }
+        );
+      }
     } finally {
       setIsLoading(false);
+      setIsStreaming(false);
       abortControllerRef.current = null;
     }
   };
 
-  if (!session) {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim() && !isLoading) {
+      sendMessage(input);
+    }
+  };
+
+  if (!user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-      <Card className="p-8 max-w-md w-full text-center">
-        <div className="flex justify-center mb-4">
-          <img 
-            src={mariAvatar} 
-            alt="Mariana Marques" 
-            className="w-16 h-16 rounded-full border-2 border-primary object-cover"
-          />
-        </div>
-        <h1 className="text-2xl font-bold mb-4">Chat com a Mari</h1>
-        <p className="text-muted-foreground mb-6">
-          Faça login para conversar diretamente com a Mariana Marques sobre sua jornada em IA
-        </p>
-        <Button onClick={() => window.location.href = '/auth'}>
-          Fazer Login
-        </Button>
-      </Card>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 className="text-2xl font-bold mb-4">Faça login para conversar</h1>
+        <Button onClick={() => navigate("/")}>Ir para Login</Button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-1 container py-6 flex flex-col">
-        <div className="mb-4">
-        <h1 className="text-2xl font-bold">Chat com a Mari</h1>
-        <p className="text-muted-foreground">
-          Converse diretamente com a Mariana sobre sua jornada em IA
-        </p>
-        </div>
-
-        <Card className="flex-1 flex flex-col">
-          {/* Header fixo */}
-          <div className="p-4 border-b flex items-center gap-3 bg-card">
-            <div className="relative">
-              <img 
-                src={mariAvatar} 
-                alt="Mariana Marques" 
-                className="w-12 h-12 rounded-full object-cover border-2 border-primary"
-              />
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
-            </div>
-            <div className="flex-1">
-              <h2 className="font-semibold text-lg">Mariana Marques</h2>
-              <p className="text-sm text-muted-foreground">Mentora IA Aplicada</p>
-            </div>
+    <div className="flex flex-col h-screen bg-background">
+      {/* Header */}
+      <div className="flex items-center gap-4 p-4 border-b border-border bg-card">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate("/dashboard")}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="flex items-center gap-3">
+          <img
+            src={mariAvatar}
+            alt="Mari"
+            className="w-10 h-10 rounded-full"
+          />
+          <div>
+            <h1 className="text-lg font-semibold">Mari - IA Aplicada</h1>
+            <p className="text-sm text-muted-foreground">
+              Sua assistente especialista em IA
+            </p>
           </div>
-          
-          <ScrollArea ref={scrollRef} className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.length === 0 && (
-                <div className="text-center py-12">
-                  <img 
-                    src={mariAvatar} 
-                    alt="Mariana Marques" 
-                    className="w-20 h-20 rounded-full mx-auto mb-4 border-2 border-primary object-cover"
-                  />
-                  <h3 className="text-lg font-semibold mb-2">Oi, Aplicado!</h3>
-                  <p className="text-muted-foreground">
-                    Sou a MarIAna, sua mentora de IA. Como posso te ajudar hoje?
-                  </p>
-                </div>
-              )}
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
-              {message.role === "assistant" ? (
-                <div className="flex gap-3 items-start max-w-[80%]">
-                  <div className="flex-shrink-0">
-                    <img 
-                      src={mariAvatar} 
-                      alt="Mariana Marques" 
-                      className="w-10 h-10 rounded-full object-cover border-2 border-primary"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-semibold text-foreground">Mari</span>
-                      <span className="text-xs text-muted-foreground">Mentora IA Aplicada</span>
-                    </div>
-                    <div className="ai-message-container">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {message.content}
-                      </ReactMarkdown>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-primary text-primary-foreground px-4 py-2 rounded-lg max-w-[80%]">
-                  {message.content}
-                </div>
-              )}
-            </div>
-          ))}
-              {isLoading && messages[messages.length - 1]?.role === "user" && (
-                <div className="flex justify-start">
-                  <div className="bg-muted rounded-lg px-4 py-2">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  </div>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+        </div>
+      </div>
 
-          <div className="p-4 border-t">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                sendMessage();
-              }}
-              className="flex gap-2"
-            >
-            <Input
+      {/* Messages */}
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+      >
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <img
+              src={mariAvatar}
+              alt="Mari"
+              className="w-24 h-24 rounded-full mb-4"
+            />
+            <h2 className="text-2xl font-bold mb-2">Olá! Sou a Mari 👋</h2>
+            <p className="text-muted-foreground max-w-md">
+              Estou aqui para ajudar você com IA Aplicada. Pergunte qualquer coisa!
+            </p>
+          </div>
+        )}
+
+        <div className="max-w-4xl mx-auto space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`flex gap-3 items-start max-w-[80%] ${
+                    message.role === "user" ? "flex-row-reverse" : ""
+                  }`}
+                >
+                  {message.role === "assistant" && (
+                    <img
+                      src={mariAvatar}
+                      alt="Mari"
+                      className="w-10 h-10 rounded-full flex-shrink-0"
+                    />
+                  )}
+                  <div
+                    className={`rounded-lg px-4 py-2 ${
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground"
+                    }`}
+                  >
+                    {message.role === "assistant" ? (
+                      <div className="flex items-start gap-1">
+                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
+                        {isStreaming && index === messages.length - 1 && (
+                          <span className="inline-flex items-center text-primary ml-1 animate-pulse">
+                            ▌
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {isLoading && !isStreaming && (
+              <div className="flex justify-start">
+                <div className="flex gap-3 items-start">
+                  <img
+                    src={mariAvatar}
+                    alt="Mari"
+                    className="w-10 h-10 rounded-full flex-shrink-0"
+                  />
+                  <div className="bg-muted rounded-lg px-4 py-2 text-muted-foreground">
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Pensando...
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+        </div>
+      </div>
+
+      {/* Input */}
+      <div className="p-4 border-t border-border bg-card">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+          <div className="flex gap-2">
+            <Textarea
+              ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
               placeholder="Digite sua mensagem..."
-              disabled={isLoading}
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
-              data-lpignore="true"
-              data-1p-ignore="true"
-              data-bwignore="true"
+              className="min-h-[60px] max-h-[200px] resize-none"
+              disabled={isLoading || isStreaming}
             />
-              <Button type="submit" disabled={isLoading || !input.trim()}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={isLoading || isStreaming || !input.trim()}
+              className="flex-shrink-0"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
           </div>
-        </Card>
-      </main>
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+export default Chat;
