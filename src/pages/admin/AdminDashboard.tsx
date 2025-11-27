@@ -50,7 +50,7 @@ export default function AdminDashboard() {
 
       {/* Seção 1: Alertas */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">⚠️ Requer Atenção</h2>
+        <h2 className="text-xl font-semibold mb-4">Requer Atenção</h2>
         <div className="grid gap-4 md:grid-cols-3">
           <AlertCard
             title="Tarefas Atrasadas"
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
 
       {/* Seção 2: Crescimento & Engajamento */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">📈 Crescimento & Engajamento</h2>
+        <h2 className="text-xl font-semibold mb-4">Crescimento & Engajamento</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
             title="Novos Usuários (7d)"
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
 
       {/* Seção 4: Saúde da Mentoria */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">🎯 Saúde da Mentoria</h2>
+        <h2 className="text-xl font-semibold mb-4">Saúde da Mentoria</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
             title="Projetos em Andamento"
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
 
       {/* Seção 5: Inventário de Conteúdo */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">📚 Inventário de Conteúdo</h2>
+        <h2 className="text-xl font-semibold mb-4">Inventário de Conteúdo</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <StatsCard
             title="Trilhas Ativas"
