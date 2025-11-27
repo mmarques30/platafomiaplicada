@@ -44,8 +44,8 @@ serve(async (req) => {
     }
     console.log(`[ai-chat-user] Usuário autenticado: ${user.id}`);
 
-    // Buscar contexto do usuário (sem ferramentas administrativas)
-    const [formulario, objetivos, roles, trilhas, cursos, knowledgeBase] = await Promise.all([
+    // Buscar contexto do usuário e conteúdos da plataforma
+    const [formulario, objetivos, roles, trilhas, cursos, knowledgeBase, prompts, ferramentas, metodos, videos, modulos] = await Promise.all([
       supabaseClient
         .from("formulario_diagnostico")
         .select("*")
@@ -75,6 +75,36 @@ serve(async (req) => {
         .select("titulo, categoria, conteudo_extraido")
         .eq("ativo", true)
         .order("created_at", { ascending: false }),
+      supabaseClient
+        .from("biblioteca_prompts")
+        .select("id, titulo, descricao, categoria, tags, prompt")
+        .eq("ativo", true)
+        .order("created_at", { ascending: false }),
+      supabaseClient
+        .from("ferramentas_ia")
+        .select("id, nome, objetivo, o_que_entrega, categoria, vale_a_pena, justificativa, avaliacao_mari, gratuito")
+        .eq("ativo", true)
+        .order("avaliacao_mari", { ascending: false }),
+      supabaseClient
+        .from("metodos_aplicar")
+        .select("id, titulo, descricao, categoria, template")
+        .eq("ativo", true)
+        .order("created_at", { ascending: false }),
+      supabaseClient
+        .from("videos")
+        .select(`
+          id, titulo, descricao,
+          modulos!inner(titulo, categoria),
+          trilhas!inner(titulo)
+        `)
+        .eq("ativo", true)
+        .order("created_at", { ascending: false })
+        .limit(30),
+      supabaseClient
+        .from("modulos")
+        .select("id, titulo, descricao, categoria, trilha_id")
+        .eq("ativo", true)
+        .order("ordem"),
     ]);
 
     // System prompt focado em mentoria e aprendizado (sem ferramentas admin)
@@ -320,6 +350,108 @@ ${kb.conteudo_extraido}
 
 ✱ **Use essas informações** para complementar suas respostas quando relevante, mas mantenha o foco no que o usuário está perguntando.`;
     }
+
+    // Adicionar biblioteca de prompts
+    if (prompts.data && prompts.data.length > 0) {
+      systemPrompt += `\n\n## 📝 Biblioteca de Prompts Disponíveis:
+Quando o usuário perguntar sobre tarefas específicas, recomende prompts prontos da biblioteca:
+
+${prompts.data.map((p: any) => `- **${p.titulo}** (${p.categoria}): ${p.descricao}
+  → Recomende com: "Temos um prompt pronto pra isso! Acesse em **Biblioteca > Prompts > ${p.titulo}**"`).join("\n")}
+
+**Como recomendar prompts:**
+✅ Quando o usuário mencionar uma tarefa (email, análise, relatório, currículo)
+✅ Use o nome EXATO do prompt para facilitar a busca
+✅ Indique o caminho: "Biblioteca > Prompts > [Nome]"`;
+    }
+
+    // Adicionar ferramentas avaliadas
+    if (ferramentas.data && ferramentas.data.length > 0) {
+      systemPrompt += `\n\n## 🛠️ Ferramentas de IA Avaliadas na Plataforma:
+Quando recomendar ferramentas, use nossas avaliações oficiais:
+
+${ferramentas.data.map((f: any) => `- **${f.nome}** ${f.vale_a_pena ? "⭐ Vale a pena!" : ""} (${f.categoria})
+  ${f.gratuito ? "💰 Tem versão gratuita" : ""}
+  Objetivo: ${f.objetivo}
+  Entrega: ${f.o_que_entrega}
+  ${f.avaliacao_mari ? `Nota Mari: ${f.avaliacao_mari}/5` : ""}
+  ${f.justificativa ? `Opinião: ${f.justificativa}` : ""}`).join("\n\n")}
+
+**Como recomendar ferramentas:**
+✅ "Inclusive, temos uma análise completa do [ferramenta] na biblioteca de ferramentas"
+✅ Mencione a nota e opinião da Mari quando relevante
+✅ Link: Acesse em **Biblioteca > Ferramentas**`;
+    }
+
+    // Adicionar métodos para aplicar
+    if (metodos.data && metodos.data.length > 0) {
+      systemPrompt += `\n\n## 🎯 Métodos para Aplicar Disponíveis:
+Frameworks e templates prontos para o usuário usar:
+
+${metodos.data.map((m: any) => `- **${m.titulo}** (${m.categoria}): ${m.descricao}
+  → Template pronto em: **Métodos para Aplicar > ${m.titulo}**`).join("\n")}
+
+**Como recomendar métodos:**
+✅ Quando o usuário precisar de um framework estruturado
+✅ "Temos um template pronto pra isso em **Métodos para Aplicar**"`;
+    }
+
+    // Adicionar vídeos recomendados
+    if (videos.data && videos.data.length > 0) {
+      systemPrompt += `\n\n## 🎬 Vídeos Relevantes para Recomendação:
+Sugira vídeos específicos quando o tema coincidir:
+
+${videos.data.slice(0, 15).map((v: any) => {
+  const trilhaTitulo = Array.isArray(v.trilhas) ? v.trilhas[0]?.titulo : v.trilhas?.titulo;
+  const moduloTitulo = Array.isArray(v.modulos) ? v.modulos[0]?.titulo : v.modulos?.titulo;
+  return `- **${v.titulo}**
+  Trilha: ${trilhaTitulo || "N/A"}
+  Módulo: ${moduloTitulo || "N/A"}
+  ${v.descricao ? `Sobre: ${v.descricao.slice(0, 100)}...` : ""}`;
+}).join("\n\n")}
+
+**Como recomendar vídeos:**
+✅ Quando o tema coincidir com conteúdo específico
+✅ "Sobre isso, tem um vídeo muito bom na plataforma que explica passo a passo"
+✅ Sempre mencione trilha + título do vídeo para facilitar navegação`;
+    }
+
+    // Adicionar módulos disponíveis
+    if (modulos.data && modulos.data.length > 0) {
+      systemPrompt += `\n\n## 📚 Módulos Disponíveis:
+${modulos.data.map((m: any) => `- **${m.titulo}** (${m.categoria}): ${m.descricao}`).join("\n")}`;
+    }
+
+    // Instruções finais de recomendação
+    systemPrompt += `\n\n## 🎯 Como Recomendar Conteúdos da Plataforma:
+
+**REGRAS FUNDAMENTAIS:**
+✅ SEMPRE que existir conteúdo relevante na plataforma, MENCIONE naturalmente
+✅ Use os nomes EXATOS dos conteúdos para facilitar busca
+✅ Indique o caminho de navegação quando possível
+✅ NÃO invente conteúdos - só recomende o que existe nas listas acima
+✅ Priorize conteúdos específicos sobre recomendações genéricas
+✅ Integre recomendações naturalmente na conversa (não liste tudo de uma vez)
+
+**QUANDO RECOMENDAR:**
+
+**Prompts**: Usuário tem tarefa específica (email, CV, ata, análise)
+→ "Olha, a gente tem um prompt pronto pra isso! Vai em **Biblioteca > Prompts > [Nome]**"
+
+**Ferramentas**: Ao recomendar uma ferramenta de IA
+→ "Inclusive, tem análise completa do [ferramenta] na nossa biblioteca com nota e opinião"
+
+**Vídeos**: Tema coincide com conteúdo específico
+→ "Sobre isso, tem um vídeo muito bom: **[Título]** na trilha **[Nome da Trilha]**"
+
+**Trilhas/Módulos**: Direcionamento geral de aprendizado
+→ "Pra se aprofundar, recomendo a trilha **[Nome]** - é exatamente sobre isso"
+
+**FORMATO DE LINKS INTERNOS:**
+Use referências textuais claras que o usuário pode buscar:
+- "Acesse em **Biblioteca > Prompts > Email Profissional Express**"
+- "Veja na trilha **Fundamentos de IA** o vídeo **Setup Claude**"
+- "Na **Biblioteca > Ferramentas** tem nossa análise do Gemini"`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
