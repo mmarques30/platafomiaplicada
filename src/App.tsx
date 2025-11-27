@@ -53,6 +53,7 @@ import GerenciarProdutos from "./pages/admin/GerenciarProdutos";
 import MinhasTarefas from "./pages/admin/MinhasTarefas";
 import Auditoria from "./pages/admin/Auditoria";
 import GerenciarMenus from "./pages/admin/GerenciarMenus";
+import ImportarUsuarios from "./pages/admin/ImportarUsuarios";
 
 const queryClient = new QueryClient();
 
@@ -111,6 +112,7 @@ function AppContent() {
             <Route path="minhas-tarefas" element={<MinhasTarefas />} />
             <Route path="menus" element={<GerenciarMenus />} />
             <Route path="auditoria" element={<Auditoria />} />
+            <Route path="importar-usuarios" element={<ImportarUsuarios />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
