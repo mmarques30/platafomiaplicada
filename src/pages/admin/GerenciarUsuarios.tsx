@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useUsers, useDeleteUser, useImportUsersBatch, useUpdateOnboardingStatus } from "@/hooks/admin/useUsers";
+import { useNavigate } from "react-router-dom";
+import { useUsers, useDeleteUser, useUpdateOnboardingStatus } from "@/hooks/admin/useUsers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -27,9 +28,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
 export default function GerenciarUsuários() {
+  const navigate = useNavigate();
   const { data: users, isLoading } = useUsers();
   const deleteUser = useDeleteUser();
-  const importUsersBatch = useImportUsersBatch();
   const updateOnboardingStatus = useUpdateOnboardingStatus();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
@@ -105,21 +106,6 @@ export default function GerenciarUsuários() {
     }
   };
 
-  const handleImportAcademyNov2025 = () => {
-    const academyUsers = [
-      { email: "ana_ps26@hotmail.com", nomeCompleto: "Ana Paula De Souza", password: "aplica2025" },
-      { email: "elilorocha@hotmail.com", nomeCompleto: "Elisangela Lo Rocha", password: "aplica2025" },
-      { email: "wagner.sillva@outlook.com", nomeCompleto: "Wagner Sillva", password: "aplica2025" },
-      { email: "renatoscher@gmail.com", nomeCompleto: "Renato Schervinski", password: "aplica2025" }
-    ];
-
-    importUsersBatch.mutate({
-      users: academyUsers,
-      planoMentoria: "academy",
-      roles: ["aluno_trilha"]
-    });
-  };
-
   if (isLoading) {
     return (
       <div>
@@ -135,12 +121,11 @@ export default function GerenciarUsuários() {
         <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
         <div className="flex gap-2">
           <Button 
-            onClick={handleImportAcademyNov2025}
+            onClick={() => navigate('/admin/importar-usuarios')}
             variant="outline"
-            disabled={importUsersBatch.isPending}
           >
             <Upload className="h-4 w-4 mr-2" />
-            {importUsersBatch.isPending ? "Importando..." : "Importar Academy Nov/2025"}
+            Importar Usuários
           </Button>
           <Button onClick={() => setNovoUsuarioOpen(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
