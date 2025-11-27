@@ -61,7 +61,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         ordem: modulo.ordem || 0,
         ativo: modulo.ativo !== undefined ? modulo.ativo : true,
         visivel_mentorados: modulo.visivel_mentorados ?? false,
-        nivel_minimo_acesso: modulo.nivel_minimo_acesso || "club",
+        nivel_minimo_acesso: modulo.nivel_minimo_acesso || "academy",
         data_inicio: modulo.data_inicio || null,
       });
       setCustomCategoria(modulo.categoria || "");
@@ -76,7 +76,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         ordem: 0, 
         ativo: true,
         visivel_mentorados: false,
-        nivel_minimo_acesso: "club",
+        nivel_minimo_acesso: "academy",
         data_inicio: null
       });
       setCustomCategoria("");
@@ -303,16 +303,17 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
           <div className="space-y-2">
             <Label>Nível Mínimo de Acesso</Label>
             <Select 
-              value={watch("nivel_minimo_acesso") || "club"}
+              value={watch("nivel_minimo_acesso") || "academy"}
               onValueChange={(value) => setValue("nivel_minimo_acesso", value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="club">🌱 Club (todos)</SelectItem>
-                <SelectItem value="boost">🚀 Boost (Boost + Legacy)</SelectItem>
-                <SelectItem value="legacy">👑 Legacy (apenas Legacy)</SelectItem>
+                <SelectItem value="academy">🎓 Academy (todos os planos)</SelectItem>
+                <SelectItem value="lab">🔬 Lab (Lab + Club)</SelectItem>
+                <SelectItem value="skills">🏢 Skills (Skills + Club)</SelectItem>
+                <SelectItem value="club">⭐ Club (apenas Club)</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">

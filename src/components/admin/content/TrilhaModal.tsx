@@ -44,6 +44,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       ativo: true,
       visivel_mentorados: false,
       visivel_apenas_pro: false,
+      nivel_minimo_acesso: "academy",
       imagem_url: "",
       duracao_estimada: 0,
     },
@@ -61,6 +62,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       setImageFile(null);
       setValue("visivel_mentorados", trilha.visivel_mentorados ?? false);
       setValue("visivel_apenas_pro", trilha.visivel_apenas_pro ?? false);
+      setValue("nivel_minimo_acesso", trilha.nivel_minimo_acesso || "academy");
     } else {
       reset({
         titulo: "",
@@ -71,6 +73,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         ativo: true,
         visivel_mentorados: false,
         visivel_apenas_pro: false,
+        nivel_minimo_acesso: "academy",
         imagem_url: "",
         duracao_estimada: 0,
       });
@@ -347,19 +350,26 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
             </Alert>
           )}
 
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="visivel_apenas_pro"
-              checked={watch("visivel_apenas_pro")}
-              onCheckedChange={(checked) => setValue("visivel_apenas_pro", !!checked)}
-            />
-            <Label htmlFor="visivel_apenas_pro">
-              🔒 Conteúdo Exclusivo PRO
-            </Label>
+          <div className="space-y-2">
+            <Label>Nível Mínimo de Acesso</Label>
+            <Select 
+              value={watch("nivel_minimo_acesso") || "academy"}
+              onValueChange={(value) => setValue("nivel_minimo_acesso", value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="academy">🎓 Academy (todos os planos)</SelectItem>
+                <SelectItem value="lab">🔬 Lab (Lab + Club)</SelectItem>
+                <SelectItem value="skills">🏢 Skills (Skills + Club)</SelectItem>
+                <SelectItem value="club">⭐ Club (apenas Club)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Define qual plano mínimo pode acessar esta trilha
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground ml-6">
-            Apenas mentorados com plano PRO terão acesso a esta trilha
-          </p>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
