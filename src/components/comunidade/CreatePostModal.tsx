@@ -9,6 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useCommunityPosts } from "@/hooks/useCommunityPosts";
 
 interface CreatePostModalProps {
@@ -20,6 +29,21 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
   const { createPost, isCreating } = useCommunityPosts();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [categoryId, setCategoryId] = useState<string>("");
+
+  const { data: categories } = useQuery({
+    queryKey: ["community-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_categories")
+        .select("*")
+        .eq("ativo", true)
+        .order("ordem", { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const handleSubmit = () => {
     if (!content.trim()) return;
@@ -28,11 +52,13 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
       {
         title: title.trim() || undefined,
         content: content.trim(),
+        category_id: categoryId || undefined,
       },
       {
         onSuccess: () => {
           setTitle("");
           setContent("");
+          setCategoryId("");
           onOpenChange(false);
         },
       }
@@ -47,6 +73,22 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
         </DialogHeader>
 
         <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="category">Categoria</Label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger className="bg-zinc-800 border-zinc-700">
+                <SelectValue placeholder="Selecione uma categoria (opcional)" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories?.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.emoji} {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="title">Título (opcional)</Label>
             <Input
