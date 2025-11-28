@@ -30,6 +30,7 @@ import {
   CheckSquare,
   Package,
   Settings,
+  MessagesSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -42,6 +43,7 @@ const navItems = [
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
   { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },
   { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
+  { path: "/admin/comunidade", label: "Comunidade", icon: MessagesSquare },
   { path: "/admin/produtos", label: "Produtos", icon: Package },
   { path: "/admin/minhas-tarefas", label: "Minhas Tarefas", icon: CheckSquare },
   { path: "/admin/menus", label: "Menus", icon: Settings },
