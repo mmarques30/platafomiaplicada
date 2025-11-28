@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada.png";
 import { useLocation } from "react-router-dom";
@@ -28,6 +29,7 @@ export function TopHeader() {
   const { user, signOut } = useAuth();
   const { isAdmin } = useUserRole();
   const { hasAccessTo } = useUserPlan();
+  const { profile } = useUserProfile();
   
   // Detectar rotas ativas para dropdowns
   const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
@@ -60,6 +62,8 @@ export function TopHeader() {
     if (email) return email.charAt(0).toUpperCase();
     return "U";
   };
+
+  const firstName = profile?.nome_completo?.split(" ")[0] || "Usuário";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
@@ -186,13 +190,13 @@ export function TopHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2 text-foreground hover:text-primary h-auto px-2 py-1">
                 <Avatar className="h-8 w-8 border-2 border-border">
-                  <AvatarImage src="" />
+                  <AvatarImage src={profile?.avatar_url || ""} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    {getInitials(user?.email, user?.user_metadata?.nome_completo)}
+                    {getInitials(user?.email, profile?.nome_completo)}
                   </AvatarFallback>
                 </Avatar>
                 <span className="hidden md:block text-sm font-medium">
-                  {user?.user_metadata?.nome_completo?.split(" ")[0] || "Usuário"}
+                  {firstName}
                 </span>
                 <ChevronDown className="h-4 w-4" />
               </Button>
