@@ -26,11 +26,6 @@ export function MembersList() {
           variant={filter === "all" ? "default" : "outline"}
           onClick={() => setFilter("all")}
           size="sm"
-          className={
-            filter === "all"
-              ? "bg-[#9EB038] hover:bg-[#8a9d32] text-[#2F302B]"
-              : ""
-          }
         >
           Todos
         </Button>
@@ -38,11 +33,6 @@ export function MembersList() {
           variant={filter === "admin" ? "default" : "outline"}
           onClick={() => setFilter("admin")}
           size="sm"
-          className={
-            filter === "admin"
-              ? "bg-[#9EB038] hover:bg-[#8a9d32] text-[#2F302B]"
-              : ""
-          }
         >
           Admins
         </Button>
@@ -50,11 +40,6 @@ export function MembersList() {
           variant={filter === "online" ? "default" : "outline"}
           onClick={() => setFilter("online")}
           size="sm"
-          className={
-            filter === "online"
-              ? "bg-[#9EB038] hover:bg-[#8a9d32] text-[#2F302B]"
-              : ""
-          }
         >
           Online
         </Button>
@@ -63,7 +48,7 @@ export function MembersList() {
       {/* Members Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {members.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-zinc-400">
+          <div className="col-span-full text-center py-12 text-muted-foreground">
             Nenhum membro encontrado
           </div>
         ) : (

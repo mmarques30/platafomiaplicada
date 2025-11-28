@@ -15,10 +15,10 @@ export default function Comunidade() {
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             IAplicada Community
           </h1>
-          <p className="text-zinc-400">
+          <p className="text-muted-foreground">
             Conecte-se, aprenda e compartilhe conhecimento sobre IA aplicada
           </p>
         </div>
@@ -30,34 +30,34 @@ export default function Comunidade() {
           {/* Main Content */}
           <div>
             <Tabs defaultValue="community" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5 bg-zinc-900 border border-zinc-800">
+              <TabsList className="grid w-full grid-cols-5 bg-muted">
                 <TabsTrigger
                   value="community"
-                  className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   Community
                 </TabsTrigger>
                 <TabsTrigger
                   value="classroom"
-                  className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   Classroom
                 </TabsTrigger>
                 <TabsTrigger
                   value="calendar"
-                  className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   Calendar
                 </TabsTrigger>
                 <TabsTrigger
                   value="members"
-                  className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   Members
                 </TabsTrigger>
                 <TabsTrigger
                   value="leaderboard"
-                  className="data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B]"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   Leaderboard
                 </TabsTrigger>

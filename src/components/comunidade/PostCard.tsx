@@ -34,29 +34,35 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
   };
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800">
+    <Card className="bg-card border-border">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-[#9EB038] text-[#2F302B]">
+              <AvatarFallback className="bg-primary text-primary-foreground">
                 {getInitials(post.profiles.nome_completo)}
               </AvatarFallback>
             </Avatar>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-medium text-zinc-200">
+                <span className="font-medium text-foreground">
                   {post.profiles.nome_completo}
                 </span>
                 <Badge variant="outline" className="text-xs">
                   Nível {post.profiles.nivel_comunidade}
                 </Badge>
               </div>
-              <div className="text-xs text-zinc-500">
+              <div className="text-xs text-muted-foreground">
                 {formatDistanceToNow(new Date(post.created_at), {
                   addSuffix: true,
                   locale: ptBR,
                 })}
+                {post.community_categories && (
+                  <>
+                    {" • "}
+                    {post.community_categories.name}
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -66,29 +72,23 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
               variant="ghost"
               size="sm"
               onClick={onDelete}
-              className="text-zinc-400 hover:text-red-500"
+              className="text-muted-foreground hover:text-red-500"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           )}
         </div>
-
-        {post.community_categories && (
-          <Badge variant="secondary" className="w-fit">
-            {post.community_categories.emoji} {post.community_categories.name}
-          </Badge>
-        )}
       </CardHeader>
 
       <CardContent className="space-y-4">
         {post.title && (
-          <h3 className="text-lg font-semibold text-zinc-100">{post.title}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{post.title}</h3>
         )}
 
-        <p className="text-zinc-300 whitespace-pre-wrap">{post.content}</p>
+        <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
 
         {/* Actions */}
-        <div className="flex items-center gap-4 pt-2 border-t border-zinc-800">
+        <div className="flex items-center gap-4 pt-2 border-t border-border">
           <Button
             variant="ghost"
             size="sm"
@@ -96,7 +96,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
             className={
               post.user_has_liked
                 ? "text-red-500 hover:text-red-600"
-                : "text-zinc-400 hover:text-zinc-300"
+                : "text-muted-foreground hover:text-foreground"
             }
           >
             <Heart
@@ -111,7 +111,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
             variant="ghost"
             size="sm"
             onClick={() => setShowComments(!showComments)}
-            className="text-zinc-400 hover:text-zinc-300"
+            className="text-muted-foreground hover:text-foreground"
           >
             <MessageCircle className="h-4 w-4 mr-1" />
             {post.comments_count}
