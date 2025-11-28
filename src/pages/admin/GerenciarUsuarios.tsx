@@ -221,7 +221,9 @@ export default function GerenciarUsuários() {
                         {(user as any).plano_mentoria === "legacy" && "Legacy"}
                       </Badge>
                     ) : (
-                      <span className="text-muted-foreground text-sm">-</span>
+                      <Badge variant="outline" className="border-gray-400 text-gray-600">
+                        Visitante
+                      </Badge>
                     )}
                     {(user as any).origem_consultoria && (
                       <Badge 

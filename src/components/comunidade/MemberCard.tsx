@@ -53,11 +53,9 @@ export function MemberCard({ member }: MemberCardProps) {
                   Admin
                 </Badge>
               )}
-              {member.plano_mentoria && (
-                <Badge variant="outline" className="text-xs capitalize">
-                  {member.plano_mentoria}
-                </Badge>
-              )}
+            <Badge variant="outline" className="text-xs capitalize">
+              {member.plano_mentoria || "Visitante"}
+            </Badge>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
@@ -65,11 +63,6 @@ export function MemberCard({ member }: MemberCardProps) {
                 Nível {member.nivel_comunidade}
               </Badge>
               <span>{member.pontos_comunidade} pontos</span>
-              {isOnline && (
-                <Badge className="bg-green-500 text-white text-xs">
-                  Online
-                </Badge>
-              )}
             </div>
 
             {member.bio && (
@@ -78,15 +71,13 @@ export function MemberCard({ member }: MemberCardProps) {
               </p>
             )}
 
-            {member.ultimo_acesso && (
-              <p className="text-xs text-muted-foreground mt-2">
-                Ativo{" "}
-                {formatDistanceToNow(new Date(member.ultimo_acesso), {
-                  addSuffix: true,
-                  locale: ptBR,
-                })}
-              </p>
-            )}
+            <p className="text-xs mt-2">
+              {isOnline ? (
+                <span className="text-green-600 font-medium">Online</span>
+              ) : (
+                <span className="text-muted-foreground">Offline</span>
+              )}
+            </p>
           </div>
         </div>
       </CardContent>
