@@ -196,7 +196,7 @@ export function TrilhasTab() {
                     <Badge variant="secondary">{trilhaStat?.total_exercicios || 0}</Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Badge variant={trilha.ativo ? "default" : "secondary"}>
                         {trilha.ativo ? "Ativo" : "Inativo"}
                       </Badge>
@@ -208,6 +208,11 @@ export function TrilhasTab() {
                       {trilha.ativo && trilha.visivel_mentorados && (
                         <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/50">
                           Publicado
+                        </Badge>
+                      )}
+                      {trilha.visivel_visitantes && (
+                        <Badge variant="outline" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/50">
+                          👁️ Visitantes
                         </Badge>
                       )}
                     </div>

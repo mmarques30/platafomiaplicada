@@ -196,6 +196,11 @@ export function ModulosTab() {
                           Publicado
                         </Badge>
                       )}
+                      {modulo.visivel_visitantes && (
+                        <Badge variant="outline" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/50">
+                          👁️ Visitantes
+                        </Badge>
+                      )}
                       {modulo.trilha_visivel && !modulo.visivel_mentorados && (
                         <Badge variant="destructive" className="text-xs flex items-center gap-1">
                           <AlertTriangle className="h-3 w-3" />

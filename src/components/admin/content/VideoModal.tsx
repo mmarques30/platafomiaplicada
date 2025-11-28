@@ -48,6 +48,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       setThumbnailPreview(video.thumbnail_customizado_url || "");
       setThumbnailFile(null);
       setValue("visivel_mentorados", video.visivel_mentorados ?? false);
+      setValue("visivel_visitantes", video.visivel_visitantes ?? false);
       setValue("nivel_minimo_acesso", video.nivel_minimo_acesso || "academy");
       setValue("thumbnail_customizado_url", video.thumbnail_customizado_url || "");
       
@@ -71,6 +72,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
         ordem: 0, 
         ativo: true,
         visivel_mentorados: false,
+        visivel_visitantes: false,
         nivel_minimo_acesso: "academy",
         thumbnail_customizado_url: "",
         data_aula: null
@@ -367,6 +369,17 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
           </div>
           <p className="text-xs text-muted-foreground ml-6">
             Deixe desmarcado para preparar a aula antes de liberá-la
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <Switch 
+              checked={watch("visivel_visitantes")} 
+              onCheckedChange={(checked) => setValue("visivel_visitantes", checked)} 
+            />
+            <Label>Visível para Visitantes</Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Marque para permitir que visitantes vejam este vídeo
           </p>
 
           <div className="space-y-2">

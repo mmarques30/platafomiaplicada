@@ -61,6 +61,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         ordem: modulo.ordem || 0,
         ativo: modulo.ativo !== undefined ? modulo.ativo : true,
         visivel_mentorados: modulo.visivel_mentorados ?? false,
+        visivel_visitantes: modulo.visivel_visitantes ?? false,
         nivel_minimo_acesso: modulo.nivel_minimo_acesso || "academy",
         data_inicio: modulo.data_inicio || null,
       });
@@ -76,6 +77,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         ordem: 0, 
         ativo: true,
         visivel_mentorados: false,
+        visivel_visitantes: false,
         nivel_minimo_acesso: "academy",
         data_inicio: null
       });
@@ -286,6 +288,17 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
           </div>
           <p className="text-xs text-muted-foreground ml-6">
             Deixe desmarcado para preparar o módulo antes de publicá-lo
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <Switch 
+              checked={watch("visivel_visitantes")} 
+              onCheckedChange={(checked) => setValue("visivel_visitantes", checked)} 
+            />
+            <Label>Visível para Visitantes</Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Marque para permitir que visitantes vejam este módulo
           </p>
 
           {trilha?.visivel_mentorados && !watch("visivel_mentorados") && (
