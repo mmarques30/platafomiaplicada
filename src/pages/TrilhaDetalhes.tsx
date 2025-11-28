@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState, useEffect, useRef } from "react";
+import { useContentVisibility } from "@/hooks/useContentVisibility";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ export default function TrilhaDetalhes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const { isVisitante, isLoading: loadingRole } = useContentVisibility();
 
   // Helper para garantir que materiais seja sempre um array
   const parseMateriais = (materiais: any): any[] => {
@@ -47,9 +49,9 @@ export default function TrilhaDetalhes() {
   };
 
   const { data: trilha, isLoading } = useQuery({
-    queryKey: ["trilha", id],
+    queryKey: ["trilha", id, isVisitante],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("trilhas")
         .select(`
           *,
@@ -60,18 +62,29 @@ export default function TrilhaDetalhes() {
         `)
         .eq("id", id)
         .eq("ativo", true)
-        .eq("visivel_mentorados", true)
         .eq("modulos.ativo", true)
-        .eq("modulos.visivel_mentorados", true)
         .eq("modulos.videos.ativo", true)
-        .eq("modulos.videos.visivel_mentorados", true)
         .order("ordem", { foreignTable: "modulos" })
-        .order("ordem", { foreignTable: "modulos.videos" })
-        .single();
+        .order("ordem", { foreignTable: "modulos.videos" });
+      
+      if (isVisitante) {
+        query = query
+          .eq("visivel_visitantes", true)
+          .eq("modulos.visivel_visitantes", true)
+          .eq("modulos.videos.visivel_visitantes", true);
+      } else {
+        query = query
+          .eq("visivel_mentorados", true)
+          .eq("modulos.visivel_mentorados", true)
+          .eq("modulos.videos.visivel_mentorados", true);
+      }
+      
+      const { data, error } = await query.single();
       
       if (error) throw error;
       return data;
     },
+    enabled: !loadingRole,
   });
 
   const { data: progressData } = useQuery({

@@ -43,6 +43,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       ordem: 0,
       ativo: true,
       visivel_mentorados: false,
+      visivel_visitantes: false,
       visivel_apenas_pro: false,
       nivel_minimo_acesso: "academy",
       imagem_url: "",
@@ -61,6 +62,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       setImagePreview(trilha.imagem_url || "");
       setImageFile(null);
       setValue("visivel_mentorados", trilha.visivel_mentorados ?? false);
+      setValue("visivel_visitantes", trilha.visivel_visitantes ?? false);
       setValue("visivel_apenas_pro", trilha.visivel_apenas_pro ?? false);
       setValue("nivel_minimo_acesso", trilha.nivel_minimo_acesso || "academy");
     } else {
@@ -72,6 +74,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         ordem: 0,
         ativo: true,
         visivel_mentorados: false,
+        visivel_visitantes: false,
         visivel_apenas_pro: false,
         nivel_minimo_acesso: "academy",
         imagem_url: "",
@@ -336,6 +339,17 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
           </div>
           <p className="text-xs text-muted-foreground ml-6">
             Marque para publicar este conteúdo. Deixe desmarcado para preparar como rascunho.
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <Switch 
+              checked={watch("visivel_visitantes")} 
+              onCheckedChange={(checked) => setValue("visivel_visitantes", checked)} 
+            />
+            <Label>Visível para Visitantes</Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Marque para permitir que visitantes (não-assinantes) vejam esta trilha
           </p>
 
           {watch("visivel_mentorados") && (

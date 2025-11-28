@@ -4,23 +4,33 @@ import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCard } from "@/components/shared/TrilhaCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { useContentVisibility } from "@/hooks/useContentVisibility";
 
 export default function Trilhas() {
   const [trilhasVisiveis, setTrilhasVisiveis] = useState(3);
+  const { isVisitante, isLoading: loadingRole } = useContentVisibility();
 
   const { data: trilhas, isLoading } = useQuery({
-    queryKey: ["trilhas"],
+    queryKey: ["trilhas", isVisitante],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("trilhas")
         .select("*")
         .eq("ativo", true)
-        .eq("visivel_mentorados", true)
         .order("ordem");
+      
+      if (isVisitante) {
+        query = query.eq("visivel_visitantes", true);
+      } else {
+        query = query.eq("visivel_mentorados", true);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;
     },
+    enabled: !loadingRole,
   });
 
   const trilhasPorNivel = {
