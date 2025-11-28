@@ -13,15 +13,13 @@ export default function Comunidade() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            IAplicada Community
-          </h1>
-          <p className="text-muted-foreground">
-            Conecte-se, aprenda e compartilhe conhecimento sobre IA aplicada
-          </p>
-        </div>
+      <div className="container mx-auto px-4 py-6">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          IAplicada Community
+        </h1>
+        <p className="text-muted-foreground">
+          Conecte-se, aprenda e compartilhe conhecimento sobre IA aplicada
+        </p>
       </div>
 
       {/* Main Layout */}
