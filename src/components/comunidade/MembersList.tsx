@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useCommunityMembers } from "@/hooks/useCommunityMembers";
+import { useCommunityStats } from "@/hooks/useCommunityStats";
 import { MemberCard } from "./MemberCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export function MembersList() {
   const [filter, setFilter] = useState<"all" | "admin" | "online">("all");
   const { members, isLoading } = useCommunityMembers(filter);
+  const { stats } = useCommunityStats();
 
   if (isLoading) {
     return (
@@ -19,42 +21,56 @@ export function MembersList() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex gap-2">
-        <Button
-          variant={filter === "all" ? "default" : "outline"}
+    <div className="space-y-6">
+      {/* Filters - Pill Style */}
+      <div className="flex items-center gap-2 p-1 bg-muted/30 rounded-full w-fit">
+        <button
           onClick={() => setFilter("all")}
-          size="sm"
+          className={cn(
+            "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+            filter === "all"
+              ? "bg-[#2F302B] text-white"
+              : "text-muted-foreground hover:bg-muted"
+          )}
         >
-          Todos
-        </Button>
-        <Button
-          variant={filter === "admin" ? "default" : "outline"}
+          Membros {stats.totalMembers}
+        </button>
+        <button
           onClick={() => setFilter("admin")}
-          size="sm"
+          className={cn(
+            "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+            filter === "admin"
+              ? "bg-[#2F302B] text-white"
+              : "text-muted-foreground hover:bg-muted"
+          )}
         >
-          Admins
-        </Button>
-        <Button
-          variant={filter === "online" ? "default" : "outline"}
+          Admins {stats.adminCount}
+        </button>
+        <button
           onClick={() => setFilter("online")}
-          size="sm"
+          className={cn(
+            "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+            filter === "online"
+              ? "bg-[#2F302B] text-white"
+              : "text-muted-foreground hover:bg-muted"
+          )}
         >
-          Online
-        </Button>
+          Online {stats.onlineMembers}
+        </button>
       </div>
 
-      {/* Members Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {members.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            Nenhum membro encontrado
-          </div>
-        ) : (
-          members.map((member) => <MemberCard key={member.id} member={member} />)
-        )}
-      </div>
+      {/* Members List */}
+      {members.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          Nenhum membro encontrado
+        </div>
+      ) : (
+        <div className="divide-y divide-border">
+          {members.map((member) => (
+            <MemberCard key={member.id} member={member} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
