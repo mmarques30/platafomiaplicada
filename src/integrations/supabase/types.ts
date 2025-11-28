@@ -2249,6 +2249,10 @@ export type Database = {
       }
     }
     Functions: {
+      add_community_points: {
+        Args: { p_points: number; p_user_id: string }
+        Returns: undefined
+      }
       calcular_prazo_sla: { Args: { p_user_id: string }; Returns: string }
       calcular_progresso_preparacao: {
         Args: { p_projeto_id: string; p_user_id: string }
