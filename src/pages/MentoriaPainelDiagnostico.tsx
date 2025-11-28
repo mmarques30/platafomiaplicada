@@ -1,5 +1,6 @@
 import { usePainelDiagnostico } from "@/hooks/usePainelDiagnostico";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { InformacoesMentorado } from "@/components/mentoria/painel/InformacoesMentorado";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProjetosPriorizados } from "@/components/mentoria/painel/ProjetosPriorizados";
@@ -19,9 +20,23 @@ export default function MentoriaPainelDiagnostico() {
   const { userId } = useParams();
   const { diagnostico, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
   const { plan } = useUserPlan();
+  const { isAdmin } = useUserRole();
   
-  const voltarUrl = plan === 'academy' ? '/evolucao' : '/mentoria';
-  const voltarLabel = plan === 'academy' ? 'Voltar para Minha Evolução' : 'Voltar para Mentoria';
+  const voltarUrl = isAdmin 
+    ? '/mentoria' 
+    : !plan 
+      ? '/comunidade' 
+      : plan === 'academy' 
+        ? '/evolucao' 
+        : '/mentoria';
+  
+  const voltarLabel = isAdmin 
+    ? 'Voltar para Mentoria' 
+    : !plan 
+      ? 'Voltar para Comunidade' 
+      : plan === 'academy' 
+        ? 'Voltar para Minha Evolução' 
+        : 'Voltar para Mentoria';
 
   if (isLoading) {
     return (
