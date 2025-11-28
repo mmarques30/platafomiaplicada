@@ -258,6 +258,268 @@ export type Database = {
         }
         Relationships: []
       }
+      classroom_courses: {
+        Row: {
+          ativo: boolean | null
+          conteudo: Json | null
+          created_at: string | null
+          descricao: string | null
+          gratuito: boolean | null
+          id: string
+          ordem: number | null
+          thumbnail_url: string | null
+          tipo: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          conteudo?: Json | null
+          created_at?: string | null
+          descricao?: string | null
+          gratuito?: boolean | null
+          id?: string
+          ordem?: number | null
+          thumbnail_url?: string | null
+          tipo?: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          conteudo?: Json | null
+          created_at?: string | null
+          descricao?: string | null
+          gratuito?: boolean | null
+          id?: string
+          ordem?: number | null
+          thumbnail_url?: string | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      classroom_progress: {
+        Row: {
+          completado: boolean | null
+          course_id: string
+          created_at: string | null
+          id: string
+          progresso: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completado?: boolean | null
+          course_id: string
+          created_at?: string | null
+          id?: string
+          progresso?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completado?: boolean | null
+          course_id?: string
+          created_at?: string | null
+          id?: string
+          progresso?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_progress_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "classroom_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classroom_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_categories: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          emoji: string | null
+          id: string
+          name: string
+          ordem: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          name: string
+          ordem?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          name?: string
+          ordem?: number | null
+        }
+        Relationships: []
+      }
+      community_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          parent_id: string | null
+          post_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          parent_id?: string | null
+          post_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          parent_id?: string | null
+          post_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "community_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_posts: {
+        Row: {
+          category_id: string | null
+          comments_count: number | null
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          media: Json | null
+          pinned: boolean | null
+          title: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          comments_count?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          media?: Json | null
+          pinned?: boolean | null
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          comments_count?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          media?: Json | null
+          pinned?: boolean | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "community_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_reactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cursos: {
         Row: {
           ativo: boolean | null
@@ -1188,6 +1450,8 @@ export type Database = {
       profiles: {
         Row: {
           adicionado_grupo_whatsapp: boolean | null
+          avatar_url: string | null
+          bio: string | null
           conta_ativa: boolean | null
           created_at: string | null
           data_expiracao_acesso: string | null
@@ -1198,18 +1462,23 @@ export type Database = {
           idade: number | null
           is_visitante: boolean | null
           linkedin: string | null
+          nivel_comunidade: number | null
           nome_completo: string
           origem_consultoria: boolean | null
           plano_mentoria: Database["public"]["Enums"]["plano_mentoria"] | null
+          pontos_comunidade: number | null
           primeiro_acesso: boolean | null
           profissao: string | null
           senha_alterada_em: string | null
           senha_temporaria: boolean | null
           telefone: string | null
+          ultimo_acesso: string | null
           updated_at: string | null
         }
         Insert: {
           adicionado_grupo_whatsapp?: boolean | null
+          avatar_url?: string | null
+          bio?: string | null
           conta_ativa?: boolean | null
           created_at?: string | null
           data_expiracao_acesso?: string | null
@@ -1220,18 +1489,23 @@ export type Database = {
           idade?: number | null
           is_visitante?: boolean | null
           linkedin?: string | null
+          nivel_comunidade?: number | null
           nome_completo: string
           origem_consultoria?: boolean | null
           plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
+          pontos_comunidade?: number | null
           primeiro_acesso?: boolean | null
           profissao?: string | null
           senha_alterada_em?: string | null
           senha_temporaria?: boolean | null
           telefone?: string | null
+          ultimo_acesso?: string | null
           updated_at?: string | null
         }
         Update: {
           adicionado_grupo_whatsapp?: boolean | null
+          avatar_url?: string | null
+          bio?: string | null
           conta_ativa?: boolean | null
           created_at?: string | null
           data_expiracao_acesso?: string | null
@@ -1242,14 +1516,17 @@ export type Database = {
           idade?: number | null
           is_visitante?: boolean | null
           linkedin?: string | null
+          nivel_comunidade?: number | null
           nome_completo?: string
           origem_consultoria?: boolean | null
           plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
+          pontos_comunidade?: number | null
           primeiro_acesso?: boolean | null
           profissao?: string | null
           senha_alterada_em?: string | null
           senha_temporaria?: boolean | null
           telefone?: string | null
+          ultimo_acesso?: string | null
           updated_at?: string | null
         }
         Relationships: []
