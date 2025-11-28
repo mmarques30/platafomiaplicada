@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, UserCog, Circle, Mail, FileText } from "lucide-react";
+import { Users, UserCog, Circle, FileText } from "lucide-react";
 import { useCommunityStats } from "@/hooks/useCommunityStats";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 
@@ -83,14 +83,8 @@ export function CommunitySidebar() {
         <CardContent className="space-y-2">
           <Button variant="ghost" className="w-full justify-start" asChild>
             <a href="/materiais-gratuitos" className="text-sm">
-              <Mail className="h-4 w-4 mr-2" />
-              Newsletter
-            </a>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start" asChild>
-            <a href="/materiais-gratuitos" className="text-sm">
               <FileText className="h-4 w-4 mr-2" />
-              Materiais
+              Materiais Gratuitos
             </a>
           </Button>
         </CardContent>
