@@ -82,7 +82,7 @@ export function CommunitySidebar() {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button variant="ghost" className="w-full justify-start" asChild>
-            <a href="/comunidade/newsletter" className="text-sm">
+            <a href="/materiais-gratuitos" className="text-sm">
               <Mail className="h-4 w-4 mr-2" />
               Newsletter
             </a>

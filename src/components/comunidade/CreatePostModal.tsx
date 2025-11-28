@@ -170,7 +170,7 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
                   <Smile className="h-4 w-4" />
                 </Button>
                 {showEmojiPicker && (
-                  <div className="absolute top-full left-0 mt-1 p-2 bg-popover border border-border rounded-md shadow-lg z-10 grid grid-cols-5 gap-1">
+                  <div className="absolute top-full left-0 mt-1 p-2 bg-popover border border-border rounded-md shadow-lg z-[100] grid grid-cols-5 gap-1 min-w-[200px]">
                     {COMMON_EMOJIS.map((emoji) => (
                       <button
                         key={emoji}

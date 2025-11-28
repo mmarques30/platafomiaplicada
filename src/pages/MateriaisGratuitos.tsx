@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, ExternalLink, FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book } from "lucide-react";
+import { Download, ExternalLink, FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Material = {
@@ -25,6 +25,7 @@ const CATEGORIAS = [
   { value: "ferramentas", label: "Ferramentas", icon: Wrench, color: "bg-purple-500" },
   { value: "checklists", label: "Checklists", icon: CheckSquare, color: "bg-orange-500" },
   { value: "ebooks", label: "E-books", icon: Book, color: "bg-pink-500" },
+  { value: "newsletter", label: "Newsletter", icon: Mail, color: "bg-red-500" },
 ];
 
 export default function MateriaisGratuitos() {

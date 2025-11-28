@@ -38,6 +38,7 @@ const CATEGORIAS = [
   { value: "ferramentas", label: "Ferramentas" },
   { value: "checklists", label: "Checklists" },
   { value: "ebooks", label: "E-books" },
+  { value: "newsletter", label: "Newsletter" },
 ];
 
 const TIPOS = [
