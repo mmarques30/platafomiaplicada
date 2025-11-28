@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,14 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { User, Briefcase, Calendar, Linkedin, Edit2, Save, X } from "lucide-react";
+import { User, Briefcase, Calendar, Linkedin, Edit2, Save, X, Camera } from "lucide-react";
 
 export default function Perfil() {
   const { user } = useAuth();
   const { roles } = useUserRole();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user?.id],
@@ -111,6 +114,87 @@ export default function Perfil() {
     setIsEditing(false);
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
+  const uploadAvatar = async (file: File) => {
+    if (!user) return;
+
+    try {
+      setUploading(true);
+
+      // Deletar avatar antigo se existir
+      if (profile?.avatar_url) {
+        const oldPath = profile.avatar_url.split("/").pop();
+        if (oldPath) {
+          await supabase.storage
+            .from("avatars")
+            .remove([`${user.id}/${oldPath}`]);
+        }
+      }
+
+      // Upload novo avatar
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Obter URL pública
+      const { data: { publicUrl } } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      // Atualizar profile
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: publicUrl })
+        .eq("id", user.id);
+
+      if (updateError) throw updateError;
+
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Avatar atualizado com sucesso");
+    } catch (error) {
+      console.error("Erro ao fazer upload:", error);
+      toast.error("Erro ao atualizar avatar");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith("image/")) {
+      toast.error("Por favor, selecione uma imagem");
+      return;
+    }
+
+    // Validar tamanho (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 2MB");
+      return;
+    }
+
+    await uploadAvatar(file);
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-8 px-4 flex items-center justify-center min-h-[400px]">
@@ -130,6 +214,47 @@ export default function Perfil() {
           </Button>
         )}
       </div>
+
+      {/* Avatar Section */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-6">
+            <div className="relative">
+              <Avatar className="h-24 w-24">
+                {profile?.avatar_url && (
+                  <AvatarImage src={profile.avatar_url} alt={profile.nome_completo} />
+                )}
+                <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                  {profile?.nome_completo ? getInitials(profile.nome_completo) : "?"}
+                </AvatarFallback>
+              </Avatar>
+              <Button
+                size="icon"
+                variant="secondary"
+                className="absolute -bottom-2 -right-2 rounded-full h-8 w-8"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                <Camera className="h-4 w-4" />
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">{profile?.nome_completo}</h3>
+              <p className="text-sm text-muted-foreground">{profile?.profissao || "Sem profissão"}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Clique no ícone da câmera para alterar sua foto
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Informações Pessoais */}

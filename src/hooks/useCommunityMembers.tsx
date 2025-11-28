@@ -10,6 +10,7 @@ export interface CommunityMember {
   pontos_comunidade: number;
   ultimo_acesso: string | null;
   created_at: string | null;
+  plano_mentoria: string | null;
   is_admin?: boolean;
 }
 
