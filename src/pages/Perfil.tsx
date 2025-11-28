@@ -86,6 +86,7 @@ export default function Perfil() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
       setIsEditing(false);
       toast.success("Perfil atualizado com sucesso");
     },
@@ -167,6 +168,7 @@ export default function Perfil() {
       if (updateError) throw updateError;
 
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
       toast.success("Avatar atualizado com sucesso");
     } catch (error) {
       console.error("Erro ao fazer upload:", error);
