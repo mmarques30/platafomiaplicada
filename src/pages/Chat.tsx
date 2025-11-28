@@ -102,49 +102,93 @@ const Chat = () => {
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let assistantContent = "";
+      let textBuffer = "";
 
       if (reader) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split("\n");
+          textBuffer += decoder.decode(value, { stream: true });
 
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") continue;
+          // Processar linha por linha
+          let newlineIndex: number;
+          while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+            let line = textBuffer.slice(0, newlineIndex);
+            textBuffer = textBuffer.slice(newlineIndex + 1);
 
-              try {
-                const parsed = JSON.parse(data);
-                const content = parsed.choices?.[0]?.delta?.content;
+            if (line.endsWith("\r")) line = line.slice(0, -1); // Handle CRLF
+            if (line.startsWith(":") || line.trim() === "") continue; // SSE comments
+            if (!line.startsWith("data: ")) continue;
+
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr === "[DONE]") continue;
+
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const content = parsed.choices?.[0]?.delta?.content;
+              
+              if (content) {
+                assistantContent += content;
                 
-                if (content) {
-                  assistantContent += content;
-                  
-                  // Primeira vez que recebemos conteúdo, ativar streaming
-                  if (!isStreaming) {
-                    setIsLoading(false);
-                    setIsStreaming(true);
-                  }
-                  
-                  // Usar flushSync para forçar atualizações progressivas
-                  flushSync(() => {
-                    setMessages((prev) => {
-                      const newMessages = [...prev];
-                      if (newMessages[newMessages.length - 1]?.role === "assistant") {
-                        newMessages[newMessages.length - 1].content = assistantContent;
-                      } else {
-                        newMessages.push({ role: "assistant", content: assistantContent });
-                      }
-                      return newMessages;
-                    });
-                  });
+                // Primeira vez que recebemos conteúdo, ativar streaming
+                if (!isStreaming) {
+                  setIsLoading(false);
+                  setIsStreaming(true);
                 }
-              } catch (e) {
-                console.error("Error parsing SSE data:", e);
+                
+                // Usar flushSync para forçar atualizações progressivas
+                flushSync(() => {
+                  setMessages((prev) => {
+                    const newMessages = [...prev];
+                    if (newMessages[newMessages.length - 1]?.role === "assistant") {
+                      newMessages[newMessages.length - 1].content = assistantContent;
+                    } else {
+                      newMessages.push({ role: "assistant", content: assistantContent });
+                    }
+                    return newMessages;
+                  });
+                });
               }
+            } catch (e) {
+              // Linha incompleta - devolver ao buffer e aguardar mais dados
+              textBuffer = line + "\n" + textBuffer;
+              break;
+            }
+          }
+        }
+
+        // Flush final para dados restantes no buffer
+        if (textBuffer.trim()) {
+          const remainingLines = textBuffer.split("\n");
+          for (let raw of remainingLines) {
+            if (!raw) continue;
+            if (raw.endsWith("\r")) raw = raw.slice(0, -1);
+            if (raw.startsWith(":") || raw.trim() === "") continue;
+            if (!raw.startsWith("data: ")) continue;
+            
+            const jsonStr = raw.slice(6).trim();
+            if (jsonStr === "[DONE]") continue;
+            
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                assistantContent += content;
+                flushSync(() => {
+                  setMessages((prev) => {
+                    const newMessages = [...prev];
+                    if (newMessages[newMessages.length - 1]?.role === "assistant") {
+                      newMessages[newMessages.length - 1].content = assistantContent;
+                    } else {
+                      newMessages.push({ role: "assistant", content: assistantContent });
+                    }
+                    return newMessages;
+                  });
+                });
+              }
+            } catch {
+              // Ignorar linhas inválidas restantes
             }
           }
         }
@@ -254,14 +298,14 @@ const Chat = () => {
         className="flex-1 overflow-y-auto p-4 space-y-4"
       >
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+          <div className="flex flex-col items-center justify-center h-full text-center p-4 md:p-8">
             <img
               src={mariAvatar}
               alt="Mari"
-              className="w-24 h-24 rounded-full mb-4"
+              className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full mb-4 object-cover"
             />
-            <h2 className="text-2xl font-bold mb-2">Olá! Sou a Mari 🧠</h2>
-            <p className="text-muted-foreground max-w-md">
+            <h2 className="text-xl md:text-2xl font-bold mb-2">Olá! Sou a Mari 🧠</h2>
+            <p className="text-muted-foreground max-w-md text-sm md:text-base">
               Estou aqui para ajudar você com IA Aplicada. Pergunte qualquer coisa!
             </p>
           </div>
