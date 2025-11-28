@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download, ExternalLink, FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -69,31 +70,29 @@ export default function MateriaisGratuitos() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Category Filter */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          <Button
-            variant={selectedCategory === null ? "default" : "outline"}
-            onClick={() => setSelectedCategory(null)}
+        <div className="flex items-center gap-4 mb-8">
+          <span className="text-sm text-muted-foreground">Filtrar por:</span>
+          <Select 
+            value={selectedCategory || "todas"} 
+            onValueChange={(value) => setSelectedCategory(value === "todas" ? null : value)}
           >
-            Todas
-          </Button>
-          {CATEGORIAS.map((cat) => {
-            const Icon = cat.icon;
-            const count = groupedMateriais[cat.value]?.length || 0;
-            return (
-              <Button
-                key={cat.value}
-                variant={selectedCategory === cat.value ? "default" : "outline"}
-                onClick={() => setSelectedCategory(cat.value)}
-                className="gap-2"
-              >
-                <Icon className="h-4 w-4" />
-                {cat.label}
-                <Badge variant="secondary" className="ml-1">
-                  {count}
-                </Badge>
-              </Button>
-            );
-          })}
+            <SelectTrigger className="w-[240px]">
+              <SelectValue placeholder="Todas as categorias" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">
+                Todas ({materiais?.length || 0})
+              </SelectItem>
+              {CATEGORIAS.map((cat) => {
+                const count = groupedMateriais[cat.value]?.length || 0;
+                return (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {cat.label} ({count})
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Loading State */}
