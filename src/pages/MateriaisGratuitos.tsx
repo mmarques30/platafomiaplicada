@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, ExternalLink, FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail } from "lucide-react";
+import { Download, ExternalLink, FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Material = {
@@ -30,6 +31,7 @@ const CATEGORIAS = [
 ];
 
 export default function MateriaisGratuitos() {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const { data: materiais, isLoading } = useQuery({
@@ -59,6 +61,16 @@ export default function MateriaisGratuitos() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="container mx-auto px-4 py-6">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate("/comunidade")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar para Comunidade
+        </Button>
+        
         <h1 className="text-3xl font-bold text-foreground mb-2">
           Materiais Gratuitos
         </h1>
