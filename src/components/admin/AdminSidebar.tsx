@@ -31,6 +31,7 @@ import {
   Package,
   Settings,
   MessagesSquare,
+  Gift,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -45,6 +46,7 @@ const navItems = [
   { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
   { path: "/admin/comunidade", label: "Comunidade", icon: MessagesSquare },
   { path: "/admin/produtos", label: "Produtos", icon: Package },
+  { path: "/admin/materiais", label: "Materiais Gratuitos", icon: Gift },
   { path: "/admin/minhas-tarefas", label: "Minhas Tarefas", icon: CheckSquare },
   { path: "/admin/menus", label: "Menus", icon: Settings },
   { path: "/admin/auditoria", label: "Auditoria do Sistema", icon: FileSearch },

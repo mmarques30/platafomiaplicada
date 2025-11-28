@@ -60,6 +60,7 @@ import Comunidade from "./pages/Comunidade";
 import DashboardVisitante from "./pages/DashboardVisitante";
 import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
 import MateriaisGratuitos from "./pages/MateriaisGratuitos";
+import GerenciarMateriais from "./pages/admin/GerenciarMateriais";
 
 const queryClient = new QueryClient();
 
@@ -122,6 +123,7 @@ function AppContent() {
             <Route path="conhecimento" element={<GerenciarConhecimento />} />
             <Route path="mentoria" element={<GerenciarMentoria />} />
             <Route path="produtos" element={<GerenciarProdutos />} />
+            <Route path="materiais" element={<GerenciarMateriais />} />
             <Route path="formularios" element={<VisualizarFormularios />} />
             <Route path="minhas-tarefas" element={<MinhasTarefas />} />
             <Route path="menus" element={<GerenciarMenus />} />
