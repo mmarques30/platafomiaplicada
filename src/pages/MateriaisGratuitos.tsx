@@ -1,0 +1,183 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Download, ExternalLink, FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+type Material = {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  categoria: string;
+  url: string;
+  tipo: string;
+  imagem_url: string | null;
+  ordem: number;
+};
+
+const CATEGORIAS = [
+  { value: "templates", label: "Templates", icon: FileText, color: "bg-blue-500" },
+  { value: "guias", label: "Guias", icon: BookOpen, color: "bg-green-500" },
+  { value: "prompts", label: "Prompts", icon: Lightbulb, color: "bg-yellow-500" },
+  { value: "ferramentas", label: "Ferramentas", icon: Wrench, color: "bg-purple-500" },
+  { value: "checklists", label: "Checklists", icon: CheckSquare, color: "bg-orange-500" },
+  { value: "ebooks", label: "E-books", icon: Book, color: "bg-pink-500" },
+];
+
+export default function MateriaisGratuitos() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const { data: materiais, isLoading } = useQuery({
+    queryKey: ["materiais-gratuitos"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("materiais_gratuitos")
+        .select("*")
+        .eq("ativo", true)
+        .order("ordem", { ascending: true });
+
+      if (error) throw error;
+      return data as Material[];
+    },
+  });
+
+  const filteredMateriais = selectedCategory
+    ? materiais?.filter((m) => m.categoria === selectedCategory)
+    : materiais;
+
+  const groupedMateriais = CATEGORIAS.reduce((acc, cat) => {
+    acc[cat.value] = materiais?.filter((m) => m.categoria === cat.value) || [];
+    return acc;
+  }, {} as Record<string, Material[]>);
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="container mx-auto px-4 py-6">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Materiais Gratuitos
+        </h1>
+        <p className="text-muted-foreground">
+          Acesse templates, guias, prompts e recursos para aplicar IA no seu dia a dia
+        </p>
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          <Button
+            variant={selectedCategory === null ? "default" : "outline"}
+            onClick={() => setSelectedCategory(null)}
+          >
+            Todas
+          </Button>
+          {CATEGORIAS.map((cat) => {
+            const Icon = cat.icon;
+            const count = groupedMateriais[cat.value]?.length || 0;
+            return (
+              <Button
+                key={cat.value}
+                variant={selectedCategory === cat.value ? "default" : "outline"}
+                onClick={() => setSelectedCategory(cat.value)}
+                className="gap-2"
+              >
+                <Icon className="h-4 w-4" />
+                {cat.label}
+                <Badge variant="secondary" className="ml-1">
+                  {count}
+                </Badge>
+              </Button>
+            );
+          })}
+        </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-full mt-2" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-10 w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Materials Grid */}
+        {!isLoading && filteredMateriais && filteredMateriais.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMateriais.map((material) => {
+              const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
+              const Icon = categoria?.icon || FileText;
+              
+              return (
+                <Card key={material.id} className="bg-card border-border hover:border-primary/50 transition-colors">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`p-2 rounded-lg ${categoria?.color || "bg-muted"}`}>
+                          <Icon className="h-5 w-5 text-white" />
+                        </div>
+                        <Badge variant="outline">{categoria?.label}</Badge>
+                      </div>
+                    </div>
+                    <CardTitle className="text-lg mt-3">{material.titulo}</CardTitle>
+                    {material.descricao && (
+                      <CardDescription className="text-sm">
+                        {material.descricao}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <Button
+                      className="w-full"
+                      asChild
+                    >
+                      <a
+                        href={material.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2"
+                      >
+                        {material.tipo === "download" ? (
+                          <>
+                            <Download className="h-4 w-4" />
+                            Baixar Material
+                          </>
+                        ) : (
+                          <>
+                            <ExternalLink className="h-4 w-4" />
+                            Acessar Material
+                          </>
+                        )}
+                      </a>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && filteredMateriais && filteredMateriais.length === 0 && (
+          <div className="text-center py-12">
+            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">
+              Nenhum material disponível nesta categoria no momento.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

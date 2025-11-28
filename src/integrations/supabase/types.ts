@@ -1181,6 +1181,48 @@ export type Database = {
         }
         Relationships: []
       }
+      materiais_gratuitos: {
+        Row: {
+          ativo: boolean | null
+          categoria: string
+          created_at: string | null
+          descricao: string | null
+          id: string
+          imagem_url: string | null
+          ordem: number | null
+          tipo: string | null
+          titulo: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria: string
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          ordem?: number | null
+          tipo?: string | null
+          titulo: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          ordem?: number | null
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       menu_config: {
         Row: {
           created_at: string | null

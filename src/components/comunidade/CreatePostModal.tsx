@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Bold, Italic, Smile } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCommunityPosts } from "@/hooks/useCommunityPosts";
@@ -25,11 +26,15 @@ interface CreatePostModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const COMMON_EMOJIS = ["😊", "👍", "🎉", "❤️", "🔥", "💡", "✨", "🚀", "💪", "🎯"];
+
 export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
   const { createPost, isCreating } = useCommunityPosts();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { data: categories } = useQuery({
     queryKey: ["community-categories"],
@@ -44,6 +49,37 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
       return data;
     },
   });
+
+  const insertFormatting = (prefix: string, suffix: string = prefix) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    const newText = content.substring(0, start) + prefix + selectedText + suffix + content.substring(end);
+    
+    setContent(newText);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, end + prefix.length);
+    }, 0);
+  };
+
+  const insertEmoji = (emoji: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const newText = content.substring(0, start) + emoji + content.substring(start);
+    
+    setContent(newText);
+    setShowEmojiPicker(false);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+    }, 0);
+  };
 
   const handleSubmit = () => {
     if (!content.trim()) return;
@@ -67,7 +103,7 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-100">
+      <DialogContent className="bg-card border-border text-foreground">
         <DialogHeader>
           <DialogTitle>Criar Novo Post</DialogTitle>
         </DialogHeader>
@@ -76,13 +112,13 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
           <div className="space-y-2">
             <Label htmlFor="category">Categoria</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger className="bg-zinc-800 border-zinc-700">
+              <SelectTrigger className="bg-background border-input">
                 <SelectValue placeholder="Selecione uma categoria (opcional)" />
               </SelectTrigger>
               <SelectContent>
                 {categories?.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id}>
-                    {cat.emoji} {cat.name}
+                    {cat.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -96,18 +132,67 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Digite um título..."
-              className="bg-zinc-800 border-zinc-700 text-zinc-200"
+              className="bg-background border-input"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="content">Conteúdo *</Label>
+            
+            {/* Formatting Toolbar */}
+            <div className="flex items-center gap-1 p-2 bg-muted rounded-t-md border border-b-0 border-input">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => insertFormatting("**")}
+                title="Negrito"
+              >
+                <Bold className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => insertFormatting("*")}
+                title="Itálico"
+              >
+                <Italic className="h-4 w-4" />
+              </Button>
+              <div className="relative">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  title="Emoji"
+                >
+                  <Smile className="h-4 w-4" />
+                </Button>
+                {showEmojiPicker && (
+                  <div className="absolute top-full left-0 mt-1 p-2 bg-popover border border-border rounded-md shadow-lg z-10 grid grid-cols-5 gap-1">
+                    {COMMON_EMOJIS.map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => insertEmoji(emoji)}
+                        className="text-xl hover:bg-accent p-1 rounded"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <Textarea
+              ref={textareaRef}
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Compartilhe algo com a comunidade..."
-              className="bg-zinc-800 border-zinc-700 text-zinc-200 min-h-[200px]"
+              placeholder="Compartilhe algo com a comunidade... Use **negrito** e *itálico*"
+              className="bg-background border-input rounded-t-none min-h-[200px]"
             />
           </div>
 
@@ -122,7 +207,7 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
             <Button
               onClick={handleSubmit}
               disabled={!content.trim() || isCreating}
-              className="bg-[#9EB038] hover:bg-[#8a9d32] text-[#2F302B]"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isCreating ? "Publicando..." : "Publicar"}
             </Button>

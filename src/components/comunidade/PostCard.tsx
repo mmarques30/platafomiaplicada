@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useState } from "react";
 import { PostComments } from "./PostComments";
+import ReactMarkdown from "react-markdown";
 
 interface PostCardProps {
   post: CommunityPost;
@@ -85,7 +86,17 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           <h3 className="text-lg font-semibold text-foreground">{post.title}</h3>
         )}
 
-        <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+        <div className="text-foreground prose prose-sm max-w-none dark:prose-invert">
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => <p className="whitespace-pre-wrap">{children}</p>,
+              strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+              em: ({ children }) => <em className="italic">{children}</em>,
+            }}
+          >
+            {post.content}
+          </ReactMarkdown>
+        </div>
 
         {/* Actions */}
         <div className="flex items-center gap-4 pt-2 border-t border-border">

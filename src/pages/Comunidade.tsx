@@ -1,7 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CommunityFeed } from "@/components/comunidade/CommunityFeed";
-import { ClassroomGrid } from "@/components/comunidade/ClassroomGrid";
-import { CalendarioAulas } from "@/components/calendario/CalendarioAulas";
 import { MembersList } from "@/components/comunidade/MembersList";
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
 import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
@@ -28,49 +26,29 @@ export default function Comunidade() {
           {/* Main Content */}
           <div>
             <Tabs defaultValue="community" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5 bg-muted">
+              <TabsList className="grid w-full grid-cols-3 bg-muted">
                 <TabsTrigger
                   value="community"
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  Community
-                </TabsTrigger>
-                <TabsTrigger
-                  value="classroom"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  Classroom
-                </TabsTrigger>
-                <TabsTrigger
-                  value="calendar"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  Calendar
+                  Comunidade
                 </TabsTrigger>
                 <TabsTrigger
                   value="members"
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  Members
+                  Membros
                 </TabsTrigger>
                 <TabsTrigger
                   value="leaderboard"
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  Leaderboard
+                  Ranking
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="community" className="space-y-4">
                 <CommunityFeed />
-              </TabsContent>
-
-              <TabsContent value="classroom" className="space-y-4">
-                <ClassroomGrid />
-              </TabsContent>
-
-              <TabsContent value="calendar" className="space-y-4">
-                <CalendarioAulas />
               </TabsContent>
 
               <TabsContent value="members" className="space-y-4">
