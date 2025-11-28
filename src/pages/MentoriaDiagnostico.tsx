@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
 import { HeroMentoria } from "@/components/mentoria/HeroMentoria";
@@ -25,6 +26,7 @@ export default function MentoriaDiagnostico() {
   const navigate = useNavigate();
   const { formulario, isLoading, refetch } = useMentoriaForm();
   const { plan } = useUserPlan();
+  const { isAdmin } = useUserRole();
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
   const [criandoNovo, setCriandoNovo] = useState(false);
@@ -34,8 +36,21 @@ export default function MentoriaDiagnostico() {
   const preenchido = formulario?.completado && !modoEdicao && !criandoNovo;
   const preenchidoPorAdmin = formulario?.preenchido_por === 'admin';
   
-  const voltarUrl = plan === 'academy' ? '/evolucao' : '/mentoria';
-  const voltarLabel = plan === 'academy' ? 'Voltar para Minha Evolução' : 'Voltar para Mentoria';
+  const voltarUrl = isAdmin 
+    ? '/mentoria' 
+    : !plan 
+      ? '/comunidade' 
+      : plan === 'academy' 
+        ? '/evolucao' 
+        : '/mentoria';
+  
+  const voltarLabel = isAdmin 
+    ? 'Voltar para Mentoria' 
+    : !plan 
+      ? 'Voltar para Comunidade' 
+      : plan === 'academy' 
+        ? 'Voltar para Minha Evolução' 
+        : 'Voltar para Mentoria';
 
   const handleFormularioFinalizado = () => {
     setMostrarFormulario(false);
