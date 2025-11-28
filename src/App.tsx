@@ -59,6 +59,7 @@ import GerenciarComunidade from "./pages/admin/GerenciarComunidade";
 import Comunidade from "./pages/Comunidade";
 import DashboardVisitante from "./pages/DashboardVisitante";
 import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
+import MateriaisGratuitos from "./pages/MateriaisGratuitos";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,7 @@ function AppContent() {
             <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />
             <Route path="/metodos-aplicar" element={<MetodosAplicar />} />
             <Route path="/comunidade" element={<Comunidade />} />
+            <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
           </Route>
           
           <Route element={<ProtectedRoute><DashboardVisitante /></ProtectedRoute>}>
