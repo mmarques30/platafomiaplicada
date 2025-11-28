@@ -17,13 +17,13 @@ export function ClassroomGrid() {
 
   return (
     <div className="space-y-4">
-      <div className="text-sm text-zinc-400">
+      <div className="text-sm text-muted-foreground">
         Conteúdo gratuito disponível para todos os membros
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {courses.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-zinc-400">
+          <div className="col-span-full text-center py-12 text-muted-foreground">
             Nenhum curso disponível no momento
           </div>
         ) : (
