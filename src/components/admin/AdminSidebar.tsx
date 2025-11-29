@@ -32,6 +32,7 @@ import {
   Settings,
   MessagesSquare,
   Gift,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -44,6 +45,7 @@ const navItems = [
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
   { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },
   { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
+  { path: "/admin/duvidas", label: "Central de Dúvidas", icon: MessageCircle },
   { path: "/admin/comunidade", label: "Comunidade", icon: MessagesSquare },
   { path: "/admin/produtos", label: "Produtos", icon: Package },
   { path: "/admin/materiais", label: "Materiais Gratuitos", icon: Gift },

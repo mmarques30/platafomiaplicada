@@ -56,6 +56,7 @@ import Auditoria from "./pages/admin/Auditoria";
 import GerenciarMenus from "./pages/admin/GerenciarMenus";
 import ImportarUsuarios from "./pages/admin/ImportarUsuarios";
 import GerenciarComunidade from "./pages/admin/GerenciarComunidade";
+import GerenciarTodasDuvidas from "./pages/admin/GerenciarTodasDuvidas";
 import Comunidade from "./pages/Comunidade";
 import DashboardVisitante from "./pages/DashboardVisitante";
 import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
@@ -122,6 +123,7 @@ function AppContent() {
             <Route path="avisos" element={<GerenciarAvisos />} />
             <Route path="conhecimento" element={<GerenciarConhecimento />} />
             <Route path="mentoria" element={<GerenciarMentoria />} />
+            <Route path="duvidas" element={<GerenciarTodasDuvidas />} />
             <Route path="produtos" element={<GerenciarProdutos />} />
             <Route path="materiais" element={<GerenciarMateriais />} />
             <Route path="formularios" element={<VisualizarFormularios />} />
