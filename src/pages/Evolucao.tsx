@@ -48,12 +48,6 @@ export default function Evolucao() {
           >
             Evolução da Comunidade
           </TabsTrigger>
-          <TabsTrigger 
-            value="duvidas"
-            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
-          >
-            Dúvidas
-          </TabsTrigger>
           {showAcompanhamento && (
             <TabsTrigger 
               value="acompanhamento"
@@ -62,6 +56,12 @@ export default function Evolucao() {
               Meu Acompanhamento
             </TabsTrigger>
           )}
+          <TabsTrigger 
+            value="duvidas"
+            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
+          >
+            Dúvidas
+          </TabsTrigger>
         </TabsList>
 
         {/* ABA 1: MINHA EVOLUÇÃO */}
@@ -103,17 +103,17 @@ export default function Evolucao() {
           )}
         </TabsContent>
 
-        {/* ABA 3: DÚVIDAS */}
-        <TabsContent value="duvidas" className="space-y-6 mt-6">
-          <AbaDuvidas />
-        </TabsContent>
-
-        {/* ABA 4: MEU ACOMPANHAMENTO (Apenas Academy) */}
+        {/* ABA 3: MEU ACOMPANHAMENTO (Apenas Academy) */}
         {showAcompanhamento && (
           <TabsContent value="acompanhamento" className="space-y-6 mt-6">
             <AbaAcompanhamento />
           </TabsContent>
         )}
+
+        {/* ABA 4: DÚVIDAS */}
+        <TabsContent value="duvidas" className="space-y-6 mt-6">
+          <AbaDuvidas />
+        </TabsContent>
       </Tabs>
     </div>
   );
