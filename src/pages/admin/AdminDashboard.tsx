@@ -126,9 +126,9 @@ export default function AdminDashboard() {
             icon={UserPlus}
           />
           <StatsCard
-            title="Taxa de Conversão"
-            value={`${(data.crescimento.totalUsuarios + data.visitantes.total) > 0 ? Math.round((data.crescimento.totalUsuarios / (data.crescimento.totalUsuarios + data.visitantes.total)) * 100) : 0}%`}
-            description="Usuários vs Total cadastrados"
+            title="Conversões (30d)"
+            value={data.visitantes.conversoes30d}
+            description={`${data.visitantes.conversoes7d} conversões (7d) | ${data.visitantes.taxaConversao}% taxa`}
             icon={TrendingUp}
           />
         </div>

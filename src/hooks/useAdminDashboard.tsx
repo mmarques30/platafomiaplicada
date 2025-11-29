@@ -13,7 +13,7 @@ export function useAdminDashboard() {
       // Buscar usuários (excluir visitantes)
       const { data: users, error: usersError } = await supabase
         .from("profiles")
-        .select("id, nome_completo, plano_mentoria, created_at, conta_ativa")
+        .select("id, nome_completo, plano_mentoria, created_at, conta_ativa, data_conversao, ultimo_acesso")
         .eq("is_visitante", false);
       
       if (usersError) throw usersError;
@@ -134,6 +134,14 @@ export function useAdminDashboard() {
       const novosUsuarios7d = users?.filter(u => u.created_at && new Date(u.created_at) >= new Date(sevenDaysAgo)).length || 0;
       const novosUsuarios30d = users?.filter(u => u.created_at && new Date(u.created_at) >= new Date(thirtyDaysAgo)).length || 0;
 
+      // Calcular conversões de visitantes (baseado em data_conversao)
+      const conversoes7d = users?.filter(u => 
+        u.data_conversao && new Date(u.data_conversao) >= new Date(sevenDaysAgo)
+      ).length || 0;
+      const conversoes30d = users?.filter(u => 
+        u.data_conversao && new Date(u.data_conversao) >= new Date(thirtyDaysAgo)
+      ).length || 0;
+
       // Calcular métricas de visitantes
       const totalVisitantes = visitantes?.length || 0;
       const novosVisitantes7d = visitantes?.filter(v => 
@@ -143,14 +151,19 @@ export function useAdminDashboard() {
         v.created_at && new Date(v.created_at) >= new Date(thirtyDaysAgo)
       ).length || 0;
 
-      // Calcular usuários ativos (que acessaram vídeos recentemente)
-      const usuariosAtivos7d = new Set(
-        progressoVideos?.filter(p => p.updated_at && new Date(p.updated_at) >= new Date(sevenDaysAgo)).map(p => p.user_id)
-      ).size;
+      // Taxa de conversão real (conversões / total que existia)
+      const taxaConversao = (totalVisitantes + conversoes30d) > 0
+        ? Math.round((conversoes30d / (totalVisitantes + conversoes30d)) * 100)
+        : 0;
 
-      const usuariosAtivos30d = new Set(
-        progressoVideos?.filter(p => p.updated_at && new Date(p.updated_at) >= new Date(thirtyDaysAgo)).map(p => p.user_id)
-      ).size;
+      // Calcular usuários ativos (baseado em ultimo_acesso)
+      const usuariosAtivos7d = users?.filter(u => 
+        u.ultimo_acesso && new Date(u.ultimo_acesso) >= new Date(sevenDaysAgo)
+      ).length || 0;
+
+      const usuariosAtivos30d = users?.filter(u => 
+        u.ultimo_acesso && new Date(u.ultimo_acesso) >= new Date(thirtyDaysAgo)
+      ).length || 0;
 
       // Top 5 usuários mais engajados
       const userEngagement = progressoVideos?.reduce((acc, p) => {
@@ -209,6 +222,9 @@ export function useAdminDashboard() {
           total: totalVisitantes,
           novos7d: novosVisitantes7d,
           novos30d: novosVisitantes30d,
+          conversoes7d,
+          conversoes30d,
+          taxaConversao,
         },
         distribuicaoPlanos,
         mentoria: {

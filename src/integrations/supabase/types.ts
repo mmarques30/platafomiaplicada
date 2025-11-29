@@ -1496,6 +1496,7 @@ export type Database = {
           bio: string | null
           conta_ativa: boolean | null
           created_at: string | null
+          data_conversao: string | null
           data_expiracao_acesso: string | null
           email: string | null
           email_acesso_enviado: boolean | null
@@ -1523,6 +1524,7 @@ export type Database = {
           bio?: string | null
           conta_ativa?: boolean | null
           created_at?: string | null
+          data_conversao?: string | null
           data_expiracao_acesso?: string | null
           email?: string | null
           email_acesso_enviado?: boolean | null
@@ -1550,6 +1552,7 @@ export type Database = {
           bio?: string | null
           conta_ativa?: boolean | null
           created_at?: string | null
+          data_conversao?: string | null
           data_expiracao_acesso?: string | null
           email?: string | null
           email_acesso_enviado?: boolean | null
