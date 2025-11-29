@@ -10,12 +10,8 @@ export function useVisitantes() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select(`
-          *,
-          user_roles!inner(role)
-        `)
+        .select("*")
         .eq("is_visitante", true)
-        .eq("user_roles.role", "visitante")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
