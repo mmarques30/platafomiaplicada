@@ -66,10 +66,13 @@ export function useVisitantes() {
 
       if (insertError) throw insertError;
 
-      // Atualizar flag is_visitante
+      // Atualizar flag is_visitante e registrar data de conversão
       const { error: updateError } = await supabase
         .from("profiles")
-        .update({ is_visitante: false })
+        .update({ 
+          is_visitante: false,
+          data_conversao: new Date().toISOString()
+        })
         .eq("id", userId);
 
       if (updateError) throw updateError;
