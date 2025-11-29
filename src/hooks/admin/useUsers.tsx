@@ -11,6 +11,7 @@ export function useUsers() {
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("*, plano_mentoria, email_acesso_enviado, adicionado_grupo_whatsapp, origem_consultoria, empresa_consultoria")
+        .eq("is_visitante", false)
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;

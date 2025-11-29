@@ -222,7 +222,7 @@ export default function GerenciarUsuários() {
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="border-gray-400 text-gray-600">
-                        Visitante
+                        Sem Plano
                       </Badge>
                     )}
                     {(user as any).origem_consultoria && (
