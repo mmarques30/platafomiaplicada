@@ -20,7 +20,7 @@ export default function BibliotecaPrompts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("todas");
   const [filtroNivel, setFiltroNivel] = useState("todos");
-  const [filtroProfissao, setFiltroProfissao] = useState("todas");
+  const [filtroTag, setFiltroTag] = useState("todas");
   const [filtroFerramenta, setFiltroFerramenta] = useState("todas");
   const [promptSelecionado, setPromptSelecionado] = useState<any>(null);
   const [itemsToShow, setItemsToShow] = useState(10);
@@ -30,7 +30,7 @@ export default function BibliotecaPrompts() {
     prompts ? Array.from(new Set(prompts.map((p) => p.categoria))) : []
   , [prompts]);
 
-  const profissoes = useMemo(() => {
+  const tags = useMemo(() => {
     if (!prompts) return [];
     const allTags = prompts.flatMap((p) => (Array.isArray(p.tags) ? p.tags : []) as string[]);
     return Array.from(new Set(allTags));
@@ -56,18 +56,18 @@ export default function BibliotecaPrompts() {
       const matchesNivel =
         filtroNivel === "todos" || prompt.nivel_complexidade === filtroNivel;
       
-      const matchesProfissao =
-        filtroProfissao === "todas" || 
-        (Array.isArray(prompt.tags) && (prompt.tags as string[]).includes(filtroProfissao));
+      const matchesTag =
+        filtroTag === "todas" || 
+        (Array.isArray(prompt.tags) && (prompt.tags as string[]).includes(filtroTag));
       
       const matchesFerramenta =
         filtroFerramenta === "todas" || 
         (Array.isArray(prompt.ferramentas_recomendadas) && (prompt.ferramentas_recomendadas as string[]).includes(filtroFerramenta));
       
       return matchesSearch && matchesCategoria && matchesNivel && 
-             matchesProfissao && matchesFerramenta;
+             matchesTag && matchesFerramenta;
     }).sort((a, b) => (a.ordem ?? 999) - (b.ordem ?? 999));
-  }, [prompts, searchTerm, filtroCategoria, filtroNivel, filtroProfissao, filtroFerramenta]);
+  }, [prompts, searchTerm, filtroCategoria, filtroNivel, filtroTag, filtroFerramenta]);
 
   const visiblePrompts = useMemo(() => {
     return filteredPrompts?.slice(0, itemsToShow) || [];
@@ -75,7 +75,7 @@ export default function BibliotecaPrompts() {
 
   useEffect(() => {
     setItemsToShow(10);
-  }, [searchTerm, filtroCategoria, filtroNivel, filtroProfissao, filtroFerramenta]);
+  }, [searchTerm, filtroCategoria, filtroNivel, filtroTag, filtroFerramenta]);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -128,17 +128,17 @@ export default function BibliotecaPrompts() {
           </SelectContent>
         </Select>
 
-        {/* Filtro Profissão */}
-        {profissoes.length > 0 && (
-          <Select value={filtroProfissao} onValueChange={setFiltroProfissao}>
+        {/* Filtro Tag */}
+        {tags.length > 0 && (
+          <Select value={filtroTag} onValueChange={setFiltroTag}>
             <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Profissão" />
+              <SelectValue placeholder="Tag" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todas">Todas Profissões</SelectItem>
-              {profissoes.map((profissao) => (
-                <SelectItem key={String(profissao)} value={String(profissao)}>
-                  {String(profissao)}
+              <SelectItem value="todas">Todas as Tags</SelectItem>
+              {tags.map((tag) => (
+                <SelectItem key={String(tag)} value={String(tag)}>
+                  {String(tag)}
                 </SelectItem>
               ))}
             </SelectContent>
