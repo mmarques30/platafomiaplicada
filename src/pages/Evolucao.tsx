@@ -11,6 +11,7 @@ import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { AbaAcompanhamento } from "@/components/evolucao/AbaAcompanhamento";
+import { AbaDuvidas } from "@/components/evolucao/AbaDuvidas";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 
 export default function Evolucao() {
@@ -46,6 +47,12 @@ export default function Evolucao() {
             className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
           >
             Evolução da Comunidade
+          </TabsTrigger>
+          <TabsTrigger 
+            value="duvidas"
+            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
+          >
+            Dúvidas
           </TabsTrigger>
           {showAcompanhamento && (
             <TabsTrigger 
@@ -96,7 +103,12 @@ export default function Evolucao() {
           )}
         </TabsContent>
 
-        {/* ABA 3: MEU ACOMPANHAMENTO (Apenas Academy) */}
+        {/* ABA 3: DÚVIDAS */}
+        <TabsContent value="duvidas" className="space-y-6 mt-6">
+          <AbaDuvidas />
+        </TabsContent>
+
+        {/* ABA 4: MEU ACOMPANHAMENTO (Apenas Academy) */}
         {showAcompanhamento && (
           <TabsContent value="acompanhamento" className="space-y-6 mt-6">
             <AbaAcompanhamento />
