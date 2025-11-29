@@ -10,12 +10,21 @@ export function useAdminDashboard() {
       const sevenDaysAgo = subDays(now, 7).toISOString();
       const thirtyDaysAgo = subDays(now, 30).toISOString();
 
-      // Buscar todos os usuários com seus planos
+      // Buscar usuários (excluir visitantes)
       const { data: users, error: usersError } = await supabase
         .from("profiles")
-        .select("id, nome_completo, plano_mentoria, created_at, conta_ativa");
+        .select("id, nome_completo, plano_mentoria, created_at, conta_ativa")
+        .eq("is_visitante", false);
       
       if (usersError) throw usersError;
+
+      // Buscar visitantes separadamente
+      const { data: visitantes, error: visitantesError } = await supabase
+        .from("profiles")
+        .select("id, nome_completo, created_at, conta_ativa")
+        .eq("is_visitante", true);
+      
+      if (visitantesError) throw visitantesError;
 
       // Buscar tarefas atrasadas
       const { data: tarefasAtrasadas, error: tarefasError } = await supabase
@@ -125,6 +134,15 @@ export function useAdminDashboard() {
       const novosUsuarios7d = users?.filter(u => u.created_at && new Date(u.created_at) >= new Date(sevenDaysAgo)).length || 0;
       const novosUsuarios30d = users?.filter(u => u.created_at && new Date(u.created_at) >= new Date(thirtyDaysAgo)).length || 0;
 
+      // Calcular métricas de visitantes
+      const totalVisitantes = visitantes?.length || 0;
+      const novosVisitantes7d = visitantes?.filter(v => 
+        v.created_at && new Date(v.created_at) >= new Date(sevenDaysAgo)
+      ).length || 0;
+      const novosVisitantes30d = visitantes?.filter(v => 
+        v.created_at && new Date(v.created_at) >= new Date(thirtyDaysAgo)
+      ).length || 0;
+
       // Calcular usuários ativos (que acessaram vídeos recentemente)
       const usuariosAtivos7d = new Set(
         progressoVideos?.filter(p => p.updated_at && new Date(p.updated_at) >= new Date(sevenDaysAgo)).map(p => p.user_id)
@@ -186,6 +204,11 @@ export function useAdminDashboard() {
           usuariosAtivos30d,
           totalUsuarios: users?.length || 0,
           usuariosAtivos: users?.filter(u => u.conta_ativa).length || 0,
+        },
+        visitantes: {
+          total: totalVisitantes,
+          novos7d: novosVisitantes7d,
+          novos30d: novosVisitantes30d,
         },
         distribuicaoPlanos,
         mentoria: {
