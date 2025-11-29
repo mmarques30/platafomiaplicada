@@ -19,6 +19,35 @@ export function useVisitantes() {
     },
   });
 
+  const updateVisitante = useMutation({
+    mutationFn: async ({
+      userId,
+      updates,
+    }: {
+      userId: string;
+      updates: {
+        nome_completo?: string;
+        email?: string;
+        telefone?: string | null;
+        conta_ativa?: boolean;
+      };
+    }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("id", userId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["visitantes"] });
+      toast.success("Visitante atualizado com sucesso!");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao atualizar visitante");
+    },
+  });
+
   const convertToMentorado = useMutation({
     mutationFn: async (userId: string) => {
       // Remover role visitante
@@ -56,27 +85,26 @@ export function useVisitantes() {
 
   const deleteVisitante = useMutation({
     mutationFn: async (userId: string) => {
-      // Supabase admin API deve ser usado aqui via edge function
-      // Por enquanto, apenas desativar a conta
-      const { error } = await supabase
-        .from("profiles")
-        .update({ conta_ativa: false })
-        .eq("id", userId);
+      const { data, error } = await supabase.functions.invoke("delete-user", {
+        body: { userId },
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["visitantes"] });
-      toast.success("Visitante desativado com sucesso!");
+      toast.success("Visitante excluído permanentemente!");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Erro ao desativar visitante");
+      toast.error(error.message || "Erro ao excluir visitante");
     },
   });
 
   return {
     visitantes: visitantes || [],
     isLoading,
+    updateVisitante,
     convertToMentorado,
     deleteVisitante,
   };

@@ -5,15 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Users, UserCheck, Trash2 } from "lucide-react";
+import { EditVisitanteModal } from "@/components/admin/EditVisitanteModal";
+import { Users, UserCheck, Trash2, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function GerenciarVisitantes() {
   const { visitantes, isLoading, convertToMentorado, deleteVisitante } = useVisitantes();
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedVisitante, setSelectedVisitante] = useState<typeof visitantes[0] | null>(null);
+
+  const handleEdit = (visitante: typeof visitantes[0]) => {
+    setSelectedVisitante(visitante);
+    setEditModalOpen(true);
+  };
 
   const handleConvert = (userId: string) => {
     setSelectedUserId(userId);
@@ -107,7 +115,7 @@ export default function GerenciarVisitantes() {
                     <TableHead>Telefone</TableHead>
                     <TableHead>Data Cadastro</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
+                    <TableHead className="text-right w-[300px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -135,6 +143,14 @@ export default function GerenciarVisitantes() {
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => handleEdit(visitante)}
+                          >
+                            <Pencil className="h-4 w-4 mr-1" />
+                            Editar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => handleConvert(visitante.id)}
                             disabled={!visitante.conta_ativa}
                           >
@@ -146,7 +162,8 @@ export default function GerenciarVisitantes() {
                             size="sm"
                             onClick={() => handleDelete(visitante.id)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Excluir
                           </Button>
                         </div>
                       </TableCell>
@@ -177,19 +194,31 @@ export default function GerenciarVisitantes() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Modal de Edição */}
+      <EditVisitanteModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        visitante={selectedVisitante}
+      />
+
       {/* Dialog de Exclusão */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Desativar Visitante</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja desativar este visitante? A conta será bloqueada.
+            <AlertDialogTitle>Excluir Visitante Permanentemente</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p className="text-destructive font-semibold">
+                Esta ação é IRREVERSÍVEL. O visitante será excluído completamente do sistema.
+              </p>
+              <p>
+                Tem certeza que deseja continuar?
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive">
-              Desativar
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir Permanentemente
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
