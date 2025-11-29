@@ -17,6 +17,7 @@ import {
   Layers,
   Sparkles,
   Star,
+  UserPlus,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -107,10 +108,36 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Seção 3: Distribuição por Plano */}
+      {/* Seção 3: Visitantes */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Visitantes</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatsCard
+            title="Total de Visitantes"
+            value={data.visitantes.total}
+            description="Cadastros via aba Visitantes"
+            icon={UserPlus}
+            onClick={() => navigate("/admin/visitantes")}
+          />
+          <StatsCard
+            title="Novos Visitantes (7d)"
+            value={data.visitantes.novos7d}
+            description={`${data.visitantes.novos30d} nos últimos 30 dias`}
+            icon={UserPlus}
+          />
+          <StatsCard
+            title="Taxa de Conversão"
+            value={`${(data.crescimento.totalUsuarios + data.visitantes.total) > 0 ? Math.round((data.crescimento.totalUsuarios / (data.crescimento.totalUsuarios + data.visitantes.total)) * 100) : 0}%`}
+            description="Usuários vs Total cadastrados"
+            icon={TrendingUp}
+          />
+        </div>
+      </div>
+
+      {/* Seção 4: Distribuição por Plano */}
       <DistribuicaoPlanos distribuicao={data.distribuicaoPlanos} />
 
-      {/* Seção 4: Saúde da Mentoria */}
+      {/* Seção 5: Saúde da Mentoria */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Saúde da Mentoria</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -141,7 +168,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Seção 5: Inventário de Conteúdo */}
+      {/* Seção 6: Inventário de Conteúdo */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Inventário de Conteúdo</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -178,7 +205,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Seção 6: Top Usuários */}
+      {/* Seção 7: Top Usuários */}
       {data.topUsuarios.length > 0 && (
         <TopUsuariosTable usuarios={data.topUsuarios} />
       )}
