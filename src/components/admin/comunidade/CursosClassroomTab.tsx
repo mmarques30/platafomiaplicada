@@ -63,12 +63,12 @@ export function CursosClassroomTab() {
   };
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800">
+    <Card className="bg-card border-border">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Cursos do Classroom</CardTitle>
-            <p className="text-sm text-zinc-400 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Conteúdo gratuito disponível para todos os membros
             </p>
           </div>

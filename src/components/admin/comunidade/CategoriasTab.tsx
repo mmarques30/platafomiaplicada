@@ -71,7 +71,7 @@ export function CategoriasTab() {
   };
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800">
+    <Card className="bg-card border-border">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Categorias de Posts</CardTitle>

@@ -8,16 +8,16 @@ export default function GerenciarComunidade() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           Gerenciar Comunidade
         </h1>
-        <p className="text-zinc-400">
+        <p className="text-muted-foreground">
           Configure categorias, cursos do Classroom e modere posts
         </p>
       </div>
 
       <Tabs defaultValue="categorias" className="space-y-6">
-        <TabsList className="bg-zinc-900 border border-zinc-800">
+        <TabsList className="bg-card border border-border">
           <TabsTrigger
             value="categorias"
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
