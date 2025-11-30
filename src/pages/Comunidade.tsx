@@ -1,12 +1,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CommunityFeed } from "@/components/comunidade/CommunityFeed";
 import { MembersList } from "@/components/comunidade/MembersList";
-import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
+import { RankingEngajamento } from "@/components/comunidade/RankingEngajamento";
 import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
-import { useRankingComunidade } from "@/hooks/useRankingComunidade";
+import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 
 export default function Comunidade() {
-  const { data: ranking } = useRankingComunidade();
+  const { data: ranking } = useRankingEngajamento();
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,7 +56,7 @@ export default function Comunidade() {
               </TabsContent>
 
               <TabsContent value="leaderboard" className="space-y-4">
-                <RankingComunidade ranking={ranking || []} />
+                <RankingEngajamento ranking={ranking || []} />
               </TabsContent>
             </Tabs>
           </div>

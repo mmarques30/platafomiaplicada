@@ -1447,6 +1447,53 @@ export type Database = {
         }
         Relationships: []
       }
+      premiacoes_comunidade: {
+        Row: {
+          created_at: string | null
+          data_entrega: string | null
+          descricao_premio: string
+          entregue: boolean | null
+          id: string
+          mes_referencia: string
+          observacoes: string | null
+          tipo_premio: string
+          updated_at: string | null
+          vencedor_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_entrega?: string | null
+          descricao_premio: string
+          entregue?: boolean | null
+          id?: string
+          mes_referencia: string
+          observacoes?: string | null
+          tipo_premio: string
+          updated_at?: string | null
+          vencedor_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_entrega?: string | null
+          descricao_premio?: string
+          entregue?: boolean | null
+          id?: string
+          mes_referencia?: string
+          observacoes?: string | null
+          tipo_premio?: string
+          updated_at?: string | null
+          vencedor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premiacoes_comunidade_vencedor_id_fkey"
+            columns: ["vencedor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       produtos: {
         Row: {
           ativo: boolean | null
@@ -2361,6 +2408,22 @@ export type Database = {
           total_ferramentas_compartilhadas: number
           total_pontos: number
           total_projetos_entregues: number
+          total_videos_assistidos: number
+          user_id: string
+        }[]
+      }
+      get_ranking_engajamento: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          dias_ativos_30d: number
+          nome_completo: string
+          posicao: number
+          total_comentarios: number
+          total_likes_dados: number
+          total_likes_recebidos: number
+          total_pontos: number
+          total_posts: number
           total_videos_assistidos: number
           user_id: string
         }[]
