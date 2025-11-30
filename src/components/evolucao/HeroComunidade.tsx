@@ -18,7 +18,7 @@ export function HeroComunidade() {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-3xl font-bold text-white mb-2">
-              Evolução da <span className="text-primary">Comunidade</span>
+              <span className="text-primary">Aplicados</span> Community
             </h2>
             <p className="text-zinc-400 text-lg">
               Veja como você está em relação aos outros membros

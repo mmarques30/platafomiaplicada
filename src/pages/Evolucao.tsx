@@ -49,7 +49,7 @@ export default function Evolucao() {
             value="comunidade"
             className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
           >
-            Evolução da Comunidade
+            Aplicados Community
           </TabsTrigger>
           {showAcompanhamento && (
             <TabsTrigger 

@@ -3,11 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, UserCog, Circle, FileText } from "lucide-react";
 import { useCommunityStats } from "@/hooks/useCommunityStats";
-import { useRankingComunidade } from "@/hooks/useRankingComunidade";
+import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 
 export function CommunitySidebar() {
   const { stats } = useCommunityStats();
-  const { data: ranking } = useRankingComunidade();
+  const { data: ranking } = useRankingEngajamento();
 
   const top3 = ranking?.slice(0, 3) || [];
 
