@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trophy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Trophy, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 interface RankingItem {
   user_id: string;
@@ -21,8 +23,12 @@ interface RankingComunidadeProps {
 
 export function RankingComunidade({ ranking }: RankingComunidadeProps) {
   const { user } = useAuth();
+  const [expanded, setExpanded] = useState(false);
+  
   const top3 = ranking?.slice(0, 3) || [];
   const outros = ranking?.slice(3) || [];
+  const outrosVisiveis = expanded ? outros : outros.slice(0, 7);
+  const temMais = outros.length > 7;
   const minhaposicao = ranking?.find(r => r.user_id === user?.id);
 
   const getBorderColor = (posicao: number) => {
@@ -81,38 +87,49 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
 
         {/* Lista do 4º em diante */}
         <div className="space-y-2">
-          <h3 className="font-semibold text-sm text-zinc-400 mb-3">Demais posições</h3>
-          {outros.map((item) => (
+          <h3 className="font-semibold text-sm text-muted-foreground mb-3">Demais posições</h3>
+          {outrosVisiveis.map((item) => (
             <div
               key={item.user_id}
               className={`flex items-center gap-3 p-4 rounded-lg border transition-all ${
                 item.user_id === user?.id 
-                  ? 'bg-aplicada-dark border-primary/40 ring-1 ring-primary/30' 
-                  : 'bg-zinc-800/30 border-aplicada-green-900/20 hover:bg-zinc-800/50 hover:border-primary/20'
+                  ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/30' 
+                  : 'bg-card border-border hover:bg-muted/50'
               }`}
             >
-              <span className="font-mono text-sm text-zinc-400 w-8">{item.posicao}º</span>
-              <Avatar className="h-10 w-10 border border-aplicada-green-900/30">
+              <span className="font-mono text-sm font-semibold text-foreground w-8">{item.posicao}º</span>
+              <Avatar className="h-10 w-10 border border-border">
                 <AvatarImage src={item.avatar_url} />
-                <AvatarFallback className="bg-zinc-800">{getInitials(item.nome_completo)}</AvatarFallback>
+                <AvatarFallback className="bg-muted">{getInitials(item.nome_completo)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className={`font-medium truncate ${item.user_id === user?.id ? 'text-primary' : 'text-white'}`}>
+                <p className={`font-medium truncate ${item.user_id === user?.id ? 'text-primary' : 'text-foreground'}`}>
                   {item.nome_completo}
                   {item.user_id === user?.id && (
                     <span className="ml-2 text-xs text-primary">(Você)</span>
                   )}
                 </p>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-muted-foreground">
                   {item.total_videos_assistidos} vídeos • {item.total_ferramentas_compartilhadas} ferramentas
                 </p>
               </div>
               <div className="text-right">
-                <p className="font-semibold text-lg text-white">{item.total_pontos}</p>
-                <p className="text-xs text-zinc-500">pontos</p>
+                <p className="font-semibold text-lg text-foreground">{item.total_pontos}</p>
+                <p className="text-xs text-muted-foreground">pontos</p>
               </div>
             </div>
           ))}
+          
+          {temMais && (
+            <Button 
+              variant="ghost" 
+              onClick={() => setExpanded(!expanded)}
+              className="w-full mt-2 text-muted-foreground hover:text-foreground"
+            >
+              <ChevronDown className={`h-4 w-4 mr-2 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+              {expanded ? 'Ver menos' : `Ver mais ${outros.length - 7} posições`}
+            </Button>
+          )}
         </div>
 
         {/* Minha posição (se não estiver no top) */}
