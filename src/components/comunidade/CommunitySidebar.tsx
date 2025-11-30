@@ -67,7 +67,7 @@ export function CommunitySidebar() {
                   {member.nome_completo}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {member.pontos_comunidade} pontos
+                  {member.total_pontos} pontos
                 </div>
               </div>
             </div>

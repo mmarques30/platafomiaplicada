@@ -9,7 +9,7 @@ export function HeroComunidade() {
   
   const minhaPosicao = ranking?.find((r: any) => r.user_id === user?.id);
   const totalMembros = ranking?.length || 0;
-  const meusPontos = minhaPosicao?.pontos_totais || 0;
+  const meusPontos = minhaPosicao?.total_pontos || 0;
   const posicao = minhaPosicao?.posicao || 0;
 
   return (
