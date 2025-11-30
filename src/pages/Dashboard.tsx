@@ -4,8 +4,10 @@ import { MessageSquare, Sparkles, ArrowRight, AlertCircle, X } from "lucide-reac
 import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
+import { VideosVisitante } from "@/components/dashboard/VideosVisitante";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,24 +17,24 @@ import mariAvatar from "@/assets/mari-avatar.jpg";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isVisitante } = useUserRole();
   const [question, setQuestion] = useState("");
   const [mostrarAvisoSenha, setMostrarAvisoSenha] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Query para buscar todas as trilhas
+  // Query para buscar todas as trilhas (apenas para mentorados)
   const { data: trilhas, isLoading: loadingTrilhas } = useQuery({
     queryKey: ["trilhas-dashboard"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trilhas")
-        .select("id, titulo, imagem_url, bloqueada, visivel_apenas_pro")
-        .eq("ativo", true)
-        .eq("visivel_mentorados", true)
+        .select("id, titulo, imagem_url, bloqueada, visivel_apenas_pro, nivel_minimo_acesso")
         .order("ordem");
       
       if (error) throw error;
       return data;
     },
+    enabled: !isVisitante,
   });
 
   useEffect(() => {
@@ -211,27 +213,37 @@ export default function Dashboard() {
           <NovidadesSemana />
         </section>
 
-        {/* Grid de Trilhas */}
+        {/* Conteúdo baseado no tipo de usuário */}
         <section>
-          {loadingTrilhas ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="h-[400px] rounded-xl" />
-              ))}
+          {isVisitante ? (
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Vídeos Disponíveis</h2>
+              <VideosVisitante />
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {trilhas?.map((trilha) => (
-                <TrilhaCardBloqueavel
-                  key={trilha.id}
-                  id={trilha.id}
-                  titulo={trilha.titulo}
-                  imagem_url={trilha.imagem_url || undefined}
-                  bloqueada={trilha.bloqueada || false}
-                  visivel_apenas_pro={trilha.visivel_apenas_pro || false}
-                />
-              ))}
-            </div>
+            <>
+              {loadingTrilhas ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {[...Array(8)].map((_, i) => (
+                    <Skeleton key={i} className="h-[400px] rounded-xl" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {trilhas?.map((trilha) => (
+                    <TrilhaCardBloqueavel
+                      key={trilha.id}
+                      id={trilha.id}
+                      titulo={trilha.titulo}
+                      imagem_url={trilha.imagem_url || undefined}
+                      bloqueada={trilha.bloqueada || false}
+                      visivel_apenas_pro={trilha.visivel_apenas_pro || false}
+                      nivel_minimo_acesso={trilha.nivel_minimo_acesso}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </section>
 

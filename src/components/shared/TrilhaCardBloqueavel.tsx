@@ -8,6 +8,7 @@ interface TrilhaCardBloqueavelProps {
   imagem_url?: string;
   bloqueada: boolean;
   visivel_apenas_pro?: boolean;
+  nivel_minimo_acesso?: string;
 }
 
 export function TrilhaCardBloqueavel({ 
@@ -15,7 +16,8 @@ export function TrilhaCardBloqueavel({
   titulo, 
   imagem_url, 
   bloqueada,
-  visivel_apenas_pro 
+  visivel_apenas_pro,
+  nivel_minimo_acesso
 }: TrilhaCardBloqueavelProps) {
   
   // Se bloqueada, renderiza card não-clicável com cadeado
@@ -25,6 +27,11 @@ export function TrilhaCardBloqueavel({
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
             🔒 PRO
+          </div>
+        )}
+        {nivel_minimo_acesso === 'club' && (
+          <div className="absolute top-4 right-4 z-10 bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
+            ⭐ Club
           </div>
         )}
         
@@ -58,6 +65,11 @@ export function TrilhaCardBloqueavel({
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
             🔒 PRO
+          </div>
+        )}
+        {nivel_minimo_acesso === 'club' && (
+          <div className="absolute top-4 right-4 z-10 bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
+            ⭐ Club
           </div>
         )}
         <div className="absolute top-4 right-4 z-10">
