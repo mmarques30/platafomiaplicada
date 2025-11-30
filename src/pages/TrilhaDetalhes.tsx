@@ -118,13 +118,29 @@ export default function TrilhaDetalhes() {
     video.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Set video from URL only (don't auto-select first video)
+  // Auto-selecionar primeiro vídeo não concluído (ou primeiro vídeo se todos concluídos)
   useEffect(() => {
     const videoIdFromUrl = searchParams.get("video");
+    
+    // Se tem vídeo na URL, usar ele
     if (videoIdFromUrl && allVideos.some(v => v.id === videoIdFromUrl)) {
       setCurrentVideoId(videoIdFromUrl);
+      return;
     }
-  }, [searchParams, allVideos]);
+    
+    // Se não tem vídeo selecionado e tem vídeos disponíveis, auto-selecionar
+    if (!currentVideoId && allVideos.length > 0) {
+      // Encontrar primeiro vídeo não concluído
+      const firstIncompleteVideo = allVideos.find(video => 
+        !progressData?.find(p => p.video_id === video.id)?.completado
+      );
+      
+      // Usar primeiro não concluído, ou primeiro vídeo se todos concluídos
+      const videoToSelect = firstIncompleteVideo || allVideos[0];
+      setCurrentVideoId(videoToSelect.id);
+      setSearchParams({ video: videoToSelect.id });
+    }
+  }, [searchParams, allVideos, currentVideoId, progressData]);
 
   // Scroll to active video in sidebar
   useEffect(() => {
@@ -233,16 +249,8 @@ export default function TrilhaDetalhes() {
           </Button>
         </Link>
 
-        {/* Se nenhum vídeo selecionado, mostrar overview da trilha */}
-        {!currentVideoId ? (
-          <TrilhaOverview
-            trilha={trilha}
-            videos={allVideos}
-            onSelectVideo={handleVideoSelect}
-            progressData={progressData}
-          />
-        ) : (
-          /* Layout com métricas + player + sidebar quando vídeo está selecionado */
+        {/* Layout com métricas + player + sidebar (vídeo auto-selecionado) */}
+        {currentVideoId && (
           <div className="space-y-6">
             {/* Cabeçalho com Métricas */}
             <div className="space-y-4">
@@ -521,6 +529,13 @@ export default function TrilhaDetalhes() {
               </div>
             </div>
           </div>
+          </div>
+        )}
+        
+        {/* Loading state enquanto seleciona vídeo */}
+        {!currentVideoId && allVideos.length > 0 && (
+          <div className="min-h-[400px] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         )}
     </div>

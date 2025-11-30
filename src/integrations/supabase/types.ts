@@ -2424,7 +2424,6 @@ export type Database = {
           total_likes_recebidos: number
           total_pontos: number
           total_posts: number
-          total_videos_assistidos: number
           user_id: string
         }[]
       }

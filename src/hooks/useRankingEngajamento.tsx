@@ -11,7 +11,6 @@ export interface RankingEngajamentoItem {
   total_comentarios: number;
   total_likes_dados: number;
   total_likes_recebidos: number;
-  total_videos_assistidos: number;
   dias_ativos_30d: number;
 }
 

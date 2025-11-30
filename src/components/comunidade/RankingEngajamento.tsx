@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, ChevronDown, MessageSquare, Heart, Play, Calendar } from "lucide-react";
+import { Trophy, ChevronDown, MessageSquare, Heart, Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import { RankingEngajamentoItem } from "@/hooks/useRankingEngajamento";
@@ -60,10 +60,6 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <Heart className="h-4 w-4" />
                     <span>{vencedor.total_likes_recebidos} likes</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <Play className="h-4 w-4" />
-                    <span>{vencedor.total_videos_assistidos} vídeos</span>
                   </div>
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <Calendar className="h-4 w-4" />
@@ -202,8 +198,8 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• Criar um post: <strong className="text-foreground">20 pontos</strong></li>
               <li>• Comentar: <strong className="text-foreground">5 pontos</strong></li>
+              <li>• Dar um like: <strong className="text-foreground">2 pontos</strong></li>
               <li>• Receber um like: <strong className="text-foreground">10 pontos</strong></li>
-              <li>• Assistir um vídeo: <strong className="text-foreground">3 pontos</strong></li>
               <li>• Dia ativo na plataforma: <strong className="text-foreground">1 ponto</strong></li>
             </ul>
           </div>
