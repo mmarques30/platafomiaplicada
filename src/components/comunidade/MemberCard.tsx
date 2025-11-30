@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Circle, CalendarDays, MessageSquare } from "lucide-react";
+import { Circle, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CommunityMember } from "@/hooks/useCommunityMembers";
@@ -98,14 +97,6 @@ export function MemberCard({ member }: MemberCardProps) {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Action Button */}
-      <div className="flex-shrink-0">
-        <Button variant="outline" size="sm" className="gap-2">
-          <MessageSquare className="h-4 w-4" />
-          Chat
-        </Button>
       </div>
     </div>
   );

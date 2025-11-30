@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useCommunityPosts } from "@/hooks/useCommunityPosts";
+import { useCommunityComments } from "@/hooks/useCommunityComments";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Pin } from "lucide-react";
+import { Trash2, Pin, ChevronDown, MessageCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,6 +14,7 @@ import { toast } from "sonner";
 export function ModeracaoTab() {
   const { posts, isLoading, deletePost } = useCommunityPosts();
   const queryClient = useQueryClient();
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
 
   const togglePin = useMutation({
     mutationFn: async ({ postId, pinned }: { postId: string; pinned: boolean }) => {
@@ -81,6 +84,27 @@ export function ModeracaoTab() {
                     <span>{post.likes_count} likes</span>
                     <span>{post.comments_count} comentários</span>
                   </div>
+
+                  {post.comments_count > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setExpandedPostId(
+                          expandedPostId === post.id ? null : post.id
+                        )
+                      }
+                      className="mt-2 gap-2"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Ver {post.comments_count} comentários
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${
+                          expandedPostId === post.id ? "rotate-180" : ""
+                        }`}
+                      />
+                    </Button>
+                  )}
                 </div>
 
                 <div className="flex gap-2">
@@ -111,10 +135,58 @@ export function ModeracaoTab() {
                   </Button>
                 </div>
               </div>
+
+              {/* Expanded Comments Section */}
+              {expandedPostId === post.id && (
+                <CommentsSection postId={post.id} />
+              )}
             </div>
           ))
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function CommentsSection({ postId }: { postId: string }) {
+  const { comments, isLoading, deleteComment } = useCommunityComments(postId);
+
+  if (isLoading) {
+    return <div className="text-sm text-muted-foreground pl-4">Carregando comentários...</div>;
+  }
+
+  if (comments.length === 0) {
+    return <div className="text-sm text-muted-foreground pl-4">Nenhum comentário</div>;
+  }
+
+  return (
+    <div className="pl-4 mt-3 space-y-2 border-l-2 border-border">
+      {comments.map((comment) => (
+        <div key={comment.id} className="flex items-start justify-between gap-2 p-2 rounded bg-muted/30">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-medium text-foreground">
+                {comment.profiles.nome_completo}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {formatDistanceToNow(new Date(comment.created_at), {
+                  addSuffix: true,
+                  locale: ptBR,
+                })}
+              </span>
+            </div>
+            <p className="text-sm text-foreground">{comment.content}</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => deleteComment(comment.id)}
+            className="text-red-500 hover:text-red-600 shrink-0"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+      ))}
+    </div>
   );
 }
