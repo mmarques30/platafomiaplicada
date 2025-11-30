@@ -16,10 +16,13 @@ import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
-  const { plan } = useUserPlan();
-  const { isAdmin } = useUserRole();
+  const { plan, isLoading: loadingPlan } = useUserPlan();
+  const { isAdmin, isLoading: loadingRole } = useUserRole();
   
-  const showAcompanhamento = plan === 'academy' || isAdmin;
+  // Mostrar "Meu Acompanhamento" para Academy, Lab, Skills (não Club) e sempre para admins
+  // Durante loading, manter visível para evitar flash/redirecionamento
+  const isLoadingAccess = loadingPlan || loadingRole;
+  const showAcompanhamento = isLoadingAccess || isAdmin || (plan && plan !== 'club');
 
   return (
     <div className="container mx-auto p-6 space-y-8">
