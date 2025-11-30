@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles, ArrowRight, AlertCircle, X } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
-import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
 import mariAvatar from "@/assets/mari-avatar.jpg";
 
 export default function Dashboard() {
@@ -16,6 +18,22 @@ export default function Dashboard() {
   const [question, setQuestion] = useState("");
   const [mostrarAvisoSenha, setMostrarAvisoSenha] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Query para buscar todas as trilhas
+  const { data: trilhas, isLoading: loadingTrilhas } = useQuery({
+    queryKey: ["trilhas-dashboard"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trilhas")
+        .select("id, titulo, imagem_url, bloqueada, visivel_apenas_pro")
+        .eq("ativo", true)
+        .eq("visivel_mentorados", true)
+        .order("ordem");
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   useEffect(() => {
     if (!user) return;
@@ -193,10 +211,28 @@ export default function Dashboard() {
           <NovidadesSemana />
         </section>
 
-        {/* Últimos Conteúdos Adicionados */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold">Últimos Conteúdos Adicionados</h2>
-          <UltimosConteudos />
+        {/* Grid de Trilhas */}
+        <section>
+          {loadingTrilhas ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="h-[400px] rounded-xl" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {trilhas?.map((trilha) => (
+                <TrilhaCardBloqueavel
+                  key={trilha.id}
+                  id={trilha.id}
+                  titulo={trilha.titulo}
+                  imagem_url={trilha.imagem_url || undefined}
+                  bloqueada={trilha.bloqueada || false}
+                  visivel_apenas_pro={trilha.visivel_apenas_pro || false}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
       </main>
