@@ -22,7 +22,7 @@ export function VideoCardVertical({
 
   return (
     <Link to={`/trilhas/${trilha_id}?video=${id}`} className="block group">
-      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative h-[400px] w-full bg-muted">
+      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative aspect-[9/16] w-full bg-muted">
         <img
           src={thumbnailUrl}
           alt={titulo}
