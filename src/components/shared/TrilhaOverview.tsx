@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, Play } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
 import { cn } from "@/lib/utils";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface Video {
   id: string;
@@ -91,7 +92,7 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
         </div>
       </div>
 
-      {/* Lista de Vídeos por Módulo */}
+      {/* Lista de Vídeos por Módulo em Carrossel */}
       <div className="space-y-8">
         {Object.values(videosByModule).map((group, idx) => (
           <div key={group.modulo.id} className="space-y-4">
@@ -100,47 +101,65 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
               <h2 className="text-xl font-semibold">{group.modulo.titulo}</h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {group.videos.map((video) => {
-                const progress = getVideoProgress(video.id);
-                const isCompleted = progress?.completado;
+            {/* Carrossel Horizontal de Cards Verticais */}
+            <div className="relative">
+              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
+                {group.videos.map((video) => {
+                  const progress = getVideoProgress(video.id);
+                  const isCompleted = progress?.completado;
 
-                return (
-                  <Card
-                    key={video.id}
-                    className={cn(
-                      "cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02]",
-                      isCompleted && "border-green-600"
-                    )}
-                    onClick={() => onSelectVideo(video.id)}
-                  >
-                    <div className="relative">
-                      <img
-                        src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_url)}
-                        alt={video.titulo}
-                        className="w-full aspect-video object-cover rounded-t-lg"
-                      />
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-t-lg">
-                        <Play className="h-12 w-12 text-white" />
-                      </div>
-                      {isCompleted && (
-                        <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-1">
-                          <CheckCircle2 className="h-4 w-4" />
+                  return (
+                    <div
+                      key={video.id}
+                      className="w-[250px] flex-shrink-0 cursor-pointer group"
+                      onClick={() => onSelectVideo(video.id)}
+                    >
+                      <div className="relative aspect-[9/16] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                        <img
+                          src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_url)}
+                          alt={video.titulo}
+                          className="w-full h-full object-cover"
+                        />
+                        
+                        {/* Overlay com Play */}
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
+                            <Play className="h-8 w-8 text-primary-foreground ml-1" fill="currentColor" />
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-sm line-clamp-2 mb-2">
-                        {video.titulo}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3" />
-                        <span>{video.duracao ? `${video.duracao} min` : "N/A"}</span>
+
+                        {/* Botão de Favoritar */}
+                        <div className="absolute top-2 right-2">
+                          <FavoriteButton 
+                            tipo="video" 
+                            itemId={video.id} 
+                            variant="icon-only"
+                            size="md"
+                          />
+                        </div>
+
+                        {/* Badge de Concluído */}
+                        {isCompleted && (
+                          <div className="absolute top-2 left-2 bg-green-600 text-white rounded-full p-1">
+                            <CheckCircle2 className="h-4 w-4" />
+                          </div>
+                        )}
+
+                        {/* Título Sobreposto */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                          <h3 className="font-semibold text-sm text-white line-clamp-2 mb-1">
+                            {video.titulo}
+                          </h3>
+                          <div className="flex items-center gap-2 text-xs text-white/80">
+                            <Clock className="h-3 w-3" />
+                            <span>{video.duracao ? `${video.duracao} min` : "N/A"}</span>
+                          </div>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         ))}

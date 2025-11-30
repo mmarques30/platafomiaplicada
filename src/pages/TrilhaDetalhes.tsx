@@ -242,8 +242,52 @@ export default function TrilhaDetalhes() {
             progressData={progressData}
           />
         ) : (
-          /* Layout com player + sidebar quando vídeo está selecionado */
-          <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
+          /* Layout com métricas + player + sidebar quando vídeo está selecionado */
+          <div className="space-y-6">
+            {/* Cabeçalho com Métricas */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Badge variant="secondary" className="mb-2">{trilha.categoria}</Badge>
+                <h1 className="text-3xl font-bold">{trilha.titulo}</h1>
+                {trilha.descricao && (
+                  <p className="text-muted-foreground text-lg">{trilha.descricao}</p>
+                )}
+              </div>
+
+              {/* Métricas */}
+              <div className="flex flex-wrap gap-4">
+                <Card className="flex-1 min-w-[200px]">
+                  <CardContent className="p-4">
+                    <div className="text-sm text-muted-foreground">Total de Vídeos</div>
+                    <div className="text-2xl font-bold">{allVideos.length}</div>
+                  </CardContent>
+                </Card>
+                <Card className="flex-1 min-w-[200px]">
+                  <CardContent className="p-4">
+                    <div className="text-sm text-muted-foreground">Progresso</div>
+                    <div className="text-2xl font-bold">
+                      {allVideos.length > 0 
+                        ? Math.round((allVideos.filter(v => progressData?.find(p => p.video_id === v.id)?.completado).length / allVideos.length) * 100)
+                        : 0}%
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {allVideos.filter(v => progressData?.find(p => p.video_id === v.id)?.completado).length}/{allVideos.length} concluídos
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="flex-1 min-w-[200px]">
+                  <CardContent className="p-4">
+                    <div className="text-sm text-muted-foreground">Duração Total</div>
+                    <div className="text-2xl font-bold">
+                      {Math.round(allVideos.reduce((sum, v) => sum + (v.duracao || 0), 0) / 60)}h
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Player e Sidebar */}
+            <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
           {/* Left: Video Player e Informações */}
           <div className="flex-1 lg:w-[65%] flex flex-col">
             {currentVideo ? (
@@ -476,6 +520,7 @@ export default function TrilhaDetalhes() {
               </div>
               </div>
             </div>
+          </div>
           </div>
         )}
     </div>
