@@ -6,8 +6,8 @@ export const useRankingComunidade = () => {
     queryKey: ["ranking-comunidade"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .rpc('get_ranking_comunidade' as any)
-        .limit(50) as any;
+        .rpc('get_ranking_comunidade')
+        .limit(50);
       
       if (error) {
         console.error("Erro ao buscar ranking:", error);

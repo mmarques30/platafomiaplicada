@@ -809,6 +809,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ferramentas_compartilhadas: {
+        Row: {
+          ativo: boolean | null
+          categoria: string
+          created_at: string | null
+          descricao: string
+          id: string
+          link: string | null
+          nome: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria: string
+          created_at?: string | null
+          descricao: string
+          id?: string
+          link?: string | null
+          nome: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string
+          created_at?: string | null
+          descricao?: string
+          id?: string
+          link?: string | null
+          nome?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ferramentas_ia: {
         Row: {
           ativo: boolean | null
@@ -2310,6 +2346,20 @@ export type Database = {
           total_exercicios: number
           total_materiais: number
           total_videos: number
+        }[]
+      }
+      get_ranking_comunidade: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          nome_completo: string
+          posicao: number
+          total_comentarios: number
+          total_ferramentas_compartilhadas: number
+          total_pontos: number
+          total_projetos_entregues: number
+          total_videos_assistidos: number
+          user_id: string
         }[]
       }
       get_trilhas_stats: {
