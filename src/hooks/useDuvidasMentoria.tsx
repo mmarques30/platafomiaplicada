@@ -18,6 +18,10 @@ export type DuvidaMentoria = {
   atrasada: boolean;
   horas_para_vencer?: number;
   tags?: string[];
+  publicar_qa: boolean;
+  categoria_qa_id?: string;
+  video_qa_url?: string;
+  publicado_qa_em?: string;
   created_at: string;
   updated_at: string;
 };
@@ -71,17 +75,39 @@ export function useDuvidasMentoria(userId?: string) {
   });
 
   const responderDuvida = useMutation({
-    mutationFn: async ({ id, resposta }: { id: string; resposta: string }) => {
+    mutationFn: async ({ 
+      id, 
+      resposta,
+      publicar_qa,
+      categoria_qa_id,
+      video_qa_url
+    }: { 
+      id: string; 
+      resposta: string;
+      publicar_qa?: boolean;
+      categoria_qa_id?: string;
+      video_qa_url?: string;
+    }) => {
       if (!user) throw new Error("Usuário não autenticado");
+
+      const updateData: any = {
+        resposta_mentor: resposta,
+        status: "respondida",
+        respondida_em: new Date().toISOString(),
+        respondida_por: user.id,
+      };
+
+      if (publicar_qa !== undefined) {
+        updateData.publicar_qa = publicar_qa;
+        updateData.publicado_qa_em = publicar_qa ? new Date().toISOString() : null;
+      }
+      
+      if (categoria_qa_id) updateData.categoria_qa_id = categoria_qa_id;
+      if (video_qa_url !== undefined) updateData.video_qa_url = video_qa_url;
 
       const { error } = await supabase
         .from("duvidas_mentoria")
-        .update({
-          resposta_mentor: resposta,
-          status: "respondida",
-          respondida_em: new Date().toISOString(),
-          respondida_por: user.id,
-        })
+        .update(updateData)
         .eq("id", id);
 
       if (error) throw error;

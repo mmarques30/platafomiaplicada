@@ -15,12 +15,19 @@ export interface TodasDuvidasItem {
   resposta_mentor: string | null;
   respondida_em: string | null;
   respondida_por: string | null;
+  publicar_qa: boolean;
+  categoria_qa_id: string | null;
+  video_qa_url: string | null;
+  publicado_qa_em: string | null;
   created_at: string;
   updated_at: string;
   profiles: {
     nome_completo: string;
     email: string | null;
   };
+  categorias_qa?: {
+    nome: string;
+  } | null;
 }
 
 export function useTodasDuvidas() {
@@ -34,6 +41,9 @@ export function useTodasDuvidas() {
           profiles!duvidas_mentoria_user_id_fkey (
             nome_completo,
             email
+          ),
+          categorias_qa (
+            nome
           )
         `)
         .order("created_at", { ascending: false });
