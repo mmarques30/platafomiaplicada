@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MessageSquare, ThumbsUp, BookOpen } from "lucide-react";
+import { Users, MessageSquare, ThumbsUp } from "lucide-react";
 
 export function EstatisticasComunidadeTab() {
   const { data: stats } = useQuery({
@@ -11,7 +11,6 @@ export function EstatisticasComunidadeTab() {
         { count: totalMembers },
         { count: totalPosts },
         { count: totalComments },
-        { count: totalCourses },
       ] = await Promise.all([
         supabase
           .from("profiles")
@@ -23,10 +22,6 @@ export function EstatisticasComunidadeTab() {
         supabase
           .from("community_comments")
           .select("*", { count: "exact", head: true }),
-        supabase
-          .from("classroom_courses")
-          .select("*", { count: "exact", head: true })
-          .eq("ativo", true),
       ]);
 
       // Get total likes
@@ -41,7 +36,6 @@ export function EstatisticasComunidadeTab() {
         totalPosts: totalPosts || 0,
         totalComments: totalComments || 0,
         totalLikes,
-        totalCourses: totalCourses || 0,
       };
     },
   });
@@ -70,12 +64,6 @@ export function EstatisticasComunidadeTab() {
       value: stats?.totalLikes || 0,
       icon: ThumbsUp,
       color: "text-red-500",
-    },
-    {
-      title: "Cursos Ativos",
-      value: stats?.totalCourses || 0,
-      icon: BookOpen,
-      color: "text-yellow-500",
     },
   ];
 

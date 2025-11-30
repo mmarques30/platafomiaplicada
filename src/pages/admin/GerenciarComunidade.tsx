@@ -1,6 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CategoriasTab } from "@/components/admin/comunidade/CategoriasTab";
-import { CursosClassroomTab } from "@/components/admin/comunidade/CursosClassroomTab";
 import { ModeracaoTab } from "@/components/admin/comunidade/ModeracaoTab";
 import { EstatisticasComunidadeTab } from "@/components/admin/comunidade/EstatisticasComunidadeTab";
 
@@ -12,7 +11,7 @@ export default function GerenciarComunidade() {
           Gerenciar Comunidade
         </h1>
         <p className="text-muted-foreground">
-          Configure categorias, cursos do Classroom e modere posts
+          Configure categorias, modere posts e visualize estatísticas da comunidade
         </p>
       </div>
 
@@ -23,12 +22,6 @@ export default function GerenciarComunidade() {
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
             Categorias
-          </TabsTrigger>
-          <TabsTrigger
-            value="classroom"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-          >
-            Classroom
           </TabsTrigger>
           <TabsTrigger
             value="moderacao"
@@ -46,10 +39,6 @@ export default function GerenciarComunidade() {
 
         <TabsContent value="categorias">
           <CategoriasTab />
-        </TabsContent>
-
-        <TabsContent value="classroom">
-          <CursosClassroomTab />
         </TabsContent>
 
         <TabsContent value="moderacao">
