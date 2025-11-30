@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDuvidasMentoria } from "@/hooks/useDuvidasMentoria";
+import { useCategoriasQA } from "@/hooks/useCategoriasQA";
 import { useState } from "react";
 
 interface NovaDuvidaModalProps {
@@ -14,21 +15,24 @@ interface NovaDuvidaModalProps {
 
 export function NovaDuvidaModal({ open, onOpenChange }: NovaDuvidaModalProps) {
   const { criarDuvida, isCriando } = useDuvidasMentoria();
+  const { categorias } = useCategoriasQA();
   const [titulo, setTitulo] = useState("");
   const [duvida, setDuvida] = useState("");
   const [contexto, setContexto] = useState("");
+  const [categoriaQAId, setCategoriaQAId] = useState<string>("");
   const [prioridade, setPrioridade] = useState<"baixa" | "normal" | "alta" | "urgente">("normal");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     criarDuvida(
-      { titulo, duvida, contexto, prioridade },
+      { titulo, duvida, contexto, prioridade, categoria_qa_id: categoriaQAId || null },
       {
         onSuccess: () => {
           setTitulo("");
           setDuvida("");
           setContexto("");
+          setCategoriaQAId("");
           setPrioridade("normal");
           onOpenChange(false);
         },
@@ -76,6 +80,22 @@ export function NovaDuvidaModal({ open, onOpenChange }: NovaDuvidaModalProps) {
               placeholder="Ex: Ao tentar implementar X, encontrei o erro Y..."
               rows={3}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="categoria">Categoria</Label>
+            <Select value={categoriaQAId} onValueChange={setCategoriaQAId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {categorias.filter(c => c.ativo).map((categoria) => (
+                  <SelectItem key={categoria.id} value={categoria.id}>
+                    {categoria.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
