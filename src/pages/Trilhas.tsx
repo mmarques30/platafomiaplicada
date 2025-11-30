@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { TrilhaCard } from "@/components/shared/TrilhaCard";
+import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useContentVisibility } from "@/hooks/useContentVisibility";
@@ -15,7 +15,7 @@ export default function Trilhas() {
     queryFn: async () => {
       let query = supabase
         .from("trilhas")
-        .select("*")
+        .select("id, titulo, imagem_url, nivel, ordem, visivel_apenas_pro, bloqueada, visivel_visitantes, visivel_mentorados")
         .eq("ativo", true)
         .order("ordem");
       
@@ -92,11 +92,12 @@ export default function Trilhas() {
           <TabsContent value="todos" className="mt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trilhasVisiveisComModulos.map((trilha) => (
-                <TrilhaCard
+                <TrilhaCardBloqueavel
                   key={trilha.id}
                   id={trilha.id}
                   titulo={trilha.titulo}
                   imagem_url={trilha.imagem_url}
+                  bloqueada={trilha.bloqueada || false}
                   visivel_apenas_pro={trilha.visivel_apenas_pro}
                 />
               ))}
@@ -119,11 +120,12 @@ export default function Trilhas() {
           <TabsContent value="iniciante" className="mt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trilhasPorNivel.iniciante.map((trilha) => (
-                <TrilhaCard
+                <TrilhaCardBloqueavel
                   key={trilha.id}
                   id={trilha.id}
                   titulo={trilha.titulo}
                   imagem_url={trilha.imagem_url}
+                  bloqueada={trilha.bloqueada || false}
                   visivel_apenas_pro={trilha.visivel_apenas_pro}
                 />
               ))}
@@ -133,11 +135,12 @@ export default function Trilhas() {
           <TabsContent value="intermediario" className="mt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trilhasPorNivel.intermediario.map((trilha) => (
-                <TrilhaCard
+                <TrilhaCardBloqueavel
                   key={trilha.id}
                   id={trilha.id}
                   titulo={trilha.titulo}
                   imagem_url={trilha.imagem_url}
+                  bloqueada={trilha.bloqueada || false}
                   visivel_apenas_pro={trilha.visivel_apenas_pro}
                 />
               ))}
@@ -147,11 +150,12 @@ export default function Trilhas() {
           <TabsContent value="avancado" className="mt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trilhasPorNivel.avancado.map((trilha) => (
-                <TrilhaCard
+                <TrilhaCardBloqueavel
                   key={trilha.id}
                   id={trilha.id}
                   titulo={trilha.titulo}
                   imagem_url={trilha.imagem_url}
+                  bloqueada={trilha.bloqueada || false}
                   visivel_apenas_pro={trilha.visivel_apenas_pro}
                 />
               ))}
