@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles, ArrowRight, AlertCircle, X } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
-import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
+import { GridTrilhas } from "@/components/dashboard/GridTrilhas";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
@@ -193,10 +193,9 @@ export default function Dashboard() {
           <NovidadesSemana />
         </section>
 
-        {/* Últimos Conteúdos Adicionados */}
+        {/* Grid de Todas as Trilhas */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Últimos Conteúdos Adicionados</h2>
-          <UltimosConteudos />
+          <GridTrilhas />
         </section>
 
       </main>

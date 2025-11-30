@@ -2062,6 +2062,7 @@ export type Database = {
       trilhas: {
         Row: {
           ativo: boolean | null
+          bloqueada: boolean | null
           categoria: string
           created_at: string | null
           descricao: string | null
@@ -2081,6 +2082,7 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean | null
+          bloqueada?: boolean | null
           categoria: string
           created_at?: string | null
           descricao?: string | null
@@ -2100,6 +2102,7 @@ export type Database = {
         }
         Update: {
           ativo?: boolean | null
+          bloqueada?: boolean | null
           categoria?: string
           created_at?: string | null
           descricao?: string | null
