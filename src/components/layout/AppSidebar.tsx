@@ -103,27 +103,42 @@ export function AppSidebar() {
                     >
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
-                          <SidebarMenuButton className={cn(
-                            "group relative rounded-lg transition-all duration-200 font-medium pl-4 w-full justify-between",
-                            isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
-                          )}>
-                            <span className={cn(
-                              "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                              isActive 
-                                ? "bg-aplicada-green-700 opacity-100" 
-                                : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
-                            )} />
-                            <IconComponent className="h-4 w-4 shrink-0" />
-                            {!collapsed && <span>{menu.label}</span>}
+                          <div className="flex items-center w-full">
+                            {/* Parte clicável que navega */}
+                            <NavLink
+                              to={menu.url || "/"}
+                              className={cn(
+                                "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2",
+                                isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
+                              )}
+                            >
+                              <span className={cn(
+                                "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                                isActive 
+                                  ? "bg-aplicada-green-700 opacity-100" 
+                                  : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                              )} />
+                              <IconComponent className="h-4 w-4 shrink-0" />
+                              {!collapsed && <span>{menu.label}</span>}
+                            </NavLink>
+                            {/* Botão do chevron que expande/colapsa */}
                             {!collapsed && (
-                              <ChevronDown 
-                                className={cn(
-                                  "h-4 w-4 ml-auto transition-transform duration-200",
-                                  isExpanded && "rotate-180"
-                                )} 
-                              />
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  toggleMenu(menu.menu_key);
+                                }}
+                                className="p-2 hover:bg-accent rounded-lg transition-colors"
+                              >
+                                <ChevronDown 
+                                  className={cn(
+                                    "h-4 w-4 transition-transform duration-200",
+                                    isExpanded && "rotate-180"
+                                  )} 
+                                />
+                              </button>
                             )}
-                          </SidebarMenuButton>
+                          </div>
                         </CollapsibleTrigger>
                       </SidebarMenuItem>
                       

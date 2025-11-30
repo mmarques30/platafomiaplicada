@@ -19,10 +19,11 @@ export default function Evolucao() {
   const { plan, isLoading: loadingPlan } = useUserPlan();
   const { isAdmin, isLoading: loadingRole } = useUserRole();
   
-  // Mostrar "Meu Acompanhamento" para Academy, Lab, Skills (não Club) e sempre para admins
-  // Durante loading, manter visível para evitar flash/redirecionamento
+  // Mostrar aba Acompanhamento para Admin (sempre) e para mentorados com plano diferente de Club
+  // Admin SEMPRE vê a aba (precedência absoluta), independente do próprio plano
+  // Club tem acesso ao painel completo em /mentoria, então não vê esta aba
   const isLoadingAccess = loadingPlan || loadingRole;
-  const showAcompanhamento = isLoadingAccess || isAdmin || (plan && plan !== 'club');
+  const showAcompanhamento = isAdmin || (isLoadingAccess ? true : (plan && plan !== 'club'));
 
   return (
     <div className="container mx-auto p-6 space-y-8">
