@@ -1,4 +1,4 @@
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -29,6 +29,7 @@ export default function TrilhaDetalhes() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -118,15 +119,21 @@ export default function TrilhaDetalhes() {
     video.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Ler vídeo da URL (SEM auto-select)
+  // Ler vídeo da URL (SEM auto-select) e redirecionar se não tiver ?video=
   useEffect(() => {
     const videoIdFromUrl = searchParams.get("video");
+    
+    // Se não tem ?video= na URL, redirecionar para /trilhas
+    if (!videoIdFromUrl) {
+      navigate("/trilhas", { replace: true });
+      return;
+    }
+    
+    // Se tem vídeo na URL e existe nos vídeos disponíveis, selecionar
     if (videoIdFromUrl && allVideos.some(v => v.id === videoIdFromUrl)) {
       setCurrentVideoId(videoIdFromUrl);
-    } else if (allVideos.length > 0) {
-      setCurrentVideoId(null); // Mostra TrilhaOverview
     }
-  }, [searchParams, allVideos]);
+  }, [searchParams, allVideos, navigate]);
 
   // Scroll to active video in sidebar
   useEffect(() => {

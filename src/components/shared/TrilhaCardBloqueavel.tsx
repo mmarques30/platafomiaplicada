@@ -60,7 +60,7 @@ export function TrilhaCardBloqueavel({
 
   // Se não bloqueada, renderiza card normal clicável
   return (
-    <Link to={`/trilhas/${id}`} className="block group">
+    <Link to="/trilhas" className="block group">
       <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative aspect-[9/16] w-full bg-muted border-2 border-primary/10 hover:border-primary/30">
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">

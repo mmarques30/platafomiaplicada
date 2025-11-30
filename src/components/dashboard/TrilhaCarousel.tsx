@@ -32,7 +32,7 @@ export function TrilhaCarousel({ trilhaId, trilhaTitulo, videos }: TrilhaCarouse
         </div>
         
         <Button variant="ghost" size="sm" asChild>
-          <Link to={`/trilhas/${trilhaId}`}>
+          <Link to={`/trilhas/${trilhaId}?video=${videos[0]?.id}`}>
             Ver trilha completa <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </Button>
