@@ -210,11 +210,6 @@ export function TrilhasTab() {
                           Publicado
                         </Badge>
                       )}
-                      {trilha.visivel_visitantes && (
-                        <Badge variant="outline" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/50">
-                          👁️ Visitantes
-                        </Badge>
-                      )}
                     </div>
                   </TableCell>
                   <TableCell className="text-right space-x-2">
