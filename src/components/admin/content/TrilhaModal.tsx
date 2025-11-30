@@ -46,6 +46,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       visivel_visitantes: false,
       visivel_apenas_pro: false,
       nivel_minimo_acesso: "academy",
+      bloqueada: false,
       imagem_url: "",
       duracao_estimada: 0,
     },
@@ -65,6 +66,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       setValue("visivel_visitantes", trilha.visivel_visitantes ?? false);
       setValue("visivel_apenas_pro", trilha.visivel_apenas_pro ?? false);
       setValue("nivel_minimo_acesso", trilha.nivel_minimo_acesso || "academy");
+      setValue("bloqueada", trilha.bloqueada ?? false);
     } else {
       reset({
         titulo: "",
@@ -77,6 +79,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         visivel_visitantes: false,
         visivel_apenas_pro: false,
         nivel_minimo_acesso: "academy",
+        bloqueada: false,
         imagem_url: "",
         duracao_estimada: 0,
       });
@@ -384,6 +387,17 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
               Define qual plano mínimo pode acessar esta trilha
             </p>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch 
+              checked={watch("bloqueada") || false} 
+              onCheckedChange={(checked) => setValue("bloqueada", checked)} 
+            />
+            <Label>Bloqueada</Label>
+          </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Marque para mostrar esta trilha com cadeado no dashboard (não clicável)
+          </p>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
