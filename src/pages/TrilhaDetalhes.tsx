@@ -22,6 +22,7 @@ import { VideoMaterialsList } from "@/components/video/VideoMaterialsList";
 import { useVideoRating } from "@/hooks/useVideoRating";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { toast } from "sonner";
+import { TrilhaOverview } from "@/components/shared/TrilhaOverview";
 
 export default function TrilhaDetalhes() {
   const { id } = useParams();
@@ -117,33 +118,13 @@ export default function TrilhaDetalhes() {
     video.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Set initial video from URL or first video
-  const initializedRef = useRef(false);
-  
+  // Set video from URL only (don't auto-select first video)
   useEffect(() => {
-    // Só inicializa uma vez quando allVideos estiver disponível
-    if (allVideos.length === 0 || initializedRef.current) return;
-    
     const videoIdFromUrl = searchParams.get("video");
-    const moduloIdFromUrl = searchParams.get("modulo");
-    
     if (videoIdFromUrl && allVideos.some(v => v.id === videoIdFromUrl)) {
       setCurrentVideoId(videoIdFromUrl);
-      initializedRef.current = true;
-    } else if (moduloIdFromUrl) {
-      // Se veio de um link de módulo, pega o primeiro vídeo daquele módulo
-      const moduloVideos = allVideos.filter(v => v.modulo.id === moduloIdFromUrl);
-      if (moduloVideos.length > 0) {
-        setCurrentVideoId(moduloVideos[0].id);
-        setSearchParams({ video: moduloVideos[0].id }, { replace: true });
-        initializedRef.current = true;
-      }
-    } else if (!currentVideoId) {
-      setCurrentVideoId(allVideos[0].id);
-      setSearchParams({ video: allVideos[0].id }, { replace: true });
-      initializedRef.current = true;
     }
-  }, [allVideos]);
+  }, [searchParams, allVideos]);
 
   // Scroll to active video in sidebar
   useEffect(() => {
@@ -248,11 +229,21 @@ export default function TrilhaDetalhes() {
         <Link to="/trilhas">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar para Trilhas
+            Voltar para Academy
           </Button>
         </Link>
 
-        <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
+        {/* Se nenhum vídeo selecionado, mostrar overview da trilha */}
+        {!currentVideoId ? (
+          <TrilhaOverview
+            trilha={trilha}
+            videos={allVideos}
+            onSelectVideo={handleVideoSelect}
+            progressData={progressData}
+          />
+        ) : (
+          /* Layout com player + sidebar quando vídeo está selecionado */
+          <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
           {/* Left: Video Player e Informações */}
           <div className="flex-1 lg:w-[65%] flex flex-col">
             {currentVideo ? (
@@ -483,9 +474,10 @@ export default function TrilhaDetalhes() {
                   </Accordion>
                 </div>
               </div>
+              </div>
             </div>
           </div>
-      </div>
+        )}
     </div>
   );
 }
