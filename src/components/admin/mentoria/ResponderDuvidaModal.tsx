@@ -2,7 +2,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDuvidasMentoria } from "@/hooks/useDuvidasMentoria";
+import { useCategoriasQA } from "@/hooks/useCategoriasQA";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -16,16 +20,29 @@ interface ResponderDuvidaModalProps {
 
 export function ResponderDuvidaModal({ duvida, open, onOpenChange }: ResponderDuvidaModalProps) {
   const { responderDuvida, isRespondendo } = useDuvidasMentoria(duvida.user_id);
+  const { categorias } = useCategoriasQA();
   const [resposta, setResposta] = useState("");
+  const [publicarQA, setPublicarQA] = useState(false);
+  const [categoriaQAId, setCategoriaQAId] = useState<string>("");
+  const [videoQAUrl, setVideoQAUrl] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     responderDuvida(
-      { id: duvida.id, resposta },
+      { 
+        id: duvida.id, 
+        resposta,
+        publicar_qa: publicarQA,
+        categoria_qa_id: publicarQA ? categoriaQAId : undefined,
+        video_qa_url: publicarQA && videoQAUrl ? videoQAUrl : undefined,
+      },
       {
         onSuccess: () => {
           setResposta("");
+          setPublicarQA(false);
+          setCategoriaQAId("");
+          setVideoQAUrl("");
           onOpenChange(false);
         },
       }
@@ -82,11 +99,61 @@ export function ResponderDuvidaModal({ duvida, open, onOpenChange }: ResponderDu
               />
             </div>
 
+            <div className="border-t pt-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="publicar-qa" className="text-base">Publicar no Q&A</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Esta resposta será visível no banco de perguntas frequentes
+                  </p>
+                </div>
+                <Switch
+                  id="publicar-qa"
+                  checked={publicarQA}
+                  onCheckedChange={setPublicarQA}
+                />
+              </div>
+
+              {publicarQA && (
+                <div className="space-y-4 pl-4 border-l-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="categoria-qa">Categoria Q&A *</Label>
+                    <Select value={categoriaQAId} onValueChange={setCategoriaQAId} required>
+                      <SelectTrigger id="categoria-qa">
+                        <SelectValue placeholder="Selecione a categoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categorias.filter(c => c.ativo).map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.nome}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="video-qa">URL do Vídeo (Opcional)</Label>
+                    <Input
+                      id="video-qa"
+                      value={videoQAUrl}
+                      onChange={(e) => setVideoQAUrl(e.target.value)}
+                      placeholder="https://youtube.com/watch?v=..."
+                      type="url"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Link do vídeo com a resposta gravada (será gerenciado como trilha)
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isRespondendo}>
+              <Button type="submit" disabled={isRespondendo || (publicarQA && !categoriaQAId)}>
                 {isRespondendo ? "Enviando..." : "Enviar Resposta"}
               </Button>
             </div>

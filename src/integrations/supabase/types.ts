@@ -175,6 +175,36 @@ export type Database = {
           },
         ]
       }
+      categorias_qa: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          descricao: string | null
+          id: string
+          nome: string
+          ordem: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          nome: string
+          ordem?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          nome?: string
+          ordem?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       certificados: {
         Row: {
           codigo_verificacao: string | null
@@ -525,6 +555,7 @@ export type Database = {
       duvidas_mentoria: {
         Row: {
           atrasada: boolean | null
+          categoria_qa_id: string | null
           contexto: string | null
           created_at: string | null
           duvida: string
@@ -532,6 +563,8 @@ export type Database = {
           id: string
           prazo_sla: string
           prioridade: string
+          publicado_qa_em: string | null
+          publicar_qa: boolean | null
           respondida_em: string | null
           respondida_por: string | null
           resposta_mentor: string | null
@@ -540,9 +573,11 @@ export type Database = {
           titulo: string
           updated_at: string | null
           user_id: string
+          video_qa_url: string | null
         }
         Insert: {
           atrasada?: boolean | null
+          categoria_qa_id?: string | null
           contexto?: string | null
           created_at?: string | null
           duvida: string
@@ -550,6 +585,8 @@ export type Database = {
           id?: string
           prazo_sla: string
           prioridade?: string
+          publicado_qa_em?: string | null
+          publicar_qa?: boolean | null
           respondida_em?: string | null
           respondida_por?: string | null
           resposta_mentor?: string | null
@@ -558,9 +595,11 @@ export type Database = {
           titulo: string
           updated_at?: string | null
           user_id: string
+          video_qa_url?: string | null
         }
         Update: {
           atrasada?: boolean | null
+          categoria_qa_id?: string | null
           contexto?: string | null
           created_at?: string | null
           duvida?: string
@@ -568,6 +607,8 @@ export type Database = {
           id?: string
           prazo_sla?: string
           prioridade?: string
+          publicado_qa_em?: string | null
+          publicar_qa?: boolean | null
           respondida_em?: string | null
           respondida_por?: string | null
           resposta_mentor?: string | null
@@ -576,8 +617,16 @@ export type Database = {
           titulo?: string
           updated_at?: string | null
           user_id?: string
+          video_qa_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "duvidas_mentoria_categoria_qa_id_fkey"
+            columns: ["categoria_qa_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_qa"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "duvidas_mentoria_respondida_por_fkey"
             columns: ["respondida_por"]

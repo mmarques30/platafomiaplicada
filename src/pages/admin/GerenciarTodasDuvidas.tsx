@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCategoriasQA } from "@/hooks/useCategoriasQA";
 import {
   Table,
   TableBody,
@@ -21,15 +22,18 @@ import {
 import { useTodasDuvidas } from "@/hooks/useTodasDuvidas";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { MessageCircle, Search, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { MessageCircle, Search, AlertCircle, CheckCircle2, Clock, Video } from "lucide-react";
 import { ResponderDuvidaModal } from "@/components/admin/mentoria/ResponderDuvidaModal";
 import type { DuvidaMentoria } from "@/hooks/useDuvidasMentoria";
 
 export default function GerenciarTodasDuvidas() {
   const { duvidas, isLoading } = useTodasDuvidas();
+  const { categorias } = useCategoriasQA();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todas");
   const [prioridadeFilter, setPrioridadeFilter] = useState("todas");
+  const [qaFilter, setQaFilter] = useState("todas");
+  const [categoriaQAFilter, setCategoriaQAFilter] = useState("todas");
   const [selectedDuvida, setSelectedDuvida] = useState<DuvidaMentoria | null>(null);
 
   const filteredDuvidas = duvidas.filter((duvida) => {
@@ -39,8 +43,12 @@ export default function GerenciarTodasDuvidas() {
     
     const matchesStatus = statusFilter === "todas" || duvida.status === statusFilter;
     const matchesPrioridade = prioridadeFilter === "todas" || duvida.prioridade === prioridadeFilter;
+    const matchesQA = qaFilter === "todas" || 
+                      (qaFilter === "publicadas" && duvida.publicar_qa) ||
+                      (qaFilter === "nao_publicadas" && !duvida.publicar_qa);
+    const matchesCategoriaQA = categoriaQAFilter === "todas" || duvida.categoria_qa_id === categoriaQAFilter;
 
-    return matchesSearch && matchesStatus && matchesPrioridade;
+    return matchesSearch && matchesStatus && matchesPrioridade && matchesQA && matchesCategoriaQA;
   });
 
   const getStatusIcon = (status: string) => {
@@ -119,7 +127,7 @@ export default function GerenciarTodasDuvidas() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -166,6 +174,18 @@ export default function GerenciarTodasDuvidas() {
             </p>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Q&A Publicados
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-primary">
+              {duvidas.filter((d) => d.publicar_qa).length}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filtros */}
@@ -208,6 +228,31 @@ export default function GerenciarTodasDuvidas() {
               </SelectContent>
             </Select>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select value={qaFilter} onValueChange={setQaFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Status Q&A" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todos os Q&A</SelectItem>
+                <SelectItem value="publicadas">Publicadas no Q&A</SelectItem>
+                <SelectItem value="nao_publicadas">Não Publicadas</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={categoriaQAFilter} onValueChange={setCategoriaQAFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Categoria Q&A" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todas as Categorias</SelectItem>
+                {categorias.filter(c => c.ativo).map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
 
@@ -224,6 +269,7 @@ export default function GerenciarTodasDuvidas() {
                 <TableHead>Título</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Prioridade</TableHead>
+                <TableHead>Q&A</TableHead>
                 <TableHead>SLA</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Ações</TableHead>
@@ -232,7 +278,7 @@ export default function GerenciarTodasDuvidas() {
             <TableBody>
               {filteredDuvidas.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     Nenhuma dúvida encontrada
                   </TableCell>
                 </TableRow>
@@ -255,6 +301,20 @@ export default function GerenciarTodasDuvidas() {
                         <Badge variant={getPrioridadeColor(duvida.prioridade)}>
                           {duvida.prioridade.charAt(0).toUpperCase() + duvida.prioridade.slice(1)}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {duvida.publicar_qa ? (
+                          <div className="flex items-center gap-2">
+                            <Badge variant="default" className="bg-primary">
+                              {duvida.categorias_qa?.nome || "Q&A"}
+                            </Badge>
+                            {duvida.video_qa_url && (
+                              <Video className="h-4 w-4 text-primary" />
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <span className={`text-sm font-medium ${slaInfo.color}`}>

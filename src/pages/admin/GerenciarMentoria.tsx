@@ -14,6 +14,7 @@ import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
 import { ProcessoRoadmap } from "@/components/admin/mentoria/ProcessoRoadmap";
+import { CategoriasQATab } from "@/components/admin/mentoria/CategoriasQATab";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import RecursoModal from "@/components/admin/mentoria/RecursoModal";
@@ -139,7 +140,7 @@ export default function GerenciarMentoria() {
         </Card>
 
         <Tabs defaultValue="diagnostico" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="diagnostico">
               <FileText className="h-4 w-4 mr-2" />
               Diagnóstico
@@ -166,6 +167,9 @@ export default function GerenciarMentoria() {
               <TabsTrigger value="recursos">
                 <BookOpen className="h-4 w-4 mr-2" />
                 Recursos
+              </TabsTrigger>
+              <TabsTrigger value="categorias-qa">
+                Categorias Q&A
               </TabsTrigger>
             </TabsList>
 
@@ -344,6 +348,10 @@ export default function GerenciarMentoria() {
                   <p className="text-center text-muted-foreground py-8">Nenhum recurso cadastrado</p>
                 )}
               </div>
+            </TabsContent>
+
+            <TabsContent value="categorias-qa" className="space-y-4">
+              <CategoriasQATab />
             </TabsContent>
               </>
             )}
