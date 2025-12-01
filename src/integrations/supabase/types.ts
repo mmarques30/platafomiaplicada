@@ -175,6 +175,143 @@ export type Database = {
           },
         ]
       }
+      candidaturas_mentoria: {
+        Row: {
+          admin_responsavel: string | null
+          autonomia_contratacao: string | null
+          cargo_atual: string | null
+          cargo_outro: string | null
+          cidade_estado: string | null
+          como_contribuir_grupo: string | null
+          created_at: string | null
+          data_contato: string | null
+          descricao_implementacao: string | null
+          email: string
+          empresa_atual: string | null
+          faixa_renda: string | null
+          ferramentas_ia: string[] | null
+          horas_semana_aprendizado: string | null
+          id: string
+          impedimento_comecar_hoje: string | null
+          ja_implementou_ia: boolean | null
+          ja_investiu_mentoria: boolean | null
+          linkedin_url: string | null
+          maximo_investido_desenvolvimento: string | null
+          nivel_ia: number | null
+          nome_completo: string
+          notas_admin: string | null
+          onde_quer_estar_2_anos: string | null
+          outras_ferramentas: string | null
+          outro_impedimento: string | null
+          por_que_escolher_voce: string
+          por_que_nao_alcancou: string | null
+          porte_empresa: string | null
+          qtd_liderados: number | null
+          quanto_investiu: string | null
+          significado_sucesso_ia: string
+          status: string | null
+          tem_4k_10k_investir: string | null
+          tempo_cargo: string | null
+          tres_maiores_desafios: string
+          updated_at: string | null
+          urgencia_dominar_ia: number | null
+          valor_disponivel: string | null
+          whatsapp: string
+        }
+        Insert: {
+          admin_responsavel?: string | null
+          autonomia_contratacao?: string | null
+          cargo_atual?: string | null
+          cargo_outro?: string | null
+          cidade_estado?: string | null
+          como_contribuir_grupo?: string | null
+          created_at?: string | null
+          data_contato?: string | null
+          descricao_implementacao?: string | null
+          email: string
+          empresa_atual?: string | null
+          faixa_renda?: string | null
+          ferramentas_ia?: string[] | null
+          horas_semana_aprendizado?: string | null
+          id?: string
+          impedimento_comecar_hoje?: string | null
+          ja_implementou_ia?: boolean | null
+          ja_investiu_mentoria?: boolean | null
+          linkedin_url?: string | null
+          maximo_investido_desenvolvimento?: string | null
+          nivel_ia?: number | null
+          nome_completo: string
+          notas_admin?: string | null
+          onde_quer_estar_2_anos?: string | null
+          outras_ferramentas?: string | null
+          outro_impedimento?: string | null
+          por_que_escolher_voce: string
+          por_que_nao_alcancou?: string | null
+          porte_empresa?: string | null
+          qtd_liderados?: number | null
+          quanto_investiu?: string | null
+          significado_sucesso_ia: string
+          status?: string | null
+          tem_4k_10k_investir?: string | null
+          tempo_cargo?: string | null
+          tres_maiores_desafios: string
+          updated_at?: string | null
+          urgencia_dominar_ia?: number | null
+          valor_disponivel?: string | null
+          whatsapp: string
+        }
+        Update: {
+          admin_responsavel?: string | null
+          autonomia_contratacao?: string | null
+          cargo_atual?: string | null
+          cargo_outro?: string | null
+          cidade_estado?: string | null
+          como_contribuir_grupo?: string | null
+          created_at?: string | null
+          data_contato?: string | null
+          descricao_implementacao?: string | null
+          email?: string
+          empresa_atual?: string | null
+          faixa_renda?: string | null
+          ferramentas_ia?: string[] | null
+          horas_semana_aprendizado?: string | null
+          id?: string
+          impedimento_comecar_hoje?: string | null
+          ja_implementou_ia?: boolean | null
+          ja_investiu_mentoria?: boolean | null
+          linkedin_url?: string | null
+          maximo_investido_desenvolvimento?: string | null
+          nivel_ia?: number | null
+          nome_completo?: string
+          notas_admin?: string | null
+          onde_quer_estar_2_anos?: string | null
+          outras_ferramentas?: string | null
+          outro_impedimento?: string | null
+          por_que_escolher_voce?: string
+          por_que_nao_alcancou?: string | null
+          porte_empresa?: string | null
+          qtd_liderados?: number | null
+          quanto_investiu?: string | null
+          significado_sucesso_ia?: string
+          status?: string | null
+          tem_4k_10k_investir?: string | null
+          tempo_cargo?: string | null
+          tres_maiores_desafios?: string
+          updated_at?: string | null
+          urgencia_dominar_ia?: number | null
+          valor_disponivel?: string | null
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidaturas_mentoria_admin_responsavel_fkey"
+            columns: ["admin_responsavel"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categorias_qa: {
         Row: {
           ativo: boolean | null
