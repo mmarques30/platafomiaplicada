@@ -6,21 +6,31 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { EditVisitanteModal } from "@/components/admin/EditVisitanteModal";
-import { Users, UserCheck, Trash2, Pencil } from "lucide-react";
+import { VisitorAccessDrawer } from "@/components/admin/VisitorAccessDrawer";
+import { useContentAccessMetrics } from "@/hooks/admin/useContentAccessMetrics";
+import { StatsCard } from "@/components/admin/StatsCard";
+import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function GerenciarVisitantes() {
   const { visitantes, isLoading, convertToMentorado, deleteVisitante } = useVisitantes();
+  const { data: metrics, isLoading: isLoadingMetrics } = useContentAccessMetrics();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedVisitante, setSelectedVisitante] = useState<typeof visitantes[0] | null>(null);
 
   const handleEdit = (visitante: typeof visitantes[0]) => {
     setSelectedVisitante(visitante);
     setEditModalOpen(true);
+  };
+
+  const handleViewAccess = (visitante: typeof visitantes[0]) => {
+    setSelectedVisitante(visitante);
+    setDrawerOpen(true);
   };
 
   const handleConvert = (userId: string) => {
@@ -61,34 +71,85 @@ export default function GerenciarVisitantes() {
         </p>
       </div>
 
-      {/* Estatísticas */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Visitantes</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalVisitantes}</div>
-            <p className="text-xs text-muted-foreground">
-              {visitantesAtivos} ativos
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversões Disponíveis</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{visitantesAtivos}</div>
-            <p className="text-xs text-muted-foreground">
-              Podem ser convertidos para mentorados
-            </p>
-          </CardContent>
-        </Card>
+      {/* Estatísticas Gerais */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <StatsCard
+          title="Total de Visitantes"
+          value={totalVisitantes}
+          description={`${visitantesAtivos} ativos`}
+          icon={Users}
+        />
+        <StatsCard
+          title="Total de Acessos"
+          value={metrics?.totalAccesses || 0}
+          description={`${metrics?.accessesLast7Days || 0} nos últimos 7 dias`}
+          icon={Eye}
+        />
+        <StatsCard
+          title="Visitantes Únicos com Acesso"
+          value={metrics?.uniqueUsers || 0}
+          description="Que acessaram conteúdo"
+          icon={UserCheck}
+        />
+        <StatsCard
+          title="Média de Acessos/Visitante"
+          value={metrics?.averagePerUser || 0}
+          description="Por visitante ativo"
+          icon={TrendingUp}
+        />
       </div>
+
+      {/* Top 10 Conteúdos Mais Acessados */}
+      {!isLoadingMetrics && metrics && metrics.topContent.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Top 10 Conteúdos Mais Acessados por Visitantes</CardTitle>
+            <CardDescription>
+              Conteúdos gratuitos com maior engajamento
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>#</TableHead>
+                  <TableHead>Conteúdo</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead className="text-right">Total de Acessos</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {metrics.topContent.map((content, index) => (
+                  <TableRow key={content.id}>
+                    <TableCell className="font-medium">{index + 1}</TableCell>
+                    <TableCell className="max-w-[300px] truncate">
+                      {content.title}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={content.type === 'video' ? 'default' : 'secondary'}>
+                        {content.type === 'video' ? (
+                          <>
+                            <Video className="h-3 w-3 mr-1" />
+                            Vídeo
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="h-3 w-3 mr-1" />
+                            Material
+                          </>
+                        )}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {content.count}x
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tabela de Visitantes */}
       <Card>
@@ -115,6 +176,7 @@ export default function GerenciarVisitantes() {
                     <TableHead>Telefone</TableHead>
                     <TableHead>Data Cadastro</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead className="text-center">Acessos</TableHead>
                     <TableHead className="text-right w-[300px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -137,6 +199,17 @@ export default function GerenciarVisitantes() {
                         ) : (
                           <Badge variant="secondary">Inativo</Badge>
                         )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewAccess(visitante)}
+                          className="font-semibold"
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          {metrics?.accessesByUser?.[visitante.email || ''] || 0}
+                        </Button>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
@@ -199,6 +272,13 @@ export default function GerenciarVisitantes() {
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
         visitante={selectedVisitante}
+      />
+
+      {/* Drawer de Detalhes de Acesso */}
+      <VisitorAccessDrawer
+        visitante={selectedVisitante}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
       />
 
       {/* Dialog de Exclusão */}

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download, ExternalLink, FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
 
 type Material = {
   id: string;
@@ -31,6 +32,7 @@ const CATEGORIAS = [
 
 export function MateriaisGratuitosTab() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { logAccess } = useContentAccessLogger();
 
   const { data: materiais, isLoading } = useQuery({
     queryKey: ["materiais-gratuitos"],
@@ -128,26 +130,22 @@ export function MateriaisGratuitosTab() {
                 <CardContent>
                   <Button
                     className="w-full"
-                    asChild
+                    onClick={() => {
+                      logAccess('material', material.id, material.titulo);
+                      window.open(material.url, '_blank');
+                    }}
                   >
-                    <a
-                      href={material.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2"
-                    >
-                      {material.tipo === "download" ? (
-                        <>
-                          <Download className="h-4 w-4" />
-                          Baixar Material
-                        </>
-                      ) : (
-                        <>
-                          <ExternalLink className="h-4 w-4" />
-                          Acessar Material
-                        </>
-                      )}
-                    </a>
+                    {material.tipo === "download" ? (
+                      <>
+                        <Download className="h-4 w-4 mr-2" />
+                        Baixar Material
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Acessar Material
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
