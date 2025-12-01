@@ -39,6 +39,21 @@ export function useAulasCalendario() {
   });
 }
 
+export function useTodasAulas() {
+  return useQuery({
+    queryKey: ["todas-aulas"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("aulas_semanais")
+        .select("*")
+        .order("data_aula", { ascending: true, nullsFirst: false });
+      
+      if (error) throw error;
+      return data as AulaSemanal[];
+    },
+  });
+}
+
 export function useProximaAula() {
   return useQuery({
     queryKey: ["proxima-aula"],
