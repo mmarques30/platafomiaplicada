@@ -110,10 +110,7 @@ export default function Aplique() {
               </Card>
 
               {/* Card Mentoria - Tema Escuro */}
-              <Card className="bg-zinc-900 border border-[#C5D63D]/30 rounded-2xl p-8 shadow-lg relative">
-                <span className="absolute top-6 right-6 bg-[#C5D63D] text-zinc-900 text-xs font-bold px-3 py-1 rounded-full">
-                  Apenas 30 vagas
-                </span>
+            <Card className="bg-zinc-900 border border-[#C5D63D]/30 rounded-2xl p-8 shadow-lg">
                 
                 <h2 className="text-3xl font-bold text-white mb-6">Mentoria</h2>
                 
