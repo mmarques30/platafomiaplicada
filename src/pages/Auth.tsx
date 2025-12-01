@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import logoMarcaCompleta from "@/assets/logo-auth-fundo-escuro.png";
-import authBackground from "@/assets/auth-background-symbol.png";
+import authBackground from "@/assets/auth-background-workspace.png";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -97,15 +97,14 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-8 py-8 lg:px-24">
-      {/* Background com símbolo como marca d'água */}
-      <div className="absolute inset-0 bg-[#2F302B]">
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <img 
-            src={authBackground} 
-            alt="" 
-            className="w-[200vw] h-[200vh] object-contain opacity-[0.12]"
-          />
-        </div>
+      {/* Background workspace */}
+      <div className="absolute inset-0">
+        <img 
+          src={authBackground} 
+          alt="" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-[#2F302B]/60" />
       </div>
       
       {/* Conteúdo centralizado */}
