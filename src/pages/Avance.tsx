@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogosTicker } from "@/components/LogosTicker";
-import { ArrowLeft, Check, Sparkles, TrendingUp, Zap, Target, Lightbulb, Table2, Workflow } from "lucide-react";
+import { ArrowLeft, Check, Sparkles, TrendingUp, Target, Lightbulb, Workflow } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logoCompleta from "@/assets/logo-aplicada-marca-completa.png";
 import backgroundSymbol from "@/assets/logos/background-symbol.png";
@@ -281,89 +281,88 @@ export default function Avance() {
           <div className="max-w-6xl mx-auto text-center">
             {/* Título */}
             <h2 className="text-3xl md:text-5xl font-bold text-[#2F302B] mb-4">
-              Aprenda na prática.
+              Acelere com acompanhamento.
               <br />
-              <span className="text-[#9EB038]">4 módulos novos</span> por semana.
+              <span className="text-[#9EB038]">Resultados em semanas</span>, não meses.
             </h2>
             
             {/* Subtítulo */}
             <p className="text-[#2F302B]/70 text-lg max-w-3xl mx-auto mb-12">
-              Liberação progressiva para acompanhar atualizações de IA e tendências de mercado.
-              Essas são as trilhas que mais economizam tempo e aceleram carreira:
+              Mentoria e Consult transformam teoria em prática com direcionamento personalizado.
             </p>
             
             {/* Grid de Cards - 3 colunas */}
             <div className="grid md:grid-cols-3 gap-6 mb-8">
-              {/* Card 1: Claude Avançado */}
+              {/* Card 1: Execute */}
               <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
-                  <Sparkles className="h-20 w-20 text-[#9EB038]" />
+                  <Target className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Claude Avançado</h3>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Execute</h3>
                 <p className="text-[#2F302B]/70 text-sm mb-4">
-                  Análise de documentos em 2 minutos
+                  Projetos práticos com feedback e orientação direta
                 </p>
                 <div className="border-t border-zinc-200 pt-4">
-                  <p className="text-[#9EB038] text-sm font-medium">Economiza 10h/semana</p>
+                  <p className="text-[#9EB038] text-sm font-medium">Saia do plano, vá pra ação</p>
                 </div>
               </div>
 
-              {/* Card 2: Planilhas e Dados */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
-                <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
-                  <Table2 className="h-20 w-20 text-[#9EB038]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Planilhas e Dados</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
-                  Transforme caos em insights acionáveis
-                </p>
-                <div className="border-t border-zinc-200 pt-4">
-                  <p className="text-[#9EB038] text-sm font-medium">Economiza 5-8h/semana</p>
-                </div>
-              </div>
-
-              {/* Card 3: Make Automação */}
+              {/* Card 2: Automatize */}
               <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Workflow className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Make: Automação Avançada</h3>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Automatize</h3>
                 <p className="text-[#2F302B]/70 text-sm mb-4">
-                  Workflows que Zapier não consegue fazer
+                  Workflows que eliminam tarefas manuais repetitivas
                 </p>
                 <div className="border-t border-zinc-200 pt-4">
-                  <p className="text-[#9EB038] text-sm font-medium">Economiza 12-15h/semana</p>
+                  <p className="text-[#9EB038] text-sm font-medium">Até 15h/semana de volta</p>
+                </div>
+              </div>
+
+              {/* Card 3: Personalize */}
+              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+                <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
+                  <Sparkles className="h-20 w-20 text-[#9EB038]" />
+                </div>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Personalize</h3>
+                <p className="text-[#2F302B]/70 text-sm mb-4">
+                  IA construída para os desafios do seu contexto
+                </p>
+                <div className="border-t border-zinc-200 pt-4">
+                  <p className="text-[#9EB038] text-sm font-medium">Solução sob medida</p>
                 </div>
               </div>
             </div>
             
             {/* Segunda linha - 2 cards centralizados */}
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {/* Card 4: IA para Vendas */}
+              {/* Card 4: Diagnostique */}
               <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <TrendingUp className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">IA para Vendas</h3>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Diagnostique</h3>
                 <p className="text-[#2F302B]/70 text-sm mb-4">
-                  Acelere seu pipeline de vendas
+                  Análise completa do cenário atual e roadmap
                 </p>
                 <div className="border-t border-zinc-200 pt-4">
-                  <p className="text-[#9EB038] text-sm font-medium">Prospecção 3x mais rápida</p>
+                  <p className="text-[#9EB038] text-sm font-medium">Clareza antes de agir</p>
                 </div>
               </div>
 
-              {/* Card 5: Dashboard & BI */}
+              {/* Card 5: Domine */}
               <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Lightbulb className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Dashboard & BI</h3>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Domine</h3>
                 <p className="text-[#2F302B]/70 text-sm mb-4">
-                  Decisões baseadas em dados reais
+                  Capacitação para autonomia total da equipe
                 </p>
                 <div className="border-t border-zinc-200 pt-4">
-                  <p className="text-[#9EB038] text-sm font-medium">Economiza 5-8h/semana</p>
+                  <p className="text-[#9EB038] text-sm font-medium">Conhecimento que fica</p>
                 </div>
               </div>
             </div>
