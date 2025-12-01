@@ -171,18 +171,6 @@ export function TopHeader() {
             </DropdownMenu>
           )}
           
-          {/* CTA - Aplique (visitante/sem plano) ou Avance (pagante) */}
-          <NavLink 
-            to={isVisitante || !plan ? "/aplique" : "/avance"}
-            className={({ isActive }) => cn(
-              "text-sm font-semibold smooth-transition px-3 py-1.5 rounded-md",
-              isActive 
-                ? "text-red-600 bg-red-50 dark:bg-red-950/30" 
-                : "text-red-600 hover:text-red-700 bg-red-50/50 hover:bg-red-50 dark:bg-red-950/20 dark:hover:bg-red-950/30"
-            )}
-          >
-            {isVisitante || !plan ? "Aplique" : "Avance"}
-          </NavLink>
         </nav>
 
         {/* DIREITA: Notificações + Avatar com Nome */}
