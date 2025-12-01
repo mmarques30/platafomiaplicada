@@ -429,7 +429,7 @@ export default function Aplique() {
           {/* CTA Button */}
           <div className="mt-12 flex justify-center">
             <Button 
-              className="bg-[#2F302B] hover:bg-[#3D3E39] text-white font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6"
+              className="bg-[#2F302B] hover:bg-[#3D3E39] text-white font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6 animate-pulse shadow-[0_0_20px_rgba(197,214,61,0.5)] hover:shadow-[0_0_30px_rgba(197,214,61,0.7)] transition-shadow duration-300"
               onClick={() => {
                 document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' });
               }}
