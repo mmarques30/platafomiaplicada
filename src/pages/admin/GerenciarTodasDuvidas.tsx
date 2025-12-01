@@ -177,7 +177,7 @@ export default function GerenciarTodasDuvidas() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Q&A Publicados
+              Solicitações Q&A
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -235,8 +235,8 @@ export default function GerenciarTodasDuvidas() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todas">Todos os Q&A</SelectItem>
-                <SelectItem value="publicadas">Publicadas no Q&A</SelectItem>
-                <SelectItem value="nao_publicadas">Não Publicadas</SelectItem>
+                <SelectItem value="publicadas">Solicitadas para Q&A</SelectItem>
+                <SelectItem value="nao_publicadas">Não Solicitadas</SelectItem>
               </SelectContent>
             </Select>
             <Select value={categoriaQAFilter} onValueChange={setCategoriaQAFilter}>

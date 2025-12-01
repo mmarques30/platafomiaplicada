@@ -22,9 +22,11 @@ export function ResponderDuvidaModal({ duvida, open, onOpenChange }: ResponderDu
   const { responderDuvida, isRespondendo } = useDuvidasMentoria(duvida.user_id);
   const { categorias } = useCategoriasQA();
   const [resposta, setResposta] = useState("");
-  const [publicarQA, setPublicarQA] = useState(false);
-  const [categoriaQAId, setCategoriaQAId] = useState<string>("");
+  const [publicarQA, setPublicarQA] = useState(duvida.publicar_qa || false);
+  const [categoriaQAId, setCategoriaQAId] = useState<string>(duvida.categoria_qa_id || "");
   const [videoQAUrl, setVideoQAUrl] = useState("");
+  
+  const mentoradoSolicitouQA = duvida.publicar_qa === true;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,40 +102,16 @@ export function ResponderDuvidaModal({ duvida, open, onOpenChange }: ResponderDu
             </div>
 
             <div className="border-t pt-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label htmlFor="publicar-qa" className="text-base">Publicar no Q&A</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Esta resposta será visível no banco de perguntas frequentes
-                  </p>
-                </div>
-                <Switch
-                  id="publicar-qa"
-                  checked={publicarQA}
-                  onCheckedChange={setPublicarQA}
-                />
-              </div>
-
-              {publicarQA && (
-                <div className="space-y-4 pl-4 border-l-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="categoria-qa">Categoria Q&A *</Label>
-                    <Select value={categoriaQAId} onValueChange={setCategoriaQAId} required>
-                      <SelectTrigger id="categoria-qa">
-                        <SelectValue placeholder="Selecione a categoria" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categorias.filter(c => c.ativo).map((cat) => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.nome}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+              {mentoradoSolicitouQA ? (
+                <div className="space-y-4">
+                  <div className="bg-primary/10 p-3 rounded-lg">
+                    <p className="text-sm font-medium">
+                      Mentorado solicitou Q&A na categoria: {duvida.categorias_qa?.nome || "Sem categoria"}
+                    </p>
                   </div>
-
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="video-qa">URL do Vídeo (Opcional)</Label>
+                    <Label htmlFor="video-qa">URL do Vídeo da Resposta (Opcional)</Label>
                     <Input
                       id="video-qa"
                       value={videoQAUrl}
@@ -142,10 +120,60 @@ export function ResponderDuvidaModal({ duvida, open, onOpenChange }: ResponderDu
                       type="url"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Link do vídeo com a resposta gravada (será gerenciado como trilha)
+                      Link do vídeo com a resposta gravada para o Q&A
                     </p>
                   </div>
                 </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label htmlFor="publicar-qa" className="text-base">Publicar no Q&A</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Esta resposta será visível no banco de perguntas frequentes
+                      </p>
+                    </div>
+                    <Switch
+                      id="publicar-qa"
+                      checked={publicarQA}
+                      onCheckedChange={setPublicarQA}
+                    />
+                  </div>
+
+                  {publicarQA && (
+                    <div className="space-y-4 pl-4 border-l-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="categoria-qa">Categoria Q&A *</Label>
+                        <Select value={categoriaQAId} onValueChange={setCategoriaQAId} required>
+                          <SelectTrigger id="categoria-qa">
+                            <SelectValue placeholder="Selecione a categoria" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categorias.filter(c => c.ativo).map((cat) => (
+                              <SelectItem key={cat.id} value={cat.id}>
+                                {cat.nome}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="video-qa">URL do Vídeo (Opcional)</Label>
+                        <Input
+                          id="video-qa"
+                          value={videoQAUrl}
+                          onChange={(e) => setVideoQAUrl(e.target.value)}
+                          placeholder="https://youtube.com/watch?v=..."
+                          type="url"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Link do vídeo com a resposta gravada (será gerenciado como trilha)
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
