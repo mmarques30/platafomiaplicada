@@ -28,16 +28,24 @@ export const useAvisosPublicos = () => {
 };
 
 export const useAvisosAtivosCount = () => {
+  const { isVisitante, isLoading: loadingRole } = useUserRole();
+  const { plan } = useUserPlan();
+  
+  // Determinar o "tier" do usuário para filtrar
+  const userTier = isVisitante ? 'visitante' : (plan || 'academy');
+
   return useQuery({
-    queryKey: ["avisos-ativos-count"],
+    queryKey: ["avisos-ativos-count", userTier],
     queryFn: async () => {
       const { count } = await supabase
         .from("avisos")
         .select("*", { count: "exact", head: true })
         .eq("ativo", true)
-        .or(`data_expiracao.is.null,data_expiracao.gt.${new Date().toISOString()}`);
+        .or(`data_expiracao.is.null,data_expiracao.gt.${new Date().toISOString()}`)
+        .contains("visivel_para", [userTier]);
       
       return count || 0;
     },
+    enabled: !loadingRole,
   });
 };
