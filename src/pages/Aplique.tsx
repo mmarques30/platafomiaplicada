@@ -7,10 +7,10 @@ import backgroundSymbol from "@/assets/logos/background-symbol.png";
 
 export default function Aplique() {
   return (
-    <div className="min-h-screen relative">
+    <div className="h-screen overflow-y-auto relative bg-gradient-to-br from-[#8B956D] via-[#6B7355] to-[#4A4F3A]">
       {/* Background com logo 4 pétalas transparente */}
       <div 
-        className="absolute inset-0 pointer-events-none"
+        className="fixed inset-0 pointer-events-none z-0"
         style={{
           backgroundImage: `url(${backgroundSymbol})`,
           backgroundSize: '600px 600px',
@@ -20,11 +20,8 @@ export default function Aplique() {
         }}
       />
       
-      {/* Gradiente de fundo verde/oliva */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#8B956D] via-[#6B7355] to-[#4A4F3A] -z-10" />
-      
-      {/* Conteúdo */}
-      <div className="relative z-10">
+      {/* Conteúdo centralizado */}
+      <div className="relative z-10 max-w-7xl mx-auto">
         {/* Hero Section */}
         <section className="py-16 md:py-24 text-center px-4">
           {/* Logo IAplicada */}
