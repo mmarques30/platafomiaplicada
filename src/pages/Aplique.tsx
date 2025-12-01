@@ -84,7 +84,7 @@ export default function Aplique() {
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Card Academy - Tema Claro */}
-              <Card className="bg-white border border-zinc-200 rounded-2xl p-8 shadow-lg">
+              <Card className="bg-white border border-zinc-200 rounded-2xl p-8 shadow-lg flex flex-col">
                 <h2 className="text-3xl font-bold text-zinc-900 mb-6">Academy</h2>
                 
                 <p className="text-5xl font-bold text-zinc-900 mb-2">R$ 1.497</p>
@@ -102,7 +102,7 @@ export default function Aplique() {
                 </div>
                 
                 <Button 
-                  className="w-full bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full py-6"
+                  className="w-full mt-auto bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full py-6"
                   onClick={() => window.open('https://pay.kiwify.com.br/yiGMp4m', '_blank')}
                 >
                   QUERO APLICAR NA ACADEMY
@@ -110,7 +110,7 @@ export default function Aplique() {
               </Card>
 
               {/* Card Mentoria - Tema Escuro */}
-            <Card className="bg-zinc-900 border border-[#C5D63D]/30 rounded-2xl p-8 shadow-lg">
+            <Card className="bg-zinc-900 border border-[#C5D63D]/30 rounded-2xl p-8 shadow-lg flex flex-col">
                 
                 <h2 className="text-3xl font-bold text-white mb-6">Mentoria</h2>
                 
@@ -128,7 +128,7 @@ export default function Aplique() {
                 
                 <Button 
                   variant="outline" 
-                  className="w-full border-2 border-[#C5D63D] bg-[#C5D63D]/10 hover:bg-[#C5D63D]/20 text-[#C5D63D] font-bold text-sm uppercase tracking-wide rounded-full py-6"
+                  className="w-full mt-auto border-2 border-[#C5D63D] bg-[#C5D63D]/10 hover:bg-[#C5D63D]/20 text-[#C5D63D] font-bold text-sm uppercase tracking-wide rounded-full py-6"
                   onClick={() => window.open('https://wa.me/5531973130846?text=Olá!%20Gostaria%20de%20me%20candidatar%20à%20Mentoria%20IAplicada', '_blank')}
                 >
                   QUERO ME CANDIDATAR
