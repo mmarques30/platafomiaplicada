@@ -145,7 +145,7 @@ export default function Aplique() {
               Compare os planos
             </h2>
             
-            <div className="rounded-2xl overflow-hidden bg-white border border-zinc-200 shadow-lg">
+            <div className="rounded-2xl overflow-hidden bg-white shadow-lg">
               <table className="w-full">
                 <thead>
                   <tr className="border-b-2 border-zinc-200">
