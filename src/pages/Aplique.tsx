@@ -1,24 +1,39 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogosTicker } from "@/components/LogosTicker";
-import { Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import logoCompleta from "@/assets/logo-aplicada-marca-completa.png";
 import backgroundSymbol from "@/assets/logos/background-symbol.png";
 
 export default function Aplique() {
+  const navigate = useNavigate();
+  
   return (
-    <div className="h-screen overflow-y-auto relative bg-gradient-to-br from-[#8B956D] via-[#6B7355] to-[#4A4F3A]">
+    <div className="h-screen overflow-y-auto relative bg-background">
       {/* Background com logo 4 pétalas transparente */}
       <div 
         className="fixed inset-0 pointer-events-none z-0"
         style={{
           backgroundImage: `url(${backgroundSymbol})`,
-          backgroundSize: '600px 600px',
+          backgroundSize: '900px 900px',
           backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',
           opacity: 0.05
         }}
       />
+      
+      {/* Botão Voltar */}
+      <div className="absolute top-4 left-4 z-20">
+        <Button 
+          variant="ghost" 
+          className="text-foreground hover:bg-muted"
+          onClick={() => navigate('/')}
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Voltar
+        </Button>
+      </div>
       
       {/* Conteúdo centralizado */}
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -28,7 +43,7 @@ export default function Aplique() {
           <img 
             src={logoCompleta} 
             alt="IAplicada" 
-            className="h-10 md:h-12 mx-auto mb-12"
+            className="h-12 md:h-16 mx-auto mb-12"
           />
           
           {/* Headline */}
@@ -60,7 +75,7 @@ export default function Aplique() {
         </section>
         
         {/* Logos Ticker */}
-        <section className="py-8 bg-white/5">
+        <section className="py-8">
           <LogosTicker />
         </section>
         
