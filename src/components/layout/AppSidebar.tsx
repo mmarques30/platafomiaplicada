@@ -210,18 +210,37 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Botão CTA Dinâmico */}
+        {/* CTA Menu Item */}
         <SidebarGroup>
           <SidebarGroupContent>
-            <div className="px-2 py-2">
-              <Button
-                onClick={() => navigate(isVisitante || !plan ? "/aplique" : "/avance")}
-                className="w-full bg-aplicada-green-700 hover:bg-aplicada-green-800 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
-              >
-                <Sparkles className="h-4 w-4" />
-                {!collapsed && (isVisitante || !plan ? "Aplique" : "Avance")}
-              </Button>
-            </div>
+            <SidebarMenu className="space-y-1 px-2">
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="group">
+                  <NavLink 
+                    to={isVisitante || !plan ? "/aplique" : "/avance"}
+                    className={({ isActive }) => cn(
+                      "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                      isActive 
+                        ? "text-amber-500 font-semibold" 
+                        : "text-amber-500 hover:text-amber-600"
+                    )}
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <span className={cn(
+                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                          isActive 
+                            ? "bg-amber-500 opacity-100" 
+                            : "bg-amber-400 opacity-0 group-hover:opacity-60"
+                        )} />
+                        <Sparkles className="h-4 w-4 shrink-0" />
+                        {!collapsed && <span>{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
+                      </>
+                    )}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
