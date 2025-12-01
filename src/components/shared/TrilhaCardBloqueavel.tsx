@@ -70,10 +70,10 @@ export function TrilhaCardBloqueavel({
           className="block w-full h-full object-cover object-center opacity-70"
         />
         
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-center justify-center">
-          <div className="bg-muted/90 backdrop-blur-sm rounded-full px-6 py-3 shadow-2xl flex items-center gap-2">
-            <Clock className="h-8 w-8 text-foreground" strokeWidth={2} />
-            <span className="text-foreground font-semibold text-lg">Em Breve</span>
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-muted/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-2xl flex items-center gap-1.5">
+            <Clock className="h-5 w-5 text-foreground" strokeWidth={2} />
+            <span className="text-foreground font-medium text-sm">Em Breve</span>
           </div>
         </div>
         
