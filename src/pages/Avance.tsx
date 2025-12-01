@@ -108,9 +108,8 @@ export default function Avance() {
               <Card className="bg-zinc-900 border border-[#C5D63D]/30 rounded-2xl p-8 shadow-lg flex flex-col">
                 <h2 className="text-3xl font-bold text-white mb-6">Consult</h2>
                 
-                <p className="text-4xl font-bold text-white mb-2">R$ 15.000+</p>
-                <p className="text-[#C5D63D] font-medium mb-8">
-                  Projeto customizado
+                <p className="text-4xl font-bold text-white mb-8">
+                  Investimento sob<br />consulta
                 </p>
                 
                 <div className="space-y-4 text-zinc-300 text-sm mb-8">
@@ -153,7 +152,7 @@ export default function Avance() {
                     </th>
                     <th className="w-[30%] p-6 text-center">
                       <div className="text-xl font-bold text-[#9EB038] mb-1">Consult</div>
-                      <div className="text-2xl font-bold text-[#9EB038]">R$ 15.000+</div>
+                      <div className="text-lg font-medium text-[#9EB038]">Sob consulta</div>
                     </th>
                   </tr>
                 </thead>
@@ -277,104 +276,109 @@ export default function Avance() {
           </div>
         </section>
         
-        {/* Featured Modules Section */}
+        {/* Seção Trilhas em Destaque */}
         <section className="py-16 px-4">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#2F302B]">
-              O que você vai dominar
+          <div className="max-w-6xl mx-auto text-center">
+            {/* Título */}
+            <h2 className="text-3xl md:text-5xl font-bold text-[#2F302B] mb-4">
+              Aprenda na prática.
+              <br />
+              <span className="text-[#9EB038]">4 módulos novos</span> por semana.
             </h2>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Módulo 1 */}
-              <Card className="bg-white border border-zinc-200 p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#9EB038]/10 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-6 w-6 text-[#9EB038]" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-zinc-900 mb-2">Prompts Avançados</h3>
-                    <p className="text-sm text-zinc-600">
-                      Economize 4h/semana em comunicação, reuniões e relatórios
-                    </p>
-                  </div>
+            {/* Subtítulo */}
+            <p className="text-[#2F302B]/70 text-lg max-w-3xl mx-auto mb-12">
+              Liberação progressiva para acompanhar atualizações de IA e tendências de mercado.
+              Essas são as trilhas que mais economizam tempo e aceleram carreira:
+            </p>
+            
+            {/* Grid de Cards - 3 colunas */}
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              {/* Card 1: Claude Avançado */}
+              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+                <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
+                  <Sparkles className="h-20 w-20 text-[#9EB038]" />
                 </div>
-              </Card>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Claude Avançado</h3>
+                <p className="text-[#2F302B]/70 text-sm mb-4">
+                  Análise de documentos em 2 minutos
+                </p>
+                <div className="border-t border-zinc-200 pt-4">
+                  <p className="text-[#9EB038] text-sm font-medium">Economiza 10h/semana</p>
+                </div>
+              </div>
 
-              {/* Módulo 2 */}
-              <Card className="bg-white border border-zinc-200 p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#9EB038]/10 flex items-center justify-center flex-shrink-0">
-                    <Table2 className="h-6 w-6 text-[#9EB038]" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-zinc-900 mb-2">Dashboards Inteligentes</h3>
-                    <p className="text-sm text-zinc-600">
-                      Economize 3h/semana em análise de dados e tomada de decisão
-                    </p>
-                  </div>
+              {/* Card 2: Planilhas e Dados */}
+              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+                <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
+                  <Table2 className="h-20 w-20 text-[#9EB038]" />
                 </div>
-              </Card>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Planilhas e Dados</h3>
+                <p className="text-[#2F302B]/70 text-sm mb-4">
+                  Transforme caos em insights acionáveis
+                </p>
+                <div className="border-t border-zinc-200 pt-4">
+                  <p className="text-[#9EB038] text-sm font-medium">Economiza 5-8h/semana</p>
+                </div>
+              </div>
 
-              {/* Módulo 3 */}
-              <Card className="bg-white border border-zinc-200 p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#9EB038]/10 flex items-center justify-center flex-shrink-0">
-                    <Workflow className="h-6 w-6 text-[#9EB038]" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-zinc-900 mb-2">Automações Práticas</h3>
-                    <p className="text-sm text-zinc-600">
-                      Economize 5h/semana em tarefas operacionais e repetitivas
-                    </p>
-                  </div>
+              {/* Card 3: Make Automação */}
+              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+                <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
+                  <Workflow className="h-20 w-20 text-[#9EB038]" />
                 </div>
-              </Card>
-
-              {/* Módulo 4 */}
-              <Card className="bg-white border border-zinc-200 p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#9EB038]/10 flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="h-6 w-6 text-[#9EB038]" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-zinc-900 mb-2">Estratégia com IA</h3>
-                    <p className="text-sm text-zinc-600">
-                      Economize 2h/semana em planejamento e análise estratégica
-                    </p>
-                  </div>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Make: Automação Avançada</h3>
+                <p className="text-[#2F302B]/70 text-sm mb-4">
+                  Workflows que Zapier não consegue fazer
+                </p>
+                <div className="border-t border-zinc-200 pt-4">
+                  <p className="text-[#9EB038] text-sm font-medium">Economiza 12-15h/semana</p>
                 </div>
-              </Card>
-
-              {/* Módulo 5 */}
-              <Card className="bg-white border border-zinc-200 p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#9EB038]/10 flex items-center justify-center flex-shrink-0">
-                    <Target className="h-6 w-6 text-[#9EB038]" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-zinc-900 mb-2">Projetos Reais</h3>
-                    <p className="text-sm text-zinc-600">
-                      Implemente cases que geram resultados mensuráveis
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Módulo 6 */}
-              <Card className="bg-white border border-zinc-200 p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#9EB038]/10 flex items-center justify-center flex-shrink-0">
-                    <Lightbulb className="h-6 w-6 text-[#9EB038]" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-zinc-900 mb-2">Inovação Contínua</h3>
-                    <p className="text-sm text-zinc-600">
-                      Acesso antecipado a ferramentas e metodologias Beta
-                    </p>
-                  </div>
-                </div>
-              </Card>
+              </div>
             </div>
+            
+            {/* Segunda linha - 2 cards centralizados */}
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {/* Card 4: IA para Vendas */}
+              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+                <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
+                  <TrendingUp className="h-20 w-20 text-[#9EB038]" />
+                </div>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">IA para Vendas</h3>
+                <p className="text-[#2F302B]/70 text-sm mb-4">
+                  Acelere seu pipeline de vendas
+                </p>
+                <div className="border-t border-zinc-200 pt-4">
+                  <p className="text-[#9EB038] text-sm font-medium">Prospecção 3x mais rápida</p>
+                </div>
+              </div>
+
+              {/* Card 5: Dashboard & BI */}
+              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+                <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
+                  <Lightbulb className="h-20 w-20 text-[#9EB038]" />
+                </div>
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Dashboard & BI</h3>
+                <p className="text-[#2F302B]/70 text-sm mb-4">
+                  Decisões baseadas em dados reais
+                </p>
+                <div className="border-t border-zinc-200 pt-4">
+                  <p className="text-[#9EB038] text-sm font-medium">Economiza 5-8h/semana</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* CTA Button */}
+          <div className="mt-12 flex justify-center">
+            <Button 
+              className="bg-[#2F302B] hover:bg-[#3D3E39] text-white font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6 animate-glow-pulse hover:shadow-[0_0_30px_rgba(197,214,61,0.7)] transition-shadow duration-300"
+              onClick={() => {
+                document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              QUERO ME CANDIDATAR
+            </Button>
           </div>
         </section>
         
