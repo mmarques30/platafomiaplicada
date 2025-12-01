@@ -377,32 +377,11 @@ export default function Avance() {
                 document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              QUERO ME CANDIDATAR
+              QUERO FAZER UPGRADE
             </Button>
           </div>
         </section>
         
-        {/* Final CTA */}
-        <section className="py-16 px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <Card className="bg-[#9EB038]/5 border-[#9EB038]/20 p-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-[#2F302B]">
-                Pronto para multiplicar seus resultados?
-              </h2>
-              <p className="text-zinc-600 mb-8 text-lg">
-                Escolha o plano ideal e acelere sua transformação com IA
-              </p>
-              <Button 
-                className="bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6"
-                onClick={() => {
-                  document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                VER OPÇÕES DE UPGRADE
-              </Button>
-            </Card>
-          </div>
-        </section>
       </div>
     </div>
   );
