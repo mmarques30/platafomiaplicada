@@ -126,7 +126,7 @@ export default function Aplique() {
                 <Button 
                   variant="outline" 
                   className="w-full mt-auto border-2 border-[#C5D63D] bg-[#C5D63D]/10 hover:bg-[#C5D63D]/20 text-[#C5D63D] font-bold text-sm uppercase tracking-wide rounded-full py-6"
-                  onClick={() => window.open('https://wa.me/5531973130846?text=Olá!%20Gostaria%20de%20me%20candidatar%20à%20Mentoria%20IAplicada', '_blank')}
+                  onClick={() => navigate('/candidatar-mentoria')}
                 >
                   QUERO ME CANDIDATAR
                 </Button>
@@ -430,7 +430,9 @@ export default function Aplique() {
           <div className="mt-12 flex justify-center">
             <Button 
               className="bg-[#2F302B] hover:bg-[#3D3E39] text-white font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6 animate-glow-pulse hover:shadow-[0_0_30px_rgba(197,214,61,0.7)] transition-shadow duration-300"
-              onClick={() => navigate('/candidatar-mentoria')}
+              onClick={() => {
+                document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
               QUERO ME CANDIDATAR
             </Button>
