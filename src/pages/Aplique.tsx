@@ -142,7 +142,7 @@ export default function Aplique() {
         <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-[#2F302B]">
-              Compare os planos
+              Qual plano combina com você?
             </h2>
             
             <div className="overflow-hidden">
