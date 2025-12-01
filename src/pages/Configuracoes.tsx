@@ -10,19 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Moon, Sun, Bell, Lock, Trash2, AlertTriangle } from "lucide-react";
+import { Moon, Sun, Bell, Lock, AlertTriangle } from "lucide-react";
 import { useTheme } from "next-themes";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 export default function Configuracoes() {
   const { user, signOut } = useAuth();
@@ -91,14 +80,6 @@ export default function Configuracoes() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    try {
-      toast.success("Conta desativada com sucesso");
-      await signOut();
-    } catch (error) {
-      toast.error("Erro ao desativar conta");
-    }
-  };
 
   return (
     <div className="container max-w-4xl py-8">
@@ -221,38 +202,6 @@ export default function Configuracoes() {
           </CardContent>
         </Card>
 
-        {/* Zona de Perigo */}
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
-              <Trash2 className="h-5 w-5" />
-              Zona de Perigo
-            </CardTitle>
-            <CardDescription>Ações irreversíveis da conta</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">Desativar Conta</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Esta ação não pode ser desfeita. Sua conta será permanentemente
-                    desativada e você será desconectado do sistema.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteAccount}>
-                    Desativar Conta
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
