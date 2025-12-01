@@ -119,21 +119,18 @@ export default function TrilhaDetalhes() {
     video.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Ler vídeo da URL (SEM auto-select) e redirecionar se não tiver ?video=
+  // Ler vídeo da URL (sem redirecionar - permitir preview de trilhas bloqueadas)
   useEffect(() => {
     const videoIdFromUrl = searchParams.get("video");
-    
-    // Se não tem ?video= na URL, redirecionar para /trilhas
-    if (!videoIdFromUrl) {
-      navigate("/trilhas", { replace: true });
-      return;
-    }
     
     // Se tem vídeo na URL e existe nos vídeos disponíveis, selecionar
     if (videoIdFromUrl && allVideos.some(v => v.id === videoIdFromUrl)) {
       setCurrentVideoId(videoIdFromUrl);
+    } else {
+      // Se não tem ?video=, não redirecionar - mostrar TrilhaOverview
+      setCurrentVideoId(null);
     }
-  }, [searchParams, allVideos, navigate]);
+  }, [searchParams, allVideos]);
 
   // Scroll to active video in sidebar
   useEffect(() => {
@@ -245,7 +242,12 @@ export default function TrilhaDetalhes() {
         {/* Se não tem vídeo selecionado → TrilhaOverview */}
         {!currentVideoId && (
           <TrilhaOverview
-            trilha={trilha}
+            trilha={{
+              titulo: trilha.titulo,
+              descricao: trilha.descricao,
+              categoria: trilha.categoria,
+              bloqueada: trilha.bloqueada || false,
+            }}
             videos={allVideos}
             progressData={progressData}
             onSelectVideo={handleVideoSelect}

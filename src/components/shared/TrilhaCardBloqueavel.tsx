@@ -50,40 +50,42 @@ export function TrilhaCardBloqueavel({
     );
   }
 
-  // MENTORADO com trilha bloqueada → "Em Breve"
+  // MENTORADO com trilha bloqueada → "Em Breve" (clicável para preview)
   if (!isVisitante && bloqueada) {
     return (
-      <div className="relative overflow-hidden rounded-xl shadow-md aspect-[9/16] w-full bg-muted border-2 border-primary/10 cursor-not-allowed">
-        {visivel_apenas_pro && (
-          <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
-            🔒 PRO
+      <Link to={`/trilhas/${id}`} className="block">
+        <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-lg aspect-[9/16] w-full bg-muted border-2 border-primary/10 hover:border-primary/20 cursor-pointer transition-all">
+          {visivel_apenas_pro && (
+            <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
+              🔒 PRO
+            </div>
+          )}
+          {nivel_minimo_acesso === 'club' && (
+            <div className="absolute top-4 right-4 z-10 bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
+              ⭐ Club
+            </div>
+          )}
+          
+          <img
+            src={imagem_url || "/placeholder.svg"}
+            alt={titulo}
+            loading="lazy"
+            className="block w-full h-full object-cover object-center opacity-50 grayscale"
+          />
+          
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div className="bg-muted/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-2xl flex items-center gap-1.5">
+              <Clock className="h-5 w-5 text-foreground" strokeWidth={2} />
+              <span className="text-foreground font-medium text-sm">Em Breve</span>
+            </div>
           </div>
-        )}
-        {nivel_minimo_acesso === 'club' && (
-          <div className="absolute top-4 right-4 z-10 bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
-            ⭐ Club
-          </div>
-        )}
-        
-        <img
-          src={imagem_url || "/placeholder.svg"}
-          alt={titulo}
-          loading="lazy"
-          className="block w-full h-full object-cover object-center opacity-50 grayscale"
-        />
-        
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-muted/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-2xl flex items-center gap-1.5">
-            <Clock className="h-5 w-5 text-foreground" strokeWidth={2} />
-            <span className="text-foreground font-medium text-sm">Em Breve</span>
+          
+          {/* Título embaixo */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+            <p className="text-white font-semibold text-center">{titulo}</p>
           </div>
         </div>
-        
-        {/* Título embaixo */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-          <p className="text-white font-semibold text-center">{titulo}</p>
-        </div>
-      </div>
+      </Link>
     );
   }
 

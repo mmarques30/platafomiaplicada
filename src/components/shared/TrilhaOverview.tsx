@@ -23,6 +23,7 @@ interface TrilhaOverviewProps {
     titulo: string;
     descricao?: string;
     categoria: string;
+    bloqueada?: boolean;
   };
   videos: Video[];
   onSelectVideo: (videoId: string) => void;
@@ -111,38 +112,56 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
                   return (
                     <div
                       key={video.id}
-                      className="w-[250px] flex-shrink-0 cursor-pointer group"
-                      onClick={() => onSelectVideo(video.id)}
+                      className={cn(
+                        "w-[250px] flex-shrink-0 group",
+                        trilha.bloqueada ? "cursor-not-allowed" : "cursor-pointer"
+                      )}
+                      onClick={() => !trilha.bloqueada && onSelectVideo(video.id)}
                     >
                       <div className="relative aspect-[9/16] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
                         <img
                           src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_url)}
                           alt={video.titulo}
-                          className="w-full h-full object-cover"
+                          className={cn(
+                            "w-full h-full object-cover",
+                            trilha.bloqueada && "opacity-50 grayscale"
+                          )}
                         />
                         
-                        {/* Overlay com Play */}
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
-                            <Play className="h-8 w-8 text-primary-foreground ml-1" fill="currentColor" />
+                        {/* Overlay "Em Breve" para trilhas bloqueadas */}
+                        {trilha.bloqueada ? (
+                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                            <div className="bg-muted/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-2xl flex items-center gap-1.5">
+                              <Clock className="h-5 w-5 text-foreground" strokeWidth={2} />
+                              <span className="text-foreground font-medium text-sm">Em Breve</span>
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <>
+                            {/* Overlay com Play (apenas para trilhas desbloqueadas) */}
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
+                                <Play className="h-8 w-8 text-primary-foreground ml-1" fill="currentColor" />
+                              </div>
+                            </div>
 
-                        {/* Botão de Favoritar */}
-                        <div className="absolute top-2 right-2">
-                          <FavoriteButton 
-                            tipo="video" 
-                            itemId={video.id} 
-                            variant="icon-only"
-                            size="md"
-                          />
-                        </div>
+                            {/* Botão de Favoritar */}
+                            <div className="absolute top-2 right-2">
+                              <FavoriteButton 
+                                tipo="video" 
+                                itemId={video.id} 
+                                variant="icon-only"
+                                size="md"
+                              />
+                            </div>
 
-                        {/* Badge de Concluído */}
-                        {isCompleted && (
-                          <div className="absolute top-2 left-2 bg-green-600 text-white rounded-full p-1">
-                            <CheckCircle2 className="h-4 w-4" />
-                          </div>
+                            {/* Badge de Concluído */}
+                            {isCompleted && (
+                              <div className="absolute top-2 left-2 bg-green-600 text-white rounded-full p-1">
+                                <CheckCircle2 className="h-4 w-4" />
+                              </div>
+                            )}
+                          </>
                         )}
 
                         {/* Título Sobreposto */}
