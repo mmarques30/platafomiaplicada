@@ -66,11 +66,8 @@ export default function Evolucao() {
           {/* Minha Jornada */}
           <TimelineJornada />
 
-          {/* Trilhas em Andamento */}
-          <div className="space-y-3">
-            <h2 className="text-xl font-semibold">Trilhas em Andamento</h2>
-            <TrilhasEmAndamentoCards />
-          </div>
+              {/* Trilhas em Andamento */}
+              <TrilhasEmAndamentoCards />
 
           {/* Conquistas */}
           <VitrineConquistas />
