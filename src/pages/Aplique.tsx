@@ -425,6 +425,18 @@ export default function Aplique() {
               </div>
             </div>
           </div>
+          
+          {/* CTA Button */}
+          <div className="mt-12">
+            <Button 
+              className="bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6"
+              onClick={() => {
+                document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              QUERO SER UM APLICADO
+            </Button>
+          </div>
         </section>
       </div>
     </div>
