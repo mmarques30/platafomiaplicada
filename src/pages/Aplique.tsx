@@ -145,16 +145,16 @@ export default function Aplique() {
               Compare os planos
             </h2>
             
-            <div className="rounded-2xl overflow-hidden bg-white shadow-lg">
+            <div className="overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b-2 border-zinc-200">
+                  <tr>
                     <th className="w-[40%] p-4 text-left"></th>
-                    <th className="w-[30%] p-6 text-center border-l border-zinc-200">
+                    <th className="w-[30%] p-6 text-center">
                       <div className="text-xl font-bold text-[#2F302B] mb-1">Academy</div>
                       <div className="text-2xl font-bold text-[#2F302B]">R$ 1.497</div>
                     </th>
-                    <th className="w-[30%] p-6 text-center border-l border-zinc-200">
+                    <th className="w-[30%] p-6 text-center">
                       <div className="text-xl font-bold text-[#9EB038] mb-1">Mentoria</div>
                       <div className="text-lg font-medium text-[#9EB038]">Sob consulta</div>
                     </th>
