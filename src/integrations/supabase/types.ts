@@ -600,6 +600,36 @@ export type Database = {
           },
         ]
       }
+      content_access_logs: {
+        Row: {
+          accessed_at: string | null
+          content_id: string
+          content_title: string | null
+          content_type: string
+          id: string
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          accessed_at?: string | null
+          content_id: string
+          content_title?: string | null
+          content_type: string
+          id?: string
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          accessed_at?: string | null
+          content_id?: string
+          content_title?: string | null
+          content_type?: string
+          id?: string
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cursos: {
         Row: {
           ativo: boolean | null

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Play } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
 import { FavoriteButton } from "./FavoriteButton";
+import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
 
 interface VideoCardVerticalProps {
   id: string;
@@ -19,9 +20,18 @@ export function VideoCardVertical({
   trilha_id
 }: VideoCardVerticalProps) {
   const thumbnailUrl = getYouTubeThumbnail(youtube_id, thumbnail_customizado_url);
+  const { logAccess } = useContentAccessLogger();
+
+  const handleClick = () => {
+    logAccess('video', id, titulo);
+  };
 
   return (
-    <Link to={`/trilhas/${trilha_id}?video=${id}`} className="block group">
+    <Link 
+      to={`/trilhas/${trilha_id}?video=${id}`} 
+      className="block group"
+      onClick={handleClick}
+    >
       <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative aspect-[9/16] w-full bg-muted">
         <img
           src={thumbnailUrl}
