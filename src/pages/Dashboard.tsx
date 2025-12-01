@@ -205,8 +205,8 @@ export default function Dashboard() {
                   </CarouselContent>
                   {trilhas.length > 4 && (
                     <>
-                      <CarouselPrevious className="-left-4 md:-left-12" />
-                      <CarouselNext className="-right-4 md:-right-12" />
+                      <CarouselPrevious className="left-2 bg-primary hover:bg-primary/90 text-white border-0 shadow-lg h-10 w-10" />
+                      <CarouselNext className="right-2 bg-primary hover:bg-primary/90 text-white border-0 shadow-lg h-10 w-10" />
                     </>
                   )}
                 </Carousel>
