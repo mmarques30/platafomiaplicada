@@ -67,7 +67,7 @@ export function TrilhaCardBloqueavel({
           src={imagem_url || "/placeholder.svg"}
           alt={titulo}
           loading="lazy"
-          className="block w-full h-full object-cover object-center opacity-70"
+          className="block w-full h-full object-cover object-center opacity-50 grayscale"
         />
         
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
