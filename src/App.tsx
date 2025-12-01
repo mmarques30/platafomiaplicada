@@ -63,6 +63,8 @@ import DashboardVisitante from "./pages/DashboardVisitante";
 import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
 import MateriaisGratuitos from "./pages/MateriaisGratuitos";
 import GerenciarMateriais from "./pages/admin/GerenciarMateriais";
+import Aplique from "./pages/Aplique";
+import Avance from "./pages/Avance";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +112,8 @@ function AppContent() {
             <Route path="/metodos-aplicar" element={<MetodosAplicar />} />
             <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
+            <Route path="/aplique" element={<Aplique />} />
+            <Route path="/avance" element={<Avance />} />
           </Route>
           
           <Route element={<ProtectedRoute><DashboardVisitante /></ProtectedRoute>}>

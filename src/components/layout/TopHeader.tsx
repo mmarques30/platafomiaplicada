@@ -27,8 +27,8 @@ export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { isAdmin } = useUserRole();
-  const { hasAccessTo } = useUserPlan();
+  const { isAdmin, isVisitante } = useUserRole();
+  const { hasAccessTo, plan } = useUserPlan();
   const { profile } = useUserProfile();
   
   // Detectar rotas ativas para dropdowns
@@ -170,8 +170,16 @@ export function TopHeader() {
           </DropdownMenu>
         </nav>
 
-        {/* DIREITA: Notificações + Avatar com Nome */}
+        {/* DIREITA: CTA + Notificações + Avatar com Nome */}
         <div className="flex items-center gap-3">
+          {/* Botão CTA Dinâmico */}
+          <Button 
+            onClick={() => navigate(isVisitante || !plan ? "/aplique" : "/avance")}
+            className="bg-aplicada-green-700 hover:bg-aplicada-green-800 text-white font-semibold px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+          >
+            {isVisitante || !plan ? "Aplique" : "Avance"}
+          </Button>
+          
           <Button 
             variant="ghost" 
             size="icon" 

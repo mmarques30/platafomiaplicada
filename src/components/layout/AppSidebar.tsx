@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, Sparkles } from "lucide-react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -15,11 +15,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
@@ -29,7 +30,8 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, isMentorado } = useUserRole();
+  const { isAdmin, isMentorado, isVisitante } = useUserRole();
+  const { plan } = useUserPlan();
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
   console.log("[AppSidebar] isAdmin:", isAdmin);
@@ -205,6 +207,21 @@ export function AppSidebar() {
                 );
               })}
             </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Botão CTA Dinâmico */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <div className="px-2 py-2">
+              <Button
+                onClick={() => navigate(isVisitante || !plan ? "/aplique" : "/avance")}
+                className="w-full bg-aplicada-green-700 hover:bg-aplicada-green-800 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                {!collapsed && (isVisitante || !plan ? "Aplique" : "Avance")}
+              </Button>
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
 
