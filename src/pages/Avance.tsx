@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { LogosTicker } from "@/components/LogosTicker";
 import { ArrowLeft, Check, Sparkles, TrendingUp, Target, Lightbulb, Workflow } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logoCompleta from "@/assets/logo-aplicada-marca-completa.png";
+import logoCompleta from "@/assets/logo-aplicada-marca-completa-clara.png";
 import backgroundSymbol from "@/assets/logos/background-symbol.png";
 
 export default function Avance() {
