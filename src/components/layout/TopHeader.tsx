@@ -14,11 +14,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada.png";
 import { useLocation } from "react-router-dom";
@@ -35,16 +35,7 @@ export function TopHeader() {
   const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
   const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(path => location.pathname.startsWith(path));
 
-  const { data: unreadCount } = useQuery({
-    queryKey: ["unread-notifications"],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("notificacoes")
-        .select("*", { count: "exact", head: true })
-        .eq("lida", false);
-      return count || 0;
-    },
-  });
+  const { data: avisosCount } = useAvisosAtivosCount();
 
   const handleLogout = async () => {
     await signOut();
@@ -182,9 +173,9 @@ export function TopHeader() {
             onClick={() => navigate("/notificacoes")}
           >
             <Bell className="h-5 w-5" />
-            {unreadCount && unreadCount > 0 && (
+            {avisosCount && avisosCount > 0 && (
               <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
-                {unreadCount > 9 ? "9+" : unreadCount}
+                {avisosCount > 9 ? "9+" : avisosCount}
               </span>
             )}
           </Button>
