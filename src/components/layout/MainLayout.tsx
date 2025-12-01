@@ -48,7 +48,7 @@ export function MainLayout() {
             <Outlet />
           </main>
         </div>
-        <MarIAnaFloatingButton />
+        {!isVisitante && <MarIAnaFloatingButton />}
         
         {/* Modal de senha temporária - apenas para mentorados cadastrados pelo admin */}
         {showPasswordModal && user && (

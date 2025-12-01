@@ -24,11 +24,10 @@ export default function Dashboard() {
     queryKey: ["trilhas-dashboard", user?.id, isVisitante],
     queryFn: async () => {
       if (isVisitante) {
-        // Visitantes: buscar todas trilhas e verificar quais têm vídeos disponíveis
+        // Visitantes: buscar TODAS trilhas (mostrar todas bloqueadas)
         const { data: trilhasData, error: trilhasError } = await supabase
           .from("trilhas")
           .select("id, titulo, imagem_url, bloqueada, ordem, visivel_apenas_pro, nivel_minimo_acesso")
-          .eq("ativo", true)
           .order("ordem");
 
         if (trilhasError) throw trilhasError;
@@ -83,7 +82,8 @@ export default function Dashboard() {
         .eq('id', user.id)
         .single();
 
-      if (profile?.senha_temporaria || profile?.primeiro_acesso) {
+      // Não mostrar aviso para visitantes - eles criaram a própria senha
+      if (!isVisitante && (profile?.senha_temporaria || profile?.primeiro_acesso)) {
         setMostrarAvisoSenha(true);
       }
     };
