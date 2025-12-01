@@ -17,7 +17,6 @@ export default function Auth() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [isVisitorSignup, setIsVisitorSignup] = useState(true);
 
   // Redirecionar usuários já autenticados
   useEffect(() => {
@@ -50,46 +49,33 @@ export default function Auth() {
     }
   };
 
-  const handleVisitorAuth = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleVisitorSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
     const formData = new FormData(e.currentTarget);
     const email = formData.get("visitor-email") as string;
     const password = formData.get("visitor-password") as string;
+    const nome = formData.get("visitor-name") as string;
+    const telefone = formData.get("visitor-phone") as string;
 
     try {
-      if (isVisitorSignup) {
-        // Cadastro de visitante
-        const nome = formData.get("visitor-name") as string;
-        const telefone = formData.get("visitor-phone") as string;
-
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              nome_completo: nome,
-              telefone: telefone,
-              is_visitante: true
-            }
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            nome_completo: nome,
+            telefone: telefone,
+            is_visitante: true
           }
-        });
+        }
+      });
 
-        if (error) throw error;
-        toast.success("Cadastro realizado! Bem-vindo à IAplicada!");
-      } else {
-        // Login de visitante
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-        toast.success("Login realizado com sucesso!");
-      }
+      if (error) throw error;
+      toast.success("Cadastro realizado! Bem-vindo à IAplicada!");
     } catch (error: any) {
-      toast.error(error.message || "Erro ao processar");
+      toast.error(error.message || "Erro ao processar cadastro");
     } finally {
       setIsLoading(false);
     }
@@ -118,30 +104,30 @@ export default function Auth() {
 
         {/* Card de Auth com altura mínima fixa */}
         <Card className="w-full min-h-[420px] bg-[#2F302B]/90 border-[#9EB038]/20 shadow-2xl backdrop-blur-md">
-          <Tabs defaultValue="aplicados" className="w-full">
+          <Tabs defaultValue="entrar" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] p-1 rounded-lg mb-4">
             <TabsTrigger 
-              value="aplicados"
+              value="entrar"
               className="rounded-md data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B] data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#F2F2F2]/60"
             >
-              Aplicados
+              Entrar
             </TabsTrigger>
             <TabsTrigger 
-              value="visitantes"
+              value="criar-conta"
               className="rounded-md data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#2F302B] data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#F2F2F2]/60"
             >
-              Visitantes
+              Criar Conta Grátis
             </TabsTrigger>
           </TabsList>
 
-            {/* Aba Aplicados */}
-            <TabsContent value="aplicados">
+            {/* Aba Entrar - Para todos os usuários (aplicados e visitantes) */}
+            <TabsContent value="entrar">
               <CardHeader className="space-y-1 p-6 pt-0 text-center">
                 <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
-                  Pronto para aplicar?
+                  Bem-vindo de volta
                 </CardTitle>
                 <CardDescription className="text-[#F2F2F2]/60 text-center">
-                  Faça login para continuar aplicando IA no seu fluxo real
+                  Entre com seu email e senha
                 </CardDescription>
               </CardHeader>
               
@@ -181,34 +167,30 @@ export default function Auth() {
               </CardContent>
             </TabsContent>
 
-            {/* Aba Visitantes */}
-            <TabsContent value="visitantes">
+            {/* Aba Criar Conta - Apenas para novos visitantes */}
+            <TabsContent value="criar-conta">
               <CardHeader className="space-y-1 p-6 pt-0 text-center">
                 <CardTitle className="text-2xl lg:text-2xl font-bold text-[#F2F2F2] text-center">
-                  {isVisitorSignup ? "Explore a plataforma" : "Bem-vindo de volta"}
+                  Explore a plataforma
                 </CardTitle>
                 <CardDescription className="text-[#F2F2F2]/60 text-center">
-                  {isVisitorSignup 
-                    ? "Crie uma conta grátis e conheça a comunidade IAplicada" 
-                    : "Acesse sua conta de visitante"}
+                  Crie uma conta grátis e conheça a comunidade IAplicada
                 </CardDescription>
               </CardHeader>
               
               <CardContent className="px-6 pb-6">
-                <form onSubmit={handleVisitorAuth} className="space-y-4">
-                  {isVisitorSignup && (
-                    <div className="space-y-1.5">
-                      <Label htmlFor="visitor-name" className="text-[#F2F2F2]">Nome Completo</Label>
-                      <Input
-                        id="visitor-name"
-                        name="visitor-name"
-                        type="text"
-                        placeholder="Seu nome"
-                        required
-                        className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
-                      />
-                    </div>
-                  )}
+                <form onSubmit={handleVisitorSignup} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="visitor-name" className="text-[#F2F2F2]">Nome Completo</Label>
+                    <Input
+                      id="visitor-name"
+                      name="visitor-name"
+                      type="text"
+                      placeholder="Seu nome"
+                      required
+                      className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
+                    />
+                  </div>
 
                   <div className="space-y-1.5">
                     <Label htmlFor="visitor-email" className="text-[#F2F2F2]">Email</Label>
@@ -222,23 +204,21 @@ export default function Auth() {
                     />
                   </div>
 
-                  {isVisitorSignup && (
-                    <div className="space-y-1.5">
-                      <Label htmlFor="visitor-phone" className="text-[#F2F2F2]">Telefone</Label>
-                      <Input
-                        id="visitor-phone"
-                        name="visitor-phone"
-                        type="tel"
-                        placeholder="(00) 00000-0000"
-                        required
-                        className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
-                      />
-                    </div>
-                  )}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="visitor-phone" className="text-[#F2F2F2]">Telefone</Label>
+                    <Input
+                      id="visitor-phone"
+                      name="visitor-phone"
+                      type="tel"
+                      placeholder="(00) 00000-0000"
+                      required
+                      className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
+                    />
+                  </div>
                   
                   <div className="space-y-1.5">
                     <Label htmlFor="visitor-password" className="text-[#F2F2F2]">
-                      {isVisitorSignup ? "Crie uma senha simples" : "Senha"}
+                      Crie uma senha simples
                     </Label>
                     <PasswordInput
                       id="visitor-password"
@@ -248,11 +228,9 @@ export default function Auth() {
                       minLength={6}
                       className="bg-[#1a1a1a] border-[#9EB038]/30 text-[#F2F2F2] placeholder:text-[#F2F2F2]/40"
                     />
-                    {isVisitorSignup && (
-                      <p className="text-xs text-[#F2F2F2]/50">
-                        Você vai usar essa senha para acessar depois
-                      </p>
-                    )}
+                    <p className="text-xs text-[#F2F2F2]/50">
+                      Você vai usar essa senha para acessar depois
+                    </p>
                   </div>
                   
                   <Button 
@@ -260,16 +238,8 @@ export default function Auth() {
                     className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold" 
                     disabled={isLoading}
                   >
-                    {isLoading ? "Processando..." : (isVisitorSignup ? "Criar conta grátis" : "Entrar")}
+                    {isLoading ? "Criando conta..." : "Criar conta grátis"}
                   </Button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsVisitorSignup(!isVisitorSignup)}
-                    className="w-full text-sm text-[#9EB038] hover:underline"
-                  >
-                    {isVisitorSignup ? "Já tenho conta" : "Primeiro acesso"}
-                  </button>
                 </form>
               </CardContent>
             </TabsContent>

@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, ExternalLink, FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail } from "lucide-react";
+import { FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, LayoutGrid, List } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type Material = {
   id: string;
@@ -21,17 +22,18 @@ type Material = {
 };
 
 const CATEGORIAS = [
-  { value: "templates", label: "Templates", icon: FileText, color: "bg-blue-500" },
-  { value: "guias", label: "Guias", icon: BookOpen, color: "bg-green-500" },
-  { value: "prompts", label: "Prompts", icon: Lightbulb, color: "bg-yellow-500" },
-  { value: "ferramentas", label: "Ferramentas", icon: Wrench, color: "bg-purple-500" },
-  { value: "checklists", label: "Checklists", icon: CheckSquare, color: "bg-orange-500" },
-  { value: "ebooks", label: "E-books", icon: Book, color: "bg-pink-500" },
-  { value: "newsletter", label: "Newsletter", icon: Mail, color: "bg-red-500" },
+  { value: "templates", label: "Templates", icon: FileText },
+  { value: "guias", label: "Guias", icon: BookOpen },
+  { value: "prompts", label: "Prompts", icon: Lightbulb },
+  { value: "ferramentas", label: "Ferramentas", icon: Wrench },
+  { value: "checklists", label: "Checklists", icon: CheckSquare },
+  { value: "ebooks", label: "E-books", icon: Book },
+  { value: "newsletter", label: "Newsletter", icon: Mail },
 ];
 
 export function MateriaisGratuitosTab() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const { logAccess } = useContentAccessLogger();
 
   const { data: materiais, isLoading } = useQuery({
@@ -59,30 +61,50 @@ export function MateriaisGratuitosTab() {
 
   return (
     <div className="space-y-6">
-      {/* Category Filter */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground">Filtrar por:</span>
-        <Select 
-          value={selectedCategory || "todas"} 
-          onValueChange={(value) => setSelectedCategory(value === "todas" ? null : value)}
-        >
-          <SelectTrigger className="w-[240px]">
-            <SelectValue placeholder="Todas as categorias" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todas">
-              Todas ({materiais?.length || 0})
-            </SelectItem>
-            {CATEGORIAS.map((cat) => {
-              const count = groupedMateriais[cat.value]?.length || 0;
-              return (
-                <SelectItem key={cat.value} value={cat.value}>
-                  {cat.label} ({count})
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
+      {/* Filters and View Toggle */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground">Filtrar por:</span>
+          <Select 
+            value={selectedCategory || "todas"} 
+            onValueChange={(value) => setSelectedCategory(value === "todas" ? null : value)}
+          >
+            <SelectTrigger className="w-[240px]">
+              <SelectValue placeholder="Todas as categorias" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">
+                Todas ({materiais?.length || 0})
+              </SelectItem>
+              {CATEGORIAS.map((cat) => {
+                const count = groupedMateriais[cat.value]?.length || 0;
+                return (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {cat.label} ({count})
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* View Toggle */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant={viewMode === 'cards' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('cards')}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={viewMode === 'table' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('table')}
+          >
+            <List className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Loading State */}
@@ -102,56 +124,93 @@ export function MateriaisGratuitosTab() {
         </div>
       )}
 
-      {/* Materials Grid */}
+      {/* Materials View */}
       {!isLoading && filteredMateriais && filteredMateriais.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMateriais.map((material) => {
-            const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
-            const Icon = categoria?.icon || FileText;
-            
-            return (
-              <Card key={material.id} className="bg-card border-border hover:border-primary/50 transition-colors">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className={`p-2 rounded-lg ${categoria?.color || "bg-muted"}`}>
-                        <Icon className="h-5 w-5 text-white" />
+        <>
+          {viewMode === 'cards' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredMateriais.map((material) => {
+                const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
+                const Icon = categoria?.icon || FileText;
+                
+                return (
+                  <Card key={material.id} className="bg-card border-border hover:border-primary/50 transition-colors flex flex-col h-full">
+                    <CardHeader className="flex-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Icon className="h-5 w-5 text-[#9EB038]" />
+                        <Badge variant="outline">{categoria?.label}</Badge>
                       </div>
-                      <Badge variant="outline">{categoria?.label}</Badge>
-                    </div>
-                  </div>
-                  <CardTitle className="text-lg mt-3">{material.titulo}</CardTitle>
-                  {material.descricao && (
-                    <CardDescription className="text-sm">
-                      {material.descricao}
-                    </CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    className="w-full"
-                    onClick={() => {
-                      logAccess('material', material.id, material.titulo);
-                      window.open(material.url, '_blank');
-                    }}
-                  >
-                    {material.tipo === "download" ? (
-                      <>
-                        <Download className="h-4 w-4 mr-2" />
-                        Baixar Material
-                      </>
-                    ) : (
-                      <>
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Acessar Material
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                      <CardTitle className="text-lg">{material.titulo}</CardTitle>
+                      {material.descricao && (
+                        <CardDescription className="text-sm line-clamp-2">
+                          {material.descricao}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="mt-auto">
+                      <Button
+                        className="w-full h-10"
+                        onClick={() => {
+                          logAccess('material', material.id, material.titulo);
+                          window.open(material.url, '_blank');
+                        }}
+                      >
+                        Acessar
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="border rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[300px]">Título</TableHead>
+                    <TableHead>Categoria</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead className="w-[120px]">Ação</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredMateriais.map((material) => {
+                    const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
+                    const Icon = categoria?.icon || FileText;
+                    
+                    return (
+                      <TableRow key={material.id}>
+                        <TableCell className="font-medium">{material.titulo}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4 text-[#9EB038]" />
+                            <span className="text-sm">{categoria?.label}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-md">
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {material.descricao || "—"}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              logAccess('material', material.id, material.titulo);
+                              window.open(material.url, '_blank');
+                            }}
+                          >
+                            Acessar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </>
       )}
 
       {/* Empty State */}
