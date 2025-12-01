@@ -125,7 +125,7 @@ export default function Avance() {
                 <Button 
                   variant="outline" 
                   className="w-full mt-auto border-2 border-[#C5D63D] bg-[#C5D63D]/10 hover:bg-[#C5D63D]/20 text-[#C5D63D] font-bold text-sm uppercase tracking-wide rounded-full py-6"
-                  onClick={() => window.open('https://wa.me/5531999999999', '_blank')}
+                  onClick={() => window.open('https://wa.me/5511950566101', '_blank')}
                 >
                   FALAR COM ESPECIALISTA
                 </Button>
