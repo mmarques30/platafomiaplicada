@@ -55,9 +55,9 @@ export function AppSidebar() {
   // Separar menus principais e subitens
   const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key);
   
-  // Filtrar menus para visitantes (apenas Academy e Comunidade)
+  // Filtrar menus para visitantes (apenas Trilhas e Comunidade)
   const mainMenus = isVisitante 
-    ? allMainMenus.filter(menu => ['academy', 'comunidade'].includes(menu.menu_key))
+    ? allMainMenus.filter(menu => ['trilhas', 'comunidade'].includes(menu.menu_key))
     : allMainMenus;
   
   const getSubMenus = (parentKey: string) => 
@@ -212,6 +212,33 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+
+              {/* Materiais - Exclusivo para Visitantes */}
+              {isVisitante && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild className="group">
+                    <NavLink 
+                      to="/materiais-gratuitos"
+                      end
+                      className={cn(
+                        "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                        location.pathname === "/materiais-gratuitos"
+                          ? "text-primary font-semibold" 
+                          : "text-foreground hover:text-primary"
+                      )}
+                    >
+                      <span className={cn(
+                        "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                        location.pathname === "/materiais-gratuitos"
+                          ? "bg-aplicada-green-700 opacity-100" 
+                          : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                      )} />
+                      <LucideIcons.FileText className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>Materiais</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
 
               {/* CTA Item */}
             <SidebarMenuItem>

@@ -132,42 +132,44 @@ export function TopHeader() {
                 </DropdownMenuContent>
           </DropdownMenu>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className={cn(
-                  "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
-                  isFerramentasActive ? "text-primary" : "text-foreground hover:text-primary"
-                )}
-              >
-                Ferramentas
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
-              <DropdownMenuItem asChild>
-                <Link to="/ia-copie-use" className="cursor-pointer">
-                  IA "Copie e Use"
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/biblioteca-ferramentas" className="cursor-pointer">
-                  Biblioteca de Ferramentas
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/biblioteca-prompts" className="cursor-pointer">
-                  Biblioteca de Prompts
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/metodos-aplicar" className="cursor-pointer">
-                  Métodos para Aplicar
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {!isVisitante && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className={cn(
+                    "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
+                    isFerramentasActive ? "text-primary" : "text-foreground hover:text-primary"
+                  )}
+                >
+                  Ferramentas
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
+                <DropdownMenuItem asChild>
+                  <Link to="/ia-copie-use" className="cursor-pointer">
+                    IA "Copie e Use"
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/biblioteca-ferramentas" className="cursor-pointer">
+                    Biblioteca de Ferramentas
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/biblioteca-prompts" className="cursor-pointer">
+                    Biblioteca de Prompts
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/metodos-aplicar" className="cursor-pointer">
+                    Métodos para Aplicar
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           
           {/* CTA - Aplique (visitante/sem plano) ou Avance (pagante) */}
           <NavLink 

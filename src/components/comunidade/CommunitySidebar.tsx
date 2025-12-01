@@ -75,20 +75,6 @@ export function CommunitySidebar() {
         </CardContent>
       </Card>
 
-      {/* Quick Links */}
-      <Card className="bg-card border-border">
-        <CardHeader>
-          <CardTitle className="text-base text-foreground">Links Rápidos</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Button variant="ghost" className="w-full justify-start" asChild>
-            <a href="/materiais-gratuitos" className="text-sm">
-              <FileText className="h-4 w-4 mr-2" />
-              Materiais Gratuitos
-            </a>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 }

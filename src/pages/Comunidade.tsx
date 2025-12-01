@@ -3,6 +3,7 @@ import { CommunityFeed } from "@/components/comunidade/CommunityFeed";
 import { MembersList } from "@/components/comunidade/MembersList";
 import { RankingEngajamento } from "@/components/comunidade/RankingEngajamento";
 import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
+import { MateriaisGratuitosTab } from "@/components/comunidade/MateriaisGratuitosTab";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 
 export default function Comunidade() {
@@ -26,7 +27,7 @@ export default function Comunidade() {
           {/* Main Content */}
           <div>
             <Tabs defaultValue="community" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3 bg-muted">
+              <TabsList className="grid w-full grid-cols-4 bg-muted">
                 <TabsTrigger
                   value="community"
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -45,6 +46,12 @@ export default function Comunidade() {
                 >
                   Ranking
                 </TabsTrigger>
+                <TabsTrigger
+                  value="materiais"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  Materiais
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="community" className="space-y-4">
@@ -57,6 +64,10 @@ export default function Comunidade() {
 
               <TabsContent value="leaderboard" className="space-y-4">
                 <RankingEngajamento ranking={ranking || []} />
+              </TabsContent>
+
+              <TabsContent value="materiais" className="space-y-4">
+                <MateriaisGratuitosTab />
               </TabsContent>
             </Tabs>
           </div>
