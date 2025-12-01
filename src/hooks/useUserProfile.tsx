@@ -11,6 +11,8 @@ export interface UserProfile {
   data_expiracao_acesso: string | null;
   created_at: string | null;
   conta_ativa: boolean | null;
+  senha_temporaria: boolean | null;
+  primeiro_acesso: boolean | null;
 }
 
 export function useUserProfile() {
