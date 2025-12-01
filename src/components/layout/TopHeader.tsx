@@ -168,11 +168,8 @@ export function TopHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </nav>
-
-        {/* DIREITA: CTA + Notificações + Avatar com Nome */}
-        <div className="flex items-center gap-3">
-          {/* CTA Link */}
+          
+          {/* CTA - Aplique (visitante/sem plano) ou Avance (pagante) */}
           <NavLink 
             to={isVisitante || !plan ? "/aplique" : "/avance"}
             className={({ isActive }) => cn(
@@ -182,8 +179,11 @@ export function TopHeader() {
           >
             {isVisitante || !plan ? "Aplique" : "Avance"}
           </NavLink>
-          
-          <Button 
+        </nav>
+
+        {/* DIREITA: Notificações + Avatar com Nome */}
+        <div className="flex items-center gap-3">
+          <Button
             variant="ghost" 
             size="icon" 
             className="relative"
