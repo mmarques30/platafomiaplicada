@@ -66,6 +66,7 @@ import Aplique from "./pages/Aplique";
 import Avance from "./pages/Avance";
 import CandidatarMentoria from "./pages/CandidatarMentoria";
 import GerenciarCandidaturas from "./pages/admin/GerenciarCandidaturas";
+import VideosBonus from "./pages/VideosBonus";
 
 const queryClient = new QueryClient();
 
@@ -115,6 +116,7 @@ function AppContent() {
             <Route path="/metodos-aplicar" element={<MetodosAplicar />} />
             <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
+            <Route path="/videos-bonus" element={<VideosBonus />} />
           </Route>
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />

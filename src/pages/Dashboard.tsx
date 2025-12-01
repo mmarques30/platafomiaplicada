@@ -142,12 +142,9 @@ export default function Dashboard() {
         {/* Conteúdo baseado no tipo de usuário */}
         <section>
           {isVisitante ? (
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Vídeos Disponíveis</h2>
-              <VideosVisitante />
-            </div>
-          ) : (
+            // Visitantes: todas trilhas bloqueadas
             <>
+              <h2 className="text-2xl font-bold mb-6">Trilhas de Aprendizado</h2>
               {loadingTrilhas ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {[...Array(8)].map((_, i) => (
@@ -157,6 +154,45 @@ export default function Dashboard() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {trilhas.map((trilha: any) => (
+                    <TrilhaCardBloqueavel
+                      key={trilha.id}
+                      id={trilha.id}
+                      titulo={trilha.titulo}
+                      imagem_url={trilha.imagem_url || undefined}
+                      bloqueada={trilha.bloqueada || false}
+                      visivel_apenas_pro={trilha.visivel_apenas_pro || false}
+                      nivel_minimo_acesso={trilha.nivel_minimo_acesso}
+                      isVisitante={true}
+                      temConteudoDisponivel={false} // Força cadeado em todas
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            // Mentorados: 4 trilhas com botão "Ver todas"
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Suas Trilhas</h2>
+                <Link 
+                  to="/trilhas" 
+                  className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
+                >
+                  Ver todas
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+              {loadingTrilhas ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-[400px] rounded-xl" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                  {trilhas.slice(0, 4).map((trilha: any) => (
                     <TrilhaCardBloqueavel
                       key={trilha.id}
                       id={trilha.id}
