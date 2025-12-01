@@ -34,28 +34,51 @@ export default function CandidatarMentoria() {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F2F2F2] to-[#E5E5E5] flex items-center justify-center p-4">
-        <Card className="max-w-2xl w-full p-8 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#F2F2F2] to-[#E5E5E5] flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Background Logo */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <img src={logoSimbol} alt="" className="w-[600px] h-[600px] object-contain opacity-5" />
+        </div>
+        
+        <Card className="max-w-2xl w-full p-8 text-center relative z-10">
           <div className="mb-6 flex justify-center">
             <div className="w-20 h-20 rounded-full bg-[#9EB038]/20 flex items-center justify-center">
               <CheckCircle2 className="w-12 h-12 text-[#9EB038]" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-[#2F302B] mb-4">
-            Candidatura Enviada!
+          
+          <h1 className="text-3xl font-bold text-[#2F302B] mb-6">
+            Obrigado por preencher!
           </h1>
-          <p className="text-muted-foreground mb-6">
-            Obrigado por se candidatar à Mentoria Club IAplicada. Nossa equipe
-            analisará seu perfil com atenção e retornaremos em até 3 dias úteis.
-          </p>
-          <div className="bg-[#9EB038]/10 rounded-lg p-4 mb-6">
-            <p className="text-sm text-[#2F302B]">
-              <strong>Próximos passos:</strong><br />
-              1. Aguarde nosso contato por WhatsApp ou email<br />
-              2. Prepare-se para uma conversa sobre seus objetivos<br />
-              3. Entraremos em contato com detalhes sobre sua candidatura
+          
+          <div className="bg-[#2F302B]/5 rounded-lg p-6 mb-6 text-left">
+            <p className="text-[#2F302B] font-semibold mb-4">
+              IMPORTANTE: Este é um programa premium para executivos comprometidos. 
+              Analisarei pessoalmente cada resposta.
             </p>
+            
+            <div className="space-y-3 text-[#2F302B]">
+              <div className="flex items-start gap-3">
+                <span className="text-[#9EB038] font-bold">✓</span>
+                <p>
+                  <strong>Se você for selecionado:</strong> Recebe link para agendar 
+                  diagnóstico gratuito de 1h
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-[#9EB038] font-bold">→</span>
+                <p>
+                  <strong>Se ainda não for o momento:</strong> Continua tendo acesso 
+                  às aulas gratuitas e comunidade
+                </p>
+              </div>
+            </div>
           </div>
+          
+          <p className="text-muted-foreground mb-6">
+            Você receberá uma resposta em até <strong>48h via WhatsApp</strong>.
+          </p>
+          
           <Button
             onClick={() => navigate("/aplique")}
             className="bg-[#2F302B] hover:bg-[#3D3E39]"
@@ -70,13 +93,13 @@ export default function CandidatarMentoria() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F2F2F2] to-[#E5E5E5] py-12 px-4 relative overflow-hidden">
       {/* Background Logo */}
-      <div 
-        className="absolute inset-0 bg-repeat opacity-5"
-        style={{
-          backgroundImage: `url(${logoSimbol})`,
-          backgroundSize: '200px 200px',
-        }}
-      />
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <img 
+          src={logoSimbol} 
+          alt="" 
+          className="w-[600px] h-[600px] object-contain opacity-5"
+        />
+      </div>
 
       <div className="max-w-3xl mx-auto relative z-10">
         {/* Header */}
