@@ -181,33 +181,6 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                           );
                         })}
-                        
-                        {/* Vídeos Bônus - Exclusivo para Visitantes */}
-                        {isVisitante && menu.menu_key === 'trilhas' && (
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild className="group">
-                              <NavLink 
-                                to="/videos-bonus" 
-                                end 
-                                className={cn(
-                                  "relative rounded-lg transition-all duration-200 font-medium pl-8",
-                                  location.pathname === '/videos-bonus'
-                                    ? "text-primary font-semibold" 
-                                    : "text-foreground hover:text-primary"
-                                )}
-                              >
-                                <span className={cn(
-                                  "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                                  location.pathname === '/videos-bonus'
-                                    ? "bg-aplicada-green-700 opacity-100" 
-                                    : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
-                                )} />
-                                <LucideIcons.Gift className="h-4 w-4 shrink-0" />
-                                {!collapsed && <span>Vídeos Bônus</span>}
-                              </NavLink>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                        )}
                       </CollapsibleContent>
                     </Collapsible>
                   );
@@ -239,6 +212,33 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+
+              {/* Vídeos Bônus - Exclusivo para Visitantes (item independente) */}
+              {isVisitante && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild className="group">
+                    <NavLink 
+                      to="/videos-bonus" 
+                      end 
+                      className={cn(
+                        "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                        location.pathname === '/videos-bonus'
+                          ? "text-primary font-semibold" 
+                          : "text-foreground hover:text-primary"
+                      )}
+                    >
+                      <span className={cn(
+                        "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                        location.pathname === '/videos-bonus'
+                          ? "bg-aplicada-green-700 opacity-100" 
+                          : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                      )} />
+                      <LucideIcons.Gift className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>Vídeos Bônus</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
 
               {/* Materiais - Exclusivo para Visitantes */}
               {isVisitante && (
