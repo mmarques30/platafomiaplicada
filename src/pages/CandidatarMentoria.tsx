@@ -37,8 +37,18 @@ export default function CandidatarMentoria() {
       <div className="min-h-screen bg-gradient-to-br from-[#F2F2F2] to-[#E5E5E5] flex items-center justify-center p-4 relative overflow-hidden">
         {/* Background Logo */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <img src={logoSimbol} alt="" className="w-[600px] h-[600px] object-contain opacity-5" />
+          <img src={logoSimbol} alt="" className="w-[600px] h-[600px] object-contain opacity-[0.08]" />
         </div>
+        
+        {/* Botão Voltar */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="absolute top-6 left-6 z-20 text-[#2F302B] hover:bg-[#2F302B]/10"
+        >
+          <ChevronLeft className="w-5 h-5 mr-1" />
+          Voltar
+        </Button>
         
         <Card className="max-w-2xl w-full p-8 text-center relative z-10">
           <div className="mb-6 flex justify-center">
@@ -97,9 +107,19 @@ export default function CandidatarMentoria() {
         <img 
           src={logoSimbol} 
           alt="" 
-          className="w-[600px] h-[600px] object-contain opacity-5"
+          className="w-[600px] h-[600px] object-contain opacity-[0.08]"
         />
       </div>
+
+      {/* Botão Voltar */}
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/aplique')}
+        className="absolute top-4 left-4 z-20 text-[#2F302B] hover:bg-[#2F302B]/10"
+      >
+        <ChevronLeft className="w-5 h-5 mr-1" />
+        Voltar
+      </Button>
 
       <div className="max-w-3xl mx-auto relative z-10">
         {/* Header */}
