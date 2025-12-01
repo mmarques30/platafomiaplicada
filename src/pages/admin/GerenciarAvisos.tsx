@@ -51,6 +51,7 @@ export default function GerenciarAvisos() {
                 <TableRow>
                   <TableHead>Título</TableHead>
                   <TableHead>Tipo</TableHead>
+                  <TableHead>Visível Para</TableHead>
                   <TableHead>Expiração</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
@@ -61,6 +62,15 @@ export default function GerenciarAvisos() {
                   <TableRow key={aviso.id}>
                     <TableCell className="font-medium">{aviso.titulo}</TableCell>
                     <TableCell><Badge>{aviso.tipo}</Badge></TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {aviso.visivel_para?.map((plano: string) => (
+                          <Badge key={plano} variant="outline" className="text-xs capitalize">
+                            {plano}
+                          </Badge>
+                        )) || <span className="text-muted-foreground text-xs">Todos</span>}
+                      </div>
+                    </TableCell>
                     <TableCell>{aviso.data_expiracao ? format(new Date(aviso.data_expiracao), "dd/MM/yyyy") : "-"}</TableCell>
                     <TableCell>
                       <Badge variant={aviso.ativo ? "default" : "secondary"}>

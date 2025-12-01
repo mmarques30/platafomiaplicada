@@ -24,27 +24,29 @@ export function TrilhaCardBloqueavel({
   temConteudoDisponivel = true
 }: TrilhaCardBloqueavelProps) {
   
-  // VISITANTE sem conteúdo disponível → Cadeado
+  // VISITANTE sem conteúdo disponível → Cadeado clicável para /aplique
   if (isVisitante && !temConteudoDisponivel) {
     return (
-      <div className="relative overflow-hidden rounded-xl shadow-md aspect-[9/16] w-full bg-muted border-2 border-primary/10 cursor-not-allowed">
-        <img
-          src={imagem_url || "/placeholder.svg"}
-          alt={titulo}
-          loading="lazy"
-          className="block w-full h-full object-cover object-center opacity-50 grayscale"
-        />
-        
-        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <div className="bg-black/60 rounded-full p-6 shadow-2xl">
-            <Lock className="h-12 w-12 text-white" strokeWidth={2.5} />
+      <Link to="/aplique" className="block">
+        <div className="relative overflow-hidden rounded-xl shadow-md aspect-[9/16] w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow">
+          <img
+            src={imagem_url || "/placeholder.svg"}
+            alt={titulo}
+            loading="lazy"
+            className="block w-full h-full object-cover object-center opacity-50 grayscale"
+          />
+          
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <div className="bg-black/60 rounded-full p-6 shadow-2xl">
+              <Lock className="h-12 w-12 text-white" strokeWidth={2.5} />
+            </div>
+          </div>
+          
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+            <p className="text-white font-semibold text-center">{titulo}</p>
           </div>
         </div>
-        
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-          <p className="text-white font-semibold text-center">{titulo}</p>
-        </div>
-      </div>
+      </Link>
     );
   }
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateAviso, useUpdateAviso } from "@/hooks/admin/useAvisos";
 
@@ -19,20 +20,24 @@ export function AvisoModal({ open, onOpenChange, aviso }: AvisoModalProps) {
   const createAviso = useCreateAviso();
   const updateAviso = useUpdateAviso();
   const { register, handleSubmit, reset, setValue, watch } = useForm();
+  const [visivelPara, setVisivelPara] = useState<string[]>(['visitante', 'academy', 'lab', 'skills', 'club']);
 
   useEffect(() => {
     if (aviso) {
       reset(aviso);
+      setVisivelPara(aviso.visivel_para || ['visitante', 'academy', 'lab', 'skills', 'club']);
     } else {
       reset({ titulo: "", mensagem: "", tipo: "info", data_expiracao: "", ativo: true });
+      setVisivelPara(['visitante', 'academy', 'lab', 'skills', 'club']);
     }
   }, [aviso, reset, open]);
 
   const onSubmit = (data: any) => {
+    const payload = { ...data, visivel_para: visivelPara };
     if (aviso) {
-      updateAviso.mutate({ id: aviso.id, ...data }, { onSuccess: () => onOpenChange(false) });
+      updateAviso.mutate({ id: aviso.id, ...payload }, { onSuccess: () => onOpenChange(false) });
     } else {
-      createAviso.mutate(data, { onSuccess: () => onOpenChange(false) });
+      createAviso.mutate(payload, { onSuccess: () => onOpenChange(false) });
     }
   };
 
@@ -71,6 +76,33 @@ export function AvisoModal({ open, onOpenChange, aviso }: AvisoModalProps) {
           <div className="flex items-center space-x-2">
             <Switch checked={watch("ativo")} onCheckedChange={(checked) => setValue("ativo", checked)} />
             <Label>Ativo</Label>
+          </div>
+          <div className="space-y-2">
+            <Label>Visível para:</Label>
+            <div className="grid grid-cols-2 gap-3 p-3 border rounded-md">
+              {[
+                { value: "visitante", label: "Visitantes" },
+                { value: "academy", label: "Academy" },
+                { value: "lab", label: "Lab" },
+                { value: "skills", label: "Skills" },
+                { value: "club", label: "Club" }
+              ].map((plano) => (
+                <div key={plano.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`visivel-${plano.value}`}
+                    checked={visivelPara.includes(plano.value)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setVisivelPara([...visivelPara, plano.value]);
+                      } else {
+                        setVisivelPara(visivelPara.filter(p => p !== plano.value));
+                      }
+                    }}
+                  />
+                  <Label htmlFor={`visivel-${plano.value}`} className="cursor-pointer">{plano.label}</Label>
+                </div>
+              ))}
+            </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
