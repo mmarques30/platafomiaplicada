@@ -53,7 +53,13 @@ export function AppSidebar() {
   const sidebarMenus = getSidebarMenus();
   
   // Separar menus principais e subitens
-  const mainMenus = sidebarMenus.filter(menu => !menu.parent_key);
+  const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key);
+  
+  // Filtrar menus para visitantes (apenas Academy e Comunidade)
+  const mainMenus = isVisitante 
+    ? allMainMenus.filter(menu => ['academy', 'comunidade'].includes(menu.menu_key))
+    : allMainMenus;
+  
   const getSubMenus = (parentKey: string) => 
     sidebarMenus.filter(menu => menu.parent_key === parentKey);
 
