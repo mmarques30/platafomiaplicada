@@ -78,8 +78,9 @@ function AppContent() {
       <Toaster />
       <Sonner />
       <Routes>
-          <Route path="/auth" element={<Auth />} />
+        <Route path="/auth" element={<Auth />} />
           <Route path="/aplique" element={<Aplique />} />
+          <Route path="/avance" element={<Avance />} />
           
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />
@@ -115,7 +116,6 @@ function AppContent() {
             <Route path="/metodos-aplicar" element={<MetodosAplicar />} />
             <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
-            <Route path="/avance" element={<Avance />} />
           </Route>
           
           <Route element={<ProtectedRoute><DashboardVisitante /></ProtectedRoute>}>
