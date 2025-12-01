@@ -10,10 +10,20 @@ import { ptBR } from "date-fns/locale";
 import { ObjetivosGerados } from "@/components/mentoria/ObjetivosGerados";
 import { ProjetosSugeridos } from "@/components/mentoria/ProjetosSugeridos";
 import { InsightIA } from "@/components/mentoria/InsightIA";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffect } from "react";
 
 export default function MeuDiagnostico() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
+  const { plan, isLoading: planLoading } = useUserPlan();
+
+  // Redirect Club/Lab para /mentoria (eles têm diagnóstico integrado)
+  useEffect(() => {
+    if (!planLoading && plan && ['club', 'lab'].includes(plan)) {
+      navigate('/mentoria', { replace: true });
+    }
+  }, [plan, planLoading, navigate]);
 
   const completo = formulario?.completado || false;
   const preenchidoPorAdmin = formulario?.preenchido_por === "admin";
