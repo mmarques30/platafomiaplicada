@@ -65,6 +65,8 @@ import MateriaisGratuitos from "./pages/MateriaisGratuitos";
 import GerenciarMateriais from "./pages/admin/GerenciarMateriais";
 import Aplique from "./pages/Aplique";
 import Avance from "./pages/Avance";
+import CandidatarMentoria from "./pages/CandidatarMentoria";
+import GerenciarCandidaturas from "./pages/admin/GerenciarCandidaturas";
 
 const queryClient = new QueryClient();
 
@@ -120,10 +122,13 @@ function AppContent() {
             <Route path="/visitante" element={<DashboardVisitante />} />
           </Route>
           
+          <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />
+          
           <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="usuarios" element={<GerenciarUsuarios />} />
             <Route path="visitantes" element={<GerenciarVisitantes />} />
+            <Route path="candidaturas" element={<GerenciarCandidaturas />} />
             <Route path="conteudo" element={<GerenciarConteudo />} />
             <Route path="bibliotecas" element={<GerenciarBibliotecas />} />
             <Route path="avisos" element={<GerenciarAvisos />} />
