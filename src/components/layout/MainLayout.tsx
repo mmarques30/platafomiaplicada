@@ -22,7 +22,7 @@ export function MainLayout() {
   const queryClient = useQueryClient();
 
   // Modal só aparece para mentorados (não visitantes) com senha temporária
-  const showPasswordModal = !isVisitante && profile?.senha_temporaria === true;
+  const showPasswordModal = !isLoading && !isVisitante && profile?.senha_temporaria === true;
 
   const handleSignOut = async () => {
     await signOut();
@@ -48,7 +48,7 @@ export function MainLayout() {
             <Outlet />
           </main>
         </div>
-        {!isVisitante && <MarIAnaFloatingButton />}
+        {(!isLoading && !isVisitante) && <MarIAnaFloatingButton />}
         
         {/* Modal de senha temporária - apenas para mentorados cadastrados pelo admin */}
         {showPasswordModal && user && (

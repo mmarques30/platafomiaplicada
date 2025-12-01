@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isVisitante } = useUserRole();
+  const { isVisitante, isLoading: loadingRole } = useUserRole();
   const [mostrarAvisoSenha, setMostrarAvisoSenha] = useState(false);
 
   // Query para buscar trilhas com lógica diferenciada por tipo de usuário
@@ -67,13 +67,13 @@ export default function Dashboard() {
         return (data || []).map((t) => ({ ...t, temConteudoDisponivel: true }));
       }
     },
-    enabled: !!user,
+    enabled: !!user && !loadingRole,
   });
 
   const trilhas = trilhasRaw || [];
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || loadingRole) return;
     
     const verificarSenhaTemporaria = async () => {
       const { data: profile } = await supabase
@@ -89,7 +89,7 @@ export default function Dashboard() {
     };
 
     verificarSenhaTemporaria();
-  }, [user]);
+  }, [user, isVisitante, loadingRole]);
 
 
   return (
