@@ -13,6 +13,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselPrevious, 
+  CarouselNext 
+} from "@/components/ui/carousel";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -163,20 +170,9 @@ export default function Dashboard() {
               )}
             </>
           ) : (
-            // Mentorados: 4 trilhas com botão "Ver todas"
+            // Mentorados: carrossel com TODAS as trilhas
             <>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Suas Trilhas</h2>
-                <Link 
-                  to="/trilhas" 
-                  className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
-                >
-                  Ver todas
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
+              <h2 className="text-2xl font-bold mb-6">Suas Trilhas</h2>
               {loadingTrilhas ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                   {[...Array(4)].map((_, i) => (
@@ -184,21 +180,36 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                  {trilhas.slice(0, 4).map((trilha: any) => (
-                    <TrilhaCardBloqueavel
-                      key={trilha.id}
-                      id={trilha.id}
-                      titulo={trilha.titulo}
-                      imagem_url={trilha.imagem_url || undefined}
-                      bloqueada={trilha.bloqueada || false}
-                      visivel_apenas_pro={trilha.visivel_apenas_pro || false}
-                      nivel_minimo_acesso={trilha.nivel_minimo_acesso}
-                      isVisitante={isVisitante}
-                      temConteudoDisponivel={trilha.temConteudoDisponivel}
-                    />
-                  ))}
-                </div>
+                <Carousel 
+                  opts={{ align: "start", loop: false }}
+                  className="w-full"
+                >
+                  <CarouselContent className="-ml-4">
+                    {trilhas.map((trilha: any) => (
+                      <CarouselItem 
+                        key={trilha.id} 
+                        className="pl-4 basis-full sm:basis-1/2 md:basis-1/4"
+                      >
+                        <TrilhaCardBloqueavel
+                          id={trilha.id}
+                          titulo={trilha.titulo}
+                          imagem_url={trilha.imagem_url || undefined}
+                          bloqueada={trilha.bloqueada || false}
+                          visivel_apenas_pro={trilha.visivel_apenas_pro || false}
+                          nivel_minimo_acesso={trilha.nivel_minimo_acesso}
+                          isVisitante={isVisitante}
+                          temConteudoDisponivel={trilha.temConteudoDisponivel}
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  {trilhas.length > 4 && (
+                    <>
+                      <CarouselPrevious className="-left-4 md:-left-12" />
+                      <CarouselNext className="-right-4 md:-right-12" />
+                    </>
+                  )}
+                </Carousel>
               )}
             </>
           )}
