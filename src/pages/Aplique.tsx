@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { LogosTicker } from "@/components/LogosTicker";
 import { ArrowLeft, Sparkles, Check, Table2, Workflow, TrendingUp, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useButtonClickLogger } from "@/hooks/useButtonClickLogger";
 import logoCompleta from "@/assets/logo-aplicada-marca-completa-clara.png";
 import backgroundSymbol from "@/assets/logos/background-symbol.png";
 
 export default function Aplique() {
   const navigate = useNavigate();
+  const { logClick } = useButtonClickLogger();
   
   return (
     <div className="h-screen overflow-y-auto relative bg-background">
@@ -100,7 +102,10 @@ export default function Aplique() {
                 
                 <Button 
                   className="w-full mt-auto bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full py-6"
-                  onClick={() => window.open('https://clkdmg.site/pay/iaplicadaacademy', '_blank')}
+                  onClick={() => {
+                    logClick('academy_purchase', 'aplique');
+                    window.open('https://clkdmg.site/pay/iaplicadaacademy', '_blank');
+                  }}
                 >
                   QUERO APLICAR NA ACADEMY
                 </Button>
@@ -126,7 +131,7 @@ export default function Aplique() {
                 <Button 
                   variant="outline" 
                   className="w-full mt-auto border-2 border-[#C5D63D] bg-[#C5D63D]/10 hover:bg-[#C5D63D]/20 text-[#C5D63D] font-bold text-sm uppercase tracking-wide rounded-full py-6"
-                  onClick={() => navigate('/candidatar-mentoria')}
+                  onClick={() => navigate('/candidatar-mentoria?origem=aplique')}
                 >
                   QUERO ME CANDIDATAR
                 </Button>

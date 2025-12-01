@@ -43,6 +43,9 @@ export interface Candidatura {
   notas_admin?: string;
   data_contato?: string;
   admin_responsavel?: string;
+  origem_pagina?: string;
+  plano_origem?: string;
+  is_visitante_origem?: boolean;
 }
 
 export const useCandidaturas = () => {
