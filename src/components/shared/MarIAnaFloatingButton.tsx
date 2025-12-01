@@ -14,7 +14,7 @@ export function MarIAnaFloatingButton() {
           <Button
             onClick={() => navigate("/chat")}
             size="icon"
-            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90 p-2"
+            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-white hover:bg-gray-50 border border-border p-2"
           >
             <img 
               src={logoMariana} 
