@@ -24,7 +24,6 @@ export default function Trilhas() {
       const { data, error } = await supabase
         .from("trilhas")
         .select("id, titulo, imagem_url, ordem")
-        .eq("ativo", true)
         .order("ordem");
       if (error) throw error;
       return data || [];
