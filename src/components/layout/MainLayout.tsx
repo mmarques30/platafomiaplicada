@@ -10,13 +10,19 @@ import { GraduationCap, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import { MarIAnaFloatingButton } from "@/components/shared/MarIAnaFloatingButton";
+import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function MainLayout() {
   useIdleLogout();
   const { isVisitante, isLoading } = useUserRole();
   const { profile } = useUserProfile();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Modal só aparece para mentorados (não visitantes) com senha temporária
+  const showPasswordModal = !isVisitante && profile?.senha_temporaria === true;
 
   const handleSignOut = async () => {
     await signOut();
@@ -43,6 +49,17 @@ export function MainLayout() {
           </main>
         </div>
         <MarIAnaFloatingButton />
+        
+        {/* Modal de senha temporária - apenas para mentorados cadastrados pelo admin */}
+        {showPasswordModal && user && (
+          <TrocarSenhaModal 
+            open={showPasswordModal}
+            userId={user.id}
+            onSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+            }}
+          />
+        )}
       </div>
     </SidebarProvider>
   );
