@@ -1,0 +1,211 @@
+import { useState, useMemo } from "react";
+import { useTodasAulas } from "@/hooks/useCalendarioAulas";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Loader2, Search, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { format, parseISO, isPast, isFuture } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+
+type StatusFilter = "todas" | "ativas" | "inativas" | "passadas" | "futuras";
+
+export function CalendarioVisaoTabela() {
+  const { data: aulas, isLoading } = useTodasAulas();
+  const [busca, setBusca] = useState("");
+  const [statusFiltro, setStatusFiltro] = useState<StatusFilter>("todas");
+  const [mesFiltro, setMesFiltro] = useState("todos");
+
+  const aulasFiltradas = useMemo(() => {
+    if (!aulas) return [];
+
+    return aulas.filter((aula) => {
+      // Filtro de busca por tema
+      const matchBusca = aula.tema.toLowerCase().includes(busca.toLowerCase());
+      if (!matchBusca) return false;
+
+      // Filtro de status
+      if (statusFiltro !== "todas") {
+        const dataAula = aula.data_aula ? parseISO(aula.data_aula) : null;
+        
+        switch (statusFiltro) {
+          case "ativas":
+            if (!aula.ativo) return false;
+            break;
+          case "inativas":
+            if (aula.ativo) return false;
+            break;
+          case "passadas":
+            if (!dataAula || !isPast(dataAula)) return false;
+            break;
+          case "futuras":
+            if (!dataAula || !isFuture(dataAula)) return false;
+            break;
+        }
+      }
+
+      // Filtro de mês
+      if (mesFiltro !== "todos" && aula.data_aula) {
+        const mesAula = format(parseISO(aula.data_aula), "MM");
+        if (mesAula !== mesFiltro) return false;
+      }
+
+      return true;
+    });
+  }, [aulas, busca, statusFiltro, mesFiltro]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const meses = [
+    { value: "todos", label: "Todos os meses" },
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" },
+  ];
+
+  const getStatusInfo = (aula: any) => {
+    if (!aula.data_aula) {
+      return {
+        label: aula.ativo ? "Ativa" : "Inativa",
+        color: aula.ativo ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+        icon: aula.ativo ? CheckCircle2 : XCircle,
+      };
+    }
+
+    const dataAula = parseISO(aula.data_aula);
+    const isPassada = isPast(dataAula);
+
+    if (isPassada) {
+      return {
+        label: "Passada",
+        color: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+        icon: Clock,
+      };
+    }
+
+    return {
+      label: aula.ativo ? "Programada" : "Inativa",
+      color: aula.ativo ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+      icon: aula.ativo ? Clock : XCircle,
+    };
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por tema..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          
+          <Select value={statusFiltro} onValueChange={(v) => setStatusFiltro(v as StatusFilter)}>
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Todas</SelectItem>
+              <SelectItem value="ativas">Ativas</SelectItem>
+              <SelectItem value="inativas">Inativas</SelectItem>
+              <SelectItem value="passadas">Passadas</SelectItem>
+              <SelectItem value="futuras">Futuras</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={mesFiltro} onValueChange={setMesFiltro}>
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder="Mês" />
+            </SelectTrigger>
+            <SelectContent>
+              {meses.map((mes) => (
+                <SelectItem key={mes.value} value={mes.value}>
+                  {mes.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </Card>
+
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Tema</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Horário</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {aulasFiltradas.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  Nenhuma aula encontrada com os filtros aplicados
+                </TableCell>
+              </TableRow>
+            ) : (
+              aulasFiltradas.map((aula) => {
+                const statusInfo = getStatusInfo(aula);
+                const StatusIcon = statusInfo.icon;
+                
+                return (
+                  <TableRow key={aula.id}>
+                    <TableCell className="font-medium">
+                      <div>
+                        <div className="text-foreground">{aula.tema}</div>
+                        {aula.descricao && (
+                          <div className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                            {aula.descricao}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {aula.data_aula
+                        ? format(parseISO(aula.data_aula), "dd/MM/yyyy", { locale: ptBR })
+                        : "-"}
+                    </TableCell>
+                    <TableCell>{aula.horario || "-"}</TableCell>
+                    <TableCell>
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full",
+                          statusInfo.color
+                        )}
+                      >
+                        <StatusIcon className="h-3 w-3" />
+                        {statusInfo.label}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+    </div>
+  );
+}
