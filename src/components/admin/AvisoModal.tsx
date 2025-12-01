@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateAviso, useUpdateAviso } from "@/hooks/admin/useAvisos";
 
 interface AvisoModalProps {
@@ -23,7 +24,7 @@ export function AvisoModal({ open, onOpenChange, aviso }: AvisoModalProps) {
     if (aviso) {
       reset(aviso);
     } else {
-      reset({ titulo: "", mensagem: "", tipo: "Info", data_expiracao: "", ativo: true });
+      reset({ titulo: "", mensagem: "", tipo: "info", data_expiracao: "", ativo: true });
     }
   }, [aviso, reset, open]);
 
@@ -52,7 +53,16 @@ export function AvisoModal({ open, onOpenChange, aviso }: AvisoModalProps) {
           </div>
           <div className="space-y-2">
             <Label>Tipo</Label>
-            <Input {...register("tipo")} placeholder="Info, Alerta, Urgente" />
+            <Select value={watch("tipo")} onValueChange={(value) => setValue("tipo", value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="info">Informação</SelectItem>
+                <SelectItem value="alerta">Alerta</SelectItem>
+                <SelectItem value="urgente">Urgente</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label>Data de Expiração (opcional)</Label>
