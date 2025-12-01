@@ -99,11 +99,11 @@ export default function Auth() {
     <div className="min-h-screen relative flex items-center justify-center px-8 py-8 lg:px-24">
       {/* Background com símbolo como marca d'água */}
       <div className="absolute inset-0 bg-[#2F302B]">
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           <img 
             src={authBackground} 
             alt="" 
-            className="w-[70vw] h-[70vh] max-w-[700px] max-h-[700px] object-contain opacity-10"
+            className="w-[120vw] h-[120vh] min-w-[1000px] min-h-[1000px] object-contain opacity-[0.08]"
           />
         </div>
       </div>
