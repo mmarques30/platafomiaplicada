@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { FileText, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { HeroAcompanhamento } from "@/components/evolucao/HeroAcompanhamento";
 import { ObjetivosGerados } from "@/components/mentoria/ObjetivosGerados";
 import { ProjetosSugeridos } from "@/components/mentoria/ProjetosSugeridos";
 import { InsightIA } from "@/components/mentoria/InsightIA";
@@ -32,9 +31,6 @@ export default function MeuDiagnostico() {
             Análise personalizada com IA e objetivos gerados
           </p>
         </div>
-
-        {/* Hero Acompanhamento */}
-        <HeroAcompanhamento />
 
         {/* Grid com Diagnóstico */}
         <div className="grid gap-6">
