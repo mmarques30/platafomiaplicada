@@ -50,7 +50,7 @@ export function AppSidebar() {
     return IconComponent || Home;
   };
 
-  const sidebarMenus = getSidebarMenus();
+  const sidebarMenus = getSidebarMenus(plan);
   
   // Separar menus principais e subitens
   const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key);

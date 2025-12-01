@@ -46,8 +46,19 @@ export function useMenuConfig() {
     return menuConfig?.find(m => m.menu_key === menuKey);
   };
 
-  const getSidebarMenus = () => {
-    return menuConfig?.filter(m => m.tipo === 'sidebar' && m.visivel) || [];
+  const getSidebarMenus = (userPlan?: string | null) => {
+    return menuConfig?.filter(m => {
+      if (m.tipo !== 'sidebar' || !m.visivel) return false;
+      
+      // Se planos_permitidos = null, menu visível para todos
+      if (!m.planos_permitidos || m.planos_permitidos.length === 0) return true;
+      
+      // Se não tem plano, não mostra menus restritos
+      if (!userPlan) return false;
+      
+      // Verifica se o plano do usuário está na lista de permitidos
+      return m.planos_permitidos.includes(userPlan);
+    }) || [];
   };
 
   const getHeaderMenus = () => {
