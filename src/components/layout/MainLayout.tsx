@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { GraduationCap, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
+import { MarIAnaFloatingButton } from "@/components/shared/MarIAnaFloatingButton";
 
 export function MainLayout() {
   useIdleLogout();
@@ -99,6 +100,7 @@ export function MainLayout() {
             <Outlet />
           </main>
         </div>
+        <MarIAnaFloatingButton />
       </div>
     </SidebarProvider>
   );

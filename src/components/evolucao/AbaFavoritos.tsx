@@ -1,0 +1,169 @@
+import { useState } from "react";
+import { useFavoritos, useToggleFavorito } from "@/hooks/useFavoritos";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Heart, Search } from "lucide-react";
+import FavoritoRow from "@/components/favoritos/FavoritoRow";
+
+export function AbaFavoritos() {
+  const { data: favoritos, isLoading } = useFavoritos();
+  const toggleFavorito = useToggleFavorito();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("todos");
+
+  const { data: trilhas } = useQuery({
+    queryKey: ["trilhas-favoritas"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("trilhas").select("*").eq("ativo", true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: videos } = useQuery({
+    queryKey: ["videos-favoritos"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("videos").select("*, modulos!inner(trilha_id)").eq("ativo", true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: ferramentas } = useQuery({
+    queryKey: ["ferramentas-favoritas"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("ferramentas_ia").select("*").eq("ativo", true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: prompts } = useQuery({
+    queryKey: ["prompts-favoritos"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("biblioteca_prompts").select("*").eq("ativo", true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: metodos } = useQuery({
+    queryKey: ["metodos-favoritos"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("metodos_aplicar").select("*").eq("ativo", true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: iasCopieUse } = useQuery({
+    queryKey: ["ias-favoritas"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("ia_copie_use").select("*").eq("ativo", true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getFavoritoDetails = (favorito: any) => {
+    let item: any = null;
+    let link = "";
+    switch (favorito.tipo) {
+      case "trilha":
+        item = trilhas?.find((t) => t.id === favorito.item_id);
+        link = `/trilhas/${favorito.item_id}`;
+        break;
+      case "video":
+        const video = videos?.find((v) => v.id === favorito.item_id);
+        item = video;
+        link = video?.modulos?.trilha_id ? `/trilhas/${video.modulos.trilha_id}?video=${favorito.item_id}` : `/video/${favorito.item_id}`;
+        break;
+      case "ferramenta":
+        item = ferramentas?.find((f) => f.id === favorito.item_id);
+        link = `/biblioteca-ferramentas`;
+        break;
+      case "prompt":
+        item = prompts?.find((p) => p.id === favorito.item_id);
+        link = `/biblioteca-prompts`;
+        break;
+      case "metodo":
+        item = metodos?.find((m) => m.id === favorito.item_id);
+        link = `/metodos-aplicar`;
+        break;
+      case "ia_copie_use":
+        item = iasCopieUse?.find((ia) => ia.id === favorito.item_id);
+        link = `/ia-copie-use`;
+        break;
+    }
+    return { item, link };
+  };
+
+  const filteredFavoritos = favoritos?.filter((fav) => {
+    const { item } = getFavoritoDetails(fav);
+    if (!item) return false;
+    const matchesSearch = (item.titulo || item.nome)?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTab = activeTab === "todos" || fav.tipo === activeTab;
+    return matchesSearch && matchesTab;
+  });
+
+  if (isLoading) return <div className="py-8"><p>Carregando...</p></div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Buscar nos favoritos..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+        </div>
+      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="flex-wrap h-auto">
+          <TabsTrigger value="todos">Todos</TabsTrigger>
+          <TabsTrigger value="trilha">Trilhas</TabsTrigger>
+          <TabsTrigger value="video">Vídeos</TabsTrigger>
+          <TabsTrigger value="ferramenta">Ferramentas</TabsTrigger>
+          <TabsTrigger value="prompt">Prompts</TabsTrigger>
+          <TabsTrigger value="metodo">Métodos</TabsTrigger>
+          <TabsTrigger value="ia_copie_use">IA Copie e Use</TabsTrigger>
+        </TabsList>
+        <TabsContent value={activeTab} className="space-y-4">
+          {!filteredFavoritos || filteredFavoritos.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Heart className="h-16 w-16 text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Nenhum favorito encontrado</h3>
+                <p className="text-muted-foreground text-center">
+                  {searchTerm ? "Tente ajustar sua busca" : "Comece a favoritar conteúdos"}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardContent className="p-0">
+                {filteredFavoritos.map((favorito) => {
+                  const { item, link } = getFavoritoDetails(favorito);
+                  if (!item) return null;
+                  
+                  return (
+                    <FavoritoRow
+                      key={favorito.id}
+                      tipo={favorito.tipo}
+                      titulo={item?.titulo || item?.nome}
+                      descricao={item?.descricao || item?.objetivo || "Sem descrição"}
+                      link={link}
+                      onRemove={() => toggleFavorito.mutate({ tipo: favorito.tipo, item_id: favorito.item_id })}
+                      isRemoving={toggleFavorito.isPending}
+                    />
+                  );
+                })}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

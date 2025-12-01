@@ -10,20 +10,12 @@ import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndament
 import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
-import { AbaAcompanhamento } from "@/components/evolucao/AbaAcompanhamento";
 import { AbaDuvidas } from "@/components/evolucao/AbaDuvidas";
+import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
-  const { plan, isLoading: loadingPlan } = useUserPlan();
-  const { isAdmin, isLoading: loadingRole } = useUserRole();
-  
-  // Mostrar aba Acompanhamento para Admin (sempre) e para mentorados com plano diferente de Club
-  // Admin SEMPRE vê a aba (precedência absoluta), independente do próprio plano
-  // Club tem acesso ao painel completo em /mentoria, então não vê esta aba
-  const isLoadingAccess = loadingPlan || loadingRole;
-  const showAcompanhamento = isAdmin || (isLoadingAccess ? true : (plan && plan !== 'club'));
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -52,14 +44,12 @@ export default function Evolucao() {
           >
             Aplicados Community
           </TabsTrigger>
-          {showAcompanhamento && (
-            <TabsTrigger 
-              value="acompanhamento"
-              className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
-            >
-              Meu Acompanhamento
-            </TabsTrigger>
-          )}
+          <TabsTrigger 
+            value="favoritos"
+            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
+          >
+            Favoritos
+          </TabsTrigger>
           <TabsTrigger 
             value="duvidas"
             className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
@@ -107,12 +97,10 @@ export default function Evolucao() {
           )}
         </TabsContent>
 
-        {/* ABA 3: MEU ACOMPANHAMENTO (Apenas Academy) */}
-        {showAcompanhamento && (
-          <TabsContent value="acompanhamento" className="space-y-6 mt-6">
-            <AbaAcompanhamento />
-          </TabsContent>
-        )}
+        {/* ABA 3: FAVORITOS */}
+        <TabsContent value="favoritos" className="space-y-6 mt-6">
+          <AbaFavoritos />
+        </TabsContent>
 
         {/* ABA 4: DÚVIDAS */}
         <TabsContent value="duvidas" className="space-y-6 mt-6">
