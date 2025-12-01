@@ -61,6 +61,47 @@ export function useContentAccessMetrics() {
         accessesByUser[log.user_email] = (accessesByUser[log.user_email] || 0) + 1;
       });
 
+      // Ranking de visitantes com mais acessos
+      const userStats: Record<string, {
+        email: string;
+        totalAccesses: number;
+        lastAccess: string;
+        videoCount: number;
+        materialCount: number;
+      }> = {};
+
+      allLogs?.forEach(log => {
+        if (log.user_email === 'anônimo') return;
+        
+        if (!userStats[log.user_email]) {
+          userStats[log.user_email] = {
+            email: log.user_email,
+            totalAccesses: 0,
+            lastAccess: log.accessed_at,
+            videoCount: 0,
+            materialCount: 0,
+          };
+        }
+        
+        userStats[log.user_email].totalAccesses++;
+        
+        // Atualizar último acesso se mais recente
+        if (new Date(log.accessed_at) > new Date(userStats[log.user_email].lastAccess)) {
+          userStats[log.user_email].lastAccess = log.accessed_at;
+        }
+        
+        // Contar por tipo
+        if (log.content_type === 'video') {
+          userStats[log.user_email].videoCount++;
+        } else {
+          userStats[log.user_email].materialCount++;
+        }
+      });
+
+      const topVisitors = Object.values(userStats)
+        .sort((a, b) => b.totalAccesses - a.totalAccesses)
+        .slice(0, 10);
+
       return {
         totalAccesses,
         uniqueUsers,
@@ -68,6 +109,7 @@ export function useContentAccessMetrics() {
         averagePerUser,
         topContent,
         accessesByUser,
+        topVisitors,
         allLogs: allLogs || [],
       };
     },

@@ -151,6 +151,58 @@ export default function GerenciarVisitantes() {
         </Card>
       )}
 
+      {/* Top 10 Visitantes por Engajamento */}
+      {!isLoadingMetrics && metrics && metrics.topVisitors && metrics.topVisitors.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Top 10 Visitantes por Engajamento</CardTitle>
+            <CardDescription>
+              Visitantes com mais acessos a conteúdos gratuitos
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>#</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead className="text-center">Vídeos</TableHead>
+                  <TableHead className="text-center">Materiais</TableHead>
+                  <TableHead className="text-center">Total</TableHead>
+                  <TableHead>Último Acesso</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {metrics.topVisitors.map((visitor, index) => (
+                  <TableRow key={visitor.email}>
+                    <TableCell className="font-medium">{index + 1}</TableCell>
+                    <TableCell>{visitor.email}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="outline">
+                        <Video className="h-3 w-3 mr-1" />
+                        {visitor.videoCount}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="outline">
+                        <FileText className="h-3 w-3 mr-1" />
+                        {visitor.materialCount}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center font-semibold">
+                      {visitor.totalAccesses}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {format(new Date(visitor.lastAccess), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Tabela de Visitantes */}
       <Card>
         <CardHeader>
