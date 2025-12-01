@@ -96,6 +96,7 @@ export type Database = {
           tipo: string
           titulo: string
           updated_at: string | null
+          visivel_para: string[] | null
         }
         Insert: {
           ativo?: boolean | null
@@ -106,6 +107,7 @@ export type Database = {
           tipo: string
           titulo: string
           updated_at?: string | null
+          visivel_para?: string[] | null
         }
         Update: {
           ativo?: boolean | null
@@ -116,6 +118,7 @@ export type Database = {
           tipo?: string
           titulo?: string
           updated_at?: string | null
+          visivel_para?: string[] | null
         }
         Relationships: []
       }

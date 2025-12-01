@@ -10,14 +10,13 @@ export default function Trilhas() {
   const { user } = useAuth();
   const { isVisitante } = useUserRole();
 
-  // Query para visitantes: buscar TODAS as trilhas
+  // Query para visitantes: buscar TODAS as trilhas (sem filtro de ativo)
   const { data: trilhasVisitante, isLoading } = useQuery({
     queryKey: ["trilhas-visitante-todas"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trilhas")
         .select("id, titulo, imagem_url, bloqueada, ordem, visivel_apenas_pro, nivel_minimo_acesso")
-        .eq("ativo", true)
         .order("ordem");
 
       if (error) throw error;
