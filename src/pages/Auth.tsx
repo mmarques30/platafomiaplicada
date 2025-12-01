@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import logoMarcaCompleta from "@/assets/logo-auth-fundo-escuro.png";
-import authBackground from "@/assets/auth-background-new.png";
+import authBackground from "@/assets/auth-background-symbol.png";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -97,12 +97,16 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-8 py-8 lg:px-24">
-      {/* Background com overlay */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${authBackground})` }}
-      />
-      <div className="absolute inset-0 bg-[#2F302B]/70 backdrop-blur-sm" />
+      {/* Background com símbolo como marca d'água */}
+      <div className="absolute inset-0 bg-[#2F302B]">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <img 
+            src={authBackground} 
+            alt="" 
+            className="w-[70vw] h-[70vh] max-w-[700px] max-h-[700px] object-contain opacity-10"
+          />
+        </div>
+      </div>
       
       {/* Conteúdo centralizado */}
       <div className="relative z-10 w-full max-w-xl flex flex-col items-center gap-6">
