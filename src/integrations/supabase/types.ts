@@ -1409,6 +1409,53 @@ export type Database = {
         }
         Relationships: []
       }
+      objetivos_mentoria: {
+        Row: {
+          created_at: string | null
+          formulario_id: string | null
+          gerado_por_ia: boolean | null
+          id: string
+          objetivo: string
+          prioridade: number | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          formulario_id?: string | null
+          gerado_por_ia?: boolean | null
+          id?: string
+          objetivo: string
+          prioridade?: number | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          formulario_id?: string | null
+          gerado_por_ia?: boolean | null
+          id?: string
+          objetivo?: string
+          prioridade?: number | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objetivos_mentoria_formulario_id_fkey"
+            columns: ["formulario_id"]
+            isOneToOne: false
+            referencedRelation: "formulario_diagnostico"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       premiacoes_comunidade: {
         Row: {
           created_at: string | null

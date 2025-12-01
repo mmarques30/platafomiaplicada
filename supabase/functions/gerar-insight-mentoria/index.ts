@@ -8,13 +8,15 @@ const corsHeaders = {
 };
 
 const systemPrompt = `Você é um mentor especialista em IA aplicada ao trabalho. 
-Analise o formulário diagnóstico e gere um insight personalizado com:
+Analise o formulário diagnóstico e gere um insight personalizado completo com:
 
 1. **Análise do Perfil**: Resumo do estágio atual do mentorado (2-3 frases)
 2. **Principais Oportunidades**: 3 áreas onde IA pode gerar mais impacto no contexto dele
 3. **Primeiros Passos**: 3 ações práticas e específicas para começar imediatamente
 4. **Alerta de Desafios**: Possíveis obstáculos baseados no contexto dele
 5. **Recomendação de Foco**: Prioridade estratégica para os próximos 30 dias
+6. **Objetivos Estratégicos**: 3-5 objetivos divididos em curto_prazo, medio_prazo e longo_prazo
+7. **Projetos Sugeridos**: 2-3 projetos práticos com título, descrição, objetivo e contribuição ao plano
 
 Seja direto, prático e encorajador. Use dados específicos do formulário.
 Responda APENAS com JSON válido neste formato exato:
@@ -23,7 +25,19 @@ Responda APENAS com JSON válido neste formato exato:
   "oportunidades": ["op1", "op2", "op3"],
   "primeiros_passos": ["passo1", "passo2", "passo3"],
   "alerta_desafios": "texto aqui",
-  "recomendacao_foco": "texto aqui"
+  "recomendacao_foco": "texto aqui",
+  "objetivos": [
+    {"objetivo": "texto", "tipo": "curto_prazo", "prioridade": 1},
+    {"objetivo": "texto", "tipo": "medio_prazo", "prioridade": 2}
+  ],
+  "projetos": [
+    {
+      "titulo": "título do projeto",
+      "descricao": "descrição breve",
+      "objetivo_projeto": "o que alcançar",
+      "contribuicao_plano": "como contribui"
+    }
+  ]
 }`;
 
 serve(async (req) => {
@@ -151,7 +165,10 @@ EXPECTATIVAS:
       .from("formulario_diagnostico")
       .update({ 
         insight_ia: insight,
-        insight_gerado_em: new Date().toISOString()
+        insight_gerado_em: new Date().toISOString(),
+        plano_gerado: true,
+        plano_gerado_em: new Date().toISOString(),
+        plano_gerado_por: user.id
       })
       .eq("id", formulario_id);
 
@@ -161,6 +178,65 @@ EXPECTATIVAS:
     }
 
     console.log("Insight salvo com sucesso");
+
+    // Salvar objetivos gerados
+    if (insight.objetivos && Array.isArray(insight.objetivos)) {
+      for (const obj of insight.objetivos) {
+        const { error: objError } = await supabaseClient
+          .from("objetivos_mentoria")
+          .insert({
+            user_id: user.id,
+            formulario_id: formulario_id,
+            objetivo: obj.objetivo,
+            tipo: obj.tipo,
+            prioridade: obj.prioridade,
+            status: "ativo",
+            gerado_por_ia: true
+          });
+        
+        if (objError) {
+          console.error("Erro ao salvar objetivo:", objError);
+        }
+      }
+      console.log("Objetivos salvos com sucesso");
+    }
+
+    // Salvar projetos sugeridos
+    if (insight.projetos && Array.isArray(insight.projetos)) {
+      for (const proj of insight.projetos) {
+        const { error: projError } = await supabaseClient
+          .from("projetos_mentoria")
+          .insert({
+            user_id: user.id,
+            titulo: proj.titulo,
+            descricao: proj.descricao,
+            objetivo_projeto: proj.objetivo_projeto,
+            contribuicao_plano: proj.contribuicao_plano,
+            status: "planejamento",
+            tipo: "operacional"
+          });
+        
+        if (projError) {
+          console.error("Erro ao salvar projeto:", projError);
+        }
+      }
+      console.log("Projetos salvos com sucesso");
+    }
+
+    // Registrar auditoria
+    await supabaseClient
+      .from("auditoria_conteudo")
+      .insert({
+        tabela: "formulario_diagnostico",
+        registro_id: formulario_id,
+        operacao: "UPDATE",
+        user_id: user.id,
+        dados_novos: {
+          plano_gerado: true,
+          objetivos_count: insight.objetivos?.length || 0,
+          projetos_count: insight.projetos?.length || 0
+        }
+      });
 
     return new Response(
       JSON.stringify({ insight }),

@@ -284,9 +284,9 @@ const Chat = () => {
             className="w-10 h-10 rounded-full"
           />
           <div>
-            <h1 className="text-lg font-semibold">Mari - IA Aplicada</h1>
+            <h1 className="text-lg font-semibold">MarIAna</h1>
             <p className="text-sm text-muted-foreground">
-              Sua assistente especialista em IA
+              Sua mentora de IA Aplicada
             </p>
           </div>
         </div>
@@ -304,9 +304,9 @@ const Chat = () => {
               alt="Mari"
               className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full mb-4 object-cover"
             />
-            <h2 className="text-xl md:text-2xl font-bold mb-2">Olá! Sou a Mari 🧠</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-2">Olá! Sou a MarIAna 🧠</h2>
             <p className="text-muted-foreground max-w-md text-sm md:text-base">
-              Estou aqui para ajudar você com IA Aplicada. Pergunte qualquer coisa!
+              Sua mentora de IA Aplicada. Estou aqui para te ajudar!
             </p>
           </div>
         )}

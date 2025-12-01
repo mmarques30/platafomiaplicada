@@ -23,6 +23,7 @@ import EvolucaoCertificados from "./pages/EvolucaoCertificados";
 import Ecossistema from "./pages/Ecossistema";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
+import MeuDiagnostico from "./pages/MeuDiagnostico";
 
 import MentoriaSessoes from "./pages/MentoriaSessoes";
 import MentoriaRecursos from "./pages/MentoriaRecursos";
@@ -90,6 +91,7 @@ function AppContent() {
             <Route path="/evolucao" element={<Evolucao />} />
             <Route path="/evolucao/conquistas" element={<EvolucaoConquistas />} />
             <Route path="/evolucao/certificados" element={<EvolucaoCertificados />} />
+            <Route path="/meu-diagnostico" element={<MeuDiagnostico />} />
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
