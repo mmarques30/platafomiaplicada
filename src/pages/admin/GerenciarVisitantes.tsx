@@ -8,14 +8,16 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { EditVisitanteModal } from "@/components/admin/EditVisitanteModal";
 import { VisitorAccessDrawer } from "@/components/admin/VisitorAccessDrawer";
 import { useContentAccessMetrics } from "@/hooks/admin/useContentAccessMetrics";
+import { useAcademyPurchaseClicks } from "@/hooks/admin/useButtonClickLogs";
 import { StatsCard } from "@/components/admin/StatsCard";
-import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText } from "lucide-react";
+import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText, MousePointerClick } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function GerenciarVisitantes() {
   const { visitantes, isLoading, convertToMentorado, deleteVisitante } = useVisitantes();
   const { data: metrics, isLoading: isLoadingMetrics } = useContentAccessMetrics();
+  const { data: academyClicks, isLoading: isLoadingClicks } = useAcademyPurchaseClicks();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -197,6 +199,67 @@ export default function GerenciarVisitantes() {
                     </TableCell>
                   </TableRow>
                 ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Cliques no Botão Academy */}
+      {!isLoadingClicks && academyClicks && academyClicks.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Cliques no Botão "Quero Aplicar na Academy"</CardTitle>
+            <CardDescription>
+              Visitantes que demonstraram interesse em comprar Academy
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-4">
+              <StatsCard
+                title="Total de Cliques"
+                value={academyClicks.length}
+                description={`${academyClicks.filter(c => new Date(c.clicked_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length} nos últimos 7 dias`}
+                icon={MousePointerClick}
+              />
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Página</TableHead>
+                  <TableHead>Data/Hora do Clique</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {academyClicks.slice(0, 20).map((click) => {
+                  const visitante = visitantes.find(v => v.email === click.user_email);
+                  const converteu = visitante && !visitante.is_visitante;
+                  
+                  return (
+                    <TableRow key={click.id}>
+                      <TableCell className="font-medium">{click.user_email}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {click.page_origin}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {format(new Date(click.clicked_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                      </TableCell>
+                      <TableCell>
+                        {converteu ? (
+                          <Badge className="bg-green-500 text-white">✓ Converteu</Badge>
+                        ) : visitante ? (
+                          <Badge className="bg-yellow-500 text-white">Visitante</Badge>
+                        ) : (
+                          <Badge variant="secondary">Não cadastrado</Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>

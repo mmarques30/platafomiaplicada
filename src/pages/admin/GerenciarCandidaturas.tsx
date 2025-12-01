@@ -157,6 +157,7 @@ export default function GerenciarCandidaturas() {
                     <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Cargo</TableHead>
+                    <TableHead>Origem</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Ações</TableHead>
@@ -171,6 +172,30 @@ export default function GerenciarCandidaturas() {
                       <TableCell>{candidatura.email}</TableCell>
                       <TableCell className="capitalize">
                         {candidatura.cargo_atual || "-"}
+                      </TableCell>
+                      <TableCell>
+                        {candidatura.origem_pagina === 'aplique' && candidatura.is_visitante_origem ? (
+                          <Badge className="bg-yellow-500 text-white">
+                            Visitante (Aplique)
+                          </Badge>
+                        ) : candidatura.origem_pagina === 'avance' && candidatura.plano_origem ? (
+                          <Badge className={
+                            candidatura.plano_origem === 'academy' ? 'bg-green-500 text-white' :
+                            candidatura.plano_origem === 'lab' ? 'bg-blue-500 text-white' :
+                            candidatura.plano_origem === 'club' ? 'bg-purple-500 text-white' :
+                            'bg-gray-500 text-white'
+                          }>
+                            {candidatura.plano_origem === 'academy' ? 'Academy (Avance)' :
+                             candidatura.plano_origem === 'lab' ? 'Lab (Avance)' :
+                             candidatura.plano_origem === 'club' ? 'Club (Avance)' :
+                             candidatura.plano_origem === 'skills' ? 'Skills (Avance)' :
+                             'Avance'}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">
+                            Direto
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge

@@ -3,11 +3,15 @@ import { Button } from "@/components/ui/button";
 import { LogosTicker } from "@/components/LogosTicker";
 import { ArrowLeft, Check, Sparkles, TrendingUp, Target, Lightbulb, Workflow } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { useButtonClickLogger } from "@/hooks/useButtonClickLogger";
 import logoCompleta from "@/assets/logo-aplicada-marca-completa-clara.png";
 import backgroundSymbol from "@/assets/logos/background-symbol.png";
 
 export default function Avance() {
   const navigate = useNavigate();
+  const { plan } = useUserPlan();
+  const { logClick } = useButtonClickLogger();
   
   return (
     <div className="h-screen overflow-y-auto relative bg-background">
@@ -98,7 +102,10 @@ export default function Avance() {
                 
                 <Button 
                   className="w-full mt-auto bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full py-6"
-                  onClick={() => navigate('/candidatar-mentoria')}
+                  onClick={() => {
+                    logClick('mentoria_candidatura', 'avance');
+                    navigate(`/candidatar-mentoria?origem=avance&plano=${plan || ''}`);
+                  }}
                 >
                   QUERO ME CANDIDATAR
                 </Button>

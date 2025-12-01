@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,20 +12,36 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import { useEnviarCandidatura } from "@/hooks/useCandidaturasMentoria";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import logoSimbol from "@/assets/logo-aplicada-simbolo.png";
 
 export default function CandidatarMentoria() {
   const [step, setStep] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { register, handleSubmit, watch, setValue } = useForm();
   const { mutate: enviarCandidatura, isPending } = useEnviarCandidatura();
+  const { profile } = useUserProfile();
+  
+  // Capturar origem e plano da URL
+  const origemPagina = searchParams.get('origem') || 'direto';
+  const planoOrigem = searchParams.get('plano') || profile?.plano_mentoria || null;
+  const isVisitanteOrigem = !profile?.plano_mentoria;
 
   const totalSteps = 7;
   const progressPercent = (step / totalSteps) * 100;
 
   const onSubmit = (data: any) => {
-    enviarCandidatura(data, {
+    // Incluir origem e plano na candidatura
+    const candidaturaData = {
+      ...data,
+      origem_pagina: origemPagina,
+      plano_origem: planoOrigem,
+      is_visitante_origem: isVisitanteOrigem,
+    };
+    
+    enviarCandidatura(candidaturaData, {
       onSuccess: () => {
         setShowSuccess(true);
       },

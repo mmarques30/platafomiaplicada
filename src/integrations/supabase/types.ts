@@ -178,6 +178,33 @@ export type Database = {
           },
         ]
       }
+      button_click_logs: {
+        Row: {
+          button_type: string
+          clicked_at: string | null
+          id: string
+          page_origin: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          button_type: string
+          clicked_at?: string | null
+          id?: string
+          page_origin: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          button_type?: string
+          clicked_at?: string | null
+          id?: string
+          page_origin?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       candidaturas_mentoria: {
         Row: {
           admin_responsavel: string | null
@@ -196,6 +223,7 @@ export type Database = {
           horas_semana_aprendizado: string | null
           id: string
           impedimento_comecar_hoje: string | null
+          is_visitante_origem: boolean | null
           ja_implementou_ia: boolean | null
           ja_investiu_mentoria: boolean | null
           linkedin_url: string | null
@@ -204,8 +232,10 @@ export type Database = {
           nome_completo: string
           notas_admin: string | null
           onde_quer_estar_2_anos: string | null
+          origem_pagina: string | null
           outras_ferramentas: string | null
           outro_impedimento: string | null
+          plano_origem: string | null
           por_que_escolher_voce: string
           por_que_nao_alcancou: string | null
           porte_empresa: string | null
@@ -238,6 +268,7 @@ export type Database = {
           horas_semana_aprendizado?: string | null
           id?: string
           impedimento_comecar_hoje?: string | null
+          is_visitante_origem?: boolean | null
           ja_implementou_ia?: boolean | null
           ja_investiu_mentoria?: boolean | null
           linkedin_url?: string | null
@@ -246,8 +277,10 @@ export type Database = {
           nome_completo: string
           notas_admin?: string | null
           onde_quer_estar_2_anos?: string | null
+          origem_pagina?: string | null
           outras_ferramentas?: string | null
           outro_impedimento?: string | null
+          plano_origem?: string | null
           por_que_escolher_voce: string
           por_que_nao_alcancou?: string | null
           porte_empresa?: string | null
@@ -280,6 +313,7 @@ export type Database = {
           horas_semana_aprendizado?: string | null
           id?: string
           impedimento_comecar_hoje?: string | null
+          is_visitante_origem?: boolean | null
           ja_implementou_ia?: boolean | null
           ja_investiu_mentoria?: boolean | null
           linkedin_url?: string | null
@@ -288,8 +322,10 @@ export type Database = {
           nome_completo?: string
           notas_admin?: string | null
           onde_quer_estar_2_anos?: string | null
+          origem_pagina?: string | null
           outras_ferramentas?: string | null
           outro_impedimento?: string | null
+          plano_origem?: string | null
           por_que_escolher_voce?: string
           por_que_nao_alcancou?: string | null
           porte_empresa?: string | null

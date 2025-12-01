@@ -106,6 +106,41 @@ export function CandidaturaDetalhesDrawer({
 
           <Separator />
 
+          {/* Origem da Candidatura */}
+          <div>
+            <h3 className="font-bold text-lg mb-3">Origem da Candidatura</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-muted-foreground">Página de Origem</Label>
+                <p className="font-medium capitalize">
+                  {candidatura.origem_pagina === 'aplique' ? 'Aplique' : 
+                   candidatura.origem_pagina === 'avance' ? 'Avance' : 
+                   'Acesso Direto'}
+                </p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Tipo de Usuário</Label>
+                <p className="font-medium">
+                  {candidatura.is_visitante_origem ? (
+                    <Badge className="bg-yellow-500 text-white">Visitante</Badge>
+                  ) : candidatura.plano_origem ? (
+                    <Badge className="bg-green-500 text-white">
+                      {candidatura.plano_origem === 'academy' ? 'Academy' :
+                       candidatura.plano_origem === 'lab' ? 'Lab' :
+                       candidatura.plano_origem === 'club' ? 'Club' :
+                       candidatura.plano_origem === 'skills' ? 'Skills' :
+                       'Mentorado'}
+                    </Badge>
+                  ) : (
+                    'Não identificado'
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
           {/* Situação Profissional */}
           <div>
             <h3 className="font-bold text-lg mb-3">Situação Profissional</h3>
