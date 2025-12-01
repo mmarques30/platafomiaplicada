@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogosTicker } from "@/components/LogosTicker";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logoCompleta from "@/assets/logo-aplicada-marca-completa.png";
 import backgroundSymbol from "@/assets/logos/background-symbol.png";
@@ -137,6 +137,204 @@ export default function Aplique() {
                   QUERO ME CANDIDATAR
                 </Button>
               </Card>
+            </div>
+          </div>
+        </section>
+        
+        {/* Tabela Comparativa */}
+        <section className="py-16 px-4">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-[#2F302B]">
+              Compare os planos
+            </h2>
+            
+            <div className="rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 shadow-xl">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b-2 border-zinc-800">
+                    <th className="w-[40%] p-4 text-left"></th>
+                    <th className="w-[30%] p-6 text-center border-l border-zinc-800">
+                      <div className="text-xl font-bold text-white mb-1">Academy</div>
+                      <div className="text-2xl font-bold text-white">R$ 1.497</div>
+                    </th>
+                    <th className="w-[30%] p-6 text-center border-l border-zinc-800">
+                      <div className="text-xl font-bold text-[#9EB038] mb-1">Mentoria</div>
+                      <div className="text-lg font-medium text-[#9EB038]">Sob consulta</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* PARA QUEM É */}
+                  <tr className="bg-[#3d4a27]">
+                    <td colSpan={3} className="px-4 py-3 text-sm font-semibold text-white/90 uppercase tracking-wide">
+                      Para quem é
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Economia de tempo</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">3 a 5 horas por semana</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">6 a 10 horas por semana</td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Payback esperado</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">1,5 mês (economia + produtividade)</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Menos de 1 mês (ganhos estratégicos)</td>
+                  </tr>
+                  
+                  {/* ACESSO E CONTEÚDO */}
+                  <tr className="bg-[#3d4a27]">
+                    <td colSpan={3} className="px-4 py-3 text-sm font-semibold text-white/90 uppercase tracking-wide">
+                      Acesso e conteúdo
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Acesso por 1 ano</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Gravação das aulas ao vivo</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Trilhas de aprendizado</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Iniciante, Intermediário, Avançado</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Iniciante, Intermediário, Avançado</td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Liberação de conteúdo</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">4 vídeos por semana (gradual)</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Acesso completo imediato</td>
+                  </tr>
+                  
+                  {/* SUPORTE */}
+                  <tr className="bg-[#3d4a27]">
+                    <td colSpan={3} className="px-4 py-3 text-sm font-semibold text-white/90 uppercase tracking-wide">
+                      Suporte
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Q&A ao vivo semanal (19h30)</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Assistente IA 24/7 (Mari)</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Encontros práticos e colaborativos</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-500 border-l border-zinc-800">–</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">6 encontros/mês (2h cada)</td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Comunidade exclusiva</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-500 border-l border-zinc-800">–</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  
+                  {/* RECURSOS */}
+                  <tr className="bg-[#3d4a27]">
+                    <td colSpan={3} className="px-4 py-3 text-sm font-semibold text-white/90 uppercase tracking-wide">
+                      Recursos
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Biblioteca de prompts</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">100+ prompts</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">100+ prompts</td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Avaliação de ferramentas IA</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">50+ ferramentas</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">50+ ferramentas</td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Diagnóstico IA personalizado</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Dashboard com métricas</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Horas economizadas + ROI</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Horas economizadas + ROI</td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Acesso antecipado (Beta)</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-500 border-l border-zinc-800">–</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Materiais exclusivos</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-500 border-l border-zinc-800">–</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  
+                  {/* IMPLEMENTAÇÃO */}
+                  <tr className="bg-[#3d4a27]">
+                    <td colSpan={3} className="px-4 py-3 text-sm font-semibold text-white/90 uppercase tracking-wide">
+                      Implementação
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Projetos práticos</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Autodirigidos</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">3 projetos orientados e avaliados</td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Feedback detalhado</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-500 border-l border-zinc-800">–</td>
+                    <td className="px-4 py-4 text-center border-l border-zinc-800">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-zinc-800">
+                    <td className="px-4 py-4 text-sm text-zinc-300">Acompanhamento de progresso</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Dashboard automatizado</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Dashboard + avaliações 1:1</td>
+                  </tr>
+                  
+                  {/* CERTIFICAÇÃO */}
+                  <tr className="bg-[#3d4a27]">
+                    <td colSpan={3} className="px-4 py-3 text-sm font-semibold text-white/90 uppercase tracking-wide">
+                      Certificação
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-4 text-sm text-zinc-300">Certificado digital</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Por trilha concluída</td>
+                    <td className="px-4 py-4 text-center text-sm text-zinc-200 border-l border-zinc-800">Trilhas + Projetos (premium)</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </section>
