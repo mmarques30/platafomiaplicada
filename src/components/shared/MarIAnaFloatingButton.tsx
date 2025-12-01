@@ -2,7 +2,7 @@ import { MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import logoMariana from "@/assets/logo-mariana.png";
+import logoMariana from "@/assets/logo-mariana-simbolo.png";
 
 export function MarIAnaFloatingButton() {
   const navigate = useNavigate();
