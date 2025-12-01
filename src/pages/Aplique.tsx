@@ -132,9 +132,158 @@ export default function Aplique() {
                 </Button>
               </Card>
             </div>
-
+          </div>
+        </section>
+        
+        {/* Tabela Comparativa */}
+        <section className="py-16 px-4 bg-zinc-50">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2F302B] text-center mb-12">
+              Compare os planos
+            </h2>
+            
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-zinc-200">
+                    <th className="text-left p-6 text-zinc-600 font-medium">Recursos</th>
+                    <th className="text-center p-6 text-[#2F302B] font-bold">Academy</th>
+                    <th className="text-center p-6 text-[#2F302B] font-bold">Mentoria</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  <tr>
+                    <td className="p-4 text-zinc-700">Acesso à Plataforma (1 ano)</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-zinc-700">Trilhas do Iniciante ao Avançado</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-zinc-700">4 vídeos novos/semana</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-zinc-700">Q&A Semanal (19h30)</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-zinc-700">Assistente IA 24/7 (Mari)</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-zinc-700">Bibliotecas (100+ prompts)</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-zinc-700">Diagnóstico + Dashboard ROI</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr className="bg-zinc-50">
+                    <td className="p-4 text-zinc-700 font-medium">6 encontros/mês (2h)</td>
+                    <td className="text-center p-4 text-zinc-300">—</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr className="bg-zinc-50">
+                    <td className="p-4 text-zinc-700 font-medium">3 projetos práticos com feedback</td>
+                    <td className="text-center p-4 text-zinc-300">—</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr className="bg-zinc-50">
+                    <td className="p-4 text-zinc-700 font-medium">Comunidade Premium</td>
+                    <td className="text-center p-4 text-zinc-300">—</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr className="bg-zinc-50">
+                    <td className="p-4 text-zinc-700 font-medium">Acesso antecipado (Beta)</td>
+                    <td className="text-center p-4 text-zinc-300">—</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                  <tr className="bg-zinc-50">
+                    <td className="p-4 text-zinc-700 font-medium">Certificado Premium</td>
+                    <td className="text-center p-4 text-zinc-300">—</td>
+                    <td className="text-center p-4"><Check className="h-5 w-5 text-[#9EB038] mx-auto" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        
+        {/* Seção Aprenda na Prática */}
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            {/* Título e Subtítulo */}
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-5xl font-bold text-[#2F302B] mb-4">
+                Aprenda na prática.
+                <br />
+                <span className="text-[#9EB038]">4 módulos novos</span> por semana.
+              </h2>
+              
+              <p className="text-[#2F302B]/70 text-lg max-w-3xl mx-auto">
+                Liberação progressiva para acompanhar atualizações de IA e tendências de mercado.
+                <br />
+                Essas são as trilhas que mais economizam tempo e aceleram carreira:
+              </p>
+            </div>
+            
+            {/* Grid 3 colunas - primeira linha */}
+            <div className="grid md:grid-cols-3 gap-6 mb-6">
+              {/* Card Claude Avançado */}
+              <Card className="bg-white border-zinc-200 p-6">
+                <Sparkles className="h-8 w-8 text-[#9EB038] mb-4" />
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Claude Avançado</h3>
+                <p className="text-zinc-600 mb-4">Análise de documentos em 2 minutos</p>
+                <p className="text-[#9EB038] font-semibold">Economiza 10h/semana</p>
+              </Card>
+              
+              {/* Card Planilhas e Dados */}
+              <Card className="bg-white border-zinc-200 p-6">
+                <Table2 className="h-8 w-8 text-[#9EB038] mb-4" />
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Planilhas e Dados</h3>
+                <p className="text-zinc-600 mb-4">Transforme caos em insights acionáveis</p>
+                <p className="text-[#9EB038] font-semibold">Economiza 5-8h/semana</p>
+              </Card>
+              
+              {/* Card Make: Automação */}
+              <Card className="bg-white border-zinc-200 p-6">
+                <Workflow className="h-8 w-8 text-[#9EB038] mb-4" />
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Make: Automação</h3>
+                <p className="text-zinc-600 mb-4">Workflows que Zapier não consegue fazer</p>
+                <p className="text-[#9EB038] font-semibold">Economiza 12-15h/semana</p>
+              </Card>
+            </div>
+            
+            {/* Grid 2 colunas centralizadas - segunda linha */}
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {/* Card IA para Vendas */}
+              <Card className="bg-white border-zinc-200 p-6">
+                <TrendingUp className="h-8 w-8 text-[#9EB038] mb-4" />
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">IA para Vendas</h3>
+                <p className="text-zinc-600 mb-4">Acelere seu pipeline de vendas</p>
+                <p className="text-[#9EB038] font-semibold">Prospecção 3x mais rápida</p>
+              </Card>
+              
+              {/* Card Dashboard & BI */}
+              <Card className="bg-white border-zinc-200 p-6">
+                <Lightbulb className="h-8 w-8 text-[#9EB038] mb-4" />
+                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Dashboard & BI</h3>
+                <p className="text-zinc-600 mb-4">Decisões baseadas em dados reais</p>
+                <p className="text-[#9EB038] font-semibold">Economiza 5-8h/semana</p>
+              </Card>
+            </div>
+            
             {/* CTA Button */}
-            <div className="mt-12">
+            <div className="text-center mt-12">
               <Button 
                 className="bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6"
                 onClick={() => {
