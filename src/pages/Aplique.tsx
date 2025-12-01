@@ -14,13 +14,13 @@ export default function Aplique() {
       {/* Background com logo 4 pétalas transparente */}
       <div 
         className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: `url(${backgroundSymbol})`,
-          backgroundSize: '900px 900px',
-          backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.05
-        }}
+          style={{
+            backgroundImage: `url(${backgroundSymbol})`,
+            backgroundSize: '900px 900px',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.12
+          }}
       />
       
       {/* Botão Voltar */}
