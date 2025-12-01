@@ -59,7 +59,6 @@ import ImportarUsuarios from "./pages/admin/ImportarUsuarios";
 import GerenciarComunidade from "./pages/admin/GerenciarComunidade";
 import GerenciarTodasDuvidas from "./pages/admin/GerenciarTodasDuvidas";
 import Comunidade from "./pages/Comunidade";
-import DashboardVisitante from "./pages/DashboardVisitante";
 import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
 import MateriaisGratuitos from "./pages/MateriaisGratuitos";
 import GerenciarMateriais from "./pages/admin/GerenciarMateriais";
@@ -116,10 +115,6 @@ function AppContent() {
             <Route path="/metodos-aplicar" element={<MetodosAplicar />} />
             <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
-          </Route>
-          
-          <Route element={<ProtectedRoute><DashboardVisitante /></ProtectedRoute>}>
-            <Route path="/visitante" element={<DashboardVisitante />} />
           </Route>
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />
