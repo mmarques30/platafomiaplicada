@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, X } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
@@ -8,6 +8,7 @@ import { VideosVisitante } from "@/components/dashboard/VideosVisitante";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,7 +18,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isVisitante, isLoading: loadingRole } = useUserRole();
-  const [mostrarAvisoSenha, setMostrarAvisoSenha] = useState(false);
+  const { profile, isLoading: loadingProfile } = useUserProfile();
 
   // Query para buscar trilhas com lógica diferenciada por tipo de usuário
   const { data: trilhasRaw, isLoading: loadingTrilhas } = useQuery({
@@ -72,24 +73,15 @@ export default function Dashboard() {
 
   const trilhas = trilhasRaw || [];
 
-  useEffect(() => {
-    if (!user || loadingRole) return;
-    
-    const verificarSenhaTemporaria = async () => {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('senha_temporaria, primeiro_acesso')
-        .eq('id', user.id)
-        .single();
-
-      // Não mostrar aviso para visitantes - eles criaram a própria senha
-      if (!isVisitante && (profile?.senha_temporaria || profile?.primeiro_acesso)) {
-        setMostrarAvisoSenha(true);
-      }
-    };
-
-    verificarSenhaTemporaria();
-  }, [user, isVisitante, loadingRole]);
+  // Derivar o estado do aviso de senha diretamente dos dados carregados (elimina race condition)
+  const mostrarAvisoSenha = useMemo(() => {
+    // Não mostrar durante carregamento
+    if (loadingRole || loadingProfile) return false;
+    // Visitantes não veem o aviso
+    if (isVisitante) return false;
+    // Só mostra se tem senha temporária ou primeiro acesso
+    return profile?.senha_temporaria === true || profile?.primeiro_acesso === true;
+  }, [loadingRole, loadingProfile, isVisitante, profile]);
 
 
   return (
@@ -110,14 +102,15 @@ export default function Dashboard() {
                 </Link>
                 .
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-4 hover:bg-primary/10"
-                onClick={() => setMostrarAvisoSenha(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <Link to="/configuracoes">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-4 hover:bg-primary/10"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </Link>
             </AlertDescription>
           </Alert>
         )}
