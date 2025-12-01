@@ -2,7 +2,7 @@ import { MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import mariAvatar from "@/assets/mari-avatar.jpg";
+import logoMariana from "@/assets/logo-mariana.png";
 
 export function MarIAnaFloatingButton() {
   const navigate = useNavigate();
@@ -14,12 +14,12 @@ export function MarIAnaFloatingButton() {
           <Button
             onClick={() => navigate("/chat")}
             size="icon"
-            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90 animate-pulse"
+            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90 animate-pulse p-2"
           >
             <img 
-              src={mariAvatar} 
+              src={logoMariana} 
               alt="MarIAna" 
-              className="w-full h-full rounded-full object-cover"
+              className="w-full h-full object-contain"
             />
           </Button>
         </TooltipTrigger>
