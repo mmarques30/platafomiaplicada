@@ -37,7 +37,7 @@ export default function CandidatarMentoria() {
       <div className="min-h-screen bg-gradient-to-br from-[#F2F2F2] to-[#E5E5E5] flex items-center justify-center p-4 relative overflow-hidden">
         {/* Background Logo */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <img src={logoSimbol} alt="" className="w-[600px] h-[600px] object-contain opacity-[0.08]" />
+          <img src={logoSimbol} alt="" className="w-[900px] h-[900px] object-contain opacity-[0.12]" />
         </div>
         
         {/* Botão Voltar */}
@@ -107,7 +107,7 @@ export default function CandidatarMentoria() {
         <img 
           src={logoSimbol} 
           alt="" 
-          className="w-[600px] h-[600px] object-contain opacity-[0.08]"
+          className="w-[900px] h-[900px] object-contain opacity-[0.12]"
         />
       </div>
 
