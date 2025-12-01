@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ChevronRight, Lock } from "lucide-react";
+import { ChevronRight, Lock, Clock } from "lucide-react";
 import { FavoriteButton } from "./FavoriteButton";
 
 interface TrilhaCardBloqueavelProps {
@@ -9,6 +9,8 @@ interface TrilhaCardBloqueavelProps {
   bloqueada: boolean;
   visivel_apenas_pro?: boolean;
   nivel_minimo_acesso?: string;
+  isVisitante?: boolean;
+  temConteudoDisponivel?: boolean;
 }
 
 export function TrilhaCardBloqueavel({ 
@@ -17,11 +19,37 @@ export function TrilhaCardBloqueavel({
   imagem_url, 
   bloqueada,
   visivel_apenas_pro,
-  nivel_minimo_acesso
+  nivel_minimo_acesso,
+  isVisitante = false,
+  temConteudoDisponivel = true
 }: TrilhaCardBloqueavelProps) {
   
-  // Se bloqueada, renderiza card não-clicável com cadeado
-  if (bloqueada) {
+  // VISITANTE sem conteúdo disponível → Cadeado
+  if (isVisitante && !temConteudoDisponivel) {
+    return (
+      <div className="relative overflow-hidden rounded-xl shadow-md aspect-[9/16] w-full bg-muted border-2 border-primary/10 cursor-not-allowed">
+        <img
+          src={imagem_url || "/placeholder.svg"}
+          alt={titulo}
+          loading="lazy"
+          className="block w-full h-full object-cover object-center opacity-50 grayscale"
+        />
+        
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <div className="bg-black/60 rounded-full p-6 shadow-2xl">
+            <Lock className="h-12 w-12 text-white" strokeWidth={2.5} />
+          </div>
+        </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+          <p className="text-white font-semibold text-center">{titulo}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // MENTORADO com trilha bloqueada → "Em Breve"
+  if (!isVisitante && bloqueada) {
     return (
       <div className="relative overflow-hidden rounded-xl shadow-md aspect-[9/16] w-full bg-muted border-2 border-primary/10 cursor-not-allowed">
         {visivel_apenas_pro && (
@@ -35,18 +63,17 @@ export function TrilhaCardBloqueavel({
           </div>
         )}
         
-        {/* Imagem com filtros */}
         <img
           src={imagem_url || "/placeholder.svg"}
           alt={titulo}
           loading="lazy"
-          className="block w-full h-full object-cover object-center opacity-50 grayscale"
+          className="block w-full h-full object-cover object-center opacity-70"
         />
         
-        {/* Overlay escuro com cadeado */}
-        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <div className="bg-black/60 rounded-full p-6 shadow-2xl">
-            <Lock className="h-12 w-12 text-white" strokeWidth={2.5} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-center justify-center">
+          <div className="bg-muted/90 backdrop-blur-sm rounded-full px-6 py-3 shadow-2xl flex items-center gap-2">
+            <Clock className="h-8 w-8 text-foreground" strokeWidth={2} />
+            <span className="text-foreground font-semibold text-lg">Em Breve</span>
           </div>
         </div>
         
@@ -58,9 +85,9 @@ export function TrilhaCardBloqueavel({
     );
   }
 
-  // Se não bloqueada, renderiza card normal clicável
+  // Trilha disponível → Card normal clicável
   return (
-    <Link to="/trilhas" className="block group">
+    <Link to={`/trilhas/${id}`} className="block group">
       <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative aspect-[9/16] w-full bg-muted border-2 border-primary/10 hover:border-primary/30">
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">

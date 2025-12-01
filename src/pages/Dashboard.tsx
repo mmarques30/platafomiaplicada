@@ -19,20 +19,60 @@ export default function Dashboard() {
   const { isVisitante } = useUserRole();
   const [mostrarAvisoSenha, setMostrarAvisoSenha] = useState(false);
 
-  // Query para buscar todas as trilhas (apenas para mentorados)
-  const { data: trilhas, isLoading: loadingTrilhas } = useQuery({
-    queryKey: ["trilhas-dashboard"],
+  // Query para buscar trilhas com lógica diferenciada por tipo de usuário
+  const { data: trilhasRaw, isLoading: loadingTrilhas } = useQuery({
+    queryKey: ["trilhas-dashboard", user?.id, isVisitante],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("trilhas")
-        .select("id, titulo, imagem_url, bloqueada, visivel_apenas_pro, nivel_minimo_acesso")
-        .order("ordem");
-      
-      if (error) throw error;
-      return data;
+      if (isVisitante) {
+        // Visitantes: buscar todas trilhas e verificar quais têm vídeos disponíveis
+        const { data: trilhasData, error: trilhasError } = await supabase
+          .from("trilhas")
+          .select("id, titulo, imagem_url, bloqueada, ordem, visivel_apenas_pro, nivel_minimo_acesso")
+          .eq("ativo", true)
+          .order("ordem");
+
+        if (trilhasError) throw trilhasError;
+
+        // Para cada trilha, verificar se tem vídeos visíveis para visitantes
+        const trilhasComDisponibilidade = await Promise.all(
+          (trilhasData || []).map(async (trilha) => {
+            const { data: videos } = await supabase
+              .from("videos")
+              .select("id")
+              .eq("trilha_id", trilha.id)
+              .eq("ativo", true)
+              .eq("visivel_visitantes", true);
+
+            return {
+              ...trilha,
+              temConteudoDisponivel: (videos?.length || 0) > 0
+            };
+          })
+        );
+
+        // Ordenar: com conteúdo disponível primeiro
+        return trilhasComDisponibilidade.sort((a, b) => {
+          if (a.temConteudoDisponivel && !b.temConteudoDisponivel) return -1;
+          if (!a.temConteudoDisponivel && b.temConteudoDisponivel) return 1;
+          return a.ordem - b.ordem;
+        });
+      } else {
+        // Mentorados: buscar trilhas ordenando liberadas primeiro
+        const { data, error } = await supabase
+          .from("trilhas")
+          .select("id, titulo, imagem_url, bloqueada, visivel_apenas_pro, nivel_minimo_acesso, ordem")
+          .eq("ativo", true)
+          .order("bloqueada", { ascending: true }) // Liberadas primeiro!
+          .order("ordem");
+
+        if (error) throw error;
+        return (data || []).map((t) => ({ ...t, temConteudoDisponivel: true }));
+      }
     },
-    enabled: !isVisitante,
+    enabled: !!user,
   });
+
+  const trilhas = trilhasRaw || [];
 
   useEffect(() => {
     if (!user) return;
@@ -117,7 +157,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {trilhas?.map((trilha) => (
+                  {trilhas.map((trilha: any) => (
                     <TrilhaCardBloqueavel
                       key={trilha.id}
                       id={trilha.id}
@@ -126,6 +166,8 @@ export default function Dashboard() {
                       bloqueada={trilha.bloqueada || false}
                       visivel_apenas_pro={trilha.visivel_apenas_pro || false}
                       nivel_minimo_acesso={trilha.nivel_minimo_acesso}
+                      isVisitante={isVisitante}
+                      temConteudoDisponivel={trilha.temConteudoDisponivel}
                     />
                   ))}
                 </div>
