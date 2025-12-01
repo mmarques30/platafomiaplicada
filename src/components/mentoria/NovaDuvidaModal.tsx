@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDuvidasMentoria } from "@/hooks/useDuvidasMentoria";
 import { useCategoriasQA } from "@/hooks/useCategoriasQA";
@@ -21,12 +22,20 @@ export function NovaDuvidaModal({ open, onOpenChange }: NovaDuvidaModalProps) {
   const [contexto, setContexto] = useState("");
   const [categoriaQAId, setCategoriaQAId] = useState<string>("");
   const [prioridade, setPrioridade] = useState<"baixa" | "normal" | "alta" | "urgente">("normal");
+  const [querQA, setQuerQA] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     criarDuvida(
-      { titulo, duvida, contexto, prioridade, categoria_qa_id: categoriaQAId || null },
+      { 
+        titulo, 
+        duvida, 
+        contexto, 
+        prioridade, 
+        publicar_qa: querQA,
+        categoria_qa_id: querQA ? categoriaQAId : null 
+      },
       {
         onSuccess: () => {
           setTitulo("");
@@ -34,6 +43,7 @@ export function NovaDuvidaModal({ open, onOpenChange }: NovaDuvidaModalProps) {
           setContexto("");
           setCategoriaQAId("");
           setPrioridade("normal");
+          setQuerQA(false);
           onOpenChange(false);
         },
       }
@@ -82,21 +92,37 @@ export function NovaDuvidaModal({ open, onOpenChange }: NovaDuvidaModalProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="categoria">Categoria</Label>
-            <Select value={categoriaQAId} onValueChange={setCategoriaQAId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categorias.filter(c => c.ativo).map((categoria) => (
-                  <SelectItem key={categoria.id} value={categoria.id}>
-                    {categoria.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center justify-between border-t pt-4">
+            <div className="space-y-1">
+              <Label htmlFor="quer-qa" className="text-base">Quero discutir no Q&A</Label>
+              <p className="text-sm text-muted-foreground">
+                Marque se quiser que essa dúvida seja discutida na reunião semanal de Q&A
+              </p>
+            </div>
+            <Switch
+              id="quer-qa"
+              checked={querQA}
+              onCheckedChange={setQuerQA}
+            />
           </div>
+
+          {querQA && (
+            <div className="space-y-2 pl-4 border-l-2">
+              <Label htmlFor="categoria">Categoria Q&A *</Label>
+              <Select value={categoriaQAId} onValueChange={setCategoriaQAId} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categorias.filter(c => c.ativo).map((categoria) => (
+                    <SelectItem key={categoria.id} value={categoria.id}>
+                      {categoria.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="prioridade">Prioridade</Label>
@@ -117,7 +143,7 @@ export function NovaDuvidaModal({ open, onOpenChange }: NovaDuvidaModalProps) {
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={isCriando}>
+            <Button type="submit" disabled={isCriando || (querQA && !categoriaQAId)}>
               {isCriando ? "Enviando..." : "Enviar Dúvida"}
             </Button>
           </div>
