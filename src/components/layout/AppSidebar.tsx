@@ -208,29 +208,29 @@ export function AppSidebar() {
               })}
 
               {/* CTA Item */}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild className="group">
-                  <NavLink 
-                    to={isVisitante || !plan ? "/aplique" : "/avance"}
-                    end
-                    className={cn(
-                      "relative rounded-lg transition-all duration-200 font-medium pl-4",
-                      location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
-                        ? "text-amber-500 font-semibold" 
-                        : "text-amber-500 hover:text-amber-600"
-                    )}
-                  >
-                    <span className={cn(
-                      "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                      location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
-                        ? "bg-amber-500 opacity-100" 
-                        : "bg-amber-400 opacity-0 group-hover:opacity-60"
-                    )} />
-                    <Zap className="h-4 w-4 shrink-0" />
-                    {!collapsed && <span>{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild className="group">
+                <NavLink 
+                  to={isVisitante || !plan ? "/aplique" : "/avance"}
+                  end
+                  className={cn(
+                    "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                    location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
+                      ? "text-red-600 font-semibold bg-red-50 dark:bg-red-950/30" 
+                      : "text-red-600 hover:text-red-700 bg-red-50/50 hover:bg-red-50 dark:bg-red-950/20 dark:hover:bg-red-950/30"
+                  )}
+                >
+                  <span className={cn(
+                    "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                    location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
+                      ? "bg-red-600 opacity-100" 
+                      : "bg-red-400 opacity-0 group-hover:opacity-60"
+                  )} />
+                  <Zap className="h-4 w-4 shrink-0" />
+                  {!collapsed && <span>{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
