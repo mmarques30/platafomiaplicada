@@ -103,7 +103,7 @@ export default function Auth() {
           <img 
             src={authBackground} 
             alt="" 
-            className="w-[120vw] h-[120vh] min-w-[1000px] min-h-[1000px] object-contain opacity-[0.08]"
+            className="w-[200vw] h-[200vh] object-contain opacity-[0.12]"
           />
         </div>
       </div>
