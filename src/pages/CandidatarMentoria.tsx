@@ -37,7 +37,7 @@ export default function CandidatarMentoria() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
         {/* Background Logo */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <img src={logoSimbol} alt="" className="w-[900px] h-[900px] object-contain opacity-[0.12]" />
+          <img src={logoSimbol} alt="" className="w-[1400px] h-[1400px] object-contain opacity-[0.25]" />
         </div>
         
         {/* Botão Voltar */}
@@ -50,7 +50,7 @@ export default function CandidatarMentoria() {
           Voltar
         </Button>
         
-        <Card className="max-w-2xl w-full p-8 text-center relative z-10 bg-white/85 backdrop-blur-sm">
+        <Card className="max-w-2xl w-full p-8 text-center relative z-10 bg-white/70 backdrop-blur-sm">
           <div className="mb-6 flex justify-center">
             <div className="w-20 h-20 rounded-full bg-[#9EB038]/20 flex items-center justify-center">
               <CheckCircle2 className="w-12 h-12 text-[#9EB038]" />
@@ -107,7 +107,7 @@ export default function CandidatarMentoria() {
         <img 
           src={logoSimbol} 
           alt="" 
-          className="w-[900px] h-[900px] object-contain opacity-[0.12]"
+          className="w-[1400px] h-[1400px] object-contain opacity-[0.25]"
         />
       </div>
 
@@ -143,7 +143,7 @@ export default function CandidatarMentoria() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Card className="p-8 bg-white/85 backdrop-blur-sm">
+          <Card className="p-8 bg-white/70 backdrop-blur-sm">
             {/* Step 1: Informações Básicas */}
             {step === 1 && (
               <div className="space-y-6">
