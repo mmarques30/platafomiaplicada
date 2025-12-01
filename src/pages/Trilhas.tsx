@@ -2,9 +2,37 @@ import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Trilhas() {
-  const { isVisitante } = useUserRole();
+  const { isVisitante, isLoading: loadingRole } = useUserRole();
+
+  // Query para buscar todas as trilhas para visitantes
+  const { data: trilhasVisitante, isLoading: loadingTrilhas } = useQuery({
+    queryKey: ["trilhas-visitante-all"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trilhas")
+        .select("id, titulo, imagem_url, ordem")
+        .eq("ativo", true)
+        .order("ordem");
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isVisitante && !loadingRole,
+  });
+
+  const showLoading = loadingRole || (isVisitante && loadingTrilhas);
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,7 +57,40 @@ export default function Trilhas() {
         </div>
 
         <div className="mt-8">
-          <UltimosConteudos />
+          {showLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-[400px] rounded-xl" />
+              ))}
+            </div>
+          ) : isVisitante ? (
+            // VISITANTE: Carrossel de trilhas bloqueadas
+            <Carousel opts={{ align: "start", loop: false }} className="w-full">
+              <CarouselContent className="-ml-4">
+                {trilhasVisitante?.map((trilha) => (
+                  <CarouselItem key={trilha.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/4">
+                    <TrilhaCardBloqueavel
+                      id={trilha.id}
+                      titulo={trilha.titulo}
+                      imagem_url={trilha.imagem_url}
+                      bloqueada={true}
+                      isVisitante={true}
+                      temConteudoDisponivel={false}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {(trilhasVisitante?.length ?? 0) > 4 && (
+                <>
+                  <CarouselPrevious className="-left-12 bg-primary hover:bg-primary/90 text-white border-0 shadow-lg h-10 w-10" />
+                  <CarouselNext className="-right-12 bg-primary hover:bg-primary/90 text-white border-0 shadow-lg h-10 w-10" />
+                </>
+              )}
+            </Carousel>
+          ) : (
+            // MENTORADO: Vídeos por trilha (comportamento atual)
+            <UltimosConteudos />
+          )}
         </div>
       </main>
     </div>
