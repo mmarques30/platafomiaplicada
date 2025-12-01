@@ -61,17 +61,14 @@ export default function Aplique() {
           </p>
           
           {/* CTA Button */}
-          <Button 
-            className="bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6 inline-flex items-center gap-3"
-            onClick={() => {
-              document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
-            GARANTIR MEU ACESSO AGORA
-            <span className="bg-[#2F302B] rounded-full p-2">
-              <Sparkles className="h-4 w-4 text-white" />
-            </span>
-          </Button>
+            <Button 
+              className="bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full px-8 py-6"
+              onClick={() => {
+                document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              GARANTIR MEU ACESSO AGORA
+            </Button>
         </section>
         
         {/* Logos Ticker */}
