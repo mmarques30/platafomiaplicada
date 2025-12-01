@@ -172,13 +172,16 @@ export function TopHeader() {
 
         {/* DIREITA: CTA + Notificações + Avatar com Nome */}
         <div className="flex items-center gap-3">
-          {/* Botão CTA Dinâmico */}
-          <Button 
-            onClick={() => navigate(isVisitante || !plan ? "/aplique" : "/avance")}
-            className="bg-aplicada-green-700 hover:bg-aplicada-green-800 text-white font-semibold px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+          {/* CTA Link */}
+          <NavLink 
+            to={isVisitante || !plan ? "/aplique" : "/avance"}
+            className={({ isActive }) => cn(
+              "text-sm font-semibold smooth-transition",
+              isActive ? "text-amber-500" : "text-amber-500 hover:text-amber-600"
+            )}
           >
             {isVisitante || !plan ? "Aplique" : "Avance"}
-          </Button>
+          </NavLink>
           
           <Button 
             variant="ghost" 
