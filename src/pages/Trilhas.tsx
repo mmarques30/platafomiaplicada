@@ -29,7 +29,6 @@ export default function Trilhas() {
         </div>
 
         <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-6">Conteúdos por trilha</h2>
           <UltimosConteudos />
         </div>
       </main>
