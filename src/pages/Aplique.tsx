@@ -100,7 +100,7 @@ export default function Aplique() {
                 
                 <Button 
                   className="w-full mt-auto bg-[#C5D63D] hover:bg-[#B5C62D] text-zinc-900 font-bold text-sm uppercase tracking-wide rounded-full py-6"
-                  onClick={() => window.open('https://pay.kiwify.com.br/yiGMp4m', '_blank')}
+                  onClick={() => window.open('https://clkdmg.site/pay/iaplicadaacademy', '_blank')}
                 >
                   QUERO APLICAR NA ACADEMY
                 </Button>
