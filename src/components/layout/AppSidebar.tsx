@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, Sparkles } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, Zap } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -206,37 +206,28 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
 
-        {/* CTA Menu Item */}
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1 px-2">
+              {/* CTA Item */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="group">
                   <NavLink 
                     to={isVisitante || !plan ? "/aplique" : "/avance"}
-                    className={({ isActive }) => cn(
+                    end
+                    className={cn(
                       "relative rounded-lg transition-all duration-200 font-medium pl-4",
-                      isActive 
+                      location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
                         ? "text-amber-500 font-semibold" 
                         : "text-amber-500 hover:text-amber-600"
                     )}
                   >
-                    {({ isActive }) => (
-                      <>
-                        <span className={cn(
-                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                          isActive 
-                            ? "bg-amber-500 opacity-100" 
-                            : "bg-amber-400 opacity-0 group-hover:opacity-60"
-                        )} />
-                        <Sparkles className="h-4 w-4 shrink-0" />
-                        {!collapsed && <span>{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
-                      </>
-                    )}
+                    <span className={cn(
+                      "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                      location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
+                        ? "bg-amber-500 opacity-100" 
+                        : "bg-amber-400 opacity-0 group-hover:opacity-60"
+                    )} />
+                    <Zap className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span>{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
