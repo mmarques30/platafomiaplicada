@@ -121,7 +121,7 @@ export default function Aplique() {
                 <div className="space-y-4 text-zinc-300 text-sm mb-8">
                   <p className="font-semibold text-white">Tudo da Academy +</p>
                   <p>6 encontros/mês (2h), práticos e colaborativos.</p>
-                  <p>3 projetos práticos (avalio e direciono sua execução).</p>
+                  <p>3 a 6 projetos práticos (avalio e direciono sua jornada)</p>
                   <p>Comunidade premium (networking com os Aplicados das melhores empresas do BR)</p>
                   <p>Acesso antecipado (Beta) + materiais exclusivos + certificado premium.</p>
                 </div>
