@@ -45,7 +45,6 @@ const navItems = [
   { path: "/admin/conteudo", label: "Gerenciar Conteúdo", icon: BookOpen },
   { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas", icon: Library },
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
-  { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },
   { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
   { path: "/admin/duvidas", label: "Central de Dúvidas", icon: MessageCircle },
   { path: "/admin/comunidade", label: "Comunidade", icon: MessagesSquare },
@@ -54,6 +53,7 @@ const navItems = [
   { path: "/admin/minhas-tarefas", label: "Minhas Tarefas", icon: CheckSquare },
   { path: "/admin/menus", label: "Menus", icon: Settings },
   { path: "/admin/auditoria", label: "Auditoria do Sistema", icon: FileSearch },
+  { path: "/admin/conhecimento", label: "Base de Conhecimento", icon: Database },
 ];
 
 export function AdminSidebar() {
