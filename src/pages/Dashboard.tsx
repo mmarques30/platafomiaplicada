@@ -57,11 +57,10 @@ export default function Dashboard() {
           return a.ordem - b.ordem;
         });
       } else {
-        // Mentorados: buscar trilhas ordenando liberadas primeiro
+        // Mentorados: buscar TODAS trilhas (incluindo bloqueadas com ativo=false)
         const { data, error } = await supabase
           .from("trilhas")
-          .select("id, titulo, imagem_url, bloqueada, visivel_apenas_pro, nivel_minimo_acesso, ordem")
-          .eq("ativo", true)
+          .select("id, titulo, imagem_url, bloqueada, visivel_apenas_pro, nivel_minimo_acesso, ordem, ativo")
           .order("bloqueada", { ascending: true }) // Liberadas primeiro!
           .order("ordem");
 
