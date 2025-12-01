@@ -11,7 +11,7 @@ export default function Trilhas() {
   const { isVisitante } = useUserRole();
 
   // Query para visitantes: buscar TODAS as trilhas (sem filtro de ativo)
-  const { data: trilhasVisitante, isLoading } = useQuery({
+  const { data: trilhasVisitante, isLoading: loadingVisitante } = useQuery({
     queryKey: ["trilhas-visitante-todas"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -25,6 +25,32 @@ export default function Trilhas() {
     enabled: isVisitante,
   });
 
+  // Query para mentorados: buscar TODAS as trilhas (incluindo bloqueadas)
+  const { data: trilhasMentorado, isLoading: loadingMentorado } = useQuery({
+    queryKey: ["trilhas-mentorado-todas"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trilhas")
+        .select("id, titulo, imagem_url, bloqueada, ordem, visivel_apenas_pro, nivel_minimo_acesso")
+        .eq("ativo", true)
+        .order("ordem");
+
+      if (error) throw error;
+      
+      // Ordenar: trilhas desbloqueadas primeiro, depois bloqueadas
+      const sorted = (data || []).sort((a, b) => {
+        if (a.bloqueada === b.bloqueada) return a.ordem - b.ordem;
+        return a.bloqueada ? 1 : -1;
+      });
+      
+      return sorted;
+    },
+    enabled: !isVisitante,
+  });
+
+  const isLoading = isVisitante ? loadingVisitante : loadingMentorado;
+  const trilhas = isVisitante ? trilhasVisitante : trilhasMentorado;
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-6">
@@ -35,17 +61,17 @@ export default function Trilhas() {
           </p>
         </div>
 
-        {isVisitante ? (
-          // VISITANTES: Mostrar TODAS as trilhas com cadeado
-          isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="h-[400px] rounded-xl" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {trilhasVisitante?.map((trilha) => (
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <Skeleton key={i} className="h-[400px] rounded-xl" />
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Grid de Catálogo de Trilhas */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+              {trilhas?.map((trilha) => (
                 <TrilhaCardBloqueavel
                   key={trilha.id}
                   id={trilha.id}
@@ -54,15 +80,20 @@ export default function Trilhas() {
                   bloqueada={trilha.bloqueada || false}
                   visivel_apenas_pro={trilha.visivel_apenas_pro || false}
                   nivel_minimo_acesso={trilha.nivel_minimo_acesso}
-                  isVisitante={true}
+                  isVisitante={isVisitante}
                   temConteudoDisponivel={false}
                 />
               ))}
             </div>
-          )
-        ) : (
-          // MENTORADOS: Mostrar carrosséis de vídeos por trilha
-          <UltimosConteudos />
+
+            {/* Seção de Últimos Vídeos (apenas para mentorados) */}
+            {!isVisitante && (
+              <div className="mt-8">
+                <h2 className="text-2xl font-bold mb-6">Últimos Vídeos Adicionados</h2>
+                <UltimosConteudos />
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
