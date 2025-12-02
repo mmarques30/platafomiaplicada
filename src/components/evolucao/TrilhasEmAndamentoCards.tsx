@@ -63,7 +63,7 @@ export function TrilhasEmAndamentoCards() {
             <Card
               key={trilha.id}
               className="border-aplicada-green-900/20 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate(`/trilha/${trilha.id}`)}
+              onClick={() => navigate(`/trilhas/${trilha.id}`)}
             >
               <CardContent className="p-0">
                 <div className="flex items-center gap-4 p-4">
@@ -109,7 +109,7 @@ export function TrilhasEmAndamentoCards() {
                     className="shrink-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/trilha/${trilha.id}`);
+                      navigate(`/trilhas/${trilha.id}`);
                     }}
                   >
                     <ChevronRight className="h-4 w-4" />
