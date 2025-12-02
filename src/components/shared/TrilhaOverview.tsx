@@ -4,6 +4,13 @@ import { CheckCircle2, Clock, Play } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
 import { cn } from "@/lib/utils";
 import { FavoriteButton } from "./FavoriteButton";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface Video {
   id: string;
@@ -103,83 +110,103 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
               <h2 className="text-xl font-semibold">{group.modulo.titulo}</h2>
             </div>
             
-            {/* Carrossel Horizontal de Cards Verticais */}
-            <div className="relative">
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-                {group.videos.map((video) => {
-                  const progress = getVideoProgress(video.id);
-                  const isCompleted = progress?.completado;
+            {/* Carrossel com Setas de Navegação */}
+            <div className="relative px-12">
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: false,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-4">
+                  {group.videos.map((video) => {
+                    const progress = getVideoProgress(video.id);
+                    const isCompleted = progress?.completado;
 
-                  return (
-                    <div
-                      key={video.id}
-                      className={cn(
-                        "w-[250px] flex-shrink-0 group",
-                        trilha.bloqueada ? "cursor-not-allowed" : "cursor-pointer"
-                      )}
-                      onClick={() => !trilha.bloqueada && onSelectVideo(video.id)}
-                    >
-                      <div className="relative aspect-[9/16] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
-                        <img
-                          src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url || video.thumbnail_url)}
-                          alt={video.titulo}
+                    return (
+                      <CarouselItem 
+                        key={video.id} 
+                        className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                      >
+                        <div
                           className={cn(
-                            "w-full h-full object-cover",
-                            trilha.bloqueada && "opacity-50 grayscale"
+                            "group",
+                            trilha.bloqueada ? "cursor-not-allowed" : "cursor-pointer"
                           )}
-                        />
-                        
-                        {/* Overlay "Em Breve" para trilhas bloqueadas */}
-                        {trilha.bloqueada ? (
-                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                            <div className="bg-muted/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-2xl flex items-center gap-1.5">
-                              <Clock className="h-5 w-5 text-foreground" strokeWidth={2} />
-                              <span className="text-foreground font-medium text-sm">Em Breve</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            {/* Overlay com Play (apenas para trilhas desbloqueadas) */}
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
-                                <Play className="h-8 w-8 text-primary-foreground ml-1" fill="currentColor" />
+                          onClick={() => !trilha.bloqueada && onSelectVideo(video.id)}
+                        >
+                          <div className="relative aspect-[9/16] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                            <img
+                              src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url || video.thumbnail_url)}
+                              alt={video.titulo}
+                              className={cn(
+                                "w-full h-full object-cover",
+                                trilha.bloqueada && "opacity-50 grayscale"
+                              )}
+                            />
+                            
+                            {/* Overlay "Em Breve" para trilhas bloqueadas */}
+                            {trilha.bloqueada ? (
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <div className="bg-muted/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-2xl flex items-center gap-1.5">
+                                  <Clock className="h-5 w-5 text-foreground" strokeWidth={2} />
+                                  <span className="text-foreground font-medium text-sm">Em Breve</span>
+                                </div>
                               </div>
-                            </div>
+                            ) : (
+                              <>
+                                {/* Overlay com Play (apenas para trilhas desbloqueadas) */}
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
+                                    <Play className="h-8 w-8 text-primary-foreground ml-1" fill="currentColor" />
+                                  </div>
+                                </div>
 
-                            {/* Botão de Favoritar */}
-                            <div className="absolute top-2 right-2">
-                              <FavoriteButton 
-                                tipo="video" 
-                                itemId={video.id} 
-                                variant="icon-only"
-                                size="md"
-                              />
-                            </div>
+                                {/* Botão de Favoritar */}
+                                <div className="absolute top-2 right-2">
+                                  <FavoriteButton 
+                                    tipo="video" 
+                                    itemId={video.id} 
+                                    variant="icon-only"
+                                    size="md"
+                                  />
+                                </div>
 
-                            {/* Badge de Concluído */}
-                            {isCompleted && (
-                              <div className="absolute top-2 left-2 bg-green-600 text-white rounded-full p-1">
-                                <CheckCircle2 className="h-4 w-4" />
-                              </div>
+                                {/* Badge de Concluído */}
+                                {isCompleted && (
+                                  <div className="absolute top-2 left-2 bg-green-600 text-white rounded-full p-1">
+                                    <CheckCircle2 className="h-4 w-4" />
+                                  </div>
+                                )}
+                              </>
                             )}
-                          </>
-                        )}
 
-                        {/* Título Sobreposto */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                          <h3 className="font-semibold text-sm text-white line-clamp-2 mb-1">
-                            {video.titulo}
-                          </h3>
-                          <div className="flex items-center gap-2 text-xs text-white/80">
-                            <Clock className="h-3 w-3" />
-                            <span>{video.duracao ? `${video.duracao} min` : "N/A"}</span>
+                            {/* Título Sobreposto */}
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                              <h3 className="font-semibold text-sm text-white line-clamp-2 mb-1">
+                                {video.titulo}
+                              </h3>
+                              <div className="flex items-center gap-2 text-xs text-white/80">
+                                <Clock className="h-3 w-3" />
+                                <span>{video.duracao ? `${video.duracao} min` : "N/A"}</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                      </CarouselItem>
+                    );
+                  })}
+                </CarouselContent>
+                
+                {/* Setas de Navegação - visíveis apenas se houver mais de 4 vídeos */}
+                {group.videos.length > 4 && (
+                  <>
+                    <CarouselPrevious className="absolute -left-10 top-1/2 -translate-y-1/2 bg-card hover:bg-primary hover:text-primary-foreground border-border shadow-lg" />
+                    <CarouselNext className="absolute -right-10 top-1/2 -translate-y-1/2 bg-card hover:bg-primary hover:text-primary-foreground border-border shadow-lg" />
+                  </>
+                )}
+              </Carousel>
             </div>
           </div>
         ))}
