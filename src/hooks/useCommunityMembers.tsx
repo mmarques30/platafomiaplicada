@@ -18,13 +18,10 @@ export function useCommunityMembers(filter?: "all" | "admin" | "online") {
   const { data: members, isLoading } = useQuery({
     queryKey: ["community-members", filter],
     queryFn: async () => {
-      let query = supabase
-        .from("profiles")
-        .select("*")
-        .eq("conta_ativa", true)
-        .order("pontos_comunidade", { ascending: false });
-
-      const { data: profiles, error } = await query;
+      // Usa função RPC segura que retorna apenas dados públicos
+      const { data: profiles, error } = await supabase
+        .rpc('get_public_profiles');
+      
       if (error) throw error;
 
       // Get admin roles
@@ -35,7 +32,7 @@ export function useCommunityMembers(filter?: "all" | "admin" | "online") {
 
       const adminIds = new Set(adminRoles?.map((r) => r.user_id) || []);
 
-      let filteredMembers = profiles.map((profile) => ({
+      let filteredMembers = (profiles || []).map((profile: any) => ({
         ...profile,
         is_admin: adminIds.has(profile.id),
       }));
@@ -49,6 +46,9 @@ export function useCommunityMembers(filter?: "all" | "admin" | "online") {
           (m) => m.ultimo_acesso && m.ultimo_acesso > fiveMinutesAgo
         );
       }
+
+      // Sort by pontos_comunidade descending
+      filteredMembers.sort((a, b) => (b.pontos_comunidade || 0) - (a.pontos_comunidade || 0));
 
       return filteredMembers as CommunityMember[];
     },

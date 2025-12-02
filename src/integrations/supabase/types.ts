@@ -2675,6 +2675,22 @@ export type Database = {
           total_videos: number
         }[]
       }
+      get_public_profiles: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          bio: string
+          conta_ativa: boolean
+          created_at: string
+          id: string
+          is_visitante: boolean
+          nivel_comunidade: number
+          nome_completo: string
+          plano_mentoria: Database["public"]["Enums"]["plano_mentoria"]
+          pontos_comunidade: number
+          ultimo_acesso: string
+        }[]
+      }
       get_ranking_comunidade: {
         Args: never
         Returns: {
