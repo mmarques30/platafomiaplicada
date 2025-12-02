@@ -1,6 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+export interface VisitorStat {
+  email: string;
+  totalAccesses: number;
+  lastAccess: string;
+  videoCount: number;
+  materialCount: number;
+  contentsList: string[];
+}
+
 export function useContentAccessMetrics() {
   return useQuery({
     queryKey: ["content-access-metrics"],
@@ -74,14 +83,8 @@ export function useContentAccessMetrics() {
         accessesByUser[log.user_email] = (accessesByUser[log.user_email] || 0) + 1;
       });
 
-      // Ranking de visitantes reais com mais acessos
-      const userStats: Record<string, {
-        email: string;
-        totalAccesses: number;
-        lastAccess: string;
-        videoCount: number;
-        materialCount: number;
-      }> = {};
+      // TODOS os visitantes com estatísticas detalhadas (não só top 10)
+      const userStats: Record<string, VisitorStat> = {};
 
       logsVisitantes.forEach(log => {
         if (log.user_email === 'anônimo') return;
@@ -93,6 +96,7 @@ export function useContentAccessMetrics() {
             lastAccess: log.accessed_at,
             videoCount: 0,
             materialCount: 0,
+            contentsList: [],
           };
         }
         
@@ -109,11 +113,20 @@ export function useContentAccessMetrics() {
         } else {
           userStats[log.user_email].materialCount++;
         }
+
+        // Adicionar conteúdo à lista (sem duplicatas)
+        const contentTitle = log.content_title || 'Sem título';
+        if (!userStats[log.user_email].contentsList.includes(contentTitle)) {
+          userStats[log.user_email].contentsList.push(contentTitle);
+        }
       });
 
-      const topVisitors = Object.values(userStats)
-        .sort((a, b) => b.totalAccesses - a.totalAccesses)
-        .slice(0, 10);
+      // Ordenar todos os visitantes por total de acessos
+      const allVisitors = Object.values(userStats)
+        .sort((a, b) => b.totalAccesses - a.totalAccesses);
+
+      // Top 10 para exibição inicial
+      const topVisitors = allVisitors.slice(0, 10);
 
       return {
         totalAccesses,
@@ -123,6 +136,7 @@ export function useContentAccessMetrics() {
         topContent,
         accessesByUser,
         topVisitors,
+        allVisitors, // Todos os visitantes para exportação e tabela expandida
         allLogs: logsVisitantes,
       };
     },
