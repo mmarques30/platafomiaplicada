@@ -49,6 +49,26 @@ export default function Auth() {
     }
   };
 
+  const logSignupAttempt = async (
+    email: string, 
+    nome: string, 
+    telefone: string, 
+    sucesso: boolean, 
+    erroMensagem?: string
+  ) => {
+    try {
+      await supabase.from('signup_attempts').insert({
+        email,
+        nome,
+        telefone,
+        sucesso,
+        erro_mensagem: erroMensagem || null,
+      });
+    } catch (logError) {
+      console.error('Erro ao registrar tentativa de signup:', logError);
+    }
+  };
+
   const handleVisitorSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -72,7 +92,14 @@ export default function Auth() {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Registrar tentativa falha
+        await logSignupAttempt(email, nome, telefone, false, error.message);
+        throw error;
+      }
+      
+      // Registrar tentativa bem-sucedida
+      await logSignupAttempt(email, nome, telefone, true);
       toast.success("Cadastro realizado! Bem-vindo à IAplicada!");
     } catch (error: any) {
       toast.error(error.message || "Erro ao processar cadastro");

@@ -2213,6 +2213,39 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_attempts: {
+        Row: {
+          created_at: string
+          email: string
+          erro_mensagem: string | null
+          id: string
+          ip_info: string | null
+          nome: string | null
+          sucesso: boolean
+          telefone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          erro_mensagem?: string | null
+          id?: string
+          ip_info?: string | null
+          nome?: string | null
+          sucesso?: boolean
+          telefone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          erro_mensagem?: string | null
+          id?: string
+          ip_info?: string | null
+          nome?: string | null
+          sucesso?: boolean
+          telefone?: string | null
+        }
+        Relationships: []
+      }
       tarefas_mentoria: {
         Row: {
           arquivo_entrega_url: string | null
