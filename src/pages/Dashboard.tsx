@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, X, Zap } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
@@ -144,7 +144,16 @@ export default function Dashboard() {
           {isVisitante ? (
             // Visitantes: todas trilhas bloqueadas
             <>
-              <h2 className="text-2xl font-bold mb-6">Trilhas de Aprendizado</h2>
+              <div className="flex justify-between items-start gap-4 mb-6">
+                <h2 className="text-2xl font-bold">Trilhas de Aprendizado</h2>
+                <Link 
+                  to="/aplique"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 bg-red-50/50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/30 font-medium transition-colors whitespace-nowrap"
+                >
+                  <Zap className="h-4 w-4" />
+                  Ter acesso ao Academy
+                </Link>
+              </div>
               {loadingTrilhas ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {[...Array(8)].map((_, i) => (
