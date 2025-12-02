@@ -5,6 +5,16 @@ export function useContentAccessMetrics() {
   return useQuery({
     queryKey: ["content-access-metrics"],
     queryFn: async () => {
+      // Buscar emails de visitantes reais
+      const { data: visitantes, error: visitantesError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('is_visitante', true);
+
+      if (visitantesError) throw visitantesError;
+
+      const visitanteEmails = new Set(visitantes?.map(v => v.email) || []);
+
       // Buscar todos os logs
       const { data: allLogs, error } = await supabase
         .from('content_access_logs')
@@ -13,33 +23,36 @@ export function useContentAccessMetrics() {
 
       if (error) throw error;
 
-      // Métricas gerais
-      const totalAccesses = allLogs?.length || 0;
+      // Filtrar apenas logs de visitantes reais
+      const logsVisitantes = allLogs?.filter(log => visitanteEmails.has(log.user_email)) || [];
+
+      // Métricas gerais (apenas visitantes)
+      const totalAccesses = logsVisitantes.length;
       const uniqueEmails = new Set(
-        allLogs?.filter(l => l.user_email !== 'anônimo').map(l => l.user_email)
+        logsVisitantes.filter(l => l.user_email !== 'anônimo').map(l => l.user_email)
       );
       const uniqueUsers = uniqueEmails.size;
 
-      // Acessos últimos 7 dias
+      // Acessos últimos 7 dias (apenas visitantes)
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const accessesLast7Days = allLogs?.filter(l => 
+      const accessesLast7Days = logsVisitantes.filter(l => 
         new Date(l.accessed_at) >= sevenDaysAgo
-      ).length || 0;
+      ).length;
 
       // Média por usuário
       const averagePerUser = uniqueUsers > 0 
         ? Math.round((totalAccesses / uniqueUsers) * 10) / 10 
         : 0;
 
-      // TOP 10 conteúdos mais acessados (agregado)
+      // TOP 10 conteúdos mais acessados por visitantes (agregado)
       const contentCounts: Record<string, { 
         count: number; 
         title: string; 
         type: string;
       }> = {};
       
-      allLogs?.forEach(log => {
+      logsVisitantes.forEach(log => {
         if (!contentCounts[log.content_id]) {
           contentCounts[log.content_id] = { 
             count: 0, 
@@ -55,13 +68,13 @@ export function useContentAccessMetrics() {
         .sort((a, b) => b.count - a.count)
         .slice(0, 10);
 
-      // Acessos por usuário (para coluna na tabela de visitantes)
+      // Acessos por visitante (para coluna na tabela de visitantes)
       const accessesByUser: Record<string, number> = {};
-      allLogs?.forEach(log => {
+      logsVisitantes.forEach(log => {
         accessesByUser[log.user_email] = (accessesByUser[log.user_email] || 0) + 1;
       });
 
-      // Ranking de visitantes com mais acessos
+      // Ranking de visitantes reais com mais acessos
       const userStats: Record<string, {
         email: string;
         totalAccesses: number;
@@ -70,7 +83,7 @@ export function useContentAccessMetrics() {
         materialCount: number;
       }> = {};
 
-      allLogs?.forEach(log => {
+      logsVisitantes.forEach(log => {
         if (log.user_email === 'anônimo') return;
         
         if (!userStats[log.user_email]) {
@@ -110,7 +123,7 @@ export function useContentAccessMetrics() {
         topContent,
         accessesByUser,
         topVisitors,
-        allLogs: allLogs || [],
+        allLogs: logsVisitantes,
       };
     },
   });
