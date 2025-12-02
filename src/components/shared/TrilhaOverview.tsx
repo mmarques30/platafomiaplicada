@@ -12,6 +12,7 @@ interface Video {
   duracao?: number;
   youtube_id: string;
   thumbnail_url?: string;
+  thumbnail_customizado_url?: string;
   modulo: {
     id: string;
     titulo: string;
@@ -120,7 +121,7 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
                     >
                       <div className="relative aspect-[9/16] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
                         <img
-                          src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_url)}
+                          src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url || video.thumbnail_url)}
                           alt={video.titulo}
                           className={cn(
                             "w-full h-full object-cover",
