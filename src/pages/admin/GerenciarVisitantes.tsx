@@ -10,7 +10,7 @@ import { VisitorAccessDrawer } from "@/components/admin/VisitorAccessDrawer";
 import { useContentAccessMetrics } from "@/hooks/admin/useContentAccessMetrics";
 import { useAcademyPurchaseClicks } from "@/hooks/admin/useButtonClickLogs";
 import { StatsCard } from "@/components/admin/StatsCard";
-import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText, MousePointerClick } from "lucide-react";
+import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText, MousePointerClick, Download, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -24,6 +24,7 @@ export default function GerenciarVisitantes() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedVisitante, setSelectedVisitante] = useState<typeof visitantes[0] | null>(null);
+  const [showAllVisitors, setShowAllVisitors] = useState(false);
 
   const handleEdit = (visitante: typeof visitantes[0]) => {
     setSelectedVisitante(visitante);
@@ -61,8 +62,87 @@ export default function GerenciarVisitantes() {
     }
   };
 
+  // Função para exportar CSV completo
+  const exportToCSV = () => {
+    if (!visitantes || !metrics) return;
+
+    // Cabeçalho do CSV
+    const headers = [
+      'Nome',
+      'Email',
+      'Telefone',
+      'Data Cadastro',
+      'Status',
+      'Vídeos Acessados',
+      'Materiais Acessados',
+      'Total Acessos',
+      'Último Acesso',
+      'Conteúdos Acessados'
+    ];
+
+    // Criar mapa de estatísticas de acesso por email
+    const accessStatsMap = new Map(
+      metrics.allVisitors?.map(v => [v.email, v]) || []
+    );
+
+    // Dados dos visitantes combinados com acessos
+    const rows = visitantes.map(visitante => {
+      const accessStats = accessStatsMap.get(visitante.email || '');
+      
+      return [
+        visitante.nome_completo || '',
+        visitante.email || '',
+        visitante.telefone || '',
+        visitante.created_at 
+          ? format(new Date(visitante.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
+          : '',
+        visitante.conta_ativa ? 'Ativo' : 'Inativo',
+        accessStats?.videoCount || 0,
+        accessStats?.materialCount || 0,
+        accessStats?.totalAccesses || 0,
+        accessStats?.lastAccess 
+          ? format(new Date(accessStats.lastAccess), "dd/MM/yyyy HH:mm", { locale: ptBR })
+          : 'Nunca',
+        accessStats?.contentsList?.join('; ') || ''
+      ];
+    });
+
+    // Montar CSV
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => 
+        row.map(cell => {
+          // Escapar aspas e envolver em aspas se tiver vírgula ou aspas
+          const cellStr = String(cell);
+          if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+            return `"${cellStr.replace(/"/g, '""')}"`;
+          }
+          return cellStr;
+        }).join(',')
+      )
+    ].join('\n');
+
+    // Criar blob e fazer download
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `visitantes_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const totalVisitantes = visitantes.length;
   const visitantesAtivos = visitantes.filter(v => v.conta_ativa).length;
+
+  // Visitantes a exibir na tabela de engajamento
+  const visitorsToShow = showAllVisitors 
+    ? metrics?.allVisitors || [] 
+    : metrics?.topVisitors || [];
+
+  const hasMoreVisitors = (metrics?.allVisitors?.length || 0) > 10;
 
   return (
     <div className="space-y-6">
@@ -153,14 +233,39 @@ export default function GerenciarVisitantes() {
         </Card>
       )}
 
-      {/* Top 10 Visitantes por Engajamento */}
-      {!isLoadingMetrics && metrics && metrics.topVisitors && metrics.topVisitors.length > 0 && (
+      {/* Visitantes por Engajamento - Expansível */}
+      {!isLoadingMetrics && metrics && metrics.allVisitors && metrics.allVisitors.length > 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle>Top 10 Visitantes por Engajamento</CardTitle>
-            <CardDescription>
-              Visitantes com mais acessos a conteúdos gratuitos
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>
+                {showAllVisitors ? 'Todos os Visitantes por Engajamento' : 'Top 10 Visitantes por Engajamento'}
+              </CardTitle>
+              <CardDescription>
+                Visitantes com mais acessos a conteúdos gratuitos
+                {showAllVisitors && ` (${metrics.allVisitors.length} visitantes)`}
+              </CardDescription>
+            </div>
+            {hasMoreVisitors && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAllVisitors(!showAllVisitors)}
+                className="gap-2"
+              >
+                {showAllVisitors ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Ver menos
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Ver todos ({metrics.allVisitors.length})
+                  </>
+                )}
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             <Table>
@@ -175,7 +280,7 @@ export default function GerenciarVisitantes() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {metrics.topVisitors.map((visitor, index) => (
+                {visitorsToShow.map((visitor, index) => (
                   <TableRow key={visitor.email}>
                     <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell>{visitor.email}</TableCell>
@@ -268,11 +373,22 @@ export default function GerenciarVisitantes() {
 
       {/* Tabela de Visitantes */}
       <Card>
-        <CardHeader>
-          <CardTitle>Lista de Visitantes</CardTitle>
-          <CardDescription>
-            Gerencie todas as contas de visitantes cadastradas
-          </CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Lista de Visitantes</CardTitle>
+            <CardDescription>
+              Gerencie todas as contas de visitantes cadastradas
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            onClick={exportToCSV}
+            disabled={!visitantes.length || !metrics}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Exportar CSV
+          </Button>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -296,67 +412,70 @@ export default function GerenciarVisitantes() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {visitantes.map((visitante) => (
-                    <TableRow key={visitante.id}>
-                      <TableCell className="font-medium">
-                        {visitante.nome_completo}
-                      </TableCell>
-                      <TableCell>{visitante.email}</TableCell>
-                      <TableCell>{visitante.telefone || "-"}</TableCell>
-                      <TableCell>
-                        {visitante.created_at
-                          ? format(new Date(visitante.created_at), "dd/MM/yyyy", { locale: ptBR })
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {visitante.conta_ativa ? (
-                          <Badge variant="default">Ativo</Badge>
-                        ) : (
-                          <Badge variant="secondary">Inativo</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewAccess(visitante)}
-                          className="font-semibold"
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          {metrics?.accessesByUser?.[visitante.email || ''] || 0}
-                        </Button>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                  {visitantes.map((visitante) => {
+                    const accessCount = metrics?.accessesByUser?.[visitante.email || ''] || 0;
+                    return (
+                      <TableRow key={visitante.id}>
+                        <TableCell className="font-medium">
+                          {visitante.nome_completo}
+                        </TableCell>
+                        <TableCell>{visitante.email}</TableCell>
+                        <TableCell>{visitante.telefone || "-"}</TableCell>
+                        <TableCell>
+                          {visitante.created_at
+                            ? format(new Date(visitante.created_at), "dd/MM/yyyy", { locale: ptBR })
+                            : "-"}
+                        </TableCell>
+                        <TableCell>
+                          {visitante.conta_ativa ? (
+                            <Badge variant="default">Ativo</Badge>
+                          ) : (
+                            <Badge variant="secondary">Inativo</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleEdit(visitante)}
+                            onClick={() => handleViewAccess(visitante)}
+                            className="gap-1 text-primary hover:text-primary"
                           >
-                            <Pencil className="h-4 w-4 mr-1" />
-                            Editar
+                            <Eye className="h-4 w-4" />
+                            Ver ({accessCount})
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleConvert(visitante.id)}
-                            disabled={!visitante.conta_ativa}
-                          >
-                            <UserCheck className="h-4 w-4 mr-1" />
-                            Converter
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDelete(visitante.id)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            Excluir
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(visitante)}
+                            >
+                              <Pencil className="h-4 w-4 mr-1" />
+                              Editar
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleConvert(visitante.id)}
+                              disabled={!visitante.conta_ativa}
+                            >
+                              <UserCheck className="h-4 w-4 mr-1" />
+                              Converter
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDelete(visitante.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Excluir
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
