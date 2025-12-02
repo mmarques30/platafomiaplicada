@@ -122,6 +122,35 @@ export type Database = {
         }
         Relationships: []
       }
+      avisos_lidos: {
+        Row: {
+          aviso_id: string
+          id: string
+          lido_em: string | null
+          user_id: string
+        }
+        Insert: {
+          aviso_id: string
+          id?: string
+          lido_em?: string | null
+          user_id: string
+        }
+        Update: {
+          aviso_id?: string
+          id?: string
+          lido_em?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_lidos_aviso_id_fkey"
+            columns: ["aviso_id"]
+            isOneToOne: false
+            referencedRelation: "avisos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       biblioteca_prompts: {
         Row: {
           ativo: boolean | null

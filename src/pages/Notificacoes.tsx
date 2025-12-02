@@ -1,4 +1,5 @@
-import { useAvisosPublicos } from "@/hooks/useAvisosPublicos";
+import { useEffect, useRef } from "react";
+import { useAvisosPublicos, useMarcarAvisosComoLidos } from "@/hooks/useAvisosPublicos";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bell, BellOff } from "lucide-react";
@@ -7,6 +8,17 @@ import { ptBR } from "date-fns/locale";
 
 export default function Notificacoes() {
   const { data: avisos, isLoading } = useAvisosPublicos();
+  const { mutate: marcarComoLidos } = useMarcarAvisosComoLidos();
+  const marcadoRef = useRef(false);
+
+  // Marcar avisos como lidos quando a página carregar
+  useEffect(() => {
+    if (avisos && avisos.length > 0 && !marcadoRef.current) {
+      const ids = avisos.map(a => a.id);
+      marcarComoLidos(ids);
+      marcadoRef.current = true;
+    }
+  }, [avisos, marcarComoLidos]);
 
   if (isLoading) {
     return (

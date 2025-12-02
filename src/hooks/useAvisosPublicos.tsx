@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "./useUserRole";
 import { useUserPlan } from "./useUserPlan";
@@ -37,15 +37,67 @@ export const useAvisosAtivosCount = () => {
   return useQuery({
     queryKey: ["avisos-ativos-count", userTier],
     queryFn: async () => {
-      const { count } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return 0;
+
+      // Buscar avisos ativos
+      const { data: avisos, error: avisosError } = await supabase
         .from("avisos")
-        .select("*", { count: "exact", head: true })
+        .select("id")
         .eq("ativo", true)
         .or(`data_expiracao.is.null,data_expiracao.gt.${new Date().toISOString()}`)
         .contains("visivel_para", [userTier]);
       
-      return count || 0;
+      if (avisosError) throw avisosError;
+      if (!avisos || avisos.length === 0) return 0;
+
+      // Buscar avisos já lidos pelo usuário
+      const avisoIds = avisos.map(a => a.id);
+      const { data: lidos, error: lidosError } = await supabase
+        .from("avisos_lidos")
+        .select("aviso_id")
+        .eq("user_id", user.id)
+        .in("aviso_id", avisoIds);
+
+      if (lidosError) throw lidosError;
+
+      // Contar apenas avisos não lidos
+      const lidosSet = new Set(lidos?.map(l => l.aviso_id) || []);
+      const naoLidos = avisos.filter(a => !lidosSet.has(a.id));
+      
+      return naoLidos.length;
     },
     enabled: !loadingRole,
+  });
+};
+
+export const useMarcarAvisosComoLidos = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (avisoIds: string[]) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || avisoIds.length === 0) return;
+      
+      // Inserir registros para cada aviso não lido (ignorar duplicatas)
+      const inserts = avisoIds.map(avisoId => ({
+        user_id: user.id,
+        aviso_id: avisoId
+      }));
+      
+      // Usar upsert para ignorar conflitos (avisos já lidos)
+      const { error } = await supabase
+        .from("avisos_lidos")
+        .upsert(inserts, { 
+          onConflict: 'user_id,aviso_id',
+          ignoreDuplicates: true 
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      // Invalidar contador para atualizar no header
+      queryClient.invalidateQueries({ queryKey: ["avisos-ativos-count"] });
+    }
   });
 };
