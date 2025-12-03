@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useCreateMetodo, useUpdateMetodo } from "@/hooks/admin/useBibliotecas";
-import { FerramentasSelector } from "./FerramentasSelector";
+import { FerramentasSelectorHibrido } from "./FerramentasSelectorHibrido";
+import { METODOS_CATEGORIAS } from "@/lib/metodosCategories";
 
 interface MetodoModalProps {
   open: boolean;
@@ -16,10 +18,12 @@ interface MetodoModalProps {
 }
 
 export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const { register, handleSubmit, reset, setValue, watch } = useForm();
   const [ferramentasRecomendadas, setFerramentasRecomendadas] = useState<string[]>([]);
   const createMetodo = useCreateMetodo();
   const updateMetodo = useUpdateMetodo();
+  
+  const categoriaValue = watch("categoria");
 
   useEffect(() => {
     if (metodo) {
@@ -32,6 +36,7 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
         categoria: "",
         template: "",
         exemplo: "",
+        link_documento: "",
         ferramentas_recomendadas: [],
         ativo: true,
       });
@@ -74,7 +79,34 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
 
           <div>
             <Label htmlFor="categoria">Categoria</Label>
-            <Input id="categoria" {...register("categoria", { required: true })} />
+            <Select
+              value={categoriaValue || ""}
+              onValueChange={(value) => setValue("categoria", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {METODOS_CATEGORIAS.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="link_documento">Link do Documento (opcional)</Label>
+            <Input 
+              id="link_documento" 
+              type="url"
+              placeholder="https://docs.google.com/..." 
+              {...register("link_documento")} 
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Link para documento de apoio (Google Docs, Notion, PDF, etc.)
+            </p>
           </div>
 
           <div>
@@ -87,7 +119,7 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
             <Textarea id="exemplo" {...register("exemplo")} rows={6} />
           </div>
 
-          <FerramentasSelector
+          <FerramentasSelectorHibrido
             value={ferramentasRecomendadas}
             onChange={setFerramentasRecomendadas}
           />

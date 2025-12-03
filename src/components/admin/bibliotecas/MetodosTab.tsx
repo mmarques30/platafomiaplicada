@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText, ExternalLink } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { MetodoModal } from "./MetodoModal";
@@ -8,6 +8,7 @@ import { useMetodosAdmin, useDeleteMetodo } from "@/hooks/admin/useBibliotecas";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FilterBar } from "../content/FilterBar";
+import { METODOS_CATEGORIAS } from "@/lib/metodosCategories";
 
 export function MetodosTab() {
   const { data: metodos, isLoading } = useMetodosAdmin();
@@ -17,7 +18,7 @@ export function MetodosTab() {
   const deleteMetodo = useDeleteMetodo();
   
   const [categoriaFilter, setCategoriaFilter] = useState('todas');
-  const [exemploFilter, setExemploFilter] = useState('todos');
+  const [documentoFilter, setDocumentoFilter] = useState('todos');
   const [statusFilter, setStatusFilter] = useState('todos');
 
   const handleEdit = (metodo: any) => {
@@ -37,24 +38,19 @@ export function MetodosTab() {
     }
   };
 
-  const uniqueCategories = useMemo(() => {
-    const categories = metodos?.map(m => m.categoria) || [];
-    return Array.from(new Set(categories));
-  }, [metodos]);
-
   const filteredMetodos = useMemo(() => {
     return metodos?.filter(m => {
       const matchesCategoria = categoriaFilter === 'todas' || m.categoria === categoriaFilter;
-      const matchesExemplo = exemploFilter === 'todos' || 
-        (exemploFilter === 'com_exemplo' && m.exemplo) || 
-        (exemploFilter === 'sem_exemplo' && !m.exemplo);
+      const matchesDocumento = documentoFilter === 'todos' || 
+        (documentoFilter === 'com_documento' && m.link_documento) || 
+        (documentoFilter === 'sem_documento' && !m.link_documento);
       const matchesStatus = statusFilter === 'todos' || 
         (statusFilter === 'ativo' && m.ativo) || 
         (statusFilter === 'inativo' && !m.ativo);
       
-      return matchesCategoria && matchesExemplo && matchesStatus;
+      return matchesCategoria && matchesDocumento && matchesStatus;
     }) || [];
-  }, [metodos, categoriaFilter, exemploFilter, statusFilter]);
+  }, [metodos, categoriaFilter, documentoFilter, statusFilter]);
 
   if (isLoading) {
     return (
@@ -76,22 +72,22 @@ export function MetodosTab() {
             placeholder: 'Todas as categorias',
             options: [
               { value: 'todas', label: 'Todas as categorias' },
-              ...uniqueCategories.map(c => ({ value: c, label: c }))
+              ...METODOS_CATEGORIAS.map(c => ({ value: c, label: c }))
             ],
             value: categoriaFilter,
             onChange: setCategoriaFilter
           },
           {
-            id: 'exemplo',
-            label: 'Exemplo',
+            id: 'documento',
+            label: 'Documento',
             placeholder: 'Todos',
             options: [
               { value: 'todos', label: 'Todos' },
-              { value: 'com_exemplo', label: 'Com Exemplo' },
-              { value: 'sem_exemplo', label: 'Sem Exemplo' }
+              { value: 'com_documento', label: 'Com Documento' },
+              { value: 'sem_documento', label: 'Sem Documento' }
             ],
-            value: exemploFilter,
-            onChange: setExemploFilter
+            value: documentoFilter,
+            onChange: setDocumentoFilter
           },
           {
             id: 'status',
@@ -108,7 +104,7 @@ export function MetodosTab() {
         ]}
         onClear={() => {
           setCategoriaFilter('todas');
-          setExemploFilter('todos');
+          setDocumentoFilter('todos');
           setStatusFilter('todos');
         }}
         totalItems={metodos?.length || 0}
@@ -124,26 +120,44 @@ export function MetodosTab() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[250px]">Título</TableHead>
-            <TableHead className="w-[180px]">Categoria</TableHead>
-            <TableHead className="w-[120px]">Exemplo</TableHead>
-            <TableHead className="w-[120px]">Status</TableHead>
+            <TableHead className="w-[220px]">Título</TableHead>
+            <TableHead className="w-[150px]">Categoria</TableHead>
+            <TableHead className="w-[100px]">Documento</TableHead>
+            <TableHead className="w-[100px]">Exemplo</TableHead>
+            <TableHead className="w-[100px]">Status</TableHead>
             <TableHead className="w-[100px]">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredMetodos?.map((metodo) => (
             <TableRow key={metodo.id}>
-              <TableCell className="w-[250px]">{metodo.titulo}</TableCell>
-              <TableCell className="w-[180px]">{metodo.categoria}</TableCell>
-              <TableCell className="w-[120px]">
+              <TableCell className="w-[220px] font-medium">{metodo.titulo}</TableCell>
+              <TableCell className="w-[150px]">
+                <Badge variant="outline" className="whitespace-nowrap">{metodo.categoria}</Badge>
+              </TableCell>
+              <TableCell className="w-[100px]">
+                {metodo.link_documento ? (
+                  <a 
+                    href={metodo.link_documento} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-primary hover:underline"
+                  >
+                    <FileText className="h-4 w-4" />
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground">-</span>
+                )}
+              </TableCell>
+              <TableCell className="w-[100px]">
                 {metodo.exemplo ? (
                   <Badge variant="default" className="whitespace-nowrap">Sim</Badge>
                 ) : (
                   <Badge variant="secondary" className="whitespace-nowrap">Não</Badge>
                 )}
               </TableCell>
-              <TableCell className="w-[120px]">
+              <TableCell className="w-[100px]">
                 {metodo.ativo ? (
                   <Badge variant="default" className="whitespace-nowrap">Ativo</Badge>
                 ) : (
