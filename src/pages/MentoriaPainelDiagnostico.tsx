@@ -12,30 +12,34 @@ import { ProximaSessao } from "@/components/mentoria/painel/ProximaSessao";
 import { ProjetoPreparacaoSection } from "@/components/mentoria/painel/ProjetoPreparacaoSection";
 import { Loader2, ArrowLeft, FileText, Edit, Target, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { formatProjetoTitulo } from "@/lib/utils";
 
 export default function MentoriaPainelDiagnostico() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { userId } = useParams();
   const { diagnostico, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
   const { plan } = useUserPlan();
   const { isAdmin } = useUserRole();
   
+  // Check if accessed via /diagnostico route (Academy-specific)
+  const isAcademyRoute = location.pathname.startsWith('/diagnostico');
+  
   const voltarUrl = isAdmin 
     ? '/mentoria' 
     : !plan 
       ? '/comunidade' 
-      : plan === 'academy' 
-        ? '/evolucao' 
+      : (plan === 'academy' || isAcademyRoute)
+        ? '/meu-diagnostico' 
         : '/mentoria';
   
   const voltarLabel = isAdmin 
     ? 'Voltar para Mentoria' 
     : !plan 
       ? 'Voltar para Comunidade' 
-      : plan === 'academy' 
-        ? 'Voltar para Minha Evolução' 
+      : (plan === 'academy' || isAcademyRoute)
+        ? 'Voltar para Meu Diagnóstico' 
         : 'Voltar para Mentoria';
 
   if (isLoading) {
@@ -96,7 +100,7 @@ export default function MentoriaPainelDiagnostico() {
           <div className="flex flex-wrap items-center gap-3">
             <Button
               variant="outline"
-              onClick={() => navigate("/mentoria/diagnostico")}
+              onClick={() => navigate(isAcademyRoute ? "/diagnostico/formulario" : "/mentoria/diagnostico")}
               className="gap-2"
             >
               <FileText className="w-4 h-4" />
@@ -105,22 +109,23 @@ export default function MentoriaPainelDiagnostico() {
             
             <Button
               variant="outline"
-              onClick={() => navigate("/mentoria/diagnostico?edit=true")}
+              onClick={() => navigate(isAcademyRoute ? "/diagnostico/formulario?edit=true" : "/mentoria/diagnostico?edit=true")}
               className="gap-2"
             >
               <Edit className="w-4 h-4" />
               Editar Diagnóstico
             </Button>
             
-            
-            <Button
-              variant="outline"
-              onClick={() => navigate("/mentoria/projetos")}
-              className="gap-2"
-            >
-              <Briefcase className="w-4 h-4" />
-              Ver Todos Projetos
-            </Button>
+            {!isAcademyRoute && (
+              <Button
+                variant="outline"
+                onClick={() => navigate("/mentoria/projetos")}
+                className="gap-2"
+              >
+                <Briefcase className="w-4 h-4" />
+                Ver Todos Projetos
+              </Button>
+            )}
           </div>
         </div>
       </div>

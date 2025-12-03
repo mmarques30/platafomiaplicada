@@ -46,6 +46,7 @@ const navItems = [
   { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas", icon: Library },
   { path: "/admin/avisos", label: "Gerenciar Avisos", icon: Bell },
   { path: "/admin/mentoria", label: "Gerenciar Mentoria", icon: GraduationCap },
+  { path: "/admin/formularios", label: "Diagnósticos", icon: FileText },
   { path: "/admin/duvidas", label: "Central de Dúvidas", icon: MessageCircle },
   { path: "/admin/comunidade", label: "Comunidade", icon: MessagesSquare },
   { path: "/admin/produtos", label: "Produtos", icon: Package },
