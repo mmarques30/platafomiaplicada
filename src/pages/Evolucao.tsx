@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
 import { EstatisticasEngajamento } from "@/components/evolucao/EstatisticasEngajamento";
 import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
+import { CompartilharFerramentaModal } from "@/components/evolucao/CompartilharFerramentaModal";
 import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
 import { HeroComunidade } from "@/components/evolucao/HeroComunidade";
 import { TimelineJornada } from "@/components/evolucao/TimelineJornada";
@@ -13,9 +16,11 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { AbaDuvidas } from "@/components/evolucao/AbaDuvidas";
 import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
+import { Plus } from "lucide-react";
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
+  const [modalFerramentaOpen, setModalFerramentaOpen] = useState(false);
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -89,7 +94,21 @@ export default function Evolucao() {
               <EstatisticasEngajamento ranking={ranking || []} />
 
               {/* Ferramentas Mais Compartilhadas */}
-              <FerramentasCompartilhadasList />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-foreground">Ferramentas da Comunidade</h2>
+                  <Button onClick={() => setModalFerramentaOpen(true)} size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Compartilhar Ferramenta
+                  </Button>
+                </div>
+                <FerramentasCompartilhadasList />
+              </div>
+              
+              <CompartilharFerramentaModal 
+                open={modalFerramentaOpen} 
+                onOpenChange={setModalFerramentaOpen} 
+              />
             </>
           )}
         </TabsContent>

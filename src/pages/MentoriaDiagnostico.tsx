@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -24,6 +24,7 @@ import { ArrowLeft, Loader2, Info, Download } from "lucide-react";
 
 export default function MentoriaDiagnostico() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { formulario, isLoading, refetch } = useMentoriaForm();
   const { plan } = useUserPlan();
   const { isAdmin } = useUserRole();
@@ -36,20 +37,23 @@ export default function MentoriaDiagnostico() {
   const preenchido = formulario?.completado && !modoEdicao && !criandoNovo;
   const preenchidoPorAdmin = formulario?.preenchido_por === 'admin';
   
+  // Check if accessed via /diagnostico route (Academy-specific)
+  const isAcademyRoute = location.pathname.startsWith('/diagnostico');
+  
   const voltarUrl = isAdmin 
     ? '/mentoria' 
     : !plan 
       ? '/comunidade' 
-      : plan === 'academy' 
-        ? '/evolucao' 
+      : (plan === 'academy' || isAcademyRoute)
+        ? '/meu-diagnostico' 
         : '/mentoria';
   
   const voltarLabel = isAdmin 
     ? 'Voltar para Mentoria' 
     : !plan 
       ? 'Voltar para Comunidade' 
-      : plan === 'academy' 
-        ? 'Voltar para Minha Evolução' 
+      : (plan === 'academy' || isAcademyRoute)
+        ? 'Voltar para Meu Diagnóstico' 
         : 'Voltar para Mentoria';
 
   const handleFormularioFinalizado = () => {

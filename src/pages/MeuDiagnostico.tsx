@@ -102,13 +102,13 @@ export default function MeuDiagnostico() {
                     )}
                     <div className="flex gap-2 pt-2">
                       <Button
-                        onClick={() => navigate("/mentoria/painel-diagnostico")}
+                        onClick={() => navigate("/diagnostico/painel")}
                         className="flex-1"
                       >
                         Ver Painel Completo
                       </Button>
                       <Button
-                        onClick={() => navigate("/mentoria/diagnostico")}
+                        onClick={() => navigate("/diagnostico/formulario")}
                         variant="outline"
                       >
                         Editar
@@ -127,7 +127,7 @@ export default function MeuDiagnostico() {
                       </div>
                     </div>
                     <Button
-                      onClick={() => navigate("/mentoria/diagnostico")}
+                      onClick={() => navigate("/diagnostico/formulario")}
                       className="w-full"
                     >
                       Iniciar Diagnóstico
