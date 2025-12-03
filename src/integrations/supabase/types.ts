@@ -1513,6 +1513,7 @@ export type Database = {
           exemplo: string | null
           ferramentas_recomendadas: Json | null
           id: string
+          link_documento: string | null
           template: string
           titulo: string
           updated_at: string | null
@@ -1525,6 +1526,7 @@ export type Database = {
           exemplo?: string | null
           ferramentas_recomendadas?: Json | null
           id?: string
+          link_documento?: string | null
           template: string
           titulo: string
           updated_at?: string | null
@@ -1537,6 +1539,7 @@ export type Database = {
           exemplo?: string | null
           ferramentas_recomendadas?: Json | null
           id?: string
+          link_documento?: string | null
           template?: string
           titulo?: string
           updated_at?: string | null

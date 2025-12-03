@@ -1,22 +1,20 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useMetodos } from "@/hooks/useFerramentas";
-import { Target, Search, Lightbulb, Cpu } from "lucide-react";
+import { Target, Search, Lightbulb, Cpu, FileText, ExternalLink } from "lucide-react";
+import { METODOS_CATEGORIAS } from "@/lib/metodosCategories";
 
 export default function MetodosAplicar() {
   const { data: metodos, isLoading } = useMetodos();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
-
-  const categorias = metodos
-    ? Array.from(new Set(metodos.map((m) => m.categoria)))
-    : [];
 
   const filteredMetodos = metodos?.filter((metodo) => {
     const matchesSearch =
@@ -56,7 +54,7 @@ export default function MetodosAplicar() {
         >
           Todas
         </Badge>
-        {categorias.map((categoria) => (
+        {METODOS_CATEGORIAS.map((categoria) => (
           <Badge
             key={categoria}
             variant={selectedCategoria === categoria ? "default" : "outline"}
@@ -101,6 +99,28 @@ export default function MetodosAplicar() {
                      />
                    </div>
                  </div>
+
+                 {/* Link do documento */}
+                 {metodo.link_documento && (
+                   <div className="mt-3">
+                     <Button
+                       variant="outline"
+                       size="sm"
+                       asChild
+                       className="gap-2"
+                     >
+                       <a 
+                         href={metodo.link_documento} 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                       >
+                         <FileText className="w-4 h-4" />
+                         Ver Documento
+                         <ExternalLink className="w-3 h-3" />
+                       </a>
+                     </Button>
+                   </div>
+                 )}
 
                  {Array.isArray(metodo.ferramentas_recomendadas) && 
                   metodo.ferramentas_recomendadas.length > 0 && (
