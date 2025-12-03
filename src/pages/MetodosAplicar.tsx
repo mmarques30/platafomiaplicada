@@ -4,8 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CopyButton } from "@/components/shared/CopyButton";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useMetodos } from "@/hooks/useFerramentas";
 import { Target, Search, Lightbulb, Cpu, FileText, ExternalLink } from "lucide-react";
@@ -67,122 +65,89 @@ export default function MetodosAplicar() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((i) => (
             <Card key={i}>
               <CardHeader>
                 <Skeleton className="h-6 w-3/4 mb-2" />
                 <Skeleton className="h-4 w-full" />
               </CardHeader>
               <CardContent>
-                <Skeleton className="h-40 w-full" />
+                <Skeleton className="h-24 w-full" />
               </CardContent>
             </Card>
           ))}
         </div>
       ) : filteredMetodos && filteredMetodos.length > 0 ? (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredMetodos.map((metodo) => (
-            <Card key={metodo.id} className="hover:shadow-lg transition-shadow">
-               <CardHeader>
-                 <div className="flex items-start justify-between gap-3">
-                   <div className="flex-1">
-                     <CardTitle className="text-xl mb-2">{metodo.titulo}</CardTitle>
-                     <CardDescription>{metodo.descricao}</CardDescription>
-                   </div>
-                   <div className="flex items-center gap-2">
-                     <Badge variant="secondary">{metodo.categoria}</Badge>
-                     <FavoriteButton 
-                       tipo="metodo" 
-                       itemId={metodo.id}
-                       variant="ghost"
-                     />
-                   </div>
-                 </div>
+            <Card key={metodo.id} className="flex flex-col hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg mb-2">{metodo.titulo}</CardTitle>
+                    <Badge variant="secondary">{metodo.categoria}</Badge>
+                  </div>
+                  <FavoriteButton 
+                    tipo="metodo" 
+                    itemId={metodo.id}
+                    variant="ghost"
+                  />
+                </div>
+                <CardDescription className="mt-3">{metodo.descricao}</CardDescription>
+              </CardHeader>
+              
+              <CardContent className="flex-1 flex flex-col gap-4">
+                {/* Botão Principal - Acessar Documento */}
+                {metodo.link_documento && (
+                  <Button asChild className="w-full">
+                    <a 
+                      href={metodo.link_documento} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Acessar Documento
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </Button>
+                )}
 
-                 {/* Link do documento */}
-                 {metodo.link_documento && (
-                   <div className="mt-3">
-                     <Button
-                       variant="outline"
-                       size="sm"
-                       asChild
-                       className="gap-2"
-                     >
-                       <a 
-                         href={metodo.link_documento} 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                       >
-                         <FileText className="w-4 h-4" />
-                         Ver Documento
-                         <ExternalLink className="w-3 h-3" />
-                       </a>
-                     </Button>
-                   </div>
-                 )}
-
-                 {Array.isArray(metodo.ferramentas_recomendadas) && 
-                  metodo.ferramentas_recomendadas.length > 0 && (
-                   <div className="mt-3 pt-3 border-t">
-                     <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                       <Cpu className="w-3 h-3" />
-                       Ferramentas onde aplicar:
-                     </p>
-                     <div className="flex gap-2 flex-wrap">
-                       {metodo.ferramentas_recomendadas.map((ferramenta: string) => (
-                         <Badge 
-                           key={ferramenta} 
-                           variant="default" 
-                           className="text-xs bg-primary/10 text-primary hover:bg-primary/20"
-                         >
-                           {ferramenta}
-                         </Badge>
-                       ))}
-                     </div>
-                   </div>
-                 )}
-               </CardHeader>
-              <CardContent className="space-y-4">
-                <Tabs defaultValue="template" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="template">Template</TabsTrigger>
-                    {metodo.exemplo && (
-                      <TabsTrigger value="exemplo">
-                        <Lightbulb className="w-4 h-4 mr-2" />
-                        Exemplo
-                      </TabsTrigger>
-                    )}
-                  </TabsList>
-                  <TabsContent value="template" className="space-y-4">
-                    <div className="bg-muted p-4 rounded-md">
-                      <pre className="text-sm whitespace-pre-wrap font-mono">
-                        {metodo.template}
-                      </pre>
+                {/* Comentários/Dicas de Uso */}
+                {metodo.comentarios && (
+                  <div className="bg-muted/50 rounded-lg p-3">
+                    <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-1">
+                      <Lightbulb className="h-4 w-4 text-primary" />
+                      Dicas de Uso
                     </div>
-                    <CopyButton
-                      content={metodo.template}
-                      variant="default"
-                      size="default"
-                      className="w-full"
-                    />
-                  </TabsContent>
-                  {metodo.exemplo && (
-                    <TabsContent value="exemplo" className="space-y-4">
-                      <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-4 rounded-md">
-                        <pre className="text-sm whitespace-pre-wrap font-mono">
-                          {metodo.exemplo}
-                        </pre>
-                      </div>
-                      <CopyButton
-                        content={metodo.exemplo}
-                        variant="outline"
-                        size="default"
-                        className="w-full"
-                      />
-                    </TabsContent>
-                  )}
-                </Tabs>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {metodo.comentarios}
+                    </p>
+                  </div>
+                )}
+
+                {/* Ferramentas Recomendadas */}
+                {Array.isArray(metodo.ferramentas_recomendadas) && 
+                 metodo.ferramentas_recomendadas.length > 0 && (
+                  <div className="mt-auto pt-3 border-t">
+                    <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                      <Cpu className="w-3 h-3" />
+                      Ferramentas onde aplicar:
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {metodo.ferramentas_recomendadas.map((ferramenta: string) => (
+                        <Badge 
+                          key={ferramenta} 
+                          variant="outline" 
+                          className="text-xs"
+                        >
+                          {ferramenta}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
