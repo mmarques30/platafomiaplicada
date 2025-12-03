@@ -1508,39 +1508,42 @@ export type Database = {
         Row: {
           ativo: boolean | null
           categoria: string
+          comentarios: string | null
           created_at: string | null
           descricao: string
           exemplo: string | null
           ferramentas_recomendadas: Json | null
           id: string
           link_documento: string | null
-          template: string
+          template: string | null
           titulo: string
           updated_at: string | null
         }
         Insert: {
           ativo?: boolean | null
           categoria: string
+          comentarios?: string | null
           created_at?: string | null
           descricao: string
           exemplo?: string | null
           ferramentas_recomendadas?: Json | null
           id?: string
           link_documento?: string | null
-          template: string
+          template?: string | null
           titulo: string
           updated_at?: string | null
         }
         Update: {
           ativo?: boolean | null
           categoria?: string
+          comentarios?: string | null
           created_at?: string | null
           descricao?: string
           exemplo?: string | null
           ferramentas_recomendadas?: Json | null
           id?: string
           link_documento?: string | null
-          template?: string
+          template?: string | null
           titulo?: string
           updated_at?: string | null
         }

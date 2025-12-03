@@ -18,7 +18,7 @@ interface MetodoModalProps {
 }
 
 export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
-  const { register, handleSubmit, reset, setValue, watch } = useForm();
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm();
   const [ferramentasRecomendadas, setFerramentasRecomendadas] = useState<string[]>([]);
   const createMetodo = useCreateMetodo();
   const updateMetodo = useUpdateMetodo();
@@ -34,9 +34,8 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
         titulo: "",
         descricao: "",
         categoria: "",
-        template: "",
-        exemplo: "",
         link_documento: "",
+        comentarios: "",
         ferramentas_recomendadas: [],
         ativo: true,
       });
@@ -47,6 +46,7 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
   const onSubmit = (data: any) => {
     const metodoData = {
       ...data,
+      template: data.link_documento || "Via documento externo",
       ferramentas_recomendadas: ferramentasRecomendadas,
     };
 
@@ -62,23 +62,23 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{metodo ? "Editar" : "Novo"} Método</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label htmlFor="titulo">Título</Label>
+            <Label htmlFor="titulo">Título *</Label>
             <Input id="titulo" {...register("titulo", { required: true })} />
           </div>
 
           <div>
-            <Label htmlFor="descricao">Descrição</Label>
-            <Textarea id="descricao" {...register("descricao", { required: true })} />
+            <Label htmlFor="descricao">Descrição *</Label>
+            <Textarea id="descricao" {...register("descricao", { required: true })} rows={3} />
           </div>
 
           <div>
-            <Label htmlFor="categoria">Categoria</Label>
+            <Label htmlFor="categoria">Categoria *</Label>
             <Select
               value={categoriaValue || ""}
               onValueChange={(value) => setValue("categoria", value)}
@@ -97,31 +97,35 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
           </div>
 
           <div>
-            <Label htmlFor="link_documento">Link do Documento (opcional)</Label>
+            <Label htmlFor="link_documento">Link do Documento *</Label>
             <Input 
               id="link_documento" 
               type="url"
               placeholder="https://docs.google.com/..." 
-              {...register("link_documento")} 
+              {...register("link_documento", { required: "Link do documento é obrigatório" })} 
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Link para documento de apoio (Google Docs, Notion, PDF, etc.)
+              Link para o template completo (Google Docs, Notion, PDF, etc.)
             </p>
+            {errors.link_documento && (
+              <p className="text-xs text-destructive mt-1">{errors.link_documento.message as string}</p>
+            )}
           </div>
 
           <div>
-            <Label htmlFor="template">Template</Label>
-            <Textarea id="template" {...register("template", { required: true })} rows={8} />
-          </div>
-
-          <div>
-            <Label htmlFor="exemplo">Exemplo (opcional)</Label>
-            <Textarea id="exemplo" {...register("exemplo")} rows={6} />
+            <Label htmlFor="comentarios">Comentários / Dicas de Uso</Label>
+            <Textarea 
+              id="comentarios" 
+              {...register("comentarios")} 
+              rows={3}
+              placeholder="Observações, dicas de aplicação, contexto de uso..."
+            />
           </div>
 
           <FerramentasSelectorHibrido
             value={ferramentasRecomendadas}
             onChange={setFerramentasRecomendadas}
+            label="Ferramentas onde aplicar"
           />
 
           <div className="flex items-center space-x-2">
