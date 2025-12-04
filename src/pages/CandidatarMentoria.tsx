@@ -13,7 +13,24 @@ import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import { useEnviarCandidatura } from "@/hooks/useCandidaturasMentoria";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { toast } from "sonner";
 import logoSimbol from "@/assets/logo-aplicada-simbolo.png";
+
+// Required fields per step
+const requiredFieldsByStep: Record<number, { field: string; label: string }[]> = {
+  1: [
+    { field: "nome_completo", label: "Nome Completo" },
+    { field: "email", label: "Email Profissional" },
+    { field: "whatsapp", label: "WhatsApp" },
+  ],
+  5: [
+    { field: "significado_sucesso_ia", label: "O que significa ser um líder de sucesso com IA" },
+    { field: "tres_maiores_desafios", label: "Seus 3 maiores desafios profissionais" },
+  ],
+  7: [
+    { field: "por_que_escolher_voce", label: "Por que eu deveria te escolher" },
+  ],
+};
 
 export default function CandidatarMentoria() {
   const [step, setStep] = useState(1);
@@ -32,7 +49,39 @@ export default function CandidatarMentoria() {
   const totalSteps = 7;
   const progressPercent = (step / totalSteps) * 100;
 
+  // Validate required fields before advancing to next step
+  const validateStep = (): boolean => {
+    const required = requiredFieldsByStep[step];
+    if (!required) return true;
+
+    const values = watch();
+    const missingFields: string[] = [];
+
+    for (const { field, label } of required) {
+      const value = values[field];
+      if (!value || value.toString().trim() === "") {
+        missingFields.push(label);
+      }
+    }
+
+    if (missingFields.length > 0) {
+      toast.error(`Por favor, preencha: ${missingFields.join(", ")}`);
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleNextStep = () => {
+    if (validateStep()) {
+      setStep(step + 1);
+    }
+  };
+
   const onSubmit = (data: any) => {
+    // Final validation before submit
+    if (!validateStep()) return;
+
     // Incluir origem e plano na candidatura
     const candidaturaData = {
       ...data,
@@ -44,6 +93,10 @@ export default function CandidatarMentoria() {
     enviarCandidatura(candidaturaData, {
       onSuccess: () => {
         setShowSuccess(true);
+      },
+      onError: (error) => {
+        console.error("Erro ao enviar candidatura:", error);
+        toast.error("Erro ao enviar candidatura. Por favor, verifique se todos os campos obrigatórios foram preenchidos e tente novamente.");
       },
     });
   };
@@ -552,7 +605,7 @@ export default function CandidatarMentoria() {
               {step < totalSteps ? (
                 <Button
                   type="button"
-                  onClick={() => setStep(step + 1)}
+                  onClick={handleNextStep}
                   className="ml-auto bg-[#9EB038] hover:bg-[#C5D63D] text-[#2F302B]"
                 >
                   Próximo
