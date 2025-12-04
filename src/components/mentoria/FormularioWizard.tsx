@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -18,7 +18,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Save } from "lucide-react";
+
+const STEP_KEY = "diagnostico_current_step";
 
 interface FormularioWizardProps {
   onCancelar?: () => void;
@@ -27,9 +29,11 @@ interface FormularioWizardProps {
 
 export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const { formulario, finalizarFormulario, isSaving } = useMentoriaForm();
+  const [draftSaved, setDraftSaved] = useState(false);
+  const { formulario, finalizarFormulario, salvarRascunho, isSaving } = useMentoriaForm();
   const { plan } = useUserPlan();
   const navigate = useNavigate();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -45,6 +49,48 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   });
 
   const totalSteps = 7;
+
+  // Restore step from localStorage on mount
+  useEffect(() => {
+    const savedStep = localStorage.getItem(STEP_KEY);
+    if (savedStep && formulario) {
+      const stepNum = parseInt(savedStep);
+      if (stepNum >= 0 && stepNum < totalSteps) {
+        setCurrentStep(stepNum);
+        toast({
+          title: "Rascunho restaurado",
+          description: "Continuando de onde você parou",
+        });
+      }
+    }
+  }, [formulario]);
+
+  // Auto-save draft on form changes (debounced)
+  useEffect(() => {
+    const subscription = form.watch((data) => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      
+      saveTimeoutRef.current = setTimeout(async () => {
+        try {
+          await salvarRascunho(data as FormData);
+          localStorage.setItem(STEP_KEY, String(currentStep));
+          setDraftSaved(true);
+          setTimeout(() => setDraftSaved(false), 2000);
+        } catch (error) {
+          console.error("Erro ao salvar rascunho:", error);
+        }
+      }, 2000);
+    });
+    
+    return () => {
+      subscription.unsubscribe();
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [form.watch, currentStep, salvarRascunho]);
 
   const nextStep = async () => {
     const fields = getStepFields(currentStep);
@@ -67,6 +113,9 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
     try {
       // Finalizar formulário
       await finalizarFormulario(data);
+      
+      // Clear localStorage on success
+      localStorage.removeItem(STEP_KEY);
       
       // Mostrar toast informando sobre geração de insight
       toast({
@@ -142,7 +191,15 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
           </div>
         )}
         
-        <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+        <div className="flex items-center justify-between mb-2">
+          <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+          {draftSaved && (
+            <span className="flex items-center gap-1 text-xs text-primary animate-in fade-in duration-300">
+              <Save className="h-3 w-3" />
+              Rascunho salvo
+            </span>
+          )}
+        </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
