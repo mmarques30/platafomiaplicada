@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +12,12 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Moon, Sun, Bell, Lock, AlertTriangle } from "lucide-react";
+import { Moon, Sun, Bell, Lock, AlertTriangle, FileText } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function Configuracoes() {
   const { user, signOut } = useAuth();
+  const { isVisitante } = useUserRole();
   const { theme, setTheme } = useTheme();
   const [notificacoesEmail, setNotificacoesEmail] = useState(true);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -199,6 +202,29 @@ export default function Configuracoes() {
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Políticas e Termos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Políticas e Termos
+            </CardTitle>
+            <CardDescription>Consulte os documentos legais da plataforma</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            {!isVisitante && (
+              <Link to="/politicavendas">
+                <Button variant="outline">Política de Vendas</Button>
+              </Link>
+            )}
+            <Link to="/politicauso">
+              <Button variant="outline">
+                {isVisitante ? "Política de Uso" : "Termos de Uso"}
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 

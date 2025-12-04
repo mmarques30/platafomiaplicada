@@ -67,6 +67,9 @@ import Avance from "./pages/Avance";
 import CandidatarMentoria from "./pages/CandidatarMentoria";
 import GerenciarCandidaturas from "./pages/admin/GerenciarCandidaturas";
 import VideosBonus from "./pages/VideosBonus";
+import PoliticaVendas from "./pages/PoliticaVendas";
+import PoliticaUso from "./pages/PoliticaUso";
+import GerenciarPoliticas from "./pages/admin/GerenciarPoliticas";
 
 const queryClient = new QueryClient();
 
@@ -119,6 +122,8 @@ function AppContent() {
             <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
             <Route path="/videos-bonus" element={<VideosBonus />} />
+            <Route path="/politicavendas" element={<PoliticaVendas />} />
+            <Route path="/politicauso" element={<PoliticaUso />} />
           </Route>
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />
@@ -142,6 +147,7 @@ function AppContent() {
             <Route path="auditoria" element={<Auditoria />} />
             <Route path="importar-usuarios" element={<ImportarUsuarios />} />
             <Route path="comunidade" element={<GerenciarComunidade />} />
+            <Route path="politicas" element={<GerenciarPoliticas />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
