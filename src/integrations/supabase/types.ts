@@ -787,6 +787,42 @@ export type Database = {
         }
         Relationships: []
       }
+      documentos_legais: {
+        Row: {
+          apenas_mentorados: boolean | null
+          conteudo_mentorados: string
+          conteudo_visitantes: string | null
+          created_at: string | null
+          id: string
+          slug: string
+          titulo: string
+          ultima_atualizacao: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          apenas_mentorados?: boolean | null
+          conteudo_mentorados: string
+          conteudo_visitantes?: string | null
+          created_at?: string | null
+          id?: string
+          slug: string
+          titulo: string
+          ultima_atualizacao?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          apenas_mentorados?: boolean | null
+          conteudo_mentorados?: string
+          conteudo_visitantes?: string | null
+          created_at?: string | null
+          id?: string
+          slug?: string
+          titulo?: string
+          ultima_atualizacao?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       duvidas_mentoria: {
         Row: {
           atrasada: boolean | null
