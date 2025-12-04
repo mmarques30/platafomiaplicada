@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, Save } from "lucide-react";
 import { useEnviarCandidatura } from "@/hooks/useCandidaturasMentoria";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
 import logoSimbol from "@/assets/logo-aplicada-simbolo.png";
+
+const DRAFT_KEY = "candidatura_mentoria_draft";
 
 // Required fields per step
 const requiredFieldsByStep: Record<number, { field: string; label: string }[]> = {
@@ -35,11 +37,13 @@ const requiredFieldsByStep: Record<number, { field: string; label: string }[]> =
 export default function CandidatarMentoria() {
   const [step, setStep] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { register, handleSubmit, watch, setValue } = useForm();
   const { mutate: enviarCandidatura, isPending } = useEnviarCandidatura();
   const { profile } = useUserProfile();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Capturar origem e plano da URL
   const origemPagina = searchParams.get('origem') || 'direto';
@@ -48,6 +52,52 @@ export default function CandidatarMentoria() {
 
   const totalSteps = 7;
   const progressPercent = (step / totalSteps) * 100;
+
+  // Restore draft on mount
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        Object.entries(parsed).forEach(([key, value]) => {
+          setValue(key, value);
+        });
+        if (parsed.step) {
+          setStep(parsed.step);
+        }
+        toast.info("Rascunho restaurado automaticamente");
+      } catch (e) {
+        console.error("Erro ao restaurar rascunho:", e);
+      }
+    }
+  }, [setValue]);
+
+  // Auto-save draft on changes (debounced)
+  useEffect(() => {
+    const subscription = watch((data) => {
+      // Clear previous timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      
+      // Debounce save by 1 second
+      saveTimeoutRef.current = setTimeout(() => {
+        const draftData = { ...data, step };
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
+        setDraftSaved(true);
+        
+        // Reset indicator after 2 seconds
+        setTimeout(() => setDraftSaved(false), 2000);
+      }, 1000);
+    });
+    
+    return () => {
+      subscription.unsubscribe();
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [watch, step]);
 
   // Validate required fields before advancing to next step
   const validateStep = (): boolean => {
@@ -92,6 +142,8 @@ export default function CandidatarMentoria() {
     
     enviarCandidatura(candidaturaData, {
       onSuccess: () => {
+        // Clear draft on successful submission
+        localStorage.removeItem(DRAFT_KEY);
         setShowSuccess(true);
       },
       onError: (error) => {
@@ -192,7 +244,15 @@ export default function CandidatarMentoria() {
         <div className="mb-8">
           <div className="flex justify-between mb-2 text-sm text-muted-foreground">
             <span>Etapa {step} de {totalSteps}</span>
-            <span>{Math.round(progressPercent)}%</span>
+            <div className="flex items-center gap-2">
+              {draftSaved && (
+                <span className="flex items-center gap-1 text-xs text-primary animate-in fade-in duration-300">
+                  <Save className="h-3 w-3" />
+                  Rascunho salvo
+                </span>
+              )}
+              <span>{Math.round(progressPercent)}%</span>
+            </div>
           </div>
           <Progress value={progressPercent} className="h-2" />
         </div>
