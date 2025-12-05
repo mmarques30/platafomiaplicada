@@ -86,6 +86,7 @@ function AppContent() {
         <Route path="/auth" element={<Auth />} />
           <Route path="/aplique" element={<Aplique />} />
           <Route path="/avance" element={<Avance />} />
+          <Route path="/formularioaplica" element={<FormularioAplica />} />
           
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />
@@ -126,7 +127,6 @@ function AppContent() {
             <Route path="/videos-bonus" element={<VideosBonus />} />
             <Route path="/politicavendas" element={<PoliticaVendas />} />
             <Route path="/politicauso" element={<PoliticaUso />} />
-            <Route path="/formularioaplica" element={<FormularioAplica />} />
           </Route>
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />
