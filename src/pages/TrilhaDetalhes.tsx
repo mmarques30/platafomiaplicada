@@ -33,7 +33,11 @@ export default function TrilhaDetalhes() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
+  // Inicializa currentVideoId diretamente da URL para evitar race conditions
+  const [currentVideoId, setCurrentVideoId] = useState<string | null>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("video");
+  });
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { isVisitante, isLoading: loadingRole } = useContentVisibility();
 
@@ -126,22 +130,11 @@ export default function TrilhaDetalhes() {
     video.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Ler vídeo da URL (sem redirecionar - permitir preview de trilhas bloqueadas)
+  // Sincroniza currentVideoId com mudanças na URL (navegação)
   useEffect(() => {
     const videoIdFromUrl = searchParams.get("video");
-    
-    // Se não tem ?video= na URL, mostrar TrilhaOverview
-    if (!videoIdFromUrl) {
-      setCurrentVideoId(null);
-      return;
-    }
-    
-    // Se tem vídeo na URL e existe nos dados carregados, selecionar
-    if (allVideos.length > 0 && allVideos.some(v => v.id === videoIdFromUrl)) {
-      setCurrentVideoId(videoIdFromUrl);
-    }
-    // Se allVideos está vazio (carregando), NÃO fazer nada - esperar dados
-  }, [searchParams, allVideos]);
+    setCurrentVideoId(videoIdFromUrl);
+  }, [searchParams]);
 
   // Scroll to active video in sidebar
   useEffect(() => {
