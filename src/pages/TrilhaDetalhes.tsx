@@ -130,13 +130,17 @@ export default function TrilhaDetalhes() {
   useEffect(() => {
     const videoIdFromUrl = searchParams.get("video");
     
-    // Se tem vídeo na URL e existe nos vídeos disponíveis, selecionar
-    if (videoIdFromUrl && allVideos.some(v => v.id === videoIdFromUrl)) {
-      setCurrentVideoId(videoIdFromUrl);
-    } else {
-      // Se não tem ?video=, não redirecionar - mostrar TrilhaOverview
+    // Se não tem ?video= na URL, mostrar TrilhaOverview
+    if (!videoIdFromUrl) {
       setCurrentVideoId(null);
+      return;
     }
+    
+    // Se tem vídeo na URL e existe nos dados carregados, selecionar
+    if (allVideos.length > 0 && allVideos.some(v => v.id === videoIdFromUrl)) {
+      setCurrentVideoId(videoIdFromUrl);
+    }
+    // Se allVideos está vazio (carregando), NÃO fazer nada - esperar dados
   }, [searchParams, allVideos]);
 
   // Scroll to active video in sidebar
