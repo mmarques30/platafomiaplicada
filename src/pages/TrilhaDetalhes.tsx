@@ -53,37 +53,28 @@ export default function TrilhaDetalhes() {
   const { data: trilha, isLoading } = useQuery({
     queryKey: ["trilha", id, isVisitante],
     queryFn: async () => {
-      let query = supabase
+      // Busca trilha sem !inner para evitar erro quando módulos não têm vídeos
+      const { data, error } = await supabase
         .from("trilhas")
         .select(`
           *,
-          modulos:modulos!inner(
+          modulos(
             *,
-            videos:videos!inner(*)
+            videos(*)
           )
         `)
         .eq("id", id)
         .eq("ativo", true)
-        .eq("modulos.ativo", true)
-        .eq("modulos.videos.ativo", true)
         .order("ordem", { foreignTable: "modulos" })
-        .order("ordem", { foreignTable: "modulos.videos" });
-      
-      if (isVisitante) {
-        query = query
-          .eq("visivel_visitantes", true)
-          .eq("modulos.visivel_visitantes", true)
-          .eq("modulos.videos.visivel_visitantes", true);
-      } else {
-        query = query
-          .eq("visivel_mentorados", true)
-          .eq("modulos.visivel_mentorados", true)
-          .eq("modulos.videos.visivel_mentorados", true);
-      }
-      
-      const { data, error } = await query.single();
+        .order("ordem", { foreignTable: "modulos.videos" })
+        .single();
       
       if (error) throw error;
+      
+      // Verifica visibilidade da trilha
+      if (isVisitante && !data.visivel_visitantes) return null;
+      if (!isVisitante && !data.visivel_mentorados) return null;
+      
       return data;
     },
     enabled: !loadingRole,
@@ -104,10 +95,24 @@ export default function TrilhaDetalhes() {
     enabled: !!user,
   });
 
-  // Filter modules that have videos
-  const modulosComVideos = trilha?.modulos?.filter(
-    (modulo: any) => modulo.videos && modulo.videos.length > 0
-  ) || [];
+  // Filtra módulos e vídeos no JavaScript baseado em visibilidade e status ativo
+  const modulosComVideos = (trilha?.modulos || [])
+    .filter((modulo: any) => {
+      if (!modulo.ativo) return false;
+      if (isVisitante && !modulo.visivel_visitantes) return false;
+      if (!isVisitante && !modulo.visivel_mentorados) return false;
+      return true;
+    })
+    .map((modulo: any) => ({
+      ...modulo,
+      videos: (modulo.videos || []).filter((video: any) => {
+        if (!video.ativo) return false;
+        if (isVisitante && !video.visivel_visitantes) return false;
+        if (!isVisitante && !video.visivel_mentorados) return false;
+        return true;
+      })
+    }))
+    .filter((modulo: any) => modulo.videos && modulo.videos.length > 0);
 
   // Get all videos from all modules
   const allVideos = modulosComVideos.flatMap(modulo => 
