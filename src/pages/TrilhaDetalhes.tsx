@@ -25,7 +25,9 @@ import { toast } from "sonner";
 import { TrilhaOverview } from "@/components/shared/TrilhaOverview";
 
 export default function TrilhaDetalhes() {
-  const { id } = useParams();
+  const { id: rawId } = useParams();
+  // Sanitiza o ID: remove qualquer query string que possa ter vazado para o path param
+  const id = rawId?.split('?')[0];
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
