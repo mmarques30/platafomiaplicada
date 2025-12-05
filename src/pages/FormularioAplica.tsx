@@ -54,7 +54,7 @@ export default function FormularioAplica() {
   // Reward based on detected mentorado status (by email, not login)
   const recompensaAtual = mentoradoDetectado ? recompensas?.mentorado : recompensas?.publico;
 
-  // Check if email belongs to a mentorado
+  // Check if email belongs to a mentorado via RPC (bypasses RLS)
   const verificarEmailMentorado = async (email: string) => {
     if (!email || !email.includes('@')) {
       setMentoradoDetectado(false);
@@ -63,15 +63,16 @@ export default function FormularioAplica() {
     
     setVerificandoEmail(true);
     try {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, plano_mentoria, is_visitante")
-        .eq("email", email.toLowerCase().trim())
-        .maybeSingle();
+      const { data, error } = await supabase
+        .rpc("verificar_email_mentorado", { email_input: email.toLowerCase().trim() });
       
-      // Is mentorado if: exists, has plan AND is not visitante
-      const isMentoradoFound = data && data.plano_mentoria && !data.is_visitante;
-      setMentoradoDetectado(!!isMentoradoFound);
+      if (error) {
+        console.error("Erro ao verificar email:", error);
+        setMentoradoDetectado(false);
+        return;
+      }
+      
+      setMentoradoDetectado(data === true);
     } catch (error) {
       console.error("Erro ao verificar email:", error);
       setMentoradoDetectado(false);
