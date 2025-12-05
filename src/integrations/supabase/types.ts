@@ -2276,35 +2276,38 @@ export type Database = {
         Row: {
           completado: boolean | null
           created_at: string | null
+          email_respondente: string | null
           id: string
           pesquisa_id: string
           respostas: Json
           secao_atual: number | null
           tempo_resposta: number | null
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           completado?: boolean | null
           created_at?: string | null
+          email_respondente?: string | null
           id?: string
           pesquisa_id: string
           respostas?: Json
           secao_atual?: number | null
           tempo_resposta?: number | null
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           completado?: boolean | null
           created_at?: string | null
+          email_respondente?: string | null
           id?: string
           pesquisa_id?: string
           respostas?: Json
           secao_atual?: number | null
           tempo_resposta?: number | null
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

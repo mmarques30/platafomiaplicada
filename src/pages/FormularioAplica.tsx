@@ -8,8 +8,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Gift, Target, CheckCircle2, Loader2, Check } from "lucide-react";
-import { usePesquisa, useMinhaResposta, useSalvarResposta } from "@/hooks/usePesquisas";
+import { ChevronLeft, ChevronRight, Gift, CheckCircle2, Loader2, Check, Mail } from "lucide-react";
+import { usePesquisa, useSalvarResposta } from "@/hooks/usePesquisas";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { supabase } from "@/integrations/supabase/client";
 import type { Pergunta, Secao } from "@/types/pesquisas";
 import logoMarca from "@/assets/logo-aplicada-marca-completa.png";
 import backgroundSymbol from "@/assets/logos/background-symbol.png";
@@ -19,8 +22,9 @@ const AUTO_SAVE_DELAY = 2000;
 
 export default function FormularioAplica() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const { plan } = useUserPlan();
   const { data: pesquisa, isLoading } = usePesquisa("formulario-aplica");
-  const { data: minhaResposta, isLoading: isLoadingResposta } = useMinhaResposta(pesquisa?.id || "");
   const salvarResposta = useSalvarResposta();
 
   const [started, setStarted] = useState(false);
@@ -28,6 +32,7 @@ export default function FormularioAplica() {
   const [secaoAtual, setSecaoAtual] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, string>>({});
   const [startTime, setStartTime] = useState(Date.now());
+  const [emailRespondente, setEmailRespondente] = useState("");
   
   // Auto-save states
   const [isSaving, setIsSaving] = useState(false);
@@ -35,30 +40,53 @@ export default function FormularioAplica() {
   const [hasRestored, setHasRestored] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Restore progress - priority: database > localStorage
-  useEffect(() => {
-    if (hasRestored || isLoadingResposta) return;
+  const isMentorado = !!user && !!plan;
+  const isLoggedIn = !!user;
 
-    // Priority 1: Database
-    if (minhaResposta) {
-      setRespostas(minhaResposta.respostas as Record<string, string>);
-      if (minhaResposta.completado) {
-        setFinished(true);
-        setStarted(true);
-      } else if (Object.keys(minhaResposta.respostas || {}).length > 0) {
-        setSecaoAtual(minhaResposta.secao_atual || 0);
-        setStarted(true);
-        toast({
-          title: "Progresso restaurado",
-          description: "Continuando de onde você parou...",
-        });
-      }
-      setHasRestored(true);
-      return;
+  // Parse recompensas from pesquisa
+  const recompensas = pesquisa?.recompensas ? 
+    (typeof pesquisa.recompensas === 'string' ? JSON.parse(pesquisa.recompensas) : pesquisa.recompensas) : 
+    null;
+  const recompensaAtual = isMentorado ? recompensas?.mentorado : recompensas?.publico;
+
+  // Restore progress from localStorage only (for anonymous users or first load)
+  useEffect(() => {
+    if (hasRestored || !pesquisa) return;
+
+    // If logged in, check database for existing response
+    if (isLoggedIn) {
+      const checkExisting = async () => {
+        const { data } = await supabase
+          .from("respostas_pesquisas")
+          .select("*")
+          .eq("pesquisa_id", pesquisa.id)
+          .eq("user_id", user!.id)
+          .maybeSingle();
+
+        if (data) {
+          setRespostas(data.respostas as Record<string, string>);
+          if (data.completado) {
+            setFinished(true);
+            setStarted(true);
+          } else if (Object.keys(data.respostas || {}).length > 0) {
+            setSecaoAtual(data.secao_atual || 0);
+            setStarted(true);
+            toast({
+              title: "Progresso restaurado",
+              description: "Continuando de onde você parou...",
+            });
+          }
+          setHasRestored(true);
+          return;
+        }
+        checkLocalStorage();
+      };
+      checkExisting();
+    } else {
+      checkLocalStorage();
     }
 
-    // Priority 2: localStorage (fallback)
-    if (!minhaResposta && pesquisa) {
+    function checkLocalStorage() {
       try {
         const draft = localStorage.getItem(STORAGE_KEY);
         if (draft) {
@@ -66,6 +94,7 @@ export default function FormularioAplica() {
           if (parsed.respostas && Object.keys(parsed.respostas).length > 0) {
             setRespostas(parsed.respostas);
             setSecaoAtual(parsed.secaoAtual || 0);
+            setEmailRespondente(parsed.emailRespondente || "");
             setStarted(true);
             toast({
               title: "Rascunho encontrado",
@@ -78,7 +107,7 @@ export default function FormularioAplica() {
       }
       setHasRestored(true);
     }
-  }, [minhaResposta, isLoadingResposta, pesquisa, hasRestored]);
+  }, [pesquisa, hasRestored, isLoggedIn, user]);
 
   // Immediate localStorage backup on any change
   useEffect(() => {
@@ -86,24 +115,76 @@ export default function FormularioAplica() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         respostas,
         secaoAtual,
+        emailRespondente,
         timestamp: Date.now()
       }));
     }
-  }, [respostas, secaoAtual, started, finished]);
+  }, [respostas, secaoAtual, emailRespondente, started, finished]);
 
   // Debounced database save
   const saveToDatabase = useCallback(async (completado: boolean = false) => {
     if (!pesquisa || finished) return;
     
+    // For anonymous users, require email
+    if (!isLoggedIn && !emailRespondente.trim()) {
+      if (completado) {
+        toast({
+          title: "Email obrigatório",
+          description: "Por favor, informe seu email para finalizar.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
     setIsSaving(true);
     try {
-      await salvarResposta.mutateAsync({
-        pesquisaId: pesquisa.id,
+      const payload = {
+        pesquisa_id: pesquisa.id,
+        user_id: isLoggedIn ? user!.id : null,
         respostas,
-        secaoAtual,
+        secao_atual: secaoAtual,
         completado,
-        tempoResposta: Math.floor((Date.now() - startTime) / 1000),
-      });
+        tempo_resposta: Math.floor((Date.now() - startTime) / 1000),
+        email_respondente: isLoggedIn ? null : emailRespondente.trim(),
+      };
+
+      // Check if response exists for this user/email
+      let existing = null;
+      if (isLoggedIn) {
+        const { data } = await supabase
+          .from("respostas_pesquisas")
+          .select("id")
+          .eq("pesquisa_id", pesquisa.id)
+          .eq("user_id", user!.id)
+          .maybeSingle();
+        existing = data;
+      } else if (emailRespondente.trim()) {
+        const { data } = await supabase
+          .from("respostas_pesquisas")
+          .select("id")
+          .eq("pesquisa_id", pesquisa.id)
+          .eq("email_respondente", emailRespondente.trim())
+          .maybeSingle();
+        existing = data;
+      }
+
+      if (existing) {
+        await supabase
+          .from("respostas_pesquisas")
+          .update({
+            respostas,
+            secao_atual: secaoAtual,
+            completado,
+            tempo_resposta: Math.floor((Date.now() - startTime) / 1000),
+          })
+          .eq("id", existing.id);
+      } else {
+        await supabase
+          .from("respostas_pesquisas")
+          .insert(payload);
+      }
+
       setLastSaved(new Date());
     } catch (error) {
       console.error("Erro ao salvar:", error);
@@ -115,18 +196,18 @@ export default function FormularioAplica() {
     } finally {
       setIsSaving(false);
     }
-  }, [pesquisa, respostas, secaoAtual, startTime, finished, salvarResposta]);
+  }, [pesquisa, respostas, secaoAtual, startTime, finished, isLoggedIn, user, emailRespondente]);
 
   // Auto-save trigger (debounced)
   useEffect(() => {
     if (!started || finished || Object.keys(respostas).length === 0) return;
+    // Only auto-save if logged in or has email
+    if (!isLoggedIn && !emailRespondente.trim()) return;
 
-    // Clear previous timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
-    // Set new timeout
     saveTimeoutRef.current = setTimeout(() => {
       saveToDatabase(false);
     }, AUTO_SAVE_DELAY);
@@ -136,7 +217,7 @@ export default function FormularioAplica() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [respostas, started, finished, saveToDatabase]);
+  }, [respostas, started, finished, saveToDatabase, isLoggedIn, emailRespondente]);
 
   const secoes = pesquisa?.perguntas || [];
   const secaoData = secoes[secaoAtual] as Secao | undefined;
@@ -154,6 +235,16 @@ export default function FormularioAplica() {
 
   const validarSecao = (): boolean => {
     if (!secaoData) return true;
+    
+    // Validate email for anonymous users on first section
+    if (secaoAtual === 0 && !isLoggedIn && !emailRespondente.trim()) {
+      toast({
+        title: "Email obrigatório",
+        description: "Por favor, informe seu email para continuar.",
+        variant: "destructive",
+      });
+      return false;
+    }
     
     for (const pergunta of secaoData.perguntas) {
       if (!shouldShowPergunta(pergunta)) continue;
@@ -182,7 +273,7 @@ export default function FormularioAplica() {
       setFinished(true);
       toast({
         title: "Pesquisa concluída!",
-        description: "Obrigado por participar. Suas recompensas serão liberadas em breve.",
+        description: "Obrigado por participar. Sua recompensa será liberada em breve.",
       });
     }
   };
@@ -292,7 +383,7 @@ export default function FormularioAplica() {
     return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#2F302B]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -322,34 +413,20 @@ export default function FormularioAplica() {
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <Target className="h-5 w-5 text-primary mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2">Objetivos</h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Compreender o perfil dos nossos primeiros clientes</li>
-                    <li>• Identificar as pessoas mais engajadas</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
             <div className="bg-[#9EB038]/10 border border-[#9EB038]/20 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <Gift className="h-5 w-5 text-[#9EB038] mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">Recompensas</h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• 1 sessão de mentoria gratuita</li>
-                    <li>• 30 dias de acesso gratuito à plataforma</li>
-                  </ul>
+                  <h3 className="font-semibold text-foreground mb-2">Sua Recompensa</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {recompensaAtual || "Complete a pesquisa para receber sua recompensa exclusiva."}
+                  </p>
                 </div>
               </div>
             </div>
 
             <p className="text-center text-sm text-muted-foreground">
-              Tempo estimado: ~15 minutos
+              Tempo estimado: ~10 minutos
             </p>
 
             <Button 
@@ -388,30 +465,34 @@ export default function FormularioAplica() {
           </CardHeader>
           <CardContent className="space-y-6">
             <p className="text-muted-foreground">
-              Suas respostas foram registradas com sucesso. Entraremos em contato em breve para liberar suas recompensas.
+              Suas respostas foram registradas com sucesso. {isMentorado ? "Sua recompensa será liberada em breve." : "Entraremos em contato pelo email informado para liberar sua recompensa."}
             </p>
 
             <div className="bg-[#9EB038]/10 border border-[#9EB038]/20 rounded-lg p-4">
-              <h3 className="font-semibold text-foreground mb-3">Suas recompensas</h3>
-              <ul className="text-sm text-muted-foreground space-y-2">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#9EB038]" />
-                  1 sessão de mentoria gratuita
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#9EB038]" />
-                  30 dias de acesso gratuito à plataforma
-                </li>
-              </ul>
+              <h3 className="font-semibold text-foreground mb-3">Sua recompensa</h3>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="h-4 w-4 text-[#9EB038]" />
+                {recompensaAtual || "Recompensa exclusiva"}
+              </div>
             </div>
 
-            <Button 
-              onClick={() => navigate("/dashboard")} 
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              size="lg"
-            >
-              VOLTAR PARA O DASHBOARD
-            </Button>
+            {isLoggedIn ? (
+              <Button 
+                onClick={() => navigate("/")} 
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                size="lg"
+              >
+                VOLTAR PARA O DASHBOARD
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => navigate("/aplique")} 
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                size="lg"
+              >
+                CONHECER O IAPLICADA
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -471,11 +552,34 @@ export default function FormularioAplica() {
               <CardTitle className="text-xl text-foreground">
                 {secaoData?.titulo}
               </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {secaoData?.objetivo}
-              </p>
+              {secaoData?.objetivo && (
+                <p className="text-sm text-muted-foreground">
+                  {secaoData.objetivo}
+                </p>
+              )}
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Email field for anonymous users on first section */}
+              {secaoAtual === 0 && !isLoggedIn && (
+                <div className="space-y-2 pb-4 border-b border-border">
+                  <Label className="text-foreground flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Seu email para contato
+                    <span className="text-destructive ml-1">*</span>
+                  </Label>
+                  <Input
+                    type="email"
+                    value={emailRespondente}
+                    onChange={(e) => setEmailRespondente(e.target.value)}
+                    placeholder="seu@email.com"
+                    className="bg-background border-border"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Usaremos este email para enviar sua recompensa após completar a pesquisa.
+                  </p>
+                </div>
+              )}
+
               {secaoData?.perguntas.map((pergunta) => (
                 <div key={pergunta.id} className="space-y-2">
                   <Label className="text-foreground">
