@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -79,24 +80,44 @@ export default function VideoPlayer() {
     enabled: !!user && !!id,
   });
 
-  const salvarProgressoMutation = useMutation({
-    mutationFn: async ({ tempo, completado }: { tempo: number; completado: boolean }) => {
+  // Mutation APENAS para salvar tempo - NÃO altera completado
+  const salvarTempoMutation = useMutation({
+    mutationFn: async (tempo: number) => {
       if (!user || !id) return;
 
-      const { error } = await supabase
+      // Verificar se já existe registro
+      const { data: existing } = await supabase
         .from("progresso_videos")
-        .upsert({
-          user_id: user.id,
-          video_id: id,
-          tempo_assistido: tempo,
-          completado,
-          ultima_visualizacao: new Date().toISOString(),
-        });
+        .select("id, completado")
+        .eq("user_id", user.id)
+        .eq("video_id", id)
+        .maybeSingle();
 
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["progresso", id, user?.id] });
+      if (existing) {
+        // Atualiza apenas tempo e visualização, mantém completado
+        const { error } = await supabase
+          .from("progresso_videos")
+          .update({
+            tempo_assistido: tempo,
+            ultima_visualizacao: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+
+        if (error) throw error;
+      } else {
+        // Primeiro acesso: cria registro com completado=false
+        const { error } = await supabase
+          .from("progresso_videos")
+          .insert({
+            user_id: user.id,
+            video_id: id,
+            tempo_assistido: tempo,
+            completado: false,
+            ultima_visualizacao: new Date().toISOString(),
+          });
+
+        if (error) throw error;
+      }
     },
   });
 
@@ -122,13 +143,17 @@ export default function VideoPlayer() {
     },
   });
 
+  // Debounce para não salvar tempo a cada segundo
+  const lastSaveRef = useRef<number>(0);
   const handleTimeUpdate = (currentTime: number) => {
     if (!user || !id) return;
     
-    salvarProgressoMutation.mutate({
-      tempo: Math.floor(currentTime),
-      completado: false,
-    });
+    const now = Date.now();
+    // Salvar apenas a cada 10 segundos
+    if (now - lastSaveRef.current < 10000) return;
+    
+    lastSaveRef.current = now;
+    salvarTempoMutation.mutate(Math.floor(currentTime));
   };
 
   const handleVideoEnded = () => {
