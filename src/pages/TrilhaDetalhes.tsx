@@ -26,18 +26,23 @@ import { TrilhaOverview } from "@/components/shared/TrilhaOverview";
 
 export default function TrilhaDetalhes() {
   const { id: rawId } = useParams();
-  // Sanitiza o ID: remove qualquer query string que possa ter vazado para o path param
-  const id = rawId?.split('?')[0];
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Sanitiza o ID: decodifica e extrai apenas o UUID, removendo query strings corrompidas
+  const decodedRawId = decodeURIComponent(rawId || '');
+  const id = decodedRawId.split('?')[0];
+  
+  // Se a URL estava corrompida (%3Fvideo= no path), extrai o videoId de lá
+  const videoIdFromCorruptedPath = decodedRawId.includes('?video=') 
+    ? decodedRawId.split('?video=')[1]?.split('?')[0] 
+    : null;
+  
+  // Prioriza searchParams, fallback para videoId extraído de path corrompido
+  const currentVideoId = searchParams.get("video") || videoIdFromCorruptedPath;
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  // Inicializa currentVideoId diretamente da URL para evitar race conditions
-  const [currentVideoId, setCurrentVideoId] = useState<string | null>(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("video");
-  });
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { isVisitante, isLoading: loadingRole } = useContentVisibility();
 
@@ -130,12 +135,6 @@ export default function TrilhaDetalhes() {
     video.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Sincroniza currentVideoId com mudanças na URL (navegação)
-  useEffect(() => {
-    const videoIdFromUrl = searchParams.get("video");
-    setCurrentVideoId(videoIdFromUrl);
-  }, [searchParams]);
-
   // Scroll to active video in sidebar
   useEffect(() => {
     if (currentVideoId && videoRefs.current[currentVideoId]) {
@@ -147,7 +146,6 @@ export default function TrilhaDetalhes() {
   }, [currentVideoId]);
 
   const handleVideoSelect = (videoId: string) => {
-    setCurrentVideoId(videoId);
     setSearchParams({ video: videoId });
   };
 
