@@ -5,11 +5,22 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Users, Download, Eye, ExternalLink } from "lucide-react";
-import { usePesquisasAdmin, useRespostasPesquisa, useEstatisticasPesquisa } from "@/hooks/usePesquisas";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { FileText, Users, Download, Eye, ExternalLink, Trash2 } from "lucide-react";
+import { usePesquisasAdmin, useRespostasPesquisa, useEstatisticasPesquisa, useDeleteResposta } from "@/hooks/usePesquisas";
 import type { Pesquisa } from "@/types/pesquisas";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toast } from "@/hooks/use-toast";
 
 export default function GerenciarPesquisas() {
   const { data: pesquisas, isLoading } = usePesquisasAdmin();
@@ -139,7 +150,32 @@ function RespostasDrawer({
   onClose: () => void;
 }) {
   const { data: respostas, isLoading } = useRespostasPesquisa(pesquisa.id);
+  const deleteResposta = useDeleteResposta();
   const [selectedResposta, setSelectedResposta] = useState<any>(null);
+  const [respostaToDelete, setRespostaToDelete] = useState<any>(null);
+
+  const handleDelete = async () => {
+    if (!respostaToDelete) return;
+    
+    try {
+      await deleteResposta.mutateAsync(respostaToDelete.id);
+      toast({
+        title: "Resposta excluída",
+        description: "A resposta foi removida com sucesso.",
+      });
+      if (selectedResposta?.id === respostaToDelete.id) {
+        setSelectedResposta(null);
+      }
+    } catch (error) {
+      toast({
+        title: "Erro ao excluir",
+        description: "Não foi possível excluir a resposta.",
+        variant: "destructive",
+      });
+    } finally {
+      setRespostaToDelete(null);
+    }
+  };
 
   const exportCSV = () => {
     if (!respostas || respostas.length === 0) return;
@@ -151,7 +187,6 @@ function RespostasDrawer({
     const headers = ["Nome", "Email", "Status", "Data", ...allPerguntaIds.map(p => p.texto)];
     
     const rows = respostas.map(r => {
-      // Usar email_respondente como fallback para visitantes
       const displayEmail = (r as any).email_respondente || "N/A";
       return [
         displayEmail.split("@")[0] || "Anônimo",
@@ -175,132 +210,165 @@ function RespostasDrawer({
   };
 
   return (
-    <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="border-b border-border">
-          <div className="flex items-center justify-between">
-            <div>
-              <DrawerTitle>Respostas: {pesquisa.titulo}</DrawerTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                {respostas?.length || 0} respostas registradas
-              </p>
-            </div>
-            <Button variant="outline" size="sm" onClick={exportCSV} className="gap-2">
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
-          </div>
-        </DrawerHeader>
-
-        <div className="p-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-32">
-              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
-            </div>
-          ) : respostas?.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              Nenhuma resposta registrada ainda.
-            </p>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Lista de respostas */}
-              <div className="border border-border rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {respostas?.map((resposta) => {
-                      // Usar email_respondente como fallback para visitantes
-                      const emailRespondente = (resposta as any).email_respondente;
-                      const displayEmail = emailRespondente || "N/A";
-                      const displayName = emailRespondente ? emailRespondente.split("@")[0] : "Anônimo";
-                      return (
-                        <TableRow 
-                          key={resposta.id}
-                          className={selectedResposta?.id === resposta.id ? "bg-muted" : ""}
-                        >
-                          <TableCell>
-                            <div>
-                              <p className="font-medium text-foreground">
-                                {displayName}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {displayEmail}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={resposta.completado ? "default" : "secondary"}>
-                              {resposta.completado ? "Completa" : "Parcial"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {format(new Date(resposta.created_at), "dd/MM/yy", { locale: ptBR })}
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedResposta(resposta)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+    <>
+      <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
+        <DrawerContent className="max-h-[90vh]">
+          <DrawerHeader className="border-b border-border">
+            <div className="flex items-center justify-between">
+              <div>
+                <DrawerTitle>Respostas: {pesquisa.titulo}</DrawerTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {respostas?.length || 0} respostas registradas
+                </p>
               </div>
+              <Button variant="outline" size="sm" onClick={exportCSV} className="gap-2">
+                <Download className="h-4 w-4" />
+                Exportar CSV
+              </Button>
+            </div>
+          </DrawerHeader>
 
-              {/* Detalhes da resposta selecionada */}
-              <div className="border border-border rounded-lg p-4">
-                {selectedResposta ? (
-                  <ScrollArea className="h-[400px]">
-                    <h3 className="font-semibold text-foreground mb-4">
-                      Respostas de {selectedResposta.email_respondente?.split("@")[0] || "Anônimo"}
-                    </h3>
-                    <div className="space-y-6">
-                      {pesquisa.perguntas.map((secao) => (
-                        <div key={secao.secao}>
-                          <h4 className="text-sm font-medium text-primary mb-3">
-                            {secao.titulo}
-                          </h4>
-                          <div className="space-y-4">
-                            {secao.perguntas.map((pergunta) => {
-                              const resposta = (selectedResposta.respostas as Record<string, string>)[pergunta.id];
-                              return (
-                                <div key={pergunta.id}>
-                                  <p className="text-sm text-muted-foreground">
-                                    {pergunta.texto}
+          <div className="p-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
+              </div>
+            ) : respostas?.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                Nenhuma resposta registrada ainda.
+              </p>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Lista de respostas */}
+                <ScrollArea className="h-[70vh]">
+                  <div className="border border-border rounded-lg overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Data</TableHead>
+                          <TableHead>Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {respostas?.map((resposta) => {
+                          const emailRespondente = (resposta as any).email_respondente;
+                          const displayEmail = emailRespondente || "N/A";
+                          const displayName = emailRespondente ? emailRespondente.split("@")[0] : "Anônimo";
+                          return (
+                            <TableRow 
+                              key={resposta.id}
+                              className={selectedResposta?.id === resposta.id ? "bg-muted" : ""}
+                            >
+                              <TableCell>
+                                <div>
+                                  <p className="font-medium text-foreground">
+                                    {displayName}
                                   </p>
-                                  <p className="text-foreground mt-1">
-                                    {resposta || <span className="text-muted-foreground italic">Não respondida</span>}
+                                  <p className="text-xs text-muted-foreground">
+                                    {displayEmail}
                                   </p>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    Selecione uma resposta para ver os detalhes
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant={resposta.completado ? "default" : "secondary"}>
+                                  {resposta.completado ? "Completa" : "Parcial"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-sm text-muted-foreground">
+                                {format(new Date(resposta.created_at), "dd/MM/yy", { locale: ptBR })}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSelectedResposta(resposta)}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-destructive hover:text-destructive"
+                                    onClick={() => setRespostaToDelete(resposta)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
                   </div>
-                )}
+                </ScrollArea>
+
+                {/* Detalhes da resposta selecionada */}
+                <div className="border border-border rounded-lg p-4">
+                  {selectedResposta ? (
+                    <ScrollArea className="h-[70vh]">
+                      <h3 className="font-semibold text-foreground mb-4">
+                        Respostas de {selectedResposta.email_respondente?.split("@")[0] || "Anônimo"}
+                      </h3>
+                      <div className="space-y-6">
+                        {pesquisa.perguntas.map((secao) => (
+                          <div key={secao.secao}>
+                            <h4 className="text-sm font-medium text-primary mb-3">
+                              {secao.titulo}
+                            </h4>
+                            <div className="space-y-4">
+                              {secao.perguntas.map((pergunta) => {
+                                const resposta = (selectedResposta.respostas as Record<string, string>)[pergunta.id];
+                                return (
+                                  <div key={pergunta.id}>
+                                    <p className="text-sm text-muted-foreground">
+                                      {pergunta.texto}
+                                    </p>
+                                    <p className="text-foreground mt-1">
+                                      {resposta || <span className="text-muted-foreground italic">Não respondida</span>}
+                                    </p>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                      Selecione uma resposta para ver os detalhes
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      </DrawerContent>
-    </Drawer>
+            )}
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      <AlertDialog open={!!respostaToDelete} onOpenChange={(o) => !o && setRespostaToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir resposta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível. A resposta de "{respostaToDelete?.email_respondente || "Anônimo"}" será excluída permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
