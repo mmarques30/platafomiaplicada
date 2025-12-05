@@ -151,10 +151,11 @@ function RespostasDrawer({
     const headers = ["Nome", "Email", "Status", "Data", ...allPerguntaIds.map(p => p.texto)];
     
     const rows = respostas.map(r => {
-      const profile = r.profiles as any;
+      // Usar email_respondente como fallback para visitantes
+      const displayEmail = (r as any).email_respondente || "N/A";
       return [
-        profile?.nome_completo || "N/A",
-        profile?.email || "N/A",
+        displayEmail.split("@")[0] || "Anônimo",
+        displayEmail,
         r.completado ? "Completa" : "Parcial",
         format(new Date(r.created_at), "dd/MM/yyyy HH:mm"),
         ...allPerguntaIds.map(p => (r.respostas as Record<string, string>)[p.id] || "")
@@ -215,7 +216,10 @@ function RespostasDrawer({
                   </TableHeader>
                   <TableBody>
                     {respostas?.map((resposta) => {
-                      const profile = resposta.profiles as any;
+                      // Usar email_respondente como fallback para visitantes
+                      const emailRespondente = (resposta as any).email_respondente;
+                      const displayEmail = emailRespondente || "N/A";
+                      const displayName = emailRespondente ? emailRespondente.split("@")[0] : "Anônimo";
                       return (
                         <TableRow 
                           key={resposta.id}
@@ -224,10 +228,10 @@ function RespostasDrawer({
                           <TableCell>
                             <div>
                               <p className="font-medium text-foreground">
-                                {profile?.nome_completo || "N/A"}
+                                {displayName}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {profile?.email || "N/A"}
+                                {displayEmail}
                               </p>
                             </div>
                           </TableCell>
@@ -260,7 +264,7 @@ function RespostasDrawer({
                 {selectedResposta ? (
                   <ScrollArea className="h-[400px]">
                     <h3 className="font-semibold text-foreground mb-4">
-                      Respostas de {(selectedResposta.profiles as any)?.nome_completo}
+                      Respostas de {selectedResposta.email_respondente?.split("@")[0] || "Anônimo"}
                     </h3>
                     <div className="space-y-6">
                       {pesquisa.perguntas.map((secao) => (
