@@ -40,14 +40,58 @@ export default function FormularioAplica() {
   const [hasRestored, setHasRestored] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const isMentorado = !!user && !!plan;
+  // Keep isLoggedIn for database operations (but NOT for rewards)
   const isLoggedIn = !!user;
+
+  // Mentorado detection by email (used for rewards)
+  const [mentoradoDetectado, setMentoradoDetectado] = useState(false);
+  const [verificandoEmail, setVerificandoEmail] = useState(false);
 
   // Parse recompensas from pesquisa
   const recompensas = pesquisa?.recompensas ? 
     (typeof pesquisa.recompensas === 'string' ? JSON.parse(pesquisa.recompensas) : pesquisa.recompensas) : 
     null;
-  const recompensaAtual = isMentorado ? recompensas?.mentorado : recompensas?.publico;
+  // Reward based on detected mentorado status (by email, not login)
+  const recompensaAtual = mentoradoDetectado ? recompensas?.mentorado : recompensas?.publico;
+
+  // Check if email belongs to a mentorado
+  const verificarEmailMentorado = async (email: string) => {
+    if (!email || !email.includes('@')) {
+      setMentoradoDetectado(false);
+      return;
+    }
+    
+    setVerificandoEmail(true);
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, plano_mentoria, is_visitante")
+        .eq("email", email.toLowerCase().trim())
+        .maybeSingle();
+      
+      // Is mentorado if: exists, has plan AND is not visitante
+      const isMentoradoFound = data && data.plano_mentoria && !data.is_visitante;
+      setMentoradoDetectado(!!isMentoradoFound);
+    } catch (error) {
+      console.error("Erro ao verificar email:", error);
+      setMentoradoDetectado(false);
+    } finally {
+      setVerificandoEmail(false);
+    }
+  };
+
+  // Debounced email verification
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (emailRespondente && emailRespondente.includes('@')) {
+        verificarEmailMentorado(emailRespondente);
+      } else {
+        setMentoradoDetectado(false);
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [emailRespondente]);
 
   // Restore progress from localStorage only (for anonymous users or first load)
   useEffect(() => {
@@ -125,8 +169,8 @@ export default function FormularioAplica() {
   const saveToDatabase = useCallback(async (completado: boolean = false) => {
     if (!pesquisa || finished) return;
     
-    // For anonymous users, require email
-    if (!isLoggedIn && !emailRespondente.trim()) {
+    // Always require email
+    if (!emailRespondente.trim()) {
       if (completado) {
         toast({
           title: "Email obrigatório",
@@ -146,28 +190,16 @@ export default function FormularioAplica() {
         secao_atual: secaoAtual,
         completado,
         tempo_resposta: Math.floor((Date.now() - startTime) / 1000),
-        email_respondente: isLoggedIn ? null : emailRespondente.trim(),
+        email_respondente: emailRespondente.trim(),
       };
 
-      // Check if response exists for this user/email
-      let existing = null;
-      if (isLoggedIn) {
-        const { data } = await supabase
-          .from("respostas_pesquisas")
-          .select("id")
-          .eq("pesquisa_id", pesquisa.id)
-          .eq("user_id", user!.id)
-          .maybeSingle();
-        existing = data;
-      } else if (emailRespondente.trim()) {
-        const { data } = await supabase
-          .from("respostas_pesquisas")
-          .select("id")
-          .eq("pesquisa_id", pesquisa.id)
-          .eq("email_respondente", emailRespondente.trim())
-          .maybeSingle();
-        existing = data;
-      }
+      // Check if response exists for this email
+      const { data: existing } = await supabase
+        .from("respostas_pesquisas")
+        .select("id")
+        .eq("pesquisa_id", pesquisa.id)
+        .eq("email_respondente", emailRespondente.trim())
+        .maybeSingle();
 
       if (existing) {
         await supabase
@@ -201,8 +233,8 @@ export default function FormularioAplica() {
   // Auto-save trigger (debounced)
   useEffect(() => {
     if (!started || finished || Object.keys(respostas).length === 0) return;
-    // Only auto-save if logged in or has email
-    if (!isLoggedIn && !emailRespondente.trim()) return;
+    // Only auto-save if has email
+    if (!emailRespondente.trim()) return;
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -217,7 +249,7 @@ export default function FormularioAplica() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [respostas, started, finished, saveToDatabase, isLoggedIn, emailRespondente]);
+  }, [respostas, started, finished, saveToDatabase, emailRespondente]);
 
   const secoes = pesquisa?.perguntas || [];
   const secaoData = secoes[secaoAtual] as Secao | undefined;
@@ -236,8 +268,8 @@ export default function FormularioAplica() {
   const validarSecao = (): boolean => {
     if (!secaoData) return true;
     
-    // Validate email for anonymous users on first section
-    if (secaoAtual === 0 && !isLoggedIn && !emailRespondente.trim()) {
+    // Always validate email on first section
+    if (secaoAtual === 0 && !emailRespondente.trim()) {
       toast({
         title: "Email obrigatório",
         description: "Por favor, informe seu email para continuar.",
@@ -465,7 +497,7 @@ export default function FormularioAplica() {
           </CardHeader>
           <CardContent className="space-y-6">
             <p className="text-muted-foreground">
-              Suas respostas foram registradas com sucesso. {isMentorado ? "Sua recompensa será liberada em breve." : "Entraremos em contato pelo email informado para liberar sua recompensa."}
+              Suas respostas foram registradas com sucesso. {mentoradoDetectado ? "Sua recompensa será liberada em breve." : "Entraremos em contato pelo email informado para liberar sua recompensa."}
             </p>
 
             <div className="bg-[#9EB038]/10 border border-[#9EB038]/20 rounded-lg p-4">
@@ -476,13 +508,13 @@ export default function FormularioAplica() {
               </div>
             </div>
 
-            {isLoggedIn ? (
+            {mentoradoDetectado ? (
               <Button 
                 onClick={() => navigate("/")} 
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                 size="lg"
               >
-                VOLTAR PARA O DASHBOARD
+                IR PARA O DASHBOARD
               </Button>
             ) : (
               <Button 
@@ -559,24 +591,40 @@ export default function FormularioAplica() {
               )}
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Email field for anonymous users on first section */}
-              {secaoAtual === 0 && !isLoggedIn && (
+              {/* Email field always required on first section */}
+              {secaoAtual === 0 && (
                 <div className="space-y-2 pb-4 border-b border-border">
                   <Label className="text-foreground flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     Seu email para contato
                     <span className="text-destructive ml-1">*</span>
                   </Label>
-                  <Input
-                    type="email"
-                    value={emailRespondente}
-                    onChange={(e) => setEmailRespondente(e.target.value)}
-                    placeholder="seu@email.com"
-                    className="bg-background border-border"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Usaremos este email para enviar sua recompensa após completar a pesquisa.
-                  </p>
+                  <div className="relative">
+                    <Input
+                      type="email"
+                      value={emailRespondente}
+                      onChange={(e) => setEmailRespondente(e.target.value)}
+                      placeholder="seu@email.com"
+                      className={`bg-background border-border pr-10 ${mentoradoDetectado ? "border-[#9EB038]" : ""}`}
+                    />
+                    {verificandoEmail && (
+                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
+                    {mentoradoDetectado && !verificandoEmail && (
+                      <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9EB038]" />
+                    )}
+                  </div>
+                  
+                  {mentoradoDetectado ? (
+                    <div className="flex items-center gap-2 text-sm text-[#9EB038] bg-[#9EB038]/10 px-3 py-2 rounded-md">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Você é um Mentorado IAplicada! Sua recompensa foi atualizada.</span>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Usaremos este email para enviar sua recompensa após completar a pesquisa.
+                    </p>
+                  )}
                 </div>
               )}
 
