@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,37 +8,135 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Gift, Target, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Gift, Target, CheckCircle2, Loader2, Check } from "lucide-react";
 import { usePesquisa, useMinhaResposta, useSalvarResposta } from "@/hooks/usePesquisas";
 import type { Pergunta, Secao } from "@/types/pesquisas";
 import logoMarca from "@/assets/logo-aplicada-marca-completa.png";
 import backgroundSymbol from "@/assets/logos/background-symbol.png";
 
+const STORAGE_KEY = "pesquisa_formulario-aplica_draft";
+const AUTO_SAVE_DELAY = 2000;
+
 export default function FormularioAplica() {
   const navigate = useNavigate();
   const { data: pesquisa, isLoading } = usePesquisa("formulario-aplica");
-  const { data: minhaResposta } = useMinhaResposta(pesquisa?.id || "");
+  const { data: minhaResposta, isLoading: isLoadingResposta } = useMinhaResposta(pesquisa?.id || "");
   const salvarResposta = useSalvarResposta();
 
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [secaoAtual, setSecaoAtual] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, string>>({});
-  const [startTime] = useState(Date.now());
+  const [startTime, setStartTime] = useState(Date.now());
+  
+  // Auto-save states
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [hasRestored, setHasRestored] = useState(false);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Restore progress from saved response
+  // Restore progress - priority: database > localStorage
   useEffect(() => {
+    if (hasRestored || isLoadingResposta) return;
+
+    // Priority 1: Database
     if (minhaResposta) {
       setRespostas(minhaResposta.respostas as Record<string, string>);
       if (minhaResposta.completado) {
         setFinished(true);
         setStarted(true);
-      } else if (minhaResposta.secao_atual > 0) {
-        setSecaoAtual(minhaResposta.secao_atual);
+      } else if (Object.keys(minhaResposta.respostas || {}).length > 0) {
+        setSecaoAtual(minhaResposta.secao_atual || 0);
         setStarted(true);
+        toast({
+          title: "Progresso restaurado",
+          description: "Continuando de onde você parou...",
+        });
       }
+      setHasRestored(true);
+      return;
     }
-  }, [minhaResposta]);
+
+    // Priority 2: localStorage (fallback)
+    if (!minhaResposta && pesquisa) {
+      try {
+        const draft = localStorage.getItem(STORAGE_KEY);
+        if (draft) {
+          const parsed = JSON.parse(draft);
+          if (parsed.respostas && Object.keys(parsed.respostas).length > 0) {
+            setRespostas(parsed.respostas);
+            setSecaoAtual(parsed.secaoAtual || 0);
+            setStarted(true);
+            toast({
+              title: "Rascunho encontrado",
+              description: "Restaurando suas respostas...",
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao restaurar localStorage:", e);
+      }
+      setHasRestored(true);
+    }
+  }, [minhaResposta, isLoadingResposta, pesquisa, hasRestored]);
+
+  // Immediate localStorage backup on any change
+  useEffect(() => {
+    if (started && !finished && Object.keys(respostas).length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        respostas,
+        secaoAtual,
+        timestamp: Date.now()
+      }));
+    }
+  }, [respostas, secaoAtual, started, finished]);
+
+  // Debounced database save
+  const saveToDatabase = useCallback(async (completado: boolean = false) => {
+    if (!pesquisa || finished) return;
+    
+    setIsSaving(true);
+    try {
+      await salvarResposta.mutateAsync({
+        pesquisaId: pesquisa.id,
+        respostas,
+        secaoAtual,
+        completado,
+        tempoResposta: Math.floor((Date.now() - startTime) / 1000),
+      });
+      setLastSaved(new Date());
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Suas respostas estão seguras localmente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [pesquisa, respostas, secaoAtual, startTime, finished, salvarResposta]);
+
+  // Auto-save trigger (debounced)
+  useEffect(() => {
+    if (!started || finished || Object.keys(respostas).length === 0) return;
+
+    // Clear previous timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Set new timeout
+    saveTimeoutRef.current = setTimeout(() => {
+      saveToDatabase(false);
+    }, AUTO_SAVE_DELAY);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [respostas, started, finished, saveToDatabase]);
 
   const secoes = pesquisa?.perguntas || [];
   const secaoData = secoes[secaoAtual] as Secao | undefined;
@@ -71,31 +169,16 @@ export default function FormularioAplica() {
     return true;
   };
 
-  const salvarProgresso = async (completado: boolean = false, novaSecao?: number) => {
-    if (!pesquisa) return;
-    
-    try {
-      await salvarResposta.mutateAsync({
-        pesquisaId: pesquisa.id,
-        respostas,
-        secaoAtual: novaSecao ?? secaoAtual,
-        completado,
-        tempoResposta: Math.floor((Date.now() - startTime) / 1000),
-      });
-    } catch (error) {
-      console.error("Erro ao salvar:", error);
-    }
-  };
-
   const handleNext = async () => {
     if (!validarSecao()) return;
 
     if (secaoAtual < totalSecoes - 1) {
       const novaSecao = secaoAtual + 1;
       setSecaoAtual(novaSecao);
-      await salvarProgresso(false, novaSecao);
     } else {
-      await salvarProgresso(true);
+      // Finalize
+      await saveToDatabase(true);
+      localStorage.removeItem(STORAGE_KEY);
       setFinished(true);
       toast({
         title: "Pesquisa concluída!",
@@ -108,6 +191,11 @@ export default function FormularioAplica() {
     if (secaoAtual > 0) {
       setSecaoAtual(secaoAtual - 1);
     }
+  };
+
+  const handleStart = () => {
+    setStarted(true);
+    setStartTime(Date.now());
   };
 
   const renderPergunta = (pergunta: Pergunta) => {
@@ -200,6 +288,10 @@ export default function FormularioAplica() {
     }
   };
 
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#2F302B]">
@@ -261,7 +353,7 @@ export default function FormularioAplica() {
             </p>
 
             <Button 
-              onClick={() => setStarted(true)} 
+              onClick={handleStart} 
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
               size="lg"
             >
@@ -339,7 +431,23 @@ export default function FormularioAplica() {
       {/* Header com logo e progresso */}
       <div className="bg-card/95 backdrop-blur border-b border-border p-4">
         <div className="max-w-3xl mx-auto">
-          <img src={logoMarca} alt="IAplicada" className="h-8 mx-auto mb-4" />
+          <div className="flex items-center justify-between mb-4">
+            <img src={logoMarca} alt="IAplicada" className="h-8" />
+            {/* Save indicator */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Salvando...</span>
+                </>
+              ) : lastSaved ? (
+                <>
+                  <Check className="h-3 w-3 text-primary" />
+                  <span>Salvo às {formatTime(lastSaved)}</span>
+                </>
+              ) : null}
+            </div>
+          </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Seção {secaoAtual + 1} de {totalSecoes}</span>
@@ -397,7 +505,7 @@ export default function FormularioAplica() {
           <Button
             onClick={handleNext}
             className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
-            disabled={salvarResposta.isPending}
+            disabled={isSaving}
           >
             {secaoAtual === totalSecoes - 1 ? "Finalizar" : "Próxima"}
             <ChevronRight className="h-4 w-4" />
