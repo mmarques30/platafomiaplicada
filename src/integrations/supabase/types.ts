@@ -2872,6 +2872,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      verificar_email_mentorado: {
+        Args: { email_input: string }
+        Returns: boolean
+      }
       verificar_integridade_sistema: {
         Args: never
         Returns: {
