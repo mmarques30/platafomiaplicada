@@ -1733,6 +1733,42 @@ export type Database = {
           },
         ]
       }
+      pesquisas: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          descricao: string | null
+          id: string
+          perguntas: Json
+          recompensas: string | null
+          slug: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          perguntas?: Json
+          recompensas?: string | null
+          slug: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          perguntas?: Json
+          recompensas?: string | null
+          slug?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       premiacoes_comunidade: {
         Row: {
           created_at: string | null
@@ -2232,6 +2268,50 @@ export type Database = {
             columns: ["formulario_id"]
             isOneToOne: false
             referencedRelation: "formularios_customizados"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      respostas_pesquisas: {
+        Row: {
+          completado: boolean | null
+          created_at: string | null
+          id: string
+          pesquisa_id: string
+          respostas: Json
+          secao_atual: number | null
+          tempo_resposta: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completado?: boolean | null
+          created_at?: string | null
+          id?: string
+          pesquisa_id: string
+          respostas?: Json
+          secao_atual?: number | null
+          tempo_resposta?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completado?: boolean | null
+          created_at?: string | null
+          id?: string
+          pesquisa_id?: string
+          respostas?: Json
+          secao_atual?: number | null
+          tempo_resposta?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "respostas_pesquisas_pesquisa_id_fkey"
+            columns: ["pesquisa_id"]
+            isOneToOne: false
+            referencedRelation: "pesquisas"
             referencedColumns: ["id"]
           },
         ]

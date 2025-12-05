@@ -104,6 +104,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: "/admin/avisos", label: "Gerenciar Avisos" },
       { path: "/admin/comunidade", label: "Comunidade" },
+      { path: "/admin/pesquisas", label: "Pesquisas" },
     ],
   },
   {
