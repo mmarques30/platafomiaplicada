@@ -112,15 +112,10 @@ export function useRespostasPesquisa(pesquisaId: string) {
   return useQuery({
     queryKey: ["respostas-pesquisa", pesquisaId],
     queryFn: async () => {
+      // Buscar respostas sem JOIN para incluir respostas de visitantes (user_id = null)
       const { data, error } = await supabase
         .from("respostas_pesquisas")
-        .select(`
-          *,
-          profiles:user_id (
-            nome_completo,
-            email
-          )
-        `)
+        .select("*")
         .eq("pesquisa_id", pesquisaId)
         .order("created_at", { ascending: false });
 

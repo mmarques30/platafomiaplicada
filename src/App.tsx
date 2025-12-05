@@ -87,6 +87,7 @@ function AppContent() {
           <Route path="/aplique" element={<Aplique />} />
           <Route path="/avance" element={<Avance />} />
           <Route path="/formularioaplica" element={<FormularioAplica />} />
+          <Route path="/formulario-aplica" element={<FormularioAplica />} />
           
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />
