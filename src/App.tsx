@@ -70,6 +70,8 @@ import VideosBonus from "./pages/VideosBonus";
 import PoliticaVendas from "./pages/PoliticaVendas";
 import PoliticaUso from "./pages/PoliticaUso";
 import GerenciarPoliticas from "./pages/admin/GerenciarPoliticas";
+import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
+import FormularioAplica from "./pages/FormularioAplica";
 
 const queryClient = new QueryClient();
 
@@ -124,6 +126,7 @@ function AppContent() {
             <Route path="/videos-bonus" element={<VideosBonus />} />
             <Route path="/politicavendas" element={<PoliticaVendas />} />
             <Route path="/politicauso" element={<PoliticaUso />} />
+            <Route path="/formularioaplica" element={<FormularioAplica />} />
           </Route>
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />
@@ -148,6 +151,7 @@ function AppContent() {
             <Route path="importar-usuarios" element={<ImportarUsuarios />} />
             <Route path="comunidade" element={<GerenciarComunidade />} />
             <Route path="politicas" element={<GerenciarPoliticas />} />
+            <Route path="pesquisas" element={<GerenciarPesquisas />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
