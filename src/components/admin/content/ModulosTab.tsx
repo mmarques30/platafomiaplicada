@@ -201,7 +201,7 @@ export function ModulosTab() {
                           👁️ Visitantes
                         </Badge>
                       )}
-                      {modulo.trilha_visivel && !modulo.visivel_mentorados && (
+                      {modulo.ativo && modulo.trilha_visivel && !modulo.visivel_mentorados && (
                         <Badge variant="destructive" className="text-xs flex items-center gap-1">
                           <AlertTriangle className="h-3 w-3" />
                           Invisível em trilha visível
