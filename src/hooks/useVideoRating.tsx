@@ -26,6 +26,7 @@ export function useVideoRating(videoId: string) {
         count: data.length,
       };
     },
+    enabled: !!videoId,
   });
 
   // Buscar rating do usuário atual
@@ -44,7 +45,7 @@ export function useVideoRating(videoId: string) {
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!user && !!videoId,
   });
 
   // Mutation para criar/atualizar rating
