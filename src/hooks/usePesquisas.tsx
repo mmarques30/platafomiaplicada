@@ -126,6 +126,25 @@ export function useRespostasPesquisa(pesquisaId: string) {
   });
 }
 
+export function useDeleteResposta() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (respostaId: string) => {
+      const { error } = await supabase
+        .from("respostas_pesquisas")
+        .delete()
+        .eq("id", respostaId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["respostas-pesquisa"] });
+      queryClient.invalidateQueries({ queryKey: ["estatisticas-pesquisa"] });
+    },
+  });
+}
+
 export function useEstatisticasPesquisa(pesquisaId: string) {
   return useQuery({
     queryKey: ["estatisticas-pesquisa", pesquisaId],
