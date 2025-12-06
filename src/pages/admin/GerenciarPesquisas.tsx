@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FileText, Users, Download, Eye, ExternalLink, Trash2 } from "lucide-react";
 import { usePesquisasAdmin, useRespostasPesquisa, useEstatisticasPesquisa, useDeleteResposta } from "@/hooks/usePesquisas";
 import type { Pesquisa } from "@/types/pesquisas";
@@ -153,6 +160,19 @@ function RespostasDrawer({
   const deleteResposta = useDeleteResposta();
   const [selectedResposta, setSelectedResposta] = useState<any>(null);
   const [respostaToDelete, setRespostaToDelete] = useState<any>(null);
+  const [statusFilter, setStatusFilter] = useState<"todos" | "completas" | "parciais">("todos");
+
+  const respostasFiltradas = useMemo(() => {
+    if (!respostas) return [];
+    switch (statusFilter) {
+      case "completas":
+        return respostas.filter(r => r.completado);
+      case "parciais":
+        return respostas.filter(r => !r.completado);
+      default:
+        return respostas;
+    }
+  }, [respostas, statusFilter]);
 
   const handleDelete = async () => {
     if (!respostaToDelete) return;
@@ -218,13 +238,28 @@ function RespostasDrawer({
               <div>
                 <DrawerTitle>Respostas: {pesquisa.titulo}</DrawerTitle>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {respostas?.length || 0} respostas registradas
+                  {statusFilter !== "todos" 
+                    ? `${respostasFiltradas.length} de ${respostas?.length || 0} respostas`
+                    : `${respostas?.length || 0} respostas registradas`
+                  }
                 </p>
               </div>
-              <Button variant="outline" size="sm" onClick={exportCSV} className="gap-2">
-                <Download className="h-4 w-4" />
-                Exportar CSV
-              </Button>
+              <div className="flex items-center gap-3">
+                <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Filtrar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todas</SelectItem>
+                    <SelectItem value="completas">Completas</SelectItem>
+                    <SelectItem value="parciais">Parciais</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" size="sm" onClick={exportCSV} className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Exportar CSV
+                </Button>
+              </div>
             </div>
           </DrawerHeader>
 
@@ -252,7 +287,7 @@ function RespostasDrawer({
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {respostas?.map((resposta) => {
+                        {respostasFiltradas.map((resposta) => {
                           const emailRespondente = (resposta as any).email_respondente;
                           const displayEmail = emailRespondente || "N/A";
                           const displayName = emailRespondente ? emailRespondente.split("@")[0] : "Anônimo";
