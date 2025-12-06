@@ -153,9 +153,9 @@ export function MateriaisGratuitosTab() {
                       )}
                     </CardHeader>
                     <CardContent className="mt-auto">
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button
-                          className="flex-1 h-10"
+                          className="h-10 flex-shrink-0"
                           asChild
                           onClick={() => handleAccessClick(material)}
                         >
@@ -168,7 +168,7 @@ export function MateriaisGratuitosTab() {
                           content={material.url} 
                           variant="outline" 
                           size="default"
-                          className="h-10"
+                          className="h-10 flex-shrink-0"
                         />
                       </div>
                     </CardContent>
