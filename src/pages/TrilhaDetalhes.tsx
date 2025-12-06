@@ -82,8 +82,8 @@ export default function TrilhaDetalhes() {
       
       if (error) throw error;
       
-      // Verifica visibilidade da trilha
-      if (isVisitante && !data.visivel_visitantes) return null;
+      // Visitantes podem ver todas as trilhas (conteúdo é filtrado por vídeos/módulos)
+      // Mentorados verificam visivel_mentorados
       if (!isVisitante && !data.visivel_mentorados) return null;
       
       return data;
