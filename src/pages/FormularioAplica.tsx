@@ -51,8 +51,8 @@ export default function FormularioAplica() {
   const recompensas = pesquisa?.recompensas ? 
     (typeof pesquisa.recompensas === 'string' ? JSON.parse(pesquisa.recompensas) : pesquisa.recompensas) : 
     null;
-  // Reward based on detected mentorado status (by email, not login)
-  const recompensaAtual = mentoradoDetectado ? recompensas?.mentorado : recompensas?.publico;
+  // Reward for mentorados only
+  const recompensaAtual = recompensas?.mentorado || "Kit Express de desenvolvimento de dashboards";
 
   // Check if email belongs to a mentorado via RPC (bypasses RLS)
   const verificarEmailMentorado = async (email: string) => {
@@ -498,34 +498,24 @@ export default function FormularioAplica() {
           </CardHeader>
           <CardContent className="space-y-6">
             <p className="text-muted-foreground">
-              Suas respostas foram registradas com sucesso. {mentoradoDetectado ? "Sua recompensa será liberada em breve." : "Entraremos em contato pelo email informado para liberar sua recompensa."}
+              Suas respostas foram registradas com sucesso. Sua recompensa será liberada em breve.
             </p>
 
             <div className="bg-[#9EB038]/10 border border-[#9EB038]/20 rounded-lg p-4">
               <h3 className="font-semibold text-foreground mb-3">Sua recompensa</h3>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4 text-[#9EB038]" />
-                {recompensaAtual || "Recompensa exclusiva"}
+                {recompensaAtual}
               </div>
             </div>
 
-            {mentoradoDetectado ? (
-              <Button 
-                onClick={() => navigate("/")} 
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                size="lg"
-              >
-                IR PARA O DASHBOARD
-              </Button>
-            ) : (
-              <Button 
-                onClick={() => navigate("/aplique")} 
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                size="lg"
-              >
-                CONHECER O IAPLICADA
-              </Button>
-            )}
+            <Button 
+              onClick={() => navigate("/")} 
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              size="lg"
+            >
+              IR PARA O DASHBOARD
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -616,15 +606,11 @@ export default function FormularioAplica() {
                     )}
                   </div>
                   
-                  {mentoradoDetectado ? (
+                  {mentoradoDetectado && (
                     <div className="flex items-center gap-2 text-sm text-[#9EB038] bg-[#9EB038]/10 px-3 py-2 rounded-md">
                       <CheckCircle2 className="h-4 w-4" />
-                      <span>Você é um Mentorado IAplicada! Sua recompensa foi atualizada.</span>
+                      <span>Você é um Mentorado IAplicada!</span>
                     </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">
-                      Usaremos este email para enviar sua recompensa após completar a pesquisa.
-                    </p>
                   )}
                 </div>
               )}
