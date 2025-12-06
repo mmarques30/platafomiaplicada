@@ -447,11 +447,7 @@ export default function FormularioAplica() {
               </p>
             </div>
 
-            <p className="text-center text-sm text-muted-foreground">
-              Tempo estimado: ~10 minutos
-            </p>
-
-            <Button 
+            <Button
               onClick={handleStart} 
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
               size="lg"
