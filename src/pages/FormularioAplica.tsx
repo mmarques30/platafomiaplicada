@@ -439,16 +439,12 @@ export default function FormularioAplica() {
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-[#9EB038]/10 border border-[#9EB038]/20 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <Gift className="h-5 w-5 text-[#9EB038] mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2">Sua Recompensa</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {recompensaAtual || "Complete a pesquisa para receber sua recompensa exclusiva."}
-                  </p>
-                </div>
-              </div>
+            <div className="bg-[#9EB038]/10 border border-[#9EB038]/20 rounded-lg p-4 text-center">
+              <Gift className="h-6 w-6 text-[#9EB038] mx-auto mb-2" />
+              <h3 className="font-semibold text-foreground mb-2">Sua Recompensa</h3>
+              <p className="text-sm text-muted-foreground">
+                {recompensaAtual || "Complete a pesquisa para receber sua recompensa exclusiva."}
+              </p>
             </div>
 
             <p className="text-center text-sm text-muted-foreground">
