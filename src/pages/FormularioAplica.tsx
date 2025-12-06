@@ -427,15 +427,7 @@ export default function FormularioAplica() {
   // Tela inicial
   if (!started) {
     return (
-      <div 
-        className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex items-center justify-center p-4"
-        style={{
-          backgroundImage: `url(${backgroundSymbolSoft})`,
-          backgroundSize: "50%",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
+      <div className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex items-center justify-center p-4">
         <Card className="max-w-2xl w-full bg-white/90 backdrop-blur-sm border border-[#9EB038]/20 shadow-lg">
           <CardHeader className="text-center pb-4">
             <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" />
@@ -479,15 +471,7 @@ export default function FormularioAplica() {
   // Tela final
   if (finished) {
     return (
-      <div 
-        className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex items-center justify-center p-4"
-        style={{
-          backgroundImage: `url(${backgroundSymbolSoft})`,
-          backgroundSize: "50%",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
+      <div className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex items-center justify-center p-4">
         <Card className="max-w-2xl w-full bg-white/90 backdrop-blur-sm border border-[#9EB038]/20 shadow-lg text-center">
           <CardHeader className="pb-4">
             <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" />
@@ -526,15 +510,7 @@ export default function FormularioAplica() {
 
   // Wizard de perguntas
   return (
-    <div 
-      className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex flex-col"
-      style={{
-        backgroundImage: `url(${backgroundSymbolSoft})`,
-        backgroundSize: "50%",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex flex-col">
       {/* Header com logo e progresso */}
       <div className="bg-white/90 backdrop-blur-sm border-b border-[#9EB038]/20 p-4">
         <div className="max-w-3xl mx-auto">
