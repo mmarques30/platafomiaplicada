@@ -114,7 +114,7 @@ export default function Auth() {
         <img 
           src={grafiaSimbolos} 
           alt="IAplicada" 
-          className="w-full max-w-xl h-auto" 
+          className="w-full max-w-md h-auto animate-[subtle-glow_5s_ease-in-out_infinite]" 
         />
 
         {/* Card de Auth semi-transparente sobre fundo escuro */}
@@ -173,7 +173,7 @@ export default function Auth() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold" 
+                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold animate-[button-soft-glow_5s_ease-in-out_infinite]" 
                     disabled={isLoading}
                   >
                     {isLoading ? "Acessando..." : "Acessar"}
@@ -250,7 +250,7 @@ export default function Auth() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold" 
+                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold animate-[button-soft-glow_5s_ease-in-out_infinite]" 
                     disabled={isLoading}
                   >
                     {isLoading ? "Criando conta..." : "Criar conta grátis"}
