@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Bell, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,6 +31,18 @@ export function TopHeader() {
   const { hasAccessTo, plan } = useUserPlan();
   const { profile } = useUserProfile();
   
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
   const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
   const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(path => location.pathname.startsWith(path));
 
@@ -56,7 +68,14 @@ export function TopHeader() {
   const firstName = profile?.nome_completo?.split(" ")[0] || "Usuário";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#3a3b36] bg-[#2F302B]">
+    <header 
+      className={cn(
+        "fixed top-0 z-50 w-full border-b border-[#3a3b36] bg-[#2F302B] transition-transform duration-300 ease-in-out",
+        isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0"
+      )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="flex h-14 items-center justify-between px-4 max-w-7xl mx-auto">
         {/* LEFT: SidebarTrigger */}
         <div className="flex items-center">
