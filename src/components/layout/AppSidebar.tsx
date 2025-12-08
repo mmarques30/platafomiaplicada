@@ -183,18 +183,12 @@ export function AppSidebar() {
                                     to={subMenu.url || "/"} 
                                     end 
                                     className={cn(
-                                      "relative rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                                       subIsActive 
                                         ? "text-primary font-semibold" 
                                         : "text-sidebar-foreground/70 hover:text-primary"
                                     )}
                                   >
-                                    <span className={cn(
-                                      "absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full transition-all duration-200",
-                                      subIsActive 
-                                        ? "bg-aplicada-green-700 opacity-100" 
-                                        : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
-                                    )} />
                                     {SubIconComponent && <SubIconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />}
                                     {!collapsed && <span>{subMenu.label}</span>}
                                   </NavLink>
