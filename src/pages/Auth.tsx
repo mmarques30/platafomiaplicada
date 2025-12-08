@@ -114,7 +114,7 @@ export default function Auth() {
         <img 
           src={grafiaSimbolos} 
           alt="IAplicada" 
-          className="w-full max-w-md h-auto animate-[subtle-glow_5s_ease-in-out_infinite]" 
+          className="w-full max-w-md h-auto drop-shadow-[0_0_15px_rgba(255,255,255,0.12)]" 
         />
 
         {/* Card de Auth semi-transparente sobre fundo escuro */}
@@ -138,8 +138,8 @@ export default function Auth() {
             {/* Aba Entrar - Para todos os usuários (aplicados e visitantes) */}
             <TabsContent value="entrar">
               <CardHeader className="space-y-1 p-6 pt-0 text-center">
-                <CardTitle className="text-2xl lg:text-2xl font-bold text-white text-center">
-                  Bem Vindo Aplicado
+                <CardTitle className="text-2xl lg:text-2xl font-normal text-white text-center">
+                  bem vindo a <span className="font-bold">IAplicada</span>
                 </CardTitle>
                 <CardDescription className="text-white/70 text-center">
                   Entre com seu email e senha
@@ -173,7 +173,7 @@ export default function Auth() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold animate-[button-soft-glow_5s_ease-in-out_infinite]" 
+                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold shadow-[0_0_15px_rgba(158,176,56,0.25)]" 
                     disabled={isLoading}
                   >
                     {isLoading ? "Acessando..." : "Acessar"}
@@ -250,7 +250,7 @@ export default function Auth() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold animate-[button-soft-glow_5s_ease-in-out_infinite]" 
+                    className="w-full bg-[#9EB038] hover:bg-[#AFC040] text-[#2F302B] font-semibold shadow-[0_0_15px_rgba(158,176,56,0.25)]" 
                     disabled={isLoading}
                   >
                     {isLoading ? "Criando conta..." : "Criar conta grátis"}
