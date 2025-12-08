@@ -60,7 +60,7 @@ export function TopHeader() {
       <div className="flex h-14 items-center justify-between px-4 max-w-7xl mx-auto">
         {/* LEFT: SidebarTrigger */}
         <div className="flex items-center">
-          <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors -ml-2" />
+          <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors -ml-4" />
         </div>
 
         {/* CENTER: Horizontal Navigation */}
