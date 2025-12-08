@@ -40,14 +40,14 @@ export function CalendarioVisaoCalendario() {
     : [];
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card className="p-6">
+    <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+      <Card className="p-8">
         <Calendar
           mode="single"
           selected={selectedDate}
           onSelect={setSelectedDate}
           locale={ptBR}
-          className="pointer-events-auto"
+          className="pointer-events-auto mx-auto"
           modifiers={{
             hasClass: datasComAulas,
           }}
@@ -61,35 +61,35 @@ export function CalendarioVisaoCalendario() {
         {selectedDate ? (
           aulasDoDia.length > 0 ? (
             <>
-              <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-foreground text-center">
                 Aulas em {format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
               </h3>
               {aulasDoDia.map((aula) => (
-                <Card key={aula.id} className="p-4">
+                <Card key={aula.id} className="p-5">
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-foreground">{aula.tema}</h4>
+                      <div className="flex-1 space-y-2">
+                        <h4 className="font-bold text-lg text-sidebar">{aula.tema}</h4>
                         {aula.horario && (
-                          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sidebar text-white text-sm font-medium">
                             <Clock className="h-4 w-4" />
                             {aula.horario}
-                          </div>
+                          </span>
                         )}
                       </div>
                       <span
                         className={cn(
-                          "px-2 py-1 text-xs font-medium rounded-full",
+                          "px-3 py-1 text-xs font-semibold rounded-full",
                           aula.ativo
-                            ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
-                            : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                            ? "bg-sidebar text-white"
+                            : "bg-muted text-muted-foreground"
                         )}
                       >
                         {aula.ativo ? "Ativa" : "Inativa"}
                       </span>
                     </div>
                     {aula.descricao && (
-                      <p className="text-sm text-muted-foreground">{aula.descricao}</p>
+                      <p className="text-muted-foreground">{aula.descricao}</p>
                     )}
                   </div>
                 </Card>
