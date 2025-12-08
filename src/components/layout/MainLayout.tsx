@@ -44,7 +44,7 @@ export function MainLayout() {
         <AppSidebar />
         <div className="flex-1 flex flex-col">
           <TopHeader />
-          <main className="flex-1">
+          <main className="flex-1 pt-14">
             <Outlet />
           </main>
         </div>
