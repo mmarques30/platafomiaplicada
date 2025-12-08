@@ -76,11 +76,12 @@ export function TopHeader() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex h-14 items-center justify-between px-4 max-w-7xl mx-auto">
-        {/* LEFT: SidebarTrigger */}
-        <div className="flex items-center">
-          <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors -ml-4" />
-        </div>
+      <div className="flex h-14 items-center">
+        {/* LEFT: SidebarTrigger - fora do container centralizado */}
+        <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors ml-2 shrink-0" />
+
+        {/* Container centralizado */}
+        <div className="flex-1 flex items-center justify-between px-4 max-w-7xl mx-auto">
 
         {/* CENTER: Horizontal Navigation */}
         <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
@@ -231,6 +232,7 @@ export function TopHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
         </div>
       </div>
     </header>
