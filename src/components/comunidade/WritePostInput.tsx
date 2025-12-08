@@ -21,7 +21,7 @@ export function WritePostInput({ onClick }: WritePostInputProps) {
 
   return (
     <div 
-      className="border-b border-zinc-800 p-4 hover:bg-zinc-800/30 transition-colors cursor-pointer"
+      className="border-b border-border p-4 hover:bg-muted/30 transition-colors cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
@@ -29,12 +29,12 @@ export function WritePostInput({ onClick }: WritePostInputProps) {
           {profile?.avatar_url && (
             <AvatarImage src={profile.avatar_url} />
           )}
-          <AvatarFallback className="bg-[#9EB038] text-white text-sm">
+          <AvatarFallback className="bg-primary text-primary-foreground text-sm">
             {getInitials(user?.user_metadata?.nome_completo || profile?.nome_completo || "U")}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 pt-2">
-          <span className="text-zinc-500 text-base">
+          <span className="text-muted-foreground text-base">
             O que está acontecendo?
           </span>
         </div>
