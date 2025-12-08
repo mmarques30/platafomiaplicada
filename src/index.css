@@ -21,6 +21,25 @@
   }
 }
 
+/* Sidebar scroll - hidden by default, visible on hover */
+[data-sidebar="content"]::-webkit-scrollbar {
+  width: 4px;
+}
+
+[data-sidebar="content"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-sidebar="content"]::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+[data-sidebar="content"]:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 /* ============================================
    IAplicada Design System - Brand Guidelines
    Executiva-tech · Neutro · Limpeza · Modernidade

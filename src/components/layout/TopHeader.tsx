@@ -56,11 +56,11 @@ export function TopHeader() {
   const firstName = profile?.nome_completo?.split(" ")[0] || "Usuário";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="flex h-14 items-center justify-between px-6 max-w-7xl mx-auto">
+    <header className="sticky top-0 z-50 w-full border-b border-[#3a3b36] bg-[#2F302B]">
+      <div className="flex h-14 items-center justify-between px-4 max-w-7xl mx-auto">
         {/* LEFT: SidebarTrigger */}
-        <div className="flex items-center gap-4">
-          <SidebarTrigger className="hover:bg-accent/50 transition-colors" />
+        <div className="flex items-center">
+          <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors -ml-2" />
         </div>
 
         {/* CENTER: Horizontal Navigation */}
@@ -70,7 +70,7 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium transition-colors",
-              isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              isActive ? "text-white" : "text-white/60 hover:text-white"
             )}
           >
             Início
@@ -82,7 +82,7 @@ export function TopHeader() {
                 variant="ghost" 
                 className={cn(
                   "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                  isCursosActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  isCursosActive ? "text-white" : "text-white/60 hover:text-white"
                 )}
               >
                 Meus Cursos
@@ -129,7 +129,7 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isFerramentasActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                    isFerramentasActive ? "text-white" : "text-white/60 hover:text-white"
                   )}
                 >
                   Ferramentas
@@ -167,7 +167,7 @@ export function TopHeader() {
           <Button
             variant="ghost" 
             size="icon" 
-            className="relative h-9 w-9"
+            className="relative h-9 w-9 text-white/80 hover:text-white hover:bg-white/10"
             onClick={() => navigate("/notificacoes")}
           >
             <Bell className="h-5 w-5" strokeWidth={1.5} />
@@ -180,17 +180,17 @@ export function TopHeader() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 h-auto px-2 py-1.5">
-                <Avatar className="h-8 w-8 border border-border">
+              <Button variant="ghost" className="gap-2 h-auto px-2 py-1.5 hover:bg-white/10">
+                <Avatar className="h-8 w-8 border border-white/20">
                   <AvatarImage src={profile?.avatar_url || ""} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
                     {getInitials(user?.email, profile?.nome_completo)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden md:block text-sm font-medium text-foreground">
+                <span className="hidden md:block text-sm font-medium text-white">
                   {firstName}
                 </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                <ChevronDown className="h-4 w-4 text-white/60" strokeWidth={1.5} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52 bg-popover border-border">
