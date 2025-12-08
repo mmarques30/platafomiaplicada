@@ -76,15 +76,12 @@ export function TopHeader() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex h-14 items-center">
-        {/* LEFT: SidebarTrigger - fora do container centralizado */}
+      <div className="flex h-14 items-center w-full">
+        {/* LEFT: SidebarTrigger - posição fixa */}
         <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors ml-2 shrink-0" />
 
-        {/* Container centralizado */}
-        <div className="flex-1 flex items-center justify-between px-4 max-w-7xl mx-auto">
-
-        {/* CENTER: Horizontal Navigation */}
-        <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
+        {/* CENTER: Horizontal Navigation - flexível sem max-width */}
+        <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center px-4">
           <NavLink 
             to="/" 
             end
@@ -182,8 +179,8 @@ export function TopHeader() {
           )}
         </nav>
 
-        {/* RIGHT: Notifications + Avatar */}
-        <div className="flex items-center gap-2">
+        {/* RIGHT: Notifications + Avatar - posição fixa */}
+        <div className="flex items-center gap-2 pr-4 shrink-0">
           <Button
             variant="ghost" 
             size="icon" 
@@ -232,7 +229,6 @@ export function TopHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
         </div>
       </div>
     </header>
