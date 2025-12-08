@@ -47,7 +47,7 @@ export function CalendarioVisaoCalendario() {
           selected={selectedDate}
           onSelect={setSelectedDate}
           locale={ptBR}
-          className="pointer-events-auto mx-auto"
+          className="pointer-events-auto w-full"
           modifiers={{
             hasClass: datasComAulas,
           }}
