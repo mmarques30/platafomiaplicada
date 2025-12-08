@@ -3,7 +3,7 @@ import { flushSync } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, Loader2 } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useAuth } from "@/hooks/useAuth";
@@ -269,26 +269,17 @@ const Chat = () => {
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b border-border bg-card">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/dashboard")}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div className="flex items-center gap-3">
-          <img
-            src={mariAvatar}
-            alt="Mari"
-            className="w-10 h-10 rounded-full"
-          />
-          <div>
-            <h1 className="text-lg font-semibold">MarIAna</h1>
-            <p className="text-sm text-muted-foreground">
-              Sua mentora de IA Aplicada
-            </p>
-          </div>
+      <div className="flex items-center gap-3 p-4 bg-zinc-800">
+        <img
+          src={mariAvatar}
+          alt="Mari"
+          className="w-10 h-10 rounded-full"
+        />
+        <div>
+          <h1 className="text-lg font-semibold text-white">MarIAna</h1>
+          <p className="text-sm text-zinc-400">
+            Sua mentora de IA Aplicada
+          </p>
         </div>
       </div>
 
