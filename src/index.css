@@ -44,16 +44,16 @@
     
     --radius: 0.75rem;
     
-    /* Sidebar Light: Clean white */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 72 6% 18%;
-    --sidebar-primary: 73 55% 47%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 63 45% 94%;
-    --sidebar-accent-foreground: 72 6% 18%;
-    --sidebar-border: 73 20% 90%;
+    /* Sidebar: Always dark #2F302B regardless of theme */
+    --sidebar-background: 72 6% 18%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 0% 95%;
+    --sidebar-primary-foreground: 72 6% 18%;
+    --sidebar-accent: 72 6% 22%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 72 6% 25%;
     --sidebar-ring: 73 55% 47%;
-    /* Active indicator: white/off-white on dark sidebar */
+    /* Active indicator: off-white on dark sidebar */
     --sidebar-active: 0 0% 95%;
     
     --complexity-high: 0 100% 65%;
