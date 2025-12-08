@@ -139,7 +139,7 @@ export default function Auth() {
             <TabsContent value="entrar">
               <CardHeader className="space-y-1 p-6 pt-0 text-center">
                 <CardTitle className="text-2xl lg:text-2xl font-normal text-white text-center">
-                  bem vindo a <span className="font-bold">IAplicada</span>
+                  Bem Vindo a <span className="font-bold">IAplicada</span>
                 </CardTitle>
                 <CardDescription className="text-white/70 text-center">
                   Entre com seu email e senha
