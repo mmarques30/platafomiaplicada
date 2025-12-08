@@ -103,6 +103,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r border-sidebar-border bg-sidebar">
+      {/* Logo sempre visível, fora do loading */}
       <SidebarHeader>
         <div className="flex h-16 items-center justify-center px-4">
           <img src={logoSimbolo} alt="IAplicada" className="h-10 w-10" />
@@ -113,7 +114,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1 px-3">
-              {!menuLoading && mainMenus.map((menu) => {
+              {mainMenus.map((menu) => {
                 const isActive = location.pathname === menu.url;
                 const IconComponent = getIconComponent(menu.icon);
                 const subMenus = getSubMenus(menu.menu_key);
