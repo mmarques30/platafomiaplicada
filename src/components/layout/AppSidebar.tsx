@@ -102,7 +102,7 @@ export function AppSidebar() {
   }, [location.pathname]);
 
   return (
-    <Sidebar className="border-r border-sidebar-border bg-sidebar">
+    <Sidebar className="border-r border-sidebar-border bg-sidebar pt-14">
       {/* Logo sempre visível, fora do loading */}
       <SidebarHeader>
         <div className="flex h-16 items-center justify-center px-4">
