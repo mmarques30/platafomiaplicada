@@ -16,23 +16,23 @@ export function CommunitySidebar() {
   return (
     <div className="space-y-4">
       {/* Community Stats */}
-      <div className="bg-zinc-800 rounded-2xl p-4">
-        <h3 className="text-xl font-bold text-white mb-4">IAplicada Community</h3>
-        <p className="text-zinc-400 text-sm mb-4">
+      <div className="bg-card rounded-2xl p-4 border border-border">
+        <h3 className="text-xl font-bold text-foreground mb-4">IAplicada Community</h3>
+        <p className="text-muted-foreground text-sm mb-4">
           Comunidade de profissionais aplicando IA no dia a dia
         </p>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-zinc-400">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Users className="h-4 w-4" />
               <span className="text-sm">Membros</span>
             </div>
-            <span className="text-white font-semibold">{stats.totalMembers}</span>
+            <span className="text-foreground font-semibold">{stats.totalMembers}</span>
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-zinc-400">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Circle className="h-3 w-3 text-green-500 fill-green-500" />
               <span className="text-sm">Online</span>
             </div>
@@ -40,46 +40,46 @@ export function CommunitySidebar() {
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-zinc-400">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <UserCog className="h-4 w-4" />
               <span className="text-sm">Admins</span>
             </div>
-            <span className="text-white font-semibold">{stats.adminCount}</span>
+            <span className="text-foreground font-semibold">{stats.adminCount}</span>
           </div>
         </div>
       </div>
 
       {/* Top 3 Leaderboard */}
-      <div className="bg-zinc-800 rounded-2xl p-4">
+      <div className="bg-card rounded-2xl p-4 border border-border">
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="h-5 w-5 text-[#9EB038]" />
-          <h3 className="text-lg font-bold text-white">Top 3 do Mês</h3>
+          <TrendingUp className="h-5 w-5 text-primary" />
+          <h3 className="text-lg font-bold text-foreground">Top 3 do Mês</h3>
         </div>
         
         <div className="space-y-3">
           {top3.map((member, index) => (
             <div 
               key={member.user_id} 
-              className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-700/50 transition-colors cursor-pointer"
+              className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer"
             >
               <span className={`text-lg font-bold w-6 ${
                 index === 0 ? "text-yellow-500" : 
-                index === 1 ? "text-zinc-400" : 
+                index === 1 ? "text-muted-foreground" : 
                 "text-amber-700"
               }`}>
                 {index + 1}
               </span>
               <Avatar className="h-10 w-10">
                 {member.avatar_url && <AvatarImage src={member.avatar_url} />}
-                <AvatarFallback className="bg-zinc-700 text-white text-sm">
+                <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                   {getInitials(member.nome_completo)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-white truncate">
+                <div className="text-sm font-medium text-foreground truncate">
                   {member.nome_completo}
                 </div>
-                <div className="text-xs text-[#9EB038]">
+                <div className="text-xs text-primary">
                   {member.total_pontos} pts
                 </div>
               </div>

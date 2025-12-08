@@ -25,19 +25,19 @@ export function MemberCard({ member }: MemberCardProps) {
       new Date(Date.now() - 5 * 60 * 1000);
 
   return (
-    <div className="flex items-start gap-4 p-4 hover:bg-zinc-800/50 transition-colors cursor-pointer">
+    <div className="flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer">
       {/* Avatar with Level Badge */}
       <div className="relative flex-shrink-0">
         <Avatar className="h-12 w-12">
           {member.avatar_url && (
             <AvatarImage src={member.avatar_url} alt={member.nome_completo} />
           )}
-          <AvatarFallback className="bg-[#9EB038] text-white">
+          <AvatarFallback className="bg-primary text-primary-foreground">
             {getInitials(member.nome_completo)}
           </AvatarFallback>
         </Avatar>
         {/* Level Badge Overlay */}
-        <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-white border-2 border-zinc-900">
+        <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-foreground border-2 border-background">
           {member.nivel_comunidade}
         </div>
       </div>
@@ -46,36 +46,36 @@ export function MemberCard({ member }: MemberCardProps) {
       <div className="flex-1 min-w-0">
         {/* Name + Badges */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-white">
+          <span className="font-semibold text-foreground">
             {member.nome_completo}
           </span>
           {member.is_admin && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[#9EB038]/20 text-[#9EB038]">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
               Admin
             </span>
           )}
         </div>
 
         {/* Plan as subtitle */}
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-muted-foreground">
           @{member.plano_mentoria || "visitante"}
         </p>
 
         {/* Bio */}
         {member.bio && (
-          <p className="text-sm text-zinc-300 mt-1 line-clamp-1">
+          <p className="text-sm text-foreground/80 mt-1 line-clamp-1">
             {member.bio}
           </p>
         )}
 
         {/* Status + Join Date */}
-        <div className="flex items-center gap-4 mt-2 text-sm text-zinc-500 flex-wrap">
+        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
           {/* Online Status */}
           <div className="flex items-center gap-1.5">
             <Circle
               className={cn(
                 "h-2 w-2 fill-current",
-                isOnline ? "text-green-500" : "text-zinc-600"
+                isOnline ? "text-green-500" : "text-muted-foreground/50"
               )}
             />
             <span className={isOnline ? "text-green-500" : ""}>

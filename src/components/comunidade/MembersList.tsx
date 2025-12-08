@@ -13,12 +13,12 @@ export function MembersList() {
     return (
       <div className="space-y-0">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="border-b border-zinc-800 p-4 animate-pulse">
+          <div key={i} className="border-b border-border p-4 animate-pulse">
             <div className="flex gap-3">
-              <div className="h-12 w-12 rounded-full bg-zinc-800" />
+              <div className="h-12 w-12 rounded-full bg-muted" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-1/3 bg-zinc-800 rounded" />
-                <div className="h-3 w-1/4 bg-zinc-800 rounded" />
+                <div className="h-4 w-1/3 bg-muted rounded" />
+                <div className="h-3 w-1/4 bg-muted rounded" />
               </div>
             </div>
           </div>
@@ -30,14 +30,14 @@ export function MembersList() {
   return (
     <div className="space-y-4">
       {/* Filters - Pill Style */}
-      <div className="flex items-center gap-2 p-1 bg-zinc-800 rounded-full w-fit">
+      <div className="flex items-center gap-2 p-1 bg-muted rounded-full w-fit">
         <button
           onClick={() => setFilter("all")}
           className={cn(
             "px-4 py-2 rounded-full text-sm font-medium transition-colors",
             filter === "all"
-              ? "bg-[#9EB038] text-white"
-              : "text-zinc-400 hover:text-white hover:bg-zinc-700"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-background"
           )}
         >
           Todos {stats.totalMembers}
@@ -47,8 +47,8 @@ export function MembersList() {
           className={cn(
             "px-4 py-2 rounded-full text-sm font-medium transition-colors",
             filter === "admin"
-              ? "bg-[#9EB038] text-white"
-              : "text-zinc-400 hover:text-white hover:bg-zinc-700"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-background"
           )}
         >
           Admins {stats.adminCount}
@@ -58,8 +58,8 @@ export function MembersList() {
           className={cn(
             "px-4 py-2 rounded-full text-sm font-medium transition-colors",
             filter === "online"
-              ? "bg-[#9EB038] text-white"
-              : "text-zinc-400 hover:text-white hover:bg-zinc-700"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-background"
           )}
         >
           Online {stats.onlineMembers}
@@ -68,11 +68,11 @@ export function MembersList() {
 
       {/* Members List */}
       {members.length === 0 ? (
-        <div className="text-center py-12 text-zinc-500">
+        <div className="text-center py-12 text-muted-foreground">
           Nenhum membro encontrado
         </div>
       ) : (
-        <div className="divide-y divide-zinc-800">
+        <div className="divide-y divide-border">
           {members.map((member) => (
             <MemberCard key={member.id} member={member} />
           ))}
