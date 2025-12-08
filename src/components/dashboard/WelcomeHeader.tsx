@@ -70,7 +70,7 @@ export function WelcomeHeader() {
 
         {/* Coluna Direita - Card Compacto Tech */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="flex items-center gap-3 bg-card rounded-2xl px-5 py-4 shadow-md border-2 border-primary/10 card-enhanced">
+          <div className="flex items-center gap-3 bg-[#2F302B]/70 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-md border border-white/10">
             {/* Ícone em círculo primary */}
             <div className="bg-primary rounded-xl p-3 flex items-center justify-center shadow-sm">
               <Calendar className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
@@ -78,8 +78,8 @@ export function WelcomeHeader() {
             
             {/* Texto - Dia e Mês */}
             <div className="flex flex-col items-start leading-tight">
-              <span className="text-2xl font-bold text-foreground">{dia}</span>
-              <span className="text-sm text-muted-foreground font-medium uppercase tracking-wide">{diaSemana}, {mes}</span>
+              <span className="text-2xl font-bold text-white">{dia}</span>
+              <span className="text-sm text-white/70 font-medium uppercase tracking-wide">{diaSemana}, {mes}</span>
             </div>
           </div>
         </div>
