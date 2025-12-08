@@ -1,16 +1,39 @@
 import { useState } from "react";
 import { useCommunityMembers } from "@/hooks/useCommunityMembers";
 import { useCommunityStats } from "@/hooks/useCommunityStats";
+import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { MemberCard } from "./MemberCard";
 import { cn } from "@/lib/utils";
-import { Users, Wifi, Shield, ChevronDown } from "lucide-react";
+import { Users, Wifi, Shield, ChevronDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function MembersList() {
   const [filter, setFilter] = useState<"all" | "admin" | "online">("all");
   const [displayCount, setDisplayCount] = useState(20);
   const { members, isLoading } = useCommunityMembers(filter);
   const { stats } = useCommunityStats();
+  const { data: ranking } = useRankingEngajamento();
+  
+  const top3 = ranking?.slice(0, 3) || [];
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getMedalColor = (position: number) => {
+    switch (position) {
+      case 1: return "text-yellow-500";
+      case 2: return "text-muted-foreground";
+      case 3: return "text-amber-700";
+      default: return "text-muted-foreground";
+    }
+  };
 
   const displayedMembers = members.slice(0, displayCount);
   const hasMore = displayCount < members.length;
@@ -69,6 +92,42 @@ export function MembersList() {
           </div>
         </div>
       </div>
+
+      {/* Top 3 do Mês */}
+      {top3.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-foreground">Top 3 do Mês</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {top3.map((user) => (
+              <div 
+                key={user.user_id} 
+                className="bg-card border border-border rounded-lg p-3 flex items-center gap-3"
+              >
+                <span className={cn("text-lg font-bold w-6", getMedalColor(user.posicao))}>
+                  {user.posicao}º
+                </span>
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={user.avatar_url} alt={user.nome_completo} />
+                  <AvatarFallback className="text-xs bg-muted">
+                    {getInitials(user.nome_completo)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-foreground truncate">
+                    {user.nome_completo}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {user.total_pontos} pts
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Filters - Pill Style */}
       <div className="flex items-center gap-2 p-1 bg-muted rounded-full w-fit">
