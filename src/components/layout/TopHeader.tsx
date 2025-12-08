@@ -76,12 +76,14 @@ export function TopHeader() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex h-14 items-center w-full">
-        {/* LEFT: SidebarTrigger - posição fixa */}
-        <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors ml-2 shrink-0" />
+      <div className="relative h-14 w-full">
+        {/* LEFT: SidebarTrigger - posição absoluta à esquerda */}
+        <div className="absolute left-0 top-0 h-full flex items-center ml-2">
+          <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors" />
+        </div>
 
-        {/* CENTER: Horizontal Navigation - flexível sem max-width */}
-        <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center px-4">
+        {/* CENTER: Horizontal Navigation - centralizado na viewport com posição absoluta */}
+        <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-8">
           <NavLink 
             to="/" 
             end
@@ -179,8 +181,8 @@ export function TopHeader() {
           )}
         </nav>
 
-        {/* RIGHT: Notifications + Avatar - posição fixa */}
-        <div className="flex items-center gap-2 pr-4 shrink-0">
+        {/* RIGHT: Notifications + Avatar - posição absoluta à direita */}
+        <div className="absolute right-0 top-0 h-full flex items-center gap-2 pr-4">
           <Button
             variant="ghost" 
             size="icon" 
