@@ -133,19 +133,19 @@ export function AppSidebar() {
                           <div className="flex items-center w-full">
                             <NavLink
                               to={menu.url || "/"}
-                              className={cn(
-                                "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
-                                isActive 
-                                  ? "text-sidebar-primary font-semibold" 
-                                  : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
-                              )}
-                            >
-                              <span className={cn(
-                                "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                                isActive 
-                                  ? "bg-sidebar-active opacity-100" 
-                                  : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
-                              )} />
+                            className={cn(
+                              "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
+                              isActive 
+                                ? "text-primary font-semibold" 
+                                : "text-sidebar-foreground hover:text-primary"
+                            )}
+                          >
+                            <span className={cn(
+                              "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                              isActive 
+                                ? "bg-aplicada-green-700 opacity-100" 
+                                : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                            )} />
                               <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                               {!collapsed && <span className="text-sm">{menu.label}</span>}
                             </NavLink>
@@ -171,36 +171,38 @@ export function AppSidebar() {
                       </SidebarMenuItem>
                       
                       <CollapsibleContent>
-                        {subMenus.map((subMenu) => {
-                          const subIsActive = location.pathname === subMenu.url;
-                          const SubIconComponent = subMenu.icon ? getIconComponent(subMenu.icon) : null;
-                          
-                          return (
-                            <SidebarMenuItem key={subMenu.menu_key}>
-                              <SidebarMenuButton asChild className="group">
-                                <NavLink 
-                                  to={subMenu.url || "/"} 
-                                  end 
-                                  className={cn(
-                                    "relative rounded-lg transition-all duration-200 font-medium pl-10 py-2",
-                                    subIsActive 
-                                      ? "text-sidebar-primary font-semibold" 
-                                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground"
-                                  )}
-                                >
-                                  <span className={cn(
-                                    "absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full transition-all duration-200",
-                                    subIsActive 
-                                      ? "bg-sidebar-active opacity-100" 
-                                      : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
-                                  )} />
-                                  {SubIconComponent && <SubIconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />}
-                                  {!collapsed && <span className="text-sm">{subMenu.label}</span>}
-                                </NavLink>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          );
-                        })}
+                        <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
+                          {subMenus.map((subMenu) => {
+                            const subIsActive = location.pathname === subMenu.url;
+                            const SubIconComponent = subMenu.icon ? getIconComponent(subMenu.icon) : null;
+                            
+                            return (
+                              <SidebarMenuItem key={subMenu.menu_key}>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink 
+                                    to={subMenu.url || "/"} 
+                                    end 
+                                    className={cn(
+                                      "relative rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      subIsActive 
+                                        ? "text-primary font-semibold" 
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    <span className={cn(
+                                      "absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full transition-all duration-200",
+                                      subIsActive 
+                                        ? "bg-aplicada-green-700 opacity-100" 
+                                        : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                                    )} />
+                                    {SubIconComponent && <SubIconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />}
+                                    {!collapsed && <span>{subMenu.label}</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            );
+                          })}
+                        </SidebarMenu>
                       </CollapsibleContent>
                     </Collapsible>
                   );
@@ -215,15 +217,15 @@ export function AppSidebar() {
                         className={cn(
                           "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                           isActive 
-                            ? "text-sidebar-primary font-semibold" 
-                            : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
+                            ? "text-primary font-semibold" 
+                            : "text-sidebar-foreground hover:text-primary"
                         )}
                       >
                         <span className={cn(
                           "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                           isActive 
-                            ? "bg-sidebar-active opacity-100" 
-                            : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
+                            ? "bg-aplicada-green-700 opacity-100" 
+                            : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
                         )} />
                         <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                         {!collapsed && <span className="text-sm">{menu.label}</span>}
@@ -243,15 +245,15 @@ export function AppSidebar() {
                       className={cn(
                         "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                         location.pathname === '/videos-bonus'
-                          ? "text-sidebar-primary font-semibold" 
-                          : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
+                          ? "text-primary font-semibold" 
+                          : "text-sidebar-foreground hover:text-primary"
                       )}
                     >
                       <span className={cn(
                         "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                         location.pathname === '/videos-bonus'
-                          ? "bg-sidebar-active opacity-100" 
-                          : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
+                          ? "bg-aplicada-green-700 opacity-100" 
+                          : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
                       )} />
                       <LucideIcons.Gift className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                       {!collapsed && <span className="text-sm">Vídeos Bônus</span>}
@@ -270,15 +272,15 @@ export function AppSidebar() {
                       className={cn(
                         "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                         location.pathname === "/materiais-gratuitos"
-                          ? "text-sidebar-primary font-semibold" 
-                          : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
+                          ? "text-primary font-semibold" 
+                          : "text-sidebar-foreground hover:text-primary"
                       )}
                     >
                       <span className={cn(
                         "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                         location.pathname === "/materiais-gratuitos"
-                          ? "bg-sidebar-active opacity-100" 
-                          : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
+                          ? "bg-aplicada-green-700 opacity-100" 
+                          : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
                       )} />
                       <LucideIcons.FileText className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                       {!collapsed && <span className="text-sm">Materiais</span>}
@@ -296,15 +298,15 @@ export function AppSidebar() {
                     className={cn(
                       "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                       location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
-                        ? "text-red-500 font-semibold bg-red-500/10" 
-                        : "text-red-500/80 hover:text-red-500 bg-red-500/5 hover:bg-red-500/10"
+                        ? "text-primary font-semibold bg-primary/10" 
+                        : "text-primary/80 hover:text-primary bg-primary/5 hover:bg-primary/10"
                     )}
                   >
                     <span className={cn(
                       "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                       location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
-                        ? "bg-red-500 opacity-100" 
-                        : "bg-red-400/50 opacity-0 group-hover:opacity-60"
+                        ? "bg-aplicada-green-700 opacity-100" 
+                        : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
                     )} />
                     <Zap className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                     {!collapsed && <span className="text-sm">{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
@@ -329,8 +331,8 @@ export function AppSidebar() {
                       className={({ isActive }) => cn(
                         "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                         isActive 
-                          ? "text-sidebar-primary font-semibold" 
-                          : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
+                          ? "text-primary font-semibold" 
+                          : "text-sidebar-foreground hover:text-primary"
                       )}
                     >
                       {({ isActive }) => (
@@ -338,8 +340,8 @@ export function AppSidebar() {
                           <span className={cn(
                             "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                             isActive 
-                              ? "bg-sidebar-active opacity-100" 
-                              : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
+                              ? "bg-aplicada-green-700 opacity-100" 
+                              : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
                           )} />
                           <Shield className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                           {!collapsed && <span className="text-sm">Painel Admin</span>}
@@ -362,7 +364,7 @@ export function AppSidebar() {
                 to="/configuracoes" 
                 className={({ isActive }) => cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium pl-4",
-                  isActive ? "text-sidebar-primary font-semibold" : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
+                  isActive ? "text-primary font-semibold" : "text-sidebar-foreground hover:text-primary"
                 )}
               >
                 {({ isActive }) => (
@@ -370,8 +372,8 @@ export function AppSidebar() {
                     <span className={cn(
                       "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                       isActive 
-                        ? "bg-sidebar-active opacity-100" 
-                        : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
+                        ? "bg-aplicada-green-700 opacity-100" 
+                        : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
                     )} />
                     <Settings className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                     {!collapsed && <span className="text-sm">Configurações</span>}
