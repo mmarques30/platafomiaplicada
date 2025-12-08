@@ -50,14 +50,28 @@ export function AppSidebar() {
 
   const sidebarMenus = getSidebarMenus(plan);
   
+  // Pegar todos os menus principais (sem parent_key)
   const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key);
   
+  // Filtrar para visitantes: apenas início, aprender (com trilhas) e comunidade via interacoes
   const mainMenus = isVisitante 
-    ? allMainMenus.filter(menu => ['trilhas', 'comunidade'].includes(menu.menu_key))
+    ? allMainMenus.filter(menu => ['inicio', 'aprender', 'interacoes'].includes(menu.menu_key))
     : allMainMenus;
   
-  const getSubMenus = (parentKey: string) => 
-    sidebarMenus.filter(menu => menu.parent_key === parentKey);
+  // Obter submenus de um parent
+  const getSubMenus = (parentKey: string) => {
+    const subMenus = sidebarMenus.filter(menu => menu.parent_key === parentKey);
+    // Visitantes: filtrar submenus
+    if (isVisitante) {
+      if (parentKey === 'aprender') {
+        return subMenus.filter(sub => sub.menu_key === 'trilhas');
+      }
+      if (parentKey === 'interacoes') {
+        return subMenus.filter(sub => sub.menu_key === 'comunidade');
+      }
+    }
+    return subMenus;
+  };
 
   const toggleMenu = (menuKey: string) => {
     setExpandedMenus(prev => 
@@ -67,14 +81,24 @@ export function AppSidebar() {
     );
   };
 
+  // Auto-expandir menu quando rota ativa está em submenu
   useEffect(() => {
+    const newExpanded: string[] = [];
     mainMenus.forEach(menu => {
       const subMenus = getSubMenus(menu.menu_key);
-      const isInSubRoute = subMenus.some(sub => location.pathname === sub.url);
-      if (isInSubRoute && !expandedMenus.includes(menu.menu_key)) {
-        setExpandedMenus(prev => [...prev, menu.menu_key]);
+      const isInSubRoute = subMenus.some(sub => 
+        sub.url && location.pathname.startsWith(sub.url)
+      );
+      if (isInSubRoute) {
+        newExpanded.push(menu.menu_key);
       }
     });
+    if (newExpanded.length > 0) {
+      setExpandedMenus(prev => {
+        const combined = [...new Set([...prev, ...newExpanded])];
+        return combined;
+      });
+    }
   }, [location.pathname]);
 
   return (
