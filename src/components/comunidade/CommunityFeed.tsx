@@ -3,7 +3,6 @@ import { useCommunityPosts } from "@/hooks/useCommunityPosts";
 import { PostCard } from "./PostCard";
 import { CreatePostModal } from "./CreatePostModal";
 import { WritePostInput } from "./WritePostInput";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export function CommunityFeed() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -11,23 +10,32 @@ export function CommunityFeed() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-0">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-48 w-full" />
+          <div key={i} className="border-b border-zinc-800 p-4 animate-pulse">
+            <div className="flex gap-3">
+              <div className="h-10 w-10 rounded-full bg-zinc-800" />
+              <div className="flex-1 space-y-3">
+                <div className="h-4 w-1/3 bg-zinc-800 rounded" />
+                <div className="h-4 w-full bg-zinc-800 rounded" />
+                <div className="h-4 w-2/3 bg-zinc-800 rounded" />
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div>
       {/* Write Post Input */}
       <WritePostInput onClick={() => setShowCreateModal(true)} />
 
       {/* Posts Feed */}
-      <div className="space-y-4">
+      <div>
         {posts.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
+          <div className="text-center py-16 text-zinc-500">
             Nenhum post ainda. Seja o primeiro a postar!
           </div>
         ) : (

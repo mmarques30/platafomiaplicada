@@ -1,8 +1,5 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Trash2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Heart, MessageCircle, Trash2, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CommunityPost } from "@/hooks/useCommunityPosts";
@@ -11,6 +8,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useState } from "react";
 import { PostComments } from "./PostComments";
 import ReactMarkdown from "react-markdown";
+import { cn } from "@/lib/utils";
 
 interface PostCardProps {
   post: CommunityPost;
@@ -35,103 +33,110 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
   };
 
   return (
-    <Card className="bg-card border-border">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                {getInitials(post.profiles.nome_completo)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-foreground">
-                  {post.profiles.nome_completo}
-                </span>
-                <Badge variant="outline" className="text-xs">
-                  Nível {post.profiles.nivel_comunidade}
-                </Badge>
-              </div>
-              <div className="text-xs text-muted-foreground">
+    <article className="border-b border-zinc-800 p-4 hover:bg-zinc-800/30 transition-colors">
+      <div className="flex gap-3">
+        {/* Avatar */}
+        <Avatar className="h-10 w-10 flex-shrink-0">
+          {post.profiles.avatar_url && (
+            <AvatarImage src={post.profiles.avatar_url} />
+          )}
+          <AvatarFallback className="bg-[#9EB038] text-white text-sm">
+            {getInitials(post.profiles.nome_completo)}
+          </AvatarFallback>
+        </Avatar>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Header */}
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className="font-semibold text-white hover:underline cursor-pointer">
+                {post.profiles.nome_completo}
+              </span>
+              <span className="text-zinc-500 text-sm">
+                @lvl{post.profiles.nivel_comunidade}
+              </span>
+              <span className="text-zinc-600">·</span>
+              <span className="text-zinc-500 text-sm hover:underline cursor-pointer">
                 {formatDistanceToNow(new Date(post.created_at), {
-                  addSuffix: true,
+                  addSuffix: false,
                   locale: ptBR,
                 })}
-                {post.community_categories && (
-                  <>
-                    {" • "}
+              </span>
+              {post.community_categories && (
+                <>
+                  <span className="text-zinc-600">·</span>
+                  <span className="text-[#9EB038] text-sm">
                     {post.community_categories.name}
-                  </>
-                )}
-              </div>
+                  </span>
+                </>
+              )}
             </div>
+
+            {canDelete && (
+              <button
+                onClick={onDelete}
+                className="p-2 rounded-full text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
-          {canDelete && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onDelete}
-              className="text-muted-foreground hover:text-red-500"
+          {/* Post Content */}
+          {post.title && (
+            <h3 className="text-lg font-semibold text-white mt-1">{post.title}</h3>
+          )}
+
+          <div className="text-white mt-1 prose prose-sm prose-invert max-w-none">
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{children}</p>,
+                strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+              }}
             >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+              {post.content}
+            </ReactMarkdown>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-6 mt-3 -ml-2">
+            <button
+              onClick={() => setShowComments(!showComments)}
+              className="flex items-center gap-2 p-2 rounded-full text-zinc-500 hover:text-[#9EB038] hover:bg-[#9EB038]/10 transition-colors group"
+            >
+              <MessageCircle className="h-[18px] w-[18px]" />
+              <span className="text-sm">{post.comments_count || ""}</span>
+            </button>
+
+            <button
+              onClick={onLike}
+              className={cn(
+                "flex items-center gap-2 p-2 rounded-full transition-colors group",
+                post.user_has_liked
+                  ? "text-red-500"
+                  : "text-zinc-500 hover:text-red-500 hover:bg-red-500/10"
+              )}
+            >
+              <Heart
+                className={cn(
+                  "h-[18px] w-[18px]",
+                  post.user_has_liked && "fill-red-500"
+                )}
+              />
+              <span className="text-sm">{post.likes_count || ""}</span>
+            </button>
+          </div>
+
+          {/* Comments Section */}
+          {showComments && (
+            <div className="mt-4 pt-4 border-t border-zinc-800">
+              <PostComments postId={post.id} />
+            </div>
           )}
         </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {post.title && (
-          <h3 className="text-lg font-semibold text-foreground">{post.title}</h3>
-        )}
-
-        <div className="text-foreground prose prose-sm max-w-none dark:prose-invert">
-          <ReactMarkdown
-            components={{
-              p: ({ children }) => <p className="whitespace-pre-wrap">{children}</p>,
-              strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-              em: ({ children }) => <em className="italic">{children}</em>,
-            }}
-          >
-            {post.content}
-          </ReactMarkdown>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-4 pt-2 border-t border-border">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onLike}
-            className={
-              post.user_has_liked
-                ? "text-red-500 hover:text-red-600"
-                : "text-muted-foreground hover:text-foreground"
-            }
-          >
-            <Heart
-              className={`h-4 w-4 mr-1 ${
-                post.user_has_liked ? "fill-red-500" : ""
-              }`}
-            />
-            {post.likes_count}
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowComments(!showComments)}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <MessageCircle className="h-4 w-4 mr-1" />
-            {post.comments_count}
-          </Button>
-        </div>
-
-        {/* Comments Section */}
-        {showComments && <PostComments postId={post.id} />}
-      </CardContent>
-    </Card>
+      </div>
+    </article>
   );
 }

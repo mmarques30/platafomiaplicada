@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Circle, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -26,19 +25,19 @@ export function MemberCard({ member }: MemberCardProps) {
       new Date(Date.now() - 5 * 60 * 1000);
 
   return (
-    <div className="flex items-start gap-4 py-6">
+    <div className="flex items-start gap-4 p-4 hover:bg-zinc-800/50 transition-colors cursor-pointer">
       {/* Avatar with Level Badge */}
       <div className="relative flex-shrink-0">
-        <Avatar className="h-14 w-14">
+        <Avatar className="h-12 w-12">
           {member.avatar_url && (
             <AvatarImage src={member.avatar_url} alt={member.nome_completo} />
           )}
-          <AvatarFallback className="bg-primary text-primary-foreground text-lg">
+          <AvatarFallback className="bg-[#9EB038] text-white">
             {getInitials(member.nome_completo)}
           </AvatarFallback>
         </Avatar>
         {/* Level Badge Overlay */}
-        <div className="absolute -bottom-1 -left-1 h-6 w-6 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground border-2 border-background">
+        <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-white border-2 border-zinc-900">
           {member.nivel_comunidade}
         </div>
       </div>
@@ -47,50 +46,49 @@ export function MemberCard({ member }: MemberCardProps) {
       <div className="flex-1 min-w-0">
         {/* Name + Badges */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-foreground text-base">
+          <span className="font-semibold text-white">
             {member.nome_completo}
           </span>
           {member.is_admin && (
-            <Badge variant="outline" className="text-xs">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#9EB038]/20 text-[#9EB038]">
               Admin
-            </Badge>
+            </span>
           )}
         </div>
 
         {/* Plan as subtitle */}
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-zinc-500">
           @{member.plano_mentoria || "visitante"}
         </p>
 
         {/* Bio */}
         {member.bio && (
-          <p className="text-sm text-foreground mt-1 line-clamp-1">
+          <p className="text-sm text-zinc-300 mt-1 line-clamp-1">
             {member.bio}
           </p>
         )}
 
         {/* Status + Join Date */}
-        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
+        <div className="flex items-center gap-4 mt-2 text-sm text-zinc-500 flex-wrap">
           {/* Online Status */}
           <div className="flex items-center gap-1.5">
             <Circle
               className={cn(
-                "h-2.5 w-2.5 fill-current",
-                isOnline ? "text-green-500" : "text-gray-400"
+                "h-2 w-2 fill-current",
+                isOnline ? "text-green-500" : "text-zinc-600"
               )}
             />
-            <span className={isOnline ? "text-green-600" : ""}>
-              {isOnline ? "Online agora" : "Offline"}
+            <span className={isOnline ? "text-green-500" : ""}>
+              {isOnline ? "Online" : "Offline"}
             </span>
           </div>
 
           {/* Join Date */}
           {member.created_at && (
             <div className="flex items-center gap-1.5">
-              <CalendarDays className="h-4 w-4" />
+              <CalendarDays className="h-3.5 w-3.5" />
               <span>
-                Entrou em{" "}
-                {format(new Date(member.created_at), "dd MMM yyyy", {
+                {format(new Date(member.created_at), "MMM yyyy", {
                   locale: ptBR,
                 })}
               </span>
