@@ -189,7 +189,6 @@ export function AppSidebar() {
                                         : "text-sidebar-foreground/70 hover:text-primary"
                                     )}
                                   >
-                                    {SubIconComponent && <SubIconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />}
                                     {!collapsed && <span>{subMenu.label}</span>}
                                   </NavLink>
                                 </SidebarMenuButton>
