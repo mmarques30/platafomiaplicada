@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface WritePostInputProps {
   onClick: () => void;
@@ -8,6 +8,7 @@ interface WritePostInputProps {
 
 export function WritePostInput({ onClick }: WritePostInputProps) {
   const { user } = useAuth();
+  const { profile } = useUserProfile();
 
   const getInitials = (name: string) => {
     return name
@@ -19,20 +20,25 @@ export function WritePostInput({ onClick }: WritePostInputProps) {
   };
 
   return (
-    <Card 
-      className="bg-card border-border hover:border-primary/20 transition-colors cursor-pointer"
+    <div 
+      className="border-b border-zinc-800 p-4 hover:bg-zinc-800/30 transition-colors cursor-pointer"
       onClick={onClick}
     >
-      <div className="p-4 flex items-center gap-3">
-        <Avatar className="h-10 w-10">
-          <AvatarFallback className="bg-primary text-primary-foreground">
-            {getInitials(user?.user_metadata?.nome_completo || "U")}
+      <div className="flex items-start gap-3">
+        <Avatar className="h-10 w-10 flex-shrink-0">
+          {profile?.avatar_url && (
+            <AvatarImage src={profile.avatar_url} />
+          )}
+          <AvatarFallback className="bg-[#9EB038] text-white text-sm">
+            {getInitials(user?.user_metadata?.nome_completo || profile?.nome_completo || "U")}
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1 text-muted-foreground text-sm">
-          Write something...
+        <div className="flex-1 pt-2">
+          <span className="text-zinc-500 text-base">
+            O que está acontecendo?
+          </span>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
