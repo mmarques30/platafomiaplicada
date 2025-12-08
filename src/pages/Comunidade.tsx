@@ -22,7 +22,7 @@ export default function Comunidade() {
   return (
     <div className="min-h-screen bg-background">
       {/* Main Layout - Single Column */}
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Tab Navigation - X/Twitter Style */}
         <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
           <nav className="flex">
