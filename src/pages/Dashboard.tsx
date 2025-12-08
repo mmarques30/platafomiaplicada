@@ -124,14 +124,7 @@ export default function Dashboard() {
 
         {/* Hero Section */}
         <section>
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-accent/5 border-2 border-primary/10 p-4 md:p-6 shadow-lg">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl"></div>
-            
-            <div className="relative z-10">
-              <WelcomeHeader />
-            </div>
-          </div>
+          <WelcomeHeader />
         </section>
 
         {/* Novidades da Semana */}
