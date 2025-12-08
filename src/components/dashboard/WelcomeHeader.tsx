@@ -50,27 +50,28 @@ export function WelcomeHeader() {
 
   return (
     <div className="w-full">
-      <div className="flex flex-row items-center justify-between gap-4">
+      {/* Container escuro transparente envolvendo TUDO */}
+      <div className="flex flex-row items-center justify-between gap-4 bg-[#2F302B]/70 backdrop-blur-sm rounded-2xl px-6 py-5 border border-white/10">
         {/* Coluna Esquerda - Saudação e Tema */}
         <div className="flex-1 min-w-0">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
             {saudacao}, <span className="text-primary">{primeiroNome}</span>!
           </h1>
           
           {aulaAtiva ? (
-            <p className="text-base md:text-lg text-muted-foreground">
-              <span className="font-semibold text-foreground">Próxima aula:</span> {aulaAtiva.tema} • {aulaAtiva.horario} - {aulaAtiva.dia_semana}
+            <p className="text-base md:text-lg text-white/70">
+              <span className="font-semibold text-white">Próxima aula:</span> {aulaAtiva.tema} • {aulaAtiva.horario} - {aulaAtiva.dia_semana}
             </p>
           ) : (
-            <p className="text-base md:text-lg text-muted-foreground font-medium">
+            <p className="text-base md:text-lg text-white/70 font-medium">
               Aplique, replique e domine IA
             </p>
           )}
         </div>
 
-        {/* Coluna Direita - Card Compacto Tech */}
+        {/* Coluna Direita - Card Compacto de Data */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="flex items-center gap-3 bg-[#2F302B]/70 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-md border border-white/10">
+          <div className="flex items-center gap-3">
             {/* Ícone em círculo primary */}
             <div className="bg-primary rounded-xl p-3 flex items-center justify-center shadow-sm">
               <Calendar className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
