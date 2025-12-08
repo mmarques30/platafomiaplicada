@@ -33,15 +33,24 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
 
   const getMedalBg = (posicao: number) => {
     switch (posicao) {
-      case 1: return "bg-yellow-50 dark:bg-yellow-950/20";
-      case 2: return "bg-muted/30";
-      case 3: return "bg-amber-50/50 dark:bg-amber-950/20";
-      default: return "";
+      case 1: return "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-300 dark:border-yellow-500/30";
+      case 2: return "bg-muted/30 border-border";
+      case 3: return "bg-amber-50/50 dark:bg-amber-950/20 border-amber-300 dark:border-amber-500/30";
+      default: return "border-border";
+    }
+  };
+
+  const getAvatarBg = (posicao: number) => {
+    switch (posicao) {
+      case 1: return "bg-yellow-500";
+      case 2: return "bg-muted-foreground";
+      case 3: return "bg-amber-600";
+      default: return "bg-primary";
     }
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Sobre a Premiação - Topo, discreta, sem ícones */}
       <div className="bg-card rounded-xl p-4 border border-border">
         <h3 className="text-sm font-semibold text-foreground mb-2">Sobre a Premiação</h3>
@@ -53,145 +62,159 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
         </p>
       </div>
 
-      {/* Top 3 - Com destaque */}
+      {/* Top 3 - Cards horizontais lado a lado */}
       {top3.length > 0 && (
-        <div className="space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {top3.map((item) => (
             <div
               key={item.user_id}
               className={cn(
-                "flex items-center gap-4 p-4 rounded-xl border transition-colors",
-                getMedalBg(item.posicao),
-                item.posicao === 1 ? "border-yellow-300 dark:border-yellow-500/30" : "border-border"
+                "flex flex-col items-center p-6 rounded-xl border transition-colors",
+                getMedalBg(item.posicao)
               )}
             >
+              {/* Posição */}
               <span className={cn(
-                "font-bold text-lg w-8",
+                "font-bold text-2xl mb-3",
                 getMedalColor(item.posicao).split(' ')[0]
               )}>
                 {item.posicao}º
               </span>
+              
+              {/* Avatar centralizado */}
               <Avatar className={cn(
-                "border-2",
-                item.posicao === 1 ? "h-14 w-14 border-yellow-500" : "h-10 w-10",
+                "mb-3 border-2",
+                item.posicao === 1 ? "h-16 w-16" : "h-12 w-12",
                 getMedalColor(item.posicao).split(' ')[1]
               )}>
                 <AvatarImage src={item.avatar_url} />
                 <AvatarFallback className={cn(
                   "text-white",
-                  item.posicao === 1 ? "bg-yellow-500 text-lg" : item.posicao === 2 ? "bg-muted-foreground" : "bg-amber-600"
+                  item.posicao === 1 ? "text-lg" : "text-sm",
+                  getAvatarBg(item.posicao)
                 )}>
                   {getInitials(item.nome_completo)}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className={cn(
-                  "font-medium truncate",
-                  item.user_id === user?.id ? "text-primary" : "text-foreground",
-                  item.posicao === 1 && "text-lg"
-                )}>
-                  {item.nome_completo}
-                  {item.user_id === user?.id && (
-                    <span className="ml-2 text-xs text-primary">(Você)</span>
-                  )}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {item.total_posts} posts • {item.total_comentarios} comentários • {item.total_likes_recebidos} likes
-                </p>
-              </div>
-              <div className="text-right">
-                <p className={cn(
-                  "font-bold",
-                  item.posicao === 1 ? "text-xl text-yellow-600 dark:text-yellow-500" : "text-lg text-foreground"
-                )}>
-                  {item.total_pontos}
-                </p>
-                <p className="text-xs text-muted-foreground">pts</p>
-              </div>
+              
+              {/* Nome */}
+              <p className={cn(
+                "font-medium truncate w-full text-center",
+                item.user_id === user?.id ? "text-primary" : "text-foreground"
+              )}>
+                {item.nome_completo}
+                {item.user_id === user?.id && (
+                  <span className="ml-1 text-xs text-primary">(Você)</span>
+                )}
+              </p>
+              
+              {/* Stats */}
+              <p className="text-xs text-muted-foreground mt-1">
+                {item.total_posts} posts • {item.total_comentarios} com.
+              </p>
+              
+              {/* Pontos */}
+              <p className={cn(
+                "font-bold text-xl mt-3",
+                item.posicao === 1 ? "text-yellow-600 dark:text-yellow-500" : "text-foreground"
+              )}>
+                {item.total_pontos} pts
+              </p>
             </div>
           ))}
         </div>
       )}
 
-      {/* Posições 4-10 e além */}
+      {/* Posições 4+ - Tabela simplificada */}
       {(posicoes4a10.length > 0 || alem10.length > 0) && (
-        <div className="bg-card rounded-xl overflow-hidden border border-border">
-          <div className="divide-y divide-border">
-            {/* Posições 4 a 10 */}
-            {posicoes4a10.map((item) => (
-              <div
-                key={item.user_id}
-                className={cn(
-                  "flex items-center gap-3 p-4 transition-colors hover:bg-muted/50",
-                  item.user_id === user?.id && "bg-primary/5"
-                )}
-              >
-                <span className="font-mono text-sm font-semibold text-muted-foreground w-8">{item.posicao}º</span>
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={item.avatar_url} />
-                  <AvatarFallback className="bg-primary text-primary-foreground">{getInitials(item.nome_completo)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "font-medium truncate",
-                    item.user_id === user?.id ? "text-primary" : "text-foreground"
-                  )}>
-                    {item.nome_completo}
-                    {item.user_id === user?.id && (
-                      <span className="ml-2 text-xs text-primary">(Você)</span>
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.total_posts} posts • {item.total_comentarios} comentários • {item.total_likes_recebidos} likes
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-lg text-foreground">{item.total_pontos}</p>
-                  <p className="text-xs text-muted-foreground">pts</p>
-                </div>
-              </div>
-            ))}
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-muted/50">
+              <tr className="text-xs text-muted-foreground">
+                <th className="text-left p-3 font-medium w-12">#</th>
+                <th className="text-left p-3 font-medium">Membro</th>
+                <th className="text-right p-3 font-medium hidden sm:table-cell">Posts</th>
+                <th className="text-right p-3 font-medium hidden sm:table-cell">Comentários</th>
+                <th className="text-right p-3 font-medium">Pontos</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {/* Posições 4 a 10 */}
+              {posicoes4a10.map((item) => (
+                <tr 
+                  key={item.user_id} 
+                  className={cn(
+                    "hover:bg-muted/50 transition-colors",
+                    item.user_id === user?.id && "bg-primary/5"
+                  )}
+                >
+                  <td className="p-3 font-mono text-sm text-muted-foreground">{item.posicao}º</td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={item.avatar_url} />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                          {getInitials(item.nome_completo)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className={cn(
+                        "truncate",
+                        item.user_id === user?.id ? "text-primary font-medium" : "text-foreground"
+                      )}>
+                        {item.nome_completo}
+                        {item.user_id === user?.id && (
+                          <span className="ml-1 text-xs text-primary">(Você)</span>
+                        )}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_posts}</td>
+                  <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_comentarios}</td>
+                  <td className="p-3 text-right font-semibold">{item.total_pontos}</td>
+                </tr>
+              ))}
 
-            {/* Posições além do 10 - mostrar quando expandido */}
-            {expanded && alem10.map((item) => (
-              <div
-                key={item.user_id}
-                className={cn(
-                  "flex items-center gap-3 p-4 transition-colors hover:bg-muted/50",
-                  item.user_id === user?.id && "bg-primary/5"
-                )}
-              >
-                <span className="font-mono text-sm font-semibold text-muted-foreground w-8">{item.posicao}º</span>
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={item.avatar_url} />
-                  <AvatarFallback className="bg-primary text-primary-foreground">{getInitials(item.nome_completo)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "font-medium truncate",
-                    item.user_id === user?.id ? "text-primary" : "text-foreground"
-                  )}>
-                    {item.nome_completo}
-                    {item.user_id === user?.id && (
-                      <span className="ml-2 text-xs text-primary">(Você)</span>
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.total_posts} posts • {item.total_comentarios} comentários • {item.total_likes_recebidos} likes
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-lg text-foreground">{item.total_pontos}</p>
-                  <p className="text-xs text-muted-foreground">pts</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              {/* Posições além do 10 - mostrar quando expandido */}
+              {expanded && alem10.map((item) => (
+                <tr 
+                  key={item.user_id} 
+                  className={cn(
+                    "hover:bg-muted/50 transition-colors",
+                    item.user_id === user?.id && "bg-primary/5"
+                  )}
+                >
+                  <td className="p-3 font-mono text-sm text-muted-foreground">{item.posicao}º</td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={item.avatar_url} />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                          {getInitials(item.nome_completo)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className={cn(
+                        "truncate",
+                        item.user_id === user?.id ? "text-primary font-medium" : "text-foreground"
+                      )}>
+                        {item.nome_completo}
+                        {item.user_id === user?.id && (
+                          <span className="ml-1 text-xs text-primary">(Você)</span>
+                        )}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_posts}</td>
+                  <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_comentarios}</td>
+                  <td className="p-3 text-right font-semibold">{item.total_pontos}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
             
           {alem10.length > 0 && (
             <button 
               onClick={() => setExpanded(!expanded)}
-              className="w-full p-4 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors flex items-center justify-center gap-2 border-t border-border"
+              className="w-full p-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors flex items-center justify-center gap-2 border-t border-border"
             >
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", expanded && "rotate-180")} />
               {expanded ? 'Ver menos' : `Ver mais ${alem10.length} posições`}
