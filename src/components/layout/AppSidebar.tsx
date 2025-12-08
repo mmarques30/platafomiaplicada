@@ -34,8 +34,6 @@ export function AppSidebar() {
   const { plan } = useUserPlan();
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
-  console.log("[AppSidebar] isAdmin:", isAdmin);
-  console.log("[AppSidebar] isMentorado:", isMentorado);
   const collapsed = !open;
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
@@ -52,10 +50,8 @@ export function AppSidebar() {
 
   const sidebarMenus = getSidebarMenus(plan);
   
-  // Separar menus principais e subitens
   const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key);
   
-  // Filtrar menus para visitantes (apenas Trilhas e Comunidade)
   const mainMenus = isVisitante 
     ? allMainMenus.filter(menu => ['trilhas', 'comunidade'].includes(menu.menu_key))
     : allMainMenus;
@@ -71,7 +67,6 @@ export function AppSidebar() {
     );
   };
 
-  // Auto-expandir se estiver em rota de submenu
   useEffect(() => {
     mainMenus.forEach(menu => {
       const subMenus = getSubMenus(menu.menu_key);
@@ -82,19 +77,18 @@ export function AppSidebar() {
     });
   }, [location.pathname]);
 
-
   return (
-    <Sidebar className="border-r border-border bg-background/50 backdrop-blur-sm">
+    <Sidebar className="border-r border-sidebar-border bg-sidebar">
       <SidebarHeader>
-        <div className="flex h-16 items-center justify-center px-4 bg-gradient-to-br from-primary/5 to-transparent">
-          <img src={logoSimbolo} alt="IAplicada" className="h-12 w-12 drop-shadow-md" />
+        <div className="flex h-16 items-center justify-center px-4">
+          <img src={logoSimbolo} alt="IAplicada" className="h-10 w-10" />
         </div>
       </SidebarHeader>
 
       <SidebarContent className="py-4">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1 px-2">
+            <SidebarMenu className="space-y-1 px-3">
               {!menuLoading && mainMenus.map((menu) => {
                 const isActive = location.pathname === menu.url;
                 const IconComponent = getIconComponent(menu.icon);
@@ -112,37 +106,38 @@ export function AppSidebar() {
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
                           <div className="flex items-center w-full">
-                            {/* Parte clicável que navega */}
                             <NavLink
                               to={menu.url || "/"}
                               className={cn(
-                                "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2",
-                                isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
+                                "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
+                                isActive 
+                                  ? "text-sidebar-primary font-semibold" 
+                                  : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
                               )}
                             >
                               <span className={cn(
                                 "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                                 isActive 
-                                  ? "bg-aplicada-green-700 opacity-100" 
-                                  : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                                  ? "bg-sidebar-active opacity-100" 
+                                  : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
                               )} />
-                              <IconComponent className="h-4 w-4 shrink-0" />
-                              {!collapsed && <span>{menu.label}</span>}
+                              <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                              {!collapsed && <span className="text-sm">{menu.label}</span>}
                             </NavLink>
-                            {/* Botão do chevron que expande/colapsa */}
                             {!collapsed && (
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
                                   toggleMenu(menu.menu_key);
                                 }}
-                                className="p-2 hover:bg-accent rounded-lg transition-colors"
+                                className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
                               >
                                 <ChevronDown 
                                   className={cn(
-                                    "h-4 w-4 transition-transform duration-200",
+                                    "h-4 w-4 transition-transform duration-200 text-sidebar-foreground/60",
                                     isExpanded && "rotate-180"
                                   )} 
+                                  strokeWidth={1.5}
                                 />
                               </button>
                             )}
@@ -162,20 +157,20 @@ export function AppSidebar() {
                                   to={subMenu.url || "/"} 
                                   end 
                                   className={cn(
-                                    "relative rounded-lg transition-all duration-200 font-medium pl-8",
+                                    "relative rounded-lg transition-all duration-200 font-medium pl-10 py-2",
                                     subIsActive 
-                                      ? "text-primary font-semibold" 
-                                      : "text-foreground hover:text-primary"
+                                      ? "text-sidebar-primary font-semibold" 
+                                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground"
                                   )}
                                 >
                                   <span className={cn(
-                                    "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                                    "absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full transition-all duration-200",
                                     subIsActive 
-                                      ? "bg-aplicada-green-700 opacity-100" 
-                                      : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                                      ? "bg-sidebar-active opacity-100" 
+                                      : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
                                   )} />
-                                  {SubIconComponent && <SubIconComponent className="h-4 w-4 shrink-0" />}
-                                  {!collapsed && <span>{subMenu.label}</span>}
+                                  {SubIconComponent && <SubIconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />}
+                                  {!collapsed && <span className="text-sm">{subMenu.label}</span>}
                                 </NavLink>
                               </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -193,27 +188,27 @@ export function AppSidebar() {
                         to={menu.url || "/"} 
                         end 
                         className={cn(
-                          "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                          "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                           isActive 
-                            ? "text-primary font-semibold" 
-                            : "text-foreground hover:text-primary"
+                            ? "text-sidebar-primary font-semibold" 
+                            : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
                         )}
                       >
                         <span className={cn(
                           "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                           isActive 
-                            ? "bg-aplicada-green-700 opacity-100" 
-                            : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                            ? "bg-sidebar-active opacity-100" 
+                            : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
                         )} />
-                        <IconComponent className="h-4 w-4 shrink-0" />
-                        {!collapsed && <span>{menu.label}</span>}
+                        <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                        {!collapsed && <span className="text-sm">{menu.label}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
               })}
 
-              {/* Vídeos Bônus - Exclusivo para Visitantes (item independente) */}
+              {/* Vídeos Bônus - Visitantes only */}
               {isVisitante && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild className="group">
@@ -221,26 +216,26 @@ export function AppSidebar() {
                       to="/videos-bonus" 
                       end 
                       className={cn(
-                        "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                        "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                         location.pathname === '/videos-bonus'
-                          ? "text-primary font-semibold" 
-                          : "text-foreground hover:text-primary"
+                          ? "text-sidebar-primary font-semibold" 
+                          : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
                       )}
                     >
                       <span className={cn(
                         "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                         location.pathname === '/videos-bonus'
-                          ? "bg-aplicada-green-700 opacity-100" 
-                          : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                          ? "bg-sidebar-active opacity-100" 
+                          : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
                       )} />
-                      <LucideIcons.Gift className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>Vídeos Bônus</span>}
+                      <LucideIcons.Gift className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                      {!collapsed && <span className="text-sm">Vídeos Bônus</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
 
-              {/* Materiais - Exclusivo para Visitantes */}
+              {/* Materiais - Visitantes only */}
               {isVisitante && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild className="group">
@@ -248,69 +243,69 @@ export function AppSidebar() {
                       to="/materiais-gratuitos"
                       end
                       className={cn(
-                        "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                        "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                         location.pathname === "/materiais-gratuitos"
-                          ? "text-primary font-semibold" 
-                          : "text-foreground hover:text-primary"
+                          ? "text-sidebar-primary font-semibold" 
+                          : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
                       )}
                     >
                       <span className={cn(
                         "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                         location.pathname === "/materiais-gratuitos"
-                          ? "bg-aplicada-green-700 opacity-100" 
-                          : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                          ? "bg-sidebar-active opacity-100" 
+                          : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
                       )} />
-                      <LucideIcons.FileText className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>Materiais</span>}
+                      <LucideIcons.FileText className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                      {!collapsed && <span className="text-sm">Materiais</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
 
               {/* CTA Item */}
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild className="group">
-                <NavLink 
-                  to={isVisitante || !plan ? "/aplique" : "/avance"}
-                  end
-                  className={cn(
-                    "relative rounded-lg transition-all duration-200 font-medium pl-4",
-                    location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
-                      ? "text-red-600 font-semibold bg-red-50 dark:bg-red-950/30" 
-                      : "text-red-600 hover:text-red-700 bg-red-50/50 hover:bg-red-50 dark:bg-red-950/20 dark:hover:bg-red-950/30"
-                  )}
-                >
-                  <span className={cn(
-                    "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                    location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
-                      ? "bg-red-600 opacity-100" 
-                      : "bg-red-400 opacity-0 group-hover:opacity-60"
-                  )} />
-                  <Zap className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span>{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="group">
+                  <NavLink 
+                    to={isVisitante || !plan ? "/aplique" : "/avance"}
+                    end
+                    className={cn(
+                      "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
+                      location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
+                        ? "text-red-500 font-semibold bg-red-500/10" 
+                        : "text-red-500/80 hover:text-red-500 bg-red-500/5 hover:bg-red-500/10"
+                    )}
+                  >
+                    <span className={cn(
+                      "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                      location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
+                        ? "bg-red-500 opacity-100" 
+                        : "bg-red-400/50 opacity-0 group-hover:opacity-60"
+                    )} />
+                    <Zap className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                    {!collapsed && <span className="text-sm">{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         {isAdmin && (
           <SidebarGroup>
-            <SidebarGroupLabel className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <SidebarGroupLabel className="px-4 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider">
               Administração
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu className="space-y-1 px-2">
+              <SidebarMenu className="space-y-1 px-3">
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild className="group">
                     <NavLink 
                       to="/admin" 
                       className={({ isActive }) => cn(
-                        "relative rounded-lg transition-all duration-200 font-medium pl-4",
+                        "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                         isActive 
-                          ? "text-primary font-semibold" 
-                          : "text-foreground hover:text-primary"
+                          ? "text-sidebar-primary font-semibold" 
+                          : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
                       )}
                     >
                       {({ isActive }) => (
@@ -318,11 +313,11 @@ export function AppSidebar() {
                           <span className={cn(
                             "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                             isActive 
-                              ? "bg-aplicada-green-700 opacity-100" 
-                              : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                              ? "bg-sidebar-active opacity-100" 
+                              : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
                           )} />
-                          <Shield className="h-4 w-4 shrink-0" />
-                          {!collapsed && <span>Painel Admin</span>}
+                          <Shield className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                          {!collapsed && <span className="text-sm">Painel Admin</span>}
                         </>
                       )}
                     </NavLink>
@@ -341,8 +336,8 @@ export function AppSidebar() {
               <NavLink 
                 to="/configuracoes" 
                 className={({ isActive }) => cn(
-                  "relative flex items-center gap-3 px-3 py-2 rounded-lg transition-colors font-medium pl-4",
-                  isActive ? "text-primary font-semibold" : "text-foreground hover:text-primary"
+                  "relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium pl-4",
+                  isActive ? "text-sidebar-primary font-semibold" : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
                 )}
               >
                 {({ isActive }) => (
@@ -350,20 +345,20 @@ export function AppSidebar() {
                     <span className={cn(
                       "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                       isActive 
-                        ? "bg-aplicada-green-700 opacity-100" 
-                        : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                        ? "bg-sidebar-active opacity-100" 
+                        : "bg-sidebar-active/30 opacity-0 group-hover:opacity-50"
                     )} />
-                    <Settings className="h-4 w-4 shrink-0" />
-                    {!collapsed && <span>Configurações</span>}
+                    <Settings className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                    {!collapsed && <span className="text-sm">Configurações</span>}
                   </>
                 )}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} className="text-destructive hover:bg-destructive/10">
-              <LogOut className="h-4 w-4 shrink-0" />
-              {!collapsed && <span>Sair</span>}
+            <SidebarMenuButton onClick={handleLogout} className="text-destructive/80 hover:text-destructive hover:bg-destructive/10 py-2.5">
+              <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+              {!collapsed && <span className="text-sm">Sair</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
