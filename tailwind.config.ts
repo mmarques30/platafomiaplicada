@@ -16,9 +16,9 @@ export default {
       fontFamily: {
         sans: ['Sora', 'system-ui', 'sans-serif'],
       },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'glow-green': 'radial-gradient(circle at center, rgba(158, 176, 56, 0.15) 0%, transparent 70%)',
+      letterSpacing: {
+        tighter: '-0.02em',
+        tight: '-0.01em',
       },
       colors: {
         border: "hsl(var(--border))",
@@ -63,22 +63,26 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+          active: "hsl(var(--sidebar-active))",
         },
+        /* IAplicada Brand Colors - Full palette */
         aplicada: {
           green: {
-            900: "hsl(73, 64%, 32%)", // #738925 - mantém
-            800: "hsl(73, 54%, 39%)", // #889C2D - mantém
-            700: "hsl(73, 55%, 47%)", // #9EB038 - mantém
-            400: "hsl(73, 35%, 79%)", // #C8D27B - BOTÕES PRIMÁRIOS
-            100: "hsl(0, 0%, 100%)", // #FFFFFF - mantém
+            900: "hsl(73, 64%, 32%)",  /* #738925 - Darkest */
+            800: "hsl(73, 54%, 39%)",  /* #889C2D - Dark */
+            700: "hsl(73, 55%, 47%)",  /* #9EB038 - Primary */
+            600: "hsl(73, 37%, 58%)",  /* #BCC95D - Subtitle */
+            500: "hsl(73, 35%, 65%)",  /* #C8D27B - Secondary */
+            400: "hsl(73, 40%, 75%)",  /* Light accent */
+            300: "hsl(73, 45%, 85%)",  /* Lighter */
+            200: "hsl(73, 50%, 92%)",  /* Very light */
+            100: "hsl(63, 45%, 94%)",  /* #F6F7E9 - Off-white */
           },
-          dark: "hsl(72, 6%, 18%)", // #2F302B - mantém
-          light: "hsl(0, 0%, 100%)", // #FFFFFF - mantém
-          gray: "hsl(72, 6%, 18%)", // #2F302B - mantém
-          yellow: "hsl(60, 100%, 97%)", // #FFFFF6 - mantém
-          button: "hsl(73, 35%, 79%)", // #C8D27B - NOVA COR DE BOTÃO
-          subtitle: "hsl(73, 37%, 69%)", // #BCC95D - mantém
-          input: "hsl(63, 45%, 93%)", // #F6F7E9 - ADICIONAR
+          dark: "hsl(72, 6%, 18%)",     /* #2F302B - Dark base */
+          light: "hsl(0, 0%, 100%)",    /* #FFFFFF */
+          gray: "hsl(72, 6%, 18%)",     /* #2F302B */
+          cream: "hsl(63, 45%, 94%)",   /* #F6F7E9 - Off-white */
+          text: "hsl(63, 48%, 91%)",    /* #E9EBC6 - Text on dark */
         },
         complexity: {
           high: "hsl(var(--complexity-high))",
@@ -91,46 +95,33 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      spacing: {
+        '18': '4.5rem',
+        '22': '5.5rem',
+      },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
         fadeIn: {
-          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        'glow-pulse': {
-          '0%, 100%': { 
-            boxShadow: '0 0 15px rgba(197, 214, 61, 0.3)' 
-          },
-          '50%': { 
-            boxShadow: '0 0 25px rgba(197, 214, 61, 0.6)' 
-          },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        'fade-in': 'fadeIn 0.6s ease-out',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'glow-pulse': 'glow-pulse 4s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.4s ease-out',
+        'slide-up': 'slideUp 0.3s ease-out',
       },
     },
   },

@@ -31,7 +31,6 @@ export function TopHeader() {
   const { hasAccessTo, plan } = useUserPlan();
   const { profile } = useUserProfile();
   
-  // Detectar rotas ativas para dropdowns
   const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
   const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(path => location.pathname.startsWith(path));
 
@@ -57,21 +56,21 @@ export function TopHeader() {
   const firstName = profile?.nome_completo?.split(" ")[0] || "Usuário";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="flex h-16 items-center justify-between px-6 max-w-7xl mx-auto">
-        {/* ESQUERDA: SidebarTrigger + Logo */}
-          <div className="flex items-center gap-4">
-            <SidebarTrigger className="hover:bg-accent/50 transition-colors" />
-          </div>
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
+      <div className="flex h-14 items-center justify-between px-6 max-w-7xl mx-auto">
+        {/* LEFT: SidebarTrigger */}
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="hover:bg-accent/50 transition-colors" />
+        </div>
 
-        {/* CENTRO: Menu de Navegação Horizontal - Tech Executive */}
+        {/* CENTER: Horizontal Navigation */}
         <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
           <NavLink 
             to="/" 
             end
             className={({ isActive }) => cn(
-              "text-sm font-semibold smooth-transition",
-              isActive ? "text-primary" : "text-foreground hover:text-primary"
+              "text-sm font-medium transition-colors",
+              isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             Início
@@ -82,45 +81,45 @@ export function TopHeader() {
               <Button 
                 variant="ghost" 
                 className={cn(
-                  "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
-                  isCursosActive ? "text-primary" : "text-foreground hover:text-primary"
+                  "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
+                  isCursosActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Meus Cursos
-                <ChevronDown className="ml-1 h-4 w-4" />
+                <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
               </Button>
             </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
-                  <DropdownMenuItem asChild>
-              <Link to="/trilhas" className="cursor-pointer">
-                Academy
-              </Link>
-                  </DropdownMenuItem>
-                  
-                  {(hasAccessTo("lab") || isAdmin) && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/lab" className="cursor-pointer">
-                        Lab
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  
-                  {(hasAccessTo("club") || isAdmin) && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/mentoria" className="cursor-pointer">
-                        Club
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  
-                  {(hasAccessTo("skills") || isAdmin) && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/skills" className="cursor-pointer">
-                        Skills
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
+            <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
+              <DropdownMenuItem asChild>
+                <Link to="/trilhas" className="cursor-pointer">
+                  Academy
+                </Link>
+              </DropdownMenuItem>
+              
+              {(hasAccessTo("lab") || isAdmin) && (
+                <DropdownMenuItem asChild>
+                  <Link to="/lab" className="cursor-pointer">
+                    Lab
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              
+              {(hasAccessTo("club") || isAdmin) && (
+                <DropdownMenuItem asChild>
+                  <Link to="/mentoria" className="cursor-pointer">
+                    Club
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              
+              {(hasAccessTo("skills") || isAdmin) && (
+                <DropdownMenuItem asChild>
+                  <Link to="/skills" className="cursor-pointer">
+                    Skills
+                  </Link>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
           </DropdownMenu>
           
           {!isVisitante && (
@@ -129,15 +128,15 @@ export function TopHeader() {
                 <Button 
                   variant="ghost" 
                   className={cn(
-                    "text-sm font-medium h-auto p-0 smooth-transition hover:bg-transparent",
-                    isFerramentasActive ? "text-primary" : "text-foreground hover:text-primary"
+                    "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
+                    isFerramentasActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   Ferramentas
-                  <ChevronDown className="ml-1 h-4 w-4" />
+                  <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-64 bg-popover border-border text-popover-foreground">
+              <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
                 <DropdownMenuItem asChild>
                   <Link to="/ia-copie-use" className="cursor-pointer">
                     IA "Copie e Use"
@@ -161,20 +160,19 @@ export function TopHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          
         </nav>
 
-        {/* DIREITA: Notificações + Avatar com Nome */}
-        <div className="flex items-center gap-3">
+        {/* RIGHT: Notifications + Avatar */}
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost" 
             size="icon" 
-            className="relative"
+            className="relative h-9 w-9"
             onClick={() => navigate("/notificacoes")}
           >
-            <Bell className="h-5 w-5" />
+            <Bell className="h-5 w-5" strokeWidth={1.5} />
             {avisosCount && avisosCount > 0 && (
-              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
                 {avisosCount > 9 ? "9+" : avisosCount}
               </span>
             )}
@@ -182,21 +180,21 @@ export function TopHeader() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 text-foreground hover:text-primary h-auto px-2 py-1">
-                <Avatar className="h-8 w-8 border-2 border-border">
+              <Button variant="ghost" className="gap-2 h-auto px-2 py-1.5">
+                <Avatar className="h-8 w-8 border border-border">
                   <AvatarImage src={profile?.avatar_url || ""} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
                     {getInitials(user?.email, profile?.nome_completo)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden md:block text-sm font-medium">
+                <span className="hidden md:block text-sm font-medium text-foreground">
                   {firstName}
                 </span>
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-popover border-border text-popover-foreground">
-              <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-52 bg-popover border-border">
+              <DropdownMenuLabel className="font-medium">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem asChild>
                 <Link to="/perfil" className="cursor-pointer">
