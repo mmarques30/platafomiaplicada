@@ -40,11 +40,11 @@ export function MainLayout() {
   // Layout unificado para todos os usuários
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <TopHeader />
+      <div className="min-h-screen flex w-full bg-background pt-14">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <TopHeader />
-          <main className="flex-1 pt-14">
+          <main className="flex-1">
             <Outlet />
           </main>
         </div>
