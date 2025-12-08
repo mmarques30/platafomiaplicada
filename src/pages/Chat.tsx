@@ -268,21 +268,6 @@ const Chat = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 bg-zinc-800">
-        <img
-          src={mariAvatar}
-          alt="Mari"
-          className="w-10 h-10 rounded-full"
-        />
-        <div>
-          <h1 className="text-lg font-semibold text-white">MarIAna</h1>
-          <p className="text-sm text-zinc-400">
-            Sua mentora de IA Aplicada
-          </p>
-        </div>
-      </div>
-
       {/* Messages */}
       <div
         ref={scrollRef}
@@ -370,10 +355,10 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Input */}
-      <div className="p-4 border-t border-border bg-card">
+      {/* Modern Input */}
+      <div className="p-4">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2 bg-card border border-border/50 rounded-full px-4 py-2 shadow-sm">
             <Textarea
               ref={inputRef}
               value={input}
@@ -385,14 +370,14 @@ const Chat = () => {
                 }
               }}
               placeholder="Digite sua mensagem..."
-              className="min-h-[60px] max-h-[200px] resize-none"
+              className="min-h-[40px] max-h-[120px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 py-2"
               disabled={isLoading || isStreaming}
             />
             <Button
               type="submit"
               size="icon"
               disabled={isLoading || isStreaming || !input.trim()}
-              className="flex-shrink-0"
+              className="flex-shrink-0 rounded-full h-10 w-10"
             >
               <Send className="h-4 w-4" />
             </Button>
