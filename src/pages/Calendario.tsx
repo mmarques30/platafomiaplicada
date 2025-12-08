@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarioVisaoCalendario } from "@/components/calendario/CalendarioVisaoCalendario";
 import { CalendarioVisaoTabela } from "@/components/calendario/CalendarioVisaoTabela";
-import { Calendar, TableIcon } from "lucide-react";
+import { Calendar, History } from "lucide-react";
 
 export default function Calendario() {
   return (
@@ -21,8 +21,8 @@ export default function Calendario() {
               Calendário
             </TabsTrigger>
             <TabsTrigger value="tabela" className="gap-2">
-              <TableIcon className="h-4 w-4" />
-              Tabela
+              <History className="h-4 w-4" />
+              Histórico de Aulas
             </TabsTrigger>
           </TabsList>
           
