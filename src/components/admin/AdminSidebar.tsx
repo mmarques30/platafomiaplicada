@@ -186,7 +186,7 @@ export function AdminSidebar() {
                             "relative font-medium transition-colors duration-200 pl-4",
                             isActive
                               ? "text-primary font-semibold"
-                              : "text-foreground hover:text-primary"
+                              : "text-sidebar-foreground hover:text-primary"
                           )}
                         >
                           <span
@@ -221,7 +221,7 @@ export function AdminSidebar() {
                             "group relative w-full font-medium transition-colors duration-200 pl-4",
                             groupActive
                               ? "text-primary font-semibold"
-                              : "text-foreground hover:text-primary"
+                              : "text-sidebar-foreground hover:text-primary"
                           )}
                         >
                           <span
@@ -255,7 +255,7 @@ export function AdminSidebar() {
                                       "relative font-medium transition-colors duration-200 pl-2 text-sm",
                                       isItemActive
                                         ? "text-primary font-semibold"
-                                        : "text-muted-foreground hover:text-primary"
+                                        : "text-sidebar-foreground/70 hover:text-primary"
                                     )}
                                   >
                                     <span>{item.label}</span>
@@ -281,7 +281,7 @@ export function AdminSidebar() {
             <SidebarMenuButton asChild tooltip="Voltar para o Site">
               <Button
                 variant="ghost"
-                className="relative w-full justify-start text-foreground hover:text-primary font-medium transition-colors pl-4 group"
+                className="relative w-full justify-start text-sidebar-foreground hover:text-primary font-medium transition-colors pl-4 group"
                 onClick={() => navigate("/")}
               >
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-aplicada-green-400 opacity-0 group-hover:opacity-60 transition-all duration-200" />
