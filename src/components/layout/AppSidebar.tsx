@@ -53,24 +53,18 @@ export function AppSidebar() {
   // Pegar todos os menus principais (sem parent_key)
   const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key);
   
-  // Filtrar para visitantes: apenas início, aprender (com trilhas) e comunidade via interacoes
+  // Filtrar para visitantes: apenas início (sem submenus expansíveis)
   const mainMenus = isVisitante 
-    ? allMainMenus.filter(menu => ['inicio', 'aprender', 'interacoes'].includes(menu.menu_key))
+    ? allMainMenus.filter(menu => menu.menu_key === 'inicio')
     : allMainMenus;
   
   // Obter submenus de um parent
   const getSubMenus = (parentKey: string) => {
-    const subMenus = sidebarMenus.filter(menu => menu.parent_key === parentKey);
-    // Visitantes: filtrar submenus
+    // Visitantes não têm submenus - retornar vazio
     if (isVisitante) {
-      if (parentKey === 'aprender') {
-        return subMenus.filter(sub => sub.menu_key === 'trilhas');
-      }
-      if (parentKey === 'interacoes') {
-        return subMenus.filter(sub => sub.menu_key === 'comunidade');
-      }
+      return [];
     }
-    return subMenus;
+    return sidebarMenus.filter(menu => menu.parent_key === parentKey);
   };
 
   const toggleMenu = (menuKey: string) => {
@@ -227,6 +221,33 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+
+              {/* Comunidade - Visitantes only (link direto) */}
+              {isVisitante && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild className="group">
+                    <NavLink 
+                      to="/comunidade" 
+                      end 
+                      className={cn(
+                        "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
+                        location.pathname === '/comunidade'
+                          ? "text-primary font-semibold" 
+                          : "text-sidebar-foreground hover:text-primary"
+                      )}
+                    >
+                      <span className={cn(
+                        "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                        location.pathname === '/comunidade'
+                          ? "bg-aplicada-green-700 opacity-100" 
+                          : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                      )} />
+                      <LucideIcons.Users className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                      {!collapsed && <span className="text-sm">Comunidade</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
 
               {/* Vídeos Bônus - Visitantes only */}
               {isVisitante && (

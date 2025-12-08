@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, X, Zap } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
@@ -26,6 +26,13 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { isVisitante, isLoading: loadingRole } = useUserRole();
   const { profile, isLoading: loadingProfile } = useUserProfile();
+
+  // Visitantes são redirecionados para /trilhas (nova homepage para acesso gratuito)
+  useEffect(() => {
+    if (!loadingRole && isVisitante) {
+      navigate("/trilhas", { replace: true });
+    }
+  }, [isVisitante, loadingRole, navigate]);
 
   // Query para buscar trilhas com lógica diferenciada por tipo de usuário
   const { data: trilhasRaw, isLoading: loadingTrilhas } = useQuery({
