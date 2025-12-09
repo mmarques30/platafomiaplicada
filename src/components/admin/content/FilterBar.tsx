@@ -1,6 +1,4 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface FilterOption {
@@ -19,14 +17,12 @@ interface Filter {
 
 interface FilterBarProps {
   filters: Filter[];
-  onClear: () => void;
   totalItems: number;
   filteredItems: number;
   actionButton?: React.ReactNode;
 }
 
-export function FilterBar({ filters, onClear, totalItems, filteredItems, actionButton }: FilterBarProps) {
-  const hasActiveFilters = filters.some(f => f.value !== 'todos' && f.value !== 'todas');
+export function FilterBar({ filters, totalItems, filteredItems, actionButton }: FilterBarProps) {
   const showCounter = filteredItems !== totalItems;
 
   return (
@@ -36,31 +32,19 @@ export function FilterBar({ filters, onClear, totalItems, filteredItems, actionB
           <span className="text-sm font-medium text-muted-foreground mr-2">Filtros:</span>
           
           {filters.map((filter) => (
-          <Select key={filter.id} value={filter.value} onValueChange={filter.onChange}>
-            <SelectTrigger className="w-[200px] bg-background">
-              <SelectValue placeholder={filter.placeholder} />
-            </SelectTrigger>
-            <SelectContent className="bg-background border shadow-lg z-50">
-              {filter.options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ))}
-
-          {hasActiveFilters && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onClear}
-              className="ml-2"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Limpar Filtros
-            </Button>
-          )}
+            <Select key={filter.id} value={filter.value} onValueChange={filter.onChange}>
+              <SelectTrigger className="w-[200px] bg-background">
+                <SelectValue placeholder={filter.placeholder} />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                {filter.options.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ))}
         </div>
 
         {actionButton && (

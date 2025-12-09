@@ -162,7 +162,6 @@ export function ExerciciosTab() {
             ],
           },
         ]}
-        onClear={handleClearFilters}
         totalItems={exercicios?.length || 0}
         filteredItems={exerciciosFiltrados.length}
       />

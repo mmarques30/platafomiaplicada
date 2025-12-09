@@ -112,11 +112,6 @@ export const FormulariosCustomizados = () => {
             onChange: setExpiracaoFilter
           }
         ]}
-        onClear={() => {
-          setStatusFilter('todos');
-          setVisibilidadeFilter('todas');
-          setExpiracaoFilter('todos');
-        }}
         totalItems={formularios.length}
         filteredItems={filteredFormularios.length}
         actionButton={

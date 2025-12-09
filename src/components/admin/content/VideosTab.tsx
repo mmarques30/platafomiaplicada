@@ -134,7 +134,6 @@ export function VideosTab() {
             ],
           },
         ]}
-        onClear={handleClearFilters}
         totalItems={videos?.length || 0}
         filteredItems={videosFiltrados.length}
       />

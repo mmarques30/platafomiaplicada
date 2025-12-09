@@ -108,11 +108,6 @@ export function IACopieUseTab() {
             onChange: setStatusFilter
           }
         ]}
-        onClear={() => {
-          setCategoriaFilter('todas');
-          setIaFilter('todas');
-          setStatusFilter('todos');
-        }}
         totalItems={items?.length || 0}
         filteredItems={filteredItems.length}
         actionButton={

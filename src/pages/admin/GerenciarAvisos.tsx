@@ -271,7 +271,6 @@ export default function GerenciarAvisos() {
         <TabsContent value="avisos" className="space-y-4">
           <FilterBar
             filters={avisosFilters}
-            onClear={clearAvisosFilters}
             totalItems={avisos?.length || 0}
             filteredItems={avisosFiltrados.length}
             actionButton={
@@ -351,7 +350,6 @@ export default function GerenciarAvisos() {
 
           <FilterBar
             filters={aulasFilters}
-            onClear={clearAulasFilters}
             totalItems={aulas?.length || 0}
             filteredItems={aulasFiltradas.length}
             actionButton={
