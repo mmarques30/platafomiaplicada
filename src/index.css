@@ -82,14 +82,14 @@
     
     --radius: 0.75rem;
     
-    /* Sidebar: Off-White Elegante #F6F7E9 */
-    --sidebar-background: 63 45% 94%;
+    /* Sidebar: Off-White Neutro #F5F5F3 (sem tom verde) */
+    --sidebar-background: 60 5% 96%;
     --sidebar-foreground: 72 6% 18%;
     --sidebar-primary: 73 55% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 63 45% 90%;
+    --sidebar-accent: 60 5% 93%;
     --sidebar-accent-foreground: 72 6% 18%;
-    --sidebar-border: 73 20% 85%;
+    --sidebar-border: 60 5% 88%;
     --sidebar-ring: 73 55% 47%;
     /* Active indicator: brand green */
     --sidebar-active: 73 55% 47%;
@@ -142,14 +142,14 @@
     
     --radius: 0.75rem;
     
-    /* Sidebar: Off-White mesmo em dark mode para consistência */
-    --sidebar-background: 63 45% 94%;
+    /* Sidebar: Off-White Neutro mesmo em dark mode */
+    --sidebar-background: 60 5% 96%;
     --sidebar-foreground: 72 6% 18%;
     --sidebar-primary: 73 55% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 63 45% 90%;
+    --sidebar-accent: 60 5% 93%;
     --sidebar-accent-foreground: 72 6% 18%;
-    --sidebar-border: 73 20% 85%;
+    --sidebar-border: 60 5% 88%;
     --sidebar-ring: 73 55% 47%;
     /* Active indicator: brand green */
     --sidebar-active: 73 55% 47%;
