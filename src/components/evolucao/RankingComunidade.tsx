@@ -32,10 +32,10 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
   const minhaposicao = ranking?.find(r => r.user_id === user?.id);
 
   const getBorderColor = (posicao: number) => {
-    if (posicao === 1) return "border-yellow-500";
-    if (posicao === 2) return "border-zinc-400";
-    if (posicao === 3) return "border-orange-600";
-    return "border-aplicada-green-900/30";
+    if (posicao === 1) return "border-primary";
+    if (posicao === 2) return "border-blue-500";
+    if (posicao === 3) return "border-yellow-500";
+    return "border-border";
   };
 
   const getInitials = (name: string) => {
