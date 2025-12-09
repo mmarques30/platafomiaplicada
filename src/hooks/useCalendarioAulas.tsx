@@ -10,6 +10,7 @@ export interface AulaSemanal {
   data_aula: string | null;
   descricao: string | null;
   ativo: boolean | null;
+  tipo_evento: 'aula_ao_vivo' | 'qa' | 'outro' | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -21,6 +22,7 @@ export interface CreateAulaInput {
   data_aula?: string | null;
   descricao?: string | null;
   ativo?: boolean;
+  tipo_evento?: 'aula_ao_vivo' | 'qa' | 'outro';
 }
 
 export function useAulasCalendario() {
