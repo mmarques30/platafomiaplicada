@@ -2,17 +2,15 @@ import { useState } from "react";
 import { CommunityFeed } from "@/components/comunidade/CommunityFeed";
 import { MembersList } from "@/components/comunidade/MembersList";
 import { RankingEngajamento } from "@/components/comunidade/RankingEngajamento";
-import { MateriaisGratuitosTab } from "@/components/comunidade/MateriaisGratuitosTab";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { cn } from "@/lib/utils";
 
-type TabValue = "community" | "members" | "leaderboard" | "materiais";
+type TabValue = "community" | "leaderboard" | "members";
 
 const tabs: { value: TabValue; label: string }[] = [
   { value: "community", label: "Feed" },
-  { value: "members", label: "Membros" },
   { value: "leaderboard", label: "Ranking" },
-  { value: "materiais", label: "Materiais" },
+  { value: "members", label: "Membros" },
 ];
 
 export default function Comunidade() {
@@ -49,19 +47,14 @@ export default function Comunidade() {
         {/* Tab Content */}
         <div className="min-h-[calc(100vh-60px)]">
           {activeTab === "community" && <CommunityFeed />}
-          {activeTab === "members" && (
-            <div className="p-4">
-              <MembersList />
-            </div>
-          )}
           {activeTab === "leaderboard" && (
             <div className="p-4">
               <RankingEngajamento ranking={ranking || []} />
             </div>
           )}
-          {activeTab === "materiais" && (
+          {activeTab === "members" && (
             <div className="p-4">
-              <MateriaisGratuitosTab />
+              <MembersList />
             </div>
           )}
         </div>
