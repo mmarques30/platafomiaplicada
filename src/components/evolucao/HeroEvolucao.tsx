@@ -1,5 +1,6 @@
 import { Progress } from "@/components/ui/progress";
 import { Trophy } from "lucide-react";
+import grafiaEvolucao from "@/assets/grafia-evolucao.svg";
 import { useNivelUsuario } from "@/hooks/useNivelUsuario";
 import { useMinhaEvolucao } from "@/hooks/useMinhaEvolucao";
 import { useSequenciaEstudo } from "@/hooks/useEvolucao";
@@ -14,8 +15,15 @@ export function HeroEvolucao() {
   const totalCertificados = certificados?.filter(c => c.status === "emitido").length || 0;
 
   return (
-    <div className="rounded-xl border border-primary/30 bg-card shadow-sm p-6">
-      <div className="space-y-4">
+    <div className="relative rounded-xl border border-primary/30 bg-card shadow-sm p-6 overflow-hidden">
+      {/* Marca d'água decorativa */}
+      <img 
+        src={grafiaEvolucao} 
+        alt="" 
+        className="absolute bottom-2 right-2 h-16 opacity-20 pointer-events-none select-none"
+        aria-hidden="true"
+      />
+      <div className="relative space-y-4">
           {/* Header: Nível e Título */}
           <div className="flex items-center justify-between">
             <div className="space-y-1">
