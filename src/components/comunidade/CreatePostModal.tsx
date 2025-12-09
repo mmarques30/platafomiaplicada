@@ -122,6 +122,16 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
     }, 0);
   };
 
+  // Sanitiza nome do arquivo removendo acentos, espaços e caracteres especiais
+  const sanitizeFileName = (fileName: string): string => {
+    return fileName
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/[^a-zA-Z0-9\-_.]/g, "")
+      .toLowerCase();
+  };
+
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0 || !user) return;
@@ -143,7 +153,8 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
           continue;
         }
 
-        const filePath = `${user.id}/${Date.now()}-${file.name}`;
+        const sanitizedName = sanitizeFileName(file.name);
+        const filePath = `${user.id}/${Date.now()}-${sanitizedName}`;
         const { error } = await supabase.storage
           .from("community-posts-images")
           .upload(filePath, file);
