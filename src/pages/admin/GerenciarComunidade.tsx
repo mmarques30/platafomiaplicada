@@ -3,6 +3,7 @@ import { CategoriasTab } from "@/components/admin/comunidade/CategoriasTab";
 import { ModeracaoTab } from "@/components/admin/comunidade/ModeracaoTab";
 import { ConversasIATab } from "@/components/admin/comunidade/ConversasIATab";
 import { EstatisticasComunidadeTab } from "@/components/admin/comunidade/EstatisticasComunidadeTab";
+import { FerramentasCompartilhadasTab } from "@/components/admin/comunidade/FerramentasCompartilhadasTab";
 
 export default function GerenciarComunidade() {
   return (
@@ -42,6 +43,12 @@ export default function GerenciarComunidade() {
           >
             Estatísticas
           </TabsTrigger>
+          <TabsTrigger
+            value="ferramentas"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
+            Ferramentas
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="categorias">
@@ -58,6 +65,10 @@ export default function GerenciarComunidade() {
 
         <TabsContent value="estatisticas">
           <EstatisticasComunidadeTab />
+        </TabsContent>
+
+        <TabsContent value="ferramentas">
+          <FerramentasCompartilhadasTab />
         </TabsContent>
       </Tabs>
     </div>
