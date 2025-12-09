@@ -114,7 +114,6 @@ export function ModulosTab() {
             ],
           },
         ]}
-        onClear={handleClearFilters}
         totalItems={modulos?.length || 0}
         filteredItems={modulosFiltrados.length}
       />

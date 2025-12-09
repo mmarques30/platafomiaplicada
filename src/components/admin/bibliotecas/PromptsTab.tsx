@@ -121,7 +121,6 @@ export function PromptsTab() {
             onChange: setFilterStatus,
           },
         ]}
-        onClear={clearFilters}
         totalItems={prompts?.length || 0}
         filteredItems={filteredPrompts.length}
         actionButton={

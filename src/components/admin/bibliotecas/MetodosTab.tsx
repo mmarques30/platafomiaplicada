@@ -102,11 +102,6 @@ export function MetodosTab() {
             onChange: setStatusFilter
           }
         ]}
-        onClear={() => {
-          setCategoriaFilter('todas');
-          setDocumentoFilter('todos');
-          setStatusFilter('todos');
-        }}
         totalItems={metodos?.length || 0}
         filteredItems={filteredMetodos.length}
         actionButton={

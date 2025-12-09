@@ -130,7 +130,6 @@ export function TrilhasTab() {
             ],
           },
         ]}
-        onClear={handleClearFilters}
         totalItems={trilhas?.length || 0}
         filteredItems={trilhasFiltradas.length}
       />

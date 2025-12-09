@@ -106,11 +106,6 @@ export function FerramentasTab() {
             onChange: setStatusFilter
           }
         ]}
-        onClear={() => {
-          setCategoriaFilter('todas');
-          setGratuitoFilter('todos');
-          setStatusFilter('todos');
-        }}
         totalItems={ferramentas?.length || 0}
         filteredItems={filteredFerramentas.length}
         actionButton={
