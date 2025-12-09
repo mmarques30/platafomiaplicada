@@ -70,6 +70,23 @@ export function useMetodos() {
   });
 }
 
+// Hook para Materiais Gratuitos
+export function useMateriaisGratuitos() {
+  return useQuery({
+    queryKey: ["materiais-gratuitos"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("materiais_gratuitos")
+        .select("*")
+        .eq("ativo", true)
+        .order("ordem", { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 // Hook para criar favorito
 export function useAddFavorito() {
   const queryClient = useQueryClient();

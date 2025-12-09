@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,22 +7,70 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useMetodos } from "@/hooks/useFerramentas";
-import { Target, Search, Lightbulb, Cpu, FileText, ExternalLink, ChevronDown } from "lucide-react";
+import { useMetodos, useMateriaisGratuitos } from "@/hooks/useFerramentas";
+import { Target, Search, Lightbulb, Cpu, FileText, ExternalLink, ChevronDown, Gift } from "lucide-react";
 import { METODOS_CATEGORIAS } from "@/lib/metodosCategories";
 
+interface MetodoItem {
+  id: string;
+  titulo: string;
+  descricao: string;
+  categoria: string;
+  link_documento: string | null;
+  ferramentas_recomendadas: unknown[];
+  comentarios: string | null;
+  isGratuito?: boolean;
+}
+
 export default function MetodosAplicar() {
-  const { data: metodos, isLoading } = useMetodos();
+  const { data: metodos, isLoading: isLoadingMetodos } = useMetodos();
+  const { data: materiaisGratuitos, isLoading: isLoadingMateriais } = useMateriaisGratuitos();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
-  const filteredMetodos = metodos?.filter((metodo) => {
+  const isLoading = isLoadingMetodos || isLoadingMateriais;
+
+  // Combinar métodos com materiais gratuitos
+  const todosItens = useMemo(() => {
+    const metodosFormatados: MetodoItem[] = (metodos || []).map(m => ({
+      id: m.id,
+      titulo: m.titulo,
+      descricao: m.descricao,
+      categoria: m.categoria,
+      link_documento: m.link_documento,
+      ferramentas_recomendadas: Array.isArray(m.ferramentas_recomendadas) ? m.ferramentas_recomendadas : [],
+      comentarios: m.comentarios,
+      isGratuito: false
+    }));
+
+    const materiaisFormatados: MetodoItem[] = (materiaisGratuitos || []).map(m => ({
+      id: m.id,
+      titulo: m.titulo,
+      descricao: m.descricao || "",
+      categoria: m.categoria,
+      link_documento: m.url,
+      ferramentas_recomendadas: [],
+      comentarios: null,
+      isGratuito: true
+    }));
+
+    return [...metodosFormatados, ...materiaisFormatados];
+  }, [metodos, materiaisGratuitos]);
+
+  // Categorias combinadas
+  const todasCategorias = useMemo(() => {
+    const categoriasMetodos = new Set(METODOS_CATEGORIAS);
+    const categoriasMateriais = new Set((materiaisGratuitos || []).map(m => m.categoria));
+    return [...new Set([...categoriasMetodos, ...categoriasMateriais])];
+  }, [materiaisGratuitos]);
+
+  const filteredItens = todosItens.filter((item) => {
     const matchesSearch =
-      metodo.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      metodo.descricao.toLowerCase().includes(searchTerm.toLowerCase());
+      item.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.descricao.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategoria =
-      !selectedCategoria || metodo.categoria === selectedCategoria;
+      !selectedCategoria || item.categoria === selectedCategoria;
     return matchesSearch && matchesCategoria;
   });
 
@@ -69,9 +117,10 @@ export default function MetodosAplicar() {
             <SelectValue placeholder="Todas as categorias" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todas">Todas ({metodos?.length || 0})</SelectItem>
-            {METODOS_CATEGORIAS.map((categoria) => {
-              const count = metodos?.filter(m => m.categoria === categoria).length || 0;
+            <SelectItem value="todas">Todas ({todosItens.length})</SelectItem>
+            {todasCategorias.map((categoria) => {
+              const count = todosItens.filter(m => m.categoria === categoria).length;
+              if (count === 0) return null;
               return (
                 <SelectItem key={categoria} value={categoria}>
                   {categoria} ({count})
@@ -92,19 +141,19 @@ export default function MetodosAplicar() {
             </Card>
           ))}
         </div>
-      ) : filteredMetodos && filteredMetodos.length > 0 ? (
+      ) : filteredItens.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {filteredMetodos.map((metodo) => {
-            const isOpen = openItems.has(metodo.id);
-            const ferramentas = Array.isArray(metodo.ferramentas_recomendadas) 
-              ? metodo.ferramentas_recomendadas 
+          {filteredItens.map((item) => {
+            const isOpen = openItems.has(item.id);
+            const ferramentas = Array.isArray(item.ferramentas_recomendadas) 
+              ? item.ferramentas_recomendadas 
               : [];
             
             return (
               <Collapsible
-                key={metodo.id}
+                key={item.id}
                 open={isOpen}
-                onOpenChange={() => toggleItem(metodo.id)}
+                onOpenChange={() => toggleItem(item.id)}
               >
                 <Card className="overflow-hidden">
                   {/* Header compacto - estrutura horizontal com altura fixa */}
@@ -113,18 +162,26 @@ export default function MetodosAplicar() {
                       {/* Conteúdo à esquerda */}
                       <div className="flex-1 min-w-0 flex flex-col justify-center">
                         <h3 className="font-medium text-sm leading-tight line-clamp-1 mb-1.5">
-                          {metodo.titulo}
+                          {item.titulo}
                         </h3>
-                        <Badge variant="secondary" className="text-xs">
-                          {metodo.categoria}
-                        </Badge>
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="secondary" className="text-xs">
+                            {item.categoria}
+                          </Badge>
+                          {item.isGratuito && (
+                            <Badge className="text-xs bg-green-100 text-green-700 border-green-300 hover:bg-green-100">
+                              <Gift className="w-3 h-3 mr-1" />
+                              Gratuito
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Ícones à direita - centralizados verticalmente */}
                       <div className="flex items-center gap-1 shrink-0">
                         <FavoriteButton 
                           tipo="metodo" 
-                          itemId={metodo.id}
+                          itemId={item.id}
                           variant="ghost"
                           className="h-7 w-7"
                         />
@@ -142,18 +199,18 @@ export default function MetodosAplicar() {
                     <div className="px-4 pb-4 border-t space-y-3">
                       {/* Descrição */}
                       <p className="text-sm text-muted-foreground pt-3">
-                        {metodo.descricao}
+                        {item.descricao}
                       </p>
 
                       {/* Dicas de Uso */}
-                      {metodo.comentarios && (
+                      {item.comentarios && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <div className="flex items-center gap-2 text-sm font-medium mb-1">
                             <Lightbulb className="h-4 w-4 text-primary" />
                             Dicas de Uso
                           </div>
                           <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                            {metodo.comentarios}
+                            {item.comentarios}
                           </p>
                         </div>
                       )}
@@ -179,17 +236,17 @@ export default function MetodosAplicar() {
                         </div>
                       )}
 
-                      {/* Botão Acessar Documento */}
-                      {metodo.link_documento && (
+                      {/* Botão Acessar Documento/Material */}
+                      {item.link_documento && (
                         <Button asChild className="w-full mt-2">
                           <a 
-                            href={metodo.link_documento} 
+                            href={item.link_documento} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2"
                           >
                             <FileText className="w-4 h-4" />
-                            Acessar Documento
+                            {item.isGratuito ? "Acessar Material" : "Acessar Documento"}
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </Button>
