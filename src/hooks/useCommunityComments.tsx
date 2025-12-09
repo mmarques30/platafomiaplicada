@@ -10,6 +10,8 @@ export interface CommunityComment {
   parent_id: string | null;
   content: string;
   created_at: string;
+  likes_count: number;
+  user_has_liked: boolean;
   profiles: {
     nome_completo: string;
     avatar_url: string | null;
@@ -24,7 +26,8 @@ export function useCommunityComments(postId: string) {
   const { data: comments, isLoading } = useQuery({
     queryKey: ["community-comments", postId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch comments
+      const { data: commentsData, error: commentsError } = await supabase
         .from("community_comments")
         .select(`
           *,
@@ -33,8 +36,27 @@ export function useCommunityComments(postId: string) {
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
-      return data as CommunityComment[];
+      if (commentsError) throw commentsError;
+
+      // Fetch likes for comments
+      const commentIds = commentsData.map(c => c.id);
+      
+      const { data: likesData } = await supabase
+        .from("community_reactions")
+        .select("comment_id, user_id")
+        .in("comment_id", commentIds);
+
+      // Map likes to comments
+      const commentsWithLikes = commentsData.map(comment => {
+        const commentLikes = likesData?.filter(l => l.comment_id === comment.id) || [];
+        return {
+          ...comment,
+          likes_count: commentLikes.length,
+          user_has_liked: user ? commentLikes.some(l => l.user_id === user.id) : false,
+        };
+      });
+
+      return commentsWithLikes as CommunityComment[];
     },
     enabled: !!postId,
   });
@@ -96,11 +118,50 @@ export function useCommunityComments(postId: string) {
     },
   });
 
+  const toggleCommentLike = useMutation({
+    mutationFn: async (commentId: string) => {
+      if (!user) throw new Error("User not authenticated");
+
+      // Check if user already liked this comment
+      const { data: existingLike } = await supabase
+        .from("community_reactions")
+        .select("id")
+        .eq("comment_id", commentId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (existingLike) {
+        // Remove like
+        const { error } = await supabase
+          .from("community_reactions")
+          .delete()
+          .eq("id", existingLike.id);
+
+        if (error) throw error;
+      } else {
+        // Add like
+        const { error } = await supabase
+          .from("community_reactions")
+          .insert({
+            comment_id: commentId,
+            user_id: user.id,
+            type: "like",
+          });
+
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community-comments", postId] });
+    },
+  });
+
   return {
     comments: comments || [],
     isLoading,
     createComment: createComment.mutate,
     deleteComment: deleteComment.mutate,
+    toggleCommentLike: toggleCommentLike.mutate,
     isCreating: createComment.isPending,
   };
 }
