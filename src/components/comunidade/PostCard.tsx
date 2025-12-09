@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Trash2, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CommunityPost } from "@/hooks/useCommunityPosts";
@@ -14,6 +14,11 @@ interface PostCardProps {
   post: CommunityPost;
   onLike: () => void;
   onDelete: () => void;
+}
+
+interface MediaItem {
+  type: string;
+  url: string;
 }
 
 export function PostCard({ post, onLike, onDelete }: PostCardProps) {
@@ -31,6 +36,13 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
       .join("")
       .toUpperCase();
   };
+
+  // Parse media array from post
+  const mediaItems: MediaItem[] = Array.isArray(post.media)
+    ? (post.media as MediaItem[]).filter((m) => m.type === "image" && m.url)
+    : [];
+
+  const mediaCount = mediaItems.length;
 
   return (
     <article className="border-b border-border p-4 hover:bg-muted/30 transition-colors">
@@ -83,22 +95,82 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
             )}
           </div>
 
-          {/* Post Content */}
+          {/* Post Title */}
           {post.title && (
             <h3 className="text-lg font-semibold text-foreground mt-1">{post.title}</h3>
           )}
 
+          {/* Post Content with Markdown links */}
           <div className="text-foreground mt-1 prose prose-sm max-w-none">
             <ReactMarkdown
               components={{
-                p: ({ children }) => <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{children}</p>,
+                p: ({ children }) => (
+                  <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{children}</p>
+                ),
                 strong: ({ children }) => <strong className="font-bold">{children}</strong>,
                 em: ({ children }) => <em className="italic">{children}</em>,
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    {children}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                ),
               }}
             >
               {post.content}
             </ReactMarkdown>
           </div>
+
+          {/* Media Grid - Twitter/Threads Style */}
+          {mediaCount > 0 && (
+            <div
+              className={cn(
+                "mt-3 rounded-2xl overflow-hidden border border-border",
+                mediaCount === 1 && "max-h-72",
+                mediaCount === 2 && "grid grid-cols-2 gap-0.5 max-h-72",
+                mediaCount === 3 && "grid grid-cols-2 gap-0.5 max-h-72",
+                mediaCount >= 4 && "grid grid-cols-2 gap-0.5 max-h-72"
+              )}
+            >
+              {mediaItems.slice(0, 4).map((media, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    "relative overflow-hidden bg-muted",
+                    // Single image
+                    mediaCount === 1 && "max-h-72",
+                    // Two images
+                    mediaCount === 2 && "h-40",
+                    // Three images: first one takes full height
+                    mediaCount === 3 && idx === 0 && "row-span-2",
+                    mediaCount === 3 && idx > 0 && "h-[calc(50%-1px)]",
+                    // Four+ images
+                    mediaCount >= 4 && "h-36"
+                  )}
+                >
+                  <img
+                    src={media.url}
+                    alt=""
+                    className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                    loading="lazy"
+                  />
+                  {/* Overlay for extra images */}
+                  {idx === 3 && mediaCount > 4 && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer">
+                      <span className="text-white text-2xl font-bold">
+                        +{mediaCount - 4}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-6 mt-3 -ml-2">

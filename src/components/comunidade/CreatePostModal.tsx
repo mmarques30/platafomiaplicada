@@ -16,10 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Bold, Italic, Smile } from "lucide-react";
+import { Bold, Italic, Smile, Link2, ImagePlus, X, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCommunityPosts } from "@/hooks/useCommunityPosts";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface CreatePostModalProps {
   open: boolean;
@@ -30,11 +33,24 @@ const COMMON_EMOJIS = ["😊", "👍", "🎉", "❤️", "🔥", "💡", "✨", 
 
 export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
   const { createPost, isCreating } = useCommunityPosts();
+  const { isVisitante, isAdmin } = useUserRole();
+  const { user } = useAuth();
+  
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkText, setLinkText] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Mentorados e admins podem fazer upload de imagens
+  const canUploadImages = !isVisitante || isAdmin;
 
   const { data: categories } = useQuery({
     queryKey: ["community-categories"],
@@ -81,29 +97,123 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
     }, 0);
   };
 
+  const insertLink = () => {
+    if (!linkUrl.trim()) {
+      toast.error("Insira uma URL válida");
+      return;
+    }
+    
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const displayText = linkText.trim() || linkUrl;
+    const markdownLink = `[${displayText}](${linkUrl})`;
+    const newText = content.substring(0, start) + markdownLink + content.substring(start);
+    
+    setContent(newText);
+    setLinkUrl("");
+    setLinkText("");
+    setShowLinkInput(false);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + markdownLink.length, start + markdownLink.length);
+    }, 0);
+  };
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !user) return;
+
+    setIsUploading(true);
+    const uploadedUrls: string[] = [];
+
+    try {
+      for (const file of Array.from(files)) {
+        // Validar tipo
+        if (!file.type.startsWith("image/")) {
+          toast.error(`${file.name} não é uma imagem válida`);
+          continue;
+        }
+
+        // Validar tamanho (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`${file.name} excede o limite de 5MB`);
+          continue;
+        }
+
+        const filePath = `${user.id}/${Date.now()}-${file.name}`;
+        const { error } = await supabase.storage
+          .from("community-posts-images")
+          .upload(filePath, file);
+
+        if (error) {
+          console.error("Upload error:", error);
+          toast.error(`Erro ao fazer upload de ${file.name}`);
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from("community-posts-images")
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(urlData.publicUrl);
+      }
+
+      setImageUrls((prev) => [...prev, ...uploadedUrls]);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImageUrls((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = () => {
     if (!content.trim()) return;
+
+    const mediaArray = imageUrls.map((url) => ({ type: "image", url }));
 
     createPost(
       {
         title: title.trim() || undefined,
         content: content.trim(),
         category_id: categoryId || undefined,
+        media: mediaArray.length > 0 ? mediaArray : undefined,
       },
       {
         onSuccess: () => {
           setTitle("");
           setContent("");
           setCategoryId("");
+          setImageUrls([]);
           onOpenChange(false);
         },
       }
     );
   };
 
+  const resetModal = () => {
+    setTitle("");
+    setContent("");
+    setCategoryId("");
+    setImageUrls([]);
+    setShowLinkInput(false);
+    setLinkUrl("");
+    setLinkText("");
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border text-foreground">
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) resetModal();
+      onOpenChange(isOpen);
+    }}>
+      <DialogContent className="bg-card border-border text-foreground max-w-lg">
         <DialogHeader>
           <DialogTitle>Criar Novo Post</DialogTitle>
         </DialogHeader>
@@ -159,6 +269,46 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
               >
                 <Italic className="h-4 w-4" />
               </Button>
+              
+              {/* Botão Link - TODOS */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowLinkInput(!showLinkInput)}
+                title="Inserir link"
+              >
+                <Link2 className="h-4 w-4" />
+              </Button>
+
+              {/* Botão Imagem - apenas mentorados/admins */}
+              {canUploadImages && (
+                <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Adicionar imagem"
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <ImagePlus className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleImageSelect}
+                  />
+                </>
+              )}
+
               <div className="relative">
                 <Button
                   type="button"
@@ -186,27 +336,71 @@ export function CreatePostModal({ open, onOpenChange }: CreatePostModalProps) {
               </div>
             </div>
 
+            {/* Link Input Popover */}
+            {showLinkInput && (
+              <div className="p-3 bg-muted rounded-md border border-input space-y-2">
+                <Input
+                  placeholder="Texto do link (ex: Clique aqui)"
+                  value={linkText}
+                  onChange={(e) => setLinkText(e.target.value)}
+                  className="bg-background"
+                />
+                <Input
+                  placeholder="URL (ex: https://exemplo.com)"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  className="bg-background"
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={insertLink}>
+                    Inserir
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setShowLinkInput(false)}>
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <Textarea
               ref={textareaRef}
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Compartilhe algo com a comunidade... Use **negrito** e *itálico*"
-              className="bg-background border-input rounded-t-none min-h-[200px]"
+              className="bg-background border-input rounded-t-none min-h-[150px]"
             />
+
+            {/* Preview de imagens selecionadas */}
+            {imageUrls.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-2 bg-muted/50 rounded-lg">
+                {imageUrls.map((url, idx) => (
+                  <div key={idx} className="relative group w-16 h-16 rounded-lg overflow-hidden">
+                    <img src={url} className="w-full h-full object-cover" alt="" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                    >
+                      <X className="h-4 w-4 text-white" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex gap-2 justify-end">
             <Button
               variant="ghost"
               onClick={() => onOpenChange(false)}
-              disabled={isCreating}
+              disabled={isCreating || isUploading}
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!content.trim() || isCreating}
+              disabled={!content.trim() || isCreating || isUploading}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isCreating ? "Publicando..." : "Publicar"}
