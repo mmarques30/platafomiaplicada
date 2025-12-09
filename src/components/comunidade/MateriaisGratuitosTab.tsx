@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, ExternalLink } from "lucide-react";
+import { FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, ExternalLink, GraduationCap } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -28,6 +28,7 @@ const CATEGORIAS = [
   { value: "checklists", label: "Checklists", icon: CheckSquare },
   { value: "ebooks", label: "E-books", icon: Book },
   { value: "newsletter", label: "Newsletter", icon: Mail },
+  { value: "materiais_aula", label: "Materiais Aula", icon: GraduationCap },
 ];
 
 export function MateriaisGratuitosTab() {
