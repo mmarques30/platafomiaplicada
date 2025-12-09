@@ -47,22 +47,6 @@ export function AbaDuvidas() {
 
   return (
     <>
-      {/* Hero Section */}
-      <div className="space-y-3">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">Suas Dúvidas</h2>
-            <p className="text-muted-foreground mt-1">
-              Tire suas dúvidas sobre a plataforma, projetos, módulos, ferramentas e muito mais
-            </p>
-          </div>
-          <Button onClick={() => setModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Nova Dúvida
-          </Button>
-        </div>
-      </div>
-
       {/* Lista de Dúvidas */}
       <div className="space-y-4">
         {duvidas.length === 0 ? (
