@@ -107,48 +107,48 @@ export default function MetodosAplicar() {
                 onOpenChange={() => toggleItem(metodo.id)}
               >
                 <Card className="overflow-hidden">
-                  {/* Header compacto - altura fixa padronizada */}
+                  {/* Header compacto - estrutura horizontal com altura fixa */}
                   <CollapsibleTrigger asChild>
-                    <div className="p-4 h-[100px] flex flex-col cursor-pointer hover:bg-muted/50 transition-colors">
-                      {/* Ícones no topo direito */}
-                      <div className="flex justify-end gap-1 mb-1">
+                    <div className="p-4 h-[72px] flex items-center gap-3 cursor-pointer hover:bg-muted/50 transition-colors">
+                      {/* Conteúdo à esquerda */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <h3 className="font-medium text-sm leading-tight line-clamp-1 mb-1.5">
+                          {metodo.titulo}
+                        </h3>
+                        <div className="flex items-center gap-1.5 overflow-hidden">
+                          <Badge variant="secondary" className="text-xs shrink-0">
+                            {metodo.categoria}
+                          </Badge>
+                          {ferramentas.slice(0, 2).map((ferramenta: string) => (
+                            <Badge 
+                              key={ferramenta} 
+                              variant="outline" 
+                              className="text-xs shrink-0"
+                            >
+                              {ferramenta}
+                            </Badge>
+                          ))}
+                          {ferramentas.length > 2 && (
+                            <Badge variant="outline" className="text-xs shrink-0">
+                              +{ferramentas.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Ícones à direita - centralizados verticalmente */}
+                      <div className="flex items-center gap-1 shrink-0">
                         <FavoriteButton 
                           tipo="metodo" 
                           itemId={metodo.id}
                           variant="ghost"
-                          className="h-6 w-6 p-0"
+                          className="h-7 w-7"
                         />
                         <ChevronDown 
                           className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
                             isOpen ? 'rotate-180' : ''
                           }`} 
                         />
-                      </div>
-                      
-                      {/* Título - altura fixa */}
-                      <h3 className="font-medium text-sm leading-tight line-clamp-2 min-h-[36px] mb-auto">
-                        {metodo.titulo}
-                      </h3>
-                      
-                      {/* Badges - linha única, sem wrap */}
-                      <div className="flex items-center gap-1.5 overflow-hidden">
-                        <Badge variant="secondary" className="text-xs shrink-0">
-                          {metodo.categoria}
-                        </Badge>
-                        {ferramentas.slice(0, 2).map((ferramenta: string) => (
-                          <Badge 
-                            key={ferramenta} 
-                            variant="outline" 
-                            className="text-xs shrink-0"
-                          >
-                            {ferramenta}
-                          </Badge>
-                        ))}
-                        {ferramentas.length > 2 && (
-                          <Badge variant="outline" className="text-xs shrink-0">
-                            +{ferramentas.length - 2}
-                          </Badge>
-                        )}
                       </div>
                     </div>
                   </CollapsibleTrigger>
