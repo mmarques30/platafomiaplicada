@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
-import { EstatisticasEngajamento } from "@/components/evolucao/EstatisticasEngajamento";
+
 import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
 import { CompartilharFerramentaModal } from "@/components/evolucao/CompartilharFerramentaModal";
 import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
@@ -20,7 +20,7 @@ import { Plus } from "lucide-react";
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
-  const { isAdmin } = useUserRole();
+  
   const [modalFerramentaOpen, setModalFerramentaOpen] = useState(false);
 
   return (
@@ -90,9 +90,6 @@ export default function Evolucao() {
 
               {/* Ranking Top 3 + Lista */}
               <RankingComunidade ranking={ranking as any || []} />
-
-              {/* Estatísticas Gerais da Comunidade - Apenas para admins */}
-              {isAdmin && <EstatisticasEngajamento ranking={ranking || []} />}
 
               {/* Ferramentas Mais Compartilhadas */}
               <div className="space-y-4">
