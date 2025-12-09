@@ -4,7 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Search, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, Search, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
 import { format, parseISO, isPast, isFuture } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -18,6 +20,7 @@ export function CalendarioVisaoTabela() {
   const [statusFiltro, setStatusFiltro] = useState<StatusFilter>("todas");
   const [tipoFiltro, setTipoFiltro] = useState<TipoFilter>("todos");
   const [mesFiltro, setMesFiltro] = useState("todos");
+  const [aulaDetalhes, setAulaDetalhes] = useState<any>(null);
 
   const aulasFiltradas = useMemo(() => {
     if (!aulas) return [];
@@ -176,12 +179,13 @@ export function CalendarioVisaoTabela() {
               <TableHead>Horário</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="w-[60px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {aulasFiltradas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   Nenhum encontro encontrado com os filtros aplicados
                 </TableCell>
               </TableRow>
@@ -235,6 +239,17 @@ export function CalendarioVisaoTabela() {
                         {statusInfo.label}
                       </span>
                     </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setAulaDetalhes(aula)}
+                        title="Ver detalhes"
+                        className="h-8 w-8"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 );
               })
@@ -242,6 +257,57 @@ export function CalendarioVisaoTabela() {
           </TableBody>
         </Table>
       </Card>
+
+      <Dialog open={!!aulaDetalhes} onOpenChange={() => setAulaDetalhes(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{aulaDetalhes?.tema}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-4 text-sm">
+              <div>
+                <span className="text-muted-foreground">Data:</span>
+                <span className="ml-2 font-medium">
+                  {aulaDetalhes?.data_aula
+                    ? format(parseISO(aulaDetalhes.data_aula), "dd/MM/yyyy", { locale: ptBR })
+                    : "-"}
+                </span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Horário:</span>
+                <span className="ml-2 font-medium">{aulaDetalhes?.horario || "-"}</span>
+              </div>
+            </div>
+
+            {aulaDetalhes?.tipo_evento && (
+              <div>
+                <span className="text-muted-foreground text-sm">Tipo:</span>
+                <span
+                  className={cn(
+                    "ml-2 px-2.5 py-1 text-xs font-medium rounded-full",
+                    aulaDetalhes.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
+                    aulaDetalhes.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
+                    aulaDetalhes.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                  )}
+                >
+                  {aulaDetalhes.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
+                  {aulaDetalhes.tipo_evento === "qa" && "Q&A"}
+                  {aulaDetalhes.tipo_evento === "outro" && "Outro"}
+                </span>
+              </div>
+            )}
+
+            {aulaDetalhes?.descricao && (
+              <div>
+                <span className="text-muted-foreground text-sm block mb-2">Descrição:</span>
+                <p className="text-foreground whitespace-pre-line bg-muted/50 p-3 rounded-lg">
+                  {aulaDetalhes.descricao}
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
