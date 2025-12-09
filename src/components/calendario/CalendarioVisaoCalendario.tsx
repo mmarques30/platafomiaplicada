@@ -49,7 +49,7 @@ export function CalendarioVisaoCalendario() {
           locale={ptBR}
           className="pointer-events-auto w-full"
           classNames={{
-            day_selected: "ring-2 ring-offset-2 ring-offset-background ring-primary/70",
+            day_selected: "bg-transparent ring-2 ring-offset-2 ring-offset-background ring-primary/70 text-foreground",
           }}
           modifiers={{
             hasClass: datasComAulas,
