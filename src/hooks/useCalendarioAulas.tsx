@@ -95,9 +95,10 @@ export function useCreateAula() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["aulas-calendario"] });
+      queryClient.invalidateQueries({ queryKey: ["todas-aulas"] });
       queryClient.invalidateQueries({ queryKey: ["proxima-aula"] });
       queryClient.invalidateQueries({ queryKey: ["aula-ativa"] });
-      toast.success("Aula criada com sucesso!");
+      toast.success("Encontro criado com sucesso!");
     },
     onError: () => {
       toast.error("Erro ao criar aula");
@@ -122,9 +123,10 @@ export function useUpdateAula() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["aulas-calendario"] });
+      queryClient.invalidateQueries({ queryKey: ["todas-aulas"] });
       queryClient.invalidateQueries({ queryKey: ["proxima-aula"] });
       queryClient.invalidateQueries({ queryKey: ["aula-ativa"] });
-      toast.success("Aula atualizada com sucesso!");
+      toast.success("Encontro atualizado com sucesso!");
     },
     onError: () => {
       toast.error("Erro ao atualizar aula");
@@ -146,9 +148,10 @@ export function useDeleteAula() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["aulas-calendario"] });
+      queryClient.invalidateQueries({ queryKey: ["todas-aulas"] });
       queryClient.invalidateQueries({ queryKey: ["proxima-aula"] });
       queryClient.invalidateQueries({ queryKey: ["aula-ativa"] });
-      toast.success("Aula removida com sucesso!");
+      toast.success("Encontro removido com sucesso!");
     },
     onError: () => {
       toast.error("Erro ao remover aula");
