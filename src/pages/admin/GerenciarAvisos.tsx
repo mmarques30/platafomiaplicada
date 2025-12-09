@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Search, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ArrowUp, ArrowDown, Check } from "lucide-react";
 import { AvisoModal } from "@/components/admin/AvisoModal";
 import { AulaSemanalModal } from "@/components/admin/AulaSemanalModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -86,11 +86,15 @@ export default function GerenciarAvisos() {
       result = result.filter(a => a.tipo_evento === tipoEventoFilter);
     }
 
-    // Filtro por status
+    // Filtro por status (ativo/inativo)
     if (statusAulaFilter === 'ativo') {
       result = result.filter(a => a.ativo);
     } else if (statusAulaFilter === 'inativo') {
       result = result.filter(a => !a.ativo);
+    } else if (statusAulaFilter === 'realizada') {
+      result = result.filter(a => a.realizada);
+    } else if (statusAulaFilter === 'pendente') {
+      result = result.filter(a => !a.realizada);
     }
 
     // Filtro por período
@@ -218,6 +222,8 @@ export default function GerenciarAvisos() {
         { value: 'todos', label: 'Todos os Status' },
         { value: 'ativo', label: 'Ativo' },
         { value: 'inativo', label: 'Inativo' },
+        { value: 'realizada', label: 'Realizada' },
+        { value: 'pendente', label: 'Pendente' },
       ]
     },
     {
@@ -374,13 +380,14 @@ export default function GerenciarAvisos() {
                   </TableHead>
                   <TableHead>Horário</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Realização</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoadingAulas ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center">Carregando...</TableCell>
+                    <TableCell colSpan={7} className="text-center">Carregando...</TableCell>
                   </TableRow>
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
@@ -398,6 +405,11 @@ export default function GerenciarAvisos() {
                       <TableCell>
                         <Badge variant={aula.ativo ? "default" : "secondary"}>
                           {aula.ativo ? "Ativo" : "Inativo"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={aula.realizada ? "default" : "outline"} className={aula.realizada ? "bg-green-600" : ""}>
+                          {aula.realizada ? "Realizada" : "Pendente"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right space-x-2">
@@ -423,7 +435,7 @@ export default function GerenciarAvisos() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">
                       Nenhum encontro encontrado
                     </TableCell>
                   </TableRow>
