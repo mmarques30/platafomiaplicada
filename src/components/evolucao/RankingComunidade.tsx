@@ -43,7 +43,7 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
   };
 
   return (
-    <Card className="border-aplicada-green-900/20">
+    <Card className="border border-primary/30 bg-card">
       <CardHeader>
         <CardTitle className="text-2xl">
           Ranking da Comunidade
@@ -52,19 +52,19 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
       <CardContent className="space-y-6">
         {/* Top 3 - Pódio */}
         {top3.length > 0 && (
-          <div className="grid grid-cols-3 gap-4 pb-6 border-b border-aplicada-green-900/20">
+          <div className="grid grid-cols-3 gap-4 pb-6 border-b border-border">
             {top3.map((item, index) => {
               const posicao = index + 1;
               return (
                 <div
                   key={item.user_id}
-                  className={`relative p-4 rounded-lg border ${getBorderColor(posicao)} bg-zinc-700`}
+                  className={`relative p-4 rounded-lg border ${getBorderColor(posicao)} bg-card`}
                 >
                   <div className="flex flex-col items-center gap-3">
                     <div className="relative">
                       <Avatar className="h-16 w-16 border-2 border-background">
                         <AvatarImage src={item.avatar_url || undefined} />
-                        <AvatarFallback>{getInitials(item.nome_completo)}</AvatarFallback>
+                        <AvatarFallback className="bg-muted">{getInitials(item.nome_completo)}</AvatarFallback>
                       </Avatar>
                       {posicao === 1 && (
                         <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
@@ -73,7 +73,7 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
                       )}
                     </div>
                     <div className="text-center">
-                      <p className="font-semibold text-white">{item.nome_completo}</p>
+                      <p className="font-semibold text-foreground">{item.nome_completo}</p>
                       <p className="text-sm text-primary font-medium">
                         {item.total_pontos?.toLocaleString() || 0} pontos
                       </p>
@@ -134,20 +134,20 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
 
         {/* Minha posição (se não estiver no top) */}
         {minhaposicao && minhaposicao.posicao > 10 && (
-          <div className="border-t border-aplicada-green-900/20 pt-4">
-            <div className="flex items-center gap-3 p-4 rounded-lg bg-aplicada-dark border border-primary/40 ring-1 ring-primary/30">
-              <span className="font-mono text-sm text-zinc-400 w-8">{minhaposicao.posicao}º</span>
+          <div className="border-t border-border pt-4">
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-card border border-primary/40 ring-1 ring-primary/30">
+              <span className="font-mono text-sm text-muted-foreground w-8">{minhaposicao.posicao}º</span>
               <Avatar className="h-10 w-10 border border-primary">
                 <AvatarImage src={minhaposicao.avatar_url} />
-                <AvatarFallback className="bg-zinc-800">{getInitials(minhaposicao.nome_completo)}</AvatarFallback>
+                <AvatarFallback className="bg-muted">{getInitials(minhaposicao.nome_completo)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <p className="font-medium text-primary">Você - {minhaposicao.nome_completo}</p>
-                <p className="text-xs text-zinc-500">Sua posição atual</p>
+                <p className="text-xs text-muted-foreground">Sua posição atual</p>
               </div>
               <div className="text-right">
-                <p className="font-semibold text-lg text-white">{minhaposicao.total_pontos}</p>
-                <p className="text-xs text-zinc-500">pontos</p>
+                <p className="font-semibold text-lg text-foreground">{minhaposicao.total_pontos}</p>
+                <p className="text-xs text-muted-foreground">pontos</p>
               </div>
             </div>
           </div>

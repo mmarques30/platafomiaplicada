@@ -2,13 +2,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Plus } from "lucide-react";
 import { useFerramentasCompartilhadas } from "@/hooks/useFerramentasCompartilhadas";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-export function FerramentasCompartilhadasList() {
+interface FerramentasCompartilhadasListProps {
+  onCompartilhar?: () => void;
+}
+
+export function FerramentasCompartilhadasList({ onCompartilhar }: FerramentasCompartilhadasListProps) {
   const { ferramentas, isLoading } = useFerramentasCompartilhadas();
   const [selectedFerramenta, setSelectedFerramenta] = useState<any>(null);
 
@@ -18,7 +22,7 @@ export function FerramentasCompartilhadasList() {
 
   if (isLoading) {
     return (
-      <Card className="border-aplicada-green-900/20">
+      <Card className="border border-primary/30 bg-card">
         <CardHeader>
           <Skeleton className="h-6 w-48" />
         </CardHeader>
@@ -31,11 +35,11 @@ export function FerramentasCompartilhadasList() {
 
   if (!ferramentas || ferramentas.length === 0) {
     return (
-      <Card className="border-aplicada-green-900/20">
+      <Card className="border border-primary/30 bg-card">
         <CardHeader>
           <CardTitle className="text-2xl">Ferramentas Compartilhadas</CardTitle>
         </CardHeader>
-        <CardContent className="text-center py-12 text-zinc-500">
+        <CardContent className="text-center py-12 text-muted-foreground">
           <p className="text-sm">
             Nenhuma ferramenta compartilhada ainda. Seja o primeiro!
           </p>
@@ -46,12 +50,20 @@ export function FerramentasCompartilhadasList() {
 
   return (
     <>
-      <Card className="border-aplicada-green-900/20">
-        <CardHeader>
-          <CardTitle className="text-2xl">Ferramentas Mais Compartilhadas</CardTitle>
-          <CardDescription>
-            Descobertas e recomendações da comunidade
-          </CardDescription>
+      <Card className="border border-primary/30 bg-card">
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div>
+            <CardTitle className="text-2xl">Ferramentas Compartilhadas</CardTitle>
+            <CardDescription>
+              Descobertas e recomendações da comunidade
+            </CardDescription>
+          </div>
+          {onCompartilhar && (
+            <Button onClick={onCompartilhar} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Compartilhar Ferramenta
+            </Button>
+          )}
         </CardHeader>
         <CardContent className="space-y-3">
           {ferramentas.slice(0, 5).map((ferramenta: any) => (
