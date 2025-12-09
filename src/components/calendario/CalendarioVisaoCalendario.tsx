@@ -182,7 +182,18 @@ export function CalendarioVisaoCalendario() {
                       </div>
                       <h4 className="font-semibold text-foreground">{aula.tema}</h4>
                       {aula.descricao && (
-                        <p className="text-sm text-muted-foreground">{aula.descricao}</p>
+                        <p className="text-sm text-muted-foreground whitespace-pre-line">{aula.descricao}</p>
+                      )}
+                      {aula.link_reuniao && (
+                        <a 
+                          href={aula.link_reuniao.startsWith('http') ? aula.link_reuniao : `https://${aula.link_reuniao}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors"
+                        >
+                          <Video className="h-4 w-4" />
+                          Acessar Reunião
+                        </a>
                       )}
                     </div>
                     {!aula.ativo && (
