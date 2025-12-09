@@ -107,45 +107,48 @@ export default function MetodosAplicar() {
                 onOpenChange={() => toggleItem(metodo.id)}
               >
                 <Card className="overflow-hidden">
-                  {/* Header compacto - sempre visível */}
+                  {/* Header compacto - altura fixa padronizada */}
                   <CollapsibleTrigger asChild>
-                    <div className="p-4 flex items-start justify-between gap-3 cursor-pointer hover:bg-muted/50 transition-colors">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm leading-tight line-clamp-2 mb-2">
-                          {metodo.titulo}
-                        </h3>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <Badge variant="secondary" className="text-xs shrink-0">
-                            {metodo.categoria}
-                          </Badge>
-                          {ferramentas.slice(0, 2).map((ferramenta: string) => (
-                            <Badge 
-                              key={ferramenta} 
-                              variant="outline" 
-                              className="text-xs shrink-0"
-                            >
-                              {ferramenta}
-                            </Badge>
-                          ))}
-                          {ferramentas.length > 2 && (
-                            <Badge variant="outline" className="text-xs shrink-0">
-                              +{ferramentas.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
+                    <div className="p-4 h-[100px] flex flex-col cursor-pointer hover:bg-muted/50 transition-colors">
+                      {/* Ícones no topo direito */}
+                      <div className="flex justify-end gap-1 mb-1">
                         <FavoriteButton 
                           tipo="metodo" 
                           itemId={metodo.id}
                           variant="ghost"
-                          className="h-8 w-8"
+                          className="h-6 w-6 p-0"
                         />
                         <ChevronDown 
                           className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
                             isOpen ? 'rotate-180' : ''
                           }`} 
                         />
+                      </div>
+                      
+                      {/* Título - altura fixa */}
+                      <h3 className="font-medium text-sm leading-tight line-clamp-2 min-h-[36px] mb-auto">
+                        {metodo.titulo}
+                      </h3>
+                      
+                      {/* Badges - linha única, sem wrap */}
+                      <div className="flex items-center gap-1.5 overflow-hidden">
+                        <Badge variant="secondary" className="text-xs shrink-0">
+                          {metodo.categoria}
+                        </Badge>
+                        {ferramentas.slice(0, 2).map((ferramenta: string) => (
+                          <Badge 
+                            key={ferramenta} 
+                            variant="outline" 
+                            className="text-xs shrink-0"
+                          >
+                            {ferramenta}
+                          </Badge>
+                        ))}
+                        {ferramentas.length > 2 && (
+                          <Badge variant="outline" className="text-xs shrink-0">
+                            +{ferramentas.length - 2}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </CollapsibleTrigger>
