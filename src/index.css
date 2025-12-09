@@ -82,17 +82,17 @@
     
     --radius: 0.75rem;
     
-    /* Sidebar: Always dark #2F302B regardless of theme */
-    --sidebar-background: 72 6% 18%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 0% 95%;
-    --sidebar-primary-foreground: 72 6% 18%;
-    --sidebar-accent: 72 6% 22%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 72 6% 25%;
+    /* Sidebar: Off-White Elegante #F6F7E9 */
+    --sidebar-background: 63 45% 94%;
+    --sidebar-foreground: 72 6% 18%;
+    --sidebar-primary: 73 55% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 63 45% 90%;
+    --sidebar-accent-foreground: 72 6% 18%;
+    --sidebar-border: 73 20% 85%;
     --sidebar-ring: 73 55% 47%;
-    /* Active indicator: off-white on dark sidebar */
-    --sidebar-active: 0 0% 95%;
+    /* Active indicator: brand green */
+    --sidebar-active: 73 55% 47%;
     
     --complexity-high: 0 100% 65%;
     --complexity-medium: 35 90% 55%;
@@ -142,17 +142,17 @@
     
     --radius: 0.75rem;
     
-    /* Sidebar Dark: Professional dark #2F302B */
-    --sidebar-background: 72 6% 18%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 0% 95%;
-    --sidebar-primary-foreground: 72 6% 18%;
-    --sidebar-accent: 72 6% 22%;
-    --sidebar-accent-foreground: 63 48% 91%;
-    --sidebar-border: 72 6% 25%;
+    /* Sidebar: Off-White mesmo em dark mode para consistência */
+    --sidebar-background: 63 45% 94%;
+    --sidebar-foreground: 72 6% 18%;
+    --sidebar-primary: 73 55% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 63 45% 90%;
+    --sidebar-accent-foreground: 72 6% 18%;
+    --sidebar-border: 73 20% 85%;
     --sidebar-ring: 73 55% 47%;
-    /* Active indicator: off-white */
-    --sidebar-active: 0 0% 95%;
+    /* Active indicator: brand green */
+    --sidebar-active: 73 55% 47%;
     
     --chart-1: 73 55% 47%;
     --chart-2: 73 35% 65%;
