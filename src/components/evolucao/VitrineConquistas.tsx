@@ -89,18 +89,16 @@ export function VitrineConquistas() {
                 key={conquista.id}
                 className={`rounded-lg border p-4 space-y-3 transition-all ${
                   conquista.desbloqueada
-                    ? "border-primary/40 bg-zinc-700"
-                    : "border-zinc-600 bg-zinc-700"
+                    ? "border-primary/40 bg-card"
+                    : "border-border bg-card"
                 }`}
               >
                 {/* Título e descrição */}
                 <div>
-                  <span
-                    className="font-semibold text-sm block text-zinc-50"
-                  >
+                  <span className="font-semibold text-sm block text-foreground">
                     {conquista.titulo}
                   </span>
-                  <p className="text-xs text-zinc-300 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {conquista.descricao}
                   </p>
                 </div>
@@ -109,10 +107,10 @@ export function VitrineConquistas() {
                 {!conquista.desbloqueada && (
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-white">
+                      <span className="text-foreground">
                         {conquista.progresso} / {conquista.meta}
                       </span>
-                      <span className="text-white">
+                      <span className="text-foreground">
                         {porcentagem.toFixed(0)}%
                       </span>
                     </div>
