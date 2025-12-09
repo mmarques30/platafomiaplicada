@@ -10,6 +10,7 @@ export interface AulaSemanal {
   data_aula: string | null;
   descricao: string | null;
   ativo: boolean | null;
+  realizada: boolean | null;
   tipo_evento: 'aula_ao_vivo' | 'qa' | 'outro' | null;
   link_reuniao: string | null;
   created_at: string | null;
@@ -23,6 +24,7 @@ export interface CreateAulaInput {
   data_aula?: string | null;
   descricao?: string | null;
   ativo?: boolean;
+  realizada?: boolean;
   tipo_evento?: 'aula_ao_vivo' | 'qa' | 'outro';
   link_reuniao?: string | null;
 }

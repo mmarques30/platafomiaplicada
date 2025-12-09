@@ -60,6 +60,7 @@ export type Database = {
           horario: string | null
           id: string
           link_reuniao: string | null
+          realizada: boolean | null
           tema: string
           tipo_evento: string | null
           updated_at: string | null
@@ -73,6 +74,7 @@ export type Database = {
           horario?: string | null
           id?: string
           link_reuniao?: string | null
+          realizada?: boolean | null
           tema: string
           tipo_evento?: string | null
           updated_at?: string | null
@@ -86,6 +88,7 @@ export type Database = {
           horario?: string | null
           id?: string
           link_reuniao?: string | null
+          realizada?: boolean | null
           tema?: string
           tipo_evento?: string | null
           updated_at?: string | null

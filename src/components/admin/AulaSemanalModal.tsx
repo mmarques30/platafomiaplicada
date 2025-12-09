@@ -21,6 +21,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
   const [horario, setHorario] = useState("19:30");
   const [descricao, setDescricao] = useState("");
   const [ativo, setAtivo] = useState(true);
+  const [realizada, setRealizada] = useState(false);
   const [tipoEvento, setTipoEvento] = useState<'aula_ao_vivo' | 'qa' | 'outro'>('aula_ao_vivo');
   const [linkReuniao, setLinkReuniao] = useState("");
 
@@ -34,6 +35,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       setHorario(aula.horario || "19:30");
       setDescricao(aula.descricao || "");
       setAtivo(aula.ativo ?? true);
+      setRealizada(aula.realizada ?? false);
       setTipoEvento(aula.tipo_evento || 'aula_ao_vivo');
       setLinkReuniao(aula.link_reuniao || "");
     } else {
@@ -42,6 +44,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       setHorario("19:30");
       setDescricao("");
       setAtivo(true);
+      setRealizada(false);
       setTipoEvento('aula_ao_vivo');
       setLinkReuniao("");
     }
@@ -60,6 +63,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       horario: horario || null,
       descricao: descricao.trim() || null,
       ativo,
+      realizada,
       tipo_evento: tipoEvento,
       link_reuniao: linkReuniao.trim() || null,
     };
@@ -173,14 +177,22 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-2">
               <Switch
                 id="ativo"
                 checked={ativo}
                 onCheckedChange={setAtivo}
               />
-              <Label htmlFor="ativo">Aula ativa</Label>
+              <Label htmlFor="ativo">Ativo</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="realizada"
+                checked={realizada}
+                onCheckedChange={setRealizada}
+              />
+              <Label htmlFor="realizada">Realizada</Label>
             </div>
           </div>
 
