@@ -51,7 +51,7 @@
     --background: 0 0% 100%;
     --foreground: 72 6% 18%;
     
-    --card: 60 45% 97%;
+    --card: 60 5% 96%;
     --card-foreground: 72 6% 18%;
     
     --popover: 0 0% 100%;
@@ -65,8 +65,8 @@
     --secondary: 73 35% 65%;
     --secondary-foreground: 72 6% 18%;
     
-    /* Muted: Off-white #F6F7E9 */
-    --muted: 63 45% 94%;
+    /* Muted: Off-white Neutro */
+    --muted: 60 5% 92%;
     --muted-foreground: 72 6% 45%;
     
     /* Accent: Subtitle Green #BCC95D */
@@ -102,7 +102,7 @@
     --chart-2: 73 35% 65%;
     --chart-3: 73 37% 58%;
     --chart-4: 72 6% 18%;
-    --chart-5: 63 45% 94%;
+    --chart-5: 60 5% 92%;
   }
 
   .dark {
@@ -158,7 +158,7 @@
     --chart-2: 73 35% 65%;
     --chart-3: 73 37% 58%;
     --chart-4: 72 6% 18%;
-    --chart-5: 63 45% 94%;
+    --chart-5: 60 5% 92%;
     
     --complexity-high: 0 100% 65%;
     --complexity-medium: 35 90% 55%;
@@ -307,7 +307,7 @@
 
   .ai-message-container code {
     background-color: hsl(73 54% 39% / 0.15);
-    color: hsl(63 45% 94%);
+    color: hsl(60 5% 92%);
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
     font-size: 0.9em;
