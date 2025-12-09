@@ -192,7 +192,7 @@ export function CalendarioVisaoTabela() {
                 
                 return (
                   <TableRow key={aula.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium max-w-md">
                       <div>
                         <div className="text-foreground">{aula.tema}</div>
                         {aula.descricao && (
@@ -212,7 +212,7 @@ export function CalendarioVisaoTabela() {
                       {aula.tipo_evento ? (
                         <span
                           className={cn(
-                            "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full",
+                            "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full whitespace-nowrap",
                             aula.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
                             aula.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
                             aula.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
