@@ -10,11 +10,13 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
 type StatusFilter = "todas" | "ativas" | "inativas" | "passadas" | "futuras";
+type TipoFilter = "todos" | "aula_ao_vivo" | "qa" | "outro";
 
 export function CalendarioVisaoTabela() {
   const { data: aulas, isLoading } = useTodasAulas();
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState<StatusFilter>("todas");
+  const [tipoFiltro, setTipoFiltro] = useState<TipoFilter>("todos");
   const [mesFiltro, setMesFiltro] = useState("todos");
 
   const aulasFiltradas = useMemo(() => {
@@ -51,9 +53,14 @@ export function CalendarioVisaoTabela() {
         if (mesAula !== mesFiltro) return false;
       }
 
+      // Filtro de tipo de evento
+      if (tipoFiltro !== "todos") {
+        if (aula.tipo_evento !== tipoFiltro) return false;
+      }
+
       return true;
     });
-  }, [aulas, busca, statusFiltro, mesFiltro]);
+  }, [aulas, busca, statusFiltro, mesFiltro, tipoFiltro]);
 
   if (isLoading) {
     return (
@@ -133,6 +140,18 @@ export function CalendarioVisaoTabela() {
             </SelectContent>
           </Select>
 
+          <Select value={tipoFiltro} onValueChange={(v) => setTipoFiltro(v as TipoFilter)}>
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os tipos</SelectItem>
+              <SelectItem value="aula_ao_vivo">Aula ao Vivo</SelectItem>
+              <SelectItem value="qa">Q&A</SelectItem>
+              <SelectItem value="outro">Outro</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Select value={mesFiltro} onValueChange={setMesFiltro}>
             <SelectTrigger className="w-full md:w-[180px]">
               <SelectValue placeholder="Mês" />
@@ -155,14 +174,15 @@ export function CalendarioVisaoTabela() {
               <TableHead>Tema</TableHead>
               <TableHead>Data</TableHead>
               <TableHead>Horário</TableHead>
+              <TableHead>Tipo</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {aulasFiltradas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                  Nenhuma aula encontrada com os filtros aplicados
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  Nenhum encontro encontrado com os filtros aplicados
                 </TableCell>
               </TableRow>
             ) : (
@@ -188,6 +208,22 @@ export function CalendarioVisaoTabela() {
                         : "-"}
                     </TableCell>
                     <TableCell>{aula.horario || "-"}</TableCell>
+                    <TableCell>
+                      {aula.tipo_evento ? (
+                        <span
+                          className={cn(
+                            "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full",
+                            aula.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
+                            aula.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
+                            aula.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                          )}
+                        >
+                          {aula.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
+                          {aula.tipo_evento === "qa" && "Q&A"}
+                          {aula.tipo_evento === "outro" && "Outro"}
+                        </span>
+                      ) : "-"}
+                    </TableCell>
                     <TableCell>
                       <span
                         className={cn(

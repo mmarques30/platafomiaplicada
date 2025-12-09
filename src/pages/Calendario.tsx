@@ -22,7 +22,7 @@ export default function Calendario() {
             </TabsTrigger>
             <TabsTrigger value="tabela" className="gap-2">
               <History className="h-4 w-4" />
-              Histórico de Aulas
+              Histórico de Encontros
             </TabsTrigger>
           </TabsList>
           
