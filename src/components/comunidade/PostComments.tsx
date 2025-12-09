@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Trash2 } from "lucide-react";
+import { Trash2, Heart } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useCommunityComments } from "@/hooks/useCommunityComments";
@@ -17,7 +17,7 @@ interface PostCommentsProps {
 export function PostComments({ postId }: PostCommentsProps) {
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
-  const { comments, createComment, deleteComment, isCreating } =
+  const { comments, createComment, deleteComment, toggleCommentLike, isCreating } =
     useCommunityComments(postId);
   const [newComment, setNewComment] = useState("");
 
@@ -37,7 +37,7 @@ export function PostComments({ postId }: PostCommentsProps) {
   };
 
   return (
-    <div className="space-y-4 pt-4 border-t border-border">
+    <div className="space-y-4">
       {/* Add Comment */}
       <div className="space-y-2">
         <Textarea
@@ -97,6 +97,19 @@ export function PostComments({ postId }: PostCommentsProps) {
                 </div>
 
                 <p className="text-sm text-foreground">{comment.content}</p>
+                
+                {/* Like button */}
+                <button
+                  onClick={() => toggleCommentLike(comment.id)}
+                  className="flex items-center gap-1 mt-1 text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Heart 
+                    className={`h-3.5 w-3.5 ${comment.user_has_liked ? 'fill-primary text-primary' : ''}`} 
+                  />
+                  {comment.likes_count > 0 && (
+                    <span className="text-xs">{comment.likes_count}</span>
+                  )}
+                </button>
               </div>
             </div>
           );
