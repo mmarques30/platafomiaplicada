@@ -59,6 +59,7 @@ export type Database = {
           dia_semana: string | null
           horario: string | null
           id: string
+          link_reuniao: string | null
           tema: string
           tipo_evento: string | null
           updated_at: string | null
@@ -71,6 +72,7 @@ export type Database = {
           dia_semana?: string | null
           horario?: string | null
           id?: string
+          link_reuniao?: string | null
           tema: string
           tipo_evento?: string | null
           updated_at?: string | null
@@ -83,6 +85,7 @@ export type Database = {
           dia_semana?: string | null
           horario?: string | null
           id?: string
+          link_reuniao?: string | null
           tema?: string
           tipo_evento?: string | null
           updated_at?: string | null

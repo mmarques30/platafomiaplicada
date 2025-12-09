@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateAula, useUpdateAula, AulaSemanal } from "@/hooks/useCalendarioAulas";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 
 interface AulaSemanalModalProps {
   open: boolean;
@@ -22,6 +22,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
   const [descricao, setDescricao] = useState("");
   const [ativo, setAtivo] = useState(true);
   const [tipoEvento, setTipoEvento] = useState<'aula_ao_vivo' | 'qa' | 'outro'>('aula_ao_vivo');
+  const [linkReuniao, setLinkReuniao] = useState("");
 
   const createAula = useCreateAula();
   const updateAula = useUpdateAula();
@@ -34,6 +35,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       setDescricao(aula.descricao || "");
       setAtivo(aula.ativo ?? true);
       setTipoEvento(aula.tipo_evento || 'aula_ao_vivo');
+      setLinkReuniao(aula.link_reuniao || "");
     } else {
       setTema("");
       setDataAula("");
@@ -41,6 +43,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       setDescricao("");
       setAtivo(true);
       setTipoEvento('aula_ao_vivo');
+      setLinkReuniao("");
     }
   }, [aula, open]);
 
@@ -58,6 +61,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       descricao: descricao.trim() || null,
       ativo,
       tipo_evento: tipoEvento,
+      link_reuniao: linkReuniao.trim() || null,
     };
 
     if (aula) {
@@ -152,6 +156,20 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
               onChange={(e) => setDescricao(e.target.value)}
               placeholder="Detalhes adicionais sobre a aula..."
               rows={4}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="link_reuniao" className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              Link da Reunião (opcional)
+            </Label>
+            <Input
+              id="link_reuniao"
+              type="url"
+              value={linkReuniao}
+              onChange={(e) => setLinkReuniao(e.target.value)}
+              placeholder="https://meet.google.com/..."
             />
           </div>
 
