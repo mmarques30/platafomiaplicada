@@ -39,6 +39,7 @@ const CATEGORIAS = [
   { value: "checklists", label: "Checklists" },
   { value: "ebooks", label: "E-books" },
   { value: "newsletter", label: "Newsletter" },
+  { value: "materiais_aula", label: "Materiais Aula" },
 ];
 
 const TIPOS = [
