@@ -1,0 +1,2 @@
+INSERT INTO menu_config (menu_key, label, tipo, url, icon, visivel, editavel, ordem, parent_key, planos_permitidos)
+VALUES ('minhas_duvidas', 'Minhas Dúvidas', 'sidebar', '/minhas-duvidas', 'HelpCircle', true, true, 33, 'meu_progresso', NULL);

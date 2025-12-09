@@ -44,23 +44,23 @@ export function HeroEvolucao() {
 
           {/* Mini Cards de Estatísticas */}
           <div className="grid grid-cols-3 gap-3 pt-2">
-          <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-            <span className="text-xs uppercase tracking-wide block mb-2 text-white">Sequência</span>
-            <p className="text-xl font-semibold text-white">{sequencia || 0}</p>
-            <p className="text-xs text-zinc-300">dias seguidos</p>
-          </div>
+            <div className="rounded-lg border border-border bg-card p-3">
+              <span className="text-xs uppercase tracking-wide block mb-2 text-foreground">Sequência</span>
+              <p className="text-xl font-semibold text-foreground">{sequencia || 0}</p>
+              <p className="text-xs text-muted-foreground">dias seguidos</p>
+            </div>
 
-          <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-            <span className="text-xs uppercase tracking-wide block mb-2 text-white">Vídeos</span>
-            <p className="text-xl font-semibold text-white">{evolucao?.totalVideos || 0}</p>
-            <p className="text-xs text-zinc-300">completos</p>
-          </div>
+            <div className="rounded-lg border border-border bg-card p-3">
+              <span className="text-xs uppercase tracking-wide block mb-2 text-foreground">Vídeos</span>
+              <p className="text-xl font-semibold text-foreground">{evolucao?.totalVideos || 0}</p>
+              <p className="text-xs text-muted-foreground">completos</p>
+            </div>
 
-          <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
-            <span className="text-xs uppercase tracking-wide block mb-2 text-white">Certificados</span>
-            <p className="text-xl font-semibold text-white">{totalCertificados}</p>
-            <p className="text-xs text-zinc-300">conquistados</p>
-          </div>
+            <div className="rounded-lg border border-border bg-card p-3">
+              <span className="text-xs uppercase tracking-wide block mb-2 text-foreground">Certificados</span>
+              <p className="text-xl font-semibold text-foreground">{totalCertificados}</p>
+              <p className="text-xs text-muted-foreground">conquistados</p>
+            </div>
           </div>
       </div>
     </div>
