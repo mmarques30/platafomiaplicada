@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateAula, useUpdateAula, AulaSemanal } from "@/hooks/useCalendarioAulas";
 import { Loader2 } from "lucide-react";
 
@@ -20,6 +21,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
   const [horario, setHorario] = useState("19:30");
   const [descricao, setDescricao] = useState("");
   const [ativo, setAtivo] = useState(true);
+  const [tipoEvento, setTipoEvento] = useState<'aula_ao_vivo' | 'qa' | 'outro'>('aula_ao_vivo');
 
   const createAula = useCreateAula();
   const updateAula = useUpdateAula();
@@ -31,12 +33,14 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       setHorario(aula.horario || "19:30");
       setDescricao(aula.descricao || "");
       setAtivo(aula.ativo ?? true);
+      setTipoEvento(aula.tipo_evento || 'aula_ao_vivo');
     } else {
       setTema("");
       setDataAula("");
       setHorario("19:30");
       setDescricao("");
       setAtivo(true);
+      setTipoEvento('aula_ao_vivo');
     }
   }, [aula, open]);
 
@@ -53,6 +57,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       horario: horario || null,
       descricao: descricao.trim() || null,
       ativo,
+      tipo_evento: tipoEvento,
     };
 
     if (aula) {
@@ -86,6 +91,35 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
               required
               rows={3}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tipo_evento">Tipo de Evento</Label>
+            <Select value={tipoEvento} onValueChange={(v) => setTipoEvento(v as 'aula_ao_vivo' | 'qa' | 'outro')}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aula_ao_vivo">
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-primary" />
+                    Aula ao Vivo
+                  </span>
+                </SelectItem>
+                <SelectItem value="qa">
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-blue-500" />
+                    Q&A
+                  </span>
+                </SelectItem>
+                <SelectItem value="outro">
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-muted-foreground" />
+                    Outro
+                  </span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
