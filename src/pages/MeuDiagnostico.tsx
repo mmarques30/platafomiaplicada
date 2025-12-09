@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useNavigate } from "react-router-dom";
-import { FileText, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ObjetivosGerados } from "@/components/mentoria/ObjetivosGerados";
@@ -37,9 +37,6 @@ export default function MeuDiagnostico() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-foreground">Meu Diagnóstico</h1>
-          <p className="text-muted-foreground mt-1">
-            Análise personalizada com IA e objetivos gerados
-          </p>
         </div>
 
         {/* Grid com Diagnóstico */}
@@ -51,8 +48,7 @@ export default function MeuDiagnostico() {
             <Card className={completo ? "border-l-4 border-l-primary" : ""}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <FileText className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-xl">
                     Diagnóstico IA
                   </CardTitle>
                   <Badge variant={completo ? "default" : "secondary"}>
