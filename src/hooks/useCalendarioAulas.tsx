@@ -13,6 +13,7 @@ export interface AulaSemanal {
   realizada: boolean | null;
   tipo_evento: 'aula_ao_vivo' | 'qa' | 'outro' | null;
   link_reuniao: string | null;
+  recorrente: boolean | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -27,6 +28,7 @@ export interface CreateAulaInput {
   realizada?: boolean;
   tipo_evento?: 'aula_ao_vivo' | 'qa' | 'outro';
   link_reuniao?: string | null;
+  recorrente?: boolean;
 }
 
 export function useAulasCalendario() {

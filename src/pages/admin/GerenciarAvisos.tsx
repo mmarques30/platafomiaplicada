@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Search, ArrowUp, ArrowDown, Check } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ArrowUp, ArrowDown, Repeat } from "lucide-react";
 import { AvisoModal } from "@/components/admin/AvisoModal";
 import { AulaSemanalModal } from "@/components/admin/AulaSemanalModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -377,6 +377,7 @@ export default function GerenciarAvisos() {
                     </div>
                   </TableHead>
                   <TableHead>Horário</TableHead>
+                  <TableHead>Recorrente</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Realização</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
@@ -385,7 +386,7 @@ export default function GerenciarAvisos() {
               <TableBody>
                 {isLoadingAulas ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">Carregando...</TableCell>
+                    <TableCell colSpan={8} className="text-center">Carregando...</TableCell>
                   </TableRow>
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
@@ -400,6 +401,11 @@ export default function GerenciarAvisos() {
                         {aula.data_aula ? format(new Date(aula.data_aula), "dd/MM/yyyy") : "-"}
                       </TableCell>
                       <TableCell>{aula.horario || "-"}</TableCell>
+                      <TableCell>
+                        {aula.recorrente && (
+                          <Repeat className="h-4 w-4 text-primary" />
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={aula.ativo ? "default" : "secondary"}>
                           {aula.ativo ? "Ativo" : "Inativo"}
@@ -433,7 +439,7 @@ export default function GerenciarAvisos() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
                       Nenhum encontro encontrado
                     </TableCell>
                   </TableRow>
