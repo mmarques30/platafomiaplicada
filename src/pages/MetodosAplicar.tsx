@@ -115,25 +115,9 @@ export default function MetodosAplicar() {
                         <h3 className="font-medium text-sm leading-tight line-clamp-1 mb-1.5">
                           {metodo.titulo}
                         </h3>
-                        <div className="flex items-center gap-1.5 overflow-hidden">
-                          <Badge variant="secondary" className="text-xs shrink-0">
-                            {metodo.categoria}
-                          </Badge>
-                          {ferramentas.slice(0, 2).map((ferramenta: string) => (
-                            <Badge 
-                              key={ferramenta} 
-                              variant="outline" 
-                              className="text-xs shrink-0"
-                            >
-                              {ferramenta}
-                            </Badge>
-                          ))}
-                          {ferramentas.length > 2 && (
-                            <Badge variant="outline" className="text-xs shrink-0">
-                              +{ferramentas.length - 2}
-                            </Badge>
-                          )}
-                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          {metodo.categoria}
+                        </Badge>
                       </div>
                       
                       {/* Ícones à direita - centralizados verticalmente */}
