@@ -55,7 +55,7 @@ export function CalendarioVisaoCalendario() {
             hasClass: datasComAulas,
           }}
           modifiersClassNames={{
-            hasClass: "bg-primary/80 text-primary-foreground font-bold hover:bg-primary/60 hover:text-primary-foreground transition-colors duration-150",
+            hasClass: "border-2 border-primary font-semibold text-foreground hover:bg-primary/10 transition-colors duration-150",
           }}
         />
       </Card>
@@ -72,9 +72,9 @@ export function CalendarioVisaoCalendario() {
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-2">
-                        <h4 className="font-bold text-lg text-sidebar">{aula.tema}</h4>
+                        <h4 className="font-bold text-lg text-[#2F302B]">{aula.tema}</h4>
                         {aula.horario && (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sidebar text-white text-sm font-medium">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2F302B] text-white text-sm font-medium">
                             <Clock className="h-4 w-4" />
                             {aula.horario}
                           </span>
@@ -84,7 +84,7 @@ export function CalendarioVisaoCalendario() {
                         className={cn(
                           "px-3 py-1 text-xs font-semibold rounded-full",
                           aula.ativo
-                            ? "bg-sidebar text-white"
+                            ? "bg-[#2F302B] text-white"
                             : "bg-muted text-muted-foreground"
                         )}
                       >
