@@ -51,7 +51,7 @@ export function WelcomeHeader() {
   return (
     <div className="w-full mt-4">
       {/* Container escuro transparente envolvendo TUDO */}
-      <div className="flex flex-row items-center justify-between gap-4 bg-sidebar/90 backdrop-blur-sm rounded-2xl px-6 py-5 border border-sidebar-border">
+      <div className="flex flex-row items-center justify-between gap-4 bg-[#2F302B]/90 backdrop-blur-sm rounded-2xl px-6 py-5 border border-white/10">
         {/* Coluna Esquerda - Saudação e Tema */}
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
