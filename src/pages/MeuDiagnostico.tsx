@@ -35,9 +35,9 @@ export default function MeuDiagnostico() {
     <div className="min-h-screen bg-background">
       <main className="container py-6 space-y-8">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Meu Diagnóstico</h1>
-        </div>
+        <h1 className="text-4xl font-bold tracking-tight text-foreground">
+          Meu <span className="text-primary">Diagnóstico</span>
+        </h1>
 
         {/* Grid com Diagnóstico */}
         <div className="grid gap-6">
