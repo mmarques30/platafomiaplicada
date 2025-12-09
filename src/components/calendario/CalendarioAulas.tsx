@@ -58,7 +58,7 @@ export function CalendarioAulas() {
               )}
             </div>
             {proximaAula.descricao && (
-              <p className="text-zinc-300 mt-2">
+              <p className="text-zinc-300 mt-2 whitespace-pre-line">
                 {proximaAula.descricao}
               </p>
             )}
@@ -81,7 +81,7 @@ export function CalendarioAulas() {
                   <div className="flex-1">
                     <h4 className="font-medium text-foreground">{aula.tema}</h4>
                     {aula.descricao && (
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-muted-foreground mt-1 whitespace-pre-line">
                         {aula.descricao}
                       </p>
                     )}
