@@ -50,6 +50,7 @@ export function CalendarioVisaoCalendario() {
           className="pointer-events-auto w-full"
           classNames={{
             day_selected: "bg-transparent ring-2 ring-offset-2 ring-offset-background ring-primary/70 text-foreground",
+            cell: "h-12 flex-1 text-center text-base p-0 relative flex items-center justify-center focus-within:relative focus-within:z-20",
           }}
           modifiers={{
             hasClass: datasComAulas,
