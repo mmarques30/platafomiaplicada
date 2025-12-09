@@ -20,6 +20,7 @@ import { Plus } from "lucide-react";
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
+  const { isAdmin } = useUserRole();
   const [modalFerramentaOpen, setModalFerramentaOpen] = useState(false);
 
   return (
@@ -90,8 +91,8 @@ export default function Evolucao() {
               {/* Ranking Top 3 + Lista */}
               <RankingComunidade ranking={ranking as any || []} />
 
-              {/* Estatísticas Gerais da Comunidade */}
-              <EstatisticasEngajamento ranking={ranking || []} />
+              {/* Estatísticas Gerais da Comunidade - Apenas para admins */}
+              {isAdmin && <EstatisticasEngajamento ranking={ranking || []} />}
 
               {/* Ferramentas Mais Compartilhadas */}
               <div className="space-y-4">
