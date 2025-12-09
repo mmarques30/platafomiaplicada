@@ -24,6 +24,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
   const [realizada, setRealizada] = useState(false);
   const [tipoEvento, setTipoEvento] = useState<'aula_ao_vivo' | 'qa' | 'outro'>('aula_ao_vivo');
   const [linkReuniao, setLinkReuniao] = useState("");
+  const [recorrente, setRecorrente] = useState(false);
 
   const createAula = useCreateAula();
   const updateAula = useUpdateAula();
@@ -38,6 +39,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       setRealizada(aula.realizada ?? false);
       setTipoEvento(aula.tipo_evento || 'aula_ao_vivo');
       setLinkReuniao(aula.link_reuniao || "");
+      setRecorrente(aula.recorrente ?? false);
     } else {
       setTema("");
       setDataAula("");
@@ -47,6 +49,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       setRealizada(false);
       setTipoEvento('aula_ao_vivo');
       setLinkReuniao("");
+      setRecorrente(false);
     }
   }, [aula, open]);
 
@@ -66,6 +69,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       realizada,
       tipo_evento: tipoEvento,
       link_reuniao: linkReuniao.trim() || null,
+      recorrente,
     };
 
     if (aula) {
@@ -170,10 +174,10 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
             </Label>
             <Input
               id="link_reuniao"
-              type="url"
+              type="text"
               value={linkReuniao}
               onChange={(e) => setLinkReuniao(e.target.value)}
-              placeholder="https://meet.google.com/..."
+              placeholder="meet.google.com/..."
             />
           </div>
 
@@ -193,6 +197,14 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
                 onCheckedChange={setRealizada}
               />
               <Label htmlFor="realizada">Realizada</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="recorrente"
+                checked={recorrente}
+                onCheckedChange={setRecorrente}
+              />
+              <Label htmlFor="recorrente">Recorrente</Label>
             </div>
           </div>
 

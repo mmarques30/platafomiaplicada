@@ -61,6 +61,7 @@ export type Database = {
           id: string
           link_reuniao: string | null
           realizada: boolean | null
+          recorrente: boolean | null
           tema: string
           tipo_evento: string | null
           updated_at: string | null
@@ -75,6 +76,7 @@ export type Database = {
           id?: string
           link_reuniao?: string | null
           realizada?: boolean | null
+          recorrente?: boolean | null
           tema: string
           tipo_evento?: string | null
           updated_at?: string | null
@@ -89,6 +91,7 @@ export type Database = {
           id?: string
           link_reuniao?: string | null
           realizada?: boolean | null
+          recorrente?: boolean | null
           tema?: string
           tipo_evento?: string | null
           updated_at?: string | null
