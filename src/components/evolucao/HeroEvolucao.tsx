@@ -14,7 +14,7 @@ export function HeroEvolucao() {
   const totalCertificados = certificados?.filter(c => c.status === "emitido").length || 0;
 
   return (
-    <div className="rounded-lg border border-aplicada-green-900/20 bg-aplicada-dark shadow-sm p-6">
+    <div className="rounded-xl border border-primary/30 bg-card shadow-sm p-6">
       <div className="space-y-4">
           {/* Header: Nível e Título */}
           <div className="flex items-center justify-between">
@@ -23,7 +23,7 @@ export function HeroEvolucao() {
                 <Trophy className="h-5 w-5 text-primary" />
                 <span className="text-sm text-muted-foreground">Nível {nivel}</span>
               </div>
-              <h2 className="text-2xl font-semibold text-white">{tituloNivel}</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{tituloNivel}</h2>
             </div>
             <div className="text-right">
               <p className="text-xs text-muted-foreground">Próximo nível</p>
