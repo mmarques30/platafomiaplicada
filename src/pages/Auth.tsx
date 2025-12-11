@@ -292,27 +292,31 @@ export default function Auth() {
           </div>
           
           {/* LADO DIREITO: Carrossel de Imagens */}
-          <div className="hidden lg:block w-1/2 relative overflow-hidden">
-            <Carousel
-              setApi={setApi}
-              opts={{ loop: true }}
-              plugins={[
-                Autoplay({ delay: 4000, stopOnInteraction: false })
-              ]}
-              className="w-full h-full"
-            >
-              <CarouselContent className="h-full ml-0">
-                {carouselImages.map((img, index) => (
-                  <CarouselItem key={index} className="pl-0 h-full">
-                    <img 
-                      src={img} 
-                      alt="" 
-                      className="w-full h-full object-cover"
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
+          <div className="hidden lg:block w-1/2 relative">
+            <div className="absolute inset-0">
+              <Carousel
+                setApi={setApi}
+                opts={{ loop: true }}
+                plugins={[
+                  Autoplay({ delay: 4000, stopOnInteraction: false })
+                ]}
+                className="h-full"
+              >
+                <CarouselContent className="h-full ml-0">
+                  {carouselImages.map((img, index) => (
+                    <CarouselItem key={index} className="pl-0 h-full">
+                      <div className="h-full w-full">
+                        <img 
+                          src={img} 
+                          alt="" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+            </div>
 
             {/* Indicadores de slide */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
