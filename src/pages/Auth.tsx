@@ -137,23 +137,23 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-8 bg-[#0a0a0a]">
-      <div className="w-full max-w-5xl">
+      <div className="w-full max-w-6xl">
         {/* Card principal dividido */}
-        <Card className="flex flex-col lg:flex-row overflow-hidden bg-[#1a1a1a] border-[#2a2a2a] rounded-3xl shadow-2xl">
+        <Card className="flex flex-col lg:flex-row overflow-hidden bg-[#1a1a1a] border-[#2a2a2a] rounded-xl shadow-2xl min-h-[600px]">
           
           {/* LADO ESQUERDO: Formulário */}
-          <div className="w-full lg:w-1/2 p-6 md:p-10 lg:p-12">
+          <div className="w-full lg:w-1/2 p-8 md:p-12 lg:p-14 flex flex-col justify-center">
             <Tabs defaultValue="entrar" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-[#2a2a2a] p-1 rounded-lg mb-6">
+              <TabsList className="grid w-full grid-cols-2 bg-[#2a2a2a] p-1 rounded-md mb-6">
                 <TabsTrigger 
                   value="entrar"
-                  className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#1a1a1a] data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#888]"
+                  className="rounded text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#1a1a1a] data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#888]"
                 >
                   Acessar
                 </TabsTrigger>
                 <TabsTrigger 
                   value="criar-conta"
-                  className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#1a1a1a] data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#888]"
+                  className="rounded text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-[#1a1a1a] data-[state=inactive]:bg-transparent data-[state=inactive]:text-[#888]"
                 >
                   Criar Conta Grátis
                 </TabsTrigger>
@@ -181,7 +181,7 @@ export default function Auth() {
                       type="email"
                       placeholder="seu@email.com"
                       required
-                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-md focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                     />
                   </div>
                   
@@ -194,13 +194,13 @@ export default function Auth() {
                       name="signin-password"
                       placeholder="••••••••"
                       required
-                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-md focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                     />
                   </div>
                   
                   <Button 
                     type="submit" 
-                    className="w-full h-11 bg-[#9EB038] hover:bg-[#b5c73f] text-[#1a1a1a] font-semibold rounded-lg transition-all mt-2" 
+                    className="w-full h-11 bg-[#9EB038] hover:bg-[#b5c73f] text-[#1a1a1a] font-semibold rounded-md transition-all mt-2" 
                     disabled={isLoading}
                   >
                     {isLoading ? "Acessando..." : "Acessar"}
@@ -230,7 +230,7 @@ export default function Auth() {
                       type="text"
                       placeholder="Seu nome"
                       required
-                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-md focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                     />
                   </div>
 
@@ -244,7 +244,7 @@ export default function Auth() {
                       type="email"
                       placeholder="seu@email.com"
                       required
-                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-md focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                     />
                   </div>
 
@@ -258,7 +258,7 @@ export default function Auth() {
                       type="tel"
                       placeholder="(00) 00000-0000"
                       required
-                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-md focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                     />
                   </div>
                   
@@ -272,7 +272,7 @@ export default function Auth() {
                       placeholder="Mínimo 6 caracteres"
                       required
                       minLength={6}
-                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                      className="bg-[#2a2a2a] border-[#3a3a3a] text-white placeholder:text-[#666] h-11 rounded-md focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                     />
                     <p className="text-xs text-[#666]">
                       Você vai usar essa senha para acessar depois
@@ -281,7 +281,7 @@ export default function Auth() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full h-11 bg-[#9EB038] hover:bg-[#b5c73f] text-[#1a1a1a] font-semibold rounded-lg transition-all mt-2" 
+                    className="w-full h-11 bg-[#9EB038] hover:bg-[#b5c73f] text-[#1a1a1a] font-semibold rounded-md transition-all mt-2" 
                     disabled={isLoading}
                   >
                     {isLoading ? "Criando conta..." : "Criar conta grátis"}
@@ -292,10 +292,10 @@ export default function Auth() {
           </div>
           
           {/* LADO DIREITO: Carrossel de Imagens */}
-          <div className="hidden lg:flex w-1/2 relative bg-[#242424] items-center justify-center">
+          <div className="hidden lg:block w-1/2 relative overflow-hidden">
             <Carousel
               setApi={setApi}
-              opts={{ loop: true, align: "center" }}
+              opts={{ loop: true }}
               plugins={[
                 Autoplay({ delay: 4000, stopOnInteraction: false })
               ]}
@@ -303,21 +303,19 @@ export default function Auth() {
             >
               <CarouselContent className="h-full ml-0">
                 {carouselImages.map((img, index) => (
-                  <CarouselItem key={index} className="pl-0 h-full flex items-center justify-center">
-                    <div className="w-full h-full flex items-center justify-center p-12">
-                      <img 
-                        src={img} 
-                        alt="" 
-                        className="max-w-full max-h-[400px] object-contain"
-                      />
-                    </div>
+                  <CarouselItem key={index} className="pl-0 h-full">
+                    <img 
+                      src={img} 
+                      alt="" 
+                      className="w-full h-full object-cover"
+                    />
                   </CarouselItem>
                 ))}
               </CarouselContent>
             </Carousel>
 
             {/* Indicadores de slide */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
               {carouselImages.map((_, index) => (
                 <button
                   key={index}
