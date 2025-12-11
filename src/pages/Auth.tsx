@@ -198,7 +198,7 @@ export default function Auth() {
                     />
                   </div>
                   
-                  <div className="flex justify-center mt-8">
+                  <div className="flex justify-center mt-12">
                     <Button 
                       type="submit" 
                       className="h-12 px-16 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-medium rounded-lg transition-all border border-[#3a3a3a]" 
@@ -281,7 +281,7 @@ export default function Auth() {
                     </p>
                   </div>
                   
-                  <div className="flex justify-center mt-8">
+                  <div className="flex justify-center mt-12">
                     <Button 
                       type="submit" 
                       className="h-12 px-16 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-medium rounded-lg transition-all border border-[#3a3a3a]" 
