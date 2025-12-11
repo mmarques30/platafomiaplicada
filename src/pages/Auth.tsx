@@ -161,9 +161,9 @@ export default function Auth() {
 
               {/* Aba Entrar */}
               <TabsContent value="entrar" className="mt-0">
-                <div className="space-y-2 mb-6">
+                <div className="space-y-2 mb-6 text-center">
                   <h1 className="text-2xl md:text-3xl font-semibold text-white">
-                    Bem vindo de volta
+                    Bem Vindo IAplicado
                   </h1>
                   <p className="text-[#888] text-sm">
                     Entre com seu email e senha para acessar
@@ -210,7 +210,7 @@ export default function Auth() {
 
               {/* Aba Criar Conta */}
               <TabsContent value="criar-conta" className="mt-0">
-                <div className="space-y-2 mb-6">
+                <div className="space-y-2 mb-6 text-center">
                   <h1 className="text-2xl md:text-3xl font-semibold text-white">
                     Explore a plataforma
                   </h1>
