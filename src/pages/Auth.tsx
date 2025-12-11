@@ -198,13 +198,15 @@ export default function Auth() {
                     />
                   </div>
                   
-                  <Button 
-                    type="submit" 
-                    className="w-full h-11 bg-[#9EB038] hover:bg-[#b5c73f] text-[#1a1a1a] font-semibold rounded-md transition-all mt-2" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Acessando..." : "Acessar"}
-                  </Button>
+                  <div className="flex justify-center mt-8">
+                    <Button 
+                      type="submit" 
+                      className="h-12 px-16 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-medium rounded-lg transition-all border border-[#3a3a3a]" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Acessando..." : "Acessar"}
+                    </Button>
+                  </div>
                 </form>
               </TabsContent>
 
@@ -279,13 +281,15 @@ export default function Auth() {
                     </p>
                   </div>
                   
-                  <Button 
-                    type="submit" 
-                    className="w-full h-11 bg-[#9EB038] hover:bg-[#b5c73f] text-[#1a1a1a] font-semibold rounded-md transition-all mt-2" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Criando conta..." : "Criar conta grátis"}
-                  </Button>
+                  <div className="flex justify-center mt-8">
+                    <Button 
+                      type="submit" 
+                      className="h-12 px-16 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-medium rounded-lg transition-all border border-[#3a3a3a]" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Criando conta..." : "Criar conta grátis"}
+                    </Button>
+                  </div>
                 </form>
               </TabsContent>
             </Tabs>
