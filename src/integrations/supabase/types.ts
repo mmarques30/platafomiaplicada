@@ -1489,6 +1489,7 @@ export type Database = {
       }
       ia_copie_use: {
         Row: {
+          arquivos_url: Json | null
           ativo: boolean | null
           categoria: string
           conteudo: string
@@ -1501,6 +1502,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          arquivos_url?: Json | null
           ativo?: boolean | null
           categoria: string
           conteudo: string
@@ -1513,6 +1515,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          arquivos_url?: Json | null
           ativo?: boolean | null
           categoria?: string
           conteudo?: string
