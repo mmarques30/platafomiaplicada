@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BonusMentoria, getArquivoUrls } from "@/hooks/useMentoriaBonus";
-import { Upload, FileText, Loader2, X, Plus } from "lucide-react";
+import { BonusMentoria, PublicoAlvo, getArquivoUrls, getPublicoAlvoLabel } from "@/hooks/useMentoriaBonus";
+import { FileText, Loader2, X, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type BonusModalProps = {
@@ -18,6 +18,8 @@ type BonusModalProps = {
   bonus?: BonusMentoria;
   userId?: string;
   isLoading?: boolean;
+  isGlobal?: boolean; // Nova prop para modo global
+  users?: Array<{ id: string; nome_completo: string }>; // Lista de usuários para seleção
 };
 
 type FormData = {
@@ -30,18 +32,31 @@ type FormData = {
   liberado: boolean;
 };
 
+const PUBLICO_ALVO_OPTIONS: { value: PublicoAlvo; label: string }[] = [
+  { value: 'todos', label: 'Todos os mentorados' },
+  { value: 'academy', label: 'Plano Academy' },
+  { value: 'lab', label: 'Plano Lab' },
+  { value: 'club', label: 'Plano Club' },
+  { value: 'skills', label: 'Plano Skills' },
+  { value: 'usuario_especifico', label: 'Usuário específico' },
+];
+
 export default function BonusModal({
   open,
   onOpenChange,
   onSubmit,
   bonus,
   userId,
-  isLoading
+  isLoading,
+  isGlobal = false,
+  users = []
 }: BonusModalProps) {
   const [uploading, setUploading] = useState(false);
   const [arquivoUrls, setArquivoUrls] = useState<string[]>([]);
   const [liberado, setLiberado] = useState(bonus?.liberado || false);
   const [condicaoTipo, setCondicaoTipo] = useState<'preenchimento' | 'sorteio'>(bonus?.condicao_tipo || 'preenchimento');
+  const [publicoAlvo, setPublicoAlvo] = useState<PublicoAlvo>(bonus?.publico_alvo || (isGlobal ? 'todos' : 'usuario_especifico'));
+  const [selectedUserId, setSelectedUserId] = useState<string>(bonus?.user_id || userId || '');
 
   const { register, handleSubmit, reset, setValue } = useForm<FormData>({
     defaultValues: {
@@ -69,6 +84,8 @@ export default function BonusModal({
       setArquivoUrls(getArquivoUrls(bonus.arquivo_url));
       setLiberado(bonus.liberado);
       setCondicaoTipo(bonus.condicao_tipo);
+      setPublicoAlvo(bonus.publico_alvo || 'usuario_especifico');
+      setSelectedUserId(bonus.user_id || '');
     } else {
       reset({
         nome: '',
@@ -82,17 +99,20 @@ export default function BonusModal({
       setArquivoUrls([]);
       setLiberado(false);
       setCondicaoTipo('preenchimento');
+      setPublicoAlvo(isGlobal ? 'todos' : 'usuario_especifico');
+      setSelectedUserId(userId || '');
     }
-  }, [bonus, reset, open]);
+  }, [bonus, reset, open, isGlobal, userId]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !userId) return;
+    const uploadId = selectedUserId || userId || 'global';
+    if (!file) return;
 
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/${Date.now()}.${fileExt}`;
+      const fileName = `${uploadId}/${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('bonus-mentoria')
@@ -112,7 +132,6 @@ export default function BonusModal({
       console.error('Erro ao fazer upload:', error);
     } finally {
       setUploading(false);
-      // Reset input
       e.target.value = '';
     }
   };
@@ -125,7 +144,6 @@ export default function BonusModal({
     try {
       const urlParts = url.split('/');
       const fileName = urlParts[urlParts.length - 1].split('?')[0];
-      // Decode and get extension
       const decoded = decodeURIComponent(fileName);
       const ext = decoded.split('.').pop()?.toUpperCase() || 'DOC';
       return `Documento ${ext}`;
@@ -139,8 +157,9 @@ export default function BonusModal({
       ...data,
       condicao_tipo: condicaoTipo,
       liberado,
-      arquivo_url: arquivoUrls as any, // JSONB array
-      user_id: userId || bonus?.user_id
+      arquivo_url: arquivoUrls as any,
+      publico_alvo: publicoAlvo,
+      user_id: publicoAlvo === 'usuario_especifico' ? selectedUserId : null
     });
     reset();
     onOpenChange(false);
@@ -172,6 +191,55 @@ export default function BonusModal({
               rows={3}
             />
           </div>
+
+          {/* Público-alvo (apenas em modo global ou ao editar bônus global) */}
+          {(isGlobal || bonus?.publico_alvo !== 'usuario_especifico') && (
+            <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
+              <div>
+                <Label>Público-alvo *</Label>
+                <Select
+                  value={publicoAlvo}
+                  onValueChange={(v) => setPublicoAlvo(v as PublicoAlvo)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PUBLICO_ALVO_OPTIONS.map(opt => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Define quem poderá ver este bônus quando liberado
+                </p>
+              </div>
+
+              {/* Seletor de usuário específico */}
+              {publicoAlvo === 'usuario_especifico' && (
+                <div>
+                  <Label>Usuário *</Label>
+                  <Select
+                    value={selectedUserId}
+                    onValueChange={setSelectedUserId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um mentorado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map(user => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.nome_completo}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -214,7 +282,6 @@ export default function BonusModal({
           <div>
             <Label>Documentos Anexos</Label>
             <div className="mt-2 space-y-2">
-              {/* Lista de documentos anexados */}
               {arquivoUrls.map((url, index) => (
                 <div key={index} className="flex items-center gap-2 p-3 bg-muted rounded-lg">
                   <FileText className="h-5 w-5 text-primary flex-shrink-0" />
@@ -230,7 +297,6 @@ export default function BonusModal({
                 </div>
               ))}
 
-              {/* Botão de upload */}
               <label className="flex items-center gap-2 p-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
                 {uploading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -269,8 +335,8 @@ export default function BonusModal({
               <Label htmlFor="liberado" className="text-base font-medium">Status: Liberado</Label>
               <p className="text-sm text-muted-foreground">
                 {liberado 
-                  ? "O mentorado pode acessar este bônus" 
-                  : "O mentorado verá este bônus bloqueado"}
+                  ? `${publicoAlvo === 'usuario_especifico' ? 'O mentorado pode' : 'Os mentorados podem'} acessar este bônus` 
+                  : `${publicoAlvo === 'usuario_especifico' ? 'O mentorado verá' : 'Os mentorados verão'} este bônus bloqueado`}
               </p>
             </div>
             <Switch
@@ -284,7 +350,7 @@ export default function BonusModal({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={isLoading || uploading}>
+            <Button type="submit" disabled={isLoading || uploading || (publicoAlvo === 'usuario_especifico' && !selectedUserId)}>
               {isLoading ? "Salvando..." : "Salvar"}
             </Button>
           </div>

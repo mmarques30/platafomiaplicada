@@ -232,8 +232,9 @@ export type Database = {
           liberado: boolean | null
           link: string | null
           nome: string
+          publico_alvo: string
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           arquivo_url?: Json | null
@@ -247,8 +248,9 @@ export type Database = {
           liberado?: boolean | null
           link?: string | null
           nome: string
+          publico_alvo?: string
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           arquivo_url?: Json | null
@@ -262,8 +264,9 @@ export type Database = {
           liberado?: boolean | null
           link?: string | null
           nome?: string
+          publico_alvo?: string
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
