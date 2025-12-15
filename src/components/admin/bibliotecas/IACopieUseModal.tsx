@@ -8,6 +8,9 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useCreateIACopieUse, useUpdateIACopieUse } from "@/hooks/admin/useBibliotecas";
 import { FerramentasSelector } from "./FerramentasSelector";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, X, FileText, Image, Table, FileCode, Upload } from "lucide-react";
 
 interface IACopieUseModalProps {
   open: boolean;
@@ -15,16 +18,57 @@ interface IACopieUseModalProps {
   item?: any;
 }
 
+// Helper to get file icon based on extension
+const getFileIcon = (url: string) => {
+  const ext = url.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'pdf':
+      return <FileText className="h-4 w-4" />;
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+      return <Image className="h-4 w-4" />;
+    case 'csv':
+      return <Table className="h-4 w-4" />;
+    case 'html':
+    case 'htm':
+      return <FileCode className="h-4 w-4" />;
+    default:
+      return <FileText className="h-4 w-4" />;
+  }
+};
+
+// Helper to extract filename from URL
+const getFileName = (url: string) => {
+  const parts = url.split('/');
+  const filename = parts[parts.length - 1];
+  // Remove UUID prefix if present
+  const cleanName = filename.replace(/^[a-f0-9-]{36}_/, '');
+  return decodeURIComponent(cleanName);
+};
+
+// Helper to normalize arquivos_url to array
+const getArquivoUrls = (arquivosUrl: any): string[] => {
+  if (!arquivosUrl) return [];
+  if (Array.isArray(arquivosUrl)) return arquivosUrl;
+  if (typeof arquivosUrl === 'string') return [arquivosUrl];
+  return [];
+};
+
 export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalProps) {
   const { register, handleSubmit, reset, setValue } = useForm();
   const [ferramentasRecomendadas, setFerramentasRecomendadas] = useState<string[]>([]);
+  const [arquivoUrls, setArquivoUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const createItem = useCreateIACopieUse();
   const updateItem = useUpdateIACopieUse();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (item) {
       reset(item);
       setFerramentasRecomendadas(item.ferramentas_recomendadas || []);
+      setArquivoUrls(getArquivoUrls(item.arquivos_url));
     } else {
       reset({
         titulo: "",
@@ -33,16 +77,108 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
         ia_recomendada: "",
         conteudo: "",
         ferramentas_recomendadas: [],
+        arquivos_url: [],
         ativo: true,
       });
       setFerramentasRecomendadas([]);
+      setArquivoUrls([]);
     }
   }, [item, reset]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    const newUrls: string[] = [];
+
+    try {
+      for (const file of Array.from(files)) {
+        const fileExt = file.name.split('.').pop()?.toLowerCase();
+        const allowedExts = ['html', 'htm', 'pdf', 'csv', 'png'];
+        
+        if (!fileExt || !allowedExts.includes(fileExt)) {
+          toast({
+            title: "Formato não suportado",
+            description: `O arquivo ${file.name} não é suportado. Use HTML, PDF, CSV ou PNG.`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        const fileName = `${crypto.randomUUID()}_${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('ia-copie-use')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          toast({
+            title: "Erro no upload",
+            description: `Erro ao enviar ${file.name}: ${uploadError.message}`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        const { data: publicUrl } = supabase.storage
+          .from('ia-copie-use')
+          .getPublicUrl(fileName);
+
+        newUrls.push(publicUrl.publicUrl);
+      }
+
+      if (newUrls.length > 0) {
+        setArquivoUrls(prev => [...prev, ...newUrls]);
+        toast({
+          title: "Upload concluído",
+          description: `${newUrls.length} arquivo(s) enviado(s) com sucesso!`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro no upload",
+        description: "Erro inesperado ao enviar arquivos",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveFile = async (urlToRemove: string) => {
+    try {
+      // Extract filename from URL
+      const urlParts = urlToRemove.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+
+      // Delete from storage
+      await supabase.storage
+        .from('ia-copie-use')
+        .remove([fileName]);
+
+      // Update state
+      setArquivoUrls(prev => prev.filter(url => url !== urlToRemove));
+      
+      toast({
+        title: "Arquivo removido",
+        description: "Arquivo removido com sucesso!",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao remover",
+        description: "Não foi possível remover o arquivo",
+        variant: "destructive",
+      });
+    }
+  };
 
   const onSubmit = (data: any) => {
     const itemData = {
       ...data,
       ferramentas_recomendadas: ferramentasRecomendadas,
+      arquivos_url: arquivoUrls,
     };
     
     if (item) {
@@ -91,6 +227,69 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
             value={ferramentasRecomendadas}
             onChange={setFerramentasRecomendadas}
           />
+
+          {/* File Upload Section */}
+          <div className="space-y-3">
+            <Label>Arquivos Anexados (HTML, PDF, CSV, PNG)</Label>
+            
+            {/* List of uploaded files */}
+            {arquivoUrls.length > 0 && (
+              <div className="space-y-2">
+                {arquivoUrls.map((url, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-center justify-between p-2 bg-muted rounded-md"
+                  >
+                    <div className="flex items-center gap-2 text-sm truncate flex-1">
+                      {getFileIcon(url)}
+                      <span className="truncate">{getFileName(url)}</span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveFile(url)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Upload button */}
+            <div className="flex items-center gap-2">
+              <Input
+                type="file"
+                accept=".html,.htm,.pdf,.csv,.png"
+                multiple
+                onChange={handleFileUpload}
+                disabled={isUploading}
+                className="hidden"
+                id="file-upload"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => document.getElementById('file-upload')?.click()}
+                disabled={isUploading}
+                className="w-full"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Adicionar arquivo
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
 
           <div className="flex items-center space-x-2">
             <Switch

@@ -3,10 +3,48 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useIACopieUse } from "@/hooks/useFerramentas";
-import { Sparkles, Search, Cpu } from "lucide-react";
+import { Sparkles, Search, Cpu, FileText, Image, Table, FileCode, Download } from "lucide-react";
+
+// Helper to get file icon based on extension
+const getFileIcon = (url: string) => {
+  const ext = url.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'pdf':
+      return <FileText className="h-4 w-4" />;
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+      return <Image className="h-4 w-4" />;
+    case 'csv':
+      return <Table className="h-4 w-4" />;
+    case 'html':
+    case 'htm':
+      return <FileCode className="h-4 w-4" />;
+    default:
+      return <FileText className="h-4 w-4" />;
+  }
+};
+
+// Helper to extract filename from URL
+const getFileName = (url: string) => {
+  const parts = url.split('/');
+  const filename = parts[parts.length - 1];
+  // Remove UUID prefix if present
+  const cleanName = filename.replace(/^[a-f0-9-]{36}_/, '');
+  return decodeURIComponent(cleanName);
+};
+
+// Helper to normalize arquivos_url to array
+const getArquivoUrls = (arquivosUrl: any): string[] => {
+  if (!arquivosUrl) return [];
+  if (Array.isArray(arquivosUrl)) return arquivosUrl;
+  if (typeof arquivosUrl === 'string') return [arquivosUrl];
+  return [];
+};
 
 export default function IACopieUse() {
   const { data: ias, isLoading } = useIACopieUse();
@@ -80,64 +118,94 @@ export default function IACopieUse() {
         </div>
       ) : filteredIAs && filteredIAs.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredIAs.map((ia) => (
-            <Card key={ia.id} className="hover:shadow-lg transition-shadow">
-               <CardHeader>
-                 <div className="flex items-start justify-between gap-3">
-                   <div className="flex-1">
-                     <CardTitle className="text-lg mb-2">{ia.titulo}</CardTitle>
-                     <CardDescription>{ia.descricao}</CardDescription>
-                   </div>
-                   <div className="flex items-center gap-2">
-                     <Badge variant="secondary">{ia.categoria}</Badge>
-                     <FavoriteButton 
-                       tipo="ia_copie_use" 
-                       itemId={ia.id}
-                       variant="ghost"
-                     />
-                   </div>
-                 </div>
+          {filteredIAs.map((ia) => {
+            const arquivos = getArquivoUrls(ia.arquivos_url);
+            
+            return (
+              <Card key={ia.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg mb-2">{ia.titulo}</CardTitle>
+                      <CardDescription>{ia.descricao}</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">{ia.categoria}</Badge>
+                      <FavoriteButton 
+                        tipo="ia_copie_use" 
+                        itemId={ia.id}
+                        variant="ghost"
+                      />
+                    </div>
+                  </div>
 
-                 {Array.isArray(ia.ferramentas_recomendadas) && 
-                  ia.ferramentas_recomendadas.length > 0 && (
-                   <div className="mt-3 pt-3 border-t">
-                     <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                       <Cpu className="w-3 h-3" />
-                       Ferramentas onde aplicar:
-                     </p>
-                     <div className="flex gap-2 flex-wrap">
-                       {ia.ferramentas_recomendadas.map((ferramenta: string) => (
-                         <Badge 
-                           key={ferramenta} 
-                           variant="default" 
-                           className="text-xs bg-primary/10 text-primary hover:bg-primary/20"
-                         >
-                           {ferramenta}
-                         </Badge>
-                       ))}
-                     </div>
-                   </div>
-                 )}
-               </CardHeader>
-               <CardContent className="space-y-4">
-                 {ia.ia_recomendada && (
-                   <div className="text-sm">
-                     <span className="font-semibold">IA Recomendada:</span>{" "}
-                     {ia.ia_recomendada}
-                   </div>
-                 )}
-                <div className="bg-muted p-3 rounded-md">
-                  <code className="text-sm break-all">{ia.conteudo}</code>
-                </div>
-                <CopyButton
-                  content={ia.conteudo}
-                  variant="default"
-                  size="default"
-                  className="w-full"
-                />
-              </CardContent>
-            </Card>
-          ))}
+                  {Array.isArray(ia.ferramentas_recomendadas) && 
+                   ia.ferramentas_recomendadas.length > 0 && (
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                        <Cpu className="w-3 h-3" />
+                        Ferramentas onde aplicar:
+                      </p>
+                      <div className="flex gap-2 flex-wrap">
+                        {ia.ferramentas_recomendadas.map((ferramenta: string) => (
+                          <Badge 
+                            key={ferramenta} 
+                            variant="default" 
+                            className="text-xs bg-primary/10 text-primary hover:bg-primary/20"
+                          >
+                            {ferramenta}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {ia.ia_recomendada && (
+                    <div className="text-sm">
+                      <span className="font-semibold">IA Recomendada:</span>{" "}
+                      {ia.ia_recomendada}
+                    </div>
+                  )}
+                  <div className="bg-muted p-3 rounded-md">
+                    <code className="text-sm break-all">{ia.conteudo}</code>
+                  </div>
+                  <CopyButton
+                    content={ia.conteudo}
+                    variant="default"
+                    size="default"
+                    className="w-full"
+                  />
+                  
+                  {/* Attached Files Section */}
+                  {arquivos.length > 0 && (
+                    <div className="pt-3 border-t space-y-2">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Download className="w-3 h-3" />
+                        Arquivos para download:
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        {arquivos.map((url, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            className="w-full justify-start"
+                            asChild
+                          >
+                            <a href={url} target="_blank" rel="noopener noreferrer" download>
+                              {getFileIcon(url)}
+                              <span className="ml-2 truncate">{getFileName(url)}</span>
+                            </a>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       ) : (
         <Card>
