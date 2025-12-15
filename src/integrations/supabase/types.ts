@@ -270,6 +270,48 @@ export type Database = {
         }
         Relationships: []
       }
+      bonus_usuarios_elegiveis: {
+        Row: {
+          bonus_id: string
+          created_at: string | null
+          data_liberacao: string | null
+          id: string
+          liberado: boolean | null
+          user_id: string
+        }
+        Insert: {
+          bonus_id: string
+          created_at?: string | null
+          data_liberacao?: string | null
+          id?: string
+          liberado?: boolean | null
+          user_id: string
+        }
+        Update: {
+          bonus_id?: string
+          created_at?: string | null
+          data_liberacao?: string | null
+          id?: string
+          liberado?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonus_usuarios_elegiveis_bonus_id_fkey"
+            columns: ["bonus_id"]
+            isOneToOne: false
+            referencedRelation: "bonus_mentoria"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bonus_usuarios_elegiveis_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       button_click_logs: {
         Row: {
           button_type: string
