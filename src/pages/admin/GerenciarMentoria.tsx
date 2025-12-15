@@ -12,9 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw, Route, Gift, Lock, CheckCircle, Pencil, Trash2, ExternalLink, FileDown } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
-import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
 import { ProcessoRoadmap } from "@/components/admin/mentoria/ProcessoRoadmap";
-import { CategoriasQATab } from "@/components/admin/mentoria/CategoriasQATab";
 import BonusGlobaisTab from "@/components/admin/mentoria/BonusGlobaisTab";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
@@ -166,7 +164,7 @@ export default function GerenciarMentoria() {
         </Card>
 
         <Tabs defaultValue="bonus-globais" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="bonus-globais">
               <Gift className="h-4 w-4 mr-2" />
               Bônus Globais
@@ -187,9 +185,6 @@ export default function GerenciarMentoria() {
               <CheckSquare className="h-4 w-4 mr-2" />
               Tarefas
             </TabsTrigger>
-            <TabsTrigger value="duvidas">
-              Dúvidas
-            </TabsTrigger>
             <TabsTrigger value="sessoes">
               <Calendar className="h-4 w-4 mr-2" />
               Sessões
@@ -197,9 +192,6 @@ export default function GerenciarMentoria() {
             <TabsTrigger value="recursos">
               <BookOpen className="h-4 w-4 mr-2" />
               Recursos
-            </TabsTrigger>
-            <TabsTrigger value="categorias-qa">
-              Q&A
             </TabsTrigger>
           </TabsList>
 
@@ -313,10 +305,6 @@ export default function GerenciarMentoria() {
 
             <TabsContent value="tarefas" className="space-y-4">
               <TarefasAdmin userId={selectedUserId} />
-            </TabsContent>
-
-            <TabsContent value="duvidas" className="space-y-4">
-              <GerenciarDuvidas userId={selectedUserId} />
             </TabsContent>
 
             <TabsContent value="sessoes" className="space-y-4">
@@ -509,10 +497,6 @@ export default function GerenciarMentoria() {
                   )}
                 </div>
               </div>
-            </TabsContent>
-
-            <TabsContent value="categorias-qa" className="space-y-4">
-              <CategoriasQATab />
             </TabsContent>
               </>
             )}

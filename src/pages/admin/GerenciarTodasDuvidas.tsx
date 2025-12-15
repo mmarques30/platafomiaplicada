@@ -19,11 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useTodasDuvidas } from "@/hooks/useTodasDuvidas";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { MessageCircle, Search, AlertCircle, CheckCircle2, Clock, Video } from "lucide-react";
+import { MessageCircle, Search, AlertCircle, CheckCircle2, Clock, Video, Settings, ChevronDown } from "lucide-react";
 import { ResponderDuvidaModal } from "@/components/admin/mentoria/ResponderDuvidaModal";
+import { CategoriasQATab } from "@/components/admin/mentoria/CategoriasQATab";
 import type { DuvidaMentoria } from "@/hooks/useDuvidasMentoria";
 
 export default function GerenciarTodasDuvidas() {
@@ -122,9 +125,31 @@ export default function GerenciarTodasDuvidas() {
           Central de Dúvidas
         </h1>
         <p className="text-muted-foreground">
-          Gerencie todas as dúvidas dos mentorados em um só lugar
+          Gerencie todas as dúvidas dos mentorados e categorias Q&A
         </p>
       </div>
+
+      {/* Categorias Q&A - Collapsible */}
+      <Collapsible>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Gerenciar Categorias Q&A
+                </span>
+                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
+              <CategoriasQATab />
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
