@@ -5,7 +5,6 @@ import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useMentoriaRecursos } from "@/hooks/useMentoriaRecursos";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import { useMentoriaBonus, BonusMentoria, getArquivoUrls } from "@/hooks/useMentoriaBonus";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +15,7 @@ import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
 import { ProcessoRoadmap } from "@/components/admin/mentoria/ProcessoRoadmap";
 import { CategoriasQATab } from "@/components/admin/mentoria/CategoriasQATab";
+import BonusGlobaisTab from "@/components/admin/mentoria/BonusGlobaisTab";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import RecursoModal from "@/components/admin/mentoria/RecursoModal";
@@ -165,39 +165,48 @@ export default function GerenciarMentoria() {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="diagnostico" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-8">
+        <Tabs defaultValue="bonus-globais" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-9">
+            <TabsTrigger value="bonus-globais">
+              <Gift className="h-4 w-4 mr-2" />
+              Bônus Globais
+            </TabsTrigger>
             <TabsTrigger value="diagnostico">
               <FileText className="h-4 w-4 mr-2" />
               Diagnóstico
             </TabsTrigger>
-              <TabsTrigger value="roadmap">
-                <Route className="h-4 w-4 mr-2" />
-                Roadmap
-              </TabsTrigger>
-              <TabsTrigger value="projetos">
-                <FolderKanban className="h-4 w-4 mr-2" />
-                Projetos
-              </TabsTrigger>
-              <TabsTrigger value="tarefas">
-                <CheckSquare className="h-4 w-4 mr-2" />
-                Tarefas
-              </TabsTrigger>
-              <TabsTrigger value="duvidas">
-                Dúvidas
-              </TabsTrigger>
-              <TabsTrigger value="sessoes">
-                <Calendar className="h-4 w-4 mr-2" />
-                Sessões
-              </TabsTrigger>
-              <TabsTrigger value="recursos">
-                <BookOpen className="h-4 w-4 mr-2" />
-                Recursos
-              </TabsTrigger>
-              <TabsTrigger value="categorias-qa">
-                Categorias Q&A
-              </TabsTrigger>
-            </TabsList>
+            <TabsTrigger value="roadmap">
+              <Route className="h-4 w-4 mr-2" />
+              Roadmap
+            </TabsTrigger>
+            <TabsTrigger value="projetos">
+              <FolderKanban className="h-4 w-4 mr-2" />
+              Projetos
+            </TabsTrigger>
+            <TabsTrigger value="tarefas">
+              <CheckSquare className="h-4 w-4 mr-2" />
+              Tarefas
+            </TabsTrigger>
+            <TabsTrigger value="duvidas">
+              Dúvidas
+            </TabsTrigger>
+            <TabsTrigger value="sessoes">
+              <Calendar className="h-4 w-4 mr-2" />
+              Sessões
+            </TabsTrigger>
+            <TabsTrigger value="recursos">
+              <BookOpen className="h-4 w-4 mr-2" />
+              Recursos
+            </TabsTrigger>
+            <TabsTrigger value="categorias-qa">
+              Q&A
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Bônus Globais - não requer seleção de usuário */}
+          <TabsContent value="bonus-globais" className="space-y-4">
+            <BonusGlobaisTab />
+          </TabsContent>
 
             {selectedUserId && (
               <>
