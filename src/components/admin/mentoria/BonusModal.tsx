@@ -7,19 +7,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BonusMentoria, PublicoAlvo, getArquivoUrls, getPublicoAlvoLabel } from "@/hooks/useMentoriaBonus";
-import { FileText, Loader2, X, Plus } from "lucide-react";
+import { BonusMentoria, PublicoAlvo, getArquivoUrls } from "@/hooks/useMentoriaBonus";
+import { FileText, Loader2, X, Plus, UserPlus, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+type UsuarioElegivel = {
+  user_id: string;
+  liberado: boolean;
+  nome_completo?: string;
+};
 
 type BonusModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Partial<BonusMentoria>) => void;
+  onSubmit: (data: Partial<BonusMentoria> & { usuarios_elegiveis?: UsuarioElegivel[] }) => void;
   bonus?: BonusMentoria;
   userId?: string;
   isLoading?: boolean;
-  isGlobal?: boolean; // Nova prop para modo global
-  users?: Array<{ id: string; nome_completo: string }>; // Lista de usuários para seleção
+  isGlobal?: boolean;
+  users?: Array<{ id: string; nome_completo: string }>;
 };
 
 type FormData = {
@@ -38,7 +46,7 @@ const PUBLICO_ALVO_OPTIONS: { value: PublicoAlvo; label: string }[] = [
   { value: 'lab', label: 'Plano Lab' },
   { value: 'club', label: 'Plano Club' },
   { value: 'skills', label: 'Plano Skills' },
-  { value: 'usuario_especifico', label: 'Usuário específico' },
+  { value: 'usuarios_especificos', label: 'Usuários específicos (liberação individual)' },
 ];
 
 export default function BonusModal({
@@ -57,6 +65,10 @@ export default function BonusModal({
   const [condicaoTipo, setCondicaoTipo] = useState<'preenchimento' | 'sorteio'>(bonus?.condicao_tipo || 'preenchimento');
   const [publicoAlvo, setPublicoAlvo] = useState<PublicoAlvo>(bonus?.publico_alvo || (isGlobal ? 'todos' : 'usuario_especifico'));
   const [selectedUserId, setSelectedUserId] = useState<string>(bonus?.user_id || userId || '');
+  
+  // Multi-select users state
+  const [usuariosElegiveis, setUsuariosElegiveis] = useState<UsuarioElegivel[]>([]);
+  const [userSearchOpen, setUserSearchOpen] = useState(false);
 
   const { register, handleSubmit, reset, setValue } = useForm<FormData>({
     defaultValues: {
@@ -86,6 +98,19 @@ export default function BonusModal({
       setCondicaoTipo(bonus.condicao_tipo);
       setPublicoAlvo(bonus.publico_alvo || 'usuario_especifico');
       setSelectedUserId(bonus.user_id || '');
+      
+      // Carregar usuários elegíveis se for usuarios_especificos
+      if (bonus.publico_alvo === 'usuarios_especificos' && bonus.usuarios_elegiveis) {
+        setUsuariosElegiveis(
+          bonus.usuarios_elegiveis.map(u => ({
+            user_id: u.user_id,
+            liberado: u.liberado,
+            nome_completo: u.user?.nome_completo
+          }))
+        );
+      } else {
+        setUsuariosElegiveis([]);
+      }
     } else {
       reset({
         nome: '',
@@ -101,6 +126,7 @@ export default function BonusModal({
       setCondicaoTipo('preenchimento');
       setPublicoAlvo(isGlobal ? 'todos' : 'usuario_especifico');
       setSelectedUserId(userId || '');
+      setUsuariosElegiveis([]);
     }
   }, [bonus, reset, open, isGlobal, userId]);
 
@@ -120,10 +146,9 @@ export default function BonusModal({
 
       if (uploadError) throw uploadError;
 
-      // Get signed URL for private bucket
       const { data } = await supabase.storage
         .from('bonus-mentoria')
-        .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365);
 
       if (data?.signedUrl) {
         setArquivoUrls(prev => [...prev, data.signedUrl]);
@@ -152,18 +177,51 @@ export default function BonusModal({
     }
   };
 
+  // Add user to eligible list
+  const addUsuarioElegivel = (user: { id: string; nome_completo: string }) => {
+    if (!usuariosElegiveis.find(u => u.user_id === user.id)) {
+      setUsuariosElegiveis(prev => [...prev, {
+        user_id: user.id,
+        liberado: false,
+        nome_completo: user.nome_completo
+      }]);
+    }
+    setUserSearchOpen(false);
+  };
+
+  // Remove user from eligible list
+  const removeUsuarioElegivel = (userId: string) => {
+    setUsuariosElegiveis(prev => prev.filter(u => u.user_id !== userId));
+  };
+
+  // Toggle user liberation
+  const toggleUsuarioLiberado = (userId: string) => {
+    setUsuariosElegiveis(prev => prev.map(u => 
+      u.user_id === userId ? { ...u, liberado: !u.liberado } : u
+    ));
+  };
+
   const handleFormSubmit = (data: FormData) => {
-    onSubmit({
+    const submitData: Partial<BonusMentoria> & { usuarios_elegiveis?: UsuarioElegivel[] } = {
       ...data,
       condicao_tipo: condicaoTipo,
-      liberado,
+      liberado: publicoAlvo === 'usuarios_especificos' ? false : liberado,
       arquivo_url: arquivoUrls as any,
       publico_alvo: publicoAlvo,
       user_id: publicoAlvo === 'usuario_especifico' ? selectedUserId : null
-    });
+    };
+
+    // Adicionar usuários elegíveis se for usuarios_especificos
+    if (publicoAlvo === 'usuarios_especificos') {
+      submitData.usuarios_elegiveis = usuariosElegiveis;
+    }
+
+    onSubmit(submitData);
     reset();
     onOpenChange(false);
   };
+
+  const availableUsers = users.filter(u => !usuariosElegiveis.find(e => e.user_id === u.id));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -192,14 +250,19 @@ export default function BonusModal({
             />
           </div>
 
-          {/* Público-alvo (apenas em modo global ou ao editar bônus global) */}
-          {(isGlobal || bonus?.publico_alvo !== 'usuario_especifico') && (
+          {/* Público-alvo (apenas em modo global) */}
+          {isGlobal && (
             <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
               <div>
                 <Label>Público-alvo *</Label>
                 <Select
                   value={publicoAlvo}
-                  onValueChange={(v) => setPublicoAlvo(v as PublicoAlvo)}
+                  onValueChange={(v) => {
+                    setPublicoAlvo(v as PublicoAlvo);
+                    if (v !== 'usuarios_especificos') {
+                      setUsuariosElegiveis([]);
+                    }
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -213,29 +276,117 @@ export default function BonusModal({
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Define quem poderá ver este bônus quando liberado
+                  {publicoAlvo === 'usuarios_especificos' 
+                    ? 'Selecione usuários específicos e libere individualmente'
+                    : 'Define quem poderá ver este bônus quando liberado'}
                 </p>
               </div>
 
-              {/* Seletor de usuário específico */}
-              {publicoAlvo === 'usuario_especifico' && (
-                <div>
-                  <Label>Usuário *</Label>
-                  <Select
-                    value={selectedUserId}
-                    onValueChange={setSelectedUserId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um mentorado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users.map(user => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.nome_completo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {/* Multi-select de usuários específicos */}
+              {publicoAlvo === 'usuarios_especificos' && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Usuários Elegíveis</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setUserSearchOpen(!userSearchOpen)}
+                    >
+                      <UserPlus className="h-4 w-4 mr-1" />
+                      Adicionar
+                    </Button>
+                  </div>
+
+                  {/* Lista de seleção de usuários */}
+                  {userSearchOpen && (
+                    <div className="border rounded-lg p-2 max-h-48 overflow-y-auto">
+                      {availableUsers.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-2">
+                          Todos os usuários já foram adicionados
+                        </p>
+                      ) : (
+                        <div className="space-y-1">
+                          {availableUsers.map(user => (
+                            <Button
+                              key={user.id}
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={() => addUsuarioElegivel(user)}
+                            >
+                              <Plus className="h-3 w-3 mr-2" />
+                              {user.nome_completo}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Lista de usuários elegíveis com toggle */}
+                  {usuariosElegiveis.length > 0 ? (
+                    <ScrollArea className="max-h-48">
+                      <div className="space-y-2">
+                        {usuariosElegiveis.map(u => {
+                          const userName = u.nome_completo || users.find(usr => usr.id === u.user_id)?.nome_completo || 'Usuário';
+                          return (
+                            <div 
+                              key={u.user_id} 
+                              className={`flex items-center justify-between p-2 rounded-lg border ${
+                                u.liberado ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : 'bg-muted/50'
+                              }`}
+                            >
+                              <span className="text-sm font-medium">{userName}</span>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  type="button"
+                                  variant={u.liberado ? "default" : "outline"}
+                                  size="sm"
+                                  onClick={() => toggleUsuarioLiberado(u.user_id)}
+                                  className="h-7 px-2"
+                                >
+                                  {u.liberado ? (
+                                    <>
+                                      <Check className="h-3 w-3 mr-1" />
+                                      Liberado
+                                    </>
+                                  ) : (
+                                    'Liberar'
+                                  )}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeUsuarioElegivel(u.user_id)}
+                                  className="h-7 w-7 p-0"
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </ScrollArea>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4 border rounded-lg">
+                      Nenhum usuário adicionado. Clique em "Adicionar" para selecionar.
+                    </p>
+                  )}
+
+                  {usuariosElegiveis.length > 0 && (
+                    <div className="flex gap-2 text-xs text-muted-foreground">
+                      <Badge variant="outline">
+                        {usuariosElegiveis.length} usuário(s)
+                      </Badge>
+                      <Badge variant="default" className="bg-green-600">
+                        {usuariosElegiveis.filter(u => u.liberado).length} liberado(s)
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -330,27 +481,45 @@ export default function BonusModal({
             />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-            <div>
-              <Label htmlFor="liberado" className="text-base font-medium">Status: Liberado</Label>
-              <p className="text-sm text-muted-foreground">
-                {liberado 
-                  ? `${publicoAlvo === 'usuario_especifico' ? 'O mentorado pode' : 'Os mentorados podem'} acessar este bônus` 
-                  : `${publicoAlvo === 'usuario_especifico' ? 'O mentorado verá' : 'Os mentorados verão'} este bônus bloqueado`}
+          {/* Status liberado (não mostrar para usuarios_especificos) */}
+          {publicoAlvo !== 'usuarios_especificos' && (
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+              <div>
+                <Label htmlFor="liberado" className="text-base font-medium">Status: Liberado</Label>
+                <p className="text-sm text-muted-foreground">
+                  {liberado 
+                    ? 'Os mentorados podem acessar este bônus' 
+                    : 'Os mentorados verão este bônus bloqueado'}
+                </p>
+              </div>
+              <Switch
+                id="liberado"
+                checked={liberado}
+                onCheckedChange={setLiberado}
+              />
+            </div>
+          )}
+
+          {publicoAlvo === 'usuarios_especificos' && (
+            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                A liberação é individual para cada usuário. Use os botões "Liberar" ao lado de cada nome.
               </p>
             </div>
-            <Switch
-              id="liberado"
-              checked={liberado}
-              onCheckedChange={setLiberado}
-            />
-          </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={isLoading || uploading || (publicoAlvo === 'usuario_especifico' && !selectedUserId)}>
+            <Button 
+              type="submit" 
+              disabled={
+                isLoading || 
+                uploading || 
+                (publicoAlvo === 'usuarios_especificos' && usuariosElegiveis.length === 0)
+              }
+            >
               {isLoading ? "Salvando..." : "Salvar"}
             </Button>
           </div>
