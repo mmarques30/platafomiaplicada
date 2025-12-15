@@ -222,7 +222,7 @@ export default function BonusModal({
                     type="file"
                     className="hidden"
                     onChange={handleFileUpload}
-                    accept=".pdf,.doc,.docx,.txt,.zip"
+                    accept=".pdf,.doc,.docx,.txt,.zip,.html,.htm"
                     disabled={uploading}
                   />
                 </label>
