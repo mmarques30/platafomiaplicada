@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Wrench, Search, ExternalLink, Loader2, BookOpen, ArrowLeft, Gift, Lock, FileDown, Copy, Check } from "lucide-react";
 import { useMentoriaRecursos } from "@/hooks/useMentoriaRecursos";
-import { useMentoriaBonus } from "@/hooks/useMentoriaBonus";
+import { useMentoriaBonus, getArquivoUrls } from "@/hooks/useMentoriaBonus";
 import {
   Collapsible,
   CollapsibleContent,
@@ -74,66 +74,69 @@ export default function MentoriaRecursos() {
           {/* Bônus Liberados */}
           {bonusLiberados.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              {bonusLiberados.map((bonusItem) => (
-                <Card key={bonusItem.id} className="border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10">
-                  <CardHeader>
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                        <Gift className="h-5 w-5 text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{bonusItem.nome}</CardTitle>
-                        <Badge variant="default" className="mt-1 bg-green-600">
-                          Liberado
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground">{bonusItem.descricao}</p>
-                    
-                    <div className="flex flex-wrap gap-2">
-                      {bonusItem.link && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={bonusItem.link} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Acessar
-                          </a>
-                        </Button>
-                      )}
-                      {bonusItem.arquivo_url && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={bonusItem.arquivo_url} target="_blank" rel="noopener noreferrer">
-                            <FileDown className="h-4 w-4 mr-2" />
-                            Baixar Documento
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-
-                    {bonusItem.comando_uso && (
-                      <div className="relative">
-                        <div className="p-3 bg-muted rounded-lg pr-12">
-                          <p className="text-xs font-medium text-muted-foreground mb-2">Como usar:</p>
-                          <p className="text-sm whitespace-pre-wrap">{bonusItem.comando_uso}</p>
+              {bonusLiberados.map((bonusItem) => {
+                const arquivos = getArquivoUrls(bonusItem.arquivo_url);
+                return (
+                  <Card key={bonusItem.id} className="border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10">
+                    <CardHeader>
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                          <Gift className="h-5 w-5 text-green-600" />
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-2 right-2"
-                          onClick={() => handleCopyComando(bonusItem.comando_uso!, bonusItem.id)}
-                        >
-                          {copiedId === bonusItem.id ? (
-                            <Check className="h-4 w-4 text-green-600" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{bonusItem.nome}</CardTitle>
+                          <Badge variant="default" className="mt-1 bg-green-600">
+                            Liberado
+                          </Badge>
+                        </div>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">{bonusItem.descricao}</p>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        {bonusItem.link && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={bonusItem.link} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Acessar
+                            </a>
+                          </Button>
+                        )}
+                        {arquivos.map((url, index) => (
+                          <Button key={index} variant="outline" size="sm" asChild>
+                            <a href={url} target="_blank" rel="noopener noreferrer">
+                              <FileDown className="h-4 w-4 mr-2" />
+                              {arquivos.length > 1 ? `Documento ${index + 1}` : 'Baixar Documento'}
+                            </a>
+                          </Button>
+                        ))}
+                      </div>
+
+                      {bonusItem.comando_uso && (
+                        <div className="relative">
+                          <div className="p-3 bg-muted rounded-lg pr-12">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Como usar:</p>
+                            <p className="text-sm whitespace-pre-wrap">{bonusItem.comando_uso}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-2 right-2"
+                            onClick={() => handleCopyComando(bonusItem.comando_uso!, bonusItem.id)}
+                          >
+                            {copiedId === bonusItem.id ? (
+                              <Check className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           )}
 

@@ -221,7 +221,7 @@ export type Database = {
       }
       bonus_mentoria: {
         Row: {
-          arquivo_url: string | null
+          arquivo_url: Json | null
           comando_uso: string | null
           condicao_descricao: string | null
           condicao_tipo: string
@@ -236,7 +236,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          arquivo_url?: string | null
+          arquivo_url?: Json | null
           comando_uso?: string | null
           condicao_descricao?: string | null
           condicao_tipo?: string
@@ -251,7 +251,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          arquivo_url?: string | null
+          arquivo_url?: Json | null
           comando_uso?: string | null
           condicao_descricao?: string | null
           condicao_tipo?: string
