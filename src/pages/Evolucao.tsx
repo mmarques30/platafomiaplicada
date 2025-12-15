@@ -9,14 +9,18 @@ import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
 import { HeroComunidade } from "@/components/evolucao/HeroComunidade";
 import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndamentoCards";
 import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
+import { BonusEvolucao } from "@/components/evolucao/BonusEvolucao";
 import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
+import { useUserPlan } from "@/hooks/useUserPlan";
 
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
+  const { isAcademy } = useUserPlan();
   
   const [modalFerramentaOpen, setModalFerramentaOpen] = useState(false);
+
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -55,6 +59,7 @@ export default function Evolucao() {
           <HeroEvolucao />
           <TrilhasEmAndamentoCards />
           <VitrineConquistas />
+          {isAcademy && <BonusEvolucao />}
         </TabsContent>
 
         {/* ABA 2: EVOLUÇÃO DA COMUNIDADE */}
