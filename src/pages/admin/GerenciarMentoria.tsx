@@ -4,12 +4,13 @@ import { useUsers } from "@/hooks/admin/useUsers";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useMentoriaRecursos } from "@/hooks/useMentoriaRecursos";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
+import { useMentoriaBonus, BonusMentoria } from "@/hooks/useMentoriaBonus";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw, Route } from "lucide-react";
+import { Plus, Users, Target, Calendar, BookOpen, FolderKanban, FileText, CheckSquare, RefreshCw, Route, Gift, Lock, CheckCircle, Pencil, Trash2, ExternalLink, FileDown } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { GerenciarDuvidas } from "@/components/admin/mentoria/GerenciarDuvidas";
@@ -19,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import RecursoModal from "@/components/admin/mentoria/RecursoModal";
 import ProjetoModal from "@/components/admin/mentoria/ProjetoModal";
+import BonusModal from "@/components/admin/mentoria/BonusModal";
 import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
 import { RecursoMentoria } from "@/hooks/useMentoriaRecursos";
 import { ProjetoMentoria } from "@/hooks/useMentoriaProjetos";
@@ -26,6 +28,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import { formatProjetoTitulo } from "@/lib/utils";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export default function GerenciarMentoria() {
   const queryClient = useQueryClient();
@@ -36,14 +39,17 @@ export default function GerenciarMentoria() {
   const { sessoes, createSessao, updateSessao, isCreating: isCreatingSessao, isUpdating: isUpdatingSessao } = useMentoriaSessoes(selectedUserId);
   const { recursos, createRecurso, updateRecurso, deleteRecurso, isCreating: isCreatingRecurso, isUpdating: isUpdatingRecurso } = useMentoriaRecursos(selectedUserId);
   const { projetos, createProjeto, updateProjeto, isCreating: isCreatingProjeto, isUpdating: isUpdatingProjeto } = useMentoriaProjetos(selectedUserId);
+  const { bonus, createBonus, updateBonus, deleteBonus, isCreating: isCreatingBonus, isUpdating: isUpdatingBonus, isDeleting: isDeletingBonus } = useMentoriaBonus(selectedUserId);
 
   const [sessaoModalOpen, setSessaoModalOpen] = useState(false);
   const [recursoModalOpen, setRecursoModalOpen] = useState(false);
   const [projetoModalOpen, setProjetoModalOpen] = useState(false);
+  const [bonusModalOpen, setBonusModalOpen] = useState(false);
 
   const [editingSessao, setEditingSessao] = useState<SessaoMentoria | undefined>();
   const [editingRecurso, setEditingRecurso] = useState<RecursoMentoria | undefined>();
   const [editingProjeto, setEditingProjeto] = useState<ProjetoMentoria | undefined>();
+  const [editingBonus, setEditingBonus] = useState<BonusMentoria | undefined>();
 
   const selectedUser = users.find(u => u.id === selectedUserId);
 
@@ -101,6 +107,26 @@ export default function GerenciarMentoria() {
       updateProjeto({ ...data, id: editingProjeto.id });
       setEditingProjeto(undefined);
     }
+  };
+
+  const handleCreateBonus = (data: Partial<BonusMentoria>) => {
+    createBonus(data);
+  };
+
+  const handleEditBonus = (bonusItem: BonusMentoria) => {
+    setEditingBonus(bonusItem);
+    setBonusModalOpen(true);
+  };
+
+  const handleUpdateBonus = (data: Partial<BonusMentoria>) => {
+    if (editingBonus) {
+      updateBonus({ ...data, id: editingBonus.id });
+      setEditingBonus(undefined);
+    }
+  };
+
+  const handleDeleteBonus = (id: string) => {
+    deleteBonus(id);
   };
 
   return (
@@ -319,34 +345,160 @@ export default function GerenciarMentoria() {
               </div>
             </TabsContent>
 
-            <TabsContent value="recursos" className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Recursos de {selectedUser?.nome_completo}</h2>
-                <Button onClick={() => { setEditingRecurso(undefined); setRecursoModalOpen(true); }}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Recurso
-                </Button>
+            <TabsContent value="recursos" className="space-y-6">
+              {/* Recursos Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-bold">Recursos de {selectedUser?.nome_completo}</h2>
+                  <Button onClick={() => { setEditingRecurso(undefined); setRecursoModalOpen(true); }}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Recurso
+                  </Button>
+                </div>
+
+                <div className="grid gap-4">
+                  {recursos.map((recurso) => (
+                    <Card key={recurso.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditRecurso(recurso)}>
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <CardTitle className="text-lg">{recurso.nome}</CardTitle>
+                          <Badge>{recurso.categoria}</Badge>
+                        </div>
+                        <CardDescription>{recurso.descricao}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">{recurso.para_que_serve}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {recursos.length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">Nenhum recurso cadastrado</p>
+                  )}
+                </div>
               </div>
 
-              <div className="grid gap-4">
-                {recursos.map((recurso) => (
-                  <Card key={recurso.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditRecurso(recurso)}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg">{recurso.nome}</CardTitle>
-                        <Badge>{recurso.categoria}</Badge>
-                      </div>
-                      <CardDescription>{recurso.descricao}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">{recurso.para_que_serve}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+              {/* Bônus Condicionados Section */}
+              <div className="space-y-4 pt-6 border-t">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Gift className="h-5 w-5 text-primary" />
+                    <h2 className="text-2xl font-bold">Bônus Condicionados</h2>
+                  </div>
+                  <Button onClick={() => { setEditingBonus(undefined); setBonusModalOpen(true); }}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Bônus
+                  </Button>
+                </div>
 
-                {recursos.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Nenhum recurso cadastrado</p>
-                )}
+                <div className="grid gap-4">
+                  {bonus.map((bonusItem) => (
+                    <Card key={bonusItem.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${bonusItem.liberado ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted'}`}>
+                              {bonusItem.liberado ? (
+                                <CheckCircle className="h-5 w-5 text-green-600" />
+                              ) : (
+                                <Lock className="h-5 w-5 text-muted-foreground" />
+                              )}
+                            </div>
+                            <div>
+                              <CardTitle className="text-lg">{bonusItem.nome}</CardTitle>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant={bonusItem.condicao_tipo === 'sorteio' ? 'secondary' : 'outline'}>
+                                  {bonusItem.condicao_tipo === 'sorteio' ? 'Sorteio' : 'Preenchimento'}
+                                </Badge>
+                                <Badge variant={bonusItem.liberado ? 'default' : 'destructive'}>
+                                  {bonusItem.liberado ? 'Liberado' : 'Bloqueado'}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => handleEditBonus(bonusItem)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Excluir bônus?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Tem certeza que deseja excluir "{bonusItem.nome}"? Esta ação não pode ser desfeita.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDeleteBonus(bonusItem.id)}>
+                                    Excluir
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                        <CardDescription>{bonusItem.descricao}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3 text-sm">
+                          {bonusItem.condicao_descricao && (
+                            <p><strong>Condição:</strong> {bonusItem.condicao_descricao}</p>
+                          )}
+                          
+                          <div className="flex flex-wrap gap-2">
+                            {bonusItem.link && (
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={bonusItem.link} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  Link
+                                </a>
+                              </Button>
+                            )}
+                            {bonusItem.arquivo_url && (
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={bonusItem.arquivo_url} target="_blank" rel="noopener noreferrer">
+                                  <FileDown className="h-3 w-3 mr-1" />
+                                  Documento
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+
+                          {bonusItem.comando_uso && (
+                            <div className="p-3 bg-muted rounded-lg">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">Comando de uso:</p>
+                              <p className="text-sm whitespace-pre-wrap line-clamp-3">{bonusItem.comando_uso}</p>
+                            </div>
+                          )}
+
+                          {bonusItem.liberado && bonusItem.data_liberacao && (
+                            <p className="text-xs text-muted-foreground">
+                              Liberado em {format(new Date(bonusItem.data_liberacao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                            </p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {bonus.length === 0 && (
+                    <Card>
+                      <CardContent className="py-8 text-center">
+                        <Gift className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-muted-foreground">Nenhum bônus cadastrado</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Adicione bônus condicionados a preenchimento ou sorteio
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
               </div>
             </TabsContent>
 
@@ -393,6 +545,18 @@ export default function GerenciarMentoria() {
         userId={selectedUserId}
         isLoading={isCreatingProjeto || isUpdatingProjeto}
         isAdmin={true}
+      />
+
+      <BonusModal
+        open={bonusModalOpen}
+        onOpenChange={(open) => {
+          setBonusModalOpen(open);
+          if (!open) setEditingBonus(undefined);
+        }}
+        onSubmit={editingBonus ? handleUpdateBonus : handleCreateBonus}
+        bonus={editingBonus}
+        userId={selectedUserId}
+        isLoading={isCreatingBonus || isUpdatingBonus}
       />
     </>
   );

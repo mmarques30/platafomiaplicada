@@ -219,6 +219,54 @@ export type Database = {
           },
         ]
       }
+      bonus_mentoria: {
+        Row: {
+          arquivo_url: string | null
+          comando_uso: string | null
+          condicao_descricao: string | null
+          condicao_tipo: string
+          created_at: string | null
+          data_liberacao: string | null
+          descricao: string
+          id: string
+          liberado: boolean | null
+          link: string | null
+          nome: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          comando_uso?: string | null
+          condicao_descricao?: string | null
+          condicao_tipo?: string
+          created_at?: string | null
+          data_liberacao?: string | null
+          descricao: string
+          id?: string
+          liberado?: boolean | null
+          link?: string | null
+          nome: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          comando_uso?: string | null
+          condicao_descricao?: string | null
+          condicao_tipo?: string
+          created_at?: string | null
+          data_liberacao?: string | null
+          descricao?: string
+          id?: string
+          liberado?: boolean | null
+          link?: string | null
+          nome?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       button_click_logs: {
         Row: {
           button_type: string
