@@ -9,7 +9,7 @@ export type BonusMentoria = {
   nome: string;
   descricao: string;
   link?: string;
-  arquivo_url?: string;
+  arquivo_url?: string | string[]; // Pode ser array de URLs
   comando_uso?: string;
   condicao_tipo: 'preenchimento' | 'sorteio';
   condicao_descricao?: string;
@@ -17,6 +17,13 @@ export type BonusMentoria = {
   data_liberacao?: string;
   created_at: string;
   updated_at: string;
+};
+
+// Helper para normalizar arquivo_url para array
+export const getArquivoUrls = (arquivo_url?: string | string[]): string[] => {
+  if (!arquivo_url) return [];
+  if (Array.isArray(arquivo_url)) return arquivo_url;
+  return [arquivo_url];
 };
 
 export const useMentoriaBonus = (userId?: string) => {

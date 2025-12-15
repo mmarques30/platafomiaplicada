@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BonusMentoria } from "@/hooks/useMentoriaBonus";
-import { Upload, FileText, Loader2 } from "lucide-react";
+import { BonusMentoria, getArquivoUrls } from "@/hooks/useMentoriaBonus";
+import { Upload, FileText, Loader2, X, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type BonusModalProps = {
@@ -39,7 +39,7 @@ export default function BonusModal({
   isLoading
 }: BonusModalProps) {
   const [uploading, setUploading] = useState(false);
-  const [arquivoUrl, setArquivoUrl] = useState<string | undefined>(bonus?.arquivo_url);
+  const [arquivoUrls, setArquivoUrls] = useState<string[]>([]);
   const [liberado, setLiberado] = useState(bonus?.liberado || false);
   const [condicaoTipo, setCondicaoTipo] = useState<'preenchimento' | 'sorteio'>(bonus?.condicao_tipo || 'preenchimento');
 
@@ -66,7 +66,7 @@ export default function BonusModal({
         condicao_descricao: bonus.condicao_descricao || '',
         liberado: bonus.liberado
       });
-      setArquivoUrl(bonus.arquivo_url);
+      setArquivoUrls(getArquivoUrls(bonus.arquivo_url));
       setLiberado(bonus.liberado);
       setCondicaoTipo(bonus.condicao_tipo);
     } else {
@@ -79,7 +79,7 @@ export default function BonusModal({
         condicao_descricao: '',
         liberado: false
       });
-      setArquivoUrl(undefined);
+      setArquivoUrls([]);
       setLiberado(false);
       setCondicaoTipo('preenchimento');
     }
@@ -106,12 +106,31 @@ export default function BonusModal({
         .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year
 
       if (data?.signedUrl) {
-        setArquivoUrl(data.signedUrl);
+        setArquivoUrls(prev => [...prev, data.signedUrl]);
       }
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
     } finally {
       setUploading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setArquivoUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const getFileName = (url: string): string => {
+    try {
+      const urlParts = url.split('/');
+      const fileName = urlParts[urlParts.length - 1].split('?')[0];
+      // Decode and get extension
+      const decoded = decodeURIComponent(fileName);
+      const ext = decoded.split('.').pop()?.toUpperCase() || 'DOC';
+      return `Documento ${ext}`;
+    } catch {
+      return 'Documento';
     }
   };
 
@@ -120,7 +139,7 @@ export default function BonusModal({
       ...data,
       condicao_tipo: condicaoTipo,
       liberado,
-      arquivo_url: arquivoUrl,
+      arquivo_url: arquivoUrls as any, // JSONB array
       user_id: userId || bonus?.user_id
     });
     reset();
@@ -193,40 +212,45 @@ export default function BonusModal({
           </div>
 
           <div>
-            <Label>Documento Anexo</Label>
-            <div className="mt-2">
-              {arquivoUrl ? (
-                <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                  <FileText className="h-5 w-5 text-primary" />
-                  <span className="text-sm flex-1 truncate">Documento anexado</span>
+            <Label>Documentos Anexos</Label>
+            <div className="mt-2 space-y-2">
+              {/* Lista de documentos anexados */}
+              {arquivoUrls.map((url, index) => (
+                <div key={index} className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                  <FileText className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span className="text-sm flex-1 truncate">{getFileName(url)}</span>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => setArquivoUrl(undefined)}
+                    onClick={() => handleRemoveFile(index)}
                   >
-                    Remover
+                    <X className="h-4 w-4" />
                   </Button>
                 </div>
-              ) : (
-                <label className="flex items-center gap-2 p-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
-                  {uploading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <Upload className="h-5 w-5 text-muted-foreground" />
-                  )}
-                  <span className="text-sm text-muted-foreground">
-                    {uploading ? "Enviando..." : "Clique para anexar documento"}
-                  </span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                    accept=".pdf,.doc,.docx,.txt,.zip,.html,.htm"
-                    disabled={uploading}
-                  />
-                </label>
-              )}
+              ))}
+
+              {/* Botão de upload */}
+              <label className="flex items-center gap-2 p-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                {uploading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Plus className="h-5 w-5 text-muted-foreground" />
+                )}
+                <span className="text-sm text-muted-foreground">
+                  {uploading ? "Enviando..." : arquivoUrls.length > 0 ? "Adicionar outro documento" : "Clique para anexar documento"}
+                </span>
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  accept=".pdf,.doc,.docx,.txt,.zip,.html,.htm"
+                  disabled={uploading}
+                />
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Formatos aceitos: PDF, DOC, DOCX, TXT, ZIP, HTML
+              </p>
             </div>
           </div>
 

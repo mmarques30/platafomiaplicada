@@ -4,7 +4,7 @@ import { useUsers } from "@/hooks/admin/useUsers";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useMentoriaRecursos } from "@/hooks/useMentoriaRecursos";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
-import { useMentoriaBonus, BonusMentoria } from "@/hooks/useMentoriaBonus";
+import { useMentoriaBonus, BonusMentoria, getArquivoUrls } from "@/hooks/useMentoriaBonus";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -460,14 +460,14 @@ export default function GerenciarMentoria() {
                                 </a>
                               </Button>
                             )}
-                            {bonusItem.arquivo_url && (
-                              <Button variant="outline" size="sm" asChild>
-                                <a href={bonusItem.arquivo_url} target="_blank" rel="noopener noreferrer">
+                            {getArquivoUrls(bonusItem.arquivo_url).map((url, idx) => (
+                              <Button key={idx} variant="outline" size="sm" asChild>
+                                <a href={url} target="_blank" rel="noopener noreferrer">
                                   <FileDown className="h-3 w-3 mr-1" />
-                                  Documento
+                                  {getArquivoUrls(bonusItem.arquivo_url).length > 1 ? `Doc ${idx + 1}` : 'Documento'}
                                 </a>
                               </Button>
-                            )}
+                            ))}
                           </div>
 
                           {bonusItem.comando_uso && (
