@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
-import { Sparkles, Cpu, Download, ExternalLink, FileText, Image, Table, FileCode } from "lucide-react";
+import { Sparkles, Cpu, Download, ExternalLink, FileText, Image, Table, FileCode, Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface IACopieUseDetalhesModalProps {
   ia: {
@@ -70,19 +71,35 @@ const getLinksUrls = (linksUrl: any): string[] => {
 
 const getDomainFromUrl = (url: string) => {
   try {
-    const domain = new URL(url).hostname.replace('www.', '');
+    const normalizedUrl = normalizeUrl(url);
+    const domain = new URL(normalizedUrl).hostname.replace('www.', '');
     return domain;
   } catch {
     return url;
   }
 };
 
+const normalizeUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  return `https://${url}`;
+};
+
 export function IACopieUseDetalhesModal({ ia, open, onOpenChange }: IACopieUseDetalhesModalProps) {
+  const { toast } = useToast();
+  
   if (!ia) return null;
 
   const arquivos = getArquivoUrls(ia.arquivos_url);
   const links = getLinksUrls(ia.links_url);
   const ferramentas = Array.isArray(ia.ferramentas_recomendadas) ? ia.ferramentas_recomendadas : [];
+
+  const handleCopyLink = (url: string) => {
+    navigator.clipboard.writeText(normalizeUrl(url));
+    toast({ title: "Link copiado!" });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -160,18 +177,26 @@ export function IACopieUseDetalhesModal({ ia, open, onOpenChange }: IACopieUseDe
               </p>
               <div className="flex flex-col gap-2">
                 {links.map((url, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <a href={url} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4 mr-2 shrink-0" />
-                      <span className="truncate">{getDomainFromUrl(url)}</span>
-                    </a>
-                  </Button>
+                  <div key={index} className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 justify-start"
+                      asChild
+                    >
+                      <a href={normalizeUrl(url)} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4 mr-2 shrink-0" />
+                        <span className="truncate">{getDomainFromUrl(url)}</span>
+                      </a>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleCopyLink(url)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ))}
               </div>
             </div>
