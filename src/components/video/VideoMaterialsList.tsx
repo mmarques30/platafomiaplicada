@@ -1,4 +1,4 @@
-import { Download, ExternalLink, FileText } from "lucide-react";
+import { Download, ExternalLink, FileText, File, Table, FileCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Material {
@@ -10,6 +10,28 @@ interface Material {
 interface VideoMaterialsListProps {
   materiais: any;
 }
+
+const getFileIcon = (url: string, tipo?: string) => {
+  if (tipo === "link") return <ExternalLink className="h-4 w-4" />;
+  
+  const ext = url.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'pdf':
+      return <FileText className="h-4 w-4 text-red-500" />;
+    case 'xlsx':
+    case 'xls':
+    case 'csv':
+      return <Table className="h-4 w-4 text-green-600" />;
+    case 'doc':
+    case 'docx':
+      return <FileText className="h-4 w-4 text-blue-500" />;
+    case 'html':
+    case 'xml':
+      return <FileCode className="h-4 w-4 text-orange-500" />;
+    default:
+      return <File className="h-4 w-4" />;
+  }
+};
 
 export function VideoMaterialsList({ materiais }: VideoMaterialsListProps) {
   const normalize = (m: any): Material[] => {
@@ -36,31 +58,34 @@ export function VideoMaterialsList({ materiais }: VideoMaterialsListProps) {
     );
   }
 
-  const getIcon = (tipo?: string) => {
-    if (tipo === "download") return <Download className="h-4 w-4" />;
-    if (tipo === "link") return <ExternalLink className="h-4 w-4" />;
-    return <FileText className="h-4 w-4" />;
-  };
-
   return (
     <div className="space-y-2">
-      {list.map((material, index) => (
-        <Button
-          key={index}
-          variant="outline"
-          className="w-full justify-start gap-2"
-          asChild
-        >
-          <a
-            href={material.url}
-            target="_blank"
-            rel="noopener noreferrer"
+      {list.map((material, index) => {
+        const isLink = material.tipo === "link";
+        const fileName = material.url.split('/').pop() || material.titulo;
+        
+        return (
+          <Button
+            key={index}
+            variant="outline"
+            className="w-full justify-between"
+            asChild
           >
-            {getIcon(material.tipo)}
-            <span className="truncate">{material.titulo}</span>
-          </a>
-        </Button>
-      ))}
+            <a
+              href={material.url}
+              target={isLink ? "_blank" : undefined}
+              rel={isLink ? "noopener noreferrer" : undefined}
+              download={!isLink ? fileName : undefined}
+            >
+              <div className="flex items-center gap-2">
+                {getFileIcon(material.url, material.tipo)}
+                <span className="truncate">{material.titulo}</span>
+              </div>
+              {!isLink && <Download className="h-4 w-4 text-muted-foreground" />}
+            </a>
+          </Button>
+        );
+      })}
     </div>
   );
 }

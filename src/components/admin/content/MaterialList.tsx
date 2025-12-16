@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Download, ExternalLink, FileText, X } from "lucide-react";
+import { Download, ExternalLink, FileText, X, File, Table, FileCode } from "lucide-react";
 import { Material } from "@/types/video";
 
 interface MaterialListProps {
@@ -8,12 +8,28 @@ interface MaterialListProps {
 }
 
 export function MaterialList({ materiais, onRemove }: MaterialListProps) {
-  const getMaterialIcon = (tipo: string) => {
-    switch (tipo) {
-      case 'download': return <Download className="h-4 w-4" />;
-      case 'link': return <ExternalLink className="h-4 w-4" />;
-      case 'documento': return <FileText className="h-4 w-4" />;
-      default: return <FileText className="h-4 w-4" />;
+  const getMaterialIcon = (material: Material) => {
+    if (material.tipo === 'link') return <ExternalLink className="h-4 w-4" />;
+    
+    const url = material.url || material.arquivo_nome || '';
+    const ext = url.split('.').pop()?.toLowerCase();
+    
+    switch (ext) {
+      case 'pdf':
+        return <FileText className="h-4 w-4 text-red-500" />;
+      case 'xlsx':
+      case 'xls':
+      case 'csv':
+        return <Table className="h-4 w-4 text-green-600" />;
+      case 'doc':
+      case 'docx':
+        return <FileText className="h-4 w-4 text-blue-500" />;
+      case 'html':
+      case 'xml':
+        return <FileCode className="h-4 w-4 text-orange-500" />;
+      default:
+        if (material.tipo === 'download') return <Download className="h-4 w-4" />;
+        return <File className="h-4 w-4" />;
     }
   };
 
@@ -34,7 +50,7 @@ export function MaterialList({ materiais, onRemove }: MaterialListProps) {
       {materiais.map((material, index) => (
         <div key={index} className="flex items-center justify-between gap-2 p-2 bg-background rounded border">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            {getMaterialIcon(material.tipo)}
+            {getMaterialIcon(material)}
             <div className="flex-1 min-w-0">
               <p className="text-sm truncate font-medium">{material.titulo}</p>
               {material.arquivo_nome && (
