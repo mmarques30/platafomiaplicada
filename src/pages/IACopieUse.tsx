@@ -11,11 +11,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useIACopieUse } from "@/hooks/useFerramentas";
-import { IACopieUseRow } from "@/components/bibliotecas/IACopieUseRow";
+import { IACopieUseCard } from "@/components/bibliotecas/IACopieUseCard";
 import { IACopieUseDetalhesModal } from "@/components/bibliotecas/IACopieUseDetalhesModal";
 import { Sparkles, Search } from "lucide-react";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 12;
 
 export default function IACopieUse() {
   const { data: ias, isLoading } = useIACopieUse();
@@ -94,25 +94,27 @@ export default function IACopieUse() {
       )}
 
       {isLoading ? (
-        <Card>
-          <div className="divide-y divide-border">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex items-center gap-4 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <Card key={i} className="h-[180px]">
+              <CardContent className="p-4 space-y-3">
                 <Skeleton className="w-10 h-10 rounded-lg" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-1/3" />
-                  <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-2/3" />
+                <div className="flex gap-2 mt-auto">
+                  <Skeleton className="h-5 w-16" />
+                  <Skeleton className="h-5 w-12" />
                 </div>
-                <Skeleton className="h-6 w-20" />
-              </div>
-            ))}
-          </div>
-        </Card>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : visibleIAs && visibleIAs.length > 0 ? (
-        <Card className="overflow-hidden">
-          <div className="divide-y divide-border">
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {visibleIAs.map((ia) => (
-              <IACopieUseRow
+              <IACopieUseCard
                 key={ia.id}
                 ia={ia}
                 onClick={() => setSelectedIA(ia)}
@@ -121,17 +123,16 @@ export default function IACopieUse() {
           </div>
           
           {hasMore && (
-            <div className="p-4 border-t border-border">
+            <div className="flex justify-center pt-4">
               <Button 
                 variant="outline" 
-                className="w-full"
                 onClick={handleShowMore}
               >
                 Ver mais ({remaining} restantes)
               </Button>
             </div>
           )}
-        </Card>
+        </>
       ) : (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
