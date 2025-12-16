@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles } from "lucide-react";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 
 interface IACopieUseCardProps {
@@ -26,11 +25,6 @@ export function IACopieUseCard({ ia, onClick }: IACopieUseCardProps) {
           <FavoriteButton tipo="ia_copie_use" itemId={ia.id} variant="icon-only" size="sm" />
         </div>
 
-        {/* Icon */}
-        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-3 shrink-0">
-          <Sparkles className="w-6 h-6 text-primary" />
-        </div>
-        
         {/* Title */}
         <h3 className="font-semibold text-base line-clamp-3 mb-2">{ia.titulo}</h3>
         
