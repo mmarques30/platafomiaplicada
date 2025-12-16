@@ -1,75 +1,22 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { CopyButton } from "@/components/shared/CopyButton";
-import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useIACopieUse } from "@/hooks/useFerramentas";
-import { Sparkles, Search, Cpu, FileText, Image, Table, FileCode, Download, ExternalLink } from "lucide-react";
+import { IACopieUseRow } from "@/components/bibliotecas/IACopieUseRow";
+import { IACopieUseDetalhesModal } from "@/components/bibliotecas/IACopieUseDetalhesModal";
+import { Sparkles, Search } from "lucide-react";
 
-// Helper to get file icon based on extension
-const getFileIcon = (url: string) => {
-  const ext = url.split('.').pop()?.toLowerCase();
-  switch (ext) {
-    case 'pdf':
-      return <FileText className="h-4 w-4 shrink-0" />;
-    case 'png':
-    case 'jpg':
-    case 'jpeg':
-      return <Image className="h-4 w-4 shrink-0" />;
-    case 'csv':
-    case 'xlsx':
-    case 'xls':
-      return <Table className="h-4 w-4 shrink-0" />;
-    case 'html':
-    case 'htm':
-      return <FileCode className="h-4 w-4 shrink-0" />;
-    default:
-      return <FileText className="h-4 w-4 shrink-0" />;
-  }
-};
-
-// Helper to extract filename from URL
-const getFileName = (url: string) => {
-  const parts = url.split('/');
-  const filename = parts[parts.length - 1];
-  // Remove UUID prefix if present
-  const cleanName = filename.replace(/^[a-f0-9-]{36}_/, '');
-  return decodeURIComponent(cleanName);
-};
-
-// Helper to normalize arquivos_url to array
-const getArquivoUrls = (arquivosUrl: any): string[] => {
-  if (!arquivosUrl) return [];
-  if (Array.isArray(arquivosUrl)) return arquivosUrl;
-  if (typeof arquivosUrl === 'string') return [arquivosUrl];
-  return [];
-};
-
-// Helper to normalize links_url to array
-const getLinksUrls = (linksUrl: any): string[] => {
-  if (!linksUrl) return [];
-  if (Array.isArray(linksUrl)) return linksUrl;
-  if (typeof linksUrl === 'string') return [linksUrl];
-  return [];
-};
-
-// Helper to extract domain from URL for display
-const getDomainFromUrl = (url: string) => {
-  try {
-    const domain = new URL(url).hostname.replace('www.', '');
-    return domain;
-  } catch {
-    return url;
-  }
-};
+const ITEMS_PER_PAGE = 10;
 
 export default function IACopieUse() {
   const { data: ias, isLoading } = useIACopieUse();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
+  const [selectedIA, setSelectedIA] = useState<any | null>(null);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   const categorias = ias
     ? Array.from(new Set(ias.map((ia) => ia.categoria)))
@@ -81,6 +28,14 @@ export default function IACopieUse() {
     const matchesCategoria = !selectedCategoria || ia.categoria === selectedCategoria;
     return matchesSearch && matchesCategoria;
   });
+
+  const visibleIAs = filteredIAs?.slice(0, visibleCount);
+  const hasMore = filteredIAs && filteredIAs.length > visibleCount;
+  const remaining = filteredIAs ? filteredIAs.length - visibleCount : 0;
+
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -97,7 +52,10 @@ export default function IACopieUse() {
           <Input
             placeholder="Buscar ferramentas..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setVisibleCount(ITEMS_PER_PAGE);
+            }}
             className="pl-10"
           />
         </div>
@@ -105,7 +63,10 @@ export default function IACopieUse() {
           <Badge
             variant={selectedCategoria === null ? "default" : "outline"}
             className="cursor-pointer"
-            onClick={() => setSelectedCategoria(null)}
+            onClick={() => {
+              setSelectedCategoria(null);
+              setVisibleCount(ITEMS_PER_PAGE);
+            }}
           >
             Todas
           </Badge>
@@ -114,7 +75,10 @@ export default function IACopieUse() {
               key={categoria}
               variant={selectedCategoria === categoria ? "default" : "outline"}
               className="cursor-pointer"
-              onClick={() => setSelectedCategoria(categoria)}
+              onClick={() => {
+                setSelectedCategoria(categoria);
+                setVisibleCount(ITEMS_PER_PAGE);
+              }}
             >
               {categoria}
             </Badge>
@@ -122,140 +86,52 @@ export default function IACopieUse() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-full" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-20 w-full" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : filteredIAs && filteredIAs.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredIAs.map((ia) => {
-            const arquivos = getArquivoUrls(ia.arquivos_url);
-            const links = getLinksUrls((ia as any).links_url);
-            
-            return (
-              <Card key={ia.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-2">{ia.titulo}</CardTitle>
-                      <CardDescription>{ia.descricao}</CardDescription>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">{ia.categoria}</Badge>
-                      <FavoriteButton 
-                        tipo="ia_copie_use" 
-                        itemId={ia.id}
-                        variant="ghost"
-                      />
-                    </div>
-                  </div>
+      {/* Results counter */}
+      {filteredIAs && (
+        <p className="text-sm text-muted-foreground">
+          {filteredIAs.length} {filteredIAs.length === 1 ? 'resultado' : 'resultados'} encontrados
+        </p>
+      )}
 
-                  {Array.isArray(ia.ferramentas_recomendadas) && 
-                   ia.ferramentas_recomendadas.length > 0 && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                        <Cpu className="w-3 h-3" />
-                        Ferramentas onde aplicar:
-                      </p>
-                      <div className="flex gap-2 flex-wrap">
-                        {ia.ferramentas_recomendadas.map((ferramenta: string) => (
-                          <Badge 
-                            key={ferramenta} 
-                            variant="default" 
-                            className="text-xs bg-primary/10 text-primary hover:bg-primary/20"
-                          >
-                            {ferramenta}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {ia.ia_recomendada && (
-                    <div className="text-sm">
-                      <span className="font-semibold">IA Recomendada:</span>{" "}
-                      {ia.ia_recomendada}
-                    </div>
-                  )}
-                  <div className="bg-muted p-3 rounded-md">
-                    <code className="text-sm break-all">{ia.conteudo}</code>
-                  </div>
-                  <CopyButton
-                    content={ia.conteudo}
-                    variant="default"
-                    size="default"
-                    className="w-full"
-                  />
-                  
-                  {/* External Links Section */}
-                  {links.length > 0 && (
-                    <div className="pt-3 border-t space-y-2">
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <ExternalLink className="w-3 h-3" />
-                        Links externos:
-                      </p>
-                      <div className="flex flex-col gap-2">
-                        {links.map((url, index) => (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-start"
-                            asChild
-                          >
-                            <a href={url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-4 w-4 mr-2 shrink-0" />
-                              <span className="truncate">{getDomainFromUrl(url)}</span>
-                            </a>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Attached Files Section */}
-                  {arquivos.length > 0 && (
-                    <div className="pt-3 border-t space-y-2">
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Download className="w-3 h-3" />
-                        Arquivos para download:
-                      </p>
-                      <div className="flex flex-col gap-2">
-                        {arquivos.map((url, index) => (
-                          <div 
-                            key={index} 
-                            className="flex items-center justify-between p-2 bg-muted/50 rounded-md"
-                          >
-                            <div className="flex items-center gap-2 min-w-0 flex-1">
-                              {getFileIcon(url)}
-                              <span className="text-sm truncate">{getFileName(url)}</span>
-                            </div>
-                            <Button variant="ghost" size="sm" asChild className="shrink-0">
-                              <a href={url} download={getFileName(url)}>
-                                <Download className="h-4 w-4" />
-                              </a>
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+      {isLoading ? (
+        <Card>
+          <div className="divide-y divide-border">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center gap-4 p-4">
+                <Skeleton className="w-10 h-10 rounded-lg" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-5 w-1/3" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+                <Skeleton className="h-6 w-20" />
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : visibleIAs && visibleIAs.length > 0 ? (
+        <Card>
+          <div className="divide-y divide-border">
+            {visibleIAs.map((ia) => (
+              <IACopieUseRow
+                key={ia.id}
+                ia={ia}
+                onClick={() => setSelectedIA(ia)}
+              />
+            ))}
+          </div>
+          
+          {hasMore && (
+            <div className="p-4 border-t border-border">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={handleShowMore}
+              >
+                Ver mais ({remaining} restantes)
+              </Button>
+            </div>
+          )}
+        </Card>
       ) : (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
@@ -266,6 +142,12 @@ export default function IACopieUse() {
           </CardContent>
         </Card>
       )}
+
+      <IACopieUseDetalhesModal
+        ia={selectedIA}
+        open={!!selectedIA}
+        onOpenChange={(open) => !open && setSelectedIA(null)}
+      />
     </div>
   );
 }
