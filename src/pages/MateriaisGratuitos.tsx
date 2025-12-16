@@ -6,7 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, ArrowLeft, LayoutGrid, List, ExternalLink, Download, Code, Table as TableIcon } from "lucide-react";
+import { FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, ArrowLeft, LayoutGrid, List, ExternalLink, Download, Code, Table as TableIcon, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -251,24 +257,22 @@ export default function MateriaisGratuitos() {
                         {arquivos.length > 0 && (
                           <div className="space-y-2">
                             <p className="text-xs text-muted-foreground font-medium">Arquivos para download:</p>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="space-y-1.5">
                               {arquivos.map((url, index) => {
                                 const FileIcon = getFileIcon(url);
+                                const fileName = getFileName(url);
                                 return (
-                                  <Button
-                                    key={index}
-                                    variant="outline"
-                                    size="sm"
-                                    asChild
-                                    className="h-8"
-                                  >
-                                    <a href={url} target="_blank" rel="noopener noreferrer" download>
-                                      <FileIcon className="h-3 w-3 mr-1" />
-                                      <span className="max-w-[120px] truncate text-xs">
-                                        {getFileName(url)}
-                                      </span>
-                                    </a>
-                                  </Button>
+                                  <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded-md gap-2">
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                      <FileIcon className="h-4 w-4 text-primary shrink-0" />
+                                      <span className="text-sm truncate">{fileName}</span>
+                                    </div>
+                                    <Button variant="ghost" size="sm" className="h-8 px-2 shrink-0" asChild>
+                                      <a href={url} download={fileName} target="_blank" rel="noopener noreferrer">
+                                        <Download className="h-4 w-4" />
+                                      </a>
+                                    </Button>
+                                  </div>
                                 );
                               })}
                             </div>
@@ -334,16 +338,36 @@ export default function MateriaisGratuitos() {
                                 </div>
                               ))}
                               {arquivos.length > 0 && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  asChild
-                                >
-                                  <a href={arquivos[0]} target="_blank" rel="noopener noreferrer" download>
-                                    <Download className="h-3 w-3 mr-1" />
-                                    {arquivos.length} arquivo{arquivos.length > 1 ? 's' : ''}
-                                  </a>
-                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm">
+                                      <Download className="h-3 w-3 mr-1" />
+                                      {arquivos.length} arquivo{arquivos.length > 1 ? 's' : ''}
+                                      <ChevronDown className="h-3 w-3 ml-1" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-64">
+                                    {arquivos.map((url, idx) => {
+                                      const FileIcon = getFileIcon(url);
+                                      const fileName = getFileName(url);
+                                      return (
+                                        <DropdownMenuItem key={idx} asChild>
+                                          <a 
+                                            href={url} 
+                                            download={fileName}
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 cursor-pointer"
+                                          >
+                                            <FileIcon className="h-4 w-4 shrink-0" />
+                                            <span className="truncate flex-1">{fileName}</span>
+                                            <Download className="h-3 w-3 shrink-0 text-muted-foreground" />
+                                          </a>
+                                        </DropdownMenuItem>
+                                      );
+                                    })}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               )}
                             </div>
                           </TableCell>
