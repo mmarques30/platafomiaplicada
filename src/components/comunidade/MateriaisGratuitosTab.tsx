@@ -20,6 +20,7 @@ type Material = {
   imagem_url: string | null;
   ordem: number;
   arquivos_url: Json | null;
+  links_url: Json | null;
 };
 
 const CATEGORIAS = [
@@ -58,6 +59,14 @@ const getArquivoUrls = (arquivos_url: Json | null): string[] => {
   if (!arquivos_url) return [];
   if (Array.isArray(arquivos_url)) {
     return arquivos_url.filter((item): item is string => typeof item === 'string');
+  }
+  return [];
+};
+
+const getLinksUrls = (links_url: Json | null): string[] => {
+  if (!links_url) return [];
+  if (Array.isArray(links_url)) {
+    return links_url.filter((item): item is string => typeof item === 'string');
   }
   return [];
 };
@@ -164,6 +173,8 @@ export function MateriaisGratuitosTab() {
                 const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
                 const Icon = categoria?.icon || FileText;
                 const arquivos = getArquivoUrls(material.arquivos_url);
+                const links = getLinksUrls(material.links_url);
+                const allLinks = material.url ? [material.url, ...links] : links;
                 
                 return (
                   <TableRow key={material.id}>
@@ -181,25 +192,26 @@ export function MateriaisGratuitosTab() {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
-                        {material.url && (
-                          <>
+                        {allLinks.map((url, index) => (
+                          <div key={index} className="flex gap-1">
                             <Button
                               size="sm"
+                              variant={index === 0 ? "default" : "outline"}
                               asChild
                               onClick={() => handleAccessClick(material)}
                             >
-                              <a href={material.url} target="_blank" rel="noopener noreferrer">
+                              <a href={url} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="h-4 w-4 mr-1" />
-                                Acessar
+                                {allLinks.length > 1 ? `Link ${index + 1}` : 'Acessar'}
                               </a>
                             </Button>
                             <CopyButton 
-                              content={material.url} 
+                              content={url} 
                               variant="outline" 
                               size="sm"
                             />
-                          </>
-                        )}
+                          </div>
+                        ))}
                         {arquivos.length > 0 && (
                           <Button
                             variant="outline"

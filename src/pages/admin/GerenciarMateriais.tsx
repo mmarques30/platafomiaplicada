@@ -29,7 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Upload, X, FileText, Code, Table as TableIcon, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, X, FileText, Code, Table as TableIcon, Loader2, ExternalLink } from "lucide-react";
 import { Json } from "@/integrations/supabase/types";
 
 const CATEGORIAS = [
@@ -59,9 +59,18 @@ type Material = {
   ordem: number;
   ativo: boolean;
   arquivos_url: Json | null;
+  links_url: Json | null;
 };
 
-type MaterialForm = Omit<Material, "id" | "arquivos_url"> & { arquivos_url?: string[] };
+type MaterialForm = Omit<Material, "id" | "arquivos_url" | "links_url"> & { arquivos_url?: string[]; links_url?: string[] };
+
+const getLinksUrls = (links_url: Json | null): string[] => {
+  if (!links_url) return [];
+  if (Array.isArray(links_url)) {
+    return links_url.filter((item): item is string => typeof item === 'string');
+  }
+  return [];
+};
 
 // Helper functions
 const getFileName = (url: string): string => {
@@ -107,6 +116,8 @@ export default function GerenciarMateriais() {
     arquivos_url: [],
   });
   const [arquivoUrls, setArquivoUrls] = useState<string[]>([]);
+  const [linkUrls, setLinkUrls] = useState<string[]>([]);
+  const [newLink, setNewLink] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   const queryClient = useQueryClient();
@@ -132,6 +143,7 @@ export default function GerenciarMateriais() {
         .insert({
           ...data,
           arquivos_url: arquivoUrls,
+          links_url: linkUrls,
         });
       if (error) throw error;
     },
@@ -153,6 +165,7 @@ export default function GerenciarMateriais() {
         .update({
           ...data,
           arquivos_url: arquivoUrls,
+          links_url: linkUrls,
         })
         .eq("id", id);
       if (error) throw error;
@@ -190,6 +203,8 @@ export default function GerenciarMateriais() {
     setIsOpen(false);
     setEditingMaterial(null);
     setArquivoUrls([]);
+    setLinkUrls([]);
+    setNewLink("");
     setFormData({
       titulo: "",
       descricao: "",
@@ -200,12 +215,15 @@ export default function GerenciarMateriais() {
       ordem: 0,
       ativo: true,
       arquivos_url: [],
+      links_url: [],
     });
   };
 
   const handleOpenEdit = (material: Material) => {
     setEditingMaterial(material);
     setArquivoUrls(getArquivoUrls(material.arquivos_url));
+    setLinkUrls(getLinksUrls(material.links_url));
+    setNewLink("");
     setFormData({
       titulo: material.titulo,
       descricao: material.descricao || "",
@@ -216,8 +234,23 @@ export default function GerenciarMateriais() {
       ordem: material.ordem,
       ativo: material.ativo,
       arquivos_url: getArquivoUrls(material.arquivos_url),
+      links_url: getLinksUrls(material.links_url),
     });
     setIsOpen(true);
+  };
+
+  const handleAddLink = () => {
+    if (!newLink.trim()) return;
+    let url = newLink.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    setLinkUrls(prev => [...prev, url]);
+    setNewLink("");
+  };
+
+  const handleRemoveLink = (urlToRemove: string) => {
+    setLinkUrls(prev => prev.filter(url => url !== urlToRemove));
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -385,16 +418,55 @@ export default function GerenciarMateriais() {
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="url">URL (link externo opcional)</Label>
-                <Input
-                  id="url"
-                  value={formData.url}
-                  onChange={(e) =>
-                    setFormData({ ...formData, url: e.target.value })
-                  }
-                  placeholder="https://..."
-                />
+              {/* Multiple Links Section */}
+              <div className="space-y-3">
+                <Label>Links Externos (apresentações, etc.)</Label>
+                
+                {/* Links list */}
+                {linkUrls.length > 0 && (
+                  <div className="space-y-2">
+                    {linkUrls.map((url, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <ExternalLink className="h-4 w-4 flex-shrink-0 text-primary" />
+                          <span className="text-sm truncate">{url}</span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 flex-shrink-0"
+                          onClick={() => handleRemoveLink(url)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add link input */}
+                <div className="flex gap-2">
+                  <Input
+                    value={newLink}
+                    onChange={(e) => setNewLink(e.target.value)}
+                    placeholder="https://..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddLink();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAddLink}
+                    disabled={!newLink.trim()}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               {/* File Upload Section */}
