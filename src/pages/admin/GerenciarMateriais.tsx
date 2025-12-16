@@ -29,7 +29,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, X, FileText, Code, Table as TableIcon, Loader2 } from "lucide-react";
+import { Json } from "@/integrations/supabase/types";
 
 const CATEGORIAS = [
   { value: "templates", label: "Templates" },
@@ -57,9 +58,39 @@ type Material = {
   imagem_url: string | null;
   ordem: number;
   ativo: boolean;
+  arquivos_url: Json | null;
 };
 
-type MaterialForm = Omit<Material, "id">;
+type MaterialForm = Omit<Material, "id" | "arquivos_url"> & { arquivos_url?: string[] };
+
+// Helper functions
+const getFileName = (url: string): string => {
+  const parts = url.split('/');
+  const fileName = parts[parts.length - 1];
+  return decodeURIComponent(fileName.split('?')[0]);
+};
+
+const getFileIcon = (url: string) => {
+  const fileName = getFileName(url).toLowerCase();
+  if (fileName.endsWith('.pdf') || fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+    return FileText;
+  }
+  if (fileName.endsWith('.csv') || fileName.endsWith('.xml')) {
+    return TableIcon;
+  }
+  if (fileName.endsWith('.html') || fileName.endsWith('.htm')) {
+    return Code;
+  }
+  return FileText;
+};
+
+const getArquivoUrls = (arquivos_url: Json | null): string[] => {
+  if (!arquivos_url) return [];
+  if (Array.isArray(arquivos_url)) {
+    return arquivos_url.filter((item): item is string => typeof item === 'string');
+  }
+  return [];
+};
 
 export default function GerenciarMateriais() {
   const [isOpen, setIsOpen] = useState(false);
@@ -73,7 +104,10 @@ export default function GerenciarMateriais() {
     imagem_url: "",
     ordem: 0,
     ativo: true,
+    arquivos_url: [],
   });
+  const [arquivoUrls, setArquivoUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -95,7 +129,10 @@ export default function GerenciarMateriais() {
     mutationFn: async (data: MaterialForm) => {
       const { error } = await supabase
         .from("materiais_gratuitos")
-        .insert(data);
+        .insert({
+          ...data,
+          arquivos_url: arquivoUrls,
+        });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -113,7 +150,10 @@ export default function GerenciarMateriais() {
     mutationFn: async ({ id, data }: { id: string; data: Partial<MaterialForm> }) => {
       const { error } = await supabase
         .from("materiais_gratuitos")
-        .update(data)
+        .update({
+          ...data,
+          arquivos_url: arquivoUrls,
+        })
         .eq("id", id);
       if (error) throw error;
     },
@@ -149,6 +189,7 @@ export default function GerenciarMateriais() {
   const handleCloseDialog = () => {
     setIsOpen(false);
     setEditingMaterial(null);
+    setArquivoUrls([]);
     setFormData({
       titulo: "",
       descricao: "",
@@ -158,11 +199,13 @@ export default function GerenciarMateriais() {
       imagem_url: "",
       ordem: 0,
       ativo: true,
+      arquivos_url: [],
     });
   };
 
   const handleOpenEdit = (material: Material) => {
     setEditingMaterial(material);
+    setArquivoUrls(getArquivoUrls(material.arquivos_url));
     setFormData({
       titulo: material.titulo,
       descricao: material.descricao || "",
@@ -172,8 +215,61 @@ export default function GerenciarMateriais() {
       imagem_url: material.imagem_url || "",
       ordem: material.ordem,
       ativo: material.ativo,
+      arquivos_url: getArquivoUrls(material.arquivos_url),
     });
     setIsOpen(true);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedExtensions = ['.pdf', '.csv', '.xml', '.doc', '.docx', '.html', '.htm'];
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+    
+    if (!allowedExtensions.includes(fileExtension)) {
+      toast.error('Formato não suportado. Use: PDF, CSV, XML, DOC ou HTML');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileName = `${Date.now()}_${file.name}`;
+      const { data, error } = await supabase.storage
+        .from('materiais-gratuitos')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('materiais-gratuitos')
+        .getPublicUrl(data.path);
+
+      setArquivoUrls(prev => [...prev, publicUrl]);
+      toast.success('Arquivo enviado com sucesso!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Erro ao enviar arquivo');
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveFile = async (urlToRemove: string) => {
+    try {
+      const fileName = urlToRemove.split('/').pop();
+      if (fileName) {
+        await supabase.storage
+          .from('materiais-gratuitos')
+          .remove([fileName]);
+      }
+      setArquivoUrls(prev => prev.filter(url => url !== urlToRemove));
+      toast.success('Arquivo removido');
+    } catch (error) {
+      console.error('Remove error:', error);
+      setArquivoUrls(prev => prev.filter(url => url !== urlToRemove));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -214,7 +310,7 @@ export default function GerenciarMateriais() {
               Novo Material
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingMaterial ? "Editar Material" : "Novo Material"}
@@ -290,17 +386,80 @@ export default function GerenciarMateriais() {
               </div>
 
               <div>
-                <Label htmlFor="url">URL *</Label>
+                <Label htmlFor="url">URL (link externo opcional)</Label>
                 <Input
                   id="url"
-                  type="url"
                   value={formData.url}
                   onChange={(e) =>
                     setFormData({ ...formData, url: e.target.value })
                   }
                   placeholder="https://..."
-                  required
                 />
+              </div>
+
+              {/* File Upload Section */}
+              <div className="space-y-3">
+                <Label>Arquivos para Download</Label>
+                <p className="text-xs text-muted-foreground">
+                  Formatos aceitos: PDF, CSV, XML, DOC, DOCX, HTML
+                </p>
+                
+                {/* Uploaded files list */}
+                {arquivoUrls.length > 0 && (
+                  <div className="space-y-2">
+                    {arquivoUrls.map((url, index) => {
+                      const Icon = getFileIcon(url);
+                      return (
+                        <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <Icon className="h-4 w-4 flex-shrink-0 text-primary" />
+                            <span className="text-sm truncate">{getFileName(url)}</span>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 flex-shrink-0"
+                            onClick={() => handleRemoveFile(url)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Upload button */}
+                <div>
+                  <input
+                    type="file"
+                    id="file-upload-material"
+                    className="hidden"
+                    accept=".pdf,.csv,.xml,.doc,.docx,.html,.htm"
+                    onChange={handleFileUpload}
+                    disabled={isUploading}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('file-upload-material')?.click()}
+                    disabled={isUploading}
+                    className="w-full"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Enviando...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Adicionar arquivo
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
 
               <div>
@@ -366,6 +525,7 @@ export default function GerenciarMateriais() {
                 <TableHead>Título</TableHead>
                 <TableHead>Categoria</TableHead>
                 <TableHead>Tipo</TableHead>
+                <TableHead className="text-center">Arquivos</TableHead>
                 <TableHead className="text-center">Ordem</TableHead>
                 <TableHead className="text-center">Ativo</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
@@ -380,6 +540,9 @@ export default function GerenciarMateriais() {
                   </TableCell>
                   <TableCell>
                     {TIPOS.find((t) => t.value === material.tipo)?.label}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {getArquivoUrls(material.arquivos_url).length}
                   </TableCell>
                   <TableCell className="text-center">{material.ordem}</TableCell>
                   <TableCell className="text-center">
