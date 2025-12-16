@@ -7,25 +7,27 @@ import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useIACopieUse } from "@/hooks/useFerramentas";
-import { Sparkles, Search, Cpu, FileText, Image, Table, FileCode, Download } from "lucide-react";
+import { Sparkles, Search, Cpu, FileText, Image, Table, FileCode, Download, ExternalLink } from "lucide-react";
 
 // Helper to get file icon based on extension
 const getFileIcon = (url: string) => {
   const ext = url.split('.').pop()?.toLowerCase();
   switch (ext) {
     case 'pdf':
-      return <FileText className="h-4 w-4" />;
+      return <FileText className="h-4 w-4 shrink-0" />;
     case 'png':
     case 'jpg':
     case 'jpeg':
-      return <Image className="h-4 w-4" />;
+      return <Image className="h-4 w-4 shrink-0" />;
     case 'csv':
-      return <Table className="h-4 w-4" />;
+    case 'xlsx':
+    case 'xls':
+      return <Table className="h-4 w-4 shrink-0" />;
     case 'html':
     case 'htm':
-      return <FileCode className="h-4 w-4" />;
+      return <FileCode className="h-4 w-4 shrink-0" />;
     default:
-      return <FileText className="h-4 w-4" />;
+      return <FileText className="h-4 w-4 shrink-0" />;
   }
 };
 
@@ -44,6 +46,24 @@ const getArquivoUrls = (arquivosUrl: any): string[] => {
   if (Array.isArray(arquivosUrl)) return arquivosUrl;
   if (typeof arquivosUrl === 'string') return [arquivosUrl];
   return [];
+};
+
+// Helper to normalize links_url to array
+const getLinksUrls = (linksUrl: any): string[] => {
+  if (!linksUrl) return [];
+  if (Array.isArray(linksUrl)) return linksUrl;
+  if (typeof linksUrl === 'string') return [linksUrl];
+  return [];
+};
+
+// Helper to extract domain from URL for display
+const getDomainFromUrl = (url: string) => {
+  try {
+    const domain = new URL(url).hostname.replace('www.', '');
+    return domain;
+  } catch {
+    return url;
+  }
 };
 
 export default function IACopieUse() {
@@ -120,6 +140,7 @@ export default function IACopieUse() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredIAs.map((ia) => {
             const arquivos = getArquivoUrls(ia.arquivos_url);
+            const links = getLinksUrls((ia as any).links_url);
             
             return (
               <Card key={ia.id} className="hover:shadow-lg transition-shadow">
@@ -177,6 +198,32 @@ export default function IACopieUse() {
                     className="w-full"
                   />
                   
+                  {/* External Links Section */}
+                  {links.length > 0 && (
+                    <div className="pt-3 border-t space-y-2">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <ExternalLink className="w-3 h-3" />
+                        Links externos:
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        {links.map((url, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            className="w-full justify-start"
+                            asChild
+                          >
+                            <a href={url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4 mr-2 shrink-0" />
+                              <span className="truncate">{getDomainFromUrl(url)}</span>
+                            </a>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Attached Files Section */}
                   {arquivos.length > 0 && (
                     <div className="pt-3 border-t space-y-2">
@@ -186,18 +233,20 @@ export default function IACopieUse() {
                       </p>
                       <div className="flex flex-col gap-2">
                         {arquivos.map((url, index) => (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-start"
-                            asChild
+                          <div 
+                            key={index} 
+                            className="flex items-center justify-between p-2 bg-muted/50 rounded-md"
                           >
-                            <a href={url} target="_blank" rel="noopener noreferrer" download>
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
                               {getFileIcon(url)}
-                              <span className="ml-2 truncate">{getFileName(url)}</span>
-                            </a>
-                          </Button>
+                              <span className="text-sm truncate">{getFileName(url)}</span>
+                            </div>
+                            <Button variant="ghost" size="sm" asChild className="shrink-0">
+                              <a href={url} download={getFileName(url)}>
+                                <Download className="h-4 w-4" />
+                              </a>
+                            </Button>
+                          </div>
                         ))}
                       </div>
                     </div>

@@ -1498,6 +1498,7 @@ export type Database = {
           ferramentas_recomendadas: Json | null
           ia_recomendada: string | null
           id: string
+          links_url: Json | null
           titulo: string
           updated_at: string | null
         }
@@ -1511,6 +1512,7 @@ export type Database = {
           ferramentas_recomendadas?: Json | null
           ia_recomendada?: string | null
           id?: string
+          links_url?: Json | null
           titulo: string
           updated_at?: string | null
         }
@@ -1524,6 +1526,7 @@ export type Database = {
           ferramentas_recomendadas?: Json | null
           ia_recomendada?: string | null
           id?: string
+          links_url?: Json | null
           titulo?: string
           updated_at?: string | null
         }

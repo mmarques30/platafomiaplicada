@@ -10,7 +10,7 @@ import { useCreateIACopieUse, useUpdateIACopieUse } from "@/hooks/admin/useBibli
 import { FerramentasSelector } from "./FerramentasSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, X, FileText, Image, Table, FileCode, Upload } from "lucide-react";
+import { Loader2, X, FileText, Image, Table, FileCode, Upload, Plus, ExternalLink } from "lucide-react";
 
 interface IACopieUseModalProps {
   open: boolean;
@@ -29,6 +29,8 @@ const getFileIcon = (url: string) => {
     case 'jpeg':
       return <Image className="h-4 w-4" />;
     case 'csv':
+    case 'xlsx':
+    case 'xls':
       return <Table className="h-4 w-4" />;
     case 'html':
     case 'htm':
@@ -55,10 +57,20 @@ const getArquivoUrls = (arquivosUrl: any): string[] => {
   return [];
 };
 
+// Helper to normalize links_url to array
+const getLinksUrls = (linksUrl: any): string[] => {
+  if (!linksUrl) return [];
+  if (Array.isArray(linksUrl)) return linksUrl;
+  if (typeof linksUrl === 'string') return [linksUrl];
+  return [];
+};
+
 export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalProps) {
   const { register, handleSubmit, reset, setValue } = useForm();
   const [ferramentasRecomendadas, setFerramentasRecomendadas] = useState<string[]>([]);
   const [arquivoUrls, setArquivoUrls] = useState<string[]>([]);
+  const [linkUrls, setLinkUrls] = useState<string[]>([]);
+  const [newLink, setNewLink] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const createItem = useCreateIACopieUse();
   const updateItem = useUpdateIACopieUse();
@@ -69,6 +81,7 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
       reset(item);
       setFerramentasRecomendadas(item.ferramentas_recomendadas || []);
       setArquivoUrls(getArquivoUrls(item.arquivos_url));
+      setLinkUrls(getLinksUrls(item.links_url));
     } else {
       reset({
         titulo: "",
@@ -78,12 +91,29 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
         conteudo: "",
         ferramentas_recomendadas: [],
         arquivos_url: [],
+        links_url: [],
         ativo: true,
       });
       setFerramentasRecomendadas([]);
       setArquivoUrls([]);
+      setLinkUrls([]);
     }
   }, [item, reset]);
+
+  const handleAddLink = () => {
+    if (newLink.trim()) {
+      let urlToAdd = newLink.trim();
+      if (!urlToAdd.startsWith('http://') && !urlToAdd.startsWith('https://')) {
+        urlToAdd = 'https://' + urlToAdd;
+      }
+      setLinkUrls(prev => [...prev, urlToAdd]);
+      setNewLink("");
+    }
+  };
+
+  const handleRemoveLink = (index: number) => {
+    setLinkUrls(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -95,12 +125,12 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
     try {
       for (const file of Array.from(files)) {
         const fileExt = file.name.split('.').pop()?.toLowerCase();
-        const allowedExts = ['html', 'htm', 'pdf', 'csv', 'png'];
+        const allowedExts = ['html', 'htm', 'pdf', 'csv', 'png', 'xlsx', 'xls', 'doc', 'docx', 'xml'];
         
         if (!fileExt || !allowedExts.includes(fileExt)) {
           toast({
             title: "Formato não suportado",
-            description: `O arquivo ${file.name} não é suportado. Use HTML, PDF, CSV ou PNG.`,
+            description: `O arquivo ${file.name} não é suportado. Use HTML, PDF, CSV, PNG, XLSX, DOC, DOCX ou XML.`,
             variant: "destructive",
           });
           continue;
@@ -179,6 +209,7 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
       ...data,
       ferramentas_recomendadas: ferramentasRecomendadas,
       arquivos_url: arquivoUrls,
+      links_url: linkUrls,
     };
     
     if (item) {
@@ -228,9 +259,55 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
             onChange={setFerramentasRecomendadas}
           />
 
+          {/* External Links Section */}
+          <div className="space-y-3">
+            <Label>Links Externos</Label>
+            <div className="flex gap-2">
+              <Input 
+                value={newLink}
+                onChange={(e) => setNewLink(e.target.value)}
+                placeholder="https://exemplo.com/recurso"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddLink();
+                  }
+                }}
+              />
+              <Button type="button" variant="outline" onClick={handleAddLink}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            {linkUrls.length > 0 && (
+              <div className="space-y-2">
+                {linkUrls.map((url, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-center justify-between p-2 bg-muted rounded-md"
+                  >
+                    <div className="flex items-center gap-2 text-sm truncate flex-1">
+                      <ExternalLink className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{url}</span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveLink(index)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* File Upload Section */}
           <div className="space-y-3">
-            <Label>Arquivos Anexados (HTML, PDF, CSV, PNG)</Label>
+            <Label>Arquivos Anexados (HTML, PDF, CSV, PNG, XLSX, DOC, DOCX, XML)</Label>
             
             {/* List of uploaded files */}
             {arquivoUrls.length > 0 && (
@@ -262,7 +339,7 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
             <div className="flex items-center gap-2">
               <Input
                 type="file"
-                accept=".html,.htm,.pdf,.csv,.png"
+                accept=".html,.htm,.pdf,.csv,.png,.xlsx,.xls,.doc,.docx,.xml"
                 multiple
                 onChange={handleFileUpload}
                 disabled={isUploading}
