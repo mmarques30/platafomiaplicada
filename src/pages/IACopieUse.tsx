@@ -109,7 +109,7 @@ export default function IACopieUse() {
           </div>
         </Card>
       ) : visibleIAs && visibleIAs.length > 0 ? (
-        <Card>
+        <Card className="overflow-hidden">
           <div className="divide-y divide-border">
             {visibleIAs.map((ia) => (
               <IACopieUseRow
