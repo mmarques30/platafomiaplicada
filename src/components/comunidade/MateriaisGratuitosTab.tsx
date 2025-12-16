@@ -45,7 +45,7 @@ const getFileIcon = (url: string) => {
   if (fileName.endsWith('.pdf') || fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
     return FileText;
   }
-  if (fileName.endsWith('.csv') || fileName.endsWith('.xml')) {
+  if (fileName.endsWith('.csv') || fileName.endsWith('.xml') || fileName.endsWith('.xlsx')) {
     return TableIcon;
   }
   if (fileName.endsWith('.html') || fileName.endsWith('.htm')) {

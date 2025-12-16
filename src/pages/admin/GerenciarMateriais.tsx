@@ -75,7 +75,7 @@ const getFileIcon = (url: string) => {
   if (fileName.endsWith('.pdf') || fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
     return FileText;
   }
-  if (fileName.endsWith('.csv') || fileName.endsWith('.xml')) {
+  if (fileName.endsWith('.csv') || fileName.endsWith('.xml') || fileName.endsWith('.xlsx')) {
     return TableIcon;
   }
   if (fileName.endsWith('.html') || fileName.endsWith('.htm')) {
@@ -224,11 +224,11 @@ export default function GerenciarMateriais() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const allowedExtensions = ['.pdf', '.csv', '.xml', '.doc', '.docx', '.html', '.htm'];
+    const allowedExtensions = ['.pdf', '.csv', '.xml', '.doc', '.docx', '.html', '.htm', '.xlsx'];
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
     
     if (!allowedExtensions.includes(fileExtension)) {
-      toast.error('Formato não suportado. Use: PDF, CSV, XML, DOC ou HTML');
+      toast.error('Formato não suportado. Use: PDF, CSV, XML, DOC, HTML ou XLSX');
       return;
     }
 
@@ -400,9 +400,9 @@ export default function GerenciarMateriais() {
               {/* File Upload Section */}
               <div className="space-y-3">
                 <Label>Arquivos para Download</Label>
-                <p className="text-xs text-muted-foreground">
-                  Formatos aceitos: PDF, CSV, XML, DOC, DOCX, HTML
-                </p>
+                 <p className="text-xs text-muted-foreground">
+                   Formatos aceitos: PDF, CSV, XML, DOC, DOCX, HTML, XLSX
+                 </p>
                 
                 {/* Uploaded files list */}
                 {arquivoUrls.length > 0 && (
