@@ -81,8 +81,8 @@ export default function Trilhas() {
               </CarouselContent>
               {(trilhasVisitante?.length ?? 0) > 4 && (
                 <>
-                  <CarouselPrevious className="-left-12 bg-primary hover:bg-primary/90 text-white border-0 shadow-lg h-10 w-10" />
-                  <CarouselNext className="-right-12 bg-primary hover:bg-primary/90 text-white border-0 shadow-lg h-10 w-10" />
+                  <CarouselPrevious className="left-2 bg-primary/90 hover:bg-primary text-white border-0 shadow-xl h-10 w-10 z-10" />
+                  <CarouselNext className="right-2 bg-primary/90 hover:bg-primary text-white border-0 shadow-xl h-10 w-10 z-10" />
                 </>
               )}
             </Carousel>
