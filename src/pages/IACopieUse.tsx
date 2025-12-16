@@ -94,17 +94,17 @@ export default function IACopieUse() {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <Card key={i} className="h-[180px]">
-              <CardContent className="p-4 space-y-3">
-                <Skeleton className="w-10 h-10 rounded-lg" />
-                <Skeleton className="h-4 w-3/4" />
+            <Card key={i} className="min-h-[220px]">
+              <CardContent className="p-5 space-y-3">
+                <Skeleton className="w-12 h-12 rounded-lg" />
+                <Skeleton className="h-4 w-4/5" />
                 <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-2/3" />
+                <Skeleton className="h-3 w-3/4" />
                 <div className="flex gap-2 mt-auto">
+                  <Skeleton className="h-5 w-20" />
                   <Skeleton className="h-5 w-16" />
-                  <Skeleton className="h-5 w-12" />
                 </div>
               </CardContent>
             </Card>
@@ -112,7 +112,7 @@ export default function IACopieUse() {
         </div>
       ) : visibleIAs && visibleIAs.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
             {visibleIAs.map((ia) => (
               <IACopieUseCard
                 key={ia.id}
