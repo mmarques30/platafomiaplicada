@@ -1570,6 +1570,7 @@ export type Database = {
       }
       materiais_gratuitos: {
         Row: {
+          arquivos_url: Json | null
           ativo: boolean | null
           categoria: string
           created_at: string | null
@@ -1583,6 +1584,7 @@ export type Database = {
           url: string
         }
         Insert: {
+          arquivos_url?: Json | null
           ativo?: boolean | null
           categoria: string
           created_at?: string | null
@@ -1596,6 +1598,7 @@ export type Database = {
           url: string
         }
         Update: {
+          arquivos_url?: Json | null
           ativo?: boolean | null
           categoria?: string
           created_at?: string | null
