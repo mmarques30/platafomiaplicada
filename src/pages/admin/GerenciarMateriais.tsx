@@ -436,7 +436,7 @@ export default function GerenciarMateriais() {
                     type="file"
                     id="file-upload-material"
                     className="hidden"
-                    accept=".pdf,.csv,.xml,.doc,.docx,.html,.htm"
+                    accept=".pdf,.csv,.xml,.doc,.docx,.html,.htm,.xlsx"
                     onChange={handleFileUpload}
                     disabled={isUploading}
                   />
