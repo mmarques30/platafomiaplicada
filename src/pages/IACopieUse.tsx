@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useIACopieUse } from "@/hooks/useFerramentas";
 import { IACopieUseRow } from "@/components/bibliotecas/IACopieUseRow";
 import { IACopieUseDetalhesModal } from "@/components/bibliotecas/IACopieUseDetalhesModal";
@@ -38,7 +44,7 @@ export default function IACopieUse() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6 max-w-full overflow-hidden">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">IA "Copie e Use"</h1>
         <p className="text-muted-foreground">
@@ -46,8 +52,8 @@ export default function IACopieUse() {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             placeholder="Buscar ferramentas..."
@@ -59,31 +65,25 @@ export default function IACopieUse() {
             className="pl-10"
           />
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Badge
-            variant={selectedCategoria === null ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => {
-              setSelectedCategoria(null);
-              setVisibleCount(ITEMS_PER_PAGE);
-            }}
-          >
-            Todas
-          </Badge>
-          {categorias.map((categoria) => (
-            <Badge
-              key={categoria}
-              variant={selectedCategoria === categoria ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => {
-                setSelectedCategoria(categoria);
-                setVisibleCount(ITEMS_PER_PAGE);
-              }}
-            >
-              {categoria}
-            </Badge>
-          ))}
-        </div>
+        <Select
+          value={selectedCategoria || "todas"}
+          onValueChange={(value) => {
+            setSelectedCategoria(value === "todas" ? null : value);
+            setVisibleCount(ITEMS_PER_PAGE);
+          }}
+        >
+          <SelectTrigger className="w-full sm:w-[220px] shrink-0">
+            <SelectValue placeholder="Categoria" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas as categorias</SelectItem>
+            {categorias.map((categoria) => (
+              <SelectItem key={categoria} value={categoria}>
+                {categoria}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Results counter */}
