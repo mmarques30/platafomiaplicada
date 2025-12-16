@@ -23,6 +23,7 @@ type Material = {
   imagem_url: string | null;
   ordem: number;
   arquivos_url: Json | null;
+  links_url: Json | null;
 };
 
 const CATEGORIAS = [
@@ -60,6 +61,14 @@ const getArquivoUrls = (arquivos_url: Json | null): string[] => {
   if (!arquivos_url) return [];
   if (Array.isArray(arquivos_url)) {
     return arquivos_url.filter((item): item is string => typeof item === 'string');
+  }
+  return [];
+};
+
+const getLinksUrls = (links_url: Json | null): string[] => {
+  if (!links_url) return [];
+  if (Array.isArray(links_url)) {
+    return links_url.filter((item): item is string => typeof item === 'string');
   }
   return [];
 };
@@ -193,6 +202,8 @@ export default function MateriaisGratuitos() {
                   const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
                   const Icon = categoria?.icon || FileText;
                   const arquivos = getArquivoUrls(material.arquivos_url);
+                  const links = getLinksUrls(material.links_url);
+                  const allLinks = material.url ? [material.url, ...links] : links;
                   
                   return (
                     <Card key={material.id} className="bg-card border-border hover:border-primary/50 transition-colors flex flex-col h-full">
@@ -209,25 +220,30 @@ export default function MateriaisGratuitos() {
                         )}
                       </CardHeader>
                       <CardContent className="mt-auto space-y-3">
-                        {/* External link if exists */}
-                        {material.url && (
-                          <div className="flex gap-2">
-                            <Button
-                              className="flex-1 h-10"
-                              asChild
-                              onClick={() => handleAccessClick(material)}
-                            >
-                              <a href={material.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Acessar
-                              </a>
-                            </Button>
-                            <CopyButton 
-                              content={material.url} 
-                              variant="outline" 
-                              size="default"
-                              className="h-10"
-                            />
+                        {/* External links */}
+                        {allLinks.length > 0 && (
+                          <div className="space-y-2">
+                            {allLinks.map((url, index) => (
+                              <div key={index} className="flex gap-2">
+                                <Button
+                                  className="flex-1 h-10"
+                                  variant={index === 0 ? "default" : "outline"}
+                                  asChild
+                                  onClick={() => handleAccessClick(material)}
+                                >
+                                  <a href={url} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="h-4 w-4 mr-2" />
+                                    {allLinks.length > 1 ? `Link ${index + 1}` : 'Acessar'}
+                                  </a>
+                                </Button>
+                                <CopyButton 
+                                  content={url} 
+                                  variant="outline" 
+                                  size="default"
+                                  className="h-10"
+                                />
+                              </div>
+                            ))}
                           </div>
                         )}
                         
@@ -279,6 +295,8 @@ export default function MateriaisGratuitos() {
                       const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
                       const Icon = categoria?.icon || FileText;
                       const arquivos = getArquivoUrls(material.arquivos_url);
+                      const links = getLinksUrls(material.links_url);
+                      const allLinks = material.url ? [material.url, ...links] : links;
                       
                       return (
                         <TableRow key={material.id}>
@@ -296,24 +314,25 @@ export default function MateriaisGratuitos() {
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-2">
-                              {material.url && (
-                                <>
+                              {allLinks.map((url, index) => (
+                                <div key={index} className="flex gap-1">
                                   <Button
                                     size="sm"
+                                    variant={index === 0 ? "default" : "outline"}
                                     asChild
                                     onClick={() => handleAccessClick(material)}
                                   >
-                                    <a href={material.url} target="_blank" rel="noopener noreferrer">
-                                      Acessar
+                                    <a href={url} target="_blank" rel="noopener noreferrer">
+                                      {allLinks.length > 1 ? `Link ${index + 1}` : 'Acessar'}
                                     </a>
                                   </Button>
                                   <CopyButton 
-                                    content={material.url} 
+                                    content={url} 
                                     variant="outline" 
                                     size="sm"
                                   />
-                                </>
-                              )}
+                                </div>
+                              ))}
                               {arquivos.length > 0 && (
                                 <Button
                                   variant="outline"

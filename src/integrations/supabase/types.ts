@@ -1577,6 +1577,7 @@ export type Database = {
           descricao: string | null
           id: string
           imagem_url: string | null
+          links_url: Json | null
           ordem: number | null
           tipo: string | null
           titulo: string
@@ -1591,6 +1592,7 @@ export type Database = {
           descricao?: string | null
           id?: string
           imagem_url?: string | null
+          links_url?: Json | null
           ordem?: number | null
           tipo?: string | null
           titulo: string
@@ -1605,6 +1607,7 @@ export type Database = {
           descricao?: string | null
           id?: string
           imagem_url?: string | null
+          links_url?: Json | null
           ordem?: number | null
           tipo?: string | null
           titulo?: string
