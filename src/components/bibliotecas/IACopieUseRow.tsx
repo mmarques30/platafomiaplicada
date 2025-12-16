@@ -29,12 +29,12 @@ export function IACopieUseRow({ ia, onClick }: IACopieUseRowProps) {
         <p className="text-sm text-muted-foreground truncate">{ia.descricao}</p>
       </div>
       
-      <div className="hidden md:flex items-center gap-2 shrink-0">
-        <Badge variant="secondary">{ia.categoria}</Badge>
+      <div className="hidden lg:flex items-center gap-2 shrink-0">
+        <Badge variant="secondary" className="max-w-[120px] truncate">{ia.categoria}</Badge>
         {ia.ia_recomendada && (
-          <Badge variant="outline" className="flex items-center gap-1">
-            <Cpu className="w-3 h-3" />
-            {ia.ia_recomendada}
+          <Badge variant="outline" className="flex items-center gap-1 max-w-[100px]">
+            <Cpu className="w-3 h-3 shrink-0" />
+            <span className="truncate">{ia.ia_recomendada}</span>
           </Badge>
         )}
       </div>

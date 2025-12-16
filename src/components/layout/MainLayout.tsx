@@ -44,7 +44,7 @@ export function MainLayout() {
       <div className="min-h-screen flex w-full bg-background pt-14">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <main className="flex-1">
+          <main className="flex-1 overflow-x-hidden">
             <Outlet />
           </main>
         </div>
