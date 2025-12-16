@@ -68,7 +68,7 @@ export default function BibliotecaFerramentas() {
   }, [searchTerm, filtroCategoria, filtroPreco, filtroValeAPena]);
 
   return (
-    <div className="container mx-auto p-6 space-y-8 max-w-5xl">
+    <div className="container mx-auto p-6 space-y-8">
       {/* Cabeçalho */}
       <div>
         <h1 className="text-3xl font-bold">Biblioteca de Ferramentas</h1>
