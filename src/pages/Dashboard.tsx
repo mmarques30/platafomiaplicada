@@ -189,6 +189,7 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : (
+              <div className="relative px-14">
                 <Carousel 
                   opts={{ align: "start", loop: false }}
                   className="w-full"
@@ -214,11 +215,12 @@ export default function Dashboard() {
                   </CarouselContent>
                   {trilhas.length > 4 && (
                     <>
-                      <CarouselPrevious className="left-2 bg-primary/90 hover:bg-primary text-white border-0 shadow-xl h-10 w-10 z-10" />
-                      <CarouselNext className="right-2 bg-primary/90 hover:bg-primary text-white border-0 shadow-xl h-10 w-10 z-10" />
+                      <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
+                      <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
                     </>
                   )}
                 </Carousel>
+              </div>
               )}
             </>
           )}
