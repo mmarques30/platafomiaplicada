@@ -76,6 +76,7 @@ export default function Trilhas() {
                         bloqueada={true}
                         isVisitante={true}
                         temConteudoDisponivel={false}
+                        aspectRatio="3/4"
                       />
                     </CarouselItem>
                   ))}

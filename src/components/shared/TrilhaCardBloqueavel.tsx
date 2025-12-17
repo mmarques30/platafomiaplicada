@@ -11,6 +11,7 @@ interface TrilhaCardBloqueavelProps {
   nivel_minimo_acesso?: string;
   isVisitante?: boolean;
   temConteudoDisponivel?: boolean;
+  aspectRatio?: string;
 }
 
 export function TrilhaCardBloqueavel({ 
@@ -21,14 +22,15 @@ export function TrilhaCardBloqueavel({
   visivel_apenas_pro,
   nivel_minimo_acesso,
   isVisitante = false,
-  temConteudoDisponivel = true
+  temConteudoDisponivel = true,
+  aspectRatio = "9/16"
 }: TrilhaCardBloqueavelProps) {
   
   // VISITANTE sem conteúdo disponível → Cadeado clicável para /aplique
   if (isVisitante && !temConteudoDisponivel) {
     return (
       <Link to="/aplique" className="block">
-        <div className="relative overflow-hidden rounded-xl shadow-md aspect-[9/16] w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow">
+        <div className={`relative overflow-hidden rounded-xl shadow-md w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow aspect-[${aspectRatio}]`}>
           <img
             src={imagem_url || "/placeholder.svg"}
             alt={titulo}
@@ -54,7 +56,7 @@ export function TrilhaCardBloqueavel({
   if (!isVisitante && bloqueada) {
     return (
       <Link to={`/trilhas/${id}`} className="block">
-        <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-lg aspect-[9/16] w-full bg-muted border-2 border-primary/10 hover:border-primary/20 cursor-pointer transition-all">
+        <div className={`relative overflow-hidden rounded-xl shadow-md hover:shadow-lg w-full bg-muted border-2 border-primary/10 hover:border-primary/20 cursor-pointer transition-all aspect-[${aspectRatio}]`}>
           {visivel_apenas_pro && (
             <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
               🔒 PRO
@@ -92,7 +94,7 @@ export function TrilhaCardBloqueavel({
   // Trilha disponível → Card normal clicável
   return (
     <Link to={`/trilhas/${id}`} className="block group">
-      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative aspect-[9/16] w-full bg-muted border-2 border-primary/10 hover:border-primary/30">
+      <div className={`overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative w-full bg-muted border-2 border-primary/10 hover:border-primary/30 aspect-[${aspectRatio}]`}>
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
             🔒 PRO
