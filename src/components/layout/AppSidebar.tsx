@@ -222,73 +222,71 @@ export function AppSidebar() {
                 );
               })}
 
-              {/* Comunidade - Visitantes only (menu expansível) */}
-              {isVisitante && (
-                <Collapsible 
-                  open={expandedMenus.includes('comunidade_visitante')} 
-                  onOpenChange={() => toggleMenu('comunidade_visitante')}
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="group w-full">
-                        <div className={cn(
-                          "relative flex items-center gap-2 rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 w-full",
+              {/* Comunidade - Menu expansível para todos os usuários */}
+              <Collapsible 
+                open={expandedMenus.includes('comunidade_menu')} 
+                onOpenChange={() => toggleMenu('comunidade_menu')}
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="group w-full">
+                      <div className={cn(
+                        "relative flex items-center gap-2 rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 w-full",
+                        (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
+                          ? "text-primary font-semibold" 
+                          : "text-sidebar-foreground hover:text-primary"
+                      )}>
+                        <span className={cn(
+                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                           (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}>
-                          <span className={cn(
-                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                            (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
-                              ? "bg-aplicada-green-700 opacity-100" 
-                              : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
-                          )} />
-                          <LucideIcons.Users className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                          {!collapsed && (
-                            <>
-                              <span className="text-sm flex-1 text-left">Comunidade</span>
-                              <LucideIcons.ChevronDown className={cn(
-                                "h-4 w-4 transition-transform duration-200",
-                                expandedMenus.includes('comunidade_visitante') && "rotate-180"
-                              )} />
-                            </>
-                          )}
-                        </div>
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
+                            ? "bg-aplicada-green-700 opacity-100" 
+                            : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                        )} />
+                        <LucideIcons.Users className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                        {!collapsed && (
+                          <>
+                            <span className="text-sm flex-1 text-left">Comunidade</span>
+                            <LucideIcons.ChevronDown className={cn(
+                              "h-4 w-4 transition-transform duration-200",
+                              expandedMenus.includes('comunidade_menu') && "rotate-180"
+                            )} />
+                          </>
+                        )}
+                      </div>
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  
+                  <CollapsibleContent className="pl-6 space-y-1 mt-1">
+                    {/* Feed */}
+                    <NavLink 
+                      to="/comunidade" 
+                      className={cn(
+                        "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
+                        location.pathname === '/comunidade'
+                          ? "text-primary font-semibold" 
+                          : "text-sidebar-foreground hover:text-primary"
+                      )}
+                    >
+                      <LucideIcons.MessageCircle className="h-4 w-4" strokeWidth={1.5} />
+                      {!collapsed && <span>Feed</span>}
+                    </NavLink>
                     
-                    <CollapsibleContent className="pl-6 space-y-1 mt-1">
-                      {/* Feed */}
-                      <NavLink 
-                        to="/comunidade" 
-                        className={cn(
-                          "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                          location.pathname === '/comunidade'
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}
-                      >
-                        <LucideIcons.MessageCircle className="h-4 w-4" strokeWidth={1.5} />
-                        {!collapsed && <span>Feed</span>}
-                      </NavLink>
-                      
-                      {/* Sala de Aula */}
-                      <NavLink 
-                        to="/videos-bonus" 
-                        className={cn(
-                          "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                          location.pathname === '/videos-bonus'
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}
-                      >
-                        <LucideIcons.PlayCircle className="h-4 w-4" strokeWidth={1.5} />
-                        {!collapsed && <span>Sala de Aula</span>}
-                      </NavLink>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
-              )}
+                    {/* Sala de Aula */}
+                    <NavLink 
+                      to="/videos-bonus" 
+                      className={cn(
+                        "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
+                        location.pathname === '/videos-bonus'
+                          ? "text-primary font-semibold" 
+                          : "text-sidebar-foreground hover:text-primary"
+                      )}
+                    >
+                      <LucideIcons.PlayCircle className="h-4 w-4" strokeWidth={1.5} />
+                      {!collapsed && <span>Sala de Aula</span>}
+                    </NavLink>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
 
               {/* CTA Item */}
               <SidebarMenuItem>

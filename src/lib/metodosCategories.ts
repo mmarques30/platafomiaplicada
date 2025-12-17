@@ -12,7 +12,6 @@ export const METODOS_CATEGORIAS = [
   "Criação de Conteúdo",
   "Atendimento ao Cliente",
   "Recursos Humanos",
-  "Materiais Aula",
 ] as const;
 
 export type MetodoCategoria = typeof METODOS_CATEGORIAS[number];
