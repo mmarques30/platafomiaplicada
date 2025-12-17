@@ -114,7 +114,7 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
                     )}
                     onClick={() => !trilha.bloqueada && onSelectVideo(video.id)}
                   >
-                    <div className="relative aspect-[3/4] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                    <div className="relative aspect-[9/16] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
                       <img
                         src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url || video.thumbnail_url)}
                         alt={video.titulo}
