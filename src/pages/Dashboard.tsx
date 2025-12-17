@@ -4,6 +4,7 @@ import { AlertCircle, X, Zap } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
+import { PendenciasOnboarding } from "@/components/dashboard/PendenciasOnboarding";
 import { VideosVisitante } from "@/components/dashboard/VideosVisitante";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
@@ -133,6 +134,9 @@ export default function Dashboard() {
         <section>
           <WelcomeHeader />
         </section>
+
+        {/* Card de Pendências (apenas mentorados) */}
+        {!isVisitante && <PendenciasOnboarding />}
 
         {/* Novidades da Semana */}
         <section>
