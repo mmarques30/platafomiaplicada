@@ -7,8 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useMetodos, useMateriaisGratuitos } from "@/hooks/useFerramentas";
-import { Target, Search, Lightbulb, Cpu, FileText, ExternalLink, ChevronDown, Gift } from "lucide-react";
+import { useMetodos } from "@/hooks/useFerramentas";
+import { Target, Search, Lightbulb, Cpu, FileText, ExternalLink, ChevronDown } from "lucide-react";
 import { METODOS_CATEGORIAS } from "@/lib/metodosCategories";
 
 interface MetodoItem {
@@ -19,21 +19,16 @@ interface MetodoItem {
   link_documento: string | null;
   ferramentas_recomendadas: unknown[];
   comentarios: string | null;
-  isGratuito?: boolean;
 }
 
 export default function MetodosAplicar() {
-  const { data: metodos, isLoading: isLoadingMetodos } = useMetodos();
-  const { data: materiaisGratuitos, isLoading: isLoadingMateriais } = useMateriaisGratuitos();
+  const { data: metodos, isLoading } = useMetodos();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
-  const isLoading = isLoadingMetodos || isLoadingMateriais;
-
-  // Combinar métodos com materiais gratuitos
   const todosItens = useMemo(() => {
-    const metodosFormatados: MetodoItem[] = (metodos || []).map(m => ({
+    return (metodos || []).map(m => ({
       id: m.id,
       titulo: m.titulo,
       descricao: m.descricao,
@@ -41,29 +36,8 @@ export default function MetodosAplicar() {
       link_documento: m.link_documento,
       ferramentas_recomendadas: Array.isArray(m.ferramentas_recomendadas) ? m.ferramentas_recomendadas : [],
       comentarios: m.comentarios,
-      isGratuito: false
     }));
-
-    const materiaisFormatados: MetodoItem[] = (materiaisGratuitos || []).map(m => ({
-      id: m.id,
-      titulo: m.titulo,
-      descricao: m.descricao || "",
-      categoria: m.categoria,
-      link_documento: m.url,
-      ferramentas_recomendadas: [],
-      comentarios: null,
-      isGratuito: true
-    }));
-
-    return [...metodosFormatados, ...materiaisFormatados];
-  }, [metodos, materiaisGratuitos]);
-
-  // Categorias combinadas
-  const todasCategorias = useMemo(() => {
-    const categoriasMetodos = new Set(METODOS_CATEGORIAS);
-    const categoriasMateriais = new Set((materiaisGratuitos || []).map(m => m.categoria));
-    return [...new Set([...categoriasMetodos, ...categoriasMateriais])];
-  }, [materiaisGratuitos]);
+  }, [metodos]);
 
   const filteredItens = todosItens.filter((item) => {
     const matchesSearch =
@@ -118,7 +92,7 @@ export default function MetodosAplicar() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todas">Todas ({todosItens.length})</SelectItem>
-            {todasCategorias.map((categoria) => {
+            {METODOS_CATEGORIAS.map((categoria) => {
               const count = todosItens.filter(m => m.categoria === categoria).length;
               if (count === 0) return null;
               return (
@@ -164,17 +138,9 @@ export default function MetodosAplicar() {
                         <h3 className="font-medium text-sm leading-tight line-clamp-1 mb-1.5">
                           {item.titulo}
                         </h3>
-                        <div className="flex items-center gap-1.5">
-                          <Badge variant="secondary" className="text-xs">
-                            {item.categoria}
-                          </Badge>
-                          {item.isGratuito && (
-                            <Badge className="text-xs bg-green-100 text-green-700 border-green-300 hover:bg-green-100">
-                              <Gift className="w-3 h-3 mr-1" />
-                              Gratuito
-                            </Badge>
-                          )}
-                        </div>
+                        <Badge variant="secondary" className="text-xs w-fit">
+                          {item.categoria}
+                        </Badge>
                       </div>
                       
                       {/* Ícones à direita - centralizados verticalmente */}
@@ -236,7 +202,7 @@ export default function MetodosAplicar() {
                         </div>
                       )}
 
-                      {/* Botão Acessar Documento/Material */}
+                      {/* Botão Acessar Documento */}
                       {item.link_documento && (
                         <Button asChild className="w-full mt-2">
                           <a 
@@ -246,7 +212,7 @@ export default function MetodosAplicar() {
                             className="flex items-center justify-center gap-2"
                           >
                             <FileText className="w-4 h-4" />
-                            {item.isGratuito ? "Acessar Material" : "Acessar Documento"}
+                            Acessar Documento
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </Button>
