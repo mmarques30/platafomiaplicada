@@ -10,6 +10,7 @@ interface VideoCardVerticalProps {
   youtube_id: string;
   thumbnail_customizado_url?: string;
   trilha_id: string;
+  aspectRatio?: string;
 }
 
 export function VideoCardVertical({ 
@@ -17,7 +18,8 @@ export function VideoCardVertical({
   titulo, 
   youtube_id, 
   thumbnail_customizado_url,
-  trilha_id
+  trilha_id,
+  aspectRatio = "9/16"
 }: VideoCardVerticalProps) {
   const thumbnailUrl = getYouTubeThumbnail(youtube_id, thumbnail_customizado_url);
   const { logAccess } = useContentAccessLogger();
@@ -32,7 +34,7 @@ export function VideoCardVertical({
       className="block group"
       onClick={handleClick}
     >
-      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative aspect-[9/16] w-full bg-muted">
+      <div className={`overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-muted aspect-[${aspectRatio}]`}>
         <img
           src={thumbnailUrl}
           alt={titulo}
