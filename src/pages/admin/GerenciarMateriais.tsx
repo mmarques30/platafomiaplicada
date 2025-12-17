@@ -128,7 +128,6 @@ export default function GerenciarMateriais() {
       const { data, error } = await supabase
         .from("materiais_gratuitos")
         .select("*")
-        .order("categoria", { ascending: true })
         .order("ordem", { ascending: true });
 
       if (error) throw error;
