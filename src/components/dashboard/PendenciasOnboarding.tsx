@@ -91,7 +91,7 @@ export function PendenciasOnboarding() {
             </div>
 
             {/* Barra de progresso */}
-            <Progress value={progressPercent} className="h-1.5 mb-4" />
+            <Progress value={progressPercent} className="h-1.5 mb-4" indicatorClassName="bg-yellow-500" />
 
             {/* Lista de pendências */}
             <p className="text-sm text-muted-foreground mb-3">
