@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { ClipboardCheck, Check, ChevronRight } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
@@ -80,14 +80,7 @@ export function PendenciasOnboarding() {
   return (
     <Card className="border-border bg-card shadow-sm">
       <CardContent className="p-4 sm:p-6">
-        <div className="flex items-start gap-4">
-          {/* Ícone */}
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <ClipboardCheck className="h-5 w-5 text-primary" />
-          </div>
-
-          {/* Conteúdo */}
-          <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-4 mb-2">
               <h3 className="font-semibold text-foreground">
                 Complete seu perfil
@@ -142,7 +135,6 @@ export function PendenciasOnboarding() {
                   )}
                 </div>
               ))}
-            </div>
           </div>
         </div>
       </CardContent>
