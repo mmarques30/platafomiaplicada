@@ -39,6 +39,7 @@ export default function FormularioAplica() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [hasRestored, setHasRestored] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const savingRef = useRef(false); // Flag para evitar saves simultâneos
 
   // Keep isLoggedIn for database operations (but NOT for rewards)
   const isLoggedIn = !!user;
@@ -182,6 +183,10 @@ export default function FormularioAplica() {
       return;
     }
 
+    // Evitar saves simultâneos (race condition)
+    if (savingRef.current && !completado) return;
+    savingRef.current = true;
+
     setIsSaving(true);
     try {
       const payload = {
@@ -228,6 +233,7 @@ export default function FormularioAplica() {
       });
     } finally {
       setIsSaving(false);
+      savingRef.current = false;
     }
   }, [pesquisa, respostas, secaoAtual, startTime, finished, isLoggedIn, user, emailRespondente]);
 
