@@ -60,9 +60,7 @@ export const useMentoriaForm = () => {
         return data;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["formulario-diagnostico"] });
-    },
+    // Não invalida queries no rascunho para evitar re-render que fecha o Select
   });
 
   // Finalizar formulário (marcar como completado)
