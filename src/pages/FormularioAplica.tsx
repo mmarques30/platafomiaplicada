@@ -39,7 +39,6 @@ export default function FormularioAplica() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [hasRestored, setHasRestored] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const savingRef = useRef(false); // Flag para evitar saves simultâneos
 
   // Keep isLoggedIn for database operations (but NOT for rewards)
   const isLoggedIn = !!user;
@@ -183,10 +182,6 @@ export default function FormularioAplica() {
       return;
     }
 
-    // Evitar saves simultâneos (race condition)
-    if (savingRef.current && !completado) return;
-    savingRef.current = true;
-
     setIsSaving(true);
     try {
       const payload = {
@@ -199,12 +194,13 @@ export default function FormularioAplica() {
         email_respondente: emailRespondente.trim(),
       };
 
-      // Check if response exists for this email
+      // Check if response exists for this email (only non-completed ones for partial saves)
       const { data: existing } = await supabase
         .from("respostas_pesquisas")
         .select("id")
         .eq("pesquisa_id", pesquisa.id)
         .eq("email_respondente", emailRespondente.trim())
+        .eq("completado", false)
         .maybeSingle();
 
       if (existing) {
@@ -223,6 +219,16 @@ export default function FormularioAplica() {
           .insert(payload);
       }
 
+      // Se finalizou, limpar todos os registros parciais anteriores
+      if (completado) {
+        await supabase
+          .from("respostas_pesquisas")
+          .delete()
+          .eq("pesquisa_id", pesquisa.id)
+          .eq("email_respondente", emailRespondente.trim())
+          .eq("completado", false);
+      }
+
       setLastSaved(new Date());
     } catch (error) {
       console.error("Erro ao salvar:", error);
@@ -233,7 +239,6 @@ export default function FormularioAplica() {
       });
     } finally {
       setIsSaving(false);
-      savingRef.current = false;
     }
   }, [pesquisa, respostas, secaoAtual, startTime, finished, isLoggedIn, user, emailRespondente]);
 
