@@ -91,17 +91,19 @@ export function CategoriasTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Emoji</TableHead>
+                <TableHead className="w-16">Emoji</TableHead>
                 <TableHead>Nome</TableHead>
-                <TableHead>Ordem</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+                <TableHead className="w-20">Ordem</TableHead>
+                <TableHead className="w-24">Status</TableHead>
+                <TableHead className="text-right w-24">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {categorias?.map((categoria) => (
                 <TableRow key={categoria.id}>
-                  <TableCell className="text-2xl">{categoria.emoji}</TableCell>
+                  <TableCell className="text-2xl w-16 text-center">
+                    {categoria.emoji || <span className="text-muted-foreground text-sm">—</span>}
+                  </TableCell>
                   <TableCell className="font-medium">{categoria.name}</TableCell>
                   <TableCell>{categoria.ordem}</TableCell>
                   <TableCell>

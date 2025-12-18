@@ -114,11 +114,14 @@ export function TopHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
-              <DropdownMenuItem asChild>
-                <Link to="/trilhas" className="cursor-pointer">
-                  Academy
-                </Link>
-              </DropdownMenuItem>
+              {/* Academy: não aparece para plano Club pois já têm acesso ao Club */}
+              {plan !== "club" && (
+                <DropdownMenuItem asChild>
+                  <Link to="/trilhas" className="cursor-pointer">
+                    Academy
+                  </Link>
+                </DropdownMenuItem>
+              )}
               
               {(hasAccessTo("lab") || isAdmin) && isProdutoAtivo("lab") && (
                 <DropdownMenuItem asChild>

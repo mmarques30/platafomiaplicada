@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCallback, useRef } from "react";
 
 export interface Candidatura {
   id: string;
@@ -116,4 +117,96 @@ export const useAtualizarCandidatura = () => {
       toast.error("Erro ao atualizar: " + error.message);
     },
   });
+};
+
+// Hook para salvar rascunho de candidatura no banco
+export const useCandidaturaDraft = (email: string | undefined) => {
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Buscar rascunho existente
+  const { data: draft, isLoading } = useQuery({
+    queryKey: ["candidatura-draft", email],
+    queryFn: async () => {
+      if (!email) return null;
+      
+      const { data, error } = await supabase
+        .from("candidaturas_mentoria")
+        .select("*")
+        .eq("email", email)
+        .eq("status", "rascunho")
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!email,
+  });
+  
+  // Salvar/atualizar rascunho
+  const saveDraft = useCallback(async (data: any, step: number) => {
+    if (!data.email) return;
+    
+    // Limpar timeout anterior
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    
+    // Debounce de 2 segundos
+    return new Promise<boolean>((resolve) => {
+      saveTimeoutRef.current = setTimeout(async () => {
+        try {
+          const draftData = {
+            ...data,
+            status: "rascunho",
+          };
+          
+          // Remover campos undefined/null vazios
+          Object.keys(draftData).forEach(key => {
+            if (draftData[key] === undefined || draftData[key] === "") {
+              delete draftData[key];
+            }
+          });
+          
+          // Verificar se já existe um rascunho para este email
+          const { data: existing } = await supabase
+            .from("candidaturas_mentoria")
+            .select("id")
+            .eq("email", data.email)
+            .eq("status", "rascunho")
+            .maybeSingle();
+          
+          if (existing) {
+            // Atualizar rascunho existente
+            await supabase
+              .from("candidaturas_mentoria")
+              .update(draftData)
+              .eq("id", existing.id);
+          } else {
+            // Criar novo rascunho
+            await supabase
+              .from("candidaturas_mentoria")
+              .insert([draftData]);
+          }
+          
+          resolve(true);
+        } catch (error) {
+          console.error("Erro ao salvar rascunho:", error);
+          resolve(false);
+        }
+      }, 2000);
+    });
+  }, []);
+  
+  // Limpar rascunho após envio bem-sucedido
+  const clearDraft = useCallback(async (email: string) => {
+    if (!email) return;
+    
+    await supabase
+      .from("candidaturas_mentoria")
+      .delete()
+      .eq("email", email)
+      .eq("status", "rascunho");
+  }, []);
+  
+  return { draft, isLoading, saveDraft, clearDraft };
 };
