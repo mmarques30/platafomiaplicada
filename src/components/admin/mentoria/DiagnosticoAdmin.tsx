@@ -5,11 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
-import { Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Target, Calendar, Video, PanelLeftOpen, FileText } from "lucide-react";
+import { Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Target, Calendar, Video, PanelLeftOpen, FileText, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 import { DiagnosticoUploadModal } from "./DiagnosticoUploadModal";
+import { DiagnosticoFormModal } from "./DiagnosticoFormModal";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
@@ -18,9 +19,10 @@ import { useNavigate } from "react-router-dom";
 
 interface DiagnosticoAdminProps {
   userId?: string;
+  allowManualInput?: boolean;
 }
 
-export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
+export function DiagnosticoAdmin({ userId, allowManualInput = true }: DiagnosticoAdminProps) {
   const navigate = useNavigate();
   const { diagnostico, isLoading, deletarArquivo } = useDiagnosticoAdmin(userId);
   const { projetos } = useMentoriaProjetos(userId);
@@ -29,6 +31,7 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
   const objetivosEstrategicos = projetos.filter(p => p.tipo === "estrategico");
   const { sessoes } = useMentoriaSessoes();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewTranscricao, setViewTranscricao] = useState<any>(null);
 
@@ -75,13 +78,27 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
               Este mentorado ainda não possui diagnóstico. Escolha como adicionar:
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex gap-2">
+            {allowManualInput && (
+              <Button variant="outline" onClick={() => setFormModalOpen(true)}>
+                <Edit className="h-4 w-4 mr-2" />
+                Preencher Manualmente
+              </Button>
+            )}
             <Button onClick={() => setUploadModalOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Upload de Arquivo
             </Button>
           </CardContent>
         </Card>
+
+        {allowManualInput && (
+          <DiagnosticoFormModal
+            open={formModalOpen}
+            onOpenChange={setFormModalOpen}
+            userId={userId}
+          />
+        )}
 
         <DiagnosticoUploadModal
           open={uploadModalOpen}
@@ -285,6 +302,15 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
         </CardContent>
       </Card>
 
+      {allowManualInput && (
+        <DiagnosticoFormModal
+          open={formModalOpen}
+          onOpenChange={setFormModalOpen}
+          userId={userId}
+          diagnostico={diagnostico}
+        />
+      )}
+
       <DiagnosticoUploadModal
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
@@ -300,7 +326,8 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
               </Button>
             </div>
             <ResumoDiagnostico 
-              formulario={diagnostico} 
+              formulario={diagnostico}
+              onEditar={allowManualInput ? () => { setViewModalOpen(false); setFormModalOpen(true); } : undefined}
             />
           </div>
         </div>

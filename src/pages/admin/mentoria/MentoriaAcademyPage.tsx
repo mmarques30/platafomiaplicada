@@ -103,7 +103,7 @@ export default function MentoriaAcademyPage() {
           </TabsList>
 
           <TabsContent value="diagnostico-ia" className="space-y-4">
-            <DiagnosticoAdmin userId={selectedUserId} />
+            <DiagnosticoAdmin userId={selectedUserId} allowManualInput={false} />
           </TabsContent>
 
           <TabsContent value="feedback-mentora" className="space-y-4">
