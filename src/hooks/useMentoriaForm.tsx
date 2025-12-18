@@ -26,7 +26,7 @@ export const useMentoriaForm = () => {
     enabled: !!user,
   });
 
-  // Salvar/Atualizar formulário
+  // Salvar/Atualizar formulário usando upsert para evitar erro de chave duplicada
   const salvarMutation = useMutation({
     mutationFn: async (dados: Partial<FormData>) => {
       if (!user) throw new Error("Usuário não autenticado");
@@ -37,33 +37,19 @@ export const useMentoriaForm = () => {
         updated_at: new Date().toISOString(),
       };
 
-      if (formulario) {
-        // Update
-        const { data, error } = await supabase
-          .from("formulario_diagnostico")
-          .update(payload)
-          .eq("user_id", user.id)
-          .select()
-          .single();
+      const { data, error } = await supabase
+        .from("formulario_diagnostico")
+        .upsert(payload, { onConflict: 'user_id' })
+        .select()
+        .single();
 
-        if (error) throw error;
-        return data;
-      } else {
-        // Insert
-        const { data, error } = await supabase
-          .from("formulario_diagnostico")
-          .insert(payload)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      }
+      if (error) throw error;
+      return data;
     },
     // Não invalida queries no rascunho para evitar re-render que fecha o Select
   });
 
-  // Finalizar formulário (marcar como completado)
+  // Finalizar formulário (marcar como completado) usando upsert
   const finalizarMutation = useMutation({
     mutationFn: async (dados: FormData) => {
       if (!user) throw new Error("Usuário não autenticado");
@@ -75,26 +61,14 @@ export const useMentoriaForm = () => {
         updated_at: new Date().toISOString(),
       };
 
-      if (formulario) {
-        const { data, error } = await supabase
-          .from("formulario_diagnostico")
-          .update(payload)
-          .eq("user_id", user.id)
-          .select()
-          .single();
+      const { data, error } = await supabase
+        .from("formulario_diagnostico")
+        .upsert(payload, { onConflict: 'user_id' })
+        .select()
+        .single();
 
-        if (error) throw error;
-        return data;
-      } else {
-        const { data, error } = await supabase
-          .from("formulario_diagnostico")
-          .insert(payload)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      }
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["formulario-diagnostico"] });
