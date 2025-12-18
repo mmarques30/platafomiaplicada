@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,15 +28,15 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
   const [planoExecucaoUrl, setPlanoExecucaoUrl] = useState("");
   const [direcionalEntregas, setDirecionalEntregas] = useState("");
 
-  // Sincronizar estado com dados do banco
-  useState(() => {
+  // Sincronizar estado com dados do banco quando carregar
+  useEffect(() => {
     if (diagnostico) {
       setVideoCallUrl(diagnostico.video_call_url || "");
       setTranscricaoUrl(diagnostico.transcricao_call_url || "");
       setPlanoExecucaoUrl(diagnostico.link_plano_execucao || "");
       setDirecionalEntregas((diagnostico as any).direcional_entregas || "");
     }
-  });
+  }, [diagnostico]);
 
   // Mutation para salvar feedback
   const salvarFeedback = useMutation({
@@ -69,14 +69,6 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
       });
     },
   });
-
-  // Atualizar campos quando dados carregarem
-  if (diagnostico && !videoCallUrl && !transcricaoUrl && !planoExecucaoUrl && !direcionalEntregas) {
-    if (diagnostico.video_call_url) setVideoCallUrl(diagnostico.video_call_url);
-    if (diagnostico.transcricao_call_url) setTranscricaoUrl(diagnostico.transcricao_call_url);
-    if (diagnostico.link_plano_execucao) setPlanoExecucaoUrl(diagnostico.link_plano_execucao);
-    if ((diagnostico as any).direcional_entregas) setDirecionalEntregas((diagnostico as any).direcional_entregas);
-  }
 
   if (isLoading) {
     return (
