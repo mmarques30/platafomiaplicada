@@ -2,9 +2,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ChevronDown, Bot, User } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ChevronDown, Bot, User, MessageSquare } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -26,7 +31,7 @@ interface GroupedChat {
 
 export function ConversasIATab() {
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState<string>("all");
 
   const { data: groupedChats, isLoading } = useQuery({
     queryKey: ["admin-chat-messages"],
@@ -79,9 +84,10 @@ export function ConversasIATab() {
     },
   });
 
-  const filteredChats = groupedChats?.filter((chat) =>
-    chat.nome_completo.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredChats =
+    selectedUserId === "all"
+      ? groupedChats
+      : groupedChats?.filter((chat) => chat.user_id === selectedUserId);
 
   if (isLoading) {
     return <div>Carregando conversas...</div>;
@@ -90,25 +96,35 @@ export function ConversasIATab() {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle>Conversas com MarIAna</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5" />
+          Conversas com MarIAna
+        </CardTitle>
         <p className="text-sm text-muted-foreground">
           Histórico completo de todas as conversas com o chatbot
         </p>
 
-        <Input
-          placeholder="Buscar por nome do usuário..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="mt-4"
-        />
+        <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+          <SelectTrigger className="w-full sm:w-80 mt-4">
+            <SelectValue placeholder="Selecionar usuário..." />
+          </SelectTrigger>
+          <SelectContent className="bg-popover">
+            <SelectItem value="all">
+              Todos os usuários ({groupedChats?.length || 0})
+            </SelectItem>
+            {groupedChats?.map((chat) => (
+              <SelectItem key={chat.user_id} value={chat.user_id}>
+                {chat.nome_completo} ({chat.total_messages} msgs)
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardHeader>
 
       <CardContent className="space-y-4">
         {filteredChats?.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            {searchTerm
-              ? "Nenhuma conversa encontrada"
-              : "Nenhuma conversa com MarIAna ainda"}
+            Nenhuma conversa com MarIAna ainda
           </div>
         ) : (
           filteredChats?.map((chat) => (
