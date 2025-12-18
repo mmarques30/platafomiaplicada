@@ -1,107 +1,119 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MessageSquare, TrendingUp, Activity, Trophy, Play, FolderOpen } from "lucide-react";
+import { Users, MessageSquare, TrendingUp, Activity, Trophy, Heart, FolderOpen } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function EstatisticasComunidadeTab() {
-  // Overview stats
+  // Buscar IDs de visitantes para filtrar
+  const { data: visitanteIds } = useQuery({
+    queryKey: ["admin-visitante-ids"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("is_visitante", true)
+        .eq("conta_ativa", true);
+      return data?.map(v => v.id) || [];
+    },
+  });
+
+  // Overview stats - APENAS VISITANTES
   const { data: stats, isLoading: loadingStats } = useQuery({
-    queryKey: ["admin-community-stats-enhanced"],
+    queryKey: ["admin-community-stats-visitantes"],
     queryFn: async () => {
       const now = new Date();
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
 
       const [
-        { count: totalMembers },
-        { count: activeMembers },
+        { count: totalVisitantes },
+        { count: activeVisitantes },
         { count: postsThisWeek },
         { count: totalPosts },
         { count: totalComments },
       ] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("conta_ativa", true),
+        // Total de visitantes cadastrados
         supabase
           .from("profiles")
           .select("*", { count: "exact", head: true })
           .eq("conta_ativa", true)
+          .eq("is_visitante", true),
+        // Visitantes ativos nos últimos 7 dias
+        supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .eq("conta_ativa", true)
+          .eq("is_visitante", true)
           .gte("ultimo_acesso", sevenDaysAgo.toISOString()),
+        // Posts da semana (comunidade geral)
         supabase
           .from("community_posts")
           .select("*", { count: "exact", head: true })
           .gte("created_at", weekStart.toISOString()),
+        // Total de posts
         supabase
           .from("community_posts")
           .select("*", { count: "exact", head: true }),
+        // Total de comentários
         supabase
           .from("community_comments")
           .select("*", { count: "exact", head: true }),
       ]);
 
-      const engagementRate = totalMembers && totalMembers > 0 
-        ? Math.round(((totalPosts || 0) + (totalComments || 0)) / totalMembers * 100) / 100
+      const engagementRate = totalVisitantes && totalVisitantes > 0 
+        ? Math.round(((totalPosts || 0) + (totalComments || 0)) / totalVisitantes * 100) / 100
         : 0;
 
       return {
-        totalMembers: totalMembers || 0,
-        activeMembers: activeMembers || 0,
+        totalVisitantes: totalVisitantes || 0,
+        activeVisitantes: activeVisitantes || 0,
         postsThisWeek: postsThisWeek || 0,
         engagementRate,
       };
     },
   });
 
-  // Top 5 ranking engajamento
+  // Top 5 ranking engajamento - FILTRADO POR VISITANTES
   const { data: ranking, isLoading: loadingRanking } = useQuery({
-    queryKey: ["admin-top-ranking-engajamento"],
+    queryKey: ["admin-top-ranking-engajamento-visitantes", visitanteIds],
     queryFn: async () => {
+      if (!visitanteIds || visitanteIds.length === 0) return [];
+      
       const { data, error } = await supabase.rpc("get_ranking_engajamento");
       if (error) throw error;
-      return (data || []).slice(0, 5);
+      
+      // Filtrar apenas visitantes
+      return (data || [])
+        .filter((user: any) => visitanteIds.includes(user.user_id))
+        .slice(0, 5);
     },
+    enabled: !!visitanteIds,
   });
 
-  // Top 5 vídeos mais assistidos
-  const { data: topVideos, isLoading: loadingVideos } = useQuery({
-    queryKey: ["admin-top-videos-watched"],
+  // Top 5 Posts Mais Populares (substituindo vídeos)
+  const { data: topPosts, isLoading: loadingPosts } = useQuery({
+    queryKey: ["admin-top-posts-popular"],
     queryFn: async () => {
-      const { data: progressData, error } = await supabase
-        .from("progresso_videos")
-        .select("video_id")
-        .eq("completado", true);
+      const { data: posts, error } = await supabase
+        .from("community_posts")
+        .select(`
+          id,
+          title,
+          content,
+          likes_count,
+          comments_count,
+          created_at,
+          user_id,
+          profiles:user_id (nome_completo, avatar_url)
+        `)
+        .order("likes_count", { ascending: false })
+        .limit(5);
 
       if (error) throw error;
-
-      // Count views per video
-      const viewCounts: Record<string, number> = {};
-      progressData?.forEach((p) => {
-        viewCounts[p.video_id] = (viewCounts[p.video_id] || 0) + 1;
-      });
-
-      // Get top 5 video IDs
-      const topVideoIds = Object.entries(viewCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5)
-        .map(([id]) => id);
-
-      if (topVideoIds.length === 0) return [];
-
-      // Fetch video details
-      const { data: videos } = await supabase
-        .from("videos")
-        .select("id, titulo")
-        .in("id", topVideoIds);
-
-      return topVideoIds.map((id) => ({
-        id,
-        titulo: videos?.find((v) => v.id === id)?.titulo || "Vídeo",
-        views: viewCounts[id],
-      }));
+      return posts || [];
     },
   });
 
@@ -139,14 +151,14 @@ export function EstatisticasComunidadeTab() {
 
   const overviewCards = [
     {
-      title: "Membros Totais",
-      value: stats?.totalMembers || 0,
+      title: "Visitantes Cadastrados",
+      value: stats?.totalVisitantes || 0,
       icon: Users,
       color: "text-blue-500",
     },
     {
-      title: "Ativos (7 dias)",
-      value: stats?.activeMembers || 0,
+      title: "Visitantes Ativos (7 dias)",
+      value: stats?.activeVisitantes || 0,
       icon: Activity,
       color: "text-green-500",
     },
@@ -161,7 +173,7 @@ export function EstatisticasComunidadeTab() {
       value: stats?.engagementRate?.toFixed(2) || "0",
       icon: TrendingUp,
       color: "text-orange-500",
-      suffix: "/ usuário",
+      suffix: "/ visitante",
     },
   ];
 
@@ -199,12 +211,12 @@ export function EstatisticasComunidadeTab() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Top 5 Ranking Engajamento */}
+        {/* Top 5 Ranking Engajamento - VISITANTES */}
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Trophy className="h-4 w-4 text-yellow-500" />
-              Top 5 Engajamento
+              Top 5 Engajamento (Visitantes)
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -246,51 +258,65 @@ export function EstatisticasComunidadeTab() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">
-                Nenhum dado de engajamento ainda
+                Nenhum visitante com engajamento ainda
               </p>
             )}
           </CardContent>
         </Card>
 
-        {/* Top 5 Vídeos Mais Assistidos */}
+        {/* Top 5 Posts Mais Populares */}
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Play className="h-4 w-4 text-red-500" />
-              Top 5 Vídeos Mais Assistidos
+              <Heart className="h-4 w-4 text-red-500" />
+              Top 5 Posts Mais Populares
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {loadingVideos ? (
+            {loadingPosts ? (
               <div className="space-y-3">
                 {[...Array(5)].map((_, i) => (
                   <Skeleton key={i} className="h-10 w-full" />
                 ))}
               </div>
-            ) : topVideos && topVideos.length > 0 ? (
+            ) : topPosts && topPosts.length > 0 ? (
               <div className="space-y-3">
-                {topVideos.map((video, index) => (
+                {topPosts.map((post: any, index: number) => (
                   <div
-                    key={video.id}
+                    key={post.id}
                     className="flex items-center gap-3 p-2 rounded-lg bg-muted/30"
                   >
                     <span className="text-sm font-bold text-muted-foreground w-5">
                       #{index + 1}
                     </span>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={post.profiles?.avatar_url} />
+                      <AvatarFallback className="text-xs">
+                        {post.profiles?.nome_completo?.charAt(0) || "?"}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">
-                        {video.titulo}
+                        {post.title || post.content?.substring(0, 40) + "..."}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        por {post.profiles?.nome_completo || "Usuário"}
                       </p>
                     </div>
-                    <span className="text-sm font-semibold text-green-600">
-                      {video.views} {video.views === 1 ? "view" : "views"}
-                    </span>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold text-red-500">
+                        {post.likes_count || 0} ❤️
+                      </span>
+                      <p className="text-xs text-muted-foreground">
+                        {post.comments_count || 0} 💬
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">
-                Nenhum vídeo assistido ainda
+                Nenhum post encontrado ainda
               </p>
             )}
           </CardContent>
