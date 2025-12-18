@@ -1267,6 +1267,7 @@ export type Database = {
           duvidas_preocupacoes: string | null
           estilo_aprendizagem: string | null
           experiencia_ia: string | null
+          feedback_mentora_em: string | null
           ferramentas_ia: Json | null
           frequencia_feedback: string | null
           frequencia_uso_ia: string | null
@@ -1276,6 +1277,7 @@ export type Database = {
           insight_ia: Json | null
           lidera_equipe: boolean | null
           limitacoes_tecnicas: string | null
+          link_plano_execucao: string | null
           linkedin: string | null
           maior_dificuldade_ia: string | null
           maior_ladrao_tempo: string | null
@@ -1309,8 +1311,10 @@ export type Database = {
           tempo_experiencia: string | null
           tipo_feedback: string | null
           tipo_suporte: string | null
+          transcricao_call_url: string | null
           updated_at: string | null
           user_id: string
+          video_call_url: string | null
           vitoria_30_dias: string | null
           zona_conforto: string | null
         }
@@ -1327,6 +1331,7 @@ export type Database = {
           duvidas_preocupacoes?: string | null
           estilo_aprendizagem?: string | null
           experiencia_ia?: string | null
+          feedback_mentora_em?: string | null
           ferramentas_ia?: Json | null
           frequencia_feedback?: string | null
           frequencia_uso_ia?: string | null
@@ -1336,6 +1341,7 @@ export type Database = {
           insight_ia?: Json | null
           lidera_equipe?: boolean | null
           limitacoes_tecnicas?: string | null
+          link_plano_execucao?: string | null
           linkedin?: string | null
           maior_dificuldade_ia?: string | null
           maior_ladrao_tempo?: string | null
@@ -1369,8 +1375,10 @@ export type Database = {
           tempo_experiencia?: string | null
           tipo_feedback?: string | null
           tipo_suporte?: string | null
+          transcricao_call_url?: string | null
           updated_at?: string | null
           user_id: string
+          video_call_url?: string | null
           vitoria_30_dias?: string | null
           zona_conforto?: string | null
         }
@@ -1387,6 +1395,7 @@ export type Database = {
           duvidas_preocupacoes?: string | null
           estilo_aprendizagem?: string | null
           experiencia_ia?: string | null
+          feedback_mentora_em?: string | null
           ferramentas_ia?: Json | null
           frequencia_feedback?: string | null
           frequencia_uso_ia?: string | null
@@ -1396,6 +1405,7 @@ export type Database = {
           insight_ia?: Json | null
           lidera_equipe?: boolean | null
           limitacoes_tecnicas?: string | null
+          link_plano_execucao?: string | null
           linkedin?: string | null
           maior_dificuldade_ia?: string | null
           maior_ladrao_tempo?: string | null
@@ -1429,8 +1439,10 @@ export type Database = {
           tempo_experiencia?: string | null
           tipo_feedback?: string | null
           tipo_suporte?: string | null
+          transcricao_call_url?: string | null
           updated_at?: string | null
           user_id?: string
+          video_call_url?: string | null
           vitoria_30_dias?: string | null
           zona_conforto?: string | null
         }
