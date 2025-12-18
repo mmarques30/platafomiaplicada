@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, Clock, AlertCircle, Brain, Video } from "lucide-react";
+import { CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ObjetivosGerados } from "@/components/mentoria/ObjetivosGerados";
@@ -29,7 +29,6 @@ export default function MeuDiagnostico() {
 
   const completo = formulario?.completado || false;
   const preenchidoPorAdmin = formulario?.preenchido_por === "admin";
-  const hasFeedbackMentora = !!formulario?.feedback_mentora_em;
   const ultimaAnalise = formulario?.updated_at
     ? format(new Date(formulario.updated_at), "dd 'de' MMMM", { locale: ptBR })
     : null;
@@ -48,20 +47,11 @@ export default function MeuDiagnostico() {
         ) : (
           <Tabs defaultValue="diagnostico-ia" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="diagnostico-ia" className="flex items-center gap-2">
-                <Brain className="h-4 w-4" />
+              <TabsTrigger value="diagnostico-ia">
                 Diagnóstico IA
               </TabsTrigger>
-              <TabsTrigger 
-                value="feedback-mentora"
-                disabled={!hasFeedbackMentora}
-                className="flex items-center gap-2"
-              >
-                <Video className="h-4 w-4" />
+              <TabsTrigger value="feedback-mentora">
                 Feedback Mentora
-                {!hasFeedbackMentora && (
-                  <Badge variant="outline" className="ml-1 text-xs">Em breve</Badge>
-                )}
               </TabsTrigger>
             </TabsList>
 
