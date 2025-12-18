@@ -21,11 +21,11 @@ export function useFormularios() {
       // Buscar nomes dos usuários separadamente
       const userIds = formularios?.map(f => f.user_id).filter(Boolean) || [];
       
-      let profiles: { id: string; nome_completo: string }[] = [];
+      let profiles: { id: string; nome_completo: string; plano_mentoria: string | null }[] = [];
       if (userIds.length > 0) {
         const { data: profilesData } = await supabase
           .from("profiles")
-          .select("id, nome_completo")
+          .select("id, nome_completo, plano_mentoria")
           .in("id", userIds);
         
         profiles = profilesData || [];
