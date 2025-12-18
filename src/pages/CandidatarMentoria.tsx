@@ -11,7 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, CheckCircle2, Save } from "lucide-react";
-import { useEnviarCandidatura } from "@/hooks/useCandidaturasMentoria";
+import { useEnviarCandidatura, useCandidaturaDraft } from "@/hooks/useCandidaturasMentoria";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
 import logoSimbol from "@/assets/logo-aplicada-simbolo.png";
@@ -38,12 +38,17 @@ export default function CandidatarMentoria() {
   const [step, setStep] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
+  const [dbSaving, setDbSaving] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { register, handleSubmit, watch, setValue } = useForm();
   const { mutate: enviarCandidatura, isPending } = useEnviarCandidatura();
   const { profile } = useUserProfile();
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Hook para salvar no banco
+  const currentEmail = watch("email");
+  const { draft, isLoading: isLoadingDraft, saveDraft, clearDraft } = useCandidaturaDraft(currentEmail);
   
   // Capturar origem e plano da URL
   const origemPagina = searchParams.get('origem') || 'direto';
@@ -53,10 +58,22 @@ export default function CandidatarMentoria() {
   const totalSteps = 7;
   const progressPercent = (step / totalSteps) * 100;
 
-  // Restore draft on mount
+  // Restore draft on mount - primeiro do banco, depois localStorage
   useEffect(() => {
+    // Se tiver rascunho no banco, usar ele
+    if (draft && !isLoadingDraft) {
+      Object.entries(draft).forEach(([key, value]) => {
+        if (value !== null && key !== 'id' && key !== 'created_at' && key !== 'updated_at' && key !== 'status') {
+          setValue(key, value);
+        }
+      });
+      toast.info("Rascunho restaurado do servidor");
+      return;
+    }
+    
+    // Fallback para localStorage
     const savedDraft = localStorage.getItem(DRAFT_KEY);
-    if (savedDraft) {
+    if (savedDraft && !draft) {
       try {
         const parsed = JSON.parse(savedDraft);
         Object.entries(parsed).forEach(([key, value]) => {
@@ -70,9 +87,9 @@ export default function CandidatarMentoria() {
         console.error("Erro ao restaurar rascunho:", e);
       }
     }
-  }, [setValue]);
+  }, [setValue, draft, isLoadingDraft]);
 
-  // Auto-save draft on changes (debounced)
+  // Auto-save draft on changes (localStorage + banco)
   useEffect(() => {
     const subscription = watch((data) => {
       // Clear previous timeout
@@ -81,14 +98,23 @@ export default function CandidatarMentoria() {
       }
       
       // Debounce save by 1 second
-      saveTimeoutRef.current = setTimeout(() => {
+      saveTimeoutRef.current = setTimeout(async () => {
         const draftData = { ...data, step };
+        
+        // Salvar no localStorage
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
         setDraftSaved(true);
         
+        // Salvar no banco se tiver email preenchido
+        if (data.email && data.nome_completo && data.whatsapp) {
+          setDbSaving(true);
+          await saveDraft(data, step);
+          setDbSaving(false);
+        }
+        
         // Reset indicator after 2 seconds
         setTimeout(() => setDraftSaved(false), 2000);
-      }, 1000);
+      }, 1500);
     });
     
     return () => {
@@ -97,7 +123,7 @@ export default function CandidatarMentoria() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [watch, step]);
+  }, [watch, step, saveDraft]);
 
   // Validate required fields before advancing to next step
   const validateStep = (): boolean => {
@@ -128,7 +154,7 @@ export default function CandidatarMentoria() {
     }
   };
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     // Final validation before submit
     if (!validateStep()) return;
 
@@ -138,11 +164,17 @@ export default function CandidatarMentoria() {
       origem_pagina: origemPagina,
       plano_origem: planoOrigem,
       is_visitante_origem: isVisitanteOrigem,
+      status: "nova", // Status final, não rascunho
     };
+    
+    // Se houver um rascunho no banco, limpar antes de enviar a candidatura final
+    if (data.email) {
+      await clearDraft(data.email);
+    }
     
     enviarCandidatura(candidaturaData, {
       onSuccess: () => {
-        // Clear draft on successful submission
+        // Clear localStorage draft on successful submission
         localStorage.removeItem(DRAFT_KEY);
         setShowSuccess(true);
       },
@@ -245,10 +277,10 @@ export default function CandidatarMentoria() {
           <div className="flex justify-between mb-2 text-sm text-muted-foreground">
             <span>Etapa {step} de {totalSteps}</span>
             <div className="flex items-center gap-2">
-              {draftSaved && (
+              {(draftSaved || dbSaving) && (
                 <span className="flex items-center gap-1 text-xs text-primary animate-in fade-in duration-300">
                   <Save className="h-3 w-3" />
-                  Rascunho salvo
+                  {dbSaving ? "Salvando no servidor..." : "Rascunho salvo"}
                 </span>
               )}
               <span>{Math.round(progressPercent)}%</span>

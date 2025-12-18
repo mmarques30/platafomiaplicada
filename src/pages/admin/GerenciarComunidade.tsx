@@ -17,35 +17,35 @@ export default function GerenciarComunidade() {
         </p>
       </div>
 
-      <Tabs defaultValue="categorias" className="space-y-6">
-        <TabsList className="bg-card border border-border">
+      <Tabs defaultValue="categorias" className="space-y-4">
+        <TabsList className="bg-muted/50 p-1 rounded-lg h-auto flex-wrap gap-1">
           <TabsTrigger
             value="categorias"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
           >
             Categorias
           </TabsTrigger>
           <TabsTrigger
             value="moderacao"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
           >
             Moderação
           </TabsTrigger>
           <TabsTrigger
             value="conversas"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
           >
             Conversas IA
           </TabsTrigger>
           <TabsTrigger
             value="estatisticas"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
           >
             Estatísticas
           </TabsTrigger>
           <TabsTrigger
             value="ferramentas"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
           >
             Ferramentas
           </TabsTrigger>
