@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Video, FileText, Target, ExternalLink, Clock, Save, Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Video, FileText, Target, ExternalLink, Clock, Save, Loader2, ClipboardList } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
@@ -43,6 +44,7 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
   const [videoCallUrl, setVideoCallUrl] = useState("");
   const [transcricaoUrl, setTranscricaoUrl] = useState("");
   const [planoExecucaoUrl, setPlanoExecucaoUrl] = useState("");
+  const [direcionalEntregas, setDirecionalEntregas] = useState("");
 
   // Sincronizar estado com dados do banco
   useState(() => {
@@ -50,6 +52,7 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
       setVideoCallUrl(diagnostico.video_call_url || "");
       setTranscricaoUrl(diagnostico.transcricao_call_url || "");
       setPlanoExecucaoUrl(diagnostico.link_plano_execucao || "");
+      setDirecionalEntregas((diagnostico as any).direcional_entregas || "");
     }
   });
 
@@ -63,8 +66,9 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
           video_call_url: videoCallUrl || null,
           transcricao_call_url: transcricaoUrl || null,
           link_plano_execucao: planoExecucaoUrl || null,
+          direcional_entregas: direcionalEntregas || null,
           feedback_mentora_em: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+        } as any, { onConflict: 'user_id' });
 
       if (error) throw error;
     },
@@ -85,10 +89,11 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
   });
 
   // Atualizar campos quando dados carregarem
-  if (diagnostico && !videoCallUrl && !transcricaoUrl && !planoExecucaoUrl) {
+  if (diagnostico && !videoCallUrl && !transcricaoUrl && !planoExecucaoUrl && !direcionalEntregas) {
     if (diagnostico.video_call_url) setVideoCallUrl(diagnostico.video_call_url);
     if (diagnostico.transcricao_call_url) setTranscricaoUrl(diagnostico.transcricao_call_url);
     if (diagnostico.link_plano_execucao) setPlanoExecucaoUrl(diagnostico.link_plano_execucao);
+    if ((diagnostico as any).direcional_entregas) setDirecionalEntregas((diagnostico as any).direcional_entregas);
   }
 
   if (isLoading) {
@@ -152,7 +157,19 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
             />
           </div>
 
-          <Button 
+          <div className="space-y-2">
+            <Label htmlFor="direcional">Direcional de Entregas</Label>
+            <Textarea
+              id="direcional"
+              placeholder="Descreva as próximas entregas, prazos e expectativas para o mentorado..."
+              value={direcionalEntregas}
+              onChange={(e) => setDirecionalEntregas(e.target.value)}
+              rows={6}
+              className="resize-none"
+            />
+          </div>
+
+          <Button
             onClick={() => salvarFeedback.mutate()}
             disabled={salvarFeedback.isPending}
             className="w-full"
@@ -176,7 +193,7 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {!hasVideo && !transcricaoUrl && !planoExecucaoUrl ? (
+          {!hasVideo && !transcricaoUrl && !planoExecucaoUrl && !direcionalEntregas ? (
             <div className="text-center py-8 text-muted-foreground">
               <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">Nenhum material adicionado ainda</p>
@@ -231,6 +248,19 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
                   </Button>
                 )}
               </div>
+
+              {/* Direcional de Entregas */}
+              {direcionalEntregas && (
+                <div className="space-y-2 pt-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <ClipboardList className="h-4 w-4 text-primary" />
+                    Direcional de Entregas
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-4 text-sm whitespace-pre-wrap">
+                    {direcionalEntregas}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
