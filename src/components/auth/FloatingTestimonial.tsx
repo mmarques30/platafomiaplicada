@@ -15,6 +15,12 @@ const feedbacks = [
   { texto: "A comunidade é sensacional!", autor: "Rafael Souza" },
   { texto: "Finalmente entendi como usar IA!", autor: "Camila Rocha" },
   { texto: "Melhor investimento que fiz esse ano.", autor: "Pedro Almeida" },
+  { texto: "Nunca recebi um direcional como esse pra usar a ferramenta certa pra tarefa certa.", autor: "Carolina Mendes" },
+  { texto: "Fiz um MBA de IA e aprendi só teoria, aqui eu aprendo e consigo aplicar no dia seguinte.", autor: "Thiago Barros" },
+  { texto: "Meu chefe ficou assustado com o dashboard que criei depois de só uma aula!", autor: "Amanda Santana" },
+  { texto: "Consegui a promoção que eu não tinha há anos. Depois da mentoria do Club, virei líder de tecnologia!", autor: "Ricardo Gomes" },
+  { texto: "É muito mais que uma mentoria de IA, a Mari ajudou a minha carreira acelerar.", autor: "Patrícia Nunes" },
+  { texto: "Nunca pensei que ia criar um sistema sozinha, minha cabeça está explodindo! rsrs", autor: "Beatriz Lima" },
 ];
 
 export function FloatingTestimonial() {
