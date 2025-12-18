@@ -1264,6 +1264,7 @@ export type Database = {
           desafio_1: string | null
           desafio_2: string | null
           desafio_3: string | null
+          direcional_entregas: string | null
           duvidas_preocupacoes: string | null
           estilo_aprendizagem: string | null
           experiencia_ia: string | null
@@ -1328,6 +1329,7 @@ export type Database = {
           desafio_1?: string | null
           desafio_2?: string | null
           desafio_3?: string | null
+          direcional_entregas?: string | null
           duvidas_preocupacoes?: string | null
           estilo_aprendizagem?: string | null
           experiencia_ia?: string | null
@@ -1392,6 +1394,7 @@ export type Database = {
           desafio_1?: string | null
           desafio_2?: string | null
           desafio_3?: string | null
+          direcional_entregas?: string | null
           duvidas_preocupacoes?: string | null
           estilo_aprendizagem?: string | null
           experiencia_ia?: string | null
