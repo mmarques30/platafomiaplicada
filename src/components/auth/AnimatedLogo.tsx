@@ -6,14 +6,14 @@ export function AnimatedLogo() {
     <motion.img
       src={logo3D}
       alt=""
-      className="absolute w-40 h-40 opacity-25 pointer-events-none"
-      initial={{ x: "-20%", y: "10%" }}
+      className="absolute w-48 h-48 opacity-20 pointer-events-none"
+      initial={{ x: "0%", y: "0%" }}
       animate={{
-        x: ["0%", "300%", "150%", "350%", "50%", "0%"],
-        y: ["10%", "60%", "30%", "70%", "45%", "10%"],
+        x: ["0%", "250%", "50%", "300%", "100%", "200%", "0%"],
+        y: ["0%", "80%", "30%", "100%", "50%", "90%", "20%", "0%"],
       }}
       transition={{
-        duration: 25,
+        duration: 30,
         repeat: Infinity,
         ease: "linear",
       }}
