@@ -87,11 +87,15 @@ function AppContent() {
       <Toaster />
       <Sonner />
       <Routes>
+        {/* Rotas públicas */}
         <Route path="/auth" element={<Auth />} />
-          <Route path="/aplique" element={<Aplique />} />
-          <Route path="/avance" element={<Avance />} />
-          <Route path="/formularioaplica" element={<FormularioAplica />} />
-          
+        <Route path="/aplique" element={<Aplique />} />
+        <Route path="/avance" element={<Avance />} />
+        <Route path="/formularioaplica" element={<FormularioAplica />} />
+        <Route path="/politicauso" element={<PoliticaUso />} />
+        <Route path="/politicavendas" element={<PoliticaVendas />} />
+        
+
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/trilhas" element={<Trilhas />} />
@@ -130,8 +134,6 @@ function AppContent() {
             <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
             <Route path="/videos-bonus" element={<VideosBonus />} />
-            <Route path="/politicavendas" element={<PoliticaVendas />} />
-            <Route path="/politicauso" element={<PoliticaUso />} />
           </Route>
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />
