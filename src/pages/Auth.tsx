@@ -106,7 +106,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex">
       {/* LADO ESQUERDO: Animação + Feedbacks */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#1a1a2e] via-[#252540] to-[#1e1e35] overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#0f0f0f] via-[#1a1a1a] to-[#0a0a0a] overflow-hidden">
         {/* Logo 3D animada */}
         <AnimatedLogo />
 
