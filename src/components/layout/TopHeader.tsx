@@ -12,15 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { NavLink, useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
+import { useProdutosAtivos } from "@/hooks/admin/useProdutos";
 import { cn } from "@/lib/utils";
-import logoAplicada from "@/assets/logo-aplicada.png";
 import { useLocation } from "react-router-dom";
 
 export function TopHeader() {
@@ -30,6 +29,12 @@ export function TopHeader() {
   const { isAdmin, isVisitante } = useUserRole();
   const { hasAccessTo, plan } = useUserPlan();
   const { profile } = useUserProfile();
+  const { data: produtosAtivos } = useProdutosAtivos();
+  
+  // Verifica se um produto está ativo pelo slug
+  const isProdutoAtivo = (slug: string) => {
+    return produtosAtivos?.some(p => p.slug === slug) ?? false;
+  };
   
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -115,7 +120,7 @@ export function TopHeader() {
                 </Link>
               </DropdownMenuItem>
               
-              {(hasAccessTo("lab") || isAdmin) && (
+              {(hasAccessTo("lab") || isAdmin) && isProdutoAtivo("lab") && (
                 <DropdownMenuItem asChild>
                   <Link to="/lab" className="cursor-pointer">
                     Lab
@@ -123,7 +128,7 @@ export function TopHeader() {
                 </DropdownMenuItem>
               )}
               
-              {(hasAccessTo("club") || isAdmin) && (
+              {(hasAccessTo("club") || isAdmin) && isProdutoAtivo("club") && (
                 <DropdownMenuItem asChild>
                   <Link to="/mentoria" className="cursor-pointer">
                     Club
@@ -131,7 +136,7 @@ export function TopHeader() {
                 </DropdownMenuItem>
               )}
               
-              {(hasAccessTo("skills") || isAdmin) && (
+              {(hasAccessTo("skills") || isAdmin) && isProdutoAtivo("skills") && (
                 <DropdownMenuItem asChild>
                   <Link to="/skills" className="cursor-pointer">
                     Skills
