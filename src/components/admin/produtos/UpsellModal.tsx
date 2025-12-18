@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { RegraUpsell, useProdutos, useCreateRegraUpsell, useUpdateRegraUpsell } from "@/hooks/admin/useProdutos";
+import { RegraUpsell, useProdutosAtivos, useCreateRegraUpsell, useUpdateRegraUpsell } from "@/hooks/admin/useProdutos";
 
 interface UpsellModalProps {
   open: boolean;
@@ -15,7 +15,7 @@ interface UpsellModalProps {
 }
 
 export function UpsellModal({ open, onOpenChange, regra }: UpsellModalProps) {
-  const { data: produtos } = useProdutos();
+  const { data: produtos } = useProdutosAtivos();
   const createRegra = useCreateRegraUpsell();
   const updateRegra = useUpdateRegraUpsell();
 

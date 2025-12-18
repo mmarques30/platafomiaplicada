@@ -71,6 +71,22 @@ export function useProdutos() {
   });
 }
 
+export function useProdutosAtivos() {
+  return useQuery({
+    queryKey: ["produtos-ativos"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("produtos")
+        .select("*")
+        .eq("ativo", true)
+        .order("ordem");
+
+      if (error) throw error;
+      return data as Produto[];
+    },
+  });
+}
+
 export function useRegrasUpsell() {
   return useQuery({
     queryKey: ["regras-upsell"],
