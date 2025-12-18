@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "@/hooks/admin/useUsers";
-import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, CheckSquare, Calendar } from "lucide-react";
+import { ArrowLeft, Users, FileText, Lightbulb } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
-import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
+import { ProjetosIAAdmin } from "@/components/admin/mentoria/ProjetosIAAdmin";
 import { Badge } from "@/components/ui/badge";
 
 export default function MentoriaAcademyPage() {
@@ -24,7 +23,7 @@ export default function MentoriaAcademyPage() {
 
   useEffect(() => {
     if (selectedUserId) {
-      queryClient.invalidateQueries({ queryKey: ["tarefas-mentoria", selectedUserId] });
+      queryClient.invalidateQueries({ queryKey: ["projetos-mentoria", selectedUserId] });
     }
   }, [selectedUserId, queryClient]);
 
@@ -92,9 +91,9 @@ export default function MentoriaAcademyPage() {
               <FileText className="h-4 w-4 mr-2" />
               Diagnóstico
             </TabsTrigger>
-            <TabsTrigger value="tarefas">
-              <CheckSquare className="h-4 w-4 mr-2" />
-              Tarefas
+            <TabsTrigger value="projetos-ia">
+              <Lightbulb className="h-4 w-4 mr-2" />
+              Projetos IA
             </TabsTrigger>
           </TabsList>
 
@@ -102,8 +101,8 @@ export default function MentoriaAcademyPage() {
             <DiagnosticoAdmin userId={selectedUserId} />
           </TabsContent>
 
-          <TabsContent value="tarefas" className="space-y-4">
-            <TarefasAdmin userId={selectedUserId} />
+          <TabsContent value="projetos-ia" className="space-y-4">
+            <ProjetosIAAdmin userId={selectedUserId} />
           </TabsContent>
         </Tabs>
       )}
