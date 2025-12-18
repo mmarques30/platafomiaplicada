@@ -33,7 +33,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   useCreateDesconto,
   useUpdateDesconto,
-  useProdutos,
+  useProdutosAtivos,
   type Desconto,
 } from "@/hooks/admin/useProdutos";
 
@@ -58,7 +58,7 @@ interface DescontoModalProps {
 }
 
 export function DescontoModal({ open, onOpenChange, desconto }: DescontoModalProps) {
-  const { data: produtos } = useProdutos();
+  const { data: produtos } = useProdutosAtivos();
   const createDesconto = useCreateDesconto();
   const updateDesconto = useUpdateDesconto();
   const [isSubmitting, setIsSubmitting] = useState(false);
