@@ -10,8 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { AnimatedLogo } from "@/components/auth/AnimatedLogo";
 import { FloatingTestimonial } from "@/components/auth/FloatingTestimonial";
-import logoIaplicada from "@/assets/logo-aplicada-marca-completa-clara.png";
-
 export default function Auth() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -108,53 +106,28 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex">
       {/* LADO ESQUERDO: Animação + Feedbacks */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#0f0f0f] via-[#1a1a1a] to-[#0a0a0a] overflow-hidden">
-        {/* Logo no topo */}
-        <div className="absolute top-8 left-8 z-10">
-          <img 
-            src={logoIaplicada} 
-            alt="IAplicada" 
-            className="h-10 w-auto"
-          />
-        </div>
-
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#1a1a2e] via-[#252540] to-[#1e1e35] overflow-hidden">
         {/* Logo 3D animada */}
         <AnimatedLogo />
 
         {/* Feedbacks rotativos */}
         <FloatingTestimonial />
-
-        {/* Texto decorativo */}
-        <div className="absolute top-1/2 left-12 -translate-y-1/2 max-w-md">
-          <h2 className="text-4xl font-bold text-white/10 leading-tight">
-            Transforme sua carreira com Inteligência Artificial
-          </h2>
-        </div>
       </div>
 
       {/* LADO DIREITO: Formulários */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-[#0a0a0f]">
         <div className="w-full max-w-md">
-          {/* Logo para mobile */}
-          <div className="lg:hidden flex justify-center mb-8">
-            <img 
-              src={logoIaplicada} 
-              alt="IAplicada" 
-              className="h-10 w-auto invert"
-            />
-          </div>
-
           <Tabs defaultValue="entrar" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-lg mb-8">
+            <TabsList className="grid w-full grid-cols-2 bg-white/5 p-1 rounded-lg mb-8">
               <TabsTrigger 
                 value="entrar"
-                className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-600"
+                className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-white/60"
               >
                 Acessar
               </TabsTrigger>
               <TabsTrigger 
                 value="criar-conta"
-                className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-600"
+                className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-white/60"
               >
                 Criar Conta Grátis
               </TabsTrigger>
@@ -162,18 +135,18 @@ export default function Auth() {
 
             {/* Aba Entrar */}
             <TabsContent value="entrar" className="mt-0">
-              <div className="space-y-2 mb-8">
-                <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
+              <div className="space-y-2 mb-8 text-center">
+                <h1 className="text-2xl md:text-3xl font-semibold text-white">
                   Bem-vindo de volta
                 </h1>
-                <p className="text-gray-500 text-sm">
+                <p className="text-white/60 text-sm">
                   Entre com seu email e senha para acessar
                 </p>
               </div>
               
               <form onSubmit={handleSignIn} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email" className="text-gray-700 text-sm font-medium">
+                  <Label htmlFor="signin-email" className="text-white/80 text-sm font-medium">
                     Email
                   </Label>
                   <Input
@@ -182,12 +155,12 @@ export default function Auth() {
                     type="email"
                     placeholder="seu@email.com"
                     required
-                    className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password" className="text-gray-700 text-sm font-medium">
+                  <Label htmlFor="signin-password" className="text-white/80 text-sm font-medium">
                     Senha
                   </Label>
                   <PasswordInput
@@ -195,7 +168,7 @@ export default function Auth() {
                     name="signin-password"
                     placeholder="••••••••"
                     required
-                    className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                   />
                 </div>
                 
@@ -211,18 +184,18 @@ export default function Auth() {
 
             {/* Aba Criar Conta */}
             <TabsContent value="criar-conta" className="mt-0">
-              <div className="space-y-2 mb-8">
-                <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
+              <div className="space-y-2 mb-8 text-center">
+                <h1 className="text-2xl md:text-3xl font-semibold text-white">
                   Explore a plataforma
                 </h1>
-                <p className="text-gray-500 text-sm">
+                <p className="text-white/60 text-sm">
                   Crie uma conta grátis e conheça a comunidade IAplicada
                 </p>
               </div>
               
               <form onSubmit={handleVisitorSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="visitor-name" className="text-gray-700 text-sm font-medium">
+                  <Label htmlFor="visitor-name" className="text-white/80 text-sm font-medium">
                     Nome Completo
                   </Label>
                   <Input
@@ -231,12 +204,12 @@ export default function Auth() {
                     type="text"
                     placeholder="Seu nome"
                     required
-                    className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="visitor-email" className="text-gray-700 text-sm font-medium">
+                  <Label htmlFor="visitor-email" className="text-white/80 text-sm font-medium">
                     Email
                   </Label>
                   <Input
@@ -245,12 +218,12 @@ export default function Auth() {
                     type="email"
                     placeholder="seu@email.com"
                     required
-                    className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="visitor-phone" className="text-gray-700 text-sm font-medium">
+                  <Label htmlFor="visitor-phone" className="text-white/80 text-sm font-medium">
                     Telefone
                   </Label>
                   <Input
@@ -259,12 +232,12 @@ export default function Auth() {
                     type="tel"
                     placeholder="(00) 00000-0000"
                     required
-                    className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="visitor-password" className="text-gray-700 text-sm font-medium">
+                  <Label htmlFor="visitor-password" className="text-white/80 text-sm font-medium">
                     Crie uma senha
                   </Label>
                   <PasswordInput
@@ -273,9 +246,9 @@ export default function Auth() {
                     placeholder="Mínimo 6 caracteres"
                     required
                     minLength={6}
-                    className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-white/50">
                     Você vai usar essa senha para acessar depois
                   </p>
                 </div>
@@ -292,7 +265,7 @@ export default function Auth() {
           </Tabs>
 
           {/* Termos */}
-          <p className="text-center text-xs text-gray-400 mt-8">
+          <p className="text-center text-xs text-white/40 mt-8">
             Ao continuar, você concorda com nossos{" "}
             <a href="/politica-uso" className="text-[#9EB038] hover:underline">
               Termos de Uso
