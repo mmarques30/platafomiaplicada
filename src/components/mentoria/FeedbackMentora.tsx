@@ -1,14 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Video, FileText, Target, ExternalLink, Clock, Play } from "lucide-react";
+import { Video, FileText, Target, ExternalLink, Clock, ClipboardList } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface FeedbackMentoraProps {
   formulario: {
     video_call_url?: string | null;
     transcricao_call_url?: string | null;
     link_plano_execucao?: string | null;
+    direcional_entregas?: string | null;
     feedback_mentora_em?: string | null;
   } | null;
 }
@@ -37,7 +40,8 @@ export function FeedbackMentora({ formulario }: FeedbackMentoraProps) {
   const hasVideo = formulario?.video_call_url;
   const hasTranscricao = formulario?.transcricao_call_url;
   const hasPlano = formulario?.link_plano_execucao;
-  const hasFeedback = hasVideo || hasTranscricao || hasPlano;
+  const hasDirecional = formulario?.direcional_entregas;
+  const hasFeedback = hasVideo || hasTranscricao || hasPlano || hasDirecional;
   const feedbackDate = formulario?.feedback_mentora_em
     ? format(new Date(formulario.feedback_mentora_em), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
     : null;
@@ -147,6 +151,28 @@ export function FeedbackMentora({ formulario }: FeedbackMentoraProps) {
             </Card>
           )}
         </div>
+      )}
+
+      {/* Direcional de Entregas */}
+      {hasDirecional && (
+        <Card className="border-primary/20">
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Direcional de Entregas</CardTitle>
+            </div>
+            <CardDescription>
+              Próximos passos e expectativas definidas pela mentora
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-muted/30 rounded-lg p-4 md:p-6 prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {formulario.direcional_entregas!}
+              </ReactMarkdown>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

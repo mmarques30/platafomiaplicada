@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, Target, ExternalLink, Clock, Save, Loader2, ClipboardList, Video } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
@@ -139,13 +141,21 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
 
           <div className="space-y-2">
             <Label htmlFor="direcional">Direcional de Entregas</Label>
+            <p className="text-xs text-muted-foreground">
+              Suporta Markdown: use **negrito**, *itálico*, - bullets, 1. listas numeradas, → setas
+            </p>
             <Textarea
               id="direcional"
-              placeholder="Descreva as próximas entregas, prazos e expectativas para o mentorado..."
+              placeholder="Exemplo:
+1. Entregar projeto de automação até sexta
+2. Revisar dashboard de vendas
+→ Prioridade: integração com CRM
+- Item importante
+- Outro item"
               value={direcionalEntregas}
               onChange={(e) => setDirecionalEntregas(e.target.value)}
-              rows={6}
-              className="resize-none"
+              rows={8}
+              className="resize-y font-mono text-sm"
             />
           </div>
 
@@ -230,8 +240,10 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
                     <ClipboardList className="h-4 w-4 text-primary" />
                     Direcional de Entregas
                   </div>
-                  <div className="bg-muted/50 rounded-lg p-4 text-sm whitespace-pre-wrap">
-                    {direcionalEntregas}
+                  <div className="bg-muted/50 rounded-lg p-4 text-sm prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {direcionalEntregas}
+                    </ReactMarkdown>
                   </div>
                 </div>
               )}
