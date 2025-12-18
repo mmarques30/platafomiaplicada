@@ -5,12 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
-import { FileText, Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Target, Calendar, Video, PanelLeftOpen } from "lucide-react";
+import { Upload, AlertCircle, CheckCircle, Download, Trash2, Eye, Target, Calendar, Video, PanelLeftOpen, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 import { DiagnosticoUploadModal } from "./DiagnosticoUploadModal";
-import { DiagnosticoFormModal } from "./DiagnosticoFormModal";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
@@ -30,7 +29,6 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
   const objetivosEstrategicos = projetos.filter(p => p.tipo === "estrategico");
   const { sessoes } = useMentoriaSessoes();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [formModalOpen, setFormModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewTranscricao, setViewTranscricao] = useState<any>(null);
 
@@ -77,14 +75,10 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
               Este mentorado ainda não possui diagnóstico. Escolha como adicionar:
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex gap-4">
+          <CardContent>
             <Button onClick={() => setUploadModalOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Upload de Arquivo
-            </Button>
-            <Button variant="outline" onClick={() => setFormModalOpen(true)}>
-              <FileText className="h-4 w-4 mr-2" />
-              Preencher Manualmente
             </Button>
           </CardContent>
         </Card>
@@ -92,11 +86,6 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
         <DiagnosticoUploadModal
           open={uploadModalOpen}
           onOpenChange={setUploadModalOpen}
-          userId={userId}
-        />
-        <DiagnosticoFormModal
-          open={formModalOpen}
-          onOpenChange={setFormModalOpen}
           userId={userId}
         />
       </>
@@ -286,10 +275,6 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
               <Eye className="h-4 w-4 mr-2" />
               Visualizar
             </Button>
-            <Button variant="outline" onClick={() => setFormModalOpen(true)}>
-              <FileText className="h-4 w-4 mr-2" />
-              Editar
-            </Button>
             {!diagnostico.arquivo_diagnostico_url && (
               <Button variant="outline" onClick={() => setUploadModalOpen(true)}>
                 <Upload className="h-4 w-4 mr-2" />
@@ -305,12 +290,6 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
         onOpenChange={setUploadModalOpen}
         userId={userId}
       />
-      <DiagnosticoFormModal
-        open={formModalOpen}
-        onOpenChange={setFormModalOpen}
-        userId={userId}
-        diagnostico={diagnostico}
-      />
       {viewModalOpen && diagnostico && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
           <div className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg max-h-[90vh] overflow-y-auto">
@@ -322,10 +301,6 @@ export function DiagnosticoAdmin({ userId }: DiagnosticoAdminProps) {
             </div>
             <ResumoDiagnostico 
               formulario={diagnostico} 
-              onEditar={() => {
-                setViewModalOpen(false);
-                setFormModalOpen(true);
-              }}
             />
           </div>
         </div>

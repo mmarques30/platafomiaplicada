@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Video, FileText, Target, ExternalLink, Clock, Save, Loader2, ClipboardList } from "lucide-react";
+import { FileText, Target, ExternalLink, Clock, Save, Loader2, ClipboardList, Video } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
@@ -14,26 +14,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface FeedbackMentoraAdminProps {
   userId: string;
-}
-
-// Função para extrair embed URL de vídeo
-function getEmbedUrl(url: string): string {
-  // YouTube
-  const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-  if (youtubeMatch) {
-    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-  }
-  // Vimeo
-  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-  if (vimeoMatch) {
-    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-  }
-  // Loom
-  const loomMatch = url.match(/loom\.com\/share\/([a-zA-Z0-9]+)/);
-  if (loomMatch) {
-    return `https://www.loom.com/embed/${loomMatch[1]}`;
-  }
-  return url;
 }
 
 export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
@@ -128,30 +108,30 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="video-url">Link do Vídeo da Call (YouTube, Vimeo ou Loom)</Label>
+            <Label htmlFor="video-url">Link do Vídeo da Call (Google Drive)</Label>
             <Input
               id="video-url"
-              placeholder="https://www.youtube.com/watch?v=..."
+              placeholder="https://drive.google.com/file/d/..."
               value={videoCallUrl}
               onChange={(e) => setVideoCallUrl(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="transcricao-url">Link da Transcrição</Label>
+            <Label htmlFor="transcricao-url">Link da Transcrição (Google Drive)</Label>
             <Input
               id="transcricao-url"
-              placeholder="https://docs.google.com/document/..."
+              placeholder="https://drive.google.com/file/d/..."
               value={transcricaoUrl}
               onChange={(e) => setTranscricaoUrl(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="plano-url">Link do Plano de Execução</Label>
+            <Label htmlFor="plano-url">Link do Plano de Execução (Google Drive)</Label>
             <Input
               id="plano-url"
-              placeholder="https://notion.so/... ou https://docs.google.com/..."
+              placeholder="https://drive.google.com/file/d/..."
               value={planoExecucaoUrl}
               onChange={(e) => setPlanoExecucaoUrl(e.target.value)}
             />
@@ -200,31 +180,25 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Vídeo Preview */}
-              {hasVideo && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <Video className="h-4 w-4 text-primary" />
-                    Gravação da Call
-                    {feedbackDate && (
-                      <span className="text-muted-foreground font-normal">
-                        ({feedbackDate})
-                      </span>
-                    )}
-                  </div>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-muted">
-                    <iframe
-                      src={getEmbedUrl(videoCallUrl || diagnostico?.video_call_url || "")}
-                      className="w-full h-full"
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    />
-                  </div>
-                </div>
+              {feedbackDate && (
+                <p className="text-sm text-muted-foreground">
+                  Feedback enviado em {feedbackDate}
+                </p>
               )}
 
-              {/* Links */}
+              {/* Links - todos como botões externos */}
               <div className="grid gap-3 md:grid-cols-2">
+                {hasVideo && (
+                  <Button 
+                    variant="outline" 
+                    className="justify-start"
+                    onClick={() => window.open(videoCallUrl || diagnostico?.video_call_url || '', '_blank')}
+                  >
+                    <Video className="h-4 w-4 mr-2" />
+                    Gravação da Call
+                    <ExternalLink className="h-3 w-3 ml-auto" />
+                  </Button>
+                )}
                 {transcricaoUrl && (
                   <Button 
                     variant="outline" 
