@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useContentAccessMetrics } from "@/hooks/admin/useContentAccessMetrics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MessageSquare, TrendingUp, Activity, Trophy, Heart, FolderOpen } from "lucide-react";
+import { Users, MessageSquare, TrendingUp, Activity, Trophy, Heart, FolderOpen, Eye, Video, FileText } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -116,6 +117,9 @@ export function EstatisticasComunidadeTab() {
       return posts || [];
     },
   });
+
+  // Conteúdos mais acessados por visitantes
+  const { data: accessMetrics, isLoading: loadingAccess } = useContentAccessMetrics();
 
   // Posts por categoria
   const { data: categoryStats, isLoading: loadingCategories } = useQuery({
@@ -323,45 +327,101 @@ export function EstatisticasComunidadeTab() {
         </Card>
       </div>
 
-      {/* Posts por Categoria */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <FolderOpen className="h-4 w-4 text-blue-500" />
-            Posts por Categoria
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loadingCategories ? (
-            <div className="space-y-4">
-              {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-8 w-full" />
-              ))}
-            </div>
-          ) : categoryStats && categoryStats.length > 0 ? (
-            <div className="space-y-4">
-              {categoryStats.map((cat) => (
-                <div key={cat.id} className="space-y-1">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2">
-                      {cat.emoji && <span>{cat.emoji}</span>}
-                      {cat.name}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Top 5 Conteúdos Mais Acessados */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Eye className="h-4 w-4 text-emerald-500" />
+              Top 5 Conteúdos Mais Acessados
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loadingAccess ? (
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
+              </div>
+            ) : accessMetrics?.topContent && accessMetrics.topContent.length > 0 ? (
+              <div className="space-y-3">
+                {accessMetrics.topContent.slice(0, 5).map((content, index) => (
+                  <div
+                    key={content.id}
+                    className="flex items-center gap-3 p-2 rounded-lg bg-muted/30"
+                  >
+                    <span className="text-sm font-bold text-muted-foreground w-5">
+                      #{index + 1}
                     </span>
-                    <span className="font-medium text-muted-foreground">
-                      {cat.count} {cat.count === 1 ? "post" : "posts"}
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted">
+                      {content.type === 'video' ? (
+                        <Video className="h-4 w-4 text-purple-500" />
+                      ) : (
+                        <FileText className="h-4 w-4 text-blue-500" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {content.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {content.type === 'video' ? 'Vídeo' : 'Material'}
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold text-emerald-500">
+                      {content.count} acessos
                     </span>
                   </div>
-                  <Progress value={cat.percentage} className="h-2" />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              Nenhuma categoria encontrada
-            </p>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Nenhum conteúdo acessado ainda
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Posts por Categoria */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <FolderOpen className="h-4 w-4 text-blue-500" />
+              Posts por Categoria
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loadingCategories ? (
+              <div className="space-y-4">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-full" />
+                ))}
+              </div>
+            ) : categoryStats && categoryStats.length > 0 ? (
+              <div className="space-y-4">
+                {categoryStats.map((cat) => (
+                  <div key={cat.id} className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-2">
+                        {cat.emoji && <span>{cat.emoji}</span>}
+                        {cat.name}
+                      </span>
+                      <span className="font-medium text-muted-foreground">
+                        {cat.count} {cat.count === 1 ? "post" : "posts"}
+                      </span>
+                    </div>
+                    <Progress value={cat.percentage} className="h-2" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Nenhuma categoria encontrada
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
