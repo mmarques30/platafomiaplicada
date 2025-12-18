@@ -52,6 +52,10 @@ import GerenciarAvisos from "./pages/admin/GerenciarAvisos";
 import VisualizarFormularios from "./pages/admin/VisualizarFormularios";
 import GerenciarConhecimento from "./pages/admin/GerenciarConhecimento";
 import GerenciarMentoria from "./pages/admin/GerenciarMentoria";
+import MentoriaIndex from "./pages/admin/mentoria/MentoriaIndex";
+import MentoriaBonusPage from "./pages/admin/mentoria/MentoriaBonusPage";
+import MentoriaAcademyPage from "./pages/admin/mentoria/MentoriaAcademyPage";
+import MentoriaClubPage from "./pages/admin/mentoria/MentoriaClubPage";
 import GerenciarProdutos from "./pages/admin/GerenciarProdutos";
 import MinhasTarefas from "./pages/admin/MinhasTarefas";
 import Auditoria from "./pages/admin/Auditoria";
@@ -142,7 +146,10 @@ function AppContent() {
             <Route path="bibliotecas" element={<GerenciarBibliotecas />} />
             <Route path="avisos" element={<GerenciarAvisos />} />
             <Route path="conhecimento" element={<GerenciarConhecimento />} />
-            <Route path="mentoria" element={<GerenciarMentoria />} />
+            <Route path="mentoria" element={<MentoriaIndex />} />
+            <Route path="mentoria/bonus" element={<MentoriaBonusPage />} />
+            <Route path="mentoria/academy" element={<MentoriaAcademyPage />} />
+            <Route path="mentoria/club" element={<MentoriaClubPage />} />
             <Route path="duvidas" element={<GerenciarTodasDuvidas />} />
             <Route path="produtos" element={<GerenciarProdutos />} />
             <Route path="materiais" element={<GerenciarMateriais />} />
