@@ -65,30 +65,50 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
     }
   };
 
-  if (!diagnostico) {
+  // Verificar se diagnóstico foi realmente completado pelo mentorado
+  const diagnosticoCompleto = diagnostico?.completado === true;
+  const temFeedbackMentora = diagnostico?.video_call_url || diagnostico?.transcricao_call_url || 
+                              diagnostico?.link_plano_execucao || (diagnostico as any)?.direcional_entregas;
+
+  if (!diagnostico || !diagnosticoCompleto) {
     return (
       <>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-yellow-500" />
-              Diagnóstico não realizado
+              {diagnostico ? 'Diagnóstico pendente' : 'Diagnóstico não realizado'}
             </CardTitle>
             <CardDescription>
-              Este mentorado ainda não possui diagnóstico. Escolha como adicionar:
+              {diagnostico 
+                ? 'O mentorado ainda não preencheu o diagnóstico de IA.'
+                : 'Este mentorado ainda não possui diagnóstico. Escolha como adicionar:'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex gap-2">
-            {allowManualInput && (
-              <Button variant="outline" onClick={() => setFormModalOpen(true)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Preencher Manualmente
-              </Button>
+          <CardContent className="space-y-4">
+            {/* Aviso de Feedback Mentora já preenchido */}
+            {diagnostico && temFeedbackMentora && (
+              <Alert className="border-blue-200 bg-blue-50">
+                <CheckCircle className="h-4 w-4 text-blue-600" />
+                <AlertTitle className="text-blue-900">Feedback da Mentora já adicionado</AlertTitle>
+                <AlertDescription className="text-blue-800">
+                  Existe feedback da mentora configurado para este mentorado, mas o diagnóstico de IA ainda não foi preenchido.
+                </AlertDescription>
+              </Alert>
             )}
-            <Button onClick={() => setUploadModalOpen(true)}>
-              <Upload className="h-4 w-4 mr-2" />
-              Upload de Arquivo
-            </Button>
+            
+            <div className="flex gap-2">
+              {allowManualInput && (
+                <Button variant="outline" onClick={() => setFormModalOpen(true)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Preencher Manualmente
+                </Button>
+              )}
+              <Button onClick={() => setUploadModalOpen(true)}>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload de Arquivo
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
