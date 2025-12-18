@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Lightbulb } from "lucide-react";
+import { ArrowLeft, Users, FileText, Lightbulb, Video } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { ProjetosIAAdmin } from "@/components/admin/mentoria/ProjetosIAAdmin";
+import { FeedbackMentoraAdmin } from "@/components/admin/mentoria/FeedbackMentoraAdmin";
 import { Badge } from "@/components/ui/badge";
 
 export default function MentoriaAcademyPage() {
@@ -85,11 +86,15 @@ export default function MentoriaAcademyPage() {
       )}
 
       {selectedUserId && (
-        <Tabs defaultValue="diagnostico" className="space-y-4">
+        <Tabs defaultValue="diagnostico-ia" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="diagnostico">
+            <TabsTrigger value="diagnostico-ia">
               <FileText className="h-4 w-4 mr-2" />
-              Diagnóstico
+              Diagnóstico IA
+            </TabsTrigger>
+            <TabsTrigger value="feedback-mentora">
+              <Video className="h-4 w-4 mr-2" />
+              Feedback Mentora
             </TabsTrigger>
             <TabsTrigger value="projetos-ia">
               <Lightbulb className="h-4 w-4 mr-2" />
@@ -97,8 +102,12 @@ export default function MentoriaAcademyPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="diagnostico" className="space-y-4">
+          <TabsContent value="diagnostico-ia" className="space-y-4">
             <DiagnosticoAdmin userId={selectedUserId} />
+          </TabsContent>
+
+          <TabsContent value="feedback-mentora" className="space-y-4">
+            <FeedbackMentoraAdmin userId={selectedUserId} />
           </TabsContent>
 
           <TabsContent value="projetos-ia" className="space-y-4">
