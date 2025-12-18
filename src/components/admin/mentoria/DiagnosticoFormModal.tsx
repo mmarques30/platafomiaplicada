@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Video, FileText, Target } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 interface DiagnosticoFormModalProps {
   open: boolean;
@@ -26,6 +27,10 @@ export function DiagnosticoFormModal({ open, onOpenChange, userId, diagnostico }
     experiencia_ia: "",
     nivel_ia: "",
     observacoes_admin: "",
+    // Novos campos de Feedback Mentora
+    video_call_url: "",
+    transcricao_call_url: "",
+    link_plano_execucao: "",
   });
 
   useEffect(() => {
@@ -38,13 +43,23 @@ export function DiagnosticoFormModal({ open, onOpenChange, userId, diagnostico }
         experiencia_ia: diagnostico.experiencia_ia || "",
         nivel_ia: diagnostico.nivel_ia || "",
         observacoes_admin: diagnostico.observacoes_admin || "",
+        video_call_url: diagnostico.video_call_url || "",
+        transcricao_call_url: diagnostico.transcricao_call_url || "",
+        link_plano_execucao: diagnostico.link_plano_execucao || "",
       });
     }
   }, [diagnostico]);
 
   const handleSubmit = () => {
+    // Se algum campo de feedback foi preenchido, adiciona timestamp
+    const hasFeedback = formData.video_call_url || formData.transcricao_call_url || formData.link_plano_execucao;
+    const payload = {
+      ...formData,
+      ...(hasFeedback && !diagnostico?.feedback_mentora_em ? { feedback_mentora_em: new Date().toISOString() } : {}),
+    };
+
     salvarDiagnostico(
-      { userId, dados: formData },
+      { userId, dados: payload },
       {
         onSuccess: () => {
           onOpenChange(false);
@@ -160,6 +175,58 @@ export function DiagnosticoFormModal({ open, onOpenChange, userId, diagnostico }
                 onChange={(e) => setFormData({ ...formData, observacoes_admin: e.target.value })}
                 rows={4}
               />
+            </div>
+
+            {/* Seção de Feedback da Mentora (Academy) */}
+            <Separator className="my-6" />
+            
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-primary">
+                <Video className="h-5 w-5" />
+                <h3 className="font-semibold">Feedback da Mentora (Academy)</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Preencha os campos abaixo após realizar a call de diagnóstico com o mentorado.
+              </p>
+
+              <div>
+                <Label htmlFor="video_call_url" className="flex items-center gap-2">
+                  <Video className="h-4 w-4" />
+                  URL do Vídeo da Call
+                </Label>
+                <Input
+                  id="video_call_url"
+                  placeholder="https://youtube.com/watch?v=... ou https://vimeo.com/..."
+                  value={formData.video_call_url}
+                  onChange={(e) => setFormData({ ...formData, video_call_url: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="transcricao_call_url" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  URL da Transcrição
+                </Label>
+                <Input
+                  id="transcricao_call_url"
+                  placeholder="https://docs.google.com/... ou https://notion.so/..."
+                  value={formData.transcricao_call_url}
+                  onChange={(e) => setFormData({ ...formData, transcricao_call_url: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="link_plano_execucao" className="flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Link do Plano de Execução
+                </Label>
+                <Input
+                  id="link_plano_execucao"
+                  placeholder="https://notion.so/... ou https://docs.google.com/..."
+                  value={formData.link_plano_execucao}
+                  onChange={(e) => setFormData({ ...formData, link_plano_execucao: e.target.value })}
+                />
+              </div>
             </div>
           </div>
         </ScrollArea>
