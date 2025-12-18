@@ -115,7 +115,7 @@ export default function Auth() {
       </div>
 
       {/* LADO DIREITO: Formulários */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-[#0a0a0f]">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-[#151515]">
         <div className="w-full max-w-md">
           <Tabs defaultValue="entrar" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-white/5 p-1 rounded-lg mb-8">
