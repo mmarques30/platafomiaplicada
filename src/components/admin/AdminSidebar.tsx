@@ -92,7 +92,6 @@ const menuGroups: MenuGroup[] = [
     label: "Mentoria",
     icon: GraduationCap,
     items: [
-      { path: "/admin/mentoria", label: "Visão Geral" },
       { path: "/admin/mentoria/bonus", label: "Bônus Globais" },
       { path: "/admin/mentoria/academy", label: "Academy" },
       { path: "/admin/mentoria/club", label: "Club" },
