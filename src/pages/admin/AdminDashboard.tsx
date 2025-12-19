@@ -4,6 +4,7 @@ import { StatsCard } from "@/components/admin/StatsCard";
 import { AlertCard } from "@/components/admin/AlertCard";
 import { DistribuicaoPlanos } from "@/components/admin/DistribuicaoPlanos";
 import { TopUsuariosTable } from "@/components/admin/TopUsuariosTable";
+import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import {
   Users,
   TrendingUp,
@@ -48,6 +49,8 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Dashboard Administrativo</h1>
+
+      <PWAInstallBanner />
 
       {/* Seção 1: Alertas */}
       <div>
