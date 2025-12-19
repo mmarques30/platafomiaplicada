@@ -170,7 +170,60 @@ export function CalendarioVisaoTabela() {
         </div>
       </Card>
 
-      <Card>
+      {/* Mobile: Cards */}
+      <div className="md:hidden space-y-3">
+        {aulasFiltradas.length === 0 ? (
+          <Card className="p-8 text-center text-muted-foreground">
+            Nenhum encontro encontrado com os filtros aplicados
+          </Card>
+        ) : (
+          aulasFiltradas.map((aula) => {
+            const statusInfo = getStatusInfo(aula);
+            const StatusIcon = statusInfo.icon;
+            
+            return (
+              <Card key={aula.id} className="p-4" onClick={() => setAulaDetalhes(aula)}>
+                <div className="font-medium text-foreground mb-2">{aula.tema}</div>
+                {aula.descricao && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{aula.descricao}</p>
+                )}
+                <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground mb-3">
+                  <span>📅 {aula.data_aula ? format(parseISO(aula.data_aula), "dd/MM/yyyy", { locale: ptBR }) : "-"}</span>
+                  <span>🕐 {aula.horario || "-"}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  {aula.tipo_evento && (
+                    <span
+                      className={cn(
+                        "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full",
+                        aula.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
+                        aula.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
+                        aula.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                      )}
+                    >
+                      {aula.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
+                      {aula.tipo_evento === "qa" && "Q&A"}
+                      {aula.tipo_evento === "outro" && "Outro"}
+                    </span>
+                  )}
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full",
+                      statusInfo.color
+                    )}
+                  >
+                    <StatusIcon className="h-3 w-3" />
+                    {statusInfo.label}
+                  </span>
+                </div>
+              </Card>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop: Table */}
+      <Card className="hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>

@@ -78,11 +78,11 @@ export default function BibliotecaPrompts() {
   }, [searchTerm, filtroCategoria, filtroNivel, filtroTag, filtroFerramenta]);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Biblioteca de Prompts</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl md:text-3xl font-bold">Biblioteca de Prompts</h1>
+        <p className="text-sm md:text-base text-muted-foreground">
           Prompts prontos para cada tipo de situação
         </p>
       </div>

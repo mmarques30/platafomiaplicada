@@ -85,8 +85,8 @@ export default function Configuracoes() {
 
 
   return (
-    <div className="container max-w-4xl py-8">
-      <h1 className="text-3xl font-bold mb-8">Configurações</h1>
+    <div className="container max-w-4xl py-4 md:py-8 px-4">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Configurações</h1>
 
       <div className="space-y-6">
         {/* Aparência */}

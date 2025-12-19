@@ -61,10 +61,10 @@ export default function MetodosAplicar() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Métodos para Aplicar</h1>
-        <p className="text-muted-foreground">
+    <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold">Métodos para Aplicar</h1>
+        <p className="text-sm md:text-base text-muted-foreground">
           Metodologias para alimentar a IA e obter resultados melhores
         </p>
       </div>

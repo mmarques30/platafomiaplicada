@@ -68,11 +68,11 @@ export default function BibliotecaFerramentas() {
   }, [searchTerm, filtroCategoria, filtroPreco, filtroValeAPena]);
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
       {/* Cabeçalho */}
       <div>
-        <h1 className="text-3xl font-bold">Biblioteca de Ferramentas</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl md:text-3xl font-bold">Biblioteca de Ferramentas</h1>
+        <p className="text-sm md:text-base text-muted-foreground">
           Catálogo completo de ferramentas de IA com avaliações especializadas
         </p>
       </div>
@@ -87,24 +87,24 @@ export default function BibliotecaFerramentas() {
 
       {/* Seção de Catálogo Completo */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Catálogo Completo</h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <h2 className="text-xl md:text-2xl font-bold">Catálogo Completo</h2>
           <div className="flex gap-2">
             <Button
               variant={viewMode === "horizontal" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("horizontal")}
             >
-              <LayoutList className="w-4 h-4 mr-2" />
-              Lista
+              <LayoutList className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Lista</span>
             </Button>
             <Button
               variant={viewMode === "grid" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("grid")}
             >
-              <LayoutGrid className="w-4 h-4 mr-2" />
-              Grid
+              <LayoutGrid className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Grid</span>
             </Button>
           </div>
         </div>

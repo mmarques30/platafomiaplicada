@@ -15,33 +15,33 @@ export function HeroEvolucao() {
   const totalCertificados = certificados?.filter(c => c.status === "emitido").length || 0;
 
   return (
-    <div className="relative rounded-xl border border-primary/30 bg-card shadow-sm p-6 overflow-hidden">
+    <div className="relative rounded-xl border border-primary/30 bg-card shadow-sm p-4 md:p-6 overflow-hidden">
       {/* Marca d'água decorativa */}
       <img 
         src={grafiaEvolucao} 
         alt="" 
-        className="absolute bottom-2 right-2 h-16 opacity-20 pointer-events-none select-none"
+        className="absolute bottom-2 right-2 h-12 md:h-16 opacity-20 pointer-events-none select-none"
         aria-hidden="true"
       />
       <div className="relative space-y-4">
           {/* Header: Nível e Título */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <div className="space-y-1 min-w-0">
               <div className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-primary" />
-                <span className="text-sm text-muted-foreground">Nível {nivel}</span>
+                <Trophy className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
+                <span className="text-xs md:text-sm text-muted-foreground">Nível {nivel}</span>
               </div>
-              <h2 className="text-2xl font-semibold text-foreground">{tituloNivel}</h2>
+              <h2 className="text-lg md:text-2xl font-semibold text-foreground truncate">{tituloNivel}</h2>
             </div>
-            <div className="text-right">
+            <div className="text-right shrink-0">
               <p className="text-xs text-muted-foreground">Próximo nível</p>
-              <p className="text-sm font-medium text-primary">{proximoTitulo}</p>
+              <p className="text-xs md:text-sm font-medium text-primary truncate max-w-[100px] md:max-w-none">{proximoTitulo}</p>
             </div>
           </div>
 
           {/* Barra de Progresso XP */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-xs md:text-sm">
               <span className="text-muted-foreground">Experiência</span>
               <span className="text-muted-foreground">
                 {xpAtual.toLocaleString()} / {xpNecessario.toLocaleString()} XP
@@ -51,23 +51,23 @@ export function HeroEvolucao() {
           </div>
 
           {/* Mini Cards de Estatísticas */}
-          <div className="grid grid-cols-3 gap-3 pt-2">
-            <div className="rounded-lg border border-border bg-card p-3">
-              <span className="text-xs uppercase tracking-wide block mb-2 text-foreground">Sequência</span>
-              <p className="text-xl font-semibold text-foreground">{sequencia || 0}</p>
-              <p className="text-xs text-muted-foreground">dias seguidos</p>
+          <div className="grid grid-cols-3 gap-2 md:gap-3 pt-2">
+            <div className="rounded-lg border border-border bg-card p-2 md:p-3">
+              <span className="text-[10px] md:text-xs uppercase tracking-wide block mb-1 md:mb-2 text-foreground truncate">Sequência</span>
+              <p className="text-base md:text-xl font-semibold text-foreground">{sequencia || 0}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">dias</p>
             </div>
 
-            <div className="rounded-lg border border-border bg-card p-3">
-              <span className="text-xs uppercase tracking-wide block mb-2 text-foreground">Vídeos</span>
-              <p className="text-xl font-semibold text-foreground">{evolucao?.totalVideos || 0}</p>
-              <p className="text-xs text-muted-foreground">completos</p>
+            <div className="rounded-lg border border-border bg-card p-2 md:p-3">
+              <span className="text-[10px] md:text-xs uppercase tracking-wide block mb-1 md:mb-2 text-foreground truncate">Vídeos</span>
+              <p className="text-base md:text-xl font-semibold text-foreground">{evolucao?.totalVideos || 0}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">completos</p>
             </div>
 
-            <div className="rounded-lg border border-border bg-card p-3">
-              <span className="text-xs uppercase tracking-wide block mb-2 text-foreground">Certificados</span>
-              <p className="text-xl font-semibold text-foreground">{totalCertificados}</p>
-              <p className="text-xs text-muted-foreground">conquistados</p>
+            <div className="rounded-lg border border-border bg-card p-2 md:p-3">
+              <span className="text-[10px] md:text-xs uppercase tracking-wide block mb-1 md:mb-2 text-foreground truncate">Certificados</span>
+              <p className="text-base md:text-xl font-semibold text-foreground">{totalCertificados}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">obtidos</p>
             </div>
           </div>
       </div>

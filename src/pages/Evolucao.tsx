@@ -23,32 +23,32 @@ export default function Evolucao() {
 
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">
           Minha <span className="text-primary">Evolução</span>
         </h1>
       </div>
 
       {/* Sistema de Abas */}
       <Tabs defaultValue="minha-evolucao" className="w-full">
-        <TabsList className="w-full justify-start bg-transparent h-auto gap-2">
+        <TabsList className="w-full justify-start bg-transparent h-auto gap-1 md:gap-2 overflow-x-auto flex-nowrap">
           <TabsTrigger 
             value="minha-evolucao"
-            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
+            className="px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none whitespace-nowrap"
           >
             Evolução
           </TabsTrigger>
           <TabsTrigger 
             value="comunidade"
-            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
+            className="px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none whitespace-nowrap"
           >
             Ranking IAplicada
           </TabsTrigger>
           <TabsTrigger 
             value="favoritos"
-            className="px-6 py-3 text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none"
+            className="px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none whitespace-nowrap"
           >
             Favoritos
           </TabsTrigger>

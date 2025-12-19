@@ -112,29 +112,29 @@ export default function Favoritos() {
   if (isLoading) return <div className="container mx-auto py-8 px-4"><p>Carregando...</p></div>;
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-          <Heart className="h-10 w-10 text-primary" />
+    <div className="container mx-auto py-4 md:py-8 px-4">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2 md:gap-3">
+          <Heart className="h-7 w-7 md:h-10 md:w-10 text-primary shrink-0" />
           Meus Favoritos
         </h1>
-        <p className="text-muted-foreground">Acesse rapidamente seus conteúdos favoritos</p>
+        <p className="text-sm md:text-base text-muted-foreground">Acesse rapidamente seus conteúdos favoritos</p>
       </div>
-      <div className="mb-6">
-        <div className="relative max-w-md">
+      <div className="mb-4 md:mb-6">
+        <div className="relative w-full md:max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Buscar nos favoritos..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
         </div>
       </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="flex-wrap h-auto">
-          <TabsTrigger value="todos">Todos</TabsTrigger>
-          <TabsTrigger value="trilha">Trilhas</TabsTrigger>
-          <TabsTrigger value="video">Vídeos</TabsTrigger>
-          <TabsTrigger value="ferramenta">Ferramentas</TabsTrigger>
-          <TabsTrigger value="prompt">Prompts</TabsTrigger>
-          <TabsTrigger value="metodo">Métodos</TabsTrigger>
-          <TabsTrigger value="ia_copie_use">IA Copie e Use</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 md:space-y-6">
+        <TabsList className="flex-wrap h-auto gap-1 overflow-x-auto">
+          <TabsTrigger value="todos" className="text-xs sm:text-sm">Todos</TabsTrigger>
+          <TabsTrigger value="trilha" className="text-xs sm:text-sm">Trilhas</TabsTrigger>
+          <TabsTrigger value="video" className="text-xs sm:text-sm">Vídeos</TabsTrigger>
+          <TabsTrigger value="ferramenta" className="text-xs sm:text-sm">Ferramentas</TabsTrigger>
+          <TabsTrigger value="prompt" className="text-xs sm:text-sm">Prompts</TabsTrigger>
+          <TabsTrigger value="metodo" className="text-xs sm:text-sm">Métodos</TabsTrigger>
+          <TabsTrigger value="ia_copie_use" className="text-xs sm:text-sm whitespace-nowrap">IA Copie e Use</TabsTrigger>
         </TabsList>
         <TabsContent value={activeTab} className="space-y-4">
           {!filteredFavoritos || filteredFavoritos.length === 0 ? (

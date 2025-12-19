@@ -18,29 +18,29 @@ export default function Mentoria() {
   const navigate = useNavigate();
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
+    <div className="container mx-auto py-4 md:py-8 px-4 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
           Olá, {user?.user_metadata?.nome_completo?.split(' ')[0] || 'Mentorado'}!
         </h1>
-        <p className="text-foreground text-lg">
+        <p className="text-foreground text-sm md:text-lg">
           Bem-vindo ao seu painel de mentoria personalizado
         </p>
       </div>
 
       {/* Seção de Alertas/Pendências Urgentes */}
-      <div className="mb-8">
+      <div className="mb-6 md:mb-8">
         <PendenciasUrgentes />
       </div>
 
       {/* Card Destaque - Fase Atual */}
-      <div className="mb-8">
+      <div className="mb-6 md:mb-8">
         <FaseAtualCard />
       </div>
 
       {/* Grid Principal - Cards de Destaque */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         {/* Coluna 1: Diagnóstico */}
         <div>
           <StatusDiagnostico />

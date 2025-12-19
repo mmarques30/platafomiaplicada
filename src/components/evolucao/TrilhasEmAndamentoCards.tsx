@@ -66,10 +66,10 @@ export function TrilhasEmAndamentoCards() {
               onClick={() => navigate(`/trilhas/${trilha.id}`)}
             >
               <CardContent className="p-0">
-                <div className="flex items-center gap-4 p-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4">
                   {/* Imagem da trilha */}
                   {trilha.imagem_url && (
-                    <div className="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-muted">
+                    <div className="w-full sm:w-24 h-32 sm:h-24 shrink-0 rounded-lg overflow-hidden bg-muted">
                       <img
                         src={trilha.imagem_url}
                         alt={trilha.titulo}
