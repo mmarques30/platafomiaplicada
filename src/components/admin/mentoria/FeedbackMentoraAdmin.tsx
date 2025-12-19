@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Target, ExternalLink, Clock, Save, Loader2, ClipboardList, Video } from "lucide-react";
+import { FileText, Target, ExternalLink, Clock, Save, Loader2, ClipboardList, Video, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { format } from "date-fns";
@@ -27,6 +27,7 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
   const [transcricaoUrl, setTranscricaoUrl] = useState("");
   const [planoExecucaoUrl, setPlanoExecucaoUrl] = useState("");
   const [direcionalEntregas, setDirecionalEntregas] = useState("");
+  const [isFormatting, setIsFormatting] = useState(false);
 
   // Sincronizar estado com dados do banco quando carregar
   useEffect(() => {
@@ -69,6 +70,46 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
       });
     },
   });
+
+  // Função para formatar texto com IA
+  const formatarComIA = async () => {
+    if (!direcionalEntregas.trim()) {
+      toast({
+        title: "Campo vazio",
+        description: "Digite algum texto antes de formatar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsFormatting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("formatar-direcional", {
+        body: { texto: direcionalEntregas },
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setDirecionalEntregas(data.texto_formatado);
+      toast({
+        title: "Texto formatado!",
+        description: "Revise o resultado no preview abaixo.",
+      });
+    } catch (error: any) {
+      console.error("Erro ao formatar:", error);
+      toast({
+        title: "Erro ao formatar",
+        description: error.message || "Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsFormatting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -132,18 +173,29 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="direcional">Direcional de Entregas</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="direcional">Direcional de Entregas</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={formatarComIA}
+                disabled={isFormatting || !direcionalEntregas.trim()}
+              >
+                {isFormatting ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                Formatar com IA
+              </Button>
+            </div>
             <p className="text-xs text-muted-foreground">
-              Suporta Markdown: use **negrito**, *itálico*, - bullets, 1. listas numeradas, → setas
+              Cole o texto bruto e clique em "Formatar com IA" para estruturar automaticamente
             </p>
             <Textarea
               id="direcional"
-              placeholder="Exemplo:
-1. Entregar projeto de automação até sexta
-2. Revisar dashboard de vendas
-→ Prioridade: integração com CRM
-- Item importante
-- Outro item"
+              placeholder="Cole aqui o texto do direcional de entregas e clique em 'Formatar com IA' para estruturar automaticamente..."
               value={direcionalEntregas}
               onChange={(e) => setDirecionalEntregas(e.target.value)}
               rows={8}
