@@ -1,9 +1,12 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ProjetoPreparacaoCard } from "../ProjetoPreparacaoCard";
 import { formatProjetoTitulo } from "@/lib/utils";
-import { Clock, BookOpen } from "lucide-react";
+import { Clock, BookOpen, RefreshCw, Loader2 } from "lucide-react";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useAtualizarConteudosProjeto } from "@/hooks/useAtualizarConteudosProjeto";
 
 interface ProjetoPreparacaoSectionProps {
   projeto: any;
@@ -19,6 +22,9 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export const ProjetoPreparacaoSection = ({ projeto, userId }: ProjetoPreparacaoSectionProps) => {
+  const { isAdmin } = useUserRole();
+  const { atualizarConteudos, isLoading: isAtualizando } = useAtualizarConteudosProjeto();
+
   // Verificar se o projeto tem conteúdo de preparação
   const trilhasRecomendadas = projeto.trilhas_recomendadas && Array.isArray(projeto.trilhas_recomendadas) 
     ? projeto.trilhas_recomendadas 
@@ -34,6 +40,10 @@ export const ProjetoPreparacaoSection = ({ projeto, userId }: ProjetoPreparacaoS
   const trilhasEmBreve = trilhasRecomendadas.filter((t: any) => t.status === 'em_breve');
   const modulosDisponiveis = modulosObrigatorios.filter((m: any) => m.status === 'disponivel');
   const modulosEmBreve = modulosObrigatorios.filter((m: any) => m.status === 'em_breve');
+
+  const handleAtualizarConteudos = async () => {
+    await atualizarConteudos(projeto.id);
+  };
 
   return (
     <div className="border-l-4 border-l-primary bg-card/50 p-6 rounded-lg space-y-4">
@@ -89,6 +99,27 @@ export const ProjetoPreparacaoSection = ({ projeto, userId }: ProjetoPreparacaoS
             <p className="text-xs text-muted-foreground mt-1">
               A IA associará conteúdos automaticamente ao gerar o diagnóstico
             </p>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={handleAtualizarConteudos}
+                disabled={isAtualizando}
+              >
+                {isAtualizando ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Atualizando...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Atualizar Conteúdos com IA
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         )}
       </div>
