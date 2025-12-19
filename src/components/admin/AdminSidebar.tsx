@@ -42,6 +42,7 @@ import {
   FileText,
   ChevronDown,
   Briefcase,
+  Smartphone,
   LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -127,6 +128,12 @@ const menuGroups: MenuGroup[] = [
       { path: "/admin/auditoria", label: "Auditoria do Sistema" },
       { path: "/admin/conhecimento", label: "Base de Conhecimento" },
     ],
+  },
+  {
+    type: "standalone",
+    path: "/instalar",
+    label: "Instalar App",
+    icon: Smartphone,
   },
 ];
 
