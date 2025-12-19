@@ -51,7 +51,7 @@ export default function Avance() {
           />
           
           {/* Headline */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-[#2F302B] mb-6">
+          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-[#2F302B] mb-6">
             Avance <span className="text-[#9EB038]">agora</span>,
             <br />
             acelere resultados.
@@ -144,12 +144,12 @@ export default function Avance() {
         {/* Tabela Comparativa */}
         <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-[#2F302B]">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 md:mb-10 text-[#2F302B]">
               Qual plano combina com você?
             </h2>
             
-            <div className="overflow-hidden">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-4 px-4">
+              <table className="w-full min-w-[600px]">
                 <thead>
                   <tr>
                     <th className="w-[40%] p-4 text-left"></th>

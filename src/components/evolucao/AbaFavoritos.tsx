@@ -120,14 +120,14 @@ export function AbaFavoritos() {
         </div>
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="flex-wrap h-auto">
-          <TabsTrigger value="todos">Todos</TabsTrigger>
-          <TabsTrigger value="trilha">Trilhas</TabsTrigger>
-          <TabsTrigger value="video">Vídeos</TabsTrigger>
-          <TabsTrigger value="ferramenta">Ferramentas</TabsTrigger>
-          <TabsTrigger value="prompt">Prompts</TabsTrigger>
-          <TabsTrigger value="metodo">Métodos</TabsTrigger>
-          <TabsTrigger value="ia_copie_use">IA Copie e Use</TabsTrigger>
+        <TabsList className="w-full overflow-x-auto flex-nowrap h-auto gap-1 justify-start">
+          <TabsTrigger value="todos" className="text-xs whitespace-nowrap">Todos</TabsTrigger>
+          <TabsTrigger value="trilha" className="text-xs whitespace-nowrap">Trilhas</TabsTrigger>
+          <TabsTrigger value="video" className="text-xs whitespace-nowrap">Vídeos</TabsTrigger>
+          <TabsTrigger value="ferramenta" className="text-xs whitespace-nowrap">Ferramentas</TabsTrigger>
+          <TabsTrigger value="prompt" className="text-xs whitespace-nowrap">Prompts</TabsTrigger>
+          <TabsTrigger value="metodo" className="text-xs whitespace-nowrap">Métodos</TabsTrigger>
+          <TabsTrigger value="ia_copie_use" className="text-xs whitespace-nowrap">IA Copie e Use</TabsTrigger>
         </TabsList>
         <TabsContent value={activeTab} className="space-y-4">
           {!filteredFavoritos || filteredFavoritos.length === 0 ? (
