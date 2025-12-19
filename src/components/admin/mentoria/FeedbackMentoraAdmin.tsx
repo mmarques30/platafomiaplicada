@@ -163,10 +163,10 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="plano-url">Link do Plano de Execução (Google Drive)</Label>
+            <Label htmlFor="plano-url">Link do Plano de Execução</Label>
             <Input
               id="plano-url"
-              placeholder="https://drive.google.com/file/d/..."
+              placeholder="https://..."
               value={planoExecucaoUrl}
               onChange={(e) => setPlanoExecucaoUrl(e.target.value)}
             />
