@@ -24,6 +24,46 @@ export const useMentoriaSessoes = (userId?: string) => {
   const queryClient = useQueryClient();
   const targetUserId = userId || user?.id;
 
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+  const getAccessTokenOrThrow = async () => {
+    let { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      const refreshed = await supabase.auth.refreshSession();
+      session = refreshed.data.session ?? null;
+    }
+
+    if (!session?.access_token) {
+      throw new Error("Sessão expirada. Faça login novamente.");
+    }
+
+    return session.access_token;
+  };
+
+  const authedFetchJson = async <T,>(path: string, init: RequestInit) => {
+    const token = await getAccessTokenOrThrow();
+
+    const res = await fetch(`${supabaseUrl}${path}`, {
+      ...init,
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${token}`,
+        ...(init.headers || {}),
+      },
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const message = json?.message || json?.error_description || json?.error || `Erro (${res.status})`;
+      throw new Error(message);
+    }
+
+    return json as T;
+  };
+
   const { data: sessoes, isLoading } = useQuery({
     queryKey: ["sessoes-mentoria", targetUserId],
     queryFn: async () => {
@@ -43,13 +83,28 @@ export const useMentoriaSessoes = (userId?: string) => {
 
   const createSessao = useMutation({
     mutationFn: async (sessao: Partial<SessaoMentoria>) => {
-      const { data, error } = await supabase
-        .from("sessoes_mentoria")
-        .insert([sessao as any])
-        .select()
-        .single();
+      const payload = {
+        ...sessao,
+        user_id: sessao.user_id ?? targetUserId,
+      };
 
-      if (error) throw error;
+      if (!payload.user_id) {
+        throw new Error("Selecione um mentorado para criar a sessão");
+      }
+
+      const data = await authedFetchJson<SessaoMentoria>(
+        "/rest/v1/sessoes_mentoria?select=*",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/vnd.pgrst.object+json",
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify([payload]),
+        }
+      );
+
       return data;
     },
     onSuccess: () => {
@@ -70,14 +125,19 @@ export const useMentoriaSessoes = (userId?: string) => {
 
   const updateSessao = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<SessaoMentoria> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("sessoes_mentoria")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .maybeSingle();
+      const data = await authedFetchJson<SessaoMentoria>(
+        `/rest/v1/sessoes_mentoria?id=eq.${id}&select=*`,
+        {
+          method: "PATCH",
+          headers: {
+            Accept: "application/vnd.pgrst.object+json",
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify(updates),
+        }
+      );
 
-      if (error) throw error;
       if (!data) throw new Error("Sessão não encontrada");
       return data;
     },
