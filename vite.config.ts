@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'IAplicada Academy',
@@ -72,7 +72,7 @@ export default defineConfig(({ mode }) => ({
           }
         ],
         cleanupOutdatedCaches: true,
-        skipWaiting: false
+        skipWaiting: true
       }
     })
   ].filter(Boolean),
