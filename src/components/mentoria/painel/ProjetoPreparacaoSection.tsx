@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ProjetoPreparacaoCard } from "../ProjetoPreparacaoCard";
 import { formatProjetoTitulo } from "@/lib/utils";
+import { Clock, BookOpen } from "lucide-react";
 
 interface ProjetoPreparacaoSectionProps {
   projeto: any;
@@ -19,9 +20,20 @@ const STATUS_LABELS: Record<string, string> = {
 
 export const ProjetoPreparacaoSection = ({ projeto, userId }: ProjetoPreparacaoSectionProps) => {
   // Verificar se o projeto tem conteúdo de preparação
-  const temConteudo = 
-    (projeto.trilhas_recomendadas && Array.isArray(projeto.trilhas_recomendadas) && projeto.trilhas_recomendadas.length > 0) ||
-    (projeto.modulos_obrigatorios && Array.isArray(projeto.modulos_obrigatorios) && projeto.modulos_obrigatorios.length > 0);
+  const trilhasRecomendadas = projeto.trilhas_recomendadas && Array.isArray(projeto.trilhas_recomendadas) 
+    ? projeto.trilhas_recomendadas 
+    : [];
+  const modulosObrigatorios = projeto.modulos_obrigatorios && Array.isArray(projeto.modulos_obrigatorios) 
+    ? projeto.modulos_obrigatorios 
+    : [];
+  
+  const temConteudo = trilhasRecomendadas.length > 0 || modulosObrigatorios.length > 0;
+  
+  // Contar conteúdos disponíveis e em breve
+  const trilhasDisponiveis = trilhasRecomendadas.filter((t: any) => t.status === 'disponivel');
+  const trilhasEmBreve = trilhasRecomendadas.filter((t: any) => t.status === 'em_breve');
+  const modulosDisponiveis = modulosObrigatorios.filter((m: any) => m.status === 'disponivel');
+  const modulosEmBreve = modulosObrigatorios.filter((m: any) => m.status === 'em_breve');
 
   return (
     <div className="border-l-4 border-l-primary bg-card/50 p-6 rounded-lg space-y-4">
@@ -44,6 +56,24 @@ export const ProjetoPreparacaoSection = ({ projeto, userId }: ProjetoPreparacaoS
         </div>
       </div>
 
+      {/* Resumo de Conteúdos */}
+      {temConteudo && (
+        <div className="flex items-center gap-4 flex-wrap text-sm">
+          {(trilhasDisponiveis.length > 0 || modulosDisponiveis.length > 0) && (
+            <div className="flex items-center gap-1 text-green-700">
+              <BookOpen className="h-4 w-4" />
+              <span>{trilhasDisponiveis.length} trilha(s), {modulosDisponiveis.length} módulo(s) disponíveis</span>
+            </div>
+          )}
+          {(trilhasEmBreve.length > 0 || modulosEmBreve.length > 0) && (
+            <div className="flex items-center gap-1 text-amber-700">
+              <Clock className="h-4 w-4" />
+              <span>{trilhasEmBreve.length + modulosEmBreve.length} conteúdo(s) em breve</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Conteúdos Recomendados */}
       <div className="pl-4 border-l-2 border-muted space-y-3">
         <h4 className="text-sm font-medium text-foreground">
@@ -57,7 +87,7 @@ export const ProjetoPreparacaoSection = ({ projeto, userId }: ProjetoPreparacaoS
               Nenhum conteúdo de preparação associado a este projeto ainda
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Configure trilhas e módulos recomendados na área administrativa
+              A IA associará conteúdos automaticamente ao gerar o diagnóstico
             </p>
           </div>
         )}

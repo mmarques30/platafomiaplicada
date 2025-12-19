@@ -7,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const systemPrompt = `Você é um mentor especialista em IA aplicada ao trabalho. 
+const buildSystemPrompt = (catalogoConteudo: string) => `Você é um mentor especialista em IA aplicada ao trabalho. 
 Analise o formulário diagnóstico e gere um insight personalizado completo com:
 
 1. **Análise do Perfil**: Resumo do estágio atual do mentorado (2-3 frases)
@@ -16,7 +16,16 @@ Analise o formulário diagnóstico e gere um insight personalizado completo com:
 4. **Alerta de Desafios**: Possíveis obstáculos baseados no contexto dele
 5. **Recomendação de Foco**: Prioridade estratégica para os próximos 30 dias
 6. **Objetivos Estratégicos**: 3-5 objetivos divididos em curto_prazo, medio_prazo e longo_prazo
-7. **Projetos Sugeridos**: 2-3 projetos práticos com título, descrição, objetivo e contribuição ao plano
+7. **Projetos Sugeridos**: 2-3 projetos práticos com trilhas e módulos recomendados do catálogo abaixo
+
+${catalogoConteudo}
+
+IMPORTANTE SOBRE RECOMENDAÇÕES DE CONTEÚDO:
+- Para cada projeto, selecione trilhas e módulos do catálogo acima que ajudem na preparação
+- Use os IDs exatos das trilhas e módulos do catálogo
+- Se uma trilha ou módulo não está ativo (marcado como "EM BREVE"), inclua mesmo assim com status "em_breve"
+- Se está ativo (marcado como "DISPONÍVEL"), use status "disponivel"
+- Prioridades: "essencial" (obrigatório), "recomendada" (importante), "complementar" (opcional)
 
 Seja direto, prático e encorajador. Use dados específicos do formulário.
 Responda APENAS com JSON válido neste formato exato:
@@ -35,7 +44,13 @@ Responda APENAS com JSON válido neste formato exato:
       "titulo": "título do projeto",
       "descricao": "descrição breve",
       "objetivo_projeto": "o que alcançar",
-      "contribuicao_plano": "como contribui"
+      "contribuicao_plano": "como contribui",
+      "trilhas_recomendadas": [
+        {"trilha_id": "uuid-da-trilha", "titulo": "Nome da Trilha", "prioridade": "essencial", "status": "disponivel"}
+      ],
+      "modulos_obrigatorios": [
+        {"modulo_id": "uuid-do-modulo", "titulo": "Nome do Módulo", "trilha_id": "uuid-da-trilha", "trilha_titulo": "Nome da Trilha", "status": "disponivel"}
+      ]
     }
   ]
 }`;
@@ -74,6 +89,62 @@ serve(async (req) => {
       console.error("Erro ao buscar formulário:", error);
       throw new Error("Formulário não encontrado");
     }
+
+    // Buscar catálogo de conteúdos (trilhas e módulos)
+    console.log("Buscando catálogo de conteúdos...");
+    
+    const { data: trilhas, error: trilhasError } = await supabaseClient
+      .from("trilhas")
+      .select("id, titulo, categoria, ativo, descricao, nivel")
+      .order("ordem");
+    
+    if (trilhasError) {
+      console.error("Erro ao buscar trilhas:", trilhasError);
+    }
+
+    const { data: modulos, error: modulosError } = await supabaseClient
+      .from("modulos")
+      .select("id, titulo, trilha_id, ativo, descricao, categoria")
+      .order("ordem");
+    
+    if (modulosError) {
+      console.error("Erro ao buscar módulos:", modulosError);
+    }
+
+    // Montar catálogo para a IA
+    const trilhasFormatadas = (trilhas || []).map(t => 
+      `- "${t.titulo}" (${t.categoria}${t.nivel ? `, ${t.nivel}` : ''}) [${t.ativo ? 'DISPONÍVEL' : 'EM BREVE'}] ID: ${t.id}${t.descricao ? ` - ${t.descricao}` : ''}`
+    ).join('\n');
+
+    // Agrupar módulos por trilha
+    const modulosPorTrilha: Record<string, any[]> = {};
+    (modulos || []).forEach(m => {
+      if (!modulosPorTrilha[m.trilha_id]) {
+        modulosPorTrilha[m.trilha_id] = [];
+      }
+      modulosPorTrilha[m.trilha_id].push(m);
+    });
+
+    const modulosFormatados = (trilhas || []).map(t => {
+      const modulosDaTrilha = modulosPorTrilha[t.id] || [];
+      if (modulosDaTrilha.length === 0) return null;
+      
+      return `\nTrilha "${t.titulo}":\n${modulosDaTrilha.map(m => 
+        `  - "${m.titulo}" [${m.ativo ? 'DISPONÍVEL' : 'EM BREVE'}] ID: ${m.id}`
+      ).join('\n')}`;
+    }).filter(Boolean).join('\n');
+
+    const catalogoConteudo = `
+CATÁLOGO DE CONTEÚDOS DA PLATAFORMA:
+
+TRILHAS DISPONÍVEIS:
+${trilhasFormatadas || 'Nenhuma trilha cadastrada'}
+
+MÓDULOS POR TRILHA:
+${modulosFormatados || 'Nenhum módulo cadastrado'}
+`;
+
+    console.log("Catálogo de conteúdos montado:", catalogoConteudo.substring(0, 500) + "...");
 
     // Preparar contexto detalhado para IA
     const contexto = `
@@ -130,6 +201,8 @@ EXPECTATIVAS:
     }
 
     console.log("Gerando insight para formulário:", formulario_id);
+
+    const systemPrompt = buildSystemPrompt(catalogoConteudo);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -201,9 +274,27 @@ EXPECTATIVAS:
       console.log("Objetivos salvos com sucesso");
     }
 
-    // Salvar projetos sugeridos
+    // Salvar projetos sugeridos com trilhas e módulos
     if (insight.projetos && Array.isArray(insight.projetos)) {
       for (const proj of insight.projetos) {
+        // Processar trilhas recomendadas - adicionar video_ids para cada módulo
+        const modulosComVideos = await Promise.all(
+          (proj.modulos_obrigatorios || []).map(async (modulo: any) => {
+            // Buscar vídeos do módulo
+            const { data: videos } = await supabaseClient
+              .from("videos")
+              .select("id")
+              .eq("modulo_id", modulo.modulo_id)
+              .eq("ativo", true)
+              .order("ordem");
+            
+            return {
+              ...modulo,
+              video_ids: videos?.map(v => v.id) || []
+            };
+          })
+        );
+
         const { error: projError } = await supabaseClient
           .from("projetos_mentoria")
           .insert({
@@ -213,7 +304,10 @@ EXPECTATIVAS:
             objetivo_projeto: proj.objetivo_projeto,
             contribuicao_plano: proj.contribuicao_plano,
             status: "planejamento",
-            tipo: "operacional"
+            tipo: "operacional",
+            trilhas_recomendadas: proj.trilhas_recomendadas || [],
+            modulos_obrigatorios: modulosComVideos,
+            progresso_preparacao: 0
           });
         
         if (projError) {
