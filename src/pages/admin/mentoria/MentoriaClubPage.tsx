@@ -40,7 +40,7 @@ export default function MentoriaClubPage() {
 
   const { sessoes, createSessao, updateSessao } = useMentoriaSessoes(selectedUserId);
   const { recursos, createRecurso, updateRecurso, deleteRecurso } = useMentoriaRecursos(selectedUserId);
-  const { projetos, createProjeto, updateProjeto } = useMentoriaProjetos(selectedUserId);
+  const { projetos, createProjeto, updateProjeto, deleteProjeto } = useMentoriaProjetos(selectedUserId);
   const { bonus, createBonus, updateBonus, deleteBonus } = useMentoriaBonus(selectedUserId);
 
   const [sessaoModalOpen, setSessaoModalOpen] = useState(false);
@@ -205,7 +205,7 @@ export default function MentoriaClubPage() {
 
             <div className="grid gap-4">
               {projetos.map((projeto) => (
-                <Card key={projeto.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditProjeto(projeto)}>
+                <Card key={projeto.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start gap-4">
                       <div className="flex-1">
@@ -219,16 +219,42 @@ export default function MentoriaClubPage() {
                           )}
                         </div>
                       </div>
-                      <Badge variant={
-                        projeto.status === "concluido" ? "default" : 
-                        projeto.status === "em_andamento" ? "secondary" : 
-                        projeto.status === "planejamento" ? "outline" : 
-                        "destructive"
-                      }>
-                        {projeto.status === "planejamento" ? "Planejamento" : 
-                         projeto.status === "em_andamento" ? "Em Andamento" : 
-                         projeto.status === "concluido" ? "Concluído" : "Cancelado"}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={
+                          projeto.status === "concluido" ? "default" : 
+                          projeto.status === "em_andamento" ? "secondary" : 
+                          projeto.status === "planejamento" ? "outline" : 
+                          "destructive"
+                        }>
+                          {projeto.status === "planejamento" ? "Planejamento" : 
+                           projeto.status === "em_andamento" ? "Em Andamento" : 
+                           projeto.status === "concluido" ? "Concluído" : "Cancelado"}
+                        </Badge>
+                        <Button variant="ghost" size="icon" onClick={() => handleEditProjeto(projeto)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Excluir Projeto</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza que deseja excluir o projeto "{formatProjetoTitulo(projeto.titulo)}"? Esta ação não pode ser desfeita.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteProjeto(projeto.id)}>
+                                Excluir
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
                     <CardDescription>{projeto.descricao}</CardDescription>
                   </CardHeader>
