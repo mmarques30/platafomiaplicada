@@ -37,10 +37,10 @@ export default function Trilhas() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-6">
-        <div className="mb-8 flex justify-between items-start gap-4">
+        <div className="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Trilhas de Aprendizado</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Trilhas de Aprendizado</h1>
+            <p className="text-sm md:text-base text-muted-foreground">
               Vídeos organizados por trilha
             </p>
           </div>
@@ -48,7 +48,7 @@ export default function Trilhas() {
           {isVisitante && (
             <Link 
               to="/aplique"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 bg-red-50/50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/30 font-medium transition-colors whitespace-nowrap"
+              className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-red-600 bg-red-50/50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/30 text-sm sm:text-base font-medium transition-colors whitespace-nowrap"
             >
               <Zap className="h-4 w-4" />
               Ter acesso ao Academy
@@ -68,7 +68,7 @@ export default function Trilhas() {
             </div>
           ) : isVisitante ? (
             // VISITANTE: Carrossel de trilhas bloqueadas
-            <div className="relative px-14">
+            <div className="relative px-0 md:px-14">
               <Carousel opts={{ align: "start", loop: false }} className="w-full">
                 <CarouselContent className="-ml-4">
                   {trilhasVisitante?.map((trilha) => (
@@ -86,8 +86,8 @@ export default function Trilhas() {
                 </CarouselContent>
                 {(trilhasVisitante?.length ?? 0) > 4 && (
                   <>
-                    <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
-                    <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
+                    <CarouselPrevious className="hidden md:flex absolute -left-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
+                    <CarouselNext className="hidden md:flex absolute -right-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
                   </>
                 )}
               </Carousel>

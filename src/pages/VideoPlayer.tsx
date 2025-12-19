@@ -207,8 +207,8 @@ export default function VideoPlayer() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <div className="lg:col-span-2 space-y-3 md:space-y-4">
             <Card>
               <CardContent className="p-0">
                 <CustomVideoPlayer
