@@ -116,12 +116,39 @@ export const useMentoriaProjetos = (userId?: string) => {
     }
   });
 
+  const deleteProjeto = useMutation({
+    mutationFn: async (projetoId: string) => {
+      const { error } = await supabase
+        .from("projetos_mentoria")
+        .delete()
+        .eq("id", projetoId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projetos-mentoria"] });
+      toast({
+        title: "Projeto excluído!",
+        description: "O projeto foi removido com sucesso"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir projeto",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+
   return {
     projetos: projetos || [],
     isLoading,
     createProjeto: createProjeto.mutate,
     updateProjeto: updateProjeto.mutate,
+    deleteProjeto: deleteProjeto.mutate,
     isCreating: createProjeto.isPending,
-    isUpdating: updateProjeto.isPending
+    isUpdating: updateProjeto.isPending,
+    isDeleting: deleteProjeto.isPending
   };
 };
