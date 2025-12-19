@@ -15,23 +15,29 @@ export interface ObjetivoMentoria {
   updated_at: string;
 }
 
-export function useObjetivos() {
+export function useObjetivos(userId?: string) {
   const { data: objetivos, isLoading } = useQuery({
-    queryKey: ["objetivos-mentoria"],
+    queryKey: ["objetivos-mentoria", userId],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
+      let targetUserId = userId;
+      
+      if (!targetUserId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        targetUserId = user.id;
+      }
 
       const { data, error } = await supabase
         .from("objetivos_mentoria")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .order("prioridade", { ascending: false })
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as ObjetivoMentoria[];
     },
+    enabled: userId !== undefined ? true : undefined,
   });
 
   return { objetivos, isLoading };

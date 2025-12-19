@@ -12,9 +12,9 @@ import { useState } from "react";
 import { DiagnosticoUploadModal } from "./DiagnosticoUploadModal";
 import { DiagnosticoFormModal } from "./DiagnosticoFormModal";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
-import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
+import { useObjetivos } from "@/hooks/useObjetivos";
 import { useNavigate } from "react-router-dom";
 
 interface DiagnosticoAdminProps {
@@ -25,10 +25,8 @@ interface DiagnosticoAdminProps {
 export function DiagnosticoAdmin({ userId, allowManualInput = true }: DiagnosticoAdminProps) {
   const navigate = useNavigate();
   const { diagnostico, isLoading, deletarArquivo } = useDiagnosticoAdmin(userId);
-  const { projetos } = useMentoriaProjetos(userId);
+  const { objetivos } = useObjetivos(userId);
   const { tarefas } = useMentoriaTarefas(userId);
-  
-  const objetivosEstrategicos = projetos.filter(p => p.tipo === "estrategico");
   const { sessoes } = useMentoriaSessoes();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -194,7 +192,7 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
                   <div className="flex items-center gap-4 mt-2">
                     <div className="flex items-center gap-2">
                       <Target className="h-4 w-4" />
-                      <span className="font-semibold">{objetivosEstrategicos.length}</span> objetivos estratégicos
+                      <span className="font-semibold">{objetivos?.length || 0}</span> objetivos estratégicos
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
