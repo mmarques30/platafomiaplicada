@@ -102,7 +102,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container py-6 space-y-8">
+      <main className="container py-4 md:py-6 px-4 space-y-6 md:space-y-8">
         {/* Aviso de senha temporária */}
         {mostrarAvisoSenha && (
           <Alert className="border-2 border-primary bg-primary/5 shadow-md">

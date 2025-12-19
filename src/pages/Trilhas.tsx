@@ -36,7 +36,7 @@ export default function Trilhas() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container py-6">
+      <main className="container py-4 md:py-6 px-4">
         <div className="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Trilhas de Aprendizado</h1>

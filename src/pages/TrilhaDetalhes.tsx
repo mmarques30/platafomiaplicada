@@ -233,7 +233,7 @@ export default function TrilhaDetalhes() {
   }
 
   return (
-    <div className="container py-6">
+    <div className="container py-4 md:py-6 px-4">
         <Link to="/trilhas">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
