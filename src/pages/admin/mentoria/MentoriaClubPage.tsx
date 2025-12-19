@@ -404,6 +404,7 @@ export default function MentoriaClubPage() {
         open={sessaoModalOpen}
         onOpenChange={setSessaoModalOpen}
         sessao={editingSessao}
+        userId={selectedUserId}
         onSubmit={(data) => {
           if (editingSessao) {
             updateSessao({ ...data, id: editingSessao.id });
