@@ -270,17 +270,17 @@ export default function TrilhaDetalhes() {
               </div>
 
               {/* Métricas */}
-              <div className="flex flex-wrap gap-4">
-                <Card className="flex-1 min-w-[200px]">
-                  <CardContent className="p-4">
-                    <div className="text-sm text-muted-foreground">Total de Vídeos</div>
-                    <div className="text-2xl font-bold">{allVideos.length}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                <Card className="w-full">
+                  <CardContent className="p-3 md:p-4">
+                    <div className="text-xs md:text-sm text-muted-foreground">Total de Vídeos</div>
+                    <div className="text-xl md:text-2xl font-bold">{allVideos.length}</div>
                   </CardContent>
                 </Card>
-                <Card className="flex-1 min-w-[200px]">
-                  <CardContent className="p-4">
-                    <div className="text-sm text-muted-foreground">Progresso</div>
-                    <div className="text-2xl font-bold">
+                <Card className="w-full">
+                  <CardContent className="p-3 md:p-4">
+                    <div className="text-xs md:text-sm text-muted-foreground">Progresso</div>
+                    <div className="text-xl md:text-2xl font-bold">
                       {allVideos.length > 0 
                         ? Math.round((allVideos.filter(v => progressData?.find(p => p.video_id === v.id)?.completado).length / allVideos.length) * 100)
                         : 0}%
@@ -290,10 +290,10 @@ export default function TrilhaDetalhes() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="flex-1 min-w-[200px]">
-                  <CardContent className="p-4">
-                    <div className="text-sm text-muted-foreground">Duração Total</div>
-                    <div className="text-2xl font-bold">
+                <Card className="w-full">
+                  <CardContent className="p-3 md:p-4">
+                    <div className="text-xs md:text-sm text-muted-foreground">Duração Total</div>
+                    <div className="text-xl md:text-2xl font-bold">
                       {Math.round(allVideos.reduce((sum, v) => sum + (v.duracao || 0), 0) / 60)}h
                     </div>
                   </CardContent>
