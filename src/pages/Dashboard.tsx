@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
+import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { 
   Carousel, 
   CarouselContent, 
@@ -134,6 +135,9 @@ export default function Dashboard() {
         <section>
           <WelcomeHeader />
         </section>
+
+        {/* Banner PWA (apenas para mentorados) */}
+        {!isVisitante && <PWAInstallBanner />}
 
         {/* Card de Pendências (apenas mentorados) */}
         {!isVisitante && <PendenciasOnboarding />}

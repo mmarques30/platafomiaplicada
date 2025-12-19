@@ -76,6 +76,8 @@ import PoliticaUso from "./pages/PoliticaUso";
 import GerenciarPoliticas from "./pages/admin/GerenciarPoliticas";
 import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
 import FormularioAplica from "./pages/FormularioAplica";
+import Instalar from "./pages/Instalar";
+import { PWAUpdatePrompt } from "./components/shared/PWAUpdatePrompt";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +88,7 @@ function AppContent() {
     <>
       <Toaster />
       <Sonner />
+      <PWAUpdatePrompt />
       <Routes>
         {/* Rotas públicas */}
         <Route path="/auth" element={<Auth />} />
@@ -134,6 +137,7 @@ function AppContent() {
             <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
             <Route path="/videos-bonus" element={<VideosBonus />} />
+            <Route path="/instalar" element={<Instalar />} />
           </Route>
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />

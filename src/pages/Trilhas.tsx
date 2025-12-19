@@ -5,6 +5,7 @@ import { Zap } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
+import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import {
   Carousel,
   CarouselContent,
@@ -54,6 +55,9 @@ export default function Trilhas() {
             </Link>
           )}
         </div>
+
+        {/* Banner PWA para visitantes */}
+        {isVisitante && <PWAInstallBanner />}
 
         <div className="mt-8">
           {showLoading ? (
