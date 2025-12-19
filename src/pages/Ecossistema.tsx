@@ -15,12 +15,12 @@ export default function Ecossistema() {
   const produtosB2B = produtosAtivos.filter((p) => p.tipo === 'b2b');
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      <div className="flex items-center gap-3">
-        <Layers className="h-8 w-8 text-primary" />
+    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+      <div className="flex items-center gap-2 md:gap-3">
+        <Layers className="h-6 w-6 md:h-8 md:w-8 text-primary shrink-0" />
         <div>
-          <h1 className="text-3xl font-bold">Ecossistema IAplicada</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold">Ecossistema IAplicada</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
             Conheça todos os produtos e escolha o melhor para você
           </p>
         </div>

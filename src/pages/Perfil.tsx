@@ -206,11 +206,11 @@ export default function Perfil() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">Meu Perfil</h1>
+    <div className="container mx-auto py-4 md:py-8 px-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Meu Perfil</h1>
         {!isEditing && (
-          <Button onClick={handleEdit} variant="outline">
+          <Button onClick={handleEdit} variant="outline" className="w-full sm:w-auto">
             <Edit2 className="h-4 w-4 mr-2" />
             Editar Perfil
           </Button>
@@ -394,18 +394,18 @@ export default function Perfil() {
             <CardDescription className="text-card-foreground/70">Acompanhe seu progresso na plataforma</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-4 md:gap-6">
               <div className="text-center">
-                <div className="text-4xl font-bold text-primary">{stats?.videosAssistidos || 0}</div>
-                <p className="text-sm text-card-foreground/70 mt-2">Vídeos Completados</p>
+                <div className="text-2xl md:text-4xl font-bold text-primary">{stats?.videosAssistidos || 0}</div>
+                <p className="text-xs md:text-sm text-card-foreground/70 mt-1 md:mt-2">Vídeos Completados</p>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-primary">{stats?.totalVideos || 0}</div>
-                <p className="text-sm text-card-foreground/70 mt-2">Total de Vídeos</p>
+                <div className="text-2xl md:text-4xl font-bold text-primary">{stats?.totalVideos || 0}</div>
+                <p className="text-xs md:text-sm text-card-foreground/70 mt-1 md:mt-2">Total de Vídeos</p>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-primary">{stats?.horasAssistidas || 0}h</div>
-                <p className="text-sm text-card-foreground/70 mt-2">Horas Assistidas</p>
+                <div className="text-2xl md:text-4xl font-bold text-primary">{stats?.horasAssistidas || 0}h</div>
+                <p className="text-xs md:text-sm text-card-foreground/70 mt-1 md:mt-2">Horas Assistidas</p>
               </div>
             </div>
           </CardContent>

@@ -47,15 +47,15 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
   };
 
   const getPodiumHeight = (index: number) => {
-    if (index === 1) return "h-[500px]"; // 1º mais alto
-    if (index === 0) return "h-[470px]"; // 2º médio
-    return "h-[440px]"; // 3º menor
+    if (index === 1) return "md:h-[500px]"; // 1º mais alto
+    if (index === 0) return "md:h-[470px]"; // 2º médio
+    return "md:h-[440px]"; // 3º menor
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-center">
-        <h2 className="text-2xl font-bold text-center">Top 3 Ferramentas Recomendadas</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-center">Top 3 Ferramentas Recomendadas</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -66,16 +66,16 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
           return (
             <Card
               key={ferramenta.id}
-              className={`${getPodiumHeight(idx)} transition-all hover:scale-105 hover:shadow-xl relative overflow-hidden`}
+              className={`h-auto ${getPodiumHeight(idx)} transition-all hover:scale-105 hover:shadow-xl relative overflow-hidden`}
             >
               {/* Badge de posição */}
-              <div className={`absolute top-0 left-0 right-0 h-12 bg-gradient-to-r ${getMedalColor(idx)} flex items-center justify-center`}>
-                <span className="text-white font-bold text-lg">{posicaoReal}º Lugar</span>
+              <div className={`absolute top-0 left-0 right-0 h-10 md:h-12 bg-gradient-to-r ${getMedalColor(idx)} flex items-center justify-center`}>
+                <span className="text-white font-bold text-sm md:text-lg">{posicaoReal}º Lugar</span>
               </div>
 
-              <CardContent className="p-4 pt-16 flex flex-col h-full">
+              <CardContent className="p-3 md:p-4 pt-12 md:pt-16 flex flex-col h-full">
                 {/* Nome e Categoria */}
-                <h3 className="text-lg font-bold text-center mb-4 line-clamp-2">
+                <h3 className="text-base md:text-lg font-bold text-center mb-3 md:mb-4 line-clamp-2">
                   {ferramenta.nome}
                 </h3>
                 <div className="flex justify-center gap-2 mb-3">
