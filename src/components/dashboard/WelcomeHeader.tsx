@@ -51,37 +51,35 @@ export function WelcomeHeader() {
   return (
     <div className="w-full mt-4">
       {/* Container escuro transparente envolvendo TUDO */}
-      <div className="flex flex-col md:flex-row items-center md:justify-between gap-4 bg-[#2F302B]/90 backdrop-blur-sm rounded-2xl px-4 md:px-6 py-4 md:py-5 border border-white/10">
+      <div className="flex flex-row items-center justify-between gap-3 md:gap-4 bg-[#2F302B]/90 backdrop-blur-sm rounded-xl md:rounded-2xl px-3 md:px-6 py-3 md:py-5 border border-white/10">
         {/* Coluna Esquerda - Saudação e Tema */}
-        <div className="flex-1 min-w-0 text-center md:text-left">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
+        <div className="flex-1 min-w-0 text-left">
+          <h1 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-0.5 md:mb-1">
             {saudacao}, <span className="text-primary">{primeiroNome}</span>!
           </h1>
           
           {aulaAtiva ? (
-            <p className="text-sm md:text-base lg:text-lg text-white/70">
-              <span className="font-semibold text-white">Próxima aula:</span> {aulaAtiva.tema} • {aulaAtiva.horario} - {aulaAtiva.dia_semana}
+            <p className="text-xs md:text-base lg:text-lg text-white/70 truncate">
+              <span className="font-semibold text-white">Aula:</span> {aulaAtiva.tema}
             </p>
           ) : (
-            <p className="text-sm md:text-base lg:text-lg text-white/70 font-medium">
+            <p className="text-xs md:text-base lg:text-lg text-white/70 font-medium">
               Aplique, replique e domine IA
             </p>
           )}
         </div>
 
         {/* Coluna Direita - Card Compacto de Data */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="flex items-center gap-3">
-            {/* Ícone em círculo primary */}
-            <div className="bg-primary rounded-xl p-2 md:p-3 flex items-center justify-center shadow-sm">
-              <Calendar className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" strokeWidth={2.5} />
-            </div>
-            
-            {/* Texto - Dia e Mês */}
-            <div className="flex flex-col items-start leading-tight">
-              <span className="text-xl md:text-2xl font-bold text-white">{dia}</span>
-              <span className="text-xs md:text-sm text-white/70 font-medium uppercase tracking-wide">{diaSemana}, {mes}</span>
-            </div>
+        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+          {/* Ícone em círculo primary */}
+          <div className="bg-primary rounded-lg md:rounded-xl p-1.5 md:p-3 flex items-center justify-center shadow-sm">
+            <Calendar className="w-4 h-4 md:w-6 md:h-6 text-primary-foreground" strokeWidth={2.5} />
+          </div>
+          
+          {/* Texto - Dia e Mês */}
+          <div className="flex flex-col items-start leading-tight">
+            <span className="text-lg md:text-2xl font-bold text-white">{dia}</span>
+            <span className="text-[10px] md:text-sm text-white/70 font-medium uppercase tracking-wide">{diaSemana}, {mes}</span>
           </div>
         </div>
       </div>
