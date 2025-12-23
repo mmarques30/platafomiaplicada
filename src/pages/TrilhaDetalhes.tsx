@@ -252,15 +252,17 @@ export default function TrilhaDetalhes() {
       {/* Se tem vídeo selecionado → Novo Layout Full Width */}
       {currentVideoId && currentVideo && (
         <div className="flex flex-col gap-6">
-          {/* 1. Player de Vídeo - Largura Total */}
-          <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
-            <iframe
-              src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
-              title={currentVideo.titulo}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
+          {/* 1. Player de Vídeo - Largura Limitada e Centralizado */}
+          <div className="w-full max-w-5xl mx-auto">
+            <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
+              <iframe
+                src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
+                title={currentVideo.titulo}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
           </div>
 
           {/* 2. Título e Informações do Vídeo */}
