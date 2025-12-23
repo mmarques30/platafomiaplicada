@@ -44,7 +44,7 @@ export default function TrilhaDetalhes() {
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { isVisitante, isLoading: loadingRole } = useContentVisibility();
   const [videosExpanded, setVideosExpanded] = useState(true);
-  const [infoExpanded, setInfoExpanded] = useState(false);
+  const [infoExpanded, setInfoExpanded] = useState(true);
 
   // Helper para garantir que materiais seja sempre um array
   const parseMateriais = (materiais: any): any[] => {
@@ -331,41 +331,41 @@ export default function TrilhaDetalhes() {
               </CardContent>
             </Card>
 
-            {/* 4. Tabs de Descrição e Comentários */}
-            <Card className="border-border h-[300px] flex flex-col">
-              <CardContent className="p-4 md:p-6 flex-1 overflow-hidden flex flex-col">
-                <Tabs defaultValue="descricao" className="w-full flex-1 flex flex-col">
-                  <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
-                    <TabsTrigger 
-                      value="descricao"
-                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                    >
-                      Informações da aula
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="comentarios"
-                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                    >
-                      Comentários
-                    </TabsTrigger>
-                  </TabsList>
+            {/* 4. Card de Informações da Aula - Colapsável como um todo */}
+            <Collapsible open={infoExpanded} onOpenChange={setInfoExpanded}>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-muted-foreground">Informações da aula</h3>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground h-8">
+                    <ChevronDown className={cn(
+                      "h-4 w-4 transition-transform duration-200",
+                      infoExpanded && "rotate-180"
+                    )} />
+                    {infoExpanded ? "Ocultar" : "Expandir"}
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
+              
+              <CollapsibleContent>
+                <Card className="border-border">
+                  <CardContent className="p-4 md:p-6">
+                    <Tabs defaultValue="descricao" className="w-full">
+                      <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
+                        <TabsTrigger 
+                          value="descricao"
+                          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                        >
+                          Descrição
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="comentarios"
+                          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                        >
+                          Comentários
+                        </TabsTrigger>
+                      </TabsList>
 
-                  <TabsContent value="descricao" className="mt-0 flex-1 overflow-auto">
-                    <Collapsible open={infoExpanded} onOpenChange={setInfoExpanded}>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold">Descrição</h3>
-                        <CollapsibleTrigger asChild>
-                          <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground h-8">
-                            <ChevronDown className={cn(
-                              "h-4 w-4 transition-transform duration-200",
-                              infoExpanded && "rotate-180"
-                            )} />
-                            {infoExpanded ? "Ocultar" : "Expandir"}
-                          </Button>
-                        </CollapsibleTrigger>
-                      </div>
-                      
-                      <CollapsibleContent className="space-y-6">
+                      <TabsContent value="descricao" className="mt-0 space-y-6">
                         <p className="text-muted-foreground">
                           {currentVideo.descricao || "Sem descrição disponível."}
                         </p>
@@ -376,18 +376,18 @@ export default function TrilhaDetalhes() {
                             materiais={parseMateriais(currentVideo?.materiais)} 
                           />
                         </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </TabsContent>
+                      </TabsContent>
 
-                  <TabsContent value="comentarios" className="mt-0">
-                    {currentVideoId && (
-                      <VideoFeedbackSection videoId={currentVideoId} />
-                    )}
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+                      <TabsContent value="comentarios" className="mt-0">
+                        {currentVideoId && (
+                          <VideoFeedbackSection videoId={currentVideoId} />
+                        )}
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
+              </CollapsibleContent>
+            </Collapsible>
 
             {/* Lista de vídeos para mobile (colapsável) */}
             <div className="lg:hidden">
@@ -458,13 +458,13 @@ export default function TrilhaDetalhes() {
 
           {/* Sidebar Direita: Lista de Vídeos (apenas desktop) */}
           <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-            <Card className="sticky top-4 border-border overflow-hidden h-[300px] flex flex-col">
+            <Card className="sticky top-4 border-border overflow-hidden flex flex-col max-h-[calc(100vh-120px)]">
               <div className="p-3 border-b border-border bg-muted/30 flex-shrink-0">
                 <h3 className="font-semibold text-sm">
                   Vídeos da trilha ({allVideos.length})
                 </h3>
               </div>
-              <ScrollArea className="flex-1">
+              <ScrollArea className="flex-1 min-h-0">
                 <div className="flex flex-col">
                   {allVideos.map((video, index) => {
                     const progress = getVideoProgress(video.id);
