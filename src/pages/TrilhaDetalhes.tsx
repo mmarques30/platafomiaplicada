@@ -44,7 +44,7 @@ export default function TrilhaDetalhes() {
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { isVisitante, isLoading: loadingRole } = useContentVisibility();
   const [videosExpanded, setVideosExpanded] = useState(true);
-  const [infoExpanded, setInfoExpanded] = useState(true);
+  const [infoExpanded, setInfoExpanded] = useState(false);
 
   // Helper para garantir que materiais seja sempre um array
   const parseMateriais = (materiais: any): any[] => {
@@ -332,9 +332,9 @@ export default function TrilhaDetalhes() {
             </Card>
 
             {/* 4. Tabs de Descrição e Comentários */}
-            <Card className="border-border">
-              <CardContent className="p-4 md:p-6">
-                <Tabs defaultValue="descricao" className="w-full">
+            <Card className="border-border h-[300px] flex flex-col">
+              <CardContent className="p-4 md:p-6 flex-1 overflow-hidden flex flex-col">
+                <Tabs defaultValue="descricao" className="w-full flex-1 flex flex-col">
                   <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
                     <TabsTrigger 
                       value="descricao"
@@ -350,7 +350,7 @@ export default function TrilhaDetalhes() {
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="descricao" className="mt-0">
+                  <TabsContent value="descricao" className="mt-0 flex-1 overflow-auto">
                     <Collapsible open={infoExpanded} onOpenChange={setInfoExpanded}>
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="font-semibold">Descrição</h3>
@@ -458,13 +458,13 @@ export default function TrilhaDetalhes() {
 
           {/* Sidebar Direita: Lista de Vídeos (apenas desktop) */}
           <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-            <Card className="sticky top-4 border-border overflow-hidden">
-              <div className="p-3 border-b border-border bg-muted/30">
+            <Card className="sticky top-4 border-border overflow-hidden h-[300px] flex flex-col">
+              <div className="p-3 border-b border-border bg-muted/30 flex-shrink-0">
                 <h3 className="font-semibold text-sm">
                   Vídeos da trilha ({allVideos.length})
                 </h3>
               </div>
-              <ScrollArea className="h-[calc(100vh-200px)] max-h-[600px]">
+              <ScrollArea className="flex-1">
                 <div className="flex flex-col">
                   {allVideos.map((video, index) => {
                     const progress = getVideoProgress(video.id);
