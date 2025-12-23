@@ -44,6 +44,7 @@ export default function TrilhaDetalhes() {
   const videoRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { isVisitante, isLoading: loadingRole } = useContentVisibility();
   const [videosExpanded, setVideosExpanded] = useState(true);
+  const [infoExpanded, setInfoExpanded] = useState(true);
 
   // Helper para garantir que materiais seja sempre um array
   const parseMateriais = (materiais: any): any[] => {
@@ -270,7 +271,7 @@ export default function TrilhaDetalhes() {
             <div className="space-y-2">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <h1 className="text-xl md:text-2xl font-bold">{currentVideo.titulo}</h1>
+                  <h1 className="text-lg font-semibold line-clamp-2">{currentVideo.titulo}</h1>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
@@ -349,20 +350,34 @@ export default function TrilhaDetalhes() {
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="descricao" className="space-y-6 mt-0">
-                    <div>
-                      <h3 className="font-semibold mb-3">Descrição</h3>
-                      <p className="text-muted-foreground">
-                        {currentVideo.descricao || "Sem descrição disponível."}
-                      </p>
-                    </div>
+                  <TabsContent value="descricao" className="mt-0">
+                    <Collapsible open={infoExpanded} onOpenChange={setInfoExpanded}>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold">Descrição</h3>
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground h-8">
+                            <ChevronDown className={cn(
+                              "h-4 w-4 transition-transform duration-200",
+                              infoExpanded && "rotate-180"
+                            )} />
+                            {infoExpanded ? "Ocultar" : "Expandir"}
+                          </Button>
+                        </CollapsibleTrigger>
+                      </div>
+                      
+                      <CollapsibleContent className="space-y-6">
+                        <p className="text-muted-foreground">
+                          {currentVideo.descricao || "Sem descrição disponível."}
+                        </p>
 
-                    <div>
-                      <h3 className="font-semibold mb-3">LINKS IMPORTANTES</h3>
-                      <VideoMaterialsList 
-                        materiais={parseMateriais(currentVideo?.materiais)} 
-                      />
-                    </div>
+                        <div>
+                          <h3 className="font-semibold mb-3">LINKS IMPORTANTES</h3>
+                          <VideoMaterialsList 
+                            materiais={parseMateriais(currentVideo?.materiais)} 
+                          />
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </TabsContent>
 
                   <TabsContent value="comentarios" className="mt-0">
