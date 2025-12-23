@@ -460,13 +460,13 @@ export default function TrilhaDetalhes() {
 
           {/* Sidebar Direita: Lista de Vídeos (apenas desktop) */}
           <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-            <Card className="sticky top-4 border-border overflow-hidden flex flex-col max-h-[calc(100vh-120px)]">
+            <Card className="sticky top-4 border-border overflow-hidden flex flex-col h-[calc(100vh-120px)] max-h-[calc(100vh-120px)]">
               <div className="p-3 border-b border-border bg-muted/30 flex-shrink-0">
                 <h3 className="font-semibold text-sm">
                   Vídeos da trilha ({allVideos.length})
                 </h3>
               </div>
-              <ScrollArea className="flex-1 min-h-0">
+              <ScrollArea className="flex-1 min-h-0 h-full">
                 <div className="flex flex-col">
                   {allVideos.map((video, index) => {
                     const progress = getVideoProgress(video.id);
