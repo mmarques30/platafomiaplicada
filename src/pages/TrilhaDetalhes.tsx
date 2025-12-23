@@ -331,23 +331,25 @@ export default function TrilhaDetalhes() {
               </CardContent>
             </Card>
 
-            {/* 4. Card de Informações da Aula - Colapsável como um todo */}
+            {/* 4. Card de Informações da Aula - Colapsável com header sempre visível */}
             <Collapsible open={infoExpanded} onOpenChange={setInfoExpanded}>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Informações da aula</h3>
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground h-8">
-                    <ChevronDown className={cn(
-                      "h-4 w-4 transition-transform duration-200",
-                      infoExpanded && "rotate-180"
-                    )} />
-                    {infoExpanded ? "Ocultar" : "Expandir"}
-                  </Button>
-                </CollapsibleTrigger>
-              </div>
-              
-              <CollapsibleContent>
-                <Card className="border-border">
+              <Card className="border-border">
+                {/* Header sempre visível */}
+                <div className="flex items-center justify-between p-4 border-b border-border">
+                  <h3 className="text-sm font-semibold">Informações da aula</h3>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground h-8">
+                      <ChevronDown className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        infoExpanded && "rotate-180"
+                      )} />
+                      {infoExpanded ? "Ocultar" : "Expandir"}
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
+                
+                {/* Conteúdo que colapsa */}
+                <CollapsibleContent>
                   <CardContent className="p-4 md:p-6">
                     <Tabs defaultValue="descricao" className="w-full">
                       <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
@@ -385,8 +387,8 @@ export default function TrilhaDetalhes() {
                       </TabsContent>
                     </Tabs>
                   </CardContent>
-                </Card>
-              </CollapsibleContent>
+                </CollapsibleContent>
+              </Card>
             </Collapsible>
 
             {/* Lista de vídeos para mobile (colapsável) */}
