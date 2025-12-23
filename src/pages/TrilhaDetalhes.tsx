@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState, useEffect, useRef } from "react";
 import { useContentVisibility } from "@/hooks/useContentVisibility";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -249,11 +250,12 @@ export default function TrilhaDetalhes() {
         />
       )}
 
-      {/* Se tem vídeo selecionado → Novo Layout Full Width */}
+      {/* Se tem vídeo selecionado → Layout Lateral (Player + Sidebar) */}
       {currentVideoId && currentVideo && (
-        <div className="flex flex-col gap-6">
-          {/* 1. Player de Vídeo - Largura Limitada e Centralizado */}
-          <div className="w-full max-w-5xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Coluna Esquerda: Player + Info + Avaliação + Tabs */}
+          <div className="flex-1 flex flex-col gap-4 min-w-0">
+            {/* 1. Player de Vídeo */}
             <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
               <iframe
                 src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
@@ -263,192 +265,253 @@ export default function TrilhaDetalhes() {
                 className="w-full h-full"
               />
             </div>
-          </div>
 
-          {/* 2. Título e Informações do Vídeo */}
-          <div className="space-y-2">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <h1 className="text-xl md:text-2xl font-bold">{currentVideo.titulo}</h1>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {formatDuration(currentVideo.duracao)}
-                  </span>
-                  {formatDataAula(currentVideo.data_aula) && (
-                    <span>• {formatDataAula(currentVideo.data_aula)}</span>
-                  )}
+            {/* 2. Título e Informações do Vídeo */}
+            <div className="space-y-2">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h1 className="text-xl md:text-2xl font-bold">{currentVideo.titulo}</h1>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {formatDuration(currentVideo.duracao)}
+                    </span>
+                    {formatDataAula(currentVideo.data_aula) && (
+                      <span>• {formatDataAula(currentVideo.data_aula)}</span>
+                    )}
+                  </div>
                 </div>
+                <FavoriteButton 
+                  tipo="video" 
+                  itemId={currentVideo.id}
+                  variant="ghost"
+                  size="sm"
+                />
               </div>
-              <FavoriteButton 
-                tipo="video" 
-                itemId={currentVideo.id}
-                variant="ghost"
-                size="sm"
-              />
+            </div>
+
+            {/* 3. Avaliação + Botão Concluir */}
+            <Card className="bg-muted/30 border-border">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  {/* Avaliação */}
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Avalie esta aula</div>
+                    <div className="flex items-center gap-3">
+                      <VideoRatingInput
+                        rating={userRating}
+                        onRatingChange={setRating}
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        ({ratingCount} {ratingCount === 1 ? "avaliação" : "avaliações"})
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Botão Concluir */}
+                  <div className="w-full sm:w-auto">
+                    {getVideoProgress(currentVideoId || '')?.completado ? (
+                      <div className="flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg bg-primary text-primary-foreground">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span className="font-medium text-sm">Concluída</span>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => marcarConcluidoMutation.mutate()}
+                        disabled={marcarConcluidoMutation.isPending}
+                        className="w-full sm:w-auto transition-colors bg-aplicada-dark hover:bg-aplicada-dark/90 text-white"
+                      >
+                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                        Marcar como Concluída
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 4. Tabs de Descrição e Comentários */}
+            <Card className="border-border">
+              <CardContent className="p-4 md:p-6">
+                <Tabs defaultValue="descricao" className="w-full">
+                  <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
+                    <TabsTrigger 
+                      value="descricao"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                    >
+                      Informações da aula
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="comentarios"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                    >
+                      Comentários
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="descricao" className="space-y-6 mt-0">
+                    <div>
+                      <h3 className="font-semibold mb-3">Descrição</h3>
+                      <p className="text-muted-foreground">
+                        {currentVideo.descricao || "Sem descrição disponível."}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold mb-3">LINKS IMPORTANTES</h3>
+                      <VideoMaterialsList 
+                        materiais={parseMateriais(currentVideo?.materiais)} 
+                      />
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="comentarios" className="mt-0">
+                    {currentVideoId && (
+                      <VideoFeedbackSection videoId={currentVideoId} />
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Lista de vídeos para mobile (colapsável) */}
+            <div className="lg:hidden">
+              <Collapsible open={videosExpanded} onOpenChange={setVideosExpanded}>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-base font-semibold">
+                    Vídeos da trilha ({allVideos.length})
+                  </h2>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+                      <ChevronDown className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        videosExpanded && "rotate-180"
+                      )} />
+                      {videosExpanded ? "Ocultar" : "Expandir"}
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
+                <CollapsibleContent>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {allVideos.map((video) => {
+                      const progress = getVideoProgress(video.id);
+                      const isPlaying = currentVideoId === video.id;
+                      const isCompleted = progress?.completado;
+
+                      return (
+                        <div
+                          key={video.id}
+                          onClick={() => handleVideoSelect(video.id)}
+                          className={cn(
+                            "cursor-pointer rounded-lg overflow-hidden transition-all border group",
+                            isPlaying 
+                              ? "ring-2 ring-primary border-primary bg-primary/5" 
+                              : "hover:bg-muted/50 border-border bg-card"
+                          )}
+                        >
+                          <div className="aspect-video relative overflow-hidden">
+                            <img
+                              src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)}
+                              alt={video.titulo}
+                              className="w-full h-full object-cover"
+                            />
+                            {isPlaying && (
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <Play className="h-5 w-5 text-white fill-white" />
+                              </div>
+                            )}
+                            {isCompleted && !isPlaying && (
+                              <div className="absolute top-1 right-1 bg-primary rounded-full p-0.5">
+                                <CheckCircle2 className="h-3 w-3 text-white" />
+                              </div>
+                            )}
+                            <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] px-1 py-0.5 rounded">
+                              {formatDuration(video.duracao)}
+                            </div>
+                          </div>
+                          <div className="p-2">
+                            <h4 className="text-xs font-medium line-clamp-2">{video.titulo}</h4>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           </div>
 
-          {/* 3. Lista de Vídeos da Trilha - Colapsável */}
-          <Collapsible open={videosExpanded} onOpenChange={setVideosExpanded}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold">
-                Vídeos da trilha ({allVideos.length})
-              </h2>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
-                  <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform duration-200",
-                    videosExpanded && "rotate-180"
-                  )} />
-                  {videosExpanded ? "Ocultar" : "Expandir"}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3">
-                {allVideos.map((video) => {
-                  const progress = getVideoProgress(video.id);
-                  const isPlaying = currentVideoId === video.id;
-                  const isCompleted = progress?.completado;
+          {/* Sidebar Direita: Lista de Vídeos (apenas desktop) */}
+          <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
+            <Card className="sticky top-4 border-border overflow-hidden">
+              <div className="p-3 border-b border-border bg-muted/30">
+                <h3 className="font-semibold text-sm">
+                  Vídeos da trilha ({allVideos.length})
+                </h3>
+              </div>
+              <ScrollArea className="h-[calc(100vh-200px)] max-h-[600px]">
+                <div className="flex flex-col">
+                  {allVideos.map((video, index) => {
+                    const progress = getVideoProgress(video.id);
+                    const isPlaying = currentVideoId === video.id;
+                    const isCompleted = progress?.completado;
 
-                  return (
-                    <div
-                      key={video.id}
-                      ref={(el) => { videoRefs.current[video.id] = el; }}
-                      onClick={() => handleVideoSelect(video.id)}
-                      className={cn(
-                        "cursor-pointer rounded-md overflow-hidden transition-all border group",
-                        isPlaying 
-                          ? "ring-2 ring-primary border-primary bg-primary/5" 
-                          : "hover:scale-[1.02] hover:shadow-sm border-border bg-card"
-                      )}
-                    >
-                      {/* Thumbnail */}
-                      <div className="aspect-[16/10] relative overflow-hidden">
-                        <img
-                          src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)}
-                          alt={video.titulo}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                        />
-                        {isPlaying && (
-                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                            <Play className="h-6 w-6 text-white fill-white" />
-                          </div>
+                    return (
+                      <div
+                        key={video.id}
+                        ref={(el) => { videoRefs.current[video.id] = el; }}
+                        onClick={() => handleVideoSelect(video.id)}
+                        className={cn(
+                          "flex gap-3 p-2 cursor-pointer transition-all border-l-2",
+                          isPlaying 
+                            ? "border-l-primary bg-primary/10" 
+                            : "border-l-transparent hover:bg-muted/50"
                         )}
-                        {isCompleted && !isPlaying && (
-                          <div className="absolute top-1 right-1 bg-primary rounded-full p-0.5">
-                            <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+                      >
+                        {/* Número do vídeo */}
+                        <div className="flex-shrink-0 w-6 text-center text-xs text-muted-foreground pt-1">
+                          {isPlaying ? (
+                            <Play className="h-4 w-4 text-primary fill-primary mx-auto" />
+                          ) : isCompleted ? (
+                            <CheckCircle2 className="h-4 w-4 text-primary mx-auto" />
+                          ) : (
+                            <span>{index + 1}</span>
+                          )}
+                        </div>
+
+                        {/* Thumbnail */}
+                        <div className="relative w-28 flex-shrink-0">
+                          <img
+                            src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)}
+                            alt={video.titulo}
+                            className="w-full h-16 rounded object-cover"
+                          />
+                          <div className="absolute bottom-0.5 right-0.5 bg-black/80 text-white text-[10px] px-1 rounded">
+                            {formatDuration(video.duracao)}
                           </div>
-                        )}
-                        {/* Duração overlay */}
-                        <div className="absolute bottom-0.5 right-0.5 bg-black/80 text-white text-[10px] px-1 py-0.5 rounded">
-                          {formatDuration(video.duracao)}
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0 py-0.5">
+                          <p className={cn(
+                            "text-sm font-medium line-clamp-2 leading-tight",
+                            isPlaying && "text-primary"
+                          )}>
+                            {video.titulo}
+                          </p>
+                          {isPlaying && (
+                            <Badge variant="secondary" className="mt-1.5 text-[10px] px-1.5 py-0">
+                              Tocando
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                      
-                      {/* Info */}
-                      <div className="p-1.5 md:p-2">
-                        <h4 className="text-[10px] md:text-xs font-medium line-clamp-2 leading-tight">
-                          {video.titulo}
-                        </h4>
-                        {isPlaying && (
-                          <Badge variant="secondary" className="mt-1 text-[8px] px-1 py-0">
-                            Tocando
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-
-          {/* 4. Avaliação + Botão Concluir */}
-          <Card className="bg-muted/30 border-border">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                {/* Avaliação */}
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Avalie esta aula</div>
-                  <div className="flex items-center gap-3">
-                    <VideoRatingInput
-                      rating={userRating}
-                      onRatingChange={setRating}
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      ({ratingCount} {ratingCount === 1 ? "avaliação" : "avaliações"})
-                    </span>
-                  </div>
+                    );
+                  })}
                 </div>
-                
-                {/* Botão Concluir */}
-                <div className="w-full md:w-auto">
-                  {getVideoProgress(currentVideoId || '')?.completado ? (
-                    <div className="flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-primary text-primary-foreground">
-                      <CheckCircle2 className="h-5 w-5" />
-                      <span className="font-medium">Concluída</span>
-                    </div>
-                  ) : (
-                    <Button
-                      size="lg"
-                      onClick={() => marcarConcluidoMutation.mutate()}
-                      disabled={marcarConcluidoMutation.isPending}
-                      className="w-full md:w-auto transition-colors bg-aplicada-dark hover:bg-aplicada-dark/90 text-white"
-                    >
-                      <CheckCircle2 className="h-5 w-5 mr-2" />
-                      Marcar como Concluída
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 5. Tabs de Descrição e Comentários */}
-          <Card className="border-border">
-            <CardContent className="p-4 md:p-6">
-              <Tabs defaultValue="descricao" className="w-full">
-                <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
-                  <TabsTrigger 
-                    value="descricao"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                  >
-                    Informações da aula
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="comentarios"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                  >
-                    Comentários
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="descricao" className="space-y-6 mt-0">
-                  <div>
-                    <h3 className="font-semibold mb-3">Descrição</h3>
-                    <p className="text-muted-foreground">
-                      {currentVideo.descricao || "Sem descrição disponível."}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold mb-3">LINKS IMPORTANTES</h3>
-                    <VideoMaterialsList 
-                      materiais={parseMateriais(currentVideo?.materiais)} 
-                    />
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="comentarios" className="mt-0">
-                  {currentVideoId && (
-                    <VideoFeedbackSection videoId={currentVideoId} />
-                  )}
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+              </ScrollArea>
+            </Card>
+          </div>
         </div>
       )}
 
