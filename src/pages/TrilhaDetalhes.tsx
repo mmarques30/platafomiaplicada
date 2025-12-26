@@ -1,4 +1,6 @@
 import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -368,9 +370,11 @@ export default function TrilhaDetalhes() {
                       </TabsList>
 
                       <TabsContent value="descricao" className="mt-0 space-y-6">
-                        <p className="text-muted-foreground">
-                          {currentVideo.descricao || "Sem descrição disponível."}
-                        </p>
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {currentVideo.descricao || "Sem descrição disponível."}
+                          </ReactMarkdown>
+                        </div>
 
                         <div>
                           <h3 className="font-semibold mb-3">LINKS IMPORTANTES</h3>
