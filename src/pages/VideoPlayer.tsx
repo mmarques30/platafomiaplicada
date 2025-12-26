@@ -1,4 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -303,7 +305,11 @@ export default function VideoPlayer() {
                   <TabsContent value="info" className="space-y-4 mt-4">
                     <div>
                       <h3 className="font-semibold mb-2">Descrição</h3>
-                      <p className="text-muted-foreground">{video.descricao}</p>
+                      <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {video.descricao || "Sem descrição disponível."}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                     <div>
                       <h3 className="font-semibold mb-3">Materiais de Apoio</h3>
