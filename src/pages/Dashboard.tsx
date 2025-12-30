@@ -100,6 +100,16 @@ export default function Dashboard() {
   }, [loadingRole, loadingProfile, isVisitante, profile]);
 
 
+  // IMPORTANTE: Não renderizar enquanto carrega ou se for visitante
+  // Isso evita flash de conteúdo errado antes do redirect
+  if (loadingRole || isVisitante) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-4 md:py-6 px-4 space-y-6 md:space-y-8">

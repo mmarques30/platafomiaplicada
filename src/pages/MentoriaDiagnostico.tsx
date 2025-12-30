@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useUserPlan } from "@/hooks/useUserPlan";
@@ -21,17 +21,26 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ArrowLeft, Loader2, Info, Download } from "lucide-react";
+import { toast } from "sonner";
 
 export default function MentoriaDiagnostico() {
   const navigate = useNavigate();
   const location = useLocation();
   const { formulario, isLoading, refetch } = useMentoriaForm();
   const { plan } = useUserPlan();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
   const [criandoNovo, setCriandoNovo] = useState(false);
   const [confirmarNovoOpen, setConfirmarNovoOpen] = useState(false);
+
+  // Redirecionar visitantes - não devem acessar esta página
+  useEffect(() => {
+    if (!roleLoading && isVisitante) {
+      toast.info("Esta funcionalidade requer um plano ativo");
+      navigate("/trilhas", { replace: true });
+    }
+  }, [isVisitante, roleLoading, navigate]);
 
   const naoPreencheu = !formulario?.completado;
   const preenchido = formulario?.completado && !modoEdicao && !criandoNovo;
@@ -63,7 +72,8 @@ export default function MentoriaDiagnostico() {
     refetch();
   };
 
-  if (isLoading) {
+  // Não renderizar enquanto carrega ou se for visitante
+  if (isLoading || roleLoading || isVisitante) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
