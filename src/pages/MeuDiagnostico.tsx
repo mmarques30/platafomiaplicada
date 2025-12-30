@@ -13,12 +13,23 @@ import { ProjetosSugeridos } from "@/components/mentoria/ProjetosSugeridos";
 import { InsightIA } from "@/components/mentoria/InsightIA";
 import { FeedbackMentora } from "@/components/mentoria/FeedbackMentora";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function MeuDiagnostico() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
   const { plan, isLoading: planLoading } = useUserPlan();
+  const { isVisitante, isLoading: roleLoading } = useUserRole();
+
+  // Redirecionar visitantes - não devem acessar esta página
+  useEffect(() => {
+    if (!roleLoading && isVisitante) {
+      toast.info("Esta funcionalidade requer um plano ativo");
+      navigate("/trilhas", { replace: true });
+    }
+  }, [isVisitante, roleLoading, navigate]);
 
   // Redirect Club/Lab para /mentoria (eles têm diagnóstico integrado)
   useEffect(() => {
@@ -26,6 +37,15 @@ export default function MeuDiagnostico() {
       navigate('/mentoria', { replace: true });
     }
   }, [plan, planLoading, navigate]);
+
+  // Não renderizar enquanto carrega ou se for visitante
+  if (roleLoading || isVisitante) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   const completo = formulario?.completado || false;
   const preenchidoPorAdmin = formulario?.preenchido_por === "admin";

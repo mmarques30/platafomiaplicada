@@ -14,6 +14,8 @@ import { Loader2, ArrowLeft, FileText, Edit, Target, Briefcase } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { formatProjetoTitulo } from "@/lib/utils";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function MentoriaPainelDiagnostico() {
   const navigate = useNavigate();
@@ -21,7 +23,15 @@ export default function MentoriaPainelDiagnostico() {
   const { userId } = useParams();
   const { diagnostico, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
   const { plan } = useUserPlan();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
+  
+  // Redirecionar visitantes - não devem acessar esta página
+  useEffect(() => {
+    if (!roleLoading && isVisitante) {
+      toast.info("Esta funcionalidade requer um plano ativo");
+      navigate("/trilhas", { replace: true });
+    }
+  }, [isVisitante, roleLoading, navigate]);
   
   // Check if accessed via /diagnostico route (Academy-specific)
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');
@@ -42,10 +52,11 @@ export default function MentoriaPainelDiagnostico() {
         ? 'Voltar para Meu Diagnóstico' 
         : 'Voltar para Mentoria';
 
-  if (isLoading) {
+  // Não renderizar enquanto carrega ou se for visitante
+  if (isLoading || roleLoading || isVisitante) {
     return (
       <div className="container mx-auto py-8 flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-aplicada-green-900" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
