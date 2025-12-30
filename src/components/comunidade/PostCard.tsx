@@ -100,54 +100,45 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
             <h3 className="text-lg font-semibold text-foreground mt-1">{post.title}</h3>
           )}
 
-          {/* Content + Image Layout */}
-          <div className={cn(
-            "mt-1",
-            mediaCount === 1 && "sm:flex sm:gap-4"
-          )}>
-            {/* Post Content with Markdown links */}
-            <div className={cn(
-              "text-foreground prose prose-sm max-w-none",
-              mediaCount === 1 && "flex-1 min-w-0"
-            )}>
-              <ReactMarkdown
-                components={{
-                  p: ({ children }) => (
-                    <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{children}</p>
-                  ),
-                  strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-                  em: ({ children }) => <em className="italic">{children}</em>,
-                  a: ({ href, children }) => (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      {children}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  ),
-                }}
-              >
-                {post.content}
-              </ReactMarkdown>
-            </div>
-
-            {/* Single Image - Lateral Thumbnail (não corta) */}
-            {mediaCount === 1 && (
-              <div className="mt-3 sm:mt-0 flex-shrink-0 sm:w-56">
-                <div className="rounded-xl overflow-hidden border border-border bg-muted flex items-center justify-center">
-                  <img
-                    src={mediaItems[0].url}
-                    alt=""
-                    className="w-full h-auto max-h-72 object-contain cursor-pointer hover:opacity-95 transition-opacity"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            )}
+          {/* Post Content with Markdown links */}
+          <div className="text-foreground prose prose-sm max-w-none mt-1">
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => (
+                  <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{children}</p>
+                ),
+                strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    {children}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                ),
+              }}
+            >
+              {post.content}
+            </ReactMarkdown>
           </div>
+
+          {/* Single Image - Full Width (não corta) */}
+          {mediaCount === 1 && (
+            <div className="mt-3">
+              <div className="rounded-xl overflow-hidden border border-border bg-muted flex items-center justify-center">
+                <img
+                  src={mediaItems[0].url}
+                  alt=""
+                  className="w-full h-auto max-h-[500px] object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Media Grid for 2+ images */}
           {mediaCount >= 2 && (
