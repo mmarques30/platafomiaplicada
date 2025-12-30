@@ -26,7 +26,11 @@ export function PWAUpdatePrompt() {
 
   useEffect(() => {
     if (needRefresh) {
-      setShowPrompt(true);
+      // Delay para não interferir com instalação inicial do PWA
+      const timer = setTimeout(() => {
+        setShowPrompt(true);
+      }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [needRefresh]);
 
