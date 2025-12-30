@@ -103,7 +103,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           {/* Content + Image Layout */}
           <div className={cn(
             "mt-1",
-            mediaCount === 1 && "flex gap-4"
+            mediaCount === 1 && "sm:flex sm:gap-4"
           )}>
             {/* Post Content with Markdown links */}
             <div className={cn(
@@ -134,14 +134,14 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
               </ReactMarkdown>
             </div>
 
-            {/* Single Image - Lateral Thumbnail */}
+            {/* Single Image - Lateral Thumbnail (não corta) */}
             {mediaCount === 1 && (
-              <div className="flex-shrink-0 w-32 sm:w-40">
-                <div className="rounded-xl overflow-hidden border border-border bg-muted aspect-square">
+              <div className="mt-3 sm:mt-0 flex-shrink-0 sm:w-44">
+                <div className="rounded-xl overflow-hidden border border-border bg-muted flex items-center justify-center">
                   <img
                     src={mediaItems[0].url}
                     alt=""
-                    className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                    className="w-full h-auto max-h-52 object-contain cursor-pointer hover:opacity-95 transition-opacity"
                     loading="lazy"
                   />
                 </div>
