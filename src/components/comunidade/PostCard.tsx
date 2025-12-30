@@ -100,38 +100,60 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
             <h3 className="text-lg font-semibold text-foreground mt-1">{post.title}</h3>
           )}
 
-          {/* Post Content with Markdown links */}
-          <div className="text-foreground mt-1 prose prose-sm max-w-none">
-            <ReactMarkdown
-              components={{
-                p: ({ children }) => (
-                  <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{children}</p>
-                ),
-                strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-                em: ({ children }) => <em className="italic">{children}</em>,
-                a: ({ href, children }) => (
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    {children}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                ),
-              }}
-            >
-              {post.content}
-            </ReactMarkdown>
+          {/* Content + Image Layout */}
+          <div className={cn(
+            "mt-1",
+            mediaCount === 1 && "flex gap-4"
+          )}>
+            {/* Post Content with Markdown links */}
+            <div className={cn(
+              "text-foreground prose prose-sm max-w-none",
+              mediaCount === 1 && "flex-1 min-w-0"
+            )}>
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => (
+                    <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{children}</p>
+                  ),
+                  strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                  em: ({ children }) => <em className="italic">{children}</em>,
+                  a: ({ href, children }) => (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      {children}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  ),
+                }}
+              >
+                {post.content}
+              </ReactMarkdown>
+            </div>
+
+            {/* Single Image - Lateral Thumbnail */}
+            {mediaCount === 1 && (
+              <div className="flex-shrink-0 w-32 sm:w-40">
+                <div className="rounded-xl overflow-hidden border border-border bg-muted aspect-square">
+                  <img
+                    src={mediaItems[0].url}
+                    alt=""
+                    className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Media Grid - Twitter/Threads Style */}
-          {mediaCount > 0 && (
+          {/* Media Grid for 2+ images */}
+          {mediaCount >= 2 && (
             <div
               className={cn(
                 "mt-3 rounded-2xl overflow-hidden border border-border",
-                mediaCount === 1 && "max-h-72",
                 mediaCount === 2 && "grid grid-cols-2 gap-0.5 max-h-72",
                 mediaCount === 3 && "grid grid-cols-2 gap-0.5 max-h-72",
                 mediaCount >= 4 && "grid grid-cols-2 gap-0.5 max-h-72"
@@ -142,14 +164,9 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
                   key={idx}
                   className={cn(
                     "relative overflow-hidden bg-muted",
-                    // Single image
-                    mediaCount === 1 && "max-h-72",
-                    // Two images
                     mediaCount === 2 && "h-40",
-                    // Three images: first one takes full height
                     mediaCount === 3 && idx === 0 && "row-span-2",
                     mediaCount === 3 && idx > 0 && "h-[calc(50%-1px)]",
-                    // Four+ images
                     mediaCount >= 4 && "h-36"
                   )}
                 >
@@ -159,7 +176,6 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
                     className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
                     loading="lazy"
                   />
-                  {/* Overlay for extra images */}
                   {idx === 3 && mediaCount > 4 && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer">
                       <span className="text-white text-2xl font-bold">
