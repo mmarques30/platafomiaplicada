@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +13,15 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Moon, Sun, Bell, Lock, AlertTriangle, FileText } from "lucide-react";
+import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, CheckCircle2 } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function Configuracoes() {
   const { user, signOut } = useAuth();
   const { isVisitante } = useUserRole();
   const { theme, setTheme } = useTheme();
+  const { canInstall, isInstalled, deviceType, triggerInstall } = usePWAInstall();
+  const navigate = useNavigate();
   const [notificacoesEmail, setNotificacoesEmail] = useState(true);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -112,6 +115,58 @@ export default function Configuracoes() {
                 onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
               />
             </div>
+        </CardContent>
+        </Card>
+
+        {/* Instalar Aplicativo */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Smartphone className="h-5 w-5" />
+              Instalar Aplicativo
+            </CardTitle>
+            <CardDescription>
+              Acesse o Academy direto da tela inicial do seu celular
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isInstalled ? (
+              <div className="flex items-center gap-3 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                <div>
+                  <p className="font-medium text-green-600 dark:text-green-400">
+                    App instalado!
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Você já está usando o aplicativo instalado
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  {deviceType === 'ios' 
+                    ? "No Safari, toque em Compartilhar e depois em 'Adicionar à Tela de Início'"
+                    : "Instale o app para acesso rápido, offline e notificações"
+                  }
+                </p>
+                
+                <div className="flex flex-wrap gap-2">
+                  {deviceType !== 'ios' && canInstall && (
+                    <Button onClick={triggerInstall} className="gap-2">
+                      <Download className="h-4 w-4" />
+                      Instalar Agora
+                    </Button>
+                  )}
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate('/instalar')}
+                  >
+                    Ver instruções detalhadas
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
