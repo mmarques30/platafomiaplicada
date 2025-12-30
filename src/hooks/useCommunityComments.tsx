@@ -10,6 +10,7 @@ export interface CommunityComment {
   parent_id: string | null;
   content: string;
   created_at: string;
+  updated_at: string;
   likes_count: number;
   user_has_liked: boolean;
   profiles: {
@@ -118,6 +119,28 @@ export function useCommunityComments(postId: string) {
     },
   });
 
+  const updateComment = useMutation({
+    mutationFn: async ({ commentId, content }: { commentId: string; content: string }) => {
+      const trimmedContent = content.trim();
+      if (!trimmedContent) throw new Error("Conteúdo não pode estar vazio");
+      if (trimmedContent.length > 2000) throw new Error("Comentário muito longo");
+
+      const { error } = await supabase
+        .from("community_comments")
+        .update({ content: trimmedContent })
+        .eq("id", commentId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community-comments", postId] });
+      toast.success("Comentário atualizado!");
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar comentário");
+    },
+  });
+
   const toggleCommentLike = useMutation({
     mutationFn: async (commentId: string) => {
       if (!user) throw new Error("User not authenticated");
@@ -161,7 +184,9 @@ export function useCommunityComments(postId: string) {
     isLoading,
     createComment: createComment.mutate,
     deleteComment: deleteComment.mutate,
+    updateComment: updateComment.mutate,
     toggleCommentLike: toggleCommentLike.mutate,
     isCreating: createComment.isPending,
+    isUpdating: updateComment.isPending,
   };
 }
