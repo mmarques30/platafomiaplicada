@@ -136,12 +136,12 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
 
             {/* Single Image - Lateral Thumbnail (não corta) */}
             {mediaCount === 1 && (
-              <div className="mt-3 sm:mt-0 flex-shrink-0 sm:w-44">
+              <div className="mt-3 sm:mt-0 flex-shrink-0 sm:w-56">
                 <div className="rounded-xl overflow-hidden border border-border bg-muted flex items-center justify-center">
                   <img
                     src={mediaItems[0].url}
                     alt=""
-                    className="w-full h-auto max-h-52 object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                    className="w-full h-auto max-h-72 object-contain cursor-pointer hover:opacity-95 transition-opacity"
                     loading="lazy"
                   />
                 </div>
