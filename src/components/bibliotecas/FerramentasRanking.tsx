@@ -101,13 +101,8 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
             onMouseEnter={() => setHoveredIndex(idx)}
             onMouseLeave={() => setHoveredIndex(null)}
           >
-            {/* Badge de posição */}
-            <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs font-semibold shadow-lg">
-              #{idx + 1}
-            </div>
-
             {/* Conteúdo */}
-            <div className="pt-4 flex flex-col flex-grow">
+            <div className="pt-2 flex flex-col flex-grow">
               {/* Logo pequena + Nome */}
               <div className="flex items-center gap-2">
                 {ferramenta.logo_url ? (
