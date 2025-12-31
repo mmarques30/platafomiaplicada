@@ -17,6 +17,8 @@ const sizeClasses = {
   xl: "w-20 h-20 text-lg",
 };
 
+const imgClass = "w-full h-full object-contain rounded-lg";
+
 export function ToolLogo({ 
   logoUrl, 
   toolName, 
@@ -40,7 +42,7 @@ export function ToolLogo({
 
   const domain = getDomain(linkFerramenta);
   const fallbackUrl = domain 
-    ? `https://www.google.com/s2/favicons?sz=128&domain_url=${domain}`
+    ? `https://www.google.com/s2/favicons?sz=256&domain_url=${domain}`
     : null;
 
   // Get initial for text fallback
@@ -63,7 +65,7 @@ export function ToolLogo({
   };
 
   const containerClass = cn(
-    "rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center bg-muted",
+    "rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center bg-muted/50 p-1.5",
     sizeClasses[size],
     className
   );
@@ -84,7 +86,7 @@ export function ToolLogo({
         <img
           src={fallbackUrl}
           alt={toolName}
-          className="w-full h-full object-contain p-1"
+          className={imgClass}
           onError={() => setFallbackError(true)}
         />
       </div>
@@ -98,7 +100,7 @@ export function ToolLogo({
         <img
           src={logoUrl}
           alt={toolName}
-          className="w-full h-full object-contain"
+          className={imgClass}
           onError={() => setImgError(true)}
         />
       </div>
@@ -112,7 +114,7 @@ export function ToolLogo({
         <img
           src={fallbackUrl}
           alt={toolName}
-          className="w-full h-full object-contain p-1"
+          className={imgClass}
           onError={() => {
             setImgError(true);
             setFallbackError(true);
