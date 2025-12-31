@@ -94,7 +94,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
           <div
             key={ferramenta.id}
             className={cn(
-              "group relative rounded-xl p-4 transition-all duration-300",
+              "group relative rounded-xl p-4 transition-all duration-300 h-full flex flex-col",
               "glass-card hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10",
               hoveredIndex === idx && "border-primary/40 shadow-xl shadow-primary/10"
             )}
@@ -107,7 +107,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
             </div>
 
             {/* Conteúdo */}
-            <div className="pt-4 space-y-3">
+            <div className="pt-4 flex flex-col flex-grow">
               {/* Logo pequena + Nome */}
               <div className="flex items-center gap-2">
                 {ferramenta.logo_url ? (
@@ -123,24 +123,27 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
               </div>
               
               {/* Categoria */}
-              <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
+              <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground mt-3">
                 {ferramenta.categoria}
               </span>
 
               {/* Objetivo */}
-              <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+              <p className="text-xs text-muted-foreground line-clamp-2 h-[2.5rem] mt-3">
                 {ferramenta.objetivo}
               </p>
 
+              {/* Spacer para empurrar botões para baixo */}
+              <div className="flex-grow" />
+
               {/* Avaliação Mari */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 mt-3">
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 <span className="font-semibold text-sm">{ferramenta.avaliacao_mari || 0}</span>
                 <span className="text-xs text-muted-foreground">/ 5</span>
               </div>
 
               {/* Ações */}
-              <div className="flex gap-2 pt-1">
+              <div className="flex gap-2 mt-3">
                 <Button 
                   size="sm" 
                   className="flex-1 text-xs h-8"
