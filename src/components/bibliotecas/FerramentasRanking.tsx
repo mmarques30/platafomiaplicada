@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Star, Zap, ExternalLink } from "lucide-react";
+import { ToolLogo } from "@/components/shared/ToolLogo";
+import { Star, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Ferramenta {
@@ -73,16 +74,14 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
                 {idx + 1}
               </span>
               
-              {/* Logo ou ícone */}
-              {ferramenta.logo_url ? (
-                <img 
-                  src={ferramenta.logo_url} 
-                  alt={ferramenta.nome} 
-                  className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-lg" 
-                />
-              ) : (
-                <Zap className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-              )}
+              {/* Logo */}
+              <ToolLogo 
+                logoUrl={ferramenta.logo_url}
+                toolName={ferramenta.nome}
+                linkFerramenta={ferramenta.link_ferramenta}
+                size="md"
+                className="!bg-transparent"
+              />
             </button>
           ))}
         </div>
@@ -105,15 +104,12 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
             <div className="pt-2 flex flex-col flex-grow">
               {/* Logo pequena + Nome */}
               <div className="flex items-center gap-2">
-                {ferramenta.logo_url ? (
-                  <img 
-                    src={ferramenta.logo_url} 
-                    alt={ferramenta.nome} 
-                    className="w-6 h-6 object-contain rounded" 
-                  />
-                ) : (
-                  <Zap className="w-6 h-6 text-primary" />
-                )}
+                <ToolLogo 
+                  logoUrl={ferramenta.logo_url}
+                  toolName={ferramenta.nome}
+                  linkFerramenta={ferramenta.link_ferramenta}
+                  size="sm"
+                />
                 <h3 className="font-semibold text-sm line-clamp-1">{ferramenta.nome}</h3>
               </div>
               

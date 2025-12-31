@@ -2,7 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RatingStars } from "@/components/shared/RatingStars";
-import { ExternalLink, CheckCircle, AlertCircle, Wrench } from "lucide-react";
+import { ToolLogo } from "@/components/shared/ToolLogo";
+import { ExternalLink, CheckCircle, AlertCircle } from "lucide-react";
 
 interface FerramentaDetalhesModalProps {
   ferramenta: any;
@@ -30,13 +31,12 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden flex-shrink-0 flex items-center justify-center">
-              {logo_url ? (
-                <img src={logo_url} alt={nome} className="w-full h-full object-contain" />
-              ) : (
-                <Wrench className="w-10 h-10 text-muted-foreground" />
-              )}
-            </div>
+            <ToolLogo 
+              logoUrl={logo_url}
+              toolName={nome}
+              linkFerramenta={link_ferramenta}
+              size="xl"
+            />
             <div className="flex-1">
               <DialogTitle className="text-2xl">{nome}</DialogTitle>
               <div className="flex gap-2 mt-2 flex-wrap">
