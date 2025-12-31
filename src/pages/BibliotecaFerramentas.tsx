@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useFerramentasIA } from "@/hooks/useFerramentas";
-import { Wrench, Search, LayoutGrid, LayoutList, Zap, ExternalLink } from "lucide-react";
+import { Wrench, Search } from "lucide-react";
 import { FerramentasRanking } from "@/components/bibliotecas/FerramentasRanking";
 import { FerramentaCardHorizontal } from "@/components/bibliotecas/FerramentaCardHorizontal";
 import { FerramentaDetalhesModal } from "@/components/bibliotecas/FerramentaDetalhesModal";
@@ -25,7 +25,6 @@ export default function BibliotecaFerramentas() {
   const [filtroPreco, setFiltroPreco] = useState("todas");
   const [filtroValeAPena, setFiltroValeAPena] = useState("todas");
   const [itemsToShow, setItemsToShow] = useState(10);
-  const [viewMode, setViewMode] = useState<"horizontal" | "grid">("horizontal");
 
   const categorias = useMemo(
     () => (ferramentas ? Array.from(new Set(ferramentas.map((f) => f.categoria))) : []),
@@ -87,24 +86,6 @@ export default function BibliotecaFerramentas() {
 
       {/* Seção de Catálogo Completo */}
       <div className="space-y-4">
-        <div className="flex justify-end gap-2">
-          <Button
-            variant={viewMode === "horizontal" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setViewMode("horizontal")}
-          >
-            <LayoutList className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">Lista</span>
-          </Button>
-          <Button
-            variant={viewMode === "grid" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setViewMode("grid")}
-          >
-            <LayoutGrid className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">Grid</span>
-          </Button>
-        </div>
 
         {/* Barra de Busca e Filtros */}
         <div className="flex flex-col md:flex-row gap-3">
@@ -167,11 +148,11 @@ export default function BibliotecaFerramentas() {
           </p>
         )}
 
-        {/* Conteúdo - Cards Horizontais ou Grid */}
+        {/* Conteúdo - Lista */}
         {isLoading ? (
-          <div className={viewMode === "horizontal" ? "space-y-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"}>
+          <div className="space-y-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className={viewMode === "horizontal" ? "h-[140px]" : "h-[280px]"}>
+              <Card key={i} className="h-[140px]">
                 <CardContent className="p-4 flex flex-col gap-3">
                   <Skeleton className="h-16 w-16 rounded-xl" />
                   <Skeleton className="h-6 w-3/4" />
@@ -183,63 +164,15 @@ export default function BibliotecaFerramentas() {
           </div>
         ) : filteredFerramentas && filteredFerramentas.length > 0 ? (
           <>
-            {viewMode === "horizontal" ? (
-              <div className="space-y-3">
-                {visibleFerramentas.map((ferramenta) => (
-                  <FerramentaCardHorizontal
-                    key={ferramenta.id}
-                    ferramenta={ferramenta}
-                    onVerMais={() => setFerramentaSelecionada(ferramenta)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {visibleFerramentas.map((ferramenta) => (
-                  <Card key={ferramenta.id} className="hover:shadow-lg transition-all">
-                    <CardContent className="p-4 flex flex-col h-full">
-                      {/* Ícone */}
-                      <div className="flex justify-center mb-3">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Zap className="w-6 h-6 text-primary" />
-                        </div>
-                      </div>
-                      <h3 className="text-lg font-bold text-center mb-2 line-clamp-2">
-                        {ferramenta.nome}
-                      </h3>
-                      <p className="text-sm text-muted-foreground text-center mb-4 line-clamp-2 flex-grow">
-                        {ferramenta.objetivo}
-                      </p>
-                      <div className="flex gap-2 w-full">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => setFerramentaSelecionada(ferramenta)}
-                        >
-                          Ver Detalhes
-                        </Button>
-                        {ferramenta.link_ferramenta && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                          >
-                            <a
-                              href={ferramenta.link_ferramenta}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+            <div className="space-y-3">
+              {visibleFerramentas.map((ferramenta) => (
+                <FerramentaCardHorizontal
+                  key={ferramenta.id}
+                  ferramenta={ferramenta}
+                  onVerMais={() => setFerramentaSelecionada(ferramenta)}
+                />
+              ))}
+            </div>
 
             {/* Botão Ver Mais */}
             {filteredFerramentas && visibleFerramentas.length < filteredFerramentas.length && (
