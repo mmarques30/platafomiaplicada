@@ -87,26 +87,23 @@ export default function BibliotecaFerramentas() {
 
       {/* Seção de Catálogo Completo */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <h2 className="text-xl md:text-2xl font-bold">Catálogo Completo</h2>
-          <div className="flex gap-2">
-            <Button
-              variant={viewMode === "horizontal" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setViewMode("horizontal")}
-            >
-              <LayoutList className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Lista</span>
-            </Button>
-            <Button
-              variant={viewMode === "grid" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setViewMode("grid")}
-            >
-              <LayoutGrid className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Grid</span>
-            </Button>
-          </div>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant={viewMode === "horizontal" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("horizontal")}
+          >
+            <LayoutList className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Lista</span>
+          </Button>
+          <Button
+            variant={viewMode === "grid" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("grid")}
+          >
+            <LayoutGrid className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Grid</span>
+          </Button>
         </div>
 
         {/* Barra de Busca e Filtros */}
