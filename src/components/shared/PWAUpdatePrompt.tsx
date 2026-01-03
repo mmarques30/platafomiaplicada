@@ -11,35 +11,44 @@ export function PWAUpdatePrompt() {
     updateServiceWorker
   } = useRegisterSW({
     onRegisteredSW(swUrl, r) {
-      console.log('Service Worker registrado:', swUrl);
-      // Verificar atualizações a cada hora
+      console.log('[PWA] Service Worker registrado:', swUrl);
+      
       if (r) {
+        // Verificar imediatamente na montagem
+        console.log('[PWA] Verificando atualizações iniciais...');
+        r.update();
+        
+        // Verificar atualizações a cada 15 minutos
         setInterval(() => {
+          console.log('[PWA] Verificando atualizações periódicas...');
           r.update();
-        }, 60 * 60 * 1000);
+        }, 15 * 60 * 1000);
       }
     },
     onRegisterError(error) {
-      console.error('Erro ao registrar Service Worker:', error);
+      console.error('[PWA] Erro ao registrar Service Worker:', error);
     }
   });
 
   useEffect(() => {
     if (needRefresh) {
+      console.log('[PWA] Nova versão disponível!');
       // Delay para não interferir com instalação inicial do PWA
       const timer = setTimeout(() => {
         setShowPrompt(true);
-      }, 3000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [needRefresh]);
 
   const handleUpdate = () => {
+    console.log('[PWA] Usuário aceitou atualização');
     updateServiceWorker(true);
     setShowPrompt(false);
   };
 
   const handleDismiss = () => {
+    console.log('[PWA] Usuário adiou atualização');
     setNeedRefresh(false);
     setShowPrompt(false);
   };
