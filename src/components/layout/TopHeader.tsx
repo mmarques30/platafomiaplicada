@@ -83,8 +83,8 @@ export function TopHeader() {
     >
       <div className="relative h-14 w-full">
         {/* LEFT: SidebarTrigger - posição absoluta à esquerda */}
-        <div className="absolute left-0 top-0 h-full flex items-center ml-2">
-          <SidebarTrigger className="text-white/80 hover:text-white hover:bg-white/10 transition-colors" />
+        <div className="absolute left-0 top-0 h-full flex items-center ml-1 md:ml-2">
+          <SidebarTrigger className="h-10 w-10 md:h-7 md:w-7 text-white/80 hover:text-white hover:bg-white/10 transition-colors" />
         </div>
 
         {/* CENTER: Horizontal Navigation - centralizado na viewport com posição absoluta */}
