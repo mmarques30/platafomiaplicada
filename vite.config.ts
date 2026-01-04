@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'IAplicada Academy',
@@ -45,37 +45,36 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /^\/supabase/],
-        skipWaiting: true,
-        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             urlPattern: /\.(js|css)$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'assets-cache',
-              networkTimeoutSeconds: 10,
+              cacheName: 'assets-cache-v2',
+              networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 43200 // 12 horas
+                maxAgeSeconds: 7200 // 2 horas
               }
             }
           },
           {
             urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/,
-            handler: 'StaleWhileRevalidate',
+            handler: 'NetworkFirst',
             options: {
-              cacheName: 'images-cache',
+              cacheName: 'images-cache-v2',
+              networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 200,
-                maxAgeSeconds: 86400 // 1 dia
+                maxAgeSeconds: 14400 // 4 horas
               }
             }
           }
-        ],
-        cleanupOutdatedCaches: true
+        ]
       }
     })
   ].filter(Boolean),
