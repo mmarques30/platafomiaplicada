@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, CheckCircle2 } from "lucide-react";
+import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, CheckCircle2, RefreshCw } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function Configuracoes() {
@@ -257,6 +257,52 @@ export default function Configuracoes() {
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Atualização do App */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <RefreshCw className="h-5 w-5" />
+              Atualização do App
+            </CardTitle>
+            <CardDescription>
+              Force a atualização se algo não estiver funcionando corretamente
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Se você está vendo imagens antigas ou comportamentos estranhos, 
+              clique no botão abaixo para forçar uma atualização completa.
+            </p>
+            <Button 
+              variant="outline"
+              onClick={async () => {
+                toast.loading("Limpando cache e atualizando...");
+                
+                // Limpar todos os caches
+                if ('caches' in window) {
+                  const cacheNames = await caches.keys();
+                  await Promise.all(cacheNames.map(name => caches.delete(name)));
+                }
+                
+                // Desregistrar service workers
+                if ('serviceWorker' in navigator) {
+                  const registrations = await navigator.serviceWorker.getRegistrations();
+                  for (const registration of registrations) {
+                    await registration.unregister();
+                  }
+                }
+                
+                // Recarregar a página
+                window.location.reload();
+              }}
+              className="gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Forçar Atualização Completa
+            </Button>
           </CardContent>
         </Card>
 
