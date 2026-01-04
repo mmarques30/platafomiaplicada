@@ -3,7 +3,9 @@ import { MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import logoMariana from "@/assets/logo-mariana-simbolo.png";
+
+// Usar caminho estático para garantir carregamento no PWA
+const logoMariana = "/logo-mariana.png";
 
 export function MarIAnaFloatingButton() {
   const navigate = useNavigate();
@@ -16,10 +18,10 @@ export function MarIAnaFloatingButton() {
           <Button
             onClick={() => navigate("/chat")}
             size="icon"
-            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-white hover:bg-gray-50 border border-border p-2"
+            className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 h-11 w-11 md:h-14 md:w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-white hover:bg-gray-50 border border-border p-2"
           >
             {logoError ? (
-              <MessageSquare className="w-7 h-7 text-primary" />
+              <MessageSquare className="w-5 h-5 md:w-7 md:h-7 text-primary" />
             ) : (
               <img 
                 src={logoMariana} 
