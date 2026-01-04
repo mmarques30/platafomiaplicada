@@ -3,7 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
-import { ExternalLink, CheckCircle, Box } from "lucide-react";
+import { ToolLogo } from "@/components/shared/ToolLogo";
+import { ExternalLink, CheckCircle } from "lucide-react";
 
 interface FerramentaCardProps {
   ferramenta: {
@@ -26,24 +27,12 @@ export function FerramentaCard({ ferramenta, onVerMais }: FerramentaCardProps) {
       <CardContent className="p-4 flex flex-col gap-3 flex-1">
         {/* Logo */}
         <div className="flex justify-center mb-3">
-          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
-            {ferramenta.logo_url ? (
-              <img 
-                src={ferramenta.logo_url} 
-                alt={ferramenta.nome}
-                className="w-8 h-8 object-contain"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (fallback) fallback.style.display = 'flex';
-                }}
-              />
-            ) : null}
-            <Box 
-              className="w-6 h-6 text-primary" 
-              style={{ display: ferramenta.logo_url ? 'none' : 'flex' }}
-            />
-          </div>
+          <ToolLogo 
+            logoUrl={ferramenta.logo_url}
+            toolName={ferramenta.nome}
+            linkFerramenta={ferramenta.link_ferramenta}
+            size="lg"
+          />
         </div>
 
         {/* Nome da Ferramenta */}
