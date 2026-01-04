@@ -105,7 +105,7 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
               return (
                 <CarouselItem 
                   key={video.id} 
-                  className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                  className="pl-4 basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
                 >
                   <div
                     className={cn(
@@ -114,7 +114,7 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
                     )}
                     onClick={() => !trilha.bloqueada && onSelectVideo(video.id)}
                   >
-                    <div className="relative aspect-[9/16] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                    <div className="relative aspect-[4/3] sm:aspect-square md:aspect-[9/16] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
                       <img
                         src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url || video.thumbnail_url)}
                         alt={video.titulo}
