@@ -18,7 +18,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
+// Usar caminho estático para garantir carregamento no PWA
+const logoSimbolo = "/logo-simbolo.png";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
@@ -100,16 +101,16 @@ export function AppSidebar() {
     <Sidebar className="border-r border-sidebar-border bg-sidebar pt-14">
       {/* Logo sempre visível, fora do loading */}
       <SidebarHeader>
-        <div className="flex h-16 items-center justify-center px-4">
+        <div className="flex h-12 items-center justify-center px-4">
           {logoError ? (
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <span className="text-primary font-bold text-lg">iA</span>
+            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span className="text-primary font-bold text-sm">iA</span>
             </div>
           ) : (
             <img 
               src={logoSimbolo} 
               alt="IAplicada" 
-              className="h-10 w-10"
+              className="h-8 w-8"
               onError={() => setLogoError(true)}
             />
           )}
