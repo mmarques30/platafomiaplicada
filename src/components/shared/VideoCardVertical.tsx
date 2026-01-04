@@ -34,7 +34,7 @@ export function VideoCardVertical({
       className="block group"
       onClick={handleClick}
     >
-      <div className={`overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-muted aspect-[${aspectRatio}]`}>
+      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-muted aspect-[4/5] sm:aspect-[9/14] md:aspect-[9/16]">
         <img
           src={thumbnailUrl}
           alt={titulo}

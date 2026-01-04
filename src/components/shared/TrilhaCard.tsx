@@ -12,7 +12,7 @@ interface TrilhaCardProps {
 export function TrilhaCard({ id, titulo, imagem_url, visivel_apenas_pro }: TrilhaCardProps) {
   return (
     <Link to={`/trilhas/${id}`} className="block group">
-      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative h-[400px] w-full bg-muted border-2 border-primary/10 hover:border-primary/30">
+      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative h-[280px] sm:h-[320px] md:h-[400px] w-full bg-muted border-2 border-primary/10 hover:border-primary/30">
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
             🔒 PRO
