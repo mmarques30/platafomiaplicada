@@ -216,7 +216,7 @@ export default function Dashboard() {
                     {trilhas.map((trilha: any) => (
                       <CarouselItem 
                         key={trilha.id} 
-                        className="pl-4 basis-full sm:basis-1/2 md:basis-1/4"
+                        className="pl-4 basis-1/2 sm:basis-1/2 md:basis-1/4"
                       >
                         <TrilhaCardBloqueavel
                           id={trilha.id}

@@ -30,7 +30,7 @@ export function TrilhaCardBloqueavel({
   if (isVisitante && !temConteudoDisponivel) {
     return (
       <Link to="/aplique" className="block">
-        <div className="relative overflow-hidden rounded-xl shadow-md w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow aspect-square sm:aspect-[3/4] md:aspect-[9/16]">
+        <div className="relative overflow-hidden rounded-xl shadow-md w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow aspect-[4/3] sm:aspect-[3/4] md:aspect-[9/16]">
           <img
             src={imagem_url || "/placeholder.svg"}
             alt={titulo}
@@ -56,7 +56,7 @@ export function TrilhaCardBloqueavel({
   if (!isVisitante && bloqueada) {
     return (
       <Link to={`/trilhas/${id}`} className="block">
-        <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-lg w-full bg-muted border-2 border-primary/10 hover:border-primary/20 cursor-pointer transition-all aspect-square sm:aspect-[3/4] md:aspect-[9/16]">
+        <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-lg w-full bg-muted border-2 border-primary/10 hover:border-primary/20 cursor-pointer transition-all aspect-[4/3] sm:aspect-[3/4] md:aspect-[9/16]">
           {visivel_apenas_pro && (
             <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
               🔒 PRO
@@ -94,7 +94,7 @@ export function TrilhaCardBloqueavel({
   // Trilha disponível → Card normal clicável
   return (
     <Link to={`/trilhas/${id}`} className="block group">
-      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative w-full bg-muted border-2 border-primary/10 hover:border-primary/30 aspect-square sm:aspect-[3/4] md:aspect-[9/16]">
+      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative w-full bg-muted border-2 border-primary/10 hover:border-primary/30 aspect-[4/3] sm:aspect-[3/4] md:aspect-[9/16]">
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
             🔒 PRO
