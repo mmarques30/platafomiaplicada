@@ -142,14 +142,14 @@
     
     --radius: 0.75rem;
     
-    /* Sidebar: Off-White Neutro mesmo em dark mode */
-    --sidebar-background: 60 5% 96%;
-    --sidebar-foreground: 72 6% 18%;
+    /* Sidebar: Dark Mode - harmonizado com o tema escuro */
+    --sidebar-background: 72 6% 10%;
+    --sidebar-foreground: 0 0% 90%;
     --sidebar-primary: 73 55% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 60 5% 93%;
-    --sidebar-accent-foreground: 72 6% 18%;
-    --sidebar-border: 60 5% 88%;
+    --sidebar-accent: 72 6% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 72 6% 18%;
     --sidebar-ring: 73 55% 47%;
     /* Active indicator: brand green */
     --sidebar-active: 73 55% 47%;
