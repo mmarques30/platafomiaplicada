@@ -41,8 +41,25 @@ export function PWAUpdatePrompt() {
     }
   }, [needRefresh]);
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     console.log('[PWA] Usuário aceitou atualização');
+    
+    // Limpar todos os caches antes de atualizar
+    if ('caches' in window) {
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => {
+            console.log('[PWA] Limpando cache:', cacheName);
+            return caches.delete(cacheName);
+          })
+        );
+        console.log('[PWA] Todos os caches limpos');
+      } catch (error) {
+        console.error('[PWA] Erro ao limpar caches:', error);
+      }
+    }
+    
     updateServiceWorker(true);
     setShowPrompt(false);
   };

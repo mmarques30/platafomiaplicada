@@ -36,6 +36,7 @@ export function AppSidebar() {
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
   const collapsed = !open;
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+  const [logoError, setLogoError] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
@@ -100,7 +101,18 @@ export function AppSidebar() {
       {/* Logo sempre visível, fora do loading */}
       <SidebarHeader>
         <div className="flex h-16 items-center justify-center px-4">
-          <img src={logoSimbolo} alt="IAplicada" className="h-10 w-10" />
+          {logoError ? (
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span className="text-primary font-bold text-lg">iA</span>
+            </div>
+          ) : (
+            <img 
+              src={logoSimbolo} 
+              alt="IAplicada" 
+              className="h-10 w-10"
+              onError={() => setLogoError(true)}
+            />
+          )}
         </div>
       </SidebarHeader>
 
