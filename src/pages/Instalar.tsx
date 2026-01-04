@@ -14,7 +14,8 @@ import {
   ArrowLeft,
   Monitor
 } from 'lucide-react';
-import logoSimbolo from '@/assets/logo-aplicada-simbolo.png';
+// Usar caminho estático para evitar problemas de cache no PWA
+const logoSimbolo = "/logo-simbolo.png";
 
 export default function Instalar() {
   const navigate = useNavigate();
