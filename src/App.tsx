@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { TrocarSenhaModal } from "./components/auth/TrocarSenhaModal";
 import { useAuth } from "./hooks/useAuth";
+import { useVersionCheck } from "./hooks/useVersionCheck";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Trilhas from "./pages/Trilhas";
@@ -84,6 +85,7 @@ const queryClient = new QueryClient();
 
 function AppContent() {
   const { user } = useAuth();
+  useVersionCheck();
 
   return (
     <>

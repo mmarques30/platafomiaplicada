@@ -295,8 +295,11 @@ export default function Configuracoes() {
                   }
                 }
                 
-                // Recarregar a página
-                window.location.reload();
+                // Limpar versão do localStorage para forçar check
+                localStorage.removeItem('app-version');
+                
+                // Forçar hard reload
+                window.location.href = window.location.origin + '?nocache=' + Date.now();
               }}
               className="gap-2"
             >
