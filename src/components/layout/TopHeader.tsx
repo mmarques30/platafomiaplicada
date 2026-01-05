@@ -77,7 +77,7 @@ export function TopHeader() {
   return (
     <header 
       className={cn(
-        "fixed top-0 z-50 w-full border-b border-[#3a3b36] bg-[#2F302B] transition-transform duration-300 ease-in-out",
+        "fixed top-0 z-50 w-full border-b border-white/10 bg-[#0D0D0D] transition-transform duration-300 ease-in-out",
         isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0"
       )}
       onMouseEnter={() => setIsHovered(true)}
