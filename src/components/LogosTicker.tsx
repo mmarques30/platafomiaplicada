@@ -43,13 +43,25 @@ export function LogosTicker() {
             <img 
               src={logo.image} 
               alt={logo.alt}
+              loading="lazy"
+              decoding="async"
               className="h-11 w-auto object-contain grayscale brightness-0 dark:hidden"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+              }}
             />
             {/* Logo clara - visível no modo escuro */}
             <img 
               src={logo.image} 
               alt={logo.alt}
+              loading="lazy"
+              decoding="async"
               className="h-11 w-auto object-contain grayscale hidden dark:block dark:invert"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+              }}
             />
           </div>
         ))}

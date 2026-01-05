@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo-simbolo.png', 'logo-mariana.png'],
+      includeAssets: ['logo-simbolo.png', 'apple-touch-icon-180.png', 'logo-mariana.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'IAplicada Academy',
         short_name: 'IAplicada',
@@ -27,20 +27,20 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         icons: [
           {
-            src: '/icon-192.png',
+            src: '/logo-simbolo.png?v=4',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png',
+            src: '/logo-simbolo.png?v=4',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png',
+            src: '/logo-simbolo.png?v=4',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'maskable'
+            purpose: 'any'
           }
         ]
       },
@@ -49,12 +49,14 @@ export default defineConfig(({ mode }) => ({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /^\/supabase/],
         cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /\.(js|css)$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'assets-cache-v2',
+              cacheName: 'assets-cache-v4',
               networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 100,
@@ -66,7 +68,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'images-cache-v2',
+              cacheName: 'images-cache-v4',
               networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 200,
