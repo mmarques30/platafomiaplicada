@@ -18,9 +18,9 @@ export function CentralConteudo() {
   const { data: conteudos, isLoading } = useConteudosDashboard(activeTab);
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border-2 border-aplicada-green-700/40 bg-gradient-to-br from-aplicada-green-900/20 via-card to-aplicada-green-800/10 shadow-xl shadow-aplicada-green-900/10">
-      {/* Background Logo 3D */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+    <section className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-aplicada-green-700/40 sm:border-2 bg-gradient-to-br from-aplicada-green-900/20 via-card to-aplicada-green-800/10 shadow-lg sm:shadow-xl shadow-aplicada-green-900/10">
+      {/* Background Logo 3D - hidden on mobile for performance */}
+      <div className="hidden sm:flex absolute inset-0 items-center justify-center pointer-events-none overflow-hidden">
         <img 
           src={logo3d} 
           alt="" 
@@ -32,14 +32,14 @@ export function CentralConteudo() {
       <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 p-6 md:p-8">
+      <div className="relative z-10 p-3 sm:p-5 md:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">
+            <h2 className="text-base sm:text-xl md:text-2xl font-bold text-foreground">
               Central de Conteudo
             </h2>
-            <p className="text-sm text-aplicada-green-600 mt-1">
+            <p className="text-xs sm:text-sm text-aplicada-green-600 mt-0.5 sm:mt-1">
               Fique por dentro das novidades e aplique hoje
             </p>
           </div>
@@ -47,14 +47,14 @@ export function CentralConteudo() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo)} className="w-full">
-          <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-1 bg-aplicada-green-900/40 p-1.5 rounded-xl mb-6 border border-aplicada-green-700/30">
+          <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-aplicada-green-900/40 p-1 sm:p-1.5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 md:mb-6 border border-aplicada-green-700/30">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="flex items-center gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg px-4 py-2.5 transition-all duration-200"
+                className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
               </TabsTrigger>
             ))}
@@ -69,13 +69,13 @@ export function CentralConteudo() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin snap-x snap-mandatory"
+                  className="flex gap-2.5 sm:gap-4 overflow-x-auto pb-3 sm:pb-4 scrollbar-thin snap-x snap-mandatory -mx-1 px-1"
                 >
                   {isLoading ? (
                     <>
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="min-w-[280px] max-w-[320px] flex-shrink-0">
-                          <div className="h-[200px] w-full rounded-xl bg-aplicada-green-900/30 animate-pulse" />
+                        <div key={i} className="min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0">
+                          <div className="h-[160px] sm:h-[200px] w-full rounded-lg sm:rounded-xl bg-aplicada-green-900/30 animate-pulse" />
                         </div>
                       ))}
                     </>
