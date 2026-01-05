@@ -49,14 +49,14 @@ export default function Aplique() {
           />
           
           {/* Headline */}
-          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-[#2F302B] mb-6">
+          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-foreground mb-6">
             Aplique <span className="text-[#9EB038]">agora</span>,
             <br />
             não amanhã.
           </h1>
           
           {/* Subtítulo */}
-          <p className="text-[#2F302B]/80 text-lg md:text-xl max-w-2xl mx-auto mb-10">
+          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10">
             Inteligência Artificial que você usa hoje, do raciocínio à ação.
             <br />
             Comece <span className="text-[#9EB038] font-semibold">agora</span> a aplicar e ter resultados reais.
@@ -83,15 +83,15 @@ export default function Aplique() {
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Card Academy - Tema Claro */}
-              <Card className="bg-white border border-zinc-200 rounded-2xl p-8 shadow-lg flex flex-col">
-                <h2 className="text-3xl font-bold text-zinc-900 mb-6">Academy</h2>
+              <Card className="bg-card border border-border rounded-2xl p-8 shadow-lg flex flex-col">
+                <h2 className="text-3xl font-bold text-card-foreground mb-6">Academy</h2>
                 
-                <p className="text-5xl font-bold text-zinc-900 mb-2">R$ 1.497</p>
+                <p className="text-5xl font-bold text-card-foreground mb-2">R$ 1.497</p>
                 <p className="text-[#9EB038] font-medium mb-8">
                   Pague em até 12x ou à vista
                 </p>
                 
-                <div className="space-y-4 text-zinc-600 text-sm mb-8">
+                <div className="space-y-4 text-muted-foreground text-sm mb-8">
                   <p>Plataforma completa por 1 ano. Acesso as gravações das aulas semanais e trilhas (do iniciante ao avançado).</p>
                   <p>Liberação gradual: 4 vídeos/semana (progresso guiado, sem sobrecarga).</p>
                   <p>Q&A semanal (19h30).</p>
@@ -143,7 +143,7 @@ export default function Aplique() {
         {/* Tabela Comparativa */}
         <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 md:mb-10 text-[#2F302B]">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 md:mb-10 text-foreground">
               Qual plano combina com você?
             </h2>
             
@@ -153,8 +153,8 @@ export default function Aplique() {
                   <tr>
                     <th className="w-[40%] p-4 text-left"></th>
                     <th className="w-[30%] p-6 text-center">
-                      <div className="text-xl font-bold text-[#2F302B] mb-1">Academy</div>
-                      <div className="text-2xl font-bold text-[#2F302B]">R$ 1.497</div>
+                      <div className="text-xl font-bold text-foreground mb-1">Academy</div>
+                      <div className="text-2xl font-bold text-foreground">R$ 1.497</div>
                     </th>
                     <th className="w-[30%] p-6 text-center">
                       <div className="text-xl font-bold text-[#9EB038] mb-1">Mentoria</div>
@@ -169,15 +169,15 @@ export default function Aplique() {
                       Para quem é
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Economia de tempo</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">3 a 5 horas por semana</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">6 a 10 horas por semana</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Economia de tempo</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">3 a 5 horas por semana</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">6 a 10 horas por semana</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Payback esperado</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">1,5 mês (economia + produtividade)</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Menos de 1 mês (ganhos estratégicos)</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Payback esperado</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">1,5 mês (economia + produtividade)</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Menos de 1 mês (ganhos estratégicos)</td>
                   </tr>
                   
                   {/* ACESSO E CONTEÚDO */}
@@ -186,33 +186,33 @@ export default function Aplique() {
                       Acesso e conteúdo
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Acesso por 1 ano</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Acesso por 1 ano</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
-                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
-                    </td>
-                  </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Gravação das aulas ao vivo</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
-                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
-                    </td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Trilhas de aprendizado</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Iniciante, Intermediário, Avançado</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Iniciante, Intermediário, Avançado</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Gravação das aulas ao vivo</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                    <td className="px-4 py-4 text-center border-l border-border">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Liberação de conteúdo</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">4 vídeos por semana (gradual)</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Acesso completo imediato</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Trilhas de aprendizado</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Iniciante, Intermediário, Avançado</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Iniciante, Intermediário, Avançado</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Liberação de conteúdo</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">4 vídeos por semana (gradual)</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Acesso completo imediato</td>
                   </tr>
                   
                   {/* SUPORTE */}
@@ -221,33 +221,33 @@ export default function Aplique() {
                       Suporte
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Q&A ao vivo semanal (19h30)</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Q&A ao vivo semanal (19h30)</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
-                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
-                    </td>
-                  </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Assistente IA 24/7 (Mari)</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
-                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
-                    </td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Encontros práticos e colaborativos</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">6 encontros/mês (2h cada)</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Assistente IA 24/7 (Mari)</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                    <td className="px-4 py-4 text-center border-l border-border">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Comunidade exclusiva</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Encontros práticos e colaborativos</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">6 encontros/mês (2h cada)</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Comunidade exclusiva</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
@@ -258,41 +258,41 @@ export default function Aplique() {
                       Recursos
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Biblioteca de prompts</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">100+ prompts</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">100+ prompts</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Biblioteca de prompts</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">100+ prompts</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">100+ prompts</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Avaliação de ferramentas IA</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">50+ ferramentas</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">50+ ferramentas</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Avaliação de ferramentas IA</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">50+ ferramentas</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">50+ ferramentas</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Diagnóstico IA personalizado</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Diagnóstico IA personalizado</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
-                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
-                    </td>
-                  </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Dashboard com métricas</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Horas economizadas + ROI</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Horas economizadas + ROI</td>
-                  </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Acesso antecipado (Beta)</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Materiais exclusivos</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Dashboard com métricas</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Horas economizadas + ROI</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Horas economizadas + ROI</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Acesso antecipado (Beta)</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
+                      <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Materiais exclusivos</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
@@ -303,22 +303,22 @@ export default function Aplique() {
                       Implementação
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Projetos práticos</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Autodirigidos</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">3 projetos orientados e avaliados</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Projetos práticos</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Autodirigidos</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">3 projetos orientados e avaliados</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Feedback detalhado</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Feedback detalhado</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Acompanhamento de progresso</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Dashboard automatizado</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Dashboard + avaliações 1:1</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Acompanhamento de progresso</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Dashboard automatizado</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Dashboard + avaliações 1:1</td>
                   </tr>
                   
                   {/* CERTIFICAÇÃO */}
@@ -328,9 +328,9 @@ export default function Aplique() {
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-4 text-sm text-zinc-600">Certificado digital</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Por trilha concluída</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Trilhas + Projetos (premium)</td>
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Certificado digital</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Por trilha concluída</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Trilhas + Projetos (premium)</td>
                   </tr>
                 </tbody>
               </table>
@@ -342,14 +342,14 @@ export default function Aplique() {
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto text-center">
             {/* Título */}
-            <h2 className="text-3xl md:text-5xl font-bold text-[#2F302B] mb-4">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
               Aprenda na prática.
               <br />
               <span className="text-[#9EB038]">4 módulos novos</span> por semana.
             </h2>
             
             {/* Subtítulo */}
-            <p className="text-[#2F302B]/70 text-lg max-w-3xl mx-auto mb-12">
+            <p className="text-muted-foreground text-lg max-w-3xl mx-auto mb-12">
               Liberação progressiva para acompanhar atualizações de IA e tendências de mercado.
               Essas são as trilhas que mais economizam tempo e aceleram carreira:
             </p>
@@ -357,43 +357,43 @@ export default function Aplique() {
             {/* Grid de Cards - 3 colunas */}
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               {/* Card 1: Claude Avançado */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Sparkles className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Claude Avançado</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Claude Avançado</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Análise de documentos em 2 minutos
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Economiza 10h/semana</p>
                 </div>
               </div>
 
               {/* Card 2: Planilhas e Dados */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Table2 className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Planilhas e Dados</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Planilhas e Dados</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Transforme caos em insights acionáveis
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Economiza 5-8h/semana</p>
                 </div>
               </div>
 
               {/* Card 3: Make Automação */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Workflow className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Make: Automação Avançada</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Make: Automação Avançada</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Workflows que Zapier não consegue fazer
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Economiza 12-15h/semana</p>
                 </div>
               </div>
@@ -402,29 +402,29 @@ export default function Aplique() {
             {/* Segunda linha - 2 cards centralizados */}
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {/* Card 4: IA para Vendas */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <TrendingUp className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">IA para Vendas</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">IA para Vendas</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Acelere seu pipeline de vendas
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Prospecção 3x mais rápida</p>
                 </div>
               </div>
 
               {/* Card 5: Dashboard & BI */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Lightbulb className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Dashboard & BI</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Dashboard & BI</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Decisões baseadas em dados reais
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Economiza 5-8h/semana</p>
                 </div>
               </div>

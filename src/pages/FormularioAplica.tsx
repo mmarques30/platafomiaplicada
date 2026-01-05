@@ -429,7 +429,7 @@ export default function FormularioAplica() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
@@ -438,8 +438,8 @@ export default function FormularioAplica() {
   // Tela inicial
   if (!started) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex items-center justify-center p-4">
-        <Card className="max-w-2xl w-full bg-white/90 backdrop-blur-sm border border-[#9EB038]/20 shadow-lg">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-2xl w-full bg-card/95 backdrop-blur-sm border border-primary/20 shadow-lg">
           <CardHeader className="text-center pb-4">
             <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" />
             <CardTitle className="text-2xl md:text-3xl text-foreground">
@@ -474,8 +474,8 @@ export default function FormularioAplica() {
   // Tela final
   if (finished) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex items-center justify-center p-4">
-        <Card className="max-w-2xl w-full bg-white/90 backdrop-blur-sm border border-[#9EB038]/20 shadow-lg text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-2xl w-full bg-card/95 backdrop-blur-sm border border-primary/20 shadow-lg text-center">
           <CardHeader className="pb-4">
             <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" />
             <div className="w-16 h-16 bg-[#9EB038]/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -513,9 +513,9 @@ export default function FormularioAplica() {
 
   // Wizard de perguntas
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFFFF6] via-[#F6F7E9] to-[#E8EDD0] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header com logo e progresso */}
-      <div className="bg-white/90 backdrop-blur-sm border-b border-[#9EB038]/20 p-4">
+      <div className="bg-card/95 backdrop-blur-sm border-b border-border p-4">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <img src={logoMarca} alt="IAplicada" className="h-8" />
@@ -547,7 +547,7 @@ export default function FormularioAplica() {
       {/* Conteúdo */}
       <div className="flex-1 p-4 overflow-auto">
         <div className="max-w-3xl mx-auto">
-          <Card className="bg-white/90 backdrop-blur-sm border border-[#9EB038]/20 shadow-lg">
+          <Card className="bg-card/95 backdrop-blur-sm border border-primary/20 shadow-lg">
             <CardHeader>
               <div className="flex items-center gap-2 text-sm text-primary mb-2">
                 <span className="bg-primary/20 px-2 py-1 rounded text-xs font-medium">

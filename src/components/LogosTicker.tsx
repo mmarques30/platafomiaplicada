@@ -42,7 +42,7 @@ export function LogosTicker() {
             <img 
               src={logo.image} 
               alt={logo.alt}
-              className="h-11 w-auto object-contain grayscale brightness-0"
+              className="h-11 w-auto object-contain grayscale brightness-0 dark:brightness-100 dark:invert"
             />
           </div>
         ))}
