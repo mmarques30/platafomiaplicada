@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IAplicada - Sem conexão</title>
+  <style>
+    body {
+      font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #2F302B;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      text-align: center;
+      padding: 20px;
+    }
+    .container { max-width: 400px; }
+    .logo { width: 80px; height: 80px; margin-bottom: 24px; }
+    h1 { color: #9EB038; margin-bottom: 16px; font-size: 24px; }
+    p { opacity: 0.7; margin-bottom: 24px; line-height: 1.5; }
+    button {
+      background: #9EB038;
+      color: #2F302B;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/logo-simbolo.png" alt="IAplicada" class="logo">
+    <h1>Sem conexão</h1>
+    <p>Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.</p>
+    <button onclick="location.reload()">Tentar novamente</button>
+  </div>
+</body>
+</html>

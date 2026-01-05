@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
-import logo3D from "@/assets/logo-3d.png";
 
 export function AnimatedLogo() {
   return (
     <motion.img
-      src={logo3D}
+      src="/logo-3d.png"
       alt=""
       className="absolute w-48 h-48 opacity-20 pointer-events-none"
       style={{ top: 0, left: 0 }}
@@ -16,6 +15,9 @@ export function AnimatedLogo() {
         duration: 30,
         repeat: Infinity,
         ease: "linear",
+      }}
+      onError={(e) => {
+        e.currentTarget.style.display = 'none';
       }}
     />
   );
