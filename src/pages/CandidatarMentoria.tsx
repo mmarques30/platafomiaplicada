@@ -192,7 +192,7 @@ export default function CandidatarMentoria() {
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
-          className="absolute top-6 left-6 z-20 text-[#2F302B] hover:bg-[#2F302B]/10"
+          className="absolute top-6 left-6 z-20 text-foreground hover:bg-muted"
         >
           <ChevronLeft className="w-5 h-5 mr-1" />
           Voltar
@@ -205,17 +205,17 @@ export default function CandidatarMentoria() {
             </div>
           </div>
           
-          <h1 className="text-3xl font-bold text-[#2F302B] mb-6">
+          <h1 className="text-3xl font-bold text-foreground mb-6">
             Obrigado por preencher!
           </h1>
           
-          <div className="bg-[#2F302B]/5 rounded-lg p-6 mb-6 text-left">
-            <p className="text-[#2F302B] font-semibold mb-4">
+          <div className="bg-muted rounded-lg p-6 mb-6 text-left">
+            <p className="text-foreground font-semibold mb-4">
               IMPORTANTE: Este é um programa premium para executivos comprometidos. 
               Analisarei pessoalmente cada resposta.
             </p>
             
-            <div className="space-y-3 text-[#2F302B]">
+            <div className="space-y-3 text-foreground">
               <div className="flex items-start gap-3">
                 <span className="text-[#9EB038] font-bold">✓</span>
                 <p>
@@ -254,7 +254,7 @@ export default function CandidatarMentoria() {
       <Button
         variant="ghost"
         onClick={() => navigate('/aplique')}
-        className="absolute top-4 left-4 z-20 text-[#2F302B] hover:bg-[#2F302B]/10"
+        className="absolute top-4 left-4 z-20 text-foreground hover:bg-muted"
       >
         <ChevronLeft className="w-5 h-5 mr-1" />
         Voltar
@@ -264,7 +264,7 @@ export default function CandidatarMentoria() {
         {/* Header */}
         <div className="text-center mb-8">
           <img src={logoSimbol} alt="IAplicada" className="h-16 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-[#2F302B] mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Candidatura <span className="text-[#9EB038]">Mentoria Club</span>
           </h1>
           <p className="text-muted-foreground">
@@ -294,7 +294,7 @@ export default function CandidatarMentoria() {
             {/* Step 1: Informações Básicas */}
             {step === 1 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-[#2F302B] mb-4">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Informações Básicas
                 </h2>
                 <div>
@@ -323,7 +323,7 @@ export default function CandidatarMentoria() {
             {/* Step 2: Situação Profissional */}
             {step === 2 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-[#2F302B] mb-4">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Situação Profissional
                 </h2>
                 <div>
@@ -386,7 +386,7 @@ export default function CandidatarMentoria() {
             {/* Step 3: Conhecimento em IA */}
             {step === 3 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-[#2F302B] mb-4">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Conhecimento em IA
                 </h2>
                 <div>
@@ -462,7 +462,7 @@ export default function CandidatarMentoria() {
             {/* Step 4: Situação Financeira */}
             {step === 4 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-[#2F302B] mb-4">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Situação Financeira
                 </h2>
                 <div>
@@ -504,7 +504,7 @@ export default function CandidatarMentoria() {
             {/* Step 5: Motivações e Objetivos */}
             {step === 5 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-[#2F302B] mb-4">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Motivações e Objetivos
                 </h2>
                 <div>
@@ -545,7 +545,7 @@ export default function CandidatarMentoria() {
             {/* Step 6: Urgência e Comprometimento */}
             {step === 6 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-[#2F302B] mb-4">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Urgência e Comprometimento
                 </h2>
                 <div>
@@ -604,7 +604,7 @@ export default function CandidatarMentoria() {
             {/* Step 7: Qualificação Final */}
             {step === 7 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-[#2F302B] mb-4">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Qualificação Final
                 </h2>
                 <div>

@@ -51,14 +51,14 @@ export default function Avance() {
           />
           
           {/* Headline */}
-          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-[#2F302B] mb-6">
+          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-foreground mb-6">
             Avance <span className="text-[#9EB038]">agora</span>,
             <br />
             acelere resultados.
           </h1>
           
           {/* Subtítulo */}
-          <p className="text-[#2F302B]/80 text-lg md:text-xl max-w-2xl mx-auto mb-10">
+          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10">
             Você já conhece o poder da IA. Hora de multiplicar seus resultados
             <br />
             com mentoria ou transformação digital completa.
@@ -85,15 +85,15 @@ export default function Avance() {
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Card Mentoria - Tema Claro */}
-              <Card className="bg-white border border-zinc-200 rounded-2xl p-8 shadow-lg flex flex-col">
-                <h2 className="text-3xl font-bold text-zinc-900 mb-6">Mentoria</h2>
+              <Card className="bg-card border border-border rounded-2xl p-8 shadow-lg flex flex-col">
+                <h2 className="text-3xl font-bold text-card-foreground mb-6">Mentoria</h2>
                 
-                <p className="text-4xl font-bold text-zinc-900 mb-8">
+                <p className="text-4xl font-bold text-card-foreground mb-8">
                   Investimento sob<br />consulta
                 </p>
                 
-                <div className="space-y-4 text-zinc-600 text-sm mb-8">
-                  <p className="font-semibold text-zinc-900">Tudo da Academy +</p>
+                <div className="space-y-4 text-muted-foreground text-sm mb-8">
+                  <p className="font-semibold text-card-foreground">Tudo da Academy +</p>
                   <p>6 encontros/mês (2h), práticos e colaborativos.</p>
                   <p>3 a 6 projetos práticos (avalio e direciono sua jornada)</p>
                   <p>Comunidade premium (networking com os Aplicados)</p>
@@ -144,7 +144,7 @@ export default function Avance() {
         {/* Tabela Comparativa */}
         <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 md:mb-10 text-[#2F302B]">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 md:mb-10 text-foreground">
               Qual plano combina com você?
             </h2>
             
@@ -154,8 +154,8 @@ export default function Avance() {
                   <tr>
                     <th className="w-[40%] p-4 text-left"></th>
                     <th className="w-[30%] p-6 text-center">
-                      <div className="text-xl font-bold text-[#2F302B] mb-1">Mentoria</div>
-                      <div className="text-lg font-medium text-[#2F302B]">Sob consulta</div>
+                      <div className="text-xl font-bold text-foreground mb-1">Mentoria</div>
+                      <div className="text-lg font-medium text-foreground">Sob consulta</div>
                     </th>
                     <th className="w-[30%] p-6 text-center">
                       <div className="text-xl font-bold text-[#9EB038] mb-1">Consult</div>
@@ -170,20 +170,20 @@ export default function Avance() {
                       Para quem é
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Público-alvo</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Profissionais individuais</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Empresas e times</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Público-alvo</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Profissionais individuais</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Empresas e times</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Economia de tempo</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">6 a 10 horas/semana</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">15+ horas/semana</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Economia de tempo</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">6 a 10 horas/semana</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">15+ horas/semana</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Duração</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">6 meses (encontros mensais)</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Projeto 3-6 meses + recorrência</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Duração</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">6 meses (encontros mensais)</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Projeto 3-6 meses + recorrência</td>
                   </tr>
                   
                   {/* FORMATO */}
@@ -192,22 +192,22 @@ export default function Avance() {
                       Formato
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Encontros práticos</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">6 encontros/mês (2h cada)</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Cronograma personalizado</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Encontros práticos</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">6 encontros/mês (2h cada)</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Cronograma personalizado</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Projetos práticos</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">3-6 projetos orientados</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Implementamos com você</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Projetos práticos</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">3-6 projetos orientados</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Implementamos com você</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Comunidade premium</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Comunidade premium</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
@@ -218,24 +218,24 @@ export default function Avance() {
                       Suporte e acesso
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Academy incluso</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Academy incluso</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Gestor + equipe</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Gestor + equipe</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Plano para equipe</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Personalizado</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Plano para equipe</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Personalizado</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Acesso antecipado (Beta)</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Acesso antecipado (Beta)</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
@@ -246,36 +246,36 @@ export default function Avance() {
                       Implementação
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Diagnóstico de maturidade</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Diagnóstico de maturidade</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Automações e dashboards</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Você aplica com suporte</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Implementamos para você</td>
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Automações e dashboards</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Você aplica com suporte</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Implementamos para você</td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Capacitação hands-on</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Capacitação hands-on</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-200">
-                    <td className="px-4 py-4 text-sm text-zinc-600">Ferramenta IA personalizada</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-400 border-l border-zinc-200">–</td>
-                    <td className="px-4 py-4 text-center border-l border-zinc-200">
+                  <tr className="border-b border-border">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Ferramenta IA personalizada</td>
+                    <td className="px-4 py-4 text-center text-sm text-muted-foreground border-l border-border">–</td>
+                    <td className="px-4 py-4 text-center border-l border-border">
                       <Check className="h-5 w-5 text-[#9EB038] mx-auto" />
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-4 text-sm text-zinc-600">Modelo de entrega</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">DIY (com orientação)</td>
-                    <td className="px-4 py-4 text-center text-sm text-zinc-700 border-l border-zinc-200">Done For You</td>
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Modelo de entrega</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">DIY (com orientação)</td>
+                    <td className="px-4 py-4 text-center text-sm text-foreground/80 border-l border-border">Done For You</td>
                   </tr>
                 </tbody>
               </table>
@@ -287,57 +287,57 @@ export default function Avance() {
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto text-center">
             {/* Título */}
-            <h2 className="text-3xl md:text-5xl font-bold text-[#2F302B] mb-4">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
               Acelere com acompanhamento.
               <br />
               <span className="text-[#9EB038]">Resultados em semanas</span>, não meses.
             </h2>
             
             {/* Subtítulo */}
-            <p className="text-[#2F302B]/70 text-lg max-w-3xl mx-auto mb-12">
+            <p className="text-muted-foreground text-lg max-w-3xl mx-auto mb-12">
               Mentoria e Consult transformam teoria em prática com direcionamento personalizado.
             </p>
             
             {/* Grid de Cards - 3 colunas */}
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               {/* Card 1: Execute */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Target className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Execute</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Execute</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Projetos práticos com feedback e orientação direta
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Saia do plano, vá pra ação</p>
                 </div>
               </div>
 
               {/* Card 2: Automatize */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Workflow className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Automatize</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Automatize</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Workflows que eliminam tarefas manuais repetitivas
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Até 15h/semana de volta</p>
                 </div>
               </div>
 
               {/* Card 3: Personalize */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Sparkles className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Personalize</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Personalize</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   IA construída para os desafios do seu contexto
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Solução sob medida</p>
                 </div>
               </div>
@@ -346,29 +346,29 @@ export default function Avance() {
             {/* Segunda linha - 2 cards centralizados */}
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {/* Card 4: Diagnostique */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <TrendingUp className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Diagnostique</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Diagnostique</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Análise completa do cenário atual e roadmap
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Clareza antes de agir</p>
                 </div>
               </div>
 
               {/* Card 5: Domine */}
-              <div className="bg-white border border-zinc-200 rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
+              <div className="bg-card border border-border rounded-2xl p-6 text-left hover:shadow-lg transition-shadow">
                 <div className="bg-[#9EB038]/10 rounded-xl h-48 flex items-center justify-center mb-6">
                   <Lightbulb className="h-20 w-20 text-[#9EB038]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2F302B] mb-2">Domine</h3>
-                <p className="text-[#2F302B]/70 text-sm mb-4">
+                <h3 className="text-xl font-bold text-card-foreground mb-2">Domine</h3>
+                <p className="text-muted-foreground text-sm mb-4">
                   Capacitação para autonomia total da equipe
                 </p>
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-border pt-4">
                   <p className="text-[#9EB038] text-sm font-medium">Conhecimento que fica</p>
                 </div>
               </div>
