@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function MentoriaSessoes() {
   const navigate = useNavigate();
@@ -100,8 +101,8 @@ export default function MentoriaSessoes() {
       </Button>
 
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-3">Sessões de Mentoria</h1>
-        <p className="text-muted-foreground text-lg">
+        <PageTitle primary="Sessões" secondary="de Mentoria" />
+        <p className="text-muted-foreground text-lg mt-2">
           Acompanhe suas sessões e acesse gravações e transcrições
         </p>
       </div>

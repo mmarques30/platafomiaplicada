@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useMetodos } from "@/hooks/useFerramentas";
 import { Target, Search, Lightbulb, Cpu, FileText, ExternalLink, ChevronDown } from "lucide-react";
 import { METODOS_CATEGORIAS } from "@/lib/metodosCategories";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 interface MetodoItem {
   id: string;
@@ -63,8 +64,8 @@ export default function MetodosAplicar() {
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
       <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold">Métodos para Aplicar</h1>
-        <p className="text-sm md:text-base text-muted-foreground">
+        <PageTitle primary="Métodos" secondary="para Aplicar" />
+        <p className="text-sm md:text-base text-muted-foreground mt-1">
           Metodologias para alimentar a IA e obter resultados melhores
         </p>
       </div>

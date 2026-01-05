@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Search } from "lucide-react";
 import FavoritoRow from "@/components/favoritos/FavoritoRow";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Favoritos() {
   const { data: favoritos, isLoading } = useFavoritos();
@@ -114,11 +115,8 @@ export default function Favoritos() {
   return (
     <div className="container mx-auto py-4 md:py-8 px-4">
       <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2 md:gap-3">
-          <Heart className="h-7 w-7 md:h-10 md:w-10 text-primary shrink-0" />
-          Meus Favoritos
-        </h1>
-        <p className="text-sm md:text-base text-muted-foreground">Acesse rapidamente seus conteúdos favoritos</p>
+        <PageTitle primary="Meus" secondary="Favoritos" icon={<Heart className="h-7 w-7 md:h-8 md:w-8 text-primary shrink-0" />} />
+        <p className="text-sm md:text-base text-muted-foreground mt-2">Acesse rapidamente seus conteúdos favoritos</p>
       </div>
       <div className="mb-4 md:mb-6">
         <div className="relative w-full md:max-w-md">

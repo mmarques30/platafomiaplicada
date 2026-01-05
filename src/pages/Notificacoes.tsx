@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Bell, BellOff } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Notificacoes() {
   const { data: avisos, isLoading } = useAvisosPublicos();
@@ -31,11 +32,8 @@ export default function Notificacoes() {
   return (
     <div className="container mx-auto py-6 md:py-8 px-4">
       <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2 md:gap-3">
-          <Bell className="h-7 w-7 md:h-10 md:w-10 text-primary shrink-0" />
-          Avisos
-        </h1>
-        <p className="text-sm md:text-base text-muted-foreground">Acompanhe os avisos e comunicados da plataforma</p>
+        <PageTitle primary="Avisos" icon={<Bell className="h-7 w-7 md:h-8 md:w-8 text-primary shrink-0" />} />
+        <p className="text-sm md:text-base text-muted-foreground mt-2">Acompanhe os avisos e comunicados da plataforma</p>
       </div>
 
       <div className="space-y-4">

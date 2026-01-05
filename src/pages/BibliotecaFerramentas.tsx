@@ -9,6 +9,7 @@ import { FerramentasRanking } from "@/components/bibliotecas/FerramentasRanking"
 import { FerramentaCardHorizontal } from "@/components/bibliotecas/FerramentaCardHorizontal";
 import { FerramentaDetalhesModal } from "@/components/bibliotecas/FerramentaDetalhesModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageTitle } from "@/components/shared/PageTitle";
 import {
   Select,
   SelectContent,
@@ -70,8 +71,8 @@ export default function BibliotecaFerramentas() {
     <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
       {/* Cabeçalho */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Biblioteca de Ferramentas</h1>
-        <p className="text-sm md:text-base text-muted-foreground">
+        <PageTitle primary="Biblioteca" secondary="de Ferramentas" />
+        <p className="text-sm md:text-base text-muted-foreground mt-1">
           Catálogo completo de ferramentas de IA com avaliações especializadas
         </p>
       </div>

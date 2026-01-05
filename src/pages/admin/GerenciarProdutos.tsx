@@ -6,13 +6,14 @@ import { JornadasTab } from "@/components/admin/produtos/JornadasTab";
 import { EstatisticasProdutos } from "@/components/admin/produtos/EstatisticasProdutos";
 import { DescontosTab } from "@/components/admin/produtos/DescontosTab";
 import { Package, TrendingUp, RefreshCw, Map, BarChart3, Percent } from "lucide-react";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function GerenciarProdutos() {
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Gestão de Produtos</h1>
-        <p className="text-muted-foreground">
+        <PageTitle primary="Gestão" secondary="de Produtos" />
+        <p className="text-muted-foreground mt-2">
           Gerencie produtos, upsells, jornadas e acompanhe estatísticas
         </p>
       </div>
