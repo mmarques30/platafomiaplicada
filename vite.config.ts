@@ -16,15 +16,15 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [
-        'logo-simbolo.png',
+        'logo-simbolo.png?v=8',
         'logo-marca-completa.png',
         'logo-marca-completa-clara.png',
         'logo-marca-completa-escura.png',
-        'logo-mariana.png?v=7',
-        'logo-3d.png?v=7',
-        'apple-touch-icon-180.png',
-        'icon-192.png',
-        'icon-512.png',
+        'logo-mariana.png?v=8',
+        'logo-3d.png?v=8',
+        'apple-touch-icon-180.png?v=8',
+        'icon-192.png?v=8',
+        'icon-512.png?v=8',
         'background-symbol.png',
         'background-symbol-soft.png',
         'offline.html',
@@ -47,17 +47,17 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         icons: [
           {
-            src: '/icon-192.png?v=7',
+            src: '/icon-192.png?v=8',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png?v=7',
+            src: '/icon-512.png?v=8',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png?v=7',
+            src: '/icon-512.png?v=8',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
