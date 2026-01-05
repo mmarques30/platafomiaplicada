@@ -22,19 +22,19 @@ export function RankingTicker() {
   const topFerramenta = data?.topFerramentas[0];
 
   return (
-    <section className="rounded-lg bg-[#E9EBC6] p-2 sm:p-3 shadow-sm">
+    <section className="rounded-lg bg-[#E9EBC6] p-3 sm:p-4 shadow-sm">
+      {/* Título e subtítulo */}
+      <div className="mb-2 sm:mb-3">
+        <h2 className="text-base sm:text-xl md:text-2xl font-bold text-[#0D0D0D]">
+          Destaques
+        </h2>
+        <p className="text-xs sm:text-sm text-[#2F302B] mt-0.5">
+          Fique por dentro das novidades e aplique hoje
+        </p>
+      </div>
+
+      {/* Métricas */}
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
-        {/* Título */}
-        <div className="flex items-center gap-1.5">
-          <TrendingUp className="w-4 h-4 text-[#0D0D0D]" />
-          <span className="text-xs font-bold text-[#0D0D0D] uppercase tracking-wide">
-            Destaques
-          </span>
-        </div>
-
-        {/* Separador */}
-        <div className="h-4 w-px bg-[#0D0D0D]/20 hidden sm:block" />
-
         {/* Top Aluno */}
         {topAluno && (
           <RankingItem
