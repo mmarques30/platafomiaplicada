@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/shared/CopyButton";
+import { usePromptCopyLogger } from "@/hooks/usePromptCopyLogger";
 import { Cpu, TrendingUp, Megaphone, Settings, MessageSquare, BarChart3, Zap, PenTool, LineChart, Presentation, FileText, type LucideIcon } from "lucide-react";
 
 interface PromptDetalhesModalProps {
@@ -58,7 +59,13 @@ const getNivelColor = (nivel: string | null) => {
 };
 
 export function PromptDetalhesModal({ prompt, onClose }: PromptDetalhesModalProps) {
+  const { logPromptCopy } = usePromptCopyLogger();
+
   if (!prompt) return null;
+
+  const handleCopy = () => {
+    logPromptCopy(prompt.id, prompt.titulo);
+  };
 
   return (
     <Dialog open={!!prompt} onOpenChange={onClose}>
@@ -124,7 +131,7 @@ export function PromptDetalhesModal({ prompt, onClose }: PromptDetalhesModalProp
         <div className="mt-6">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium">Prompt:</p>
-            <CopyButton content={prompt.prompt} size="sm" />
+            <CopyButton content={prompt.prompt} size="sm" onCopy={handleCopy} />
           </div>
           <div className="bg-muted p-4 rounded-md max-h-[400px] overflow-y-auto">
             <pre className="text-sm whitespace-pre-wrap font-mono">
@@ -140,6 +147,7 @@ export function PromptDetalhesModal({ prompt, onClose }: PromptDetalhesModalProp
           <CopyButton 
             content={prompt.prompt} 
             variant="default"
+            onCopy={handleCopy}
           />
         </DialogFooter>
       </DialogContent>

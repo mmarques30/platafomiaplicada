@@ -79,6 +79,7 @@ import GerenciarPoliticas from "./pages/admin/GerenciarPoliticas";
 import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
 import FormularioAplica from "./pages/FormularioAplica";
 import Instalar from "./pages/Instalar";
+import Central from "./pages/Central";
 import { PWAUpdatePrompt } from "./components/shared/PWAUpdatePrompt";
 
 const queryClient = new QueryClient();
@@ -140,6 +141,7 @@ function AppContent() {
             <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
             <Route path="/videos-bonus" element={<VideosBonus />} />
+            <Route path="/central" element={<Central />} />
             <Route path="/instalar" element={<Instalar />} />
           </Route>
           

@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useConteudosDashboard, TipoConteudo } from "@/hooks/useConteudosDashboard";
 import { ConteudoCard } from "./ConteudoCard";
 import logo3d from "@/assets/logo-3d.png";
+import { Link } from "react-router-dom";
 
 const tabs = [
   { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
@@ -101,13 +102,15 @@ export function CentralConteudo() {
 
         {/* CTA */}
         <div className="flex justify-end mt-2">
-          <motion.button
-            whileHover={{ x: 4 }}
-            className="flex items-center gap-2 text-sm text-aplicada-green-600 hover:text-aplicada-green-400 transition-colors font-medium"
-          >
-            Ver todos os conteudos
-            <ArrowRight className="w-4 h-4" />
-          </motion.button>
+          <Link to="/central">
+            <motion.button
+              whileHover={{ x: 4 }}
+              className="flex items-center gap-2 text-sm text-aplicada-green-600 hover:text-aplicada-green-400 transition-colors font-medium"
+            >
+              Ver todos os conteudos
+              <ArrowRight className="w-4 h-4" />
+            </motion.button>
+          </Link>
         </div>
       </div>
     </section>

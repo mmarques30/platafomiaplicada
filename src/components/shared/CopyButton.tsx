@@ -8,9 +8,10 @@ interface CopyButtonProps {
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
+  onCopy?: () => void;
 }
 
-export function CopyButton({ content, variant = "outline", size = "sm", className }: CopyButtonProps) {
+export function CopyButton({ content, variant = "outline", size = "sm", className, onCopy }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
@@ -18,6 +19,7 @@ export function CopyButton({ content, variant = "outline", size = "sm", classNam
     try {
       await navigator.clipboard.writeText(content);
       setCopied(true);
+      onCopy?.();
       toast({
         title: "Copiado",
         description: "Conteúdo copiado para a área de transferência",

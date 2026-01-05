@@ -2349,6 +2349,33 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_copy_logs: {
+        Row: {
+          copied_at: string
+          id: string
+          prompt_id: string
+          prompt_titulo: string
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          copied_at?: string
+          id?: string
+          prompt_id: string
+          prompt_titulo: string
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          copied_at?: string
+          id?: string
+          prompt_id?: string
+          prompt_titulo?: string
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       recursos_mentoria: {
         Row: {
           categoria: string

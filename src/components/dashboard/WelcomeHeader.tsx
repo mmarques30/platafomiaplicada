@@ -55,7 +55,7 @@ export function WelcomeHeader() {
         {/* Coluna Esquerda - Saudação e Tema */}
         <div className="flex-1 min-w-0 text-left">
           <h1 className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-0.5 md:mb-1">
-            {saudacao}, <span className="text-primary">{primeiroNome}</span>!
+            {saudacao}, <span className="text-primary font-bold">{primeiroNome}</span>!
           </h1>
           
           {aulaAtiva ? (

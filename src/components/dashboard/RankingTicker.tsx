@@ -1,6 +1,7 @@
 import { useDashboardRanking } from "@/hooks/useDashboardRanking";
 import { Trophy, PlayCircle, Wrench, TrendingUp, TrendingDown, Star, Minus, FileText, Bookmark } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 
 export function RankingTicker() {
   const { data, isLoading } = useDashboardRanking();
@@ -25,13 +26,6 @@ export function RankingTicker() {
 
   return (
     <section className="rounded-lg bg-[#E9EBC6] p-3 sm:p-4 shadow-sm">
-      {/* Título */}
-      <div className="mb-2 sm:mb-3">
-        <h2 className="text-base sm:text-xl md:text-2xl font-bold text-[#0D0D0D]">
-          Destaques
-        </h2>
-      </div>
-
       {/* Métricas */}
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
         {/* Top Aluno */}
@@ -42,6 +36,7 @@ export function RankingTicker() {
             value={topAluno.totalVideos}
             percentual={topAluno.percentual}
             tendencia={topAluno.tendencia}
+            href="/evolucao"
           />
         )}
 
@@ -56,6 +51,7 @@ export function RankingTicker() {
             value={topAula.visualizacoes}
             percentual={topAula.percentual}
             tendencia={topAula.tendencia}
+            href={`/videos/${topAula.id}`}
           />
         )}
 
@@ -68,6 +64,7 @@ export function RankingTicker() {
             icon={Wrench}
             label={topFerramenta.nome}
             stars={topFerramenta.avaliacao}
+            href="/biblioteca-ferramentas"
           />
         )}
 
@@ -82,6 +79,7 @@ export function RankingTicker() {
             value={topPrompt.acessos}
             percentual={topPrompt.percentual}
             tendencia={topPrompt.tendencia}
+            href="/biblioteca-prompts"
           />
         )}
 
@@ -94,6 +92,7 @@ export function RankingTicker() {
             icon={Bookmark}
             label={topSalvo.titulo}
             value={topSalvo.salvamentos}
+            href="/favoritos"
           />
         )}
 
@@ -115,11 +114,12 @@ interface RankingItemProps {
   percentual?: number;
   tendencia?: 'up' | 'down' | 'stable';
   stars?: number;
+  href?: string;
 }
 
-function RankingItem({ icon: Icon, label, value, percentual, tendencia, stars }: RankingItemProps) {
-  return (
-    <div className="flex items-center gap-1.5 text-[#0D0D0D]">
+function RankingItem({ icon: Icon, label, value, percentual, tendencia, stars, href }: RankingItemProps) {
+  const content = (
+    <div className="flex items-center gap-1.5 text-[#0D0D0D] cursor-pointer hover:opacity-70 transition-opacity">
       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
       <span className="text-xs font-medium truncate max-w-[100px] sm:max-w-[120px]">
         {label}
@@ -156,4 +156,6 @@ function RankingItem({ icon: Icon, label, value, percentual, tendencia, stars }:
       )}
     </div>
   );
+
+  return href ? <Link to={href}>{content}</Link> : content;
 }
