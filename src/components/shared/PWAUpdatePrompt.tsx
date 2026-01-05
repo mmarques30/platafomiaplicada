@@ -13,20 +13,40 @@ export function PWAUpdatePrompt() {
         console.log('[PWA] Verificando atualizações iniciais...');
         r.update();
         
-        // Verificar atualizações a cada 5 minutos (mais frequente para iOS)
+        // Verificar atualizações a cada 1 minuto (mais agressivo)
         setInterval(() => {
           console.log('[PWA] Verificando atualizações periódicas...');
           r.update();
-        }, 5 * 60 * 1000);
+        }, 60 * 1000);
       }
     },
     onRegisterError(error) {
       console.error('[PWA] Erro ao registrar Service Worker:', error);
     },
     onNeedRefresh() {
-      // Auto-update: aplicar atualização automaticamente sem prompt
-      console.log('[PWA] Nova versão detectada, atualizando automaticamente...');
-      updateServiceWorker(true);
+      console.log('[PWA] Nova versão detectada, limpando caches antigos...');
+      
+      // Limpar caches antigos antes de atualizar
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          const deletePromises = names
+            .filter(name => !name.includes('-v5'))
+            .map(name => {
+              console.log('[PWA] Removendo cache antigo:', name);
+              return caches.delete(name);
+            });
+          
+          return Promise.all(deletePromises);
+        }).then(() => {
+          console.log('[PWA] Caches limpos, aplicando atualização...');
+          updateServiceWorker(true);
+        }).catch(() => {
+          // Se falhar a limpeza, atualiza mesmo assim
+          updateServiceWorker(true);
+        });
+      } else {
+        updateServiceWorker(true);
+      }
     }
   });
 

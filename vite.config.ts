@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo-simbolo.png', 'apple-touch-icon-180.png', 'logo-mariana.png', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['logo-simbolo.png', 'apple-touch-icon-180.png', 'logo-mariana.png', 'icon-192.png', 'icon-512.png', 'logo-3d.png', 'offline.html'],
       manifest: {
         name: 'IAplicada Academy',
         short_name: 'IAplicada',
@@ -27,17 +27,17 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         icons: [
           {
-            src: '/logo-simbolo.png?v=4',
+            src: '/logo-simbolo.png?v=5',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/logo-simbolo.png?v=4',
+            src: '/logo-simbolo.png?v=5',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/logo-simbolo.png?v=4',
+            src: '/logo-simbolo.png?v=5',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any'
@@ -53,26 +53,36 @@ export default defineConfig(({ mode }) => ({
         clientsClaim: true,
         runtimeCaching: [
           {
-            urlPattern: /\.(js|css)$/,
+            urlPattern: /\.html$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'assets-cache-v4',
-              networkTimeoutSeconds: 5,
+              cacheName: 'html-cache-v5',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 3600
+              }
+            }
+          },
+          {
+            urlPattern: /\.(js|css)$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'assets-cache-v5',
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 7200 // 2 horas
+                maxAgeSeconds: 86400
               }
             }
           },
           {
             urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/,
-            handler: 'NetworkFirst',
+            handler: 'CacheFirst',
             options: {
-              cacheName: 'images-cache-v4',
-              networkTimeoutSeconds: 5,
+              cacheName: 'images-cache-v5',
               expiration: {
                 maxEntries: 200,
-                maxAgeSeconds: 14400 // 4 horas
+                maxAgeSeconds: 86400
               }
             }
           }
