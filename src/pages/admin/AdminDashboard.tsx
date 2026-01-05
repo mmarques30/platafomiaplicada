@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { VisaoGeralTab } from "@/components/admin/dashboard/VisaoGeralTab";
 import { UsuariosTab } from "@/components/admin/dashboard/UsuariosTab";
 import { EngajamentoTab } from "@/components/admin/dashboard/EngajamentoTab";
+import { PaginaGratuitaTab } from "@/components/admin/dashboard/PaginaGratuitaTab";
 import { ConteudoTab } from "@/components/admin/dashboard/ConteudoTab";
 import { MentoriaTab } from "@/components/admin/dashboard/MentoriaTab";
 import {
@@ -13,6 +14,7 @@ import {
   TrendingUp,
   Video,
   GraduationCap,
+  Eye,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -46,7 +48,7 @@ export default function AdminDashboard() {
       <PWAInstallBanner />
 
       <Tabs defaultValue="visao-geral" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
+        <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
           <TabsTrigger value="visao-geral" className="gap-2">
             <LayoutDashboard className="h-4 w-4 hidden sm:inline" />
             <span className="hidden sm:inline">Visão Geral</span>
@@ -54,12 +56,18 @@ export default function AdminDashboard() {
           </TabsTrigger>
           <TabsTrigger value="usuarios" className="gap-2">
             <Users className="h-4 w-4 hidden sm:inline" />
-            Usuários
+            <span className="hidden sm:inline">Usuários</span>
+            <span className="sm:hidden">Users</span>
           </TabsTrigger>
           <TabsTrigger value="engajamento" className="gap-2">
             <TrendingUp className="h-4 w-4 hidden sm:inline" />
             <span className="hidden sm:inline">Engajamento</span>
             <span className="sm:hidden">Engaj.</span>
+          </TabsTrigger>
+          <TabsTrigger value="pagina-gratuita" className="gap-2">
+            <Eye className="h-4 w-4 hidden sm:inline" />
+            <span className="hidden sm:inline">Página Gratuita</span>
+            <span className="sm:hidden">Grátis</span>
           </TabsTrigger>
           <TabsTrigger value="conteudo" className="gap-2">
             <Video className="h-4 w-4 hidden sm:inline" />
@@ -81,6 +89,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="engajamento">
           <EngajamentoTab />
+        </TabsContent>
+
+        <TabsContent value="pagina-gratuita">
+          <PaginaGratuitaTab />
         </TabsContent>
 
         <TabsContent value="conteudo">
