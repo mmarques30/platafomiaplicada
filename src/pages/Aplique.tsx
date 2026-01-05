@@ -4,12 +4,16 @@ import { LogosTicker } from "@/components/LogosTicker";
 import { ArrowLeft, Sparkles, Check, Table2, Workflow, TrendingUp, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useButtonClickLogger } from "@/hooks/useButtonClickLogger";
+import { useTheme } from "next-themes";
 
 // Usar caminhos estáticos para evitar problemas de cache no PWA
-const logoCompleta = "/logo-marca-completa-clara.png";
 const backgroundSymbol = "/background-symbol.png";
 
 export default function Aplique() {
+  const { theme } = useTheme();
+  const logoCompleta = theme === 'dark' 
+    ? "/logo-marca-completa-escura.png" 
+    : "/logo-marca-completa.png";
   const navigate = useNavigate();
   const { logClick } = useButtonClickLogger();
   
