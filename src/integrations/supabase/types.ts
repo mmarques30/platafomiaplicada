@@ -813,6 +813,51 @@ export type Database = {
         }
         Relationships: []
       }
+      conteudos_dashboard: {
+        Row: {
+          ativo: boolean | null
+          conteudo: string | null
+          created_at: string
+          destaque: boolean | null
+          id: string
+          imagem_url: string | null
+          link_externo: string | null
+          ordem: number | null
+          resumo: string
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          conteudo?: string | null
+          created_at?: string
+          destaque?: boolean | null
+          id?: string
+          imagem_url?: string | null
+          link_externo?: string | null
+          ordem?: number | null
+          resumo: string
+          tipo: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          conteudo?: string | null
+          created_at?: string
+          destaque?: boolean | null
+          id?: string
+          imagem_url?: string | null
+          link_externo?: string | null
+          ordem?: number | null
+          resumo?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cursos: {
         Row: {
           ativo: boolean | null
