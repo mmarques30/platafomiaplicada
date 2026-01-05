@@ -171,24 +171,18 @@ export default function Auth() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-[#151515]">
         <div className="w-full max-w-md">
           <Tabs defaultValue="entrar" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-white/5 p-1 rounded-lg mb-8">
-              <TabsTrigger 
-                value="entrar"
-                className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-white/60"
-              >
-                Acessar
-              </TabsTrigger>
-              <TabsTrigger 
-                value="criar-conta"
-                className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-white/60"
-              >
-                Criar Conta Grátis
-              </TabsTrigger>
-            </TabsList>
-
             {/* Aba Entrar */}
             <TabsContent value="entrar" className="mt-0">
-              <div className="space-y-2 mb-8 text-center">
+              {/* Logo pequena centralizada */}
+              <div className="flex justify-center mb-6">
+                <img 
+                  src="/logo-marca-completa-clara.png" 
+                  alt="IAplicada" 
+                  className="h-10 w-auto"
+                />
+              </div>
+
+              <div className="space-y-2 mb-6 text-center">
                 <h1 className="text-2xl md:text-3xl font-semibold text-white">
                   Bem-vindo de volta
                 </h1>
@@ -196,6 +190,22 @@ export default function Auth() {
                   Entre com seu email e senha para acessar
                 </p>
               </div>
+
+              {/* Tabs abaixo do subtítulo */}
+              <TabsList className="grid w-full grid-cols-2 bg-white/5 p-1 rounded-lg mb-8">
+                <TabsTrigger 
+                  value="entrar"
+                  className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-white/60"
+                >
+                  Acessar
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="criar-conta"
+                  className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-white/60"
+                >
+                  Criar Conta Grátis
+                </TabsTrigger>
+              </TabsList>
               
               <form onSubmit={handleSignIn} className="space-y-5">
                 <div className="space-y-2">
@@ -239,7 +249,16 @@ export default function Auth() {
 
             {/* Aba Criar Conta */}
             <TabsContent value="criar-conta" className="mt-0">
-              <div className="space-y-2 mb-8 text-center">
+              {/* Logo pequena centralizada */}
+              <div className="flex justify-center mb-6">
+                <img 
+                  src="/logo-marca-completa-clara.png" 
+                  alt="IAplicada" 
+                  className="h-10 w-auto"
+                />
+              </div>
+
+              <div className="space-y-2 mb-6 text-center">
                 <h1 className="text-2xl md:text-3xl font-semibold text-white">
                   Explore a plataforma
                 </h1>
@@ -247,6 +266,22 @@ export default function Auth() {
                   Crie uma conta grátis e conheça a comunidade IAplicada
                 </p>
               </div>
+
+              {/* Tabs abaixo do subtítulo */}
+              <TabsList className="grid w-full grid-cols-2 bg-white/5 p-1 rounded-lg mb-8">
+                <TabsTrigger 
+                  value="entrar"
+                  className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-white/60"
+                >
+                  Acessar
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="criar-conta"
+                  className="rounded-md text-sm font-medium transition-all data-[state=active]:bg-[#9EB038] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-white/60"
+                >
+                  Criar Conta Grátis
+                </TabsTrigger>
+              </TabsList>
               
               <form onSubmit={handleVisitorSignup} className="space-y-4">
                 <div className="space-y-2">
