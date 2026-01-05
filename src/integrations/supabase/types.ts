@@ -850,43 +850,58 @@ export type Database = {
       }
       conteudos_dashboard: {
         Row: {
+          arquivo_pdf_url: string | null
           ativo: boolean | null
+          autor: string | null
           conteudo: string | null
           created_at: string
           destaque: boolean | null
+          estilo_texto: Json | null
+          galeria_imagens: Json | null
           id: string
           imagem_url: string | null
           link_externo: string | null
           ordem: number | null
           resumo: string
+          tags: Json | null
           tipo: string
           titulo: string
           updated_at: string
         }
         Insert: {
+          arquivo_pdf_url?: string | null
           ativo?: boolean | null
+          autor?: string | null
           conteudo?: string | null
           created_at?: string
           destaque?: boolean | null
+          estilo_texto?: Json | null
+          galeria_imagens?: Json | null
           id?: string
           imagem_url?: string | null
           link_externo?: string | null
           ordem?: number | null
           resumo: string
+          tags?: Json | null
           tipo: string
           titulo: string
           updated_at?: string
         }
         Update: {
+          arquivo_pdf_url?: string | null
           ativo?: boolean | null
+          autor?: string | null
           conteudo?: string | null
           created_at?: string
           destaque?: boolean | null
+          estilo_texto?: Json | null
+          galeria_imagens?: Json | null
           id?: string
           imagem_url?: string | null
           link_externo?: string | null
           ordem?: number | null
           resumo?: string
+          tags?: Json | null
           tipo?: string
           titulo?: string
           updated_at?: string
