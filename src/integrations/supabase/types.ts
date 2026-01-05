@@ -310,6 +310,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "bonus_usuarios_elegiveis_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       button_click_logs: {
@@ -482,6 +489,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidaturas_mentoria_admin_responsavel_fkey"
+            columns: ["admin_responsavel"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -675,6 +689,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "community_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       community_posts: {
@@ -732,6 +753,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "community_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       community_reactions: {
@@ -780,6 +808,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -1066,11 +1101,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "duvidas_mentoria_respondida_por_fkey"
+            columns: ["respondida_por"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "duvidas_mentoria_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duvidas_mentoria_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -2001,6 +2050,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "premiacoes_comunidade_vencedor_id_fkey"
+            columns: ["vencedor_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       produtos: {
@@ -2816,6 +2872,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "video_feedbacks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "video_feedbacks_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
@@ -2964,6 +3027,16 @@ export type Database = {
           registro_id: string | null
           tabela: string | null
           usuario: string | null
+        }
+        Relationships: []
+      }
+      ranking_dashboard: {
+        Row: {
+          nome_completo: string | null
+          total_videos: number | null
+          user_id: string | null
+          videos_24h: number | null
+          videos_24h_anterior: number | null
         }
         Relationships: []
       }
