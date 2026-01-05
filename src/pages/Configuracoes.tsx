@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, CheckCircle2, RefreshCw } from "lucide-react";
 import { useTheme } from "next-themes";
+import { forceFullAppReload } from "@/lib/pwaUpdate";
 
 export default function Configuracoes() {
   const { user, signOut } = useAuth();
@@ -278,29 +279,7 @@ export default function Configuracoes() {
             </p>
             <Button 
               variant="outline"
-              onClick={async () => {
-                toast.loading("Limpando cache e atualizando...");
-                
-                // Limpar todos os caches
-                if ('caches' in window) {
-                  const cacheNames = await caches.keys();
-                  await Promise.all(cacheNames.map(name => caches.delete(name)));
-                }
-                
-                // Desregistrar service workers
-                if ('serviceWorker' in navigator) {
-                  const registrations = await navigator.serviceWorker.getRegistrations();
-                  for (const registration of registrations) {
-                    await registration.unregister();
-                  }
-                }
-                
-                // Limpar versão do localStorage para forçar check
-                localStorage.removeItem('app-version');
-                
-                // Forçar hard reload
-                window.location.href = window.location.origin + '?nocache=' + Date.now();
-              }}
+              onClick={forceFullAppReload}
               className="gap-2"
             >
               <RefreshCw className="h-4 w-4" />

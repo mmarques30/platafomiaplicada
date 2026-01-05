@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell, ChevronDown, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -10,8 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { NavLink, useNavigate, Link } from "react-router-dom";
+import { NavLink, useNavigate, Link, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserPlan } from "@/hooks/useUserPlan";
@@ -20,7 +21,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
 import { useProdutosAtivos } from "@/hooks/admin/useProdutos";
 import { cn } from "@/lib/utils";
-import { useLocation } from "react-router-dom";
+import { forceFullAppReload } from "@/lib/pwaUpdate";
 
 export function TopHeader() {
   const navigate = useNavigate();
@@ -189,8 +190,26 @@ export function TopHeader() {
           )}
         </nav>
 
-        {/* RIGHT: Notifications + Avatar - posição absoluta à direita */}
-        <div className="absolute right-0 top-0 h-full flex items-center gap-2 pr-4">
+        {/* RIGHT: Refresh + Notifications + Avatar - posição absoluta à direita */}
+        <div className="absolute right-0 top-0 h-full flex items-center gap-1 pr-4">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-9 w-9 text-white/80 hover:text-white hover:bg-white/10"
+                  onClick={forceFullAppReload}
+                >
+                  <RefreshCw className="h-5 w-5" strokeWidth={1.5} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Atualizar app</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
           <Button
             variant="ghost" 
             size="icon" 
@@ -232,6 +251,10 @@ export function TopHeader() {
                 <Link to="/configuracoes" className="cursor-pointer">
                   Configurações
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={forceFullAppReload} className="cursor-pointer">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Atualizar app
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">

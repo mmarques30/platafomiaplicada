@@ -47,20 +47,20 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         icons: [
           {
-            src: '/logo-simbolo.png?v=5',
+            src: '/icon-192.png?v=7',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/logo-simbolo.png?v=5',
+            src: '/icon-512.png?v=7',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/logo-simbolo.png?v=5',
+            src: '/icon-512.png?v=7',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any'
+            purpose: 'any maskable'
           }
         ]
       },
@@ -76,7 +76,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.html$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'html-cache-v6',
+              cacheName: 'html-cache-v7',
               networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 10,
@@ -88,7 +88,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.(js|css)$/,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'assets-cache-v6',
+              cacheName: 'assets-cache-v7',
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 86400
@@ -97,9 +97,9 @@ export default defineConfig(({ mode }) => ({
           },
           {
             urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'images-cache-v6',
+              cacheName: 'images-cache-v7',
               expiration: {
                 maxEntries: 200,
                 maxAgeSeconds: 86400
