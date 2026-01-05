@@ -18,18 +18,18 @@ export function CentralConteudo() {
   const { data: conteudos, isLoading } = useConteudosDashboard(activeTab);
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-card/90 via-card/70 to-card/90 backdrop-blur-sm">
+    <section className="relative overflow-hidden rounded-2xl border-2 border-aplicada-green-700/40 bg-gradient-to-br from-aplicada-green-900/20 via-card to-aplicada-green-800/10 shadow-xl shadow-aplicada-green-900/10">
       {/* Background Logo 3D */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
         <img 
           src={logo3d} 
           alt="" 
-          className="w-[500px] h-[500px] object-contain opacity-[0.04] blur-[1px]"
+          className="w-[500px] h-[500px] md:w-[650px] md:h-[650px] object-contain opacity-[0.08] md:opacity-[0.12] select-none"
         />
       </div>
 
       {/* Gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10 p-6 md:p-8">
@@ -39,7 +39,7 @@ export function CentralConteudo() {
             <h2 className="text-xl md:text-2xl font-bold text-foreground">
               Central de Conteudo
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-aplicada-green-600 mt-1">
               Fique por dentro das novidades e aplique hoje
             </p>
           </div>
@@ -47,12 +47,12 @@ export function CentralConteudo() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo)} className="w-full">
-          <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-1 bg-muted/50 p-1 rounded-xl mb-6">
+          <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-1 bg-aplicada-green-900/40 p-1.5 rounded-xl mb-6 border border-aplicada-green-700/30">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg px-4 py-2.5 transition-all"
+                className="flex items-center gap-2 text-foreground/70 data-[state=active]:bg-aplicada-green-700 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg px-4 py-2.5 transition-all duration-200"
               >
                 <tab.icon className="w-4 h-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
@@ -69,14 +69,13 @@ export function CentralConteudo() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin snap-x snap-mandatory"
                 >
                   {isLoading ? (
                     <>
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="min-w-[280px] max-w-[320px] flex-shrink-0">
-                          <Skeleton className="h-[200px] w-full rounded-xl" />
+                          <div className="h-[200px] w-full rounded-xl bg-aplicada-green-900/30 animate-pulse" />
                         </div>
                       ))}
                     </>
@@ -88,7 +87,7 @@ export function CentralConteudo() {
                     ))
                   ) : (
                     <div className="w-full py-12 text-center">
-                      <tab.icon className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+                      <tab.icon className="w-12 h-12 mx-auto text-aplicada-green-700/30 mb-3" />
                       <p className="text-muted-foreground">
                         Nenhum conteudo disponivel nesta categoria
                       </p>
@@ -104,7 +103,7 @@ export function CentralConteudo() {
         <div className="flex justify-end mt-2">
           <motion.button
             whileHover={{ x: 4 }}
-            className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+            className="flex items-center gap-2 text-sm text-aplicada-green-600 hover:text-aplicada-green-400 transition-colors font-medium"
           >
             Ver todos os conteudos
             <ArrowRight className="w-4 h-4" />
