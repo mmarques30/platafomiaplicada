@@ -99,25 +99,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r border-sidebar-border bg-sidebar pt-14">
-      {/* Logo sempre visível, fora do loading */}
-      <SidebarHeader>
-        <div className="flex h-12 items-center justify-center px-4">
-          {logoError ? (
-            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <span className="text-primary font-bold text-sm">iA</span>
-            </div>
-          ) : (
-            <img 
-              src={logoSimbolo} 
-              alt="IAplicada" 
-              className="h-8 w-8"
-              onError={() => setLogoError(true)}
-            />
-          )}
-        </div>
-      </SidebarHeader>
-
-      <SidebarContent className="py-4">
+      <SidebarContent className="pt-2 pb-4">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1 px-3">
@@ -150,8 +132,8 @@ export function AppSidebar() {
                             <span className={cn(
                               "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                               isActive 
-                                ? "bg-aplicada-green-700 opacity-100" 
-                                : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                                ? "bg-[#0D0D0D] opacity-100" 
+                                : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
                             )} />
                               <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                               {!collapsed && <span className="text-sm">{menu.label}</span>}
@@ -224,8 +206,8 @@ export function AppSidebar() {
                         <span className={cn(
                           "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                           isActive 
-                            ? "bg-aplicada-green-700 opacity-100" 
-                            : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                            ? "bg-[#0D0D0D] opacity-100" 
+                            : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
                         )} />
                         <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                         {!collapsed && <span className="text-sm">{menu.label}</span>}
@@ -242,19 +224,19 @@ export function AppSidebar() {
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="group w-full">
+                    <SidebarMenuButton className="group w-full relative">
+                      <span className={cn(
+                        "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                        (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
+                          ? "bg-[#0D0D0D] opacity-100" 
+                          : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                      )} />
                       <div className={cn(
-                        "relative flex items-center gap-2 rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 w-full",
+                        "flex items-center gap-2 rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 w-full",
                         (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
                           ? "text-primary font-semibold" 
                           : "text-sidebar-foreground hover:text-primary"
                       )}>
-                        <span className={cn(
-                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                          (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
-                            ? "bg-aplicada-green-700 opacity-100" 
-                            : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
-                        )} />
                         <LucideIcons.Users className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                         {!collapsed && (
                           <>
@@ -317,8 +299,8 @@ export function AppSidebar() {
                     <span className={cn(
                       "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                       location.pathname === (isVisitante || !plan ? "/aplique" : "/avance")
-                        ? "bg-aplicada-green-700 opacity-100" 
-                        : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                        ? "bg-[#0D0D0D] opacity-100" 
+                        : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
                     )} />
                     <Zap className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                     {!collapsed && <span className="text-sm">{isVisitante || !plan ? "Aplique" : "Avance"}</span>}
@@ -352,8 +334,8 @@ export function AppSidebar() {
                           <span className={cn(
                             "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                             isActive 
-                              ? "bg-aplicada-green-700 opacity-100" 
-                              : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                              ? "bg-[#0D0D0D] opacity-100" 
+                              : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
                           )} />
                           <Shield className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                           {!collapsed && <span className="text-sm">Painel Admin</span>}
@@ -384,8 +366,8 @@ export function AppSidebar() {
                     <span className={cn(
                       "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                       isActive 
-                        ? "bg-aplicada-green-700 opacity-100" 
-                        : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                        ? "bg-[#0D0D0D] opacity-100" 
+                        : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
                     )} />
                     <Settings className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                     {!collapsed && <span className="text-sm">Configurações</span>}
