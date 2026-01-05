@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 export function AnimatedLogo() {
   return (
     <motion.img
-      src="/logo-marca-completa-clara.png"
+      src="/logo-3d.png"
       alt="IAplicada"
       className="absolute w-64 h-auto opacity-30 pointer-events-none"
       style={{ top: 0, left: 0 }}
