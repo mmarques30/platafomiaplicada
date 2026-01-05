@@ -1,29 +1,21 @@
-import { useNavigate } from "react-router-dom";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
-import { StatsCard } from "@/components/admin/StatsCard";
-import { AlertCard } from "@/components/admin/AlertCard";
-import { DistribuicaoPlanos } from "@/components/admin/DistribuicaoPlanos";
-import { TopUsuariosTable } from "@/components/admin/TopUsuariosTable";
 import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { VisaoGeralTab } from "@/components/admin/dashboard/VisaoGeralTab";
+import { UsuariosTab } from "@/components/admin/dashboard/UsuariosTab";
+import { EngajamentoTab } from "@/components/admin/dashboard/EngajamentoTab";
+import { ConteudoTab } from "@/components/admin/dashboard/ConteudoTab";
+import { MentoriaTab } from "@/components/admin/dashboard/MentoriaTab";
 import {
+  LayoutDashboard,
   Users,
   TrendingUp,
-  CheckSquare,
-  AlertTriangle,
-  HelpCircle,
-  FileText,
-  FolderKanban,
-  Calendar,
   Video,
-  Layers,
-  Sparkles,
-  Star,
-  UserPlus,
+  GraduationCap,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
   const { data, isLoading } = useAdminDashboard();
 
   if (isLoading || !data) {
@@ -31,6 +23,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold mb-8">Dashboard Administrativo</h1>
         <div className="space-y-6">
+          <Skeleton className="h-12 w-full max-w-xl" />
           <div className="grid gap-4 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-32" />
@@ -47,171 +40,57 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold">Dashboard Administrativo</h1>
 
       <PWAInstallBanner />
 
-      {/* Seção 1: Alertas */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Requer Atenção</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          <AlertCard
-            title="Tarefas Atrasadas"
-            value={data.alertas.tarefasAtrasadas}
-            icon={AlertTriangle}
-            severity="error"
-            onClick={() => navigate("/admin/minhas-tarefas")}
-          />
-          <AlertCard
-            title="Dúvidas Pendentes"
-            value={data.alertas.duvidasPendentes}
-            icon={HelpCircle}
-            severity="warning"
-            onClick={() => navigate("/admin/mentoria")}
-          />
-          <AlertCard
-            title="Diagnósticos Incompletos"
-            value={data.alertas.diagnosticosIncompletos}
-            icon={FileText}
-            severity="warning"
-            onClick={() => navigate("/admin/mentoria")}
-          />
-        </div>
-      </div>
+      <Tabs defaultValue="visao-geral" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
+          <TabsTrigger value="visao-geral" className="gap-2">
+            <LayoutDashboard className="h-4 w-4 hidden sm:inline" />
+            <span className="hidden sm:inline">Visão Geral</span>
+            <span className="sm:hidden">Geral</span>
+          </TabsTrigger>
+          <TabsTrigger value="usuarios" className="gap-2">
+            <Users className="h-4 w-4 hidden sm:inline" />
+            Usuários
+          </TabsTrigger>
+          <TabsTrigger value="engajamento" className="gap-2">
+            <TrendingUp className="h-4 w-4 hidden sm:inline" />
+            <span className="hidden sm:inline">Engajamento</span>
+            <span className="sm:hidden">Engaj.</span>
+          </TabsTrigger>
+          <TabsTrigger value="conteudo" className="gap-2">
+            <Video className="h-4 w-4 hidden sm:inline" />
+            Conteúdo
+          </TabsTrigger>
+          <TabsTrigger value="mentoria" className="gap-2">
+            <GraduationCap className="h-4 w-4 hidden sm:inline" />
+            Mentoria
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Seção 2: Crescimento & Engajamento */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Crescimento & Engajamento</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="Novos Usuários (7d)"
-            value={data.crescimento.novosUsuarios7d}
-            description={`${data.crescimento.novosUsuarios30d} nos últimos 30 dias`}
-            icon={Users}
-          />
-          <StatsCard
-            title="Usuários Ativos (7d)"
-            value={data.crescimento.usuariosAtivos7d}
-            description={`${data.crescimento.usuariosAtivos30d} nos últimos 30 dias`}
-            icon={TrendingUp}
-          />
-          <StatsCard
-            title="Total de Usuários"
-            value={data.crescimento.totalUsuarios}
-            description={`${data.crescimento.usuariosAtivos} contas ativas`}
-            icon={Users}
-          />
-          <StatsCard
-            title="Taxa de Engajamento"
-            value={`${data.crescimento.totalUsuarios > 0 ? Math.round((data.crescimento.usuariosAtivos7d / data.crescimento.totalUsuarios) * 100) : 0}%`}
-            description="Ativos nos últimos 7 dias"
-            icon={TrendingUp}
-          />
-        </div>
-      </div>
+        <TabsContent value="visao-geral">
+          <VisaoGeralTab data={data} />
+        </TabsContent>
 
-      {/* Seção 3: Visitantes */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Visitantes</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          <StatsCard
-            title="Total de Visitantes"
-            value={data.visitantes.total}
-            description="Cadastros via aba Visitantes"
-            icon={UserPlus}
-            onClick={() => navigate("/admin/visitantes")}
-          />
-          <StatsCard
-            title="Novos Visitantes (7d)"
-            value={data.visitantes.novos7d}
-            description={`${data.visitantes.novos30d} nos últimos 30 dias`}
-            icon={UserPlus}
-          />
-          <StatsCard
-            title="Conversões (30d)"
-            value={data.visitantes.conversoes30d}
-            description={`${data.visitantes.conversoes7d} conversões (7d) | ${data.visitantes.taxaConversao}% taxa`}
-            icon={TrendingUp}
-          />
-        </div>
-      </div>
+        <TabsContent value="usuarios">
+          <UsuariosTab data={data} />
+        </TabsContent>
 
-      {/* Seção 4: Distribuição por Plano */}
-      <DistribuicaoPlanos distribuicao={data.distribuicaoPlanos} />
+        <TabsContent value="engajamento">
+          <EngajamentoTab />
+        </TabsContent>
 
-      {/* Seção 5: Saúde da Mentoria */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Saúde da Mentoria</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="Projetos em Andamento"
-            value={data.mentoria.projetosEmAndamento}
-            description="Planejamento + Em andamento"
-            icon={FolderKanban}
-          />
-          <StatsCard
-            title="Tarefas Pendentes"
-            value={data.mentoria.tarefasPorStatus.pendente}
-            description={`${data.mentoria.tarefasPorStatus.em_andamento} em andamento`}
-            icon={CheckSquare}
-          />
-          <StatsCard
-            title="Tarefas Concluídas"
-            value={data.mentoria.tarefasPorStatus.concluida}
-            description="Total concluído"
-            icon={CheckSquare}
-          />
-          <StatsCard
-            title="Sessões Agendadas"
-            value={data.mentoria.sessoesAgendadas}
-            description="Próximas sessões"
-            icon={Calendar}
-          />
-        </div>
-      </div>
+        <TabsContent value="conteudo">
+          <ConteudoTab data={data} />
+        </TabsContent>
 
-      {/* Seção 6: Inventário de Conteúdo */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Inventário de Conteúdo</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-          <StatsCard
-            title="Trilhas Ativas"
-            value={data.conteudo.trilhasAtivas}
-            description="Trilhas disponíveis"
-            icon={Layers}
-          />
-          <StatsCard
-            title="Módulos Ativos"
-            value={data.conteudo.modulosAtivos}
-            description="Módulos disponíveis"
-            icon={Layers}
-          />
-          <StatsCard
-            title="Vídeos Ativos"
-            value={data.conteudo.videosAtivos}
-            description="Vídeos disponíveis"
-            icon={Video}
-          />
-          <StatsCard
-            title="Ferramentas IA"
-            value={data.conteudo.ferramentasAtivas}
-            description="Ferramentas catalogadas"
-            icon={Sparkles}
-          />
-          <StatsCard
-            title="Média Avaliações"
-            value={data.conteudo.mediaAvaliacoes}
-            description="Nota média dos vídeos"
-            icon={Star}
-          />
-        </div>
-      </div>
-
-      {/* Seção 7: Top Usuários */}
-      {data.topUsuarios.length > 0 && (
-        <TopUsuariosTable usuarios={data.topUsuarios} />
-      )}
+        <TabsContent value="mentoria">
+          <MentoriaTab data={data} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -25,15 +25,15 @@ export function PromptsAnalyticsTab() {
     );
   }
 
-  const TrendIcon = data?.tendenciaGeral && data.tendenciaGeral > 0 
+  const TrendIcon = data?.tendenciaGeral === 'up' 
     ? TrendingUp 
-    : data?.tendenciaGeral && data.tendenciaGeral < 0 
+    : data?.tendenciaGeral === 'down' 
       ? TrendingDown 
       : Minus;
 
-  const trendColor = data?.tendenciaGeral && data.tendenciaGeral > 0 
+  const trendColor = data?.tendenciaGeral === 'up' 
     ? 'text-green-500' 
-    : data?.tendenciaGeral && data.tendenciaGeral < 0 
+    : data?.tendenciaGeral === 'down' 
       ? 'text-red-500' 
       : 'text-muted-foreground';
 
@@ -79,7 +79,7 @@ export function PromptsAnalyticsTab() {
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${trendColor}`}>
-              {data?.tendenciaGeral && data.tendenciaGeral > 0 ? '+' : ''}{data?.tendenciaGeral || 0}%
+              {data?.tendenciaGeral === 'up' ? '+' : ''}{data?.tendenciaValor || 0}%
             </div>
             <p className="text-xs text-muted-foreground">vs período anterior</p>
           </CardContent>

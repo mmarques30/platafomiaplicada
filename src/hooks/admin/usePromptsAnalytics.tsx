@@ -14,7 +14,8 @@ export interface PromptCopyStat {
 export interface PromptsAnalyticsData {
   totalCopias: number;
   mediaDiaria: number;
-  tendenciaGeral: number;
+  tendenciaGeral: 'up' | 'down' | 'stable';
+  tendenciaValor: number;
   topPrompts: PromptCopyStat[];
   copiasPorDia: { data: string; copias: number }[];
 }
@@ -58,9 +59,10 @@ export function usePromptsAnalytics(periodo: Periodo) {
       const mediaDiaria = Math.round(totalCopias / days);
 
       // Calcular tendência geral
-      const tendenciaGeral = totalAnteriores > 0 
+      const tendenciaValor = totalAnteriores > 0 
         ? Math.round(((totalCopias - totalAnteriores) / totalAnteriores) * 100)
         : (totalCopias > 0 ? 100 : 0);
+      const tendenciaGeral: 'up' | 'down' | 'stable' = tendenciaValor > 0 ? 'up' : tendenciaValor < 0 ? 'down' : 'stable';
 
       // Agrupar por prompt
       const promptsCount: Record<string, { id: string; titulo: string; count: number }> = {};
@@ -111,6 +113,7 @@ export function usePromptsAnalytics(periodo: Periodo) {
         totalCopias,
         mediaDiaria,
         tendenciaGeral,
+        tendenciaValor,
         topPrompts,
         copiasPorDia,
       };
