@@ -75,7 +75,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.html$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'html-cache-v5',
+              cacheName: 'html-cache-v6',
               networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 10,
@@ -87,7 +87,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.(js|css)$/,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'assets-cache-v5',
+              cacheName: 'assets-cache-v6',
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 86400
@@ -98,7 +98,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'images-cache-v5',
+              cacheName: 'images-cache-v6',
               expiration: {
                 maxEntries: 200,
                 maxAgeSeconds: 86400
