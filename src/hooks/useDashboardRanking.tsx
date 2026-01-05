@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 export interface TopAluno {
   id: string;
@@ -26,30 +27,32 @@ export interface DashboardRanking {
 }
 
 export function useDashboardRanking() {
-  return useQuery({
+  const queryClient = useQueryClient();
+  
+  const query = useQuery({
     queryKey: ["dashboard-ranking"],
     queryFn: async (): Promise<DashboardRanking> => {
       // Buscar todas as queries em paralelo
       const [alunosResult, aulasResult, ferramentasResult] = await Promise.all([
-        // Top 3 alunos mais engajados (baseado em vídeos assistidos)
+        // Top alunos mais engajados (baseado em vídeos assistidos)
         supabase
           .from("progresso_videos")
           .select("user_id, profiles!inner(id, nome_completo)")
           .eq("completado", true),
         
-        // Top 3 aulas mais assistidas
+        // Top aulas mais assistidas
         supabase
           .from("progresso_videos")
           .select("video_id, videos!inner(id, titulo)")
           .eq("completado", true),
         
-        // Top 3 ferramentas mais bem avaliadas
+        // Top 1 ferramenta mais bem avaliada
         supabase
           .from("ferramentas_ia")
           .select("id, nome, avaliacao")
           .eq("ativo", true)
           .order("avaliacao", { ascending: false })
-          .limit(3),
+          .limit(1),
       ]);
 
       // Processar top alunos
@@ -66,7 +69,7 @@ export function useDashboardRanking() {
       }
       const topAlunos = Object.values(alunosCount)
         .sort((a, b) => b.count - a.count)
-        .slice(0, 3)
+        .slice(0, 1)
         .map((a) => ({
           id: a.id,
           nome: abreviarNome(a.nome),
@@ -87,10 +90,10 @@ export function useDashboardRanking() {
       }
       const topAulas = Object.values(aulasCount)
         .sort((a, b) => b.count - a.count)
-        .slice(0, 3)
+        .slice(0, 1)
         .map((a) => ({
           id: a.id,
-          titulo: truncarTexto(a.titulo, 20),
+          titulo: truncarTexto(a.titulo, 25),
           visualizacoes: a.count,
         }));
 
@@ -103,9 +106,30 @@ export function useDashboardRanking() {
 
       return { topAlunos, topAulas, topFerramentas };
     },
-    staleTime: 2 * 60 * 1000, // 2 minutos
-    refetchInterval: 5 * 60 * 1000, // 5 minutos
   });
+
+  // Realtime subscription para atualizações em tempo real
+  useEffect(() => {
+    const channel = supabase
+      .channel('ranking-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'progresso_videos' },
+        () => queryClient.invalidateQueries({ queryKey: ['dashboard-ranking'] })
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'ferramentas_ia' },
+        () => queryClient.invalidateQueries({ queryKey: ['dashboard-ranking'] })
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  return query;
 }
 
 function abreviarNome(nome: string): string {

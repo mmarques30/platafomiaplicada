@@ -1,5 +1,5 @@
-import { Trophy, PlayCircle, Wrench, TrendingUp, Star } from "lucide-react";
 import { useDashboardRanking } from "@/hooks/useDashboardRanking";
+import { Trophy, PlayCircle, Wrench, TrendingUp, Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function RankingTicker() {
@@ -7,154 +7,100 @@ export function RankingTicker() {
 
   if (isLoading) {
     return (
-      <div className="rounded-xl bg-[#E9EBC6] p-4 md:p-6">
-        <Skeleton className="h-6 w-48 mb-4 bg-[#0D0D0D]/10" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 bg-[#0D0D0D]/10 rounded-lg" />
-          ))}
+      <section className="rounded-lg bg-[#E9EBC6] p-2 sm:p-3 shadow-sm">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-4 w-24 bg-[#0D0D0D]/10" />
+          <Skeleton className="h-4 w-32 bg-[#0D0D0D]/10" />
+          <Skeleton className="h-4 w-28 bg-[#0D0D0D]/10" />
         </div>
-      </div>
+      </section>
     );
   }
 
-  const { topAlunos = [], topAulas = [], topFerramentas = [] } = data || {};
+  const topAluno = data?.topAlunos[0];
+  const topAula = data?.topAulas[0];
+  const topFerramenta = data?.topFerramentas[0];
 
   return (
-    <section className="rounded-xl bg-[#E9EBC6] p-3 sm:p-4 md:p-6 shadow-sm">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-4 md:mb-6">
-        <TrendingUp className="w-5 h-5 text-[#0D0D0D]" />
-        <h2 className="text-base sm:text-lg md:text-xl font-bold text-[#0D0D0D] tracking-tight">
-          Painel de Destaques
-        </h2>
-      </div>
+    <section className="rounded-lg bg-[#E9EBC6] p-2 sm:p-3 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 sm:gap-5">
+        {/* Título */}
+        <div className="flex items-center gap-1.5">
+          <TrendingUp className="w-4 h-4 text-[#0D0D0D]" />
+          <span className="text-xs font-bold text-[#0D0D0D] uppercase tracking-wide">
+            Destaques
+          </span>
+        </div>
 
-      {/* Grid de Rankings */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-        {/* Top Alunos */}
-        <RankingColumn
-          icon={<Trophy className="w-4 h-4" />}
-          title="Top Alunos"
-          items={topAlunos.map((a, i) => ({
-            position: i + 1,
-            label: a.nome,
-            value: `${a.totalVideos}`,
-            suffix: "▲",
-          }))}
-          emptyMessage="Sem dados"
-        />
+        {/* Separador */}
+        <div className="h-4 w-px bg-[#0D0D0D]/20 hidden sm:block" />
 
-        {/* Aulas Populares */}
-        <RankingColumn
-          icon={<PlayCircle className="w-4 h-4" />}
-          title="Aulas Populares"
-          items={topAulas.map((a, i) => ({
-            position: i + 1,
-            label: a.titulo,
-            value: `${a.visualizacoes}`,
-            suffix: "",
-          }))}
-          emptyMessage="Sem dados"
-        />
+        {/* Top Aluno */}
+        {topAluno && (
+          <RankingItem
+            icon={Trophy}
+            label={topAluno.nome}
+            value={`${topAluno.totalVideos}▲`}
+          />
+        )}
 
-        {/* Top Ferramentas */}
-        <RankingColumn
-          icon={<Wrench className="w-4 h-4" />}
-          title="Top Ferramentas"
-          items={topFerramentas.map((f, i) => ({
-            position: i + 1,
-            label: f.nome,
-            value: "",
-            suffix: "",
-            stars: f.avaliacao,
-          }))}
-          emptyMessage="Sem dados"
-          showStars
-        />
+        {/* Separador */}
+        {topAula && <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />}
+
+        {/* Top Aula */}
+        {topAula && (
+          <RankingItem
+            icon={PlayCircle}
+            label={topAula.titulo}
+            value={String(topAula.visualizacoes)}
+          />
+        )}
+
+        {/* Separador */}
+        {topFerramenta && <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />}
+
+        {/* Top Ferramenta */}
+        {topFerramenta && (
+          <RankingItem
+            icon={Wrench}
+            label={topFerramenta.nome}
+            stars={topFerramenta.avaliacao}
+          />
+        )}
+
+        {/* Mensagem quando não há dados */}
+        {!topAluno && !topAula && !topFerramenta && (
+          <span className="text-xs text-[#0D0D0D]/60">
+            Nenhum destaque disponível ainda
+          </span>
+        )}
       </div>
     </section>
   );
 }
 
-interface RankingItem {
-  position: number;
+interface RankingItemProps {
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
-  value: string;
-  suffix?: string;
+  value?: string;
   stars?: number;
 }
 
-interface RankingColumnProps {
-  icon: React.ReactNode;
-  title: string;
-  items: RankingItem[];
-  emptyMessage: string;
-  showStars?: boolean;
-}
-
-function RankingColumn({ icon, title, items, emptyMessage, showStars }: RankingColumnProps) {
+function RankingItem({ icon: Icon, label, value, stars }: RankingItemProps) {
   return (
-    <div className="bg-[#0D0D0D]/5 rounded-lg p-3 md:p-4">
-      {/* Header da coluna */}
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[#0D0D0D]/10">
-        <span className="text-[#0D0D0D]">{icon}</span>
-        <span className="text-xs sm:text-sm font-semibold text-[#0D0D0D] uppercase tracking-wide">
-          {title}
+    <div className="flex items-center gap-1.5 text-[#0D0D0D]">
+      <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+      <span className="text-xs font-medium truncate max-w-[120px] sm:max-w-[150px]">
+        {label}
+      </span>
+      {stars !== undefined ? (
+        <span className="text-xs font-bold flex items-center gap-0.5 text-[#0D0D0D]">
+          <Star className="w-3 h-3 fill-current" />
+          {stars}
         </span>
-      </div>
-
-      {/* Lista */}
-      <div className="space-y-2">
-        {items.length === 0 ? (
-          <p className="text-xs text-[#0D0D0D]/60 text-center py-2">{emptyMessage}</p>
-        ) : (
-          items.map((item) => (
-            <div
-              key={item.position}
-              className="flex items-center justify-between gap-2 text-[#0D0D0D]"
-            >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <PositionBadge position={item.position} />
-                <span className="text-xs sm:text-sm truncate">{item.label}</span>
-              </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                {showStars && item.stars !== undefined ? (
-                  <div className="flex items-center gap-0.5">
-                    <Star className="w-3 h-3 fill-[#0D0D0D] text-[#0D0D0D]" />
-                    <span className="text-xs font-bold">{item.stars}</span>
-                  </div>
-                ) : (
-                  <>
-                    <span className="text-xs sm:text-sm font-bold">{item.value}</span>
-                    {item.suffix && (
-                      <span className="text-xs text-green-700 font-bold">{item.suffix}</span>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      ) : (
+        <span className="text-xs font-bold text-[#0D0D0D]">{value}</span>
+      )}
     </div>
-  );
-}
-
-function PositionBadge({ position }: { position: number }) {
-  const colors: Record<number, string> = {
-    1: "bg-yellow-500 text-white",
-    2: "bg-gray-400 text-white",
-    3: "bg-amber-700 text-white",
-  };
-
-  return (
-    <span
-      className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold flex-shrink-0 ${
-        colors[position] || "bg-[#0D0D0D]/20 text-[#0D0D0D]"
-      }`}
-    >
-      {position}
-    </span>
   );
 }
