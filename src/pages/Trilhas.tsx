@@ -72,7 +72,7 @@ export default function Trilhas() {
               <Carousel opts={{ align: "start", loop: false }} className="w-full">
                 <CarouselContent className="-ml-4">
                   {trilhasVisitante?.map((trilha) => (
-                    <CarouselItem key={trilha.id} className="pl-4 basis-2/5 sm:basis-1/3 md:basis-1/4">
+                    <CarouselItem key={trilha.id} className="pl-4 basis-2/5 sm:basis-1/3 md:basis-1/4 lg:basis-1/5">
                       <TrilhaCardBloqueavel
                         id={trilha.id}
                         titulo={trilha.titulo}
