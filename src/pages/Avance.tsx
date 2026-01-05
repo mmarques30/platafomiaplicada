@@ -5,8 +5,10 @@ import { ArrowLeft, Check, Sparkles, TrendingUp, Target, Lightbulb, Workflow } f
 import { useNavigate } from "react-router-dom";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useButtonClickLogger } from "@/hooks/useButtonClickLogger";
-import logoCompleta from "@/assets/logo-aplicada-marca-completa-clara.png";
-import backgroundSymbol from "@/assets/logos/background-symbol.png";
+
+// Usar caminhos estáticos para evitar problemas de cache no PWA
+const logoCompleta = "/logo-marca-completa-clara.png";
+const backgroundSymbol = "/background-symbol.png";
 
 export default function Avance() {
   const navigate = useNavigate();
@@ -48,6 +50,7 @@ export default function Avance() {
             src={logoCompleta} 
             alt="IAplicada" 
             className="h-12 md:h-16 mx-auto mb-12"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
           
           {/* Headline */}

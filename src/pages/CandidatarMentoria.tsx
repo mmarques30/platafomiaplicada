@@ -14,7 +14,9 @@ import { ChevronLeft, ChevronRight, CheckCircle2, Save } from "lucide-react";
 import { useEnviarCandidatura, useCandidaturaDraft } from "@/hooks/useCandidaturasMentoria";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
-import logoSimbol from "@/assets/logo-aplicada-simbolo.png";
+
+// Usar caminho estático para evitar problemas de cache no PWA
+const logoSimbol = "/logo-simbolo.png";
 
 const DRAFT_KEY = "candidatura_mentoria_draft";
 
@@ -263,7 +265,7 @@ export default function CandidatarMentoria() {
       <div className="max-w-3xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <img src={logoSimbol} alt="IAplicada" className="h-16 mx-auto mb-4" />
+          <img src={logoSimbol} alt="IAplicada" className="h-16 mx-auto mb-4" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
           <h1 className="text-3xl font-bold text-foreground mb-2">
             Candidatura <span className="text-[#9EB038]">Mentoria Club</span>
           </h1>

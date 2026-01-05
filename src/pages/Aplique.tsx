@@ -4,8 +4,10 @@ import { LogosTicker } from "@/components/LogosTicker";
 import { ArrowLeft, Sparkles, Check, Table2, Workflow, TrendingUp, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useButtonClickLogger } from "@/hooks/useButtonClickLogger";
-import logoCompleta from "@/assets/logo-aplicada-marca-completa-clara.png";
-import backgroundSymbol from "@/assets/logos/background-symbol.png";
+
+// Usar caminhos estáticos para evitar problemas de cache no PWA
+const logoCompleta = "/logo-marca-completa-clara.png";
+const backgroundSymbol = "/background-symbol.png";
 
 export default function Aplique() {
   const navigate = useNavigate();
@@ -46,6 +48,7 @@ export default function Aplique() {
             src={logoCompleta} 
             alt="IAplicada" 
             className="h-12 md:h-16 mx-auto mb-12"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
           
           {/* Headline */}
