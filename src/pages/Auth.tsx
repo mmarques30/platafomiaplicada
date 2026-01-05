@@ -173,14 +173,6 @@ export default function Auth() {
           <Tabs defaultValue="entrar" className="w-full">
             {/* Aba Entrar */}
             <TabsContent value="entrar" className="mt-0">
-              {/* Logo simples centralizada */}
-              <div className="flex justify-center mb-6">
-                <img 
-                  src="/logo-simbolo-simples.png" 
-                  alt="IAplicada" 
-                  className="h-16 w-auto"
-                />
-              </div>
 
               {/* Tabs abaixo do subtítulo */}
               <TabsList className="grid w-full grid-cols-2 bg-white/5 p-1 rounded-lg mb-8">
@@ -240,14 +232,6 @@ export default function Auth() {
 
             {/* Aba Criar Conta */}
             <TabsContent value="criar-conta" className="mt-0">
-              {/* Logo simples centralizada */}
-              <div className="flex justify-center mb-6">
-                <img 
-                  src="/logo-simbolo-simples.png" 
-                  alt="IAplicada" 
-                  className="h-16 w-auto"
-                />
-              </div>
 
               <div className="space-y-2 mb-6 text-center">
                 <h1 className="text-2xl md:text-3xl font-semibold text-white">
