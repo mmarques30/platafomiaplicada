@@ -16,7 +16,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
 
 // Usar caminho estático para evitar problemas de cache no PWA
-const logoSimbol = "/logo-simbolo.png?v=8";
+const logoSimbol = "/logo-simbolo.png?v=10";
 
 const DRAFT_KEY = "candidatura_mentoria_draft";
 

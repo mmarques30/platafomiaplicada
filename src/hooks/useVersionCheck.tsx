@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const CURRENT_VERSION = '2026-01-05-v6';
+const CURRENT_VERSION = '2026-01-05-v10';
 const VERSION_KEY = 'app-version';
 
 export function useVersionCheck() {

@@ -16,15 +16,15 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [
-        'logo-simbolo.png?v=8',
+        'logo-simbolo.png?v=10',
         'logo-marca-completa.png',
         'logo-marca-completa-clara.png',
         'logo-marca-completa-escura.png',
-        'logo-mariana.png?v=8',
-        'logo-3d.png?v=8',
-        'apple-touch-icon-180.png?v=8',
-        'icon-192.png?v=8',
-        'icon-512.png?v=8',
+        'logo-mariana.png?v=10',
+        'logo-3d.png?v=10',
+        'apple-touch-icon-180.png?v=10',
+        'icon-192.png?v=10',
+        'icon-512.png?v=10',
         'background-symbol.png',
         'background-symbol-soft.png',
         'offline.html',
@@ -47,17 +47,17 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         icons: [
           {
-            src: '/icon-192.png?v=8',
+            src: '/icon-192.png?v=10',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png?v=8',
+            src: '/icon-512.png?v=10',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png?v=8',
+            src: '/icon-512.png?v=10',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
@@ -76,7 +76,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.html$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'html-cache-v7',
+              cacheName: 'html-cache-v10',
               networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 10,
@@ -88,7 +88,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.(js|css)$/,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'assets-cache-v7',
+              cacheName: 'assets-cache-v10',
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 86400
@@ -99,7 +99,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'images-cache-v7',
+              cacheName: 'images-cache-v10',
               expiration: {
                 maxEntries: 200,
                 maxAgeSeconds: 86400
