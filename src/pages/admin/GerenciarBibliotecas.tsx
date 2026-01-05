@@ -6,13 +6,15 @@ import { IACopieUseTab } from "@/components/admin/bibliotecas/IACopieUseTab";
 import { MetodosTab } from "@/components/admin/bibliotecas/MetodosTab";
 import { FormulariosCustomizados } from "@/components/admin/formularios/FormulariosCustomizados";
 import { PromptsAnalyticsTab } from "@/components/admin/bibliotecas/PromptsAnalyticsTab";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function GerenciarBibliotecas() {
   const [activeTab, setActiveTab] = useState("ferramentas");
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">Gerenciar Bibliotecas</h1>
+      <PageTitle primary="Gerenciar" secondary="Bibliotecas" />
+      <div className="mb-8" />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-6">

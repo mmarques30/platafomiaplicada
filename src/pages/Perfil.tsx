@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { User, Briefcase, Calendar, Linkedin, Edit2, Save, X, Camera } from "lucide-react";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Perfil() {
   const { user } = useAuth();
@@ -208,7 +209,7 @@ export default function Perfil() {
   return (
     <div className="container mx-auto py-4 md:py-8 px-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Meu Perfil</h1>
+        <PageTitle primary="Meu" secondary="Perfil" />
         {!isEditing && (
           <Button onClick={handleEdit} variant="outline" className="w-full sm:w-auto">
             <Edit2 className="h-4 w-4 mr-2" />

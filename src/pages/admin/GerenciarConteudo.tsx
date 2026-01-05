@@ -4,11 +4,13 @@ import { ModulosTab } from "@/components/admin/content/ModulosTab";
 import { VideosTab } from "@/components/admin/content/VideosTab";
 import { ExerciciosTab } from "@/components/admin/exercicios/ExerciciosTab";
 import { CentralTab } from "@/components/admin/content/CentralTab";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function GerenciarConteudo() {
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">Gerenciar Conteúdo</h1>
+      <PageTitle primary="Gerenciar" secondary="Conteúdo" />
+      <div className="mb-8" />
 
       <Tabs defaultValue="trilhas" className="w-full">
         <TabsList className="flex-wrap">

@@ -26,6 +26,7 @@ import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
 import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Building2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function GerenciarUsuários() {
   const navigate = useNavigate();
@@ -109,8 +110,10 @@ export default function GerenciarUsuários() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-3xl font-bold mb-8">Gerenciar Usuários</h1>
-        <Skeleton className="h-64" />
+        <PageTitle primary="Gerenciar" secondary="Usuários" />
+        <div className="mt-8">
+          <Skeleton className="h-64" />
+        </div>
       </div>
     );
   }
@@ -118,7 +121,7 @@ export default function GerenciarUsuários() {
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
+        <PageTitle primary="Gerenciar" secondary="Usuários" />
         <div className="flex gap-2">
           <Button 
             onClick={() => navigate('/admin/importar-usuarios')}

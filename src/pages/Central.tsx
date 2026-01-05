@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConteudosDashboard, TipoConteudo } from "@/hooks/useConteudosDashboard";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 const tabs = [
   { value: "todos" as const, label: "Todos", icon: FileText },
@@ -52,8 +53,8 @@ export default function Central() {
     <div className="container max-w-6xl mx-auto py-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Central de Conteúdo</h1>
-        <p className="text-muted-foreground mt-1">
+        <PageTitle primary="Central" secondary="de Conteúdo" />
+        <p className="text-muted-foreground mt-2">
           Fique por dentro das novidades e aplique hoje
         </p>
       </div>

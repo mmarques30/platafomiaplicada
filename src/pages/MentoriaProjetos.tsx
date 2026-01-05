@@ -19,6 +19,7 @@ import {
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { formatProjetoTitulo } from "@/lib/utils";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function MentoriaProjetos() {
   const navigate = useNavigate();
@@ -146,8 +147,8 @@ export default function MentoriaProjetos() {
 
       <div className="mb-8 flex justify-between items-center">
         <div>
-          <h1 className="text-4xl font-bold mb-3">Projetos de Mentoria</h1>
-          <p className="text-muted-foreground text-lg">
+          <PageTitle primary="Projetos" secondary="de Mentoria" />
+          <p className="text-muted-foreground text-lg mt-2">
             Acompanhe seus projetos e receba feedback do mentor
           </p>
         </div>

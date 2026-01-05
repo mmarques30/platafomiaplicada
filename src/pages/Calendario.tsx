@@ -9,6 +9,7 @@ import { format, parseISO, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 const tipoEventoConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   aula_ao_vivo: { label: "Aula ao Vivo", icon: Video, color: "text-primary" },
@@ -106,8 +107,8 @@ export default function Calendario() {
     <div className="min-h-screen bg-background">
       <main className="container py-6 md:py-8 px-4 md:px-6 space-y-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Calendário de Aulas</h1>
-          <p className="text-muted-foreground mt-1">
+          <PageTitle primary="Calendário" secondary="de Aulas" />
+          <p className="text-muted-foreground mt-2">
             Confira as próximas aulas semanais e seus temas
           </p>
         </div>

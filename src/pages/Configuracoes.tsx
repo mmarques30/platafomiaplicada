@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, CheckCircle2, RefreshCw } from "lucide-react";
 import { useTheme } from "next-themes";
 import { forceFullAppReload } from "@/lib/pwaUpdate";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Configuracoes() {
   const { user, signOut } = useAuth();
@@ -90,7 +91,8 @@ export default function Configuracoes() {
 
   return (
     <div className="container max-w-4xl py-4 md:py-8 px-4">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Configurações</h1>
+      <PageTitle primary="Configurações" />
+      <div className="mb-6 md:mb-8" />
 
       <div className="space-y-6">
         {/* Aparência */}

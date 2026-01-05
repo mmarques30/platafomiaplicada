@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function MentoriaTarefas() {
   const navigate = useNavigate();
@@ -200,8 +201,8 @@ export default function MentoriaTarefas() {
       </Button>
 
       <div>
-        <h1 className="text-3xl font-bold mb-2">Minhas Tarefas</h1>
-        <p className="text-muted-foreground">Gerencie suas entregas e acompanhe seu progresso</p>
+        <PageTitle primary="Minhas" secondary="Tarefas" />
+        <p className="text-muted-foreground mt-2">Gerencie suas entregas e acompanhe seu progresso</p>
       </div>
 
       <div className="grid grid-cols-3 gap-4">

@@ -13,6 +13,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { toast } from "@/hooks/use-toast";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function MentoriaRecursos() {
   const navigate = useNavigate();
@@ -57,8 +58,8 @@ export default function MentoriaRecursos() {
       </Button>
 
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-3">Recursos e Ferramentas</h1>
-        <p className="text-muted-foreground text-lg">
+        <PageTitle primary="Recursos" secondary="e Ferramentas" />
+        <p className="text-muted-foreground text-lg mt-2">
           Ferramentas recomendadas para seu desenvolvimento em IA
         </p>
       </div>

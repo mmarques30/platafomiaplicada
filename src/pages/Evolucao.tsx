@@ -13,6 +13,7 @@ import { BonusEvolucao } from "@/components/evolucao/BonusEvolucao";
 import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 
 export default function Evolucao() {
@@ -26,9 +27,7 @@ export default function Evolucao() {
     <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">
-          Minha <span className="text-primary">Evolução</span>
-        </h1>
+        <PageTitle primary="Minha" secondary="Evolução" />
       </div>
 
       {/* Sistema de Abas */}

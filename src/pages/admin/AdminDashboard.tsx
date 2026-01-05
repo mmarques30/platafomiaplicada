@@ -8,6 +8,7 @@ import { EngajamentoTab } from "@/components/admin/dashboard/EngajamentoTab";
 import { PaginaGratuitaTab } from "@/components/admin/dashboard/PaginaGratuitaTab";
 import { ConteudoTab } from "@/components/admin/dashboard/ConteudoTab";
 import { MentoriaTab } from "@/components/admin/dashboard/MentoriaTab";
+import { PageTitle } from "@/components/shared/PageTitle";
 import {
   LayoutDashboard,
   Users,
@@ -23,7 +24,7 @@ export default function AdminDashboard() {
   if (isLoading || !data) {
     return (
       <div>
-        <h1 className="text-3xl font-bold mb-8">Dashboard Administrativo</h1>
+        <PageTitle primary="Dashboard" secondary="Administrativo" />
         <div className="space-y-6">
           <Skeleton className="h-12 w-full max-w-xl" />
           <div className="grid gap-4 md:grid-cols-3">
@@ -43,7 +44,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard Administrativo</h1>
+      <PageTitle primary="Dashboard" secondary="Administrativo" />
 
       <PWAInstallBanner />
 

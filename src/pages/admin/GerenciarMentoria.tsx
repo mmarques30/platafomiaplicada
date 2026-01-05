@@ -27,6 +27,7 @@ import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import { formatProjetoTitulo } from "@/lib/utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function GerenciarMentoria() {
   const queryClient = useQueryClient();
@@ -131,8 +132,8 @@ export default function GerenciarMentoria() {
     <>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Gerenciar Mentoria</h1>
-          <p className="text-muted-foreground">
+          <PageTitle primary="Gerenciar" secondary="Mentoria" />
+          <p className="text-muted-foreground mt-2">
             Acompanhe e gerencie objetivos, sessões, recursos e projetos dos mentorados
           </p>
         </div>
