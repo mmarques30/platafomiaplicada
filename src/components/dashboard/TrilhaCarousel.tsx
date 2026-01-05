@@ -25,7 +25,7 @@ export function TrilhaCarousel({ trilhaId, trilhaTitulo, videos }: TrilhaCarouse
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-xl font-semibold">{trilhaTitulo}</h3>
+          <h3 className="text-lg font-semibold text-foreground/90 uppercase tracking-wide">{trilhaTitulo}</h3>
           <Badge variant="secondary" className="text-xs">
             {videos.length} {videos.length === 1 ? 'vídeo' : 'vídeos'}
           </Badge>

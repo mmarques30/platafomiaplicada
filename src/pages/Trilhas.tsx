@@ -39,7 +39,14 @@ export default function Trilhas() {
       <main className="container py-4 md:py-6 px-4">
         <div className="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Trilhas de Aprendizado</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              <span className="relative inline-block">
+                Trilhas
+                <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary/30 rounded-full" />
+              </span>
+              {" "}
+              <span className="text-muted-foreground font-medium">de Aprendizado</span>
+            </h1>
           </div>
           
           {isVisitante && (
