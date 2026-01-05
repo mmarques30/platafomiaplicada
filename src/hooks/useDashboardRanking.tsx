@@ -6,12 +6,16 @@ export interface TopAluno {
   id: string;
   nome: string;
   totalVideos: number;
+  percentual: number;
+  tendencia: 'up' | 'down' | 'stable';
 }
 
 export interface TopAula {
   id: string;
   titulo: string;
   visualizacoes: number;
+  percentual: number;
+  tendencia: 'up' | 'down' | 'stable';
 }
 
 export interface TopFerramenta {
@@ -33,17 +37,18 @@ export function useDashboardRanking() {
     queryKey: ["dashboard-ranking"],
     queryFn: async (): Promise<DashboardRanking> => {
       // Buscar todas as queries em paralelo
-      const [alunosResult, aulasResult, ferramentasResult] = await Promise.all([
-        // Top alunos mais engajados (baseado em vídeos assistidos)
+      const [rankingResult, aulasResult, ferramentasResult] = await Promise.all([
+        // Top aluno via view pública (bypass RLS)
         supabase
-          .from("progresso_videos")
-          .select("user_id, profiles!inner(id, nome_completo)")
-          .eq("completado", true),
+          .from("ranking_dashboard")
+          .select("*")
+          .order("total_videos", { ascending: false })
+          .limit(1),
         
-        // Top aulas mais assistidas
+        // Top aulas mais assistidas (últimas 24h e 24h anteriores)
         supabase
           .from("progresso_videos")
-          .select("video_id, videos!inner(id, titulo)")
+          .select("video_id, videos!inner(id, titulo), created_at")
           .eq("completado", true),
         
         // Top 1 ferramenta mais bem avaliada
@@ -55,52 +60,69 @@ export function useDashboardRanking() {
           .limit(1),
       ]);
 
-      // Processar top alunos
-      const alunosCount: Record<string, { id: string; nome: string; count: number }> = {};
-      if (alunosResult.data) {
-        alunosResult.data.forEach((item: any) => {
-          const userId = item.user_id;
-          const nome = item.profiles?.nome_completo || "Usuário";
-          if (!alunosCount[userId]) {
-            alunosCount[userId] = { id: userId, nome, count: 0 };
-          }
-          alunosCount[userId].count++;
-        });
-      }
-      const topAlunos = Object.values(alunosCount)
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 1)
-        .map((a) => ({
-          id: a.id,
-          nome: abreviarNome(a.nome),
-          totalVideos: a.count,
-        }));
+      // Processar top alunos da view
+      const topAlunos: TopAluno[] = (rankingResult.data || []).map((item: any) => {
+        const atual = item.videos_24h || 0;
+        const anterior = item.videos_24h_anterior || 0;
+        const percentual = anterior > 0 ? Math.round(((atual - anterior) / anterior) * 100) : (atual > 0 ? 100 : 0);
+        const tendencia: 'up' | 'down' | 'stable' = percentual > 0 ? 'up' : percentual < 0 ? 'down' : 'stable';
+        
+        return {
+          id: item.user_id,
+          nome: abreviarNome(item.nome_completo || "Usuário"),
+          totalVideos: item.total_videos || 0,
+          percentual: Math.abs(percentual),
+          tendencia,
+        };
+      });
 
-      // Processar top aulas
-      const aulasCount: Record<string, { id: string; titulo: string; count: number }> = {};
+      // Processar top aulas com cálculo de tendência
+      const now = new Date();
+      const h24ago = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      const h48ago = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+      
+      const aulasCount: Record<string, { id: string; titulo: string; count: number; count24h: number; countAnterior: number }> = {};
       if (aulasResult.data) {
         aulasResult.data.forEach((item: any) => {
           const videoId = item.video_id;
           const titulo = item.videos?.titulo || "Vídeo";
+          const createdAt = new Date(item.created_at);
+          
           if (!aulasCount[videoId]) {
-            aulasCount[videoId] = { id: videoId, titulo, count: 0 };
+            aulasCount[videoId] = { id: videoId, titulo, count: 0, count24h: 0, countAnterior: 0 };
           }
           aulasCount[videoId].count++;
+          
+          if (createdAt >= h24ago) {
+            aulasCount[videoId].count24h++;
+          } else if (createdAt >= h48ago) {
+            aulasCount[videoId].countAnterior++;
+          }
         });
       }
+      
       const topAulas = Object.values(aulasCount)
         .sort((a, b) => b.count - a.count)
         .slice(0, 1)
-        .map((a) => ({
-          id: a.id,
-          titulo: truncarTexto(a.titulo, 25),
-          visualizacoes: a.count,
-        }));
+        .map((a) => {
+          const percentual = a.countAnterior > 0 
+            ? Math.round(((a.count24h - a.countAnterior) / a.countAnterior) * 100) 
+            : (a.count24h > 0 ? 100 : 0);
+          const tendencia: 'up' | 'down' | 'stable' = percentual > 0 ? 'up' : percentual < 0 ? 'down' : 'stable';
+          
+          return {
+            id: a.id,
+            titulo: truncarTexto(a.titulo, 20),
+            visualizacoes: a.count,
+            percentual: Math.abs(percentual),
+            tendencia,
+          };
+        });
 
       // Top ferramentas
       const topFerramentas: TopFerramenta[] = (ferramentasResult.data || []).map((f: any) => ({
         id: f.id,
-        nome: f.nome,
+        nome: truncarTexto(f.nome, 15),
         avaliacao: f.avaliacao || 0,
       }));
 
