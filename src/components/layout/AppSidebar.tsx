@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 // Usar caminho estático para garantir carregamento no PWA
-const logoSimbolo = "/logo-simbolo.png?v=8";
+const logoSimbolo = "/logo-simbolo.png?v=10";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Usar caminho estático com cache-busting para garantir carregamento no PWA
-const logoMariana = "/logo-mariana.png?v=7";
+const logoMariana = "/logo-mariana.png?v=10";
 
 export function MarIAnaFloatingButton() {
   const navigate = useNavigate();
