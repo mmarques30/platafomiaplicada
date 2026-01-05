@@ -6,6 +6,7 @@ import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { PendenciasOnboarding } from "@/components/dashboard/PendenciasOnboarding";
 import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
+import { RankingTicker } from "@/components/dashboard/RankingTicker";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -88,6 +89,9 @@ export default function Dashboard() {
 
         {/* Central de Conteúdo Interativa */}
         {!isVisitante && <CentralConteudo />}
+
+        {/* Painel de Destaques - Ranking */}
+        {!isVisitante && <RankingTicker />}
 
         {/* Novidades da Semana */}
         <section>
