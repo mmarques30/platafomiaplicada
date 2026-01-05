@@ -107,16 +107,16 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           )}>
             {/* Post Content with Markdown links */}
             <div className={cn(
-              "text-foreground prose prose-sm max-w-none",
+              "text-foreground prose prose-sm max-w-none dark:prose-invert",
               mediaCount === 1 && "flex-1 min-w-0"
             )}>
               <ReactMarkdown
                 components={{
                   p: ({ children }) => (
-                    <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{children}</p>
+                    <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">{children}</p>
                   ),
-                  strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-                  em: ({ children }) => <em className="italic">{children}</em>,
+                  strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
+                  em: ({ children }) => <em className="italic text-foreground">{children}</em>,
                   a: ({ href, children }) => (
                     <a
                       href={href}
