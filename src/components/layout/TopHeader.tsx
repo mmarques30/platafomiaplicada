@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Bell, ChevronDown, RefreshCw } from "lucide-react";
+import logoHeaderDark from "@/assets/logo-header-dark.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -83,9 +84,16 @@ export function TopHeader() {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative h-14 w-full">
-        {/* LEFT: SidebarTrigger - posição absoluta à esquerda */}
-        <div className="absolute left-0 top-0 h-full flex items-center ml-1 md:ml-2">
+        {/* LEFT: SidebarTrigger + Logo - posição absoluta à esquerda */}
+        <div className="absolute left-0 top-0 h-full flex items-center gap-2 ml-1 md:ml-2">
           <SidebarTrigger className="h-10 w-10 md:h-7 md:w-7 text-white/80 hover:text-white hover:bg-white/10 transition-colors" />
+          <Link to="/" className="hidden sm:block">
+            <img 
+              src={logoHeaderDark} 
+              alt="IAplicada" 
+              className="h-5 md:h-6 w-auto opacity-90 hover:opacity-100 transition-opacity"
+            />
+          </Link>
         </div>
 
         {/* CENTER: Horizontal Navigation - centralizado na viewport com posição absoluta */}
