@@ -35,45 +35,45 @@ export function ConteudoCard({ conteudo }: ConteudoCardProps) {
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
       className={`
-        group relative p-5 rounded-xl 
+        group relative p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl 
         bg-card/90 backdrop-blur-sm 
-        border-2 border-aplicada-green-700/30 hover:border-aplicada-green-700/60 
+        border border-aplicada-green-700/30 sm:border-2 hover:border-aplicada-green-700/60 
         transition-all duration-300 cursor-pointer
-        shadow-lg hover:shadow-xl hover:shadow-aplicada-green-900/20
-        min-w-[280px] max-w-[320px] flex-shrink-0
+        shadow-md sm:shadow-lg hover:shadow-xl hover:shadow-aplicada-green-900/20
+        min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0
       `}
       onClick={handleClick}
     >
       {/* Destaque indicator */}
       {conteudo.destaque && (
-        <div className="absolute top-3 right-3">
-          <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-aplicada-green-700 text-white rounded-full shadow-md">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+          <span className="px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[8px] sm:text-[10px] font-bold uppercase tracking-wider bg-aplicada-green-700 text-white rounded-full shadow-md">
             Destaque
           </span>
         </div>
       )}
 
       {/* Icon */}
-      <div className={`w-11 h-11 rounded-xl ${iconBgClass} flex items-center justify-center mb-4 shadow-md`}>
-        <Icon className="w-5 h-5 text-white" />
+      <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg sm:rounded-xl ${iconBgClass} flex items-center justify-center mb-2.5 sm:mb-3 md:mb-4 shadow-md`}>
+        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
       </div>
 
       {/* Content */}
-      <h4 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
+      <h4 className="font-semibold text-foreground mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-aplicada-green-600 transition-colors text-sm sm:text-base">
         {conteudo.titulo}
       </h4>
-      <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3 mb-2.5 sm:mb-4">
         {conteudo.resumo}
       </p>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-1.5">
-          <Calendar className="w-3.5 h-3.5 text-aplicada-green-600" />
+      <div className="flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground">
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-aplicada-green-600" />
           <span>{format(new Date(conteudo.created_at), "dd MMM yyyy", { locale: ptBR })}</span>
         </div>
         {conteudo.link_externo && (
-          <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-aplicada-green-600" />
+          <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-0 group-hover:opacity-100 transition-opacity text-aplicada-green-600" />
         )}
       </div>
     </motion.div>
