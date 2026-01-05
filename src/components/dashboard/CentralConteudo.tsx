@@ -36,10 +36,10 @@ export function CentralConteudo() {
         {/* Header */}
         <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
           <div>
-            <h2 className="text-base sm:text-xl md:text-2xl font-bold text-foreground">
+            <h2 className="text-base sm:text-xl md:text-2xl font-bold text-[#0D0D0D]">
               Central de Conteudo
             </h2>
-            <p className="text-xs sm:text-sm text-aplicada-green-600 mt-0.5 sm:mt-1">
+            <p className="text-xs sm:text-sm text-[#2F302B] mt-0.5 sm:mt-1">
               Fique por dentro das novidades e aplique hoje
             </p>
           </div>

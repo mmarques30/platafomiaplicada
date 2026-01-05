@@ -24,10 +24,27 @@ export interface TopFerramenta {
   avaliacao: number;
 }
 
+export interface TopPrompt {
+  id: string;
+  titulo: string;
+  acessos: number;
+  percentual: number;
+  tendencia: 'up' | 'down' | 'stable';
+}
+
+export interface TopSalvo {
+  id: string;
+  titulo: string;
+  tipo: string;
+  salvamentos: number;
+}
+
 export interface DashboardRanking {
   topAlunos: TopAluno[];
   topAulas: TopAula[];
   topFerramentas: TopFerramenta[];
+  topPrompts: TopPrompt[];
+  topSalvos: TopSalvo[];
 }
 
 export function useDashboardRanking() {
@@ -37,7 +54,7 @@ export function useDashboardRanking() {
     queryKey: ["dashboard-ranking"],
     queryFn: async (): Promise<DashboardRanking> => {
       // Buscar todas as queries em paralelo
-      const [rankingResult, aulasResult, ferramentasResult] = await Promise.all([
+      const [rankingResult, aulasResult, ferramentasResult, promptsResult, favoritosResult] = await Promise.all([
         // Top aluno via view pública (bypass RLS)
         supabase
           .from("ranking_dashboard")
@@ -58,6 +75,17 @@ export function useDashboardRanking() {
           .eq("ativo", true)
           .order("avaliacao", { ascending: false })
           .limit(1),
+
+        // Prompts mais acessados
+        supabase
+          .from("content_access_logs")
+          .select("content_id, content_title, accessed_at")
+          .eq("content_type", "prompt"),
+
+        // Favoritos (para conteúdo mais salvo)
+        supabase
+          .from("favoritos")
+          .select("item_id, tipo, created_at"),
       ]);
 
       // Processar top alunos da view
@@ -126,7 +154,88 @@ export function useDashboardRanking() {
         avaliacao: f.avaliacao || 0,
       }));
 
-      return { topAlunos, topAulas, topFerramentas };
+      // Processar top prompts
+      const promptsCount: Record<string, { id: string; titulo: string; count: number; count24h: number; countAnterior: number }> = {};
+      if (promptsResult.data) {
+        promptsResult.data.forEach((item: any) => {
+          const contentId = item.content_id;
+          const titulo = item.content_title || "Prompt";
+          const accessedAt = new Date(item.accessed_at);
+          
+          if (!promptsCount[contentId]) {
+            promptsCount[contentId] = { id: contentId, titulo, count: 0, count24h: 0, countAnterior: 0 };
+          }
+          promptsCount[contentId].count++;
+          
+          if (accessedAt >= h24ago) {
+            promptsCount[contentId].count24h++;
+          } else if (accessedAt >= h48ago) {
+            promptsCount[contentId].countAnterior++;
+          }
+        });
+      }
+      
+      const topPrompts: TopPrompt[] = Object.values(promptsCount)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 1)
+        .map((p) => {
+          const percentual = p.countAnterior > 0 
+            ? Math.round(((p.count24h - p.countAnterior) / p.countAnterior) * 100) 
+            : (p.count24h > 0 ? 100 : 0);
+          const tendencia: 'up' | 'down' | 'stable' = percentual > 0 ? 'up' : percentual < 0 ? 'down' : 'stable';
+          
+          return {
+            id: p.id,
+            titulo: truncarTexto(p.titulo, 18),
+            acessos: p.count,
+            percentual: Math.abs(percentual),
+            tendencia,
+          };
+        });
+
+      // Processar conteúdo mais salvo (favoritos)
+      const favoritosCount: Record<string, { id: string; tipo: string; count: number }> = {};
+      if (favoritosResult.data) {
+        favoritosResult.data.forEach((item: any) => {
+          const key = `${item.tipo}:${item.item_id}`;
+          if (!favoritosCount[key]) {
+            favoritosCount[key] = { id: item.item_id, tipo: item.tipo, count: 0 };
+          }
+          favoritosCount[key].count++;
+        });
+      }
+      
+      const topFavoritoRaw = Object.values(favoritosCount)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 1)[0];
+
+      let topSalvos: TopSalvo[] = [];
+      if (topFavoritoRaw) {
+        // Buscar título do item mais salvo
+        let titulo = "Conteúdo";
+        if (topFavoritoRaw.tipo === "video") {
+          const { data } = await supabase.from("videos").select("titulo").eq("id", topFavoritoRaw.id).single();
+          titulo = data?.titulo || "Vídeo";
+        } else if (topFavoritoRaw.tipo === "prompt") {
+          const { data } = await supabase.from("biblioteca_prompts").select("titulo").eq("id", topFavoritoRaw.id).single();
+          titulo = data?.titulo || "Prompt";
+        } else if (topFavoritoRaw.tipo === "ferramenta") {
+          const { data } = await supabase.from("ferramentas_ia").select("nome").eq("id", topFavoritoRaw.id).single();
+          titulo = data?.nome || "Ferramenta";
+        } else if (topFavoritoRaw.tipo === "ia_copie_use") {
+          const { data } = await supabase.from("ia_copie_use").select("titulo").eq("id", topFavoritoRaw.id).single();
+          titulo = data?.titulo || "IA Copie e Use";
+        }
+        
+        topSalvos = [{
+          id: topFavoritoRaw.id,
+          titulo: truncarTexto(titulo, 18),
+          tipo: topFavoritoRaw.tipo,
+          salvamentos: topFavoritoRaw.count,
+        }];
+      }
+
+      return { topAlunos, topAulas, topFerramentas, topPrompts, topSalvos };
     },
   });
 
@@ -142,6 +251,16 @@ export function useDashboardRanking() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'ferramentas_ia' },
+        () => queryClient.invalidateQueries({ queryKey: ['dashboard-ranking'] })
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'content_access_logs' },
+        () => queryClient.invalidateQueries({ queryKey: ['dashboard-ranking'] })
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'favoritos' },
         () => queryClient.invalidateQueries({ queryKey: ['dashboard-ranking'] })
       )
       .subscribe();
