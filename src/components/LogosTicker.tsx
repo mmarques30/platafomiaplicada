@@ -15,7 +15,7 @@ const logos = [
   { id: 5, image: gptPilotLogo, alt: "GPT Pilot" },
   { id: 6, image: chatgptLogo, alt: "ChatGPT" },
   { id: 7, image: tangoLogo, alt: "Tango" },
-];
+] as const;
 
 // Duplicar 3x para loop infinito suave
 const triplicatedLogos = [...logos, ...logos, ...logos];
@@ -39,10 +39,17 @@ export function LogosTicker() {
             key={`${logo.id}-${index}`}
             className="w-[160px] h-11 flex-shrink-0 flex items-center justify-center"
           >
+            {/* Logo escura - visível no modo claro */}
             <img 
               src={logo.image} 
               alt={logo.alt}
-              className="h-11 w-auto object-contain grayscale brightness-0 dark:brightness-100 dark:invert"
+              className="h-11 w-auto object-contain grayscale brightness-0 dark:hidden"
+            />
+            {/* Logo clara - visível no modo escuro */}
+            <img 
+              src={logo.image} 
+              alt={logo.alt}
+              className="h-11 w-auto object-contain grayscale hidden dark:block dark:invert"
             />
           </div>
         ))}
