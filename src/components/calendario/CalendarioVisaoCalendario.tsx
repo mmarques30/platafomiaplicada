@@ -14,18 +14,21 @@ const tipoEventoConfig = {
     label: "Aula ao Vivo",
     color: "bg-primary",
     borderColor: "border-primary",
+    textColor: "text-primary",
     icon: Video,
   },
   qa: {
     label: "Q&A",
     color: "bg-blue-500",
     borderColor: "border-blue-500",
+    textColor: "text-blue-500",
     icon: HelpCircle,
   },
   outro: {
     label: "Outro",
-    color: "bg-muted-foreground",
-    borderColor: "border-muted-foreground",
+    color: "bg-orange-500",
+    borderColor: "border-orange-500",
+    textColor: "text-orange-500",
     icon: CalendarIcon,
   },
 };
@@ -86,22 +89,22 @@ export function CalendarioVisaoCalendario() {
   return (
     <div className="w-full">
       {/* Legenda */}
-      <div className="flex flex-wrap gap-4 mb-6 justify-center">
+      <div className="flex flex-wrap gap-6 mb-8 justify-center">
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-primary" />
-          <span className="text-sm text-muted-foreground">Aula ao Vivo</span>
+          <span className="w-4 h-4 rounded-full bg-primary ring-2 ring-primary/30" />
+          <span className="text-sm font-medium text-foreground">Aula ao Vivo</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-blue-500" />
-          <span className="text-sm text-muted-foreground">Q&A</span>
+          <span className="w-4 h-4 rounded-full bg-blue-500 ring-2 ring-blue-500/30" />
+          <span className="text-sm font-medium text-foreground">Q&A</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Outro</span>
+          <span className="w-4 h-4 rounded-full bg-orange-500 ring-2 ring-orange-500/30" />
+          <span className="text-sm font-medium text-foreground">Outro</span>
         </div>
       </div>
 
-      <Card className="p-4 md:p-8">
+      <Card className="p-4 md:p-8 border-2 border-border/50 shadow-lg bg-card">
         <Calendar
           mode="single"
           selected={selectedDate}
@@ -113,21 +116,21 @@ export function CalendarioVisaoCalendario() {
             month: "space-y-4 w-full",
             table: "w-full border-collapse",
             head_row: "flex w-full",
-            head_cell: "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] text-center",
+            head_cell: "text-foreground/70 rounded-md flex-1 font-medium text-[0.8rem] text-center uppercase tracking-wide",
             row: "flex w-full mt-2",
             cell: "h-12 md:h-16 flex-1 text-center text-base p-0 relative flex items-center justify-center focus-within:relative focus-within:z-20",
-            day: "h-10 w-10 md:h-14 md:w-14 p-0 font-normal aria-selected:opacity-100 hover:bg-accent rounded-md transition-colors",
-            day_selected: "bg-transparent ring-2 ring-offset-2 ring-offset-background ring-primary/70 text-foreground",
-            day_today: "bg-accent text-accent-foreground",
-            day_outside: "text-muted-foreground opacity-50",
-            day_disabled: "text-muted-foreground opacity-50",
+            day: "h-10 w-10 md:h-14 md:w-14 p-0 font-medium aria-selected:opacity-100 hover:bg-primary/20 rounded-md transition-colors text-foreground",
+            day_selected: "bg-primary/20 ring-2 ring-offset-2 ring-offset-background ring-primary text-foreground font-bold",
+            day_today: "bg-primary text-primary-foreground font-bold",
+            day_outside: "text-muted-foreground opacity-40",
+            day_disabled: "text-muted-foreground opacity-40",
             day_hidden: "invisible",
             nav: "space-x-1 flex items-center",
-            nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+            nav_button: "h-8 w-8 bg-transparent p-0 hover:bg-primary/20 rounded-md transition-colors text-foreground",
             nav_button_previous: "absolute left-1",
             nav_button_next: "absolute right-1",
             caption: "flex justify-center pt-1 relative items-center",
-            caption_label: "text-sm font-medium",
+            caption_label: "text-base font-semibold text-foreground",
           }}
           modifiers={{
             aulaAoVivo: aulasAoVivo,
@@ -135,9 +138,9 @@ export function CalendarioVisaoCalendario() {
             outro: outrosEventos,
           }}
           modifiersClassNames={{
-            aulaAoVivo: "border-2 border-primary font-semibold text-foreground",
-            qa: "border-2 border-blue-500 font-semibold text-foreground",
-            outro: "border-2 border-muted-foreground font-semibold text-foreground",
+            aulaAoVivo: "border-2 border-primary font-bold text-foreground bg-primary/10",
+            qa: "border-2 border-blue-500 font-bold text-foreground bg-blue-500/10",
+            outro: "border-2 border-orange-500 font-bold text-foreground bg-orange-500/10",
           }}
         />
       </Card>

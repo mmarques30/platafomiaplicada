@@ -103,10 +103,10 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium transition-colors",
-              isActive ? "text-white" : "text-white/60 hover:text-white"
+              isActive ? "text-primary" : "text-white/60 hover:text-white"
             )}
           >
-            Início
+            Página Inicial
           </NavLink>
           
           <DropdownMenu>
@@ -115,10 +115,10 @@ export function TopHeader() {
                 variant="ghost" 
                 className={cn(
                   "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                  isCursosActive ? "text-white" : "text-white/60 hover:text-white"
+                  isCursosActive ? "text-primary" : "text-white/60 hover:text-white"
                 )}
               >
-                Meus Cursos
+                Cursos
                 <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
               </Button>
             </DropdownMenuTrigger>
@@ -165,10 +165,10 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isFerramentasActive ? "text-white" : "text-white/60 hover:text-white"
+                    isFerramentasActive ? "text-primary" : "text-white/60 hover:text-white"
                   )}
                 >
-                  Ferramentas
+                  Bibliotecas
                   <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
                 </Button>
               </DropdownMenuTrigger>
