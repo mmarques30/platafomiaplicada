@@ -1,5 +1,5 @@
 import { useDashboardRanking } from "@/hooks/useDashboardRanking";
-import { Trophy, PlayCircle, Wrench, TrendingUp, TrendingDown, Star, Minus } from "lucide-react";
+import { Trophy, PlayCircle, Wrench, TrendingUp, TrendingDown, Star, Minus, FileText, Bookmark } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function RankingTicker() {
@@ -20,17 +20,16 @@ export function RankingTicker() {
   const topAluno = data?.topAlunos[0];
   const topAula = data?.topAulas[0];
   const topFerramenta = data?.topFerramentas[0];
+  const topPrompt = data?.topPrompts?.[0];
+  const topSalvo = data?.topSalvos?.[0];
 
   return (
     <section className="rounded-lg bg-[#E9EBC6] p-3 sm:p-4 shadow-sm">
-      {/* Título e subtítulo */}
+      {/* Título */}
       <div className="mb-2 sm:mb-3">
         <h2 className="text-base sm:text-xl md:text-2xl font-bold text-[#0D0D0D]">
           Destaques
         </h2>
-        <p className="text-xs sm:text-sm text-[#2F302B] mt-0.5">
-          Fique por dentro das novidades e aplique hoje
-        </p>
       </div>
 
       {/* Métricas */}
@@ -72,8 +71,34 @@ export function RankingTicker() {
           />
         )}
 
+        {/* Separador */}
+        {topPrompt && <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />}
+
+        {/* Top Prompt */}
+        {topPrompt && (
+          <RankingItem
+            icon={FileText}
+            label={topPrompt.titulo}
+            value={topPrompt.acessos}
+            percentual={topPrompt.percentual}
+            tendencia={topPrompt.tendencia}
+          />
+        )}
+
+        {/* Separador */}
+        {topSalvo && <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />}
+
+        {/* Conteúdo Mais Salvo */}
+        {topSalvo && (
+          <RankingItem
+            icon={Bookmark}
+            label={topSalvo.titulo}
+            value={topSalvo.salvamentos}
+          />
+        )}
+
         {/* Mensagem quando não há dados */}
-        {!topAluno && !topAula && !topFerramenta && (
+        {!topAluno && !topAula && !topFerramenta && !topPrompt && !topSalvo && (
           <span className="text-xs text-[#0D0D0D]/60">
             Nenhum destaque disponível ainda
           </span>
