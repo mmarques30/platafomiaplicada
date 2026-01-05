@@ -59,6 +59,11 @@ export function VideoCardVertical({
           </div>
         </div>
       </div>
+      
+      {/* Título do vídeo */}
+      <p className="mt-2 text-xs italic text-[#0D0D0D] dark:text-white/70 line-clamp-2 px-1">
+        {titulo}
+      </p>
     </Link>
   );
 }
