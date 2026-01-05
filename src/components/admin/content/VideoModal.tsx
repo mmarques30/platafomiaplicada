@@ -87,9 +87,9 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Aumentado limite para 5MB
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Imagem muito grande. Máximo 5MB");
+      // Aumentado limite para 15MB
+      if (file.size > 15 * 1024 * 1024) {
+        toast.error("Imagem muito grande. Máximo 15MB");
         setThumbnailFile(null);
         setThumbnailPreview("");
         return;
@@ -325,7 +325,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
                 </p>
               )}
               <p className="text-xs text-muted-foreground">
-                Formato horizontal recomendado (16:9), máximo 5MB
+                Formato horizontal recomendado (16:9), máximo 15MB
               </p>
             </div>
           </div>
