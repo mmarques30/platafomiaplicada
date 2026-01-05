@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => ({
         'logo-simbolo.png',
         'logo-marca-completa.png',
         'logo-marca-completa-clara.png',
+        'logo-marca-completa-escura.png',
         'logo-mariana.png',
         'logo-3d.png',
         'apple-touch-icon-180.png',

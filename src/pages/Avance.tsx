@@ -5,16 +5,19 @@ import { ArrowLeft, Check, Sparkles, TrendingUp, Target, Lightbulb, Workflow } f
 import { useNavigate } from "react-router-dom";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useButtonClickLogger } from "@/hooks/useButtonClickLogger";
+import { useTheme } from "next-themes";
 
 // Usar caminhos estáticos para evitar problemas de cache no PWA
-const logoCompleta = "/logo-marca-completa-clara.png";
 const backgroundSymbol = "/background-symbol.png";
 
 export default function Avance() {
   const navigate = useNavigate();
   const { plan } = useUserPlan();
   const { logClick } = useButtonClickLogger();
-  
+  const { theme } = useTheme();
+  const logoCompleta = theme === 'dark' 
+    ? "/logo-marca-completa-escura.png" 
+    : "/logo-marca-completa.png";
   return (
     <div className="h-screen overflow-y-auto relative bg-background">
       {/* Background com logo 4 pétalas transparente */}
