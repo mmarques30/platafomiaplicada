@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-// Usar caminho estático para garantir carregamento no PWA
-const logoMariana = "/logo-mariana.png";
+// Usar caminho estático com cache-busting para garantir carregamento no PWA
+const logoMariana = "/logo-mariana.png?v=7";
 
 export function MarIAnaFloatingButton() {
   const navigate = useNavigate();
