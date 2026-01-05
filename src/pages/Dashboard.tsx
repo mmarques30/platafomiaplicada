@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { PendenciasOnboarding } from "@/components/dashboard/PendenciasOnboarding";
+import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -84,6 +85,9 @@ export default function Dashboard() {
 
         {/* Card de Pendências (apenas mentorados) */}
         {!isVisitante && <PendenciasOnboarding />}
+
+        {/* Central de Conteúdo Interativa */}
+        {!isVisitante && <CentralConteudo />}
 
         {/* Novidades da Semana */}
         <section>
