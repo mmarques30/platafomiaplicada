@@ -173,22 +173,13 @@ export default function Auth() {
           <Tabs defaultValue="entrar" className="w-full">
             {/* Aba Entrar */}
             <TabsContent value="entrar" className="mt-0">
-              {/* Logo pequena centralizada */}
+              {/* Logo simples centralizada */}
               <div className="flex justify-center mb-6">
                 <img 
-                  src="/logo-marca-completa-clara.png" 
+                  src="/logo-simbolo-simples.png" 
                   alt="IAplicada" 
-                  className="h-10 w-auto"
+                  className="h-16 w-auto"
                 />
-              </div>
-
-              <div className="space-y-2 mb-6 text-center">
-                <h1 className="text-2xl md:text-3xl font-semibold text-white">
-                  Bem-vindo de volta
-                </h1>
-                <p className="text-white/60 text-sm">
-                  Entre com seu email e senha para acessar
-                </p>
               </div>
 
               {/* Tabs abaixo do subtítulo */}
@@ -237,7 +228,7 @@ export default function Auth() {
                 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-[#9EB038] hover:bg-[#8a9a31] text-white font-medium rounded-lg transition-all mt-4" 
+                  className="w-full h-12 bg-[#1a1a1a] hover:bg-[#2a2a2a] text-white font-medium rounded-lg transition-all mt-4 border border-white/10" 
                   disabled={isLoading}
                 >
                   {isLoading ? "Acessando..." : "Acessar"}
@@ -249,12 +240,12 @@ export default function Auth() {
 
             {/* Aba Criar Conta */}
             <TabsContent value="criar-conta" className="mt-0">
-              {/* Logo pequena centralizada */}
+              {/* Logo simples centralizada */}
               <div className="flex justify-center mb-6">
                 <img 
-                  src="/logo-marca-completa-clara.png" 
+                  src="/logo-simbolo-simples.png" 
                   alt="IAplicada" 
-                  className="h-10 w-auto"
+                  className="h-16 w-auto"
                 />
               </div>
 
