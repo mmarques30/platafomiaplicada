@@ -52,7 +52,7 @@ export function CentralConteudo() {
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="flex items-center gap-2 text-foreground/70 data-[state=active]:bg-aplicada-green-700 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg px-4 py-2.5 transition-all duration-200"
+                className="flex items-center gap-2 text-foreground/70 data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg px-4 py-2.5 transition-all duration-200"
               >
                 <tab.icon className="w-4 h-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
