@@ -1,20 +1,14 @@
 import { motion } from "framer-motion";
-import notionLogo from "@/assets/logos/notion-logo.webp";
-import claudeLogo from "@/assets/logos/claude-logo.png";
-import manusLogo from "@/assets/logos/manus-logo.png";
-import lovableLogo from "@/assets/logos/lovable-logo.png";
-import gptPilotLogo from "@/assets/logos/gpt-pilot-logo.png";
-import chatgptLogo from "@/assets/logos/chatgpt-logo.png";
-import tangoLogo from "@/assets/logos/tango-logo.png";
 
+// Usar caminhos estáticos para garantir carregamento no PWA
 const logos = [
-  { id: 1, image: notionLogo, alt: "Notion" },
-  { id: 2, image: claudeLogo, alt: "Claude" },
-  { id: 3, image: manusLogo, alt: "Manus" },
-  { id: 4, image: lovableLogo, alt: "Lovable" },
-  { id: 5, image: gptPilotLogo, alt: "GPT Pilot" },
-  { id: 6, image: chatgptLogo, alt: "ChatGPT" },
-  { id: 7, image: tangoLogo, alt: "Tango" },
+  { id: 1, image: "/logos/notion-logo.png", alt: "Notion" },
+  { id: 2, image: "/logos/claude-logo.png", alt: "Claude" },
+  { id: 3, image: "/logos/manus-logo.png", alt: "Manus" },
+  { id: 4, image: "/logos/lovable-logo.png", alt: "Lovable" },
+  { id: 5, image: "/logos/gpt-pilot-logo.png", alt: "GPT Pilot" },
+  { id: 6, image: "/logos/chatgpt-logo.png", alt: "ChatGPT" },
+  { id: 7, image: "/logos/tango-logo.png", alt: "Tango" },
 ] as const;
 
 // Duplicar 3x para loop infinito suave
@@ -47,8 +41,15 @@ export function LogosTicker() {
               decoding="async"
               className="h-11 w-auto object-contain grayscale brightness-0 dark:hidden"
               onError={(e) => {
-                const target = e.currentTarget;
-                target.style.display = 'none';
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  e.currentTarget.style.display = 'none';
+                  // Mostrar nome da ferramenta como fallback
+                  const fallback = document.createElement('span');
+                  fallback.className = 'text-sm font-medium text-muted-foreground';
+                  fallback.textContent = logo.alt;
+                  parent.appendChild(fallback);
+                }
               }}
             />
             {/* Logo clara - visível no modo escuro */}
@@ -59,8 +60,7 @@ export function LogosTicker() {
               decoding="async"
               className="h-11 w-auto object-contain grayscale hidden dark:block dark:invert"
               onError={(e) => {
-                const target = e.currentTarget;
-                target.style.display = 'none';
+                e.currentTarget.style.display = 'none';
               }}
             />
           </div>

@@ -91,6 +91,7 @@ export default function Instalar() {
               src={logoSimbolo} 
               alt="IAplicada" 
               className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           </div>
           <h1 className="text-2xl md:text-3xl font-bold mb-2">

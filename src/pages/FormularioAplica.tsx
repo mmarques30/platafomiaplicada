@@ -14,8 +14,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { supabase } from "@/integrations/supabase/client";
 import type { Pergunta, Secao } from "@/types/pesquisas";
-import logoMarca from "@/assets/logo-aplicada-marca-completa.png";
-import backgroundSymbolSoft from "@/assets/logos/background-symbol-soft.png";
+
+// Usar caminhos estáticos para evitar problemas de cache no PWA
+const logoMarca = "/logo-marca-completa.png";
+const backgroundSymbolSoft = "/background-symbol-soft.png";
 
 const STORAGE_KEY = "pesquisa_formulario-aplica_draft";
 const AUTO_SAVE_DELAY = 2000;
@@ -441,7 +443,7 @@ export default function FormularioAplica() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-2xl w-full bg-card/95 backdrop-blur-sm border border-primary/20 shadow-lg">
           <CardHeader className="text-center pb-4">
-            <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" />
+            <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
             <CardTitle className="text-2xl md:text-3xl text-foreground">
               {pesquisa?.titulo}
             </CardTitle>
@@ -477,7 +479,7 @@ export default function FormularioAplica() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-2xl w-full bg-card/95 backdrop-blur-sm border border-primary/20 shadow-lg text-center">
           <CardHeader className="pb-4">
-            <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" />
+            <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
             <div className="w-16 h-16 bg-[#9EB038]/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="h-8 w-8 text-[#9EB038]" />
             </div>
