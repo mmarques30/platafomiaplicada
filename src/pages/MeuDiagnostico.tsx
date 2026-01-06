@@ -16,6 +16,7 @@ import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function MeuDiagnostico() {
   const navigate = useNavigate();
@@ -57,9 +58,7 @@ export default function MeuDiagnostico() {
     <div className="min-h-screen bg-background">
       <main className="container py-6 space-y-8">
         {/* Header */}
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">
-          Meu <span className="text-primary">Diagnóstico</span>
-        </h1>
+        <PageTitle primary="Meu" secondary="Diagnóstico" />
 
         {/* Loading State */}
         {isLoading ? (
