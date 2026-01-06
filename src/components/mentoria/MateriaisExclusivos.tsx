@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, ExternalLink, Search, FolderLock, Sparkles } from "lucide-react";
+import { FileText, Download, ExternalLink, Search, Sparkles } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface BonusMentoria {
@@ -71,10 +71,7 @@ export function MateriaisExclusivos() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <FolderLock className="h-5 w-5 text-primary" />
-            Materiais Exclusivos
-          </h2>
+          <h2 className="text-xl font-semibold">Materiais Exclusivos</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Templates, frameworks e recursos exclusivos da mentoria
           </p>
