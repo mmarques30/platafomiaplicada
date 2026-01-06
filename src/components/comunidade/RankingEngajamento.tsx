@@ -51,17 +51,6 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
 
   return (
     <div className="space-y-6">
-      {/* Sobre a Premiação - Topo, discreta, sem ícones */}
-      <div className="bg-card rounded-xl p-4 border border-primary/20">
-        <h3 className="text-sm font-semibold mb-2">Sobre a Premiação</h3>
-        <p className="text-sm text-muted-foreground mb-3">
-          Todo mês, o membro mais engajado é premiado com acesso especial ou sessões de mentoria exclusivas.
-        </p>
-        <p className="text-xs text-muted-foreground">
-          <span className="font-medium">Como pontuar:</span> Criar post (20pts) • Comentar (5pts) • Dar like (2pts) • Receber like (10pts) • Dia ativo (1pt)
-        </p>
-      </div>
-
       {/* Top 3 - Cards horizontais lado a lado */}
       {top3.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
