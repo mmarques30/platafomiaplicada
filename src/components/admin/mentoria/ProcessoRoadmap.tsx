@@ -82,32 +82,36 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
   return (
     <div className="space-y-6">
 
-      {/* Timeline Visual - Rota com Pins */}
-      <Card className="overflow-hidden">
+      {/* Timeline Visual - Card com Branding */}
+      <Card className="overflow-hidden bg-[#E9EBC6] border-[#E9EBC6]/50">
         <CardContent className="p-6">
           {/* Barra de Progresso principal */}
-          <div className="mb-4 flex items-center gap-4">
-            <Progress value={progressoGeral} className="h-2 flex-1" />
-            <span className="text-lg font-bold text-primary">{progressoGeral}%</span>
+          <div className="mb-6 flex items-center gap-4">
+            <div className="flex-1 bg-[#0D0D0D]/20 rounded-full h-3 overflow-hidden">
+              <div 
+                className="h-full bg-[#0D0D0D] rounded-full transition-all duration-500"
+                style={{ width: `${progressoGeral}%` }}
+              />
+            </div>
+            <span className="text-lg font-bold text-[#0D0D0D]">{progressoGeral}%</span>
           </div>
 
           {/* Timeline horizontal */}
-          <div className="relative py-8">
+          <div className="relative py-6">
             {/* Linha de fundo */}
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-muted/50 rounded-full -translate-y-1/2" />
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#0D0D0D]/20 rounded-full -translate-y-1/2" />
             
             {/* Linha de progresso */}
             <div 
-              className="absolute top-1/2 left-0 h-1 bg-primary rounded-full -translate-y-1/2 transition-all duration-500"
+              className="absolute top-1/2 left-0 h-1 bg-[#0D0D0D] rounded-full -translate-y-1/2 transition-all duration-500"
               style={{ width: `${progressoGeral}%` }}
             />
 
-            {/* Pins das fases */}
+            {/* Pins das fases - Círculos numerados */}
             <div className="relative flex justify-between">
               {fases.map((fase, index) => {
                 const isConcluida = fase.status === "concluida";
                 const isAtual = fase.status === "em_andamento";
-                const isPendente = fase.status === "pendente";
                 
                 return (
                   <div 
@@ -115,40 +119,19 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
                     className="flex flex-col items-center relative"
                     style={{ width: `${100 / fases.length}%` }}
                   >
-                    {/* Pin - Logo diretamente */}
-                    <img 
-                      src={logoSimbolo} 
-                      alt="Pin" 
-                      className={cn(
-                        "relative z-10 object-contain transition-all duration-300",
-                        isConcluida && "h-10 w-10 opacity-100 drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]",
-                        isAtual && "h-12 w-12 opacity-100 drop-shadow-[0_0_14px_hsl(var(--primary)/0.8)] scale-110",
-                        isPendente && "h-8 w-8 opacity-70"
-                      )}
-                    />
-
-                    {/* Número da fase */}
-                    <span className={cn(
-                      "mt-2 text-xs font-medium",
-                      isConcluida && "text-primary",
-                      isAtual && "text-primary font-bold",
-                      isPendente && "text-muted-foreground/60"
+                    {/* Círculo numerado */}
+                    <div className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all relative z-10",
+                      isConcluida && "bg-green-600 text-white",
+                      isAtual && "bg-[#0D0D0D] text-white ring-4 ring-[#0D0D0D]/30 scale-110",
+                      !isConcluida && !isAtual && "bg-white/60 text-[#0D0D0D]/60 border-2 border-[#0D0D0D]/20"
                     )}>
                       {fase.fase_numero}
-                    </span>
-
-                    {/* Indicador "Você está aqui" */}
-                    {isAtual && (
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                        <Badge className="bg-primary text-white shadow-lg animate-bounce">
-                          Você está aqui
-                        </Badge>
-                      </div>
-                    )}
+                    </div>
 
                     {/* Bandeira de chegada na última fase */}
                     {index === fases.length - 1 && isConcluida && (
-                      <Flag className="absolute -top-6 h-5 w-5 text-green-500" />
+                      <Flag className="absolute -top-4 h-5 w-5 text-green-600" />
                     )}
                   </div>
                 );
@@ -156,23 +139,23 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
             </div>
           </div>
 
-          {/* Stats rápidas */}
-          <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-500">{fasesConcluidas}</div>
-              <div className="text-xs text-muted-foreground">Concluídas</div>
+          {/* Stats rápidas - Cards brancos */}
+          <div className="grid grid-cols-3 gap-3 mt-6">
+            <div className="text-center bg-white/70 rounded-lg py-3 px-2">
+              <div className="text-2xl font-bold text-green-600">{fasesConcluidas}</div>
+              <div className="text-xs text-[#0D0D0D]/60 font-medium">Concluídas</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">
+            <div className="text-center bg-white/70 rounded-lg py-3 px-2">
+              <div className="text-2xl font-bold text-[#0D0D0D]">
                 {faseAtual ? faseAtual.fase_numero : "-"}
               </div>
-              <div className="text-xs text-muted-foreground">Fase Atual</div>
+              <div className="text-xs text-[#0D0D0D]/60 font-medium">Fase Atual</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-amber-500">
+            <div className="text-center bg-white/70 rounded-lg py-3 px-2">
+              <div className="text-2xl font-bold text-amber-600">
                 {fases.length - fasesConcluidas - (faseAtual ? 1 : 0)}
               </div>
-              <div className="text-xs text-muted-foreground">Restantes</div>
+              <div className="text-xs text-[#0D0D0D]/60 font-medium">Restantes</div>
             </div>
           </div>
         </CardContent>
