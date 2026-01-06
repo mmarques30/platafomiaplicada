@@ -48,7 +48,7 @@ export default function Comunidade() {
               </TabsList>
 
               <TabsContent value="feed" className="mt-0">
-                <div className="bg-[#0D0D0D]/60 rounded-xl border border-neutral-800 overflow-hidden">
+                <div className="bg-card rounded-xl border overflow-hidden">
                   <CommunityFeed />
                 </div>
               </TabsContent>

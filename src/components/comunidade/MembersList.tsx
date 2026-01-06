@@ -19,12 +19,12 @@ export function MembersList() {
     return (
       <div className="space-y-0">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="border-b border-neutral-800 p-4 animate-pulse">
+          <div key={i} className="border-b p-4 animate-pulse">
             <div className="flex gap-3">
-              <div className="h-12 w-12 rounded-full bg-neutral-800" />
+              <div className="h-12 w-12 rounded-full bg-muted" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-1/3 bg-neutral-800 rounded" />
-                <div className="h-3 w-1/4 bg-neutral-800 rounded" />
+                <div className="h-4 w-1/3 bg-muted rounded" />
+                <div className="h-3 w-1/4 bg-muted rounded" />
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@ export function MembersList() {
         </div>
       ) : (
         <>
-          <div className="divide-y divide-neutral-800 bg-[#0D0D0D]/60 rounded-xl border border-neutral-800 overflow-hidden">
+          <div className="divide-y bg-card rounded-xl border overflow-hidden">
             {displayedMembers.map((member) => (
               <MemberCard key={member.id} member={member} />
             ))}

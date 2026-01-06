@@ -35,10 +35,10 @@ export function CommunitySidebar() {
   return (
     <div className="sticky top-6 space-y-4">
       {/* Top 3 Card */}
-      <div className="bg-[#0D0D0D] rounded-xl border border-primary/20 p-4">
+      <div className="bg-card rounded-xl border border-primary/20 p-4">
         <div className="flex items-center gap-2 mb-4">
           <Trophy className="w-4 h-4 text-primary" />
-          <h3 className="text-sm font-semibold text-white">Top 3 do Mês</h3>
+          <h3 className="text-sm font-semibold">Top 3 do Mês</h3>
         </div>
 
         <div className="space-y-3">
@@ -59,7 +59,7 @@ export function CommunitySidebar() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
+                <p className="text-sm font-medium truncate">
                   {member.nome_completo.split(" ")[0]}
                 </p>
                 <p className="text-xs text-primary">{member.total_pontos} pts</p>
@@ -73,16 +73,16 @@ export function CommunitySidebar() {
       </div>
 
       {/* Community Stats Card */}
-      <div className="bg-[#0D0D0D] rounded-xl border border-neutral-800 p-4">
+      <div className="bg-card rounded-xl border p-4">
         <div className="flex items-center gap-2 mb-4">
           <Users className="w-4 h-4 text-muted-foreground" />
-          <h3 className="text-sm font-semibold text-white">Comunidade</h3>
+          <h3 className="text-sm font-semibold">Comunidade</h3>
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Total de membros</span>
-            <span className="text-sm font-semibold text-white">{stats.totalMembers}</span>
+            <span className="text-sm font-semibold">{stats.totalMembers}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Online agora</span>
@@ -93,7 +93,7 @@ export function CommunitySidebar() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Admins</span>
-            <span className="text-sm font-semibold text-white">{stats.adminCount}</span>
+            <span className="text-sm font-semibold">{stats.adminCount}</span>
           </div>
         </div>
       </div>

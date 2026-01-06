@@ -45,7 +45,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
   const mediaCount = mediaItems.length;
 
   return (
-    <article className="border-b border-neutral-800 p-4 hover:bg-neutral-800/30 transition-colors">
+    <article className="border-b p-4 hover:bg-muted/30 transition-colors">
       <div className="flex gap-3">
         {/* Avatar */}
         <Avatar className="h-10 w-10 flex-shrink-0">
@@ -62,7 +62,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           {/* Header */}
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-1 flex-wrap">
-              <span className="font-semibold text-white hover:underline cursor-pointer">
+              <span className="font-semibold hover:underline cursor-pointer">
                 {post.profiles.nome_completo}
               </span>
               <span className="text-muted-foreground text-sm">
@@ -97,7 +97,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
 
           {/* Post Title */}
           {post.title && (
-            <h3 className="text-lg font-semibold text-white mt-1">{post.title}</h3>
+            <h3 className="text-lg font-semibold mt-1">{post.title}</h3>
           )}
 
           {/* Content + Image Layout */}
@@ -136,8 +136,8 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
 
             {/* Single Image - Lateral (tamanho médio) */}
             {mediaCount === 1 && (
-              <div className="mt-3 sm:mt-0 flex-shrink-0 sm:w-72">
-                <div className="rounded-xl overflow-hidden border border-neutral-800 bg-neutral-900 flex items-center justify-center">
+              <div className="mt-3 sm:mt-0 flex-shrink-0 sm:w-72 border border-border rounded-xl overflow-hidden">
+                <div className="bg-muted flex items-center justify-center">
                   <img
                     src={mediaItems[0].url}
                     alt=""
@@ -153,7 +153,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           {mediaCount >= 2 && (
             <div
               className={cn(
-                "mt-3 rounded-2xl overflow-hidden border border-neutral-800",
+                "mt-3 rounded-2xl overflow-hidden border",
                 mediaCount === 2 && "grid grid-cols-2 gap-0.5 max-h-72",
                 mediaCount === 3 && "grid grid-cols-2 gap-0.5 max-h-72",
                 mediaCount >= 4 && "grid grid-cols-2 gap-0.5 max-h-72"
@@ -163,7 +163,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
                   <div
                     key={idx}
                     className={cn(
-                      "relative overflow-hidden bg-neutral-900",
+                      "relative overflow-hidden bg-muted",
                     mediaCount === 2 && "h-40",
                     mediaCount === 3 && idx === 0 && "row-span-2",
                     mediaCount === 3 && idx > 0 && "h-[calc(50%-1px)]",
@@ -219,7 +219,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
 
           {/* Comments Section */}
           {showComments && (
-            <div className="mt-4 pt-4 border-t border-neutral-800">
+            <div className="mt-4 pt-4 border-t">
               <PostComments postId={post.id} />
             </div>
           )}

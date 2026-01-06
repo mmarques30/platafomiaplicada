@@ -1,10 +1,20 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { 
+  Route, 
+  ClipboardCheck, 
+  FolderKanban, 
+  Calendar, 
+  ListTodo, 
+  BookOpen, 
+  HelpCircle 
+} from "lucide-react";
 
 interface NavOption {
   title: string;
   description: string;
   path: string;
+  icon: React.ElementType;
 }
 
 export function NavegacaoRapida() {
@@ -13,62 +23,76 @@ export function NavegacaoRapida() {
   const navOptions: NavOption[] = [
     {
       title: "Meu Processo",
-      description: "Roadmap de fases e progresso",
-      path: "/mentoria/processo"
+      description: "Roadmap de fases",
+      path: "/mentoria/processo",
+      icon: Route,
     },
     {
       title: "Diagnóstico",
       description: "Seu perfil e análise",
-      path: "/mentoria/diagnostico"
+      path: "/mentoria/diagnostico",
+      icon: ClipboardCheck,
     },
     {
-      title: "Projetos e Entregas",
-      description: "Acompanhe suas entregas",
-      path: "/mentoria/projetos"
+      title: "Projetos",
+      description: "Suas entregas",
+      path: "/mentoria/projetos",
+      icon: FolderKanban,
     },
     {
       title: "Sessões",
-      description: "Calendário de sessões",
-      path: "/mentoria/sessoes"
+      description: "Calendário",
+      path: "/mentoria/sessoes",
+      icon: Calendar,
     },
     {
       title: "Tarefas",
-      description: "Lista de afazeres",
-      path: "/mentoria/tarefas"
+      description: "Afazeres",
+      path: "/mentoria/tarefas",
+      icon: ListTodo,
     },
     {
       title: "Materiais",
-      description: "Recursos disponíveis",
-      path: "/mentoria/recursos"
+      description: "Recursos",
+      path: "/mentoria/recursos",
+      icon: BookOpen,
     },
     {
       title: "Dúvidas",
-      description: "Tire suas dúvidas",
-      path: "/mentoria/duvidas"
-    }
+      description: "Tire dúvidas",
+      path: "/mentoria/duvidas",
+      icon: HelpCircle,
+    },
   ];
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Navegação Rápida</h2>
-      <div className="flex flex-col gap-3">
-        {navOptions.map((option) => {
-          return (
-            <Card
-              key={option.path}
-              className={`cursor-pointer transition-all hover:shadow-md border-2 hover:border-primary/50 h-20 ${
-                option.title === "Meu Processo" ? "border-primary/30 bg-primary/5" : ""
-              }`}
-              onClick={() => navigate(option.path)}
-            >
-              <CardContent className="p-4 flex items-center justify-between h-full">
-                <h3 className="font-semibold text-base">{option.title}</h3>
-                <p className="text-sm text-muted-foreground">{option.description}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
+    <Card className="h-full">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg">Acesso Rápido</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+          {navOptions.map((option) => {
+            const Icon = option.icon;
+            return (
+              <button
+                key={option.path}
+                onClick={() => navigate(option.path)}
+                className="flex flex-col items-center gap-2 p-3 rounded-lg border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 group"
+              >
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Icon className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-medium text-foreground leading-tight">
+                    {option.title}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

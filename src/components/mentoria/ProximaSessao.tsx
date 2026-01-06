@@ -12,8 +12,8 @@ export function ProximaSessao() {
 
   if (isLoading) {
     return (
-      <Card className="h-full min-h-[400px]">
-        <CardHeader>
+      <Card className="h-full">
+        <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="space-y-2 flex-1">
               <div className="h-5 w-32 bg-muted animate-pulse rounded" />
@@ -38,11 +38,11 @@ export function ProximaSessao() {
 
   if (!proximaSessao) {
     return (
-      <Card className="h-full min-h-[400px] flex flex-col">
-        <CardHeader>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3">
           <div>
-            <CardTitle className="text-xl">Próxima Sessão</CardTitle>
-            <CardDescription>Nenhuma sessão agendada</CardDescription>
+            <CardTitle className="text-lg">Próxima Sessão</CardTitle>
+            <CardDescription className="text-sm">Nenhuma sessão agendada</CardDescription>
           </div>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col">
@@ -82,12 +82,12 @@ export function ProximaSessao() {
   }
 
   return (
-    <Card className="h-full min-h-[400px] flex flex-col">
-      <CardHeader>
+    <Card className="h-full flex flex-col">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl">Próxima Sessão</CardTitle>
-            <CardDescription>{proximaSessao.titulo}</CardDescription>
+            <CardTitle className="text-lg">Próxima Sessão</CardTitle>
+            <CardDescription className="text-sm">{proximaSessao.titulo}</CardDescription>
           </div>
           <Badge variant={urgenciaVariant}>{urgenciaTexto}</Badge>
         </div>
