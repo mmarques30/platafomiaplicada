@@ -51,7 +51,7 @@ export default function Central() {
     : allConteudos.filter(c => c.tipo === activeTab);
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
       {/* Background Logo */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <img 
@@ -61,7 +61,7 @@ export default function Central() {
         />
       </div>
 
-      <main className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6 relative z-10">
+      <main className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6 relative z-10 flex-1 flex flex-col">
         {/* Header */}
         <div>
           <PageTitle primary="Central" secondary="de Conteúdo" />
@@ -71,7 +71,7 @@ export default function Central() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo | "todos")}>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo | "todos")} className="flex-1 flex flex-col">
           <TabsList className="grid w-full max-w-lg grid-cols-4 bg-aplicada-green-900/20 border border-aplicada-green-700/20">
             {tabs.map((tab) => (
               <TabsTrigger 
@@ -85,7 +85,7 @@ export default function Central() {
             ))}
           </TabsList>
 
-          <TabsContent value={activeTab} className="mt-6">
+          <TabsContent value={activeTab} className="mt-6 flex-1">
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
