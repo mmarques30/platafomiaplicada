@@ -101,15 +101,9 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           )}
 
           {/* Content + Image Layout */}
-          <div className={cn(
-            "mt-1",
-            mediaCount === 1 && "sm:flex sm:gap-4"
-          )}>
+          <div className="mt-1">
             {/* Post Content with Markdown links */}
-            <div className={cn(
-              "text-foreground prose prose-sm max-w-none dark:prose-invert",
-              mediaCount === 1 && "flex-1 min-w-0"
-            )}>
+            <div className="text-foreground prose prose-sm max-w-none dark:prose-invert">
               <ReactMarkdown
                 components={{
                   p: ({ children }) => (
@@ -134,14 +128,14 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
               </ReactMarkdown>
             </div>
 
-            {/* Single Image - Lateral (tamanho médio) */}
+            {/* Single Image - Abaixo (compacto) */}
             {mediaCount === 1 && (
-              <div className="mt-3 sm:mt-0 flex-shrink-0 sm:w-72 border border-border rounded-xl overflow-hidden">
+              <div className="mt-3 max-w-md border border-border rounded-xl overflow-hidden">
                 <div className="bg-muted flex items-center justify-center">
                   <img
                     src={mediaItems[0].url}
                     alt=""
-                    className="w-full h-auto max-h-64 object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                    className="w-full h-auto max-h-48 object-contain cursor-pointer hover:opacity-95 transition-opacity"
                     loading="lazy"
                   />
                 </div>
