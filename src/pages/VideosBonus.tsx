@@ -2,6 +2,7 @@ import { useState } from "react";
 import { VideosVisitante } from "@/components/dashboard/VideosVisitante";
 import { MateriaisGratuitosTab } from "@/components/comunidade/MateriaisGratuitosTab";
 import { cn } from "@/lib/utils";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 type SalaTabValue = "aula" | "materiais";
 
@@ -18,7 +19,7 @@ export default function VideosBonus() {
       <main className="container py-6 space-y-6">
         {/* Header */}
         <section>
-          <h1 className="text-3xl md:text-4xl font-bold">Sala de Aula</h1>
+          <PageTitle primary="Sala" secondary="de Aula" />
         </section>
 
         {/* Tab Navigation - X/Twitter Style */}
