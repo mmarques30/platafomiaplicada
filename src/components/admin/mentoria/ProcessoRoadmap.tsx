@@ -7,8 +7,10 @@ import { useFasesProcesso, FaseProcesso } from "@/hooks/useFasesProcesso";
 import { FaseCard } from "./FaseCard";
 import { FaseEditModal } from "./FaseEditModal";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Flag, Clock, CheckCircle2, Circle } from "lucide-react";
+import { Flag, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const logoSimbolo = "/logo-simbolo.png?v=10";
 
 interface ProcessoRoadmapProps {
   userId: string;
@@ -57,7 +59,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
     return (
       <Card className="border-dashed">
         <CardHeader className="text-center">
-          <MapPin className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
+          <img src={logoSimbolo} alt="Logo" className="h-12 w-12 mx-auto opacity-50 mb-2" />
           <CardTitle className="text-lg">Roadmap não inicializado</CardTitle>
           <p className="text-sm text-muted-foreground">
             {readonly 
@@ -68,7 +70,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
         {!readonly && (
           <CardContent className="text-center pb-6">
             <Button onClick={() => inicializarFases(userId)}>
-              <MapPin className="h-4 w-4 mr-2" />
+              <img src={logoSimbolo} alt="Logo" className="h-4 w-4 mr-2" />
               Inicializar Roadmap
             </Button>
           </CardContent>
@@ -80,19 +82,17 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
   return (
     <div className="space-y-6">
       {/* Header com título padronizado */}
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-primary/10 rounded-lg">
-          <MapPin className="h-6 w-6 text-primary" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold">
-            <span className="border-b-2 border-primary pb-0.5">Roadmap</span>
-            <span className="text-muted-foreground ml-2">do Processo</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {fasesConcluidas}/{fases.length} fases concluídas • {diasMentoria} dias em mentoria
-          </p>
-        </div>
+      <div className="space-y-1">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          <span className="relative inline-block">
+            Meu Processo
+            <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary/30 rounded-full" />
+          </span>{" "}
+          <span className="text-muted-foreground font-medium">de Mentoria</span>
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {fasesConcluidas}/{fases.length} fases concluídas • {diasMentoria} dias em mentoria
+        </p>
       </div>
 
       {/* Timeline Visual - Rota com Pins */}
@@ -106,12 +106,12 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
 
           {/* Timeline horizontal */}
           <div className="relative py-8">
-            {/* Linha de fundo */}
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-muted rounded-full -translate-y-1/2" />
+            {/* Linha de fundo - preta 0D0D0D */}
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#0D0D0D] rounded-full -translate-y-1/2" />
             
             {/* Linha de progresso */}
             <div 
-              className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-primary to-primary/80 rounded-full -translate-y-1/2 transition-all duration-500"
+              className="absolute top-1/2 left-0 h-1.5 bg-primary rounded-full -translate-y-1/2 transition-all duration-500"
               style={{ width: `${progressoGeral}%` }}
             />
 
@@ -128,16 +128,23 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
                     className="flex flex-col items-center relative"
                     style={{ width: `${100 / fases.length}%` }}
                   >
-                    {/* Pin/Círculo */}
+                    {/* Pin com logo IAplicada */}
                     <div className={cn(
-                      "relative z-10 flex items-center justify-center rounded-full border-4 transition-all duration-300",
-                      isConcluida && "w-10 h-10 bg-green-500 border-green-300 text-white shadow-lg shadow-green-500/30",
-                      isAtual && "w-12 h-12 bg-primary border-primary/50 text-white shadow-xl shadow-primary/40 animate-pulse",
-                      isPendente && "w-8 h-8 bg-muted border-muted-foreground/20 text-muted-foreground"
+                      "relative z-10 flex items-center justify-center rounded-full border-2 transition-all duration-300",
+                      isConcluida && "w-10 h-10 bg-[#0D0D0D] border-[#0D0D0D] shadow-lg",
+                      isAtual && "w-12 h-12 bg-[#0D0D0D] border-primary shadow-xl shadow-primary/40 ring-2 ring-primary ring-offset-2 ring-offset-background",
+                      isPendente && "w-8 h-8 bg-[#0D0D0D]/20 border-[#0D0D0D]/30"
                     )}>
-                      {isConcluida && <CheckCircle2 className="h-5 w-5" />}
-                      {isAtual && <MapPin className="h-6 w-6" />}
-                      {isPendente && <Circle className="h-4 w-4" />}
+                      <img 
+                        src={logoSimbolo} 
+                        alt="Pin" 
+                        className={cn(
+                          "object-contain",
+                          isConcluida && "h-5 w-5 opacity-100",
+                          isAtual && "h-6 w-6 opacity-100",
+                          isPendente && "h-4 w-4 opacity-40 grayscale"
+                        )}
+                      />
                     </div>
 
                     {/* Número da fase */}
