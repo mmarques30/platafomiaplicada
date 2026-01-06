@@ -72,7 +72,7 @@ export default function Central() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo | "todos")} className="flex-1 flex flex-col">
-          <TabsList className="inline-flex gap-0.5 sm:gap-1 bg-aplicada-green-900/40 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-aplicada-green-700/30">
+          <TabsList className="inline-flex w-fit gap-0.5 sm:gap-1 bg-aplicada-green-900/40 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-aplicada-green-700/30">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.value}
