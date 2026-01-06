@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, Trophy, Star } from "lucide-react";
 
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
 import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
@@ -32,23 +33,26 @@ export default function Evolucao() {
 
       {/* Sistema de Abas */}
       <Tabs defaultValue="minha-evolucao" className="w-full">
-        <TabsList className="w-full justify-start bg-transparent h-auto gap-1 md:gap-2 overflow-x-auto flex-nowrap">
+        <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40">
           <TabsTrigger 
             value="minha-evolucao"
-            className="px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none whitespace-nowrap"
+            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Evolução
           </TabsTrigger>
           <TabsTrigger 
             value="comunidade"
-            className="px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none whitespace-nowrap"
+            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
-            Ranking IAplicada
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            Ranking
           </TabsTrigger>
           <TabsTrigger 
             value="favoritos"
-            className="px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground hover:text-foreground transition-colors bg-transparent shadow-none whitespace-nowrap"
+            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
+            <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Favoritos
           </TabsTrigger>
         </TabsList>
