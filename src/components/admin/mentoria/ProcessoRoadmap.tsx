@@ -81,19 +81,10 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
 
   return (
     <div className="space-y-6">
-      {/* Header com título padronizado */}
-      <div className="space-y-1">
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          <span className="relative inline-block">
-            Meu Processo
-            <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary/30 rounded-full" />
-          </span>{" "}
-          <span className="text-muted-foreground font-medium">de Mentoria</span>
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          {fasesConcluidas}/{fases.length} fases concluídas • {diasMentoria} dias em mentoria
-        </p>
-      </div>
+      {/* Stats resumo */}
+      <p className="text-sm text-muted-foreground">
+        {fasesConcluidas}/{fases.length} fases concluídas • {diasMentoria} dias em mentoria
+      </p>
 
       {/* Timeline Visual - Rota com Pins */}
       <Card className="overflow-hidden">
@@ -128,24 +119,17 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
                     className="flex flex-col items-center relative"
                     style={{ width: `${100 / fases.length}%` }}
                   >
-                    {/* Pin com logo IAplicada */}
-                    <div className={cn(
-                      "relative z-10 flex items-center justify-center rounded-full border-2 transition-all duration-300",
-                      isConcluida && "w-10 h-10 bg-[#0D0D0D] border-[#0D0D0D] shadow-lg",
-                      isAtual && "w-12 h-12 bg-[#0D0D0D] border-primary shadow-xl shadow-primary/40 ring-2 ring-primary ring-offset-2 ring-offset-background",
-                      isPendente && "w-8 h-8 bg-[#0D0D0D]/20 border-[#0D0D0D]/30"
-                    )}>
-                      <img 
-                        src={logoSimbolo} 
-                        alt="Pin" 
-                        className={cn(
-                          "object-contain",
-                          isConcluida && "h-5 w-5 opacity-100",
-                          isAtual && "h-6 w-6 opacity-100",
-                          isPendente && "h-4 w-4 opacity-40 grayscale"
-                        )}
-                      />
-                    </div>
+                    {/* Pin - Logo diretamente */}
+                    <img 
+                      src={logoSimbolo} 
+                      alt="Pin" 
+                      className={cn(
+                        "relative z-10 object-contain transition-all duration-300",
+                        isConcluida && "h-8 w-8 opacity-100",
+                        isAtual && "h-10 w-10 opacity-100 drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]",
+                        isPendente && "h-6 w-6 opacity-40 grayscale"
+                      )}
+                    />
 
                     {/* Número da fase */}
                     <span className={cn(

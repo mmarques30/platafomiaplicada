@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { ProcessoRoadmap } from "@/components/admin/mentoria/ProcessoRoadmap";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function MentoriaProcesso() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function MentoriaProcesso() {
         </Button>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Meu Processo de Mentoria</h1>
+          <PageTitle primary="Meu Processo" secondary="de Mentoria" />
           <p className="text-muted-foreground">
             Acompanhe sua evolução fase a fase no processo de mentoria
           </p>
