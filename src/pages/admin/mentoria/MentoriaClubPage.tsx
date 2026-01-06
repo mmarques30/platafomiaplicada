@@ -177,7 +177,7 @@ export default function MentoriaClubPage() {
           </TabsContent>
 
           <TabsContent value="roadmap" className="space-y-4">
-            <ProcessoRoadmap userId={selectedUserId} />
+            <ProcessoRoadmap userId={selectedUserId} isAdmin={true} />
           </TabsContent>
 
           <TabsContent value="projetos" className="space-y-4">

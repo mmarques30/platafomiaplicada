@@ -3,7 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useFasesProcesso, FaseProcesso } from "@/hooks/useFasesProcesso";
+import { useMentoriaProjetos, ProjetoMentoria } from "@/hooks/useMentoriaProjetos";
 import { FaseEditModal } from "./FaseEditModal";
+import ProjetoModal from "./ProjetoModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle2, Circle, ChevronDown, ChevronRight, Calendar, Folder, ListTodo, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,13 +17,17 @@ const logoSimbolo = "/logo-simbolo.png?v=10";
 interface ProcessoRoadmapProps {
   userId: string;
   readonly?: boolean;
+  isAdmin?: boolean;
 }
 
-export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapProps) => {
+export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: ProcessoRoadmapProps) => {
   const { fases, isLoading, updateFase, inicializarFases, isUpdating } = useFasesProcesso(userId);
+  const { updateProjeto, isUpdating: isUpdatingProjeto } = useMentoriaProjetos(userId);
   const [editingFase, setEditingFase] = useState<FaseProcesso | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [expandedFaseId, setExpandedFaseId] = useState<string | null>(null);
+  const [editingProjeto, setEditingProjeto] = useState<ProjetoMentoria | null>(null);
+  const [projetoModalOpen, setProjetoModalOpen] = useState(false);
 
   const handleEditFase = (fase: FaseProcesso) => {
     setEditingFase(fase);
@@ -234,6 +240,23 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
                           <p className="font-medium text-[#0D0D0D]/80">{fase.projeto.titulo}</p>
                           <p className="truncate">{fase.projeto.objetivo_projeto}</p>
                         </div>
+                        
+                        {/* Botão para mentorado editar seu projeto */}
+                        {!isAdmin && !readonly && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingProjeto(fase.projeto as ProjetoMentoria);
+                              setProjetoModalOpen(true);
+                            }}
+                            className="mt-2 border-[#0D0D0D]/20 text-[#0D0D0D]/80 hover:bg-[#E9EBC6]/20"
+                          >
+                            <Pencil className="h-3 w-3 mr-1" />
+                            Editar Projeto
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -280,8 +303,8 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
                     </div>
                   )}
 
-                  {/* Botão Editar */}
-                  {!readonly && (
+                  {/* Botão Editar Fase - apenas para admin */}
+                  {isAdmin && (
                     <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30 flex justify-end">
                       <Button 
                         variant="outline" 
@@ -304,7 +327,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
         })}
       </div>
 
-      {/* Modal de Edição */}
+      {/* Modal de Edição de Fase - Admin */}
       <FaseEditModal
         open={modalOpen}
         onOpenChange={setModalOpen}
@@ -312,6 +335,23 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
         userId={userId}
         onSubmit={handleUpdateFase}
         isLoading={isUpdating}
+      />
+
+      {/* Modal de Edição de Projeto - Mentorado */}
+      <ProjetoModal
+        open={projetoModalOpen}
+        onOpenChange={setProjetoModalOpen}
+        projeto={editingProjeto}
+        userId={userId}
+        onSubmit={(data) => {
+          if (editingProjeto) {
+            updateProjeto({ ...data, id: editingProjeto.id });
+          }
+          setProjetoModalOpen(false);
+          setEditingProjeto(null);
+        }}
+        isLoading={isUpdatingProjeto}
+        isAdmin={isAdmin}
       />
     </div>
   );
