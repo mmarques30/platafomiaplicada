@@ -358,7 +358,7 @@ const Chat = () => {
       </div>
 
       {/* Modern Input */}
-      <div className="p-3 pb-1 md:p-4 md:pb-2">
+      <div className="p-3 pb-16 md:p-4 md:pb-20">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
           <div className="flex items-center gap-2 bg-card border border-border/50 rounded-full px-4 py-2 shadow-sm">
             <Textarea

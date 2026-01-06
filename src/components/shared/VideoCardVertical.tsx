@@ -34,12 +34,12 @@ export function VideoCardVertical({
       className="block group"
       onClick={handleClick}
     >
-      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-muted aspect-[9/16]">
+      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-neutral-800 aspect-[9/16]">
         <img
           src={thumbnailUrl}
           alt={titulo}
           loading="lazy"
-          className="block w-full h-full object-cover object-center"
+          className="block w-full h-full object-cover object-center bg-neutral-700"
         />
         
         {/* Botão de Favoritar */}

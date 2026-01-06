@@ -46,7 +46,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-2">
       <main className="container py-3 md:py-6 px-3 md:px-4 space-y-4 md:space-y-6 lg:space-y-8">
         {/* Aviso de senha temporária */}
         {mostrarAvisoSenha && (
