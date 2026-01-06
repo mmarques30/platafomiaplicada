@@ -94,7 +94,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
           {/* Timeline horizontal */}
           <div className="relative py-8">
             {/* Linha de fundo */}
-            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/30 rounded-full -translate-y-1/2" />
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-muted/50 rounded-full -translate-y-1/2" />
             
             {/* Linha de progresso */}
             <div 
@@ -159,7 +159,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
           {/* Stats rápidas */}
           <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">{fasesConcluidas}</div>
+              <div className="text-2xl font-bold text-green-500">{fasesConcluidas}</div>
               <div className="text-xs text-muted-foreground">Concluídas</div>
             </div>
             <div className="text-center">
@@ -169,7 +169,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
               <div className="text-xs text-muted-foreground">Fase Atual</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-muted-foreground">
+              <div className="text-2xl font-bold text-amber-500">
                 {fases.length - fasesConcluidas - (faseAtual ? 1 : 0)}
               </div>
               <div className="text-xs text-muted-foreground">Restantes</div>
@@ -180,7 +180,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
 
       {/* Cards de Fases - Detalhados */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground">
+        <h3 className="text-sm font-semibold text-foreground">
           Detalhes das Fases
         </h3>
         <div className="space-y-3">
