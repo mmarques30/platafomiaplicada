@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { useFasesProcesso, FaseProcesso } from "@/hooks/useFasesProcesso";
 import { FaseCard } from "./FaseCard";
 import { FaseEditModal } from "./FaseEditModal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MapPin, Flag, Clock, CheckCircle2, Circle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProcessoRoadmapProps {
   userId: string;
@@ -32,7 +33,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
   const fasesConcluidas = fases.filter((f) => f.status === "concluida").length;
   const progressoGeral = fases.length > 0 ? Math.round((fasesConcluidas / fases.length) * 100) : 0;
   const faseAtual = fases.find((f) => f.status === "em_andamento");
-  const proximaFase = fases.find((f) => f.status === "pendente" && f.fase_numero > (faseAtual?.fase_numero || 0));
+  const faseAtualIndex = faseAtual ? fases.findIndex(f => f.id === faseAtual.id) : -1;
 
   // Calcular dias desde primeira sessão
   const primeiraFase = fases.find((f) => f.data_inicio);
@@ -44,8 +45,9 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
     return (
       <div className="space-y-4">
         <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-24 w-full" />
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-48 w-full" />
+          <Skeleton key={i} className="h-20 w-full" />
         ))}
       </div>
     );
@@ -53,19 +55,20 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
 
   if (fases.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Roadmap não inicializado</CardTitle>
-          <CardDescription>
+      <Card className="border-dashed">
+        <CardHeader className="text-center">
+          <MapPin className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
+          <CardTitle className="text-lg">Roadmap não inicializado</CardTitle>
+          <p className="text-sm text-muted-foreground">
             {readonly 
               ? "Seu roadmap de processo ainda não foi criado pelo mentor."
-              : "Este mentorado ainda não possui um roadmap de processo. Clique no botão abaixo para criar."
-            }
-          </CardDescription>
+              : "Este mentorado ainda não possui um roadmap de processo."}
+          </p>
         </CardHeader>
         {!readonly && (
-          <CardContent>
+          <CardContent className="text-center pb-6">
             <Button onClick={() => inicializarFases(userId)}>
+              <MapPin className="h-4 w-4 mr-2" />
               Inicializar Roadmap
             </Button>
           </CardContent>
@@ -76,51 +79,125 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
 
   return (
     <div className="space-y-6">
-      {/* Estatísticas Gerais */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Visão Geral do Processo</CardTitle>
-          <Separator className="mt-2" />
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Card 1: Progresso */}
-            <div className="text-center p-6 bg-muted/30 rounded-lg space-y-3">
-              <div className="text-4xl font-bold">{progressoGeral}%</div>
-              <Progress value={progressoGeral} className="h-2" />
-              <p className="text-sm text-muted-foreground">
-                {fasesConcluidas}/{fases.length} fases concluídas
-              </p>
-            </div>
+      {/* Header com título padronizado */}
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-primary/10 rounded-lg">
+          <MapPin className="h-6 w-6 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold">
+            <span className="border-b-2 border-primary pb-0.5">Roadmap</span>
+            <span className="text-muted-foreground ml-2">do Processo</span>
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {fasesConcluidas}/{fases.length} fases concluídas • {diasMentoria} dias em mentoria
+          </p>
+        </div>
+      </div>
 
-            {/* Card 2: Tempo */}
-            <div className="text-center p-6 bg-muted/30 rounded-lg space-y-3">
-              <div className="text-4xl font-bold">{diasMentoria}</div>
-              <p className="text-sm text-muted-foreground">
-                {diasMentoria === 1 ? "dia" : "dias"} em mentoria
-              </p>
-            </div>
+      {/* Timeline Visual - Rota com Pins */}
+      <Card className="overflow-hidden">
+        <CardContent className="p-6">
+          {/* Barra de Progresso principal */}
+          <div className="mb-4 flex items-center gap-4">
+            <Progress value={progressoGeral} className="h-2 flex-1" />
+            <span className="text-lg font-bold text-primary">{progressoGeral}%</span>
+          </div>
 
-            {/* Card 3: Próxima Fase */}
-            <div className="text-center p-6 bg-muted/30 rounded-lg space-y-3">
-              <div className="text-2xl font-semibold">
-                {proximaFase ? `Fase ${proximaFase.fase_numero}` : "Completo ✓"}
+          {/* Timeline horizontal */}
+          <div className="relative py-8">
+            {/* Linha de fundo */}
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-muted rounded-full -translate-y-1/2" />
+            
+            {/* Linha de progresso */}
+            <div 
+              className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-primary to-primary/80 rounded-full -translate-y-1/2 transition-all duration-500"
+              style={{ width: `${progressoGeral}%` }}
+            />
+
+            {/* Pins das fases */}
+            <div className="relative flex justify-between">
+              {fases.map((fase, index) => {
+                const isConcluida = fase.status === "concluida";
+                const isAtual = fase.status === "em_andamento";
+                const isPendente = fase.status === "pendente";
+                
+                return (
+                  <div 
+                    key={fase.id} 
+                    className="flex flex-col items-center relative"
+                    style={{ width: `${100 / fases.length}%` }}
+                  >
+                    {/* Pin/Círculo */}
+                    <div className={cn(
+                      "relative z-10 flex items-center justify-center rounded-full border-4 transition-all duration-300",
+                      isConcluida && "w-10 h-10 bg-green-500 border-green-300 text-white shadow-lg shadow-green-500/30",
+                      isAtual && "w-12 h-12 bg-primary border-primary/50 text-white shadow-xl shadow-primary/40 animate-pulse",
+                      isPendente && "w-8 h-8 bg-muted border-muted-foreground/20 text-muted-foreground"
+                    )}>
+                      {isConcluida && <CheckCircle2 className="h-5 w-5" />}
+                      {isAtual && <MapPin className="h-6 w-6" />}
+                      {isPendente && <Circle className="h-4 w-4" />}
+                    </div>
+
+                    {/* Número da fase */}
+                    <span className={cn(
+                      "mt-2 text-sm font-medium",
+                      isConcluida && "text-green-600",
+                      isAtual && "text-primary font-bold",
+                      isPendente && "text-muted-foreground"
+                    )}>
+                      {fase.fase_numero}
+                    </span>
+
+                    {/* Indicador "Você está aqui" */}
+                    {isAtual && (
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <Badge className="bg-primary text-white shadow-lg animate-bounce">
+                          Você está aqui
+                        </Badge>
+                      </div>
+                    )}
+
+                    {/* Bandeira de chegada na última fase */}
+                    {index === fases.length - 1 && isConcluida && (
+                      <Flag className="absolute -top-6 h-5 w-5 text-green-500" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Stats rápidas */}
+          <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-500">{fasesConcluidas}</div>
+              <div className="text-xs text-muted-foreground">Concluídas</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">
+                {faseAtual ? faseAtual.fase_numero : "-"}
               </div>
-              <p className="text-sm text-muted-foreground truncate px-2">
-                {proximaFase?.nome_fase || "Processo finalizado"}
-              </p>
-              {proximaFase && (
-                <Badge variant="outline" className="mt-2">Próxima</Badge>
-              )}
+              <div className="text-xs text-muted-foreground">Fase Atual</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-muted-foreground">
+                {fases.length - fasesConcluidas - (faseAtual ? 1 : 0)}
+              </div>
+              <div className="text-xs text-muted-foreground">Restantes</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Timeline de Fases */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Timeline do Processo</h3>
-        <div className="relative space-y-4">
+      {/* Cards de Fases - Detalhados */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <Clock className="h-4 w-4" />
+          Detalhes das Fases
+        </h3>
+        <div className="space-y-3">
           {fases.map((fase) => (
             <FaseCard 
               key={fase.id} 

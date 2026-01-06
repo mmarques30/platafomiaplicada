@@ -2,7 +2,7 @@ import { VideosVisitante } from "@/components/dashboard/VideosVisitante";
 import { MateriaisGratuitosTab } from "@/components/comunidade/MateriaisGratuitosTab";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlayCircle, FileText, GraduationCap } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 
 export default function VideosBonus() {
   return (
@@ -20,14 +20,12 @@ export default function VideosBonus() {
               value="aula"
               className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
             >
-              <PlayCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Aula
             </TabsTrigger>
             <TabsTrigger 
               value="materiais"
               className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
             >
-              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Materiais
             </TabsTrigger>
           </TabsList>

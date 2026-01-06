@@ -1,10 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { ExternalLink, ChevronRight, Calendar } from "lucide-react";
 
 export function ProximaSessao() {
   const navigate = useNavigate();
@@ -12,22 +12,14 @@ export function ProximaSessao() {
 
   if (isLoading) {
     return (
-      <Card className="h-full">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="space-y-2 flex-1">
-              <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-              <div className="h-4 w-48 bg-muted animate-pulse rounded" />
-            </div>
-            <div className="h-6 w-20 bg-muted animate-pulse rounded-full" />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="h-4 bg-muted animate-pulse rounded w-full" />
-          <div className="h-4 bg-muted animate-pulse rounded w-3/4" />
-          <div className="h-10 bg-muted animate-pulse rounded w-full mt-4" />
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-between p-4 bg-card border rounded-lg animate-pulse">
+        <div className="flex items-center gap-4 flex-1">
+          <div className="h-6 w-20 bg-muted rounded-full" />
+          <div className="h-5 w-40 bg-muted rounded" />
+          <div className="h-4 w-24 bg-muted rounded" />
+        </div>
+        <div className="h-8 w-24 bg-muted rounded" />
+      </div>
     );
   }
 
@@ -38,26 +30,23 @@ export function ProximaSessao() {
 
   if (!proximaSessao) {
     return (
-      <Card className="h-full flex flex-col">
-        <CardHeader className="pb-3">
-          <div>
-            <CardTitle className="text-lg">Próxima Sessão</CardTitle>
-            <CardDescription className="text-sm">Nenhuma sessão agendada</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1 flex flex-col">
-          <p className="text-sm text-muted-foreground mb-4 flex-1">
-            Você não possui sessões agendadas no momento.
-          </p>
-          <Button 
-            onClick={() => navigate("/mentoria/sessoes")}
-            variant="outline"
-            className="w-full mt-auto"
-          >
-            Ver Todas as Sessões
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-between p-4 bg-card border rounded-lg hover:bg-muted/30 transition-colors">
+        <div className="flex items-center gap-4 flex-1">
+          <Badge variant="outline" className="shrink-0">
+            <Calendar className="w-3 h-3 mr-1" />
+            Sem Sessão
+          </Badge>
+          <span className="text-sm text-muted-foreground">Nenhuma sessão agendada</span>
+        </div>
+        <Button 
+          size="sm"
+          variant="outline"
+          onClick={() => navigate("/mentoria/sessoes")}
+        >
+          Ver Sessões
+          <ChevronRight className="w-4 h-4 ml-1" />
+        </Button>
+      </div>
     );
   }
 
@@ -82,55 +71,43 @@ export function ProximaSessao() {
   }
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg">Próxima Sessão</CardTitle>
-            <CardDescription className="text-sm">{proximaSessao.titulo}</CardDescription>
-          </div>
-          <Badge variant={urgenciaVariant}>{urgenciaTexto}</Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4 flex-1 flex flex-col">
-        <div className="flex-1">
-          <div className="text-sm text-muted-foreground space-y-1">
-            <div>
-              <span>{format(dataSessao, "dd/MM/yyyy", { locale: ptBR })}</span>
-            </div>
-            <div>
-              <span>
-                {format(dataSessao, "HH:mm", { locale: ptBR })}
-                {proximaSessao.duracao && ` - ${proximaSessao.duracao}min`}
-              </span>
-            </div>
-          </div>
-          
-          {proximaSessao.notas && (
-            <p className="text-sm text-muted-foreground mt-3">
-              {proximaSessao.notas}
-            </p>
-          )}
-        </div>
+    <div className="flex items-center justify-between p-4 bg-card border rounded-lg hover:bg-muted/30 transition-colors">
+      <div className="flex items-center gap-4 flex-1 min-w-0">
+        {/* Badge prazo */}
+        <Badge variant={urgenciaVariant} className="shrink-0">
+          {urgenciaTexto}
+        </Badge>
 
-        <div className="flex gap-2 mt-auto">
-          <Button 
-            onClick={() => navigate("/mentoria/sessoes")}
-            variant="outline"
-            className="flex-1"
+        {/* Título */}
+        <span className="font-medium text-sm truncate">{proximaSessao.titulo}</span>
+
+        {/* Data/Hora */}
+        <span className="text-xs text-muted-foreground hidden sm:block whitespace-nowrap">
+          {format(dataSessao, "dd/MM 'às' HH:mm", { locale: ptBR })}
+        </span>
+      </div>
+
+      {/* Ações */}
+      <div className="flex items-center gap-2 shrink-0">
+        {proximaSessao.video_url && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => window.open(proximaSessao.video_url, '_blank')}
+            className="hidden sm:flex"
           >
-            Ver Detalhes
+            <ExternalLink className="w-4 h-4" />
           </Button>
-          {proximaSessao.video_url && (
-            <Button
-              onClick={() => window.open(proximaSessao.video_url, '_blank')}
-              className="flex-1"
-            >
-              Link da Call
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        )}
+        <Button 
+          size="sm"
+          variant="outline"
+          onClick={() => navigate("/mentoria/sessoes")}
+        >
+          <span className="hidden sm:inline">Ver Detalhes</span>
+          <ChevronRight className="w-4 h-4 sm:ml-1" />
+        </Button>
+      </div>
+    </div>
   );
 }

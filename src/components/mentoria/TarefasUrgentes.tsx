@@ -1,123 +1,173 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
-import { differenceInDays } from "date-fns";
+import { differenceInDays, format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { ChevronRight, ListTodo } from "lucide-react";
 
 export function TarefasUrgentes() {
   const navigate = useNavigate();
   const { tarefas, isLoading } = useMentoriaTarefas();
+  const [filtroStatus, setFiltroStatus] = useState<string>("todos");
 
   if (isLoading) {
     return (
-      <Card className="h-full">
+      <Card>
         <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="space-y-2 flex-1">
-              <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-              <div className="h-4 w-48 bg-muted animate-pulse rounded" />
-            </div>
-            <div className="h-6 w-12 bg-muted animate-pulse rounded-full" />
+          <div className="flex items-center justify-between">
+            <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+            <div className="h-8 w-24 bg-muted animate-pulse rounded" />
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="h-16 bg-muted animate-pulse rounded w-full" />
-          <div className="h-16 bg-muted animate-pulse rounded w-full" />
-          <div className="h-10 bg-muted animate-pulse rounded w-full mt-4" />
+        <CardContent>
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 bg-muted animate-pulse rounded" />
+            ))}
+          </div>
         </CardContent>
       </Card>
     );
   }
 
-  // Filtrar e ordenar tarefas urgentes
-  const tarefasPendentes = tarefas
-    .filter(t => t.status === "pendente" || t.status === "em_andamento" || t.status === "atrasada")
+  // Filtrar tarefas não concluídas e ordenar por data
+  const tarefasFiltradas = tarefas
+    .filter(t => t.status !== "concluida")
+    .filter(t => filtroStatus === "todos" || t.status === filtroStatus)
     .map(t => ({
       ...t,
       diasRestantes: differenceInDays(new Date(t.prazo_entrega), new Date())
     }))
-    .sort((a, b) => a.diasRestantes - b.diasRestantes)
+    .sort((a, b) => new Date(a.prazo_entrega).getTime() - new Date(b.prazo_entrega).getTime())
     .slice(0, 3);
 
-  if (tarefasPendentes.length === 0) {
-    return (
-      <Card className="h-full flex flex-col">
-        <CardHeader className="pb-3">
-          <div>
-            <CardTitle className="text-lg">Tarefas</CardTitle>
-            <p className="text-sm text-muted-foreground">Nenhuma tarefa pendente</p>
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1 flex flex-col">
-          <p className="text-sm text-muted-foreground mb-4 flex-1">
-            Você não possui tarefas pendentes no momento.
-          </p>
-          <Button 
-            onClick={() => navigate("/mentoria/tarefas")}
-            variant="outline"
-            className="w-full mt-auto"
-          >
-            Ver Todas as Tarefas
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  const getUrgencia = (tarefa: typeof tarefasFiltradas[0]) => {
+    let variant: "default" | "secondary" | "destructive" = "default";
+    let texto = "";
+    
+    if (tarefa.status === "atrasada" || tarefa.diasRestantes < 0) {
+      variant = "destructive";
+      texto = "Atrasada";
+    } else if (tarefa.diasRestantes === 0) {
+      variant = "destructive";
+      texto = "Hoje";
+    } else if (tarefa.diasRestantes === 1) {
+      variant = "default";
+      texto = "Amanhã";
+    } else if (tarefa.diasRestantes <= 3) {
+      variant = "default";
+      texto = `${tarefa.diasRestantes}d`;
+    } else {
+      variant = "secondary";
+      texto = `${tarefa.diasRestantes}d`;
+    }
+
+    return { variant, texto };
+  };
+
+  const totalPendentes = tarefas.filter(t => t.status !== "concluida").length;
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg">Tarefas Pendentes</CardTitle>
-            <p className="text-sm text-muted-foreground">{tarefasPendentes.length} tarefas urgentes</p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <ListTodo className="h-5 w-5 text-primary" />
+            <CardTitle className="text-base">Tarefas Pendentes</CardTitle>
+            {totalPendentes > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {totalPendentes}
+              </Badge>
+            )}
           </div>
+          
+          {/* Filtro discreto */}
+          <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+            <SelectTrigger className="w-[110px] h-8 text-xs">
+              <SelectValue placeholder="Filtrar" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="pendente">Pendente</SelectItem>
+              <SelectItem value="em_andamento">Em Andamento</SelectItem>
+              <SelectItem value="atrasada">Atrasada</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3 flex-1 flex flex-col">
-        <div className="space-y-2 flex-1">
-          {tarefasPendentes.map(tarefa => {
-            let urgenciaVariant: "default" | "secondary" | "destructive" = "default";
-            let urgenciaTexto = "";
-            
-            if (tarefa.status === "atrasada" || tarefa.diasRestantes < 0) {
-              urgenciaVariant = "destructive";
-              urgenciaTexto = `Atrasada ${Math.abs(tarefa.diasRestantes)} dias`;
-            } else if (tarefa.diasRestantes === 0) {
-              urgenciaVariant = "destructive";
-              urgenciaTexto = "Vence hoje";
-            } else if (tarefa.diasRestantes === 1) {
-              urgenciaVariant = "default";
-              urgenciaTexto = "Vence amanhã";
-            } else if (tarefa.diasRestantes <= 3) {
-              urgenciaVariant = "default";
-              urgenciaTexto = `Vence em ${tarefa.diasRestantes} dias`;
-            } else {
-              urgenciaVariant = "secondary";
-              urgenciaTexto = `Vence em ${tarefa.diasRestantes} dias`;
-            }
-
-            return (
-              <div key={tarefa.id} className="p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => navigate("/mentoria/tarefas")}>
-                <div className="flex items-start justify-between gap-2">
-                  <span className="font-medium text-sm flex-1">{tarefa.titulo}</span>
-                  <Badge variant={urgenciaVariant} className="text-xs">
-                    {urgenciaTexto}
-                  </Badge>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      <CardContent className="pt-0">
+        {tarefasFiltradas.length === 0 ? (
+          <div className="text-center py-6 text-muted-foreground">
+            <p className="text-sm">Nenhuma tarefa pendente</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[45%]">Tarefa</TableHead>
+                <TableHead className="w-[20%]">Prazo</TableHead>
+                <TableHead className="w-[20%]">Status</TableHead>
+                <TableHead className="w-[15%] text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tarefasFiltradas.map(tarefa => {
+                const urgencia = getUrgencia(tarefa);
+                return (
+                  <TableRow 
+                    key={tarefa.id} 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => navigate("/mentoria/tarefas")}
+                  >
+                    <TableCell className="font-medium text-sm truncate max-w-[200px]">
+                      {tarefa.titulo}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {format(new Date(tarefa.prazo_entrega), "dd/MM", { locale: ptBR })}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={urgencia.variant} className="text-xs">
+                        {urgencia.texto}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <ChevronRight className="h-4 w-4 text-muted-foreground inline" />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
         
-        <Button 
-          onClick={() => navigate("/mentoria/tarefas")}
-          variant="outline"
-          className="w-full mt-auto"
-        >
-          Ver Todas as Tarefas
-        </Button>
+        <div className="mt-4 pt-3 border-t">
+          <Button 
+            onClick={() => navigate("/mentoria/tarefas")}
+            variant="ghost"
+            className="w-full text-sm"
+          >
+            Ver Todas as Tarefas
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

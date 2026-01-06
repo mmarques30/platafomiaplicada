@@ -1,11 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Eye } from "lucide-react";
+import { Eye, Edit, ChevronRight } from "lucide-react";
 
 export function StatusDiagnostico() {
   const navigate = useNavigate();
@@ -13,103 +12,82 @@ export function StatusDiagnostico() {
 
   if (isLoading) {
     return (
-      <Card className="h-full">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="space-y-2 flex-1">
-              <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-              <div className="h-4 w-48 bg-muted animate-pulse rounded" />
-            </div>
-            <div className="h-6 w-20 bg-muted animate-pulse rounded-full" />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="h-4 bg-muted animate-pulse rounded w-full" />
-          <div className="h-4 bg-muted animate-pulse rounded w-3/4" />
-          <div className="h-10 bg-muted animate-pulse rounded w-full mt-4" />
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-between p-4 bg-card border rounded-lg animate-pulse">
+        <div className="flex items-center gap-4 flex-1">
+          <div className="h-6 w-20 bg-muted rounded-full" />
+          <div className="h-5 w-32 bg-muted rounded" />
+          <div className="h-4 w-24 bg-muted rounded" />
+        </div>
+        <div className="h-8 w-24 bg-muted rounded" />
+      </div>
     );
   }
 
   const completo = formulario?.completado;
   const preenchidoPorAdmin = formulario?.preenchido_por === 'admin';
+  const dataAnalise = formulario?.insight_gerado_em 
+    ? format(new Date(formulario.insight_gerado_em), "dd/MM/yyyy", { locale: ptBR })
+    : null;
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg">Diagnóstico IA</CardTitle>
-            <CardDescription className="text-sm">
-              {completo 
-                ? "Seu diagnóstico está completo" 
-                : "Inicie seu diagnóstico personalizado"
-              }
-            </CardDescription>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            {completo ? (
-              <Badge variant="default">
-                Completo
-              </Badge>
-            ) : (
-              <Badge variant="secondary">
-                Pendente
-              </Badge>
-            )}
-            {preenchidoPorAdmin && (
-              <Badge variant="outline">
-                Preenchido pelo mentor
-              </Badge>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4 flex-1 flex flex-col">
+    <div className="flex items-center justify-between p-4 bg-card border rounded-lg hover:bg-muted/30 transition-colors">
+      <div className="flex items-center gap-4 flex-1 min-w-0">
+        {/* Status Badge */}
+        {completo ? (
+          <Badge variant="default" className="shrink-0">Completo</Badge>
+        ) : (
+          <Badge variant="secondary" className="shrink-0">Pendente</Badge>
+        )}
+
+        {/* Título */}
+        <span className="font-medium text-sm truncate">Diagnóstico IA</span>
+
+        {/* Data ou Info adicional */}
+        {completo && dataAnalise && (
+          <span className="text-xs text-muted-foreground hidden sm:block">
+            Análise: {dataAnalise}
+          </span>
+        )}
+
+        {/* Badge mentor */}
+        {preenchidoPorAdmin && (
+          <Badge variant="outline" className="text-xs hidden md:inline-flex">
+            Mentor
+          </Badge>
+        )}
+      </div>
+
+      {/* Ações */}
+      <div className="flex items-center gap-2 shrink-0">
         {completo ? (
           <>
-            <div className="text-sm text-muted-foreground space-y-1 flex-1">
-              <p>Perfil analisado</p>
-              <p>Objetivos definidos</p>
-              <p>Plano personalizado gerado</p>
-              {formulario?.insight_gerado_em && (
-                <p className="mt-2">
-                  Última análise: {format(new Date(formulario.insight_gerado_em), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <Button 
-                onClick={() => navigate("/mentoria/painel-diagnostico")}
-                className="w-full"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Ver Painel de Diagnóstico
-              </Button>
-              <Button 
-                onClick={() => navigate("/mentoria/diagnostico")}
-                variant="outline"
-                className="w-full"
-              >
-                Editar Diagnóstico
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="text-sm text-muted-foreground flex-1">
-              Complete seu diagnóstico para receber um plano personalizado com IA baseado no seu perfil e objetivos.
-            </p>
             <Button 
+              size="sm"
+              variant="ghost"
               onClick={() => navigate("/mentoria/diagnostico")}
-              className="w-full mt-auto"
+              className="hidden sm:flex"
             >
-              Iniciar Diagnóstico
+              <Edit className="w-4 h-4" />
+            </Button>
+            <Button 
+              size="sm"
+              onClick={() => navigate("/mentoria/painel-diagnostico")}
+            >
+              <Eye className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Ver Painel</span>
+              <ChevronRight className="w-4 h-4 sm:hidden" />
             </Button>
           </>
+        ) : (
+          <Button 
+            size="sm"
+            onClick={() => navigate("/mentoria/diagnostico")}
+          >
+            Iniciar
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
