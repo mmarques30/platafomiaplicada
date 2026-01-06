@@ -7,8 +7,8 @@ import { NavegacaoRapida } from "@/components/mentoria/NavegacaoRapida";
 import { ResumoProgresso } from "@/components/mentoria/ResumoProgresso";
 import { PendenciasUrgentes } from "@/components/mentoria/PendenciasUrgentes";
 import { FaseAtualCard } from "@/components/mentoria/FaseAtualCard";
+import { MateriaisExclusivos } from "@/components/mentoria/MateriaisExclusivos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutDashboard, Target, ListTodo } from "lucide-react";
 
 export default function Mentoria() {
   const { user } = useAuth();
@@ -25,37 +25,38 @@ export default function Mentoria() {
             value="visao-geral"
             className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
-            <LayoutDashboard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Visão Geral
           </TabsTrigger>
           <TabsTrigger
             value="processo"
             className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
-            <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Meu Processo
           </TabsTrigger>
           <TabsTrigger
-            value="acoes"
+            value="materiais"
             className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
-            <ListTodo className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            Ações
+            Materiais
           </TabsTrigger>
         </TabsList>
 
         {/* Aba Visão Geral */}
-        <TabsContent value="visao-geral" className="mt-0 space-y-6">
+        <TabsContent value="visao-geral" className="mt-0 space-y-4">
           {/* Alertas/Pendências */}
           <PendenciasUrgentes />
 
-          {/* Grid 2x2 com Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {/* Cards compactos empilhados */}
+          <div className="space-y-2">
             <StatusDiagnostico />
             <ProximaSessao />
-            <TarefasUrgentes />
-            <NavegacaoRapida />
           </div>
+
+          {/* Tabela de Tarefas */}
+          <TarefasUrgentes />
+
+          {/* Navegação Rápida */}
+          <NavegacaoRapida />
         </TabsContent>
 
         {/* Aba Meu Processo */}
@@ -67,19 +68,9 @@ export default function Mentoria() {
           <ResumoProgresso />
         </TabsContent>
 
-        {/* Aba Ações */}
-        <TabsContent value="acoes" className="mt-0 space-y-6">
-          {/* Pendências Urgentes */}
-          <PendenciasUrgentes />
-
-          {/* Grid com Tarefas e Sessões */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <TarefasUrgentes />
-            <ProximaSessao />
-          </div>
-
-          {/* Navegação Rápida */}
-          <NavegacaoRapida />
+        {/* Aba Materiais Exclusivos */}
+        <TabsContent value="materiais" className="mt-0">
+          <MateriaisExclusivos />
         </TabsContent>
       </Tabs>
     </div>

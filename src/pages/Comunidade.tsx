@@ -5,7 +5,7 @@ import { CommunityHeroDashboard } from "@/components/comunidade/CommunityHeroDas
 import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Trophy, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Comunidade() {
@@ -33,21 +33,18 @@ export default function Comunidade() {
                   value="feed"
                   className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
                 >
-                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Feed
                 </TabsTrigger>
                 <TabsTrigger 
                   value="ranking"
                   className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
                 >
-                  <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Ranking
                 </TabsTrigger>
                 <TabsTrigger 
                   value="members"
                   className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
                 >
-                  <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Membros
                 </TabsTrigger>
               </TabsList>
