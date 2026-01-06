@@ -24,27 +24,27 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
 
   const getMedalColor = (posicao: number) => {
     switch (posicao) {
-      case 1: return "text-yellow-500 border-yellow-500";
-      case 2: return "text-muted-foreground border-muted-foreground";
-      case 3: return "text-amber-600 border-amber-600";
+      case 1: return "text-amber-600 border-amber-600";
+      case 2: return "text-[#0D0D0D]/70 border-[#0D0D0D]/30";
+      case 3: return "text-amber-700 border-amber-700";
       default: return "text-muted-foreground border-border";
     }
   };
 
   const getMedalBg = (posicao: number) => {
     switch (posicao) {
-      case 1: return "bg-yellow-500/10 border-yellow-500/30";
-      case 2: return "bg-neutral-800/50 border-neutral-700";
-      case 3: return "bg-amber-700/10 border-amber-700/30";
-      default: return "border-neutral-800";
+      case 1: return "bg-[#E9EBC6] border-[#E9EBC6]/50";
+      case 2: return "bg-[#E9EBC6]/60 border-[#E9EBC6]/40";
+      case 3: return "bg-[#E9EBC6]/40 border-[#E9EBC6]/30";
+      default: return "border-border";
     }
   };
 
   const getAvatarBg = (posicao: number) => {
     switch (posicao) {
-      case 1: return "bg-yellow-500";
-      case 2: return "bg-muted-foreground";
-      case 3: return "bg-amber-600";
+      case 1: return "bg-amber-600";
+      case 2: return "bg-[#0D0D0D]/60";
+      case 3: return "bg-amber-700";
       default: return "bg-primary";
     }
   };
@@ -99,25 +99,22 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
               
               {/* Nome */}
               <p className={cn(
-                "font-medium truncate w-full text-center",
-                item.user_id === user?.id ? "text-primary" : "text-foreground"
+                "font-medium truncate w-full text-center text-[#0D0D0D]",
+                item.user_id === user?.id && "font-semibold"
               )}>
                 {item.nome_completo}
                 {item.user_id === user?.id && (
-                  <span className="ml-1 text-xs text-primary">(Você)</span>
+                  <span className="ml-1 text-xs text-amber-700">(Você)</span>
                 )}
               </p>
               
               {/* Stats */}
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-[#0D0D0D]/60 mt-1">
                 {item.total_posts} posts • {item.total_comentarios} com.
               </p>
               
               {/* Pontos */}
-              <p className={cn(
-                "font-bold text-xl mt-3",
-                item.posicao === 1 ? "text-yellow-600 dark:text-yellow-500" : "text-foreground"
-              )}>
+              <p className="font-bold text-xl mt-3 text-[#0D0D0D]">
                 {item.total_pontos} pts
               </p>
             </div>
