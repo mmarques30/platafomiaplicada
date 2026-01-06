@@ -287,32 +287,49 @@ export function EngajamentoTab() {
                 <CardTitle className="text-base">Tempo por Trilha</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={engajamentoData.videos.distribuicaoTrilhas.slice(0, 5)}
-                        dataKey="tempo"
-                        nameKey="nome"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        label={({ nome, tempo }) => `${nome.substring(0, 10)}... (${tempo.toFixed(1)}h)`}
-                        labelLine={false}
-                      >
-                        {engajamentoData.videos.distribuicaoTrilhas.slice(0, 5).map((_, index) => (
-                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--background))', 
-                          border: '1px solid hsl(var(--border))' 
-                        }}
-                        formatter={(value: number) => `${value.toFixed(1)}h`}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                <div className="flex flex-col">
+                  <div className="h-40">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={engajamentoData.videos.distribuicaoTrilhas.slice(0, 5)}
+                          dataKey="tempo"
+                          nameKey="nome"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={60}
+                          innerRadius={30}
+                          paddingAngle={2}
+                        >
+                          {engajamentoData.videos.distribuicaoTrilhas.slice(0, 5).map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            color: 'hsl(var(--foreground))'
+                          }}
+                          formatter={(value: number) => [`${value.toFixed(1)}h`, 'Tempo']}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  {/* Legenda externa */}
+                  <div className="mt-4 space-y-2">
+                    {engajamentoData.videos.distribuicaoTrilhas.slice(0, 5).map((trilha, index) => (
+                      <div key={trilha.nome} className="flex items-center gap-2 text-sm">
+                        <div 
+                          className="w-3 h-3 rounded-full shrink-0" 
+                          style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
+                        />
+                        <span className="truncate flex-1 text-foreground">{trilha.nome}</span>
+                        <span className="text-muted-foreground font-medium">{trilha.tempo.toFixed(1)}h</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>

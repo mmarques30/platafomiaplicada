@@ -81,10 +81,6 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
 
   return (
     <div className="space-y-6">
-      {/* Stats resumo */}
-      <p className="text-sm text-muted-foreground">
-        {fasesConcluidas}/{fases.length} fases concluídas • {diasMentoria} dias em mentoria
-      </p>
 
       {/* Timeline Visual - Rota com Pins */}
       <Card className="overflow-hidden">
@@ -97,12 +93,12 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
 
           {/* Timeline horizontal */}
           <div className="relative py-8">
-            {/* Linha de fundo - preta 0D0D0D */}
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#0D0D0D] rounded-full -translate-y-1/2" />
+            {/* Linha de fundo */}
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted-foreground/30 rounded-full -translate-y-1/2" />
             
             {/* Linha de progresso */}
             <div 
-              className="absolute top-1/2 left-0 h-1.5 bg-primary rounded-full -translate-y-1/2 transition-all duration-500"
+              className="absolute top-1/2 left-0 h-1 bg-primary rounded-full -translate-y-1/2 transition-all duration-500"
               style={{ width: `${progressoGeral}%` }}
             />
 
@@ -125,18 +121,18 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
                       alt="Pin" 
                       className={cn(
                         "relative z-10 object-contain transition-all duration-300",
-                        isConcluida && "h-8 w-8 opacity-100",
-                        isAtual && "h-10 w-10 opacity-100 drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]",
-                        isPendente && "h-6 w-6 opacity-40 grayscale"
+                        isConcluida && "h-7 w-7 opacity-100 drop-shadow-[0_0_6px_hsl(var(--primary)/0.4)]",
+                        isAtual && "h-9 w-9 opacity-100 drop-shadow-[0_0_12px_hsl(var(--primary)/0.7)] scale-110",
+                        isPendente && "h-5 w-5 opacity-60"
                       )}
                     />
 
                     {/* Número da fase */}
                     <span className={cn(
-                      "mt-2 text-sm font-medium",
-                      isConcluida && "text-green-600",
+                      "mt-2 text-xs font-medium",
+                      isConcluida && "text-primary",
                       isAtual && "text-primary font-bold",
-                      isPendente && "text-muted-foreground"
+                      isPendente && "text-muted-foreground/60"
                     )}>
                       {fase.fase_numero}
                     </span>
@@ -163,7 +159,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
           {/* Stats rápidas */}
           <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-500">{fasesConcluidas}</div>
+              <div className="text-2xl font-bold text-primary">{fasesConcluidas}</div>
               <div className="text-xs text-muted-foreground">Concluídas</div>
             </div>
             <div className="text-center">

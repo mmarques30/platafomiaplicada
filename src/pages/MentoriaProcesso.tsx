@@ -23,12 +23,7 @@ export default function MentoriaProcesso() {
           Voltar para Mentoria
         </Button>
 
-        <div className="space-y-2">
-          <PageTitle primary="Meu Processo" secondary="de Mentoria" />
-          <p className="text-muted-foreground">
-            Acompanhe sua evolução fase a fase no processo de mentoria
-          </p>
-        </div>
+        <PageTitle primary="Meu Processo" secondary="de Mentoria" />
       </div>
 
       <ProcessoRoadmap userId={user.id} readonly />
