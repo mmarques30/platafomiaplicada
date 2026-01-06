@@ -2020,6 +2020,51 @@ export type Database = {
         }
         Relationships: []
       }
+      players: {
+        Row: {
+          apresentacao: string | null
+          ativo: boolean | null
+          codigo_indicacao: string
+          comissao_acumulada: number | null
+          created_at: string | null
+          data_player: string | null
+          especialidade: string | null
+          id: string
+          total_indicacoes: number | null
+          updated_at: string | null
+          user_id: string
+          whatsapp: string | null
+        }
+        Insert: {
+          apresentacao?: string | null
+          ativo?: boolean | null
+          codigo_indicacao: string
+          comissao_acumulada?: number | null
+          created_at?: string | null
+          data_player?: string | null
+          especialidade?: string | null
+          id?: string
+          total_indicacoes?: number | null
+          updated_at?: string | null
+          user_id: string
+          whatsapp?: string | null
+        }
+        Update: {
+          apresentacao?: string | null
+          ativo?: boolean | null
+          codigo_indicacao?: string
+          comissao_acumulada?: number | null
+          created_at?: string | null
+          data_player?: string | null
+          especialidade?: string | null
+          id?: string
+          total_indicacoes?: number | null
+          updated_at?: string | null
+          user_id?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       premiacoes_comunidade: {
         Row: {
           created_at: string | null
@@ -3189,7 +3234,12 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "mentorado" | "aluno_trilha" | "visitante"
+      app_role:
+        | "admin"
+        | "mentorado"
+        | "aluno_trilha"
+        | "visitante"
+        | "facilitador"
       nivel_acesso_plano: "academy" | "lab" | "skills" | "club"
       plano_mentoria:
         | "club"
@@ -3332,7 +3382,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "mentorado", "aluno_trilha", "visitante"],
+      app_role: [
+        "admin",
+        "mentorado",
+        "aluno_trilha",
+        "visitante",
+        "facilitador",
+      ],
       nivel_acesso_plano: ["academy", "lab", "skills", "club"],
       plano_mentoria: [
         "club",

@@ -92,8 +92,8 @@ export function CommunitySidebar() {
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Admins</span>
-            <span className="text-sm font-semibold">{stats.adminCount}</span>
+            <span className="text-sm text-muted-foreground">Facilitadores</span>
+            <span className="text-sm font-semibold">{stats.facilitadorCount}</span>
           </div>
         </div>
       </div>
