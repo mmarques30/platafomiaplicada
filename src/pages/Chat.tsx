@@ -9,7 +9,7 @@ import remarkGfm from "remark-gfm";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import mariAvatar from "@/assets/mari-avatar.jpg";
+import mariAvatar from "@/assets/mari-avatar-new.png";
 
 interface Message {
   role: "user" | "assistant";
@@ -274,15 +274,15 @@ const Chat = () => {
         className="flex-1 overflow-y-auto p-4 space-y-4"
       >
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center p-4 md:p-8">
+          <div className="flex flex-col items-center justify-center h-full text-center p-4 md:p-6">
             <img
               src={mariAvatar}
               alt="Mari"
               className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full mb-4 object-cover"
             />
-            <h2 className="text-xl md:text-2xl font-bold mb-2">Olá! Sou a MarIAna 🧠</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-2">Sou a MarIAna 🧠</h2>
             <p className="text-muted-foreground max-w-md text-sm md:text-base">
-              Sua mentora de IA Aplicada. Estou aqui para te ajudar!
+              Sua mentora de IA Aplicada. Qual sua dúvida hoje?
             </p>
           </div>
         )}
@@ -356,7 +356,7 @@ const Chat = () => {
       </div>
 
       {/* Modern Input */}
-      <div className="p-4">
+      <div className="p-3 pb-2 md:p-4 md:pb-3">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
           <div className="flex items-center gap-2 bg-card border border-border/50 rounded-full px-4 py-2 shadow-sm">
             <Textarea
