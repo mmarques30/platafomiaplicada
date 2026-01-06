@@ -64,9 +64,9 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
       default:
         return {
           icon: <Circle className="h-5 w-5" />,
-          color: "text-muted-foreground",
-          bgColor: "bg-muted",
-          borderColor: "border-muted",
+          color: "text-secondary",
+          bgColor: "bg-secondary/10",
+          borderColor: "border-secondary/30",
           badge: "outline" as const,
           label: "Pendente"
         };

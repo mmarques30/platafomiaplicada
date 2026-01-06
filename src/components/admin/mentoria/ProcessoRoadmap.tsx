@@ -121,9 +121,9 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
                       alt="Pin" 
                       className={cn(
                         "relative z-10 object-contain transition-all duration-300",
-                        isConcluida && "h-7 w-7 opacity-100 drop-shadow-[0_0_6px_hsl(var(--primary)/0.4)]",
-                        isAtual && "h-9 w-9 opacity-100 drop-shadow-[0_0_12px_hsl(var(--primary)/0.7)] scale-110",
-                        isPendente && "h-5 w-5 opacity-60"
+                        isConcluida && "h-10 w-10 opacity-100 drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]",
+                        isAtual && "h-12 w-12 opacity-100 drop-shadow-[0_0_14px_hsl(var(--primary)/0.8)] scale-110",
+                        isPendente && "h-8 w-8 opacity-70"
                       )}
                     />
 

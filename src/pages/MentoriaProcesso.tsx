@@ -23,7 +23,7 @@ export default function MentoriaProcesso() {
           Voltar para Mentoria
         </Button>
 
-        <PageTitle primary="Meu Processo" secondary="de Mentoria" />
+        <PageTitle primary="Meu Processo" secondary="de Mentoria" className="text-xl sm:text-2xl" />
       </div>
 
       <ProcessoRoadmap userId={user.id} readonly />

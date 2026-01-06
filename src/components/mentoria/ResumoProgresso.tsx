@@ -30,9 +30,9 @@ export function ResumoProgresso() {
   const projetosEmAndamento = projetos.filter(p => p.status === "em_andamento").length;
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-card via-card to-primary/5 border-primary/20">
       <CardHeader>
-        <CardTitle>Resumo do Seu Progresso</CardTitle>
+        <CardTitle className="text-primary">Resumo do Seu Progresso</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Progress Rings */}
@@ -61,8 +61,8 @@ export function ResumoProgresso() {
         <div className="pt-4 border-t space-y-2">
           {proximaSessao && (
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="h-4 w-4" />
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
                 <span>Próxima sessão</span>
               </div>
               <span className="font-medium">
@@ -72,9 +72,9 @@ export function ResumoProgresso() {
           )}
 
           <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <FolderKanban className="h-4 w-4" />
-              <span>Projetos em andamento</span>
+            <div className="flex items-center gap-2">
+              <FolderKanban className="h-4 w-4 text-secondary" />
+              <span className="text-muted-foreground">Projetos em andamento</span>
             </div>
             <span className="font-medium">{projetosEmAndamento}</span>
           </div>
