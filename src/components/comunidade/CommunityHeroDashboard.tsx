@@ -1,0 +1,116 @@
+import { useAuth } from "@/hooks/useAuth";
+import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
+import { useCommunityStats } from "@/hooks/useCommunityStats";
+import { Trophy, TrendingUp, MessageSquare, Calendar, Users, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+
+export function CommunityHeroDashboard() {
+  const { user } = useAuth();
+  const { data: ranking } = useRankingEngajamento();
+  const { stats } = useCommunityStats();
+
+  const myRanking = ranking?.find((r) => r.user_id === user?.id);
+  const myPosition = myRanking?.posicao || 0;
+  const myPoints = myRanking?.total_pontos || 0;
+  const myPosts = myRanking?.total_posts || 0;
+  const myComments = myRanking?.total_comentarios || 0;
+  const myActiveDays = myRanking?.dias_ativos_30d || 0;
+
+  // Calculate progress to next position
+  const nextPosition = ranking?.find((r) => r.posicao === myPosition - 1);
+  const pointsToNext = nextPosition ? nextPosition.total_pontos - myPoints : 0;
+  const progressPercent = nextPosition 
+    ? Math.min(100, (myPoints / nextPosition.total_pontos) * 100) 
+    : 100;
+
+  // Mock trend (in real app, compare with previous period)
+  const positionTrend: number = 2; // Positive = moved up
+
+  return (
+    <div className="bg-[#0D0D0D] rounded-xl border border-primary/20 p-4 sm:p-6 mb-6">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-4">
+        <Trophy className="w-5 h-5 text-primary" />
+        <h2 className="text-lg font-semibold text-white">Seu Desempenho</h2>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5">
+        {/* Position */}
+        <div className="bg-neutral-900/50 rounded-lg p-3 sm:p-4 border border-primary/10">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-muted-foreground">Posição</span>
+            {positionTrend !== 0 && (
+              <span className={`flex items-center text-xs ${positionTrend > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {positionTrend > 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+                {Math.abs(positionTrend)}
+              </span>
+            )}
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl sm:text-3xl font-bold text-white">#{myPosition || '-'}</span>
+          </div>
+        </div>
+
+        {/* Points */}
+        <div className="bg-neutral-900/50 rounded-lg p-3 sm:p-4 border border-primary/10">
+          <div className="flex items-center gap-1.5 mb-1">
+            <TrendingUp className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs text-muted-foreground">Pontos</span>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl sm:text-3xl font-bold text-white">{myPoints}</span>
+            <span className="text-xs text-muted-foreground">pts</span>
+          </div>
+        </div>
+
+        {/* Posts + Comments */}
+        <div className="bg-neutral-900/50 rounded-lg p-3 sm:p-4 border border-primary/10">
+          <div className="flex items-center gap-1.5 mb-1">
+            <MessageSquare className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs text-muted-foreground">Interações</span>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl sm:text-3xl font-bold text-white">{myPosts + myComments}</span>
+            <span className="text-xs text-muted-foreground hidden sm:inline">posts/comments</span>
+          </div>
+        </div>
+
+        {/* Active Days */}
+        <div className="bg-neutral-900/50 rounded-lg p-3 sm:p-4 border border-primary/10">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Calendar className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs text-muted-foreground">Dias Ativos</span>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl sm:text-3xl font-bold text-white">{myActiveDays}</span>
+            <span className="text-xs text-muted-foreground">/ 30</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress to next position */}
+      {nextPosition && pointsToNext > 0 && (
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs">
+            <span className="text-muted-foreground">Progresso para #{myPosition - 1}</span>
+            <span className="text-primary font-medium">Faltam {pointsToNext} pts</span>
+          </div>
+          <Progress value={progressPercent} className="h-2 bg-neutral-800" />
+        </div>
+      )}
+
+      {/* Community Stats Footer */}
+      <div className="flex items-center justify-end gap-4 mt-4 pt-4 border-t border-neutral-800">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Users className="w-3.5 h-3.5" />
+          <span>{stats.totalMembers} membros</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-green-500">{stats.onlineMembers} online</span>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -2,61 +2,71 @@ import { useState } from "react";
 import { CommunityFeed } from "@/components/comunidade/CommunityFeed";
 import { MembersList } from "@/components/comunidade/MembersList";
 import { RankingEngajamento } from "@/components/comunidade/RankingEngajamento";
+import { CommunityHeroDashboard } from "@/components/comunidade/CommunityHeroDashboard";
+import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
-import { cn } from "@/lib/utils";
-
-type TabValue = "community" | "leaderboard" | "members";
-
-const tabs: { value: TabValue; label: string }[] = [
-  { value: "community", label: "Feed" },
-  { value: "leaderboard", label: "Ranking" },
-  { value: "members", label: "Membros" },
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MessageSquare, Trophy, Users } from "lucide-react";
 
 export default function Comunidade() {
   const { data: ranking } = useRankingEngajamento();
-  const [activeTab, setActiveTab] = useState<TabValue>("community");
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Main Layout - Single Column */}
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Tab Navigation - X/Twitter Style */}
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
-          <nav className="flex">
-            {tabs.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => setActiveTab(tab.value)}
-                className={cn(
-                  "flex-1 py-4 px-4 text-sm font-medium transition-colors relative hover:bg-muted/50",
-                  activeTab === tab.value
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {tab.label}
-                {activeTab === tab.value && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-1 bg-primary rounded-full" />
-                )}
-              </button>
-            ))}
-          </nav>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Hero Dashboard */}
+        <CommunityHeroDashboard />
 
-        {/* Tab Content */}
-        <div className="min-h-[calc(100vh-60px)]">
-          {activeTab === "community" && <CommunityFeed />}
-          {activeTab === "leaderboard" && (
-            <div className="p-4">
-              <RankingEngajamento ranking={ranking || []} />
-            </div>
-          )}
-          {activeTab === "members" && (
-            <div className="p-4">
-              <MembersList />
-            </div>
-          )}
+        {/* Main Content with Sidebar */}
+        <div className="flex gap-6">
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            <Tabs defaultValue="feed" className="w-full">
+              {/* Standardized Tabs */}
+              <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6">
+                <TabsTrigger 
+                  value="feed"
+                  className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  Feed
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="ranking"
+                  className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+                >
+                  <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  Ranking
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="members"
+                  className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+                >
+                  <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  Membros
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="feed" className="mt-0">
+                <div className="bg-[#0D0D0D]/60 rounded-xl border border-neutral-800 overflow-hidden">
+                  <CommunityFeed />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="ranking" className="mt-0">
+                <RankingEngajamento ranking={ranking || []} />
+              </TabsContent>
+
+              <TabsContent value="members" className="mt-0">
+                <MembersList />
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* Sidebar - Desktop Only */}
+          <div className="hidden lg:block w-80 flex-shrink-0">
+            <CommunitySidebar />
+          </div>
         </div>
       </div>
     </div>
