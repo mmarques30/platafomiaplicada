@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { CommunityFeed } from "@/components/comunidade/CommunityFeed";
 import { MembersList } from "@/components/comunidade/MembersList";
 import { RankingEngajamento } from "@/components/comunidade/RankingEngajamento";
@@ -7,6 +6,7 @@ import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Trophy, Users } from "lucide-react";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Comunidade() {
   const { data: ranking } = useRankingEngajamento();
@@ -14,6 +14,11 @@ export default function Comunidade() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Page Title */}
+        <section className="mb-6">
+          <PageTitle primary="Comunidade" secondary="Aplicada" icon={<Users className="h-7 w-7 text-primary" />} />
+        </section>
+
         {/* Hero Dashboard */}
         <CommunityHeroDashboard />
 
