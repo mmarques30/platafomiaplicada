@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useConteudosDashboard, TipoConteudo } from "@/hooks/useConteudosDashboard";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
-import logo3d from "@/assets/logo3d.png";
+import logo3d from "@/assets/logo-3d.png";
 
 const tabs = [
   { value: "todos" as const, label: "Todos", icon: FileText },
