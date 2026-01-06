@@ -19,12 +19,12 @@ export function MembersList() {
     return (
       <div className="space-y-0">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="border-b border-border p-4 animate-pulse">
+          <div key={i} className="border-b border-neutral-800 p-4 animate-pulse">
             <div className="flex gap-3">
-              <div className="h-12 w-12 rounded-full bg-muted" />
+              <div className="h-12 w-12 rounded-full bg-neutral-800" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-1/3 bg-muted rounded" />
-                <div className="h-3 w-1/4 bg-muted rounded" />
+                <div className="h-4 w-1/3 bg-neutral-800 rounded" />
+                <div className="h-3 w-1/4 bg-neutral-800 rounded" />
               </div>
             </div>
           </div>
@@ -39,15 +39,15 @@ export function MembersList() {
 
   return (
     <div className="space-y-4">
-      {/* Filters - Pill Style */}
-      <div className="flex items-center gap-2 p-1 bg-muted rounded-full w-fit">
+      {/* Filters - Standardized Style */}
+      <div className="flex items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 bg-primary/20 dark:bg-primary/30 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 w-fit">
         <button
           onClick={() => { setFilter("all"); setDisplayCount(20); }}
           className={cn(
-            "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+            "px-3 sm:px-4 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all duration-200",
             filter === "all"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground hover:bg-background"
+              ? "bg-[#0D0D0D] text-white shadow-lg"
+              : "text-foreground/70 hover:bg-neutral-800/50"
           )}
         >
           Todos {stats.totalMembers}
@@ -55,10 +55,10 @@ export function MembersList() {
         <button
           onClick={() => { setFilter("admin"); setDisplayCount(20); }}
           className={cn(
-            "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+            "px-3 sm:px-4 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all duration-200",
             filter === "admin"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground hover:bg-background"
+              ? "bg-[#0D0D0D] text-white shadow-lg"
+              : "text-foreground/70 hover:bg-neutral-800/50"
           )}
         >
           Admins {stats.adminCount}
@@ -66,10 +66,10 @@ export function MembersList() {
         <button
           onClick={() => { setFilter("online"); setDisplayCount(20); }}
           className={cn(
-            "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+            "px-3 sm:px-4 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all duration-200",
             filter === "online"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground hover:bg-background"
+              ? "bg-[#0D0D0D] text-white shadow-lg"
+              : "text-foreground/70 hover:bg-neutral-800/50"
           )}
         >
           Online {stats.onlineMembers}
@@ -83,7 +83,7 @@ export function MembersList() {
         </div>
       ) : (
         <>
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-neutral-800 bg-[#0D0D0D]/60 rounded-xl border border-neutral-800 overflow-hidden">
             {displayedMembers.map((member) => (
               <MemberCard key={member.id} member={member} />
             ))}
