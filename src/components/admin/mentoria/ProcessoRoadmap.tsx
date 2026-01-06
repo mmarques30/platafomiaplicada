@@ -106,7 +106,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
       </div>
 
       {/* Tabela de Fases */}
-      <div className="bg-card border rounded-xl overflow-hidden">
+      <div className="bg-[#E9EBC6]/15 border border-[#E9EBC6]/40 rounded-xl overflow-hidden">
         {/* Header da Tabela */}
         <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-[#E9EBC6]/30 border-b text-sm font-medium text-[#0D0D0D]">
           <div className="col-span-1">#</div>

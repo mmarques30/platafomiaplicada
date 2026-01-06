@@ -7,7 +7,8 @@ import {
   Calendar, 
   ListTodo, 
   BookOpen, 
-  HelpCircle 
+  HelpCircle,
+  ChevronRight 
 } from "lucide-react";
 
 interface NavOption {
@@ -71,7 +72,31 @@ export function NavegacaoRapida() {
         <CardTitle className="text-lg">Acesso Rápido</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+        {/* Mobile: Lista vertical */}
+        <div className="flex flex-col gap-1 sm:hidden">
+          {navOptions.map((option) => {
+            const Icon = option.icon;
+            return (
+              <button
+                key={option.path}
+                onClick={() => navigate(option.path)}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/5 transition-all group"
+              >
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Icon className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-medium text-foreground">{option.title}</p>
+                  <p className="text-xs text-muted-foreground">{option.description}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Desktop/Tablet: Grid */}
+        <div className="hidden sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
           {navOptions.map((option) => {
             const Icon = option.icon;
             return (
