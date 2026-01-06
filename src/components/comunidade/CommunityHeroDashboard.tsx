@@ -27,17 +27,17 @@ export function CommunityHeroDashboard() {
   const positionTrend: number = 2; // Positive = moved up
 
   return (
-    <div className="bg-[#0D0D0D] rounded-xl border border-primary/20 p-4 sm:p-6 mb-6">
+    <div className="bg-card rounded-xl border border-primary/20 p-4 sm:p-6 mb-6">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <Trophy className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-semibold text-white">Seu Desempenho</h2>
+        <h2 className="text-lg font-semibold">Seu Desempenho</h2>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5">
         {/* Position */}
-        <div className="bg-neutral-900/50 rounded-lg p-3 sm:p-4 border border-primary/10">
+        <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-primary/10">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-muted-foreground">Posição</span>
             {positionTrend !== 0 && (
@@ -48,42 +48,42 @@ export function CommunityHeroDashboard() {
             )}
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold text-white">#{myPosition || '-'}</span>
+            <span className="text-2xl sm:text-3xl font-bold">#{myPosition || '-'}</span>
           </div>
         </div>
 
         {/* Points */}
-        <div className="bg-neutral-900/50 rounded-lg p-3 sm:p-4 border border-primary/10">
+        <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-primary/10">
           <div className="flex items-center gap-1.5 mb-1">
             <TrendingUp className="w-3.5 h-3.5 text-primary" />
             <span className="text-xs text-muted-foreground">Pontos</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold text-white">{myPoints}</span>
+            <span className="text-2xl sm:text-3xl font-bold">{myPoints}</span>
             <span className="text-xs text-muted-foreground">pts</span>
           </div>
         </div>
 
         {/* Posts + Comments */}
-        <div className="bg-neutral-900/50 rounded-lg p-3 sm:p-4 border border-primary/10">
+        <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-primary/10">
           <div className="flex items-center gap-1.5 mb-1">
             <MessageSquare className="w-3.5 h-3.5 text-primary" />
             <span className="text-xs text-muted-foreground">Interações</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold text-white">{myPosts + myComments}</span>
+            <span className="text-2xl sm:text-3xl font-bold">{myPosts + myComments}</span>
             <span className="text-xs text-muted-foreground hidden sm:inline">posts/comments</span>
           </div>
         </div>
 
         {/* Active Days */}
-        <div className="bg-neutral-900/50 rounded-lg p-3 sm:p-4 border border-primary/10">
+        <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-primary/10">
           <div className="flex items-center gap-1.5 mb-1">
             <Calendar className="w-3.5 h-3.5 text-primary" />
             <span className="text-xs text-muted-foreground">Dias Ativos</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold text-white">{myActiveDays}</span>
+            <span className="text-2xl sm:text-3xl font-bold">{myActiveDays}</span>
             <span className="text-xs text-muted-foreground">/ 30</span>
           </div>
         </div>
@@ -96,12 +96,12 @@ export function CommunityHeroDashboard() {
             <span className="text-muted-foreground">Progresso para #{myPosition - 1}</span>
             <span className="text-primary font-medium">Faltam {pointsToNext} pts</span>
           </div>
-          <Progress value={progressPercent} className="h-2 bg-neutral-800" />
+          <Progress value={progressPercent} className="h-2 bg-muted" />
         </div>
       )}
 
       {/* Community Stats Footer */}
-      <div className="flex items-center justify-end gap-4 mt-4 pt-4 border-t border-neutral-800">
+      <div className="flex items-center justify-end gap-4 mt-4 pt-4 border-t border-border">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Users className="w-3.5 h-3.5" />
           <span>{stats.totalMembers} membros</span>

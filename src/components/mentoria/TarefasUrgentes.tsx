@@ -11,8 +11,8 @@ export function TarefasUrgentes() {
 
   if (isLoading) {
     return (
-      <Card className="h-full min-h-[400px]">
-        <CardHeader>
+      <Card className="h-full">
+        <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="space-y-2 flex-1">
               <div className="h-5 w-32 bg-muted animate-pulse rounded" />
@@ -22,8 +22,8 @@ export function TarefasUrgentes() {
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="h-20 bg-muted animate-pulse rounded w-full" />
-          <div className="h-20 bg-muted animate-pulse rounded w-full" />
+          <div className="h-16 bg-muted animate-pulse rounded w-full" />
+          <div className="h-16 bg-muted animate-pulse rounded w-full" />
           <div className="h-10 bg-muted animate-pulse rounded w-full mt-4" />
         </CardContent>
       </Card>
@@ -42,10 +42,10 @@ export function TarefasUrgentes() {
 
   if (tarefasPendentes.length === 0) {
     return (
-      <Card className="h-full min-h-[400px] flex flex-col">
-        <CardHeader>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3">
           <div>
-            <CardTitle className="text-xl">Tarefas</CardTitle>
+            <CardTitle className="text-lg">Tarefas</CardTitle>
             <p className="text-sm text-muted-foreground">Nenhuma tarefa pendente</p>
           </div>
         </CardHeader>
@@ -66,11 +66,11 @@ export function TarefasUrgentes() {
   }
 
   return (
-    <Card className="h-full min-h-[400px] flex flex-col">
-      <CardHeader>
+    <Card className="h-full flex flex-col">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl">Tarefas Pendentes</CardTitle>
+            <CardTitle className="text-lg">Tarefas Pendentes</CardTitle>
             <p className="text-sm text-muted-foreground">{tarefasPendentes.length} tarefas urgentes</p>
           </div>
         </div>

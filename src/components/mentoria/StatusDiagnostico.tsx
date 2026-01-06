@@ -13,8 +13,8 @@ export function StatusDiagnostico() {
 
   if (isLoading) {
     return (
-      <Card className="h-full min-h-[400px]">
-        <CardHeader>
+      <Card className="h-full">
+        <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="space-y-2 flex-1">
               <div className="h-5 w-32 bg-muted animate-pulse rounded" />
@@ -36,12 +36,12 @@ export function StatusDiagnostico() {
   const preenchidoPorAdmin = formulario?.preenchido_por === 'admin';
 
   return (
-    <Card className="h-full min-h-[400px] flex flex-col">
-      <CardHeader>
+    <Card className="h-full flex flex-col">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl">Diagnóstico IA</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg">Diagnóstico IA</CardTitle>
+            <CardDescription className="text-sm">
               {completo 
                 ? "Seu diagnóstico está completo" 
                 : "Inicie seu diagnóstico personalizado"

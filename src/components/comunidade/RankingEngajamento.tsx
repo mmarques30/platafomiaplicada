@@ -52,13 +52,13 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
   return (
     <div className="space-y-6">
       {/* Sobre a Premiação - Topo, discreta, sem ícones */}
-      <div className="bg-[#0D0D0D] rounded-xl p-4 border border-primary/20">
-        <h3 className="text-sm font-semibold text-white mb-2">Sobre a Premiação</h3>
+      <div className="bg-card rounded-xl p-4 border border-primary/20">
+        <h3 className="text-sm font-semibold mb-2">Sobre a Premiação</h3>
         <p className="text-sm text-muted-foreground mb-3">
           Todo mês, o membro mais engajado é premiado com acesso especial ou sessões de mentoria exclusivas.
         </p>
         <p className="text-xs text-muted-foreground">
-          <span className="font-medium text-white">Como pontuar:</span> Criar post (20pts) • Comentar (5pts) • Dar like (2pts) • Receber like (10pts) • Dia ativo (1pt)
+          <span className="font-medium">Como pontuar:</span> Criar post (20pts) • Comentar (5pts) • Dar like (2pts) • Receber like (10pts) • Dia ativo (1pt)
         </p>
       </div>
 
@@ -127,9 +127,9 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
 
       {/* Posições 4+ - Tabela simplificada */}
       {(posicoes4a10.length > 0 || alem10.length > 0) && (
-        <div className="bg-[#0D0D0D] rounded-xl border border-neutral-800 overflow-hidden">
+        <div className="bg-card rounded-xl border overflow-hidden">
           <table className="w-full">
-            <thead className="bg-neutral-900">
+            <thead className="bg-muted/50">
               <tr className="text-xs text-muted-foreground">
                 <th className="text-left p-3 font-medium w-12">#</th>
                 <th className="text-left p-3 font-medium">Membro</th>
@@ -138,13 +138,13 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                 <th className="text-right p-3 font-medium">Pontos</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-800">
+            <tbody className="divide-y divide-border">
               {/* Posições 4 a 10 */}
               {posicoes4a10.map((item) => (
                 <tr 
                   key={item.user_id} 
                   className={cn(
-                    "hover:bg-neutral-800/50 transition-colors",
+                    "hover:bg-muted/50 transition-colors",
                     item.user_id === user?.id && "bg-primary/10"
                   )}
                 >
@@ -159,7 +159,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                       </Avatar>
                       <span className={cn(
                         "truncate",
-                        item.user_id === user?.id ? "text-primary font-medium" : "text-white"
+                        item.user_id === user?.id ? "text-primary font-medium" : ""
                       )}>
                         {item.nome_completo}
                         {item.user_id === user?.id && (
@@ -170,7 +170,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                   </td>
                   <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_posts}</td>
                   <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_comentarios}</td>
-                  <td className="p-3 text-right font-semibold text-white">{item.total_pontos}</td>
+                  <td className="p-3 text-right font-semibold">{item.total_pontos}</td>
                 </tr>
               ))}
 
@@ -179,7 +179,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                 <tr 
                   key={item.user_id} 
                   className={cn(
-                    "hover:bg-neutral-800/50 transition-colors",
+                    "hover:bg-muted/50 transition-colors",
                     item.user_id === user?.id && "bg-primary/10"
                   )}
                 >
@@ -193,8 +193,8 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                         </AvatarFallback>
                       </Avatar>
                       <span className={cn(
-                        "truncate text-white",
-                        item.user_id === user?.id ? "text-primary font-medium" : "text-foreground"
+                        "truncate",
+                        item.user_id === user?.id ? "text-primary font-medium" : ""
                       )}>
                         {item.nome_completo}
                         {item.user_id === user?.id && (
@@ -205,7 +205,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                   </td>
                   <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_posts}</td>
                   <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_comentarios}</td>
-                  <td className="p-3 text-right font-semibold text-white">{item.total_pontos}</td>
+                  <td className="p-3 text-right font-semibold">{item.total_pontos}</td>
                 </tr>
               ))}
             </tbody>
@@ -214,7 +214,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
           {alem10.length > 0 && (
             <button 
               onClick={() => setExpanded(!expanded)}
-              className="w-full p-3 text-sm text-muted-foreground hover:text-white hover:bg-neutral-800/50 transition-colors flex items-center justify-center gap-2 border-t border-neutral-800"
+              className="w-full p-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors flex items-center justify-center gap-2 border-t"
             >
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", expanded && "rotate-180")} />
               {expanded ? 'Ver menos' : `Ver mais ${alem10.length} posições`}
@@ -223,7 +223,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
 
           {/* Minha posição (se não estiver visível no top 10) */}
           {minhaposicao && minhaposicao.posicao > 10 && !expanded && (
-            <div className="border-t border-neutral-800 p-4">
+            <div className="border-t p-4">
               <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border border-primary/30">
                 <span className="font-mono text-sm text-muted-foreground w-8">{minhaposicao.posicao}º</span>
                 <Avatar className="h-10 w-10 border-2 border-primary">
@@ -235,7 +235,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                   <p className="text-xs text-muted-foreground">Sua posição atual</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-lg text-white">{minhaposicao.total_pontos}</p>
+                  <p className="font-semibold text-lg">{minhaposicao.total_pontos}</p>
                   <p className="text-xs text-muted-foreground">pts</p>
                 </div>
               </div>
