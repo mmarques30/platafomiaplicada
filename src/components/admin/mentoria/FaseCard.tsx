@@ -63,10 +63,10 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
         };
       default:
         return {
-          icon: <Circle className="h-5 w-5" />,
-          color: "text-secondary",
-          bgColor: "bg-secondary/10",
-          borderColor: "border-secondary/30",
+          icon: <Clock className="h-5 w-5" />,
+          color: "text-amber-500",
+          bgColor: "bg-amber-500/10",
+          borderColor: "border-amber-500/30",
           badge: "outline" as const,
           label: "Pendente"
         };
@@ -78,8 +78,9 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
 
   return (
     <Card className={cn(
-      "transition-all hover:shadow-md",
-      status.borderColor
+      "transition-all hover:shadow-md border-l-4",
+      status.borderColor,
+      status.bgColor
     )}>
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
         {/* Header compacto */}
@@ -96,7 +97,7 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
           {/* Número + Nome */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-muted-foreground">
+              <span className={cn("text-lg font-bold", status.color)}>
                 {fase.fase_numero}.
               </span>
               <span className="font-semibold truncate">{fase.nome_fase}</span>
