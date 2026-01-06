@@ -199,9 +199,9 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
         </Accordion>
 
         {planoJaCriado && (
-          <Alert className="mt-6 border-green-200 bg-green-50">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">
+          <Alert className="mt-6 border-primary/30 bg-primary/10">
+            <CheckCircle2 className="h-4 w-4 text-primary" />
+            <AlertDescription className="text-foreground/80">
               <strong>Plano de mentoria criado com sucesso!</strong>
               <p className="text-sm mt-1">
                 Seus objetivos e tarefas iniciais já estão disponíveis na seção de Mentoria.

@@ -181,10 +181,10 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
           )}
 
           {diagnostico.plano_gerado && (
-            <Alert className="border-green-200 bg-green-50">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-900">Plano de mentoria criado</AlertTitle>
-              <AlertDescription className="text-green-800">
+            <Alert className="border-primary/30 bg-primary/10">
+              <CheckCircle className="h-4 w-4 text-primary" />
+              <AlertTitle className="text-primary">Plano de mentoria criado</AlertTitle>
+              <AlertDescription className="text-foreground/80">
                 <div className="mt-2 space-y-1">
                   <p>
                     ✱ Plano gerado em {diagnostico.plano_gerado_em && format(new Date(diagnostico.plano_gerado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}

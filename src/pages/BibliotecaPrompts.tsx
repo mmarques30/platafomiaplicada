@@ -81,12 +81,7 @@ export default function BibliotecaPrompts() {
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
       {/* Header */}
-      <div>
-        <PageTitle primary="Biblioteca" secondary="de Prompts" />
-        <p className="text-sm md:text-base text-muted-foreground mt-1">
-          Prompts prontos para cada tipo de situação
-        </p>
-      </div>
+      <PageTitle primary="Biblioteca" secondary="de Prompts" />
 
       {/* Barra de Busca e Filtros Dropdown */}
       <div className="flex flex-col md:flex-row gap-3">
