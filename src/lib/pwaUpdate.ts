@@ -11,12 +11,11 @@ export async function forceFullAppReload() {
       console.log('[PWA] Todos os caches limpos:', cacheNames);
     }
     
-    // 2. Forçar update e desregistrar service workers
+    // 2. Desregistrar service workers (sem chamar update() antes)
     if ('serviceWorker' in navigator) {
       const registrations = await navigator.serviceWorker.getRegistrations();
       for (const registration of registrations) {
         try {
-          await registration.update();
           await registration.unregister();
           console.log('[PWA] Service worker desregistrado');
         } catch (e) {
@@ -28,14 +27,18 @@ export async function forceFullAppReload() {
     // 3. Limpar localStorage de versão
     localStorage.removeItem('app-version');
     
-    // 4. Pequeno delay para garantir que tudo foi processado
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // 4. Delay maior para iOS/Safari processar
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // 5. Recarregar com cache-busting
-    window.location.replace(window.location.origin + '/?forceReload=' + Date.now());
+    // 5. Recarregar de forma mais segura para Safari
+    window.location.href = window.location.origin + '/';
   } catch (error) {
     console.error('[PWA] Erro ao forçar atualização:', error);
-    // Mesmo com erro, tentar recarregar
-    window.location.reload();
+    // Fallback simples
+    try {
+      window.location.reload();
+    } catch {
+      window.location.href = '/';
+    }
   }
 }
