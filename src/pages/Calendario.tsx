@@ -114,16 +114,21 @@ export default function Calendario() {
         </div>
 
         <Tabs defaultValue="calendario" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="calendario" className="gap-1 md:gap-2 text-xs md:text-sm">
-              <Calendar className="h-3 w-3 md:h-4 md:w-4" />
+          <TabsList className="w-full md:w-auto grid grid-cols-2 md:inline-flex gap-0.5 sm:gap-1 bg-aplicada-green-900/40 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-aplicada-green-700/30">
+            <TabsTrigger 
+              value="calendario" 
+              className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+            >
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Calendário</span>
               <span className="sm:hidden">Agenda</span>
             </TabsTrigger>
-            <TabsTrigger value="tabela" className="gap-1 md:gap-2 text-xs md:text-sm">
-              <History className="h-3 w-3 md:h-4 md:w-4" />
-              <span className="hidden sm:inline">Histórico de Encontros</span>
-              <span className="sm:hidden">Histórico</span>
+            <TabsTrigger 
+              value="tabela" 
+              className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+            >
+              <History className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Histórico</span>
             </TabsTrigger>
           </TabsList>
 

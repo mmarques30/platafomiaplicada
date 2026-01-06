@@ -12,23 +12,26 @@ import { cn } from "@/lib/utils";
 const tipoEventoConfig = {
   aula_ao_vivo: {
     label: "Aula ao Vivo",
-    color: "bg-primary",
-    borderColor: "border-primary",
-    textColor: "text-primary",
+    color: "bg-aplicada-green-700",
+    borderColor: "border-aplicada-green-700",
+    textColor: "text-aplicada-green-700",
+    legendColor: "bg-aplicada-green-700 ring-aplicada-green-700/30",
     icon: Video,
   },
   qa: {
     label: "Q&A",
-    color: "bg-blue-500",
-    borderColor: "border-blue-500",
-    textColor: "text-blue-500",
+    color: "bg-aplicada-green-500",
+    borderColor: "border-aplicada-green-500",
+    textColor: "text-aplicada-green-500",
+    legendColor: "bg-aplicada-green-500 ring-aplicada-green-500/30",
     icon: HelpCircle,
   },
   outro: {
     label: "Outro",
-    color: "bg-orange-500",
-    borderColor: "border-orange-500",
-    textColor: "text-orange-500",
+    color: "bg-aplicada-green-800",
+    borderColor: "border-aplicada-green-800",
+    textColor: "text-aplicada-green-800",
+    legendColor: "bg-aplicada-green-800 ring-aplicada-green-800/30",
     icon: CalendarIcon,
   },
 };
@@ -91,20 +94,20 @@ export function CalendarioVisaoCalendario() {
       {/* Legenda */}
       <div className="flex flex-wrap gap-6 mb-8 justify-center">
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-primary ring-2 ring-primary/30" />
+          <span className="w-4 h-4 rounded-full bg-aplicada-green-700 ring-2 ring-aplicada-green-700/30" />
           <span className="text-sm font-medium text-foreground">Aula ao Vivo</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-blue-500 ring-2 ring-blue-500/30" />
+          <span className="w-4 h-4 rounded-full bg-aplicada-green-500 ring-2 ring-aplicada-green-500/30" />
           <span className="text-sm font-medium text-foreground">Q&A</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-orange-500 ring-2 ring-orange-500/30" />
+          <span className="w-4 h-4 rounded-full bg-aplicada-green-800 ring-2 ring-aplicada-green-800/30" />
           <span className="text-sm font-medium text-foreground">Outro</span>
         </div>
       </div>
 
-      <Card className="p-4 md:p-8 border-2 border-border/50 shadow-lg bg-card">
+      <Card className="p-4 md:p-8 bg-card/50 backdrop-blur-sm">
         <Calendar
           mode="single"
           selected={selectedDate}
@@ -138,9 +141,9 @@ export function CalendarioVisaoCalendario() {
             outro: outrosEventos,
           }}
           modifiersClassNames={{
-            aulaAoVivo: "border-2 border-primary font-bold text-foreground bg-primary/10",
-            qa: "border-2 border-blue-500 font-bold text-foreground bg-blue-500/10",
-            outro: "border-2 border-orange-500 font-bold text-foreground bg-orange-500/10",
+            aulaAoVivo: "border-2 border-aplicada-green-700 font-bold text-foreground bg-aplicada-green-700/10",
+            qa: "border-2 border-aplicada-green-500 font-bold text-foreground bg-aplicada-green-500/10",
+            outro: "border-2 border-aplicada-green-800 font-bold text-foreground bg-aplicada-green-800/10",
           }}
         />
       </Card>
