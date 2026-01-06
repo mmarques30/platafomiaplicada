@@ -52,12 +52,12 @@ export default function Central() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
-      {/* Background Logo */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      {/* Background Logo - Decorativo Lateral */}
+      <div className="absolute -right-20 -bottom-20 pointer-events-none">
         <img 
           src={logo3d} 
           alt="" 
-          className="w-[600px] h-[600px] object-contain opacity-[0.03] select-none"
+          className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] object-contain opacity-[0.05] select-none"
         />
       </div>
 
