@@ -6,7 +6,6 @@ import { CommunityHeroDashboard } from "@/components/comunidade/CommunityHeroDas
 import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Comunidade() {
@@ -17,7 +16,7 @@ export default function Comunidade() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Page Title */}
         <section className="mb-6">
-          <PageTitle primary="Comunidade" secondary="Aplicada" icon={<Users className="h-7 w-7 text-primary" />} />
+          <PageTitle primary="Comunidade" secondary="Aplicada" />
         </section>
 
         {/* Hero Dashboard */}

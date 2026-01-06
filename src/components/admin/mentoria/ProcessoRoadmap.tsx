@@ -7,7 +7,7 @@ import { useFasesProcesso, FaseProcesso } from "@/hooks/useFasesProcesso";
 import { FaseCard } from "./FaseCard";
 import { FaseEditModal } from "./FaseEditModal";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Flag, Clock } from "lucide-react";
+import { Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const logoSimbolo = "/logo-simbolo.png?v=10";
@@ -200,8 +200,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
 
       {/* Cards de Fases - Detalhados */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-          <Clock className="h-4 w-4" />
+        <h3 className="text-sm font-medium text-muted-foreground">
           Detalhes das Fases
         </h3>
         <div className="space-y-3">
