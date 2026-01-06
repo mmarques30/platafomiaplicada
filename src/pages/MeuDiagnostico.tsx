@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { CheckCircle2, Clock, AlertCircle, Brain, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ObjetivosGerados } from "@/components/mentoria/ObjetivosGerados";
@@ -65,11 +65,19 @@ export default function MeuDiagnostico() {
           <Skeleton className="h-64 w-full" />
         ) : (
           <Tabs defaultValue="diagnostico-ia" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="diagnostico-ia">
+            <TabsList className="w-full md:w-auto grid grid-cols-2 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6">
+              <TabsTrigger 
+                value="diagnostico-ia"
+                className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+              >
+                <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Diagnóstico IA
               </TabsTrigger>
-              <TabsTrigger value="feedback-mentora">
+              <TabsTrigger 
+                value="feedback-mentora"
+                className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+              >
+                <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Feedback Mentora
               </TabsTrigger>
             </TabsList>
