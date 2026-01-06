@@ -6,7 +6,7 @@ import { CommunityMember } from "@/hooks/useCommunityMembers";
 import { cn } from "@/lib/utils";
 
 interface MemberCardProps {
-  member: CommunityMember;
+  member: CommunityMember & { is_facilitador?: boolean };
 }
 
 export function MemberCard({ member }: MemberCardProps) {
@@ -52,6 +52,11 @@ export function MemberCard({ member }: MemberCardProps) {
           {member.is_admin && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
               Admin
+            </span>
+          )}
+          {member.is_facilitador && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">
+              Facilitador
             </span>
           )}
         </div>

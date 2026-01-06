@@ -19,23 +19,23 @@ export function useCommunityStats() {
         .eq("conta_ativa", true)
         .gt("ultimo_acesso", fiveMinutesAgo);
 
-      // Admins
-      const { count: adminCount } = await supabase
+      // Facilitadores
+      const { count: facilitadorCount } = await supabase
         .from("user_roles")
         .select("*", { count: "exact", head: true })
-        .eq("role", "admin");
+        .eq("role", "facilitador");
 
       return {
         totalMembers: totalMembers || 0,
         onlineMembers: onlineMembers || 0,
-        adminCount: adminCount || 0,
+        facilitadorCount: facilitadorCount || 0,
       };
     },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   return {
-    stats: stats || { totalMembers: 0, onlineMembers: 0, adminCount: 0 },
+    stats: stats || { totalMembers: 0, onlineMembers: 0, facilitadorCount: 0 },
     isLoading,
   };
 }

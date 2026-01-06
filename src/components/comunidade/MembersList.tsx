@@ -7,7 +7,7 @@ import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function MembersList() {
-  const [filter, setFilter] = useState<"all" | "admin" | "online">("all");
+  const [filter, setFilter] = useState<"all" | "facilitador" | "online">("all");
   const [displayCount, setDisplayCount] = useState(20);
   const { members, isLoading } = useCommunityMembers(filter);
   const { stats } = useCommunityStats();
@@ -53,15 +53,15 @@ export function MembersList() {
           Todos {stats.totalMembers}
         </button>
         <button
-          onClick={() => { setFilter("admin"); setDisplayCount(20); }}
+          onClick={() => { setFilter("facilitador"); setDisplayCount(20); }}
           className={cn(
             "px-3 sm:px-4 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all duration-200",
-            filter === "admin"
+            filter === "facilitador"
               ? "bg-[#0D0D0D] text-white shadow-lg"
               : "text-foreground/70 hover:bg-neutral-800/50"
           )}
         >
-          Admins {stats.adminCount}
+          Facilitadores {stats.facilitadorCount}
         </button>
         <button
           onClick={() => { setFilter("online"); setDisplayCount(20); }}
