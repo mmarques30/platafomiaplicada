@@ -72,7 +72,7 @@ export default function Central() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo | "todos")} className="flex-1 flex flex-col">
-          <TabsList className="inline-flex w-fit gap-0.5 sm:gap-1 bg-aplicada-green-900/40 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-aplicada-green-700/30">
+          <TabsList className="inline-flex w-fit gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.value}
@@ -118,7 +118,7 @@ export default function Central() {
                             />
                           </div>
                         ) : (
-                          <div className="aspect-video w-full bg-gradient-to-br from-aplicada-green-900/20 via-aplicada-green-800/10 to-background flex items-center justify-center">
+                          <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
                             <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
                           </div>
                         )}

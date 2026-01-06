@@ -19,7 +19,7 @@ export function CentralConteudo() {
   const { data: conteudos, isLoading } = useConteudosDashboard(activeTab);
 
   return (
-    <section className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-aplicada-green-700/40 sm:border-2 bg-gradient-to-br from-aplicada-green-900/20 via-card to-aplicada-green-800/10 shadow-lg sm:shadow-xl shadow-aplicada-green-900/10">
+    <section className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-primary/30 sm:border-2 bg-gradient-to-br from-primary/10 via-card to-primary/5 shadow-lg sm:shadow-xl shadow-primary/10 dark:border-primary/40 dark:from-primary/15 dark:to-primary/5">
       {/* Background Logo 3D - hidden on mobile for performance */}
       <div className="hidden sm:flex absolute inset-0 items-center justify-center pointer-events-none overflow-hidden">
         <img 
@@ -37,10 +37,10 @@ export function CentralConteudo() {
         {/* Header */}
         <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
           <div>
-            <h2 className="text-base sm:text-xl md:text-2xl font-bold text-[#0D0D0D]">
+            <h2 className="text-base sm:text-xl md:text-2xl font-bold text-foreground">
               Central de Conteudo
             </h2>
-            <p className="text-xs sm:text-sm text-[#2F302B] mt-0.5 sm:mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
               Fique por dentro das novidades e aplique hoje
             </p>
           </div>
@@ -48,7 +48,7 @@ export function CentralConteudo() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo)} className="w-full">
-          <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-aplicada-green-900/40 p-1 sm:p-1.5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 md:mb-6 border border-aplicada-green-700/30">
+          <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 md:mb-6 border border-primary/30 dark:border-primary/40">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.value}
@@ -76,7 +76,7 @@ export function CentralConteudo() {
                     <>
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0">
-                          <div className="h-[160px] sm:h-[200px] w-full rounded-lg sm:rounded-xl bg-aplicada-green-900/30 animate-pulse" />
+                          <div className="h-[160px] sm:h-[200px] w-full rounded-lg sm:rounded-xl bg-primary/20 animate-pulse" />
                         </div>
                       ))}
                     </>
@@ -88,7 +88,7 @@ export function CentralConteudo() {
                     ))
                   ) : (
                     <div className="w-full py-12 text-center">
-                      <tab.icon className="w-12 h-12 mx-auto text-aplicada-green-700/30 mb-3" />
+                      <tab.icon className="w-12 h-12 mx-auto text-primary/30 mb-3" />
                       <p className="text-muted-foreground">
                         Nenhum conteudo disponivel nesta categoria
                       </p>
@@ -105,7 +105,7 @@ export function CentralConteudo() {
           <Link to="/central">
             <motion.button
               whileHover={{ x: 4 }}
-              className="flex items-center gap-2 text-sm text-aplicada-green-600 hover:text-aplicada-green-400 transition-colors font-medium"
+              className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
             >
               Ver todos os conteudos
               <ArrowRight className="w-4 h-4" />

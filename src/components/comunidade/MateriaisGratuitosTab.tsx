@@ -164,14 +164,14 @@ export function MateriaisGratuitosTab() {
 
       {/* Materials Table View */}
       {!isLoading && filteredMateriais && filteredMateriais.length > 0 && (
-        <div className="border border-border rounded-lg">
-          <Table>
+        <div className="border border-border rounded-lg overflow-x-auto">
+          <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[300px]">Título</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Descrição</TableHead>
-                <TableHead className="w-[250px]">Ação</TableHead>
+                <TableHead className="w-[180px] md:w-[300px]">Título</TableHead>
+                <TableHead className="w-[100px] md:w-auto">Categoria</TableHead>
+                <TableHead className="hidden md:table-cell">Descrição</TableHead>
+                <TableHead className="w-[100px] md:w-[250px]">Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -191,39 +191,37 @@ export function MateriaisGratuitosTab() {
                         <span className="text-sm">{categoria?.label}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-md">
+                    <TableCell className="max-w-md hidden md:table-cell">
                       <p className="text-sm text-muted-foreground line-clamp-2">
                         {material.descricao || "—"}
                       </p>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-2">
-                        {allLinks.map((url, index) => (
-                          <div key={index} className="flex gap-1">
-                            <Button
-                              size="sm"
-                              variant={index === 0 ? "default" : "outline"}
-                              asChild
-                              onClick={() => handleAccessClick(material)}
-                            >
-                              <a href={url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4 mr-1" />
-                                {allLinks.length > 1 ? `Link ${index + 1}` : 'Acessar'}
-                              </a>
-                            </Button>
-                            <CopyButton 
-                              content={url} 
-                              variant="outline" 
-                              size="sm"
-                            />
-                          </div>
+                    <TableCell className="py-2">
+                      <div className="flex flex-wrap gap-1 md:gap-2">
+                        {allLinks.slice(0, 1).map((url, index) => (
+                          <Button
+                            key={index}
+                            size="sm"
+                            variant="default"
+                            asChild
+                            onClick={() => handleAccessClick(material)}
+                            className="text-xs md:text-sm px-2 md:px-3"
+                          >
+                            <a href={url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3 w-3 md:h-4 md:w-4 mr-1" />
+                              <span className="hidden md:inline">Acessar</span>
+                              <span className="md:hidden">Ir</span>
+                            </a>
+                          </Button>
                         ))}
                         {arquivos.length > 0 && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                <Download className="h-3 w-3 mr-1" />
-                                {arquivos.length} arquivo{arquivos.length > 1 ? 's' : ''}
+                              <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3">
+                                <Download className="h-3 w-3" />
+                                <span className="hidden md:inline ml-1">
+                                  {arquivos.length} arquivo{arquivos.length > 1 ? 's' : ''}
+                                </span>
                                 <ChevronDown className="h-3 w-3 ml-1" />
                               </Button>
                             </DropdownMenuTrigger>
