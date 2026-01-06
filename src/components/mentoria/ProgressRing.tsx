@@ -32,11 +32,11 @@ export function ProgressRing({
           <circle
             cx={size / 2}
             cy={size / 2}
-            r={radius}
+            r={radius + 1}
             stroke="hsl(var(--muted))"
             strokeWidth={strokeWidth}
             fill="none"
-            opacity={0.2}
+            opacity={0.3}
           />
           {/* Progress circle */}
           <circle
@@ -50,6 +50,7 @@ export function ProgressRing({
             strokeDashoffset={offset}
             strokeLinecap="round"
             className="transition-all duration-500 ease-in-out"
+            style={{ filter: `drop-shadow(0 0 4px ${finalColor})` }}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
@@ -57,7 +58,7 @@ export function ProgressRing({
         </div>
       </div>
       <div className="text-center">
-        <div className="font-medium text-sm">{label}</div>
+        <div className="font-medium text-sm text-foreground">{label}</div>
         {subtitle && (
           <div className="text-xs text-muted-foreground">{subtitle}</div>
         )}
