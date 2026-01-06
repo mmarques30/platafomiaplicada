@@ -1,55 +1,44 @@
-import { useState } from "react";
 import { VideosVisitante } from "@/components/dashboard/VideosVisitante";
 import { MateriaisGratuitosTab } from "@/components/comunidade/MateriaisGratuitosTab";
-import { cn } from "@/lib/utils";
 import { PageTitle } from "@/components/shared/PageTitle";
-
-type SalaTabValue = "aula" | "materiais";
-
-const salaTabs: { value: SalaTabValue; label: string }[] = [
-  { value: "aula", label: "Aula" },
-  { value: "materiais", label: "Materiais" },
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlayCircle, FileText, GraduationCap } from "lucide-react";
 
 export default function VideosBonus() {
-  const [activeTab, setActiveTab] = useState<SalaTabValue>("aula");
-
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-6 space-y-6">
         {/* Header */}
         <section>
-          <PageTitle primary="Sala" secondary="de Aula" />
+          <PageTitle primary="Sala" secondary="de Aula" icon={<GraduationCap className="h-7 w-7 text-primary" />} />
         </section>
 
-        {/* Tab Navigation - X/Twitter Style */}
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
-          <nav className="flex">
-            {salaTabs.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => setActiveTab(tab.value)}
-                className={cn(
-                  "flex-1 py-4 px-4 text-sm font-medium transition-colors relative hover:bg-muted/50",
-                  activeTab === tab.value
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {tab.label}
-                {activeTab === tab.value && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-1 bg-primary rounded-full" />
-                )}
-              </button>
-            ))}
-          </nav>
-        </div>
+        {/* Tabs */}
+        <Tabs defaultValue="aula" className="w-full">
+          <TabsList className="w-full md:w-auto grid grid-cols-2 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6">
+            <TabsTrigger 
+              value="aula"
+              className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+            >
+              <PlayCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Aula
+            </TabsTrigger>
+            <TabsTrigger 
+              value="materiais"
+              className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+            >
+              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Materiais
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Tab Content */}
-        <div className="min-h-[calc(100vh-200px)]">
-          {activeTab === "aula" && <VideosVisitante />}
-          {activeTab === "materiais" && <MateriaisGratuitosTab />}
-        </div>
+          <TabsContent value="aula" className="mt-0 min-h-[calc(100vh-250px)]">
+            <VideosVisitante />
+          </TabsContent>
+          <TabsContent value="materiais" className="mt-0 min-h-[calc(100vh-250px)]">
+            <MateriaisGratuitosTab />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
