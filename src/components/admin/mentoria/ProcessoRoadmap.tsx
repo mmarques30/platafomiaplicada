@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useFasesProcesso, FaseProcesso } from "@/hooks/useFasesProcesso";
-import { FaseCard } from "./FaseCard";
 import { FaseEditModal } from "./FaseEditModal";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Flag } from "lucide-react";
+import { CheckCircle2, Circle, ChevronDown, ChevronRight, Calendar, Folder, ListTodo, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const logoSimbolo = "/logo-simbolo.png?v=10";
 
@@ -21,6 +21,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
   const { fases, isLoading, updateFase, inicializarFases, isUpdating } = useFasesProcesso(userId);
   const [editingFase, setEditingFase] = useState<FaseProcesso | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [expandedFaseId, setExpandedFaseId] = useState<string | null>(null);
 
   const handleEditFase = (fase: FaseProcesso) => {
     setEditingFase(fase);
@@ -31,26 +32,20 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
     updateFase(data);
   };
 
+  const handleRowClick = (faseId: string) => {
+    setExpandedFaseId(expandedFaseId === faseId ? null : faseId);
+  };
+
   // Calcular estatísticas
   const fasesConcluidas = fases.filter((f) => f.status === "concluida").length;
   const progressoGeral = fases.length > 0 ? Math.round((fasesConcluidas / fases.length) * 100) : 0;
   const faseAtual = fases.find((f) => f.status === "em_andamento");
-  const faseAtualIndex = faseAtual ? fases.findIndex(f => f.id === faseAtual.id) : -1;
-
-  // Calcular dias desde primeira sessão
-  const primeiraFase = fases.find((f) => f.data_inicio);
-  const diasMentoria = primeiraFase
-    ? Math.floor((new Date().getTime() - new Date(primeiraFase.data_inicio!).getTime()) / (1000 * 60 * 60 * 24))
-    : 0;
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-24 w-full" />
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-20 w-full" />
-        ))}
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
@@ -80,102 +75,233 @@ export const ProcessoRoadmap = ({ userId, readonly = false }: ProcessoRoadmapPro
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Header de Progresso - Compacto */}
+      <div className="bg-[#E9EBC6]/20 border border-[#E9EBC6]/50 rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-medium text-[#0D0D0D]/70">Progresso Geral</span>
+          <span className="text-2xl font-bold text-[#0D0D0D]">{progressoGeral}%</span>
+        </div>
+        
+        {/* Barra de Progresso */}
+        <div className="w-full bg-[#0D0D0D]/10 rounded-full h-2.5 overflow-hidden mb-3">
+          <div 
+            className="h-full bg-[#0D0D0D] rounded-full transition-all duration-500"
+            style={{ width: `${progressoGeral}%` }}
+          />
+        </div>
+        
+        {/* Stats inline */}
+        <div className="flex items-center gap-4 text-sm flex-wrap">
+          <span className="text-green-600 font-medium">{fasesConcluidas} concluídas</span>
+          <span className="text-[#0D0D0D]/40">•</span>
+          <span className="text-[#0D0D0D] font-medium">
+            {faseAtual ? `Fase ${faseAtual.fase_numero} atual` : "Nenhuma em andamento"}
+          </span>
+          <span className="text-[#0D0D0D]/40">•</span>
+          <span className="text-amber-600 font-medium">
+            {fases.length - fasesConcluidas - (faseAtual ? 1 : 0)} restantes
+          </span>
+        </div>
+      </div>
 
-      {/* Timeline Visual - Card com Branding */}
-      <Card className="overflow-hidden bg-[#E9EBC6] border-[#E9EBC6]/50">
-        <CardContent className="p-6">
-          {/* Barra de Progresso principal */}
-          <div className="mb-6 flex items-center gap-4">
-            <div className="flex-1 bg-[#0D0D0D]/20 rounded-full h-3 overflow-hidden">
+      {/* Tabela de Fases */}
+      <div className="bg-card border rounded-xl overflow-hidden">
+        {/* Header da Tabela */}
+        <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-[#E9EBC6]/30 border-b text-sm font-medium text-[#0D0D0D]">
+          <div className="col-span-1">#</div>
+          <div className="col-span-3">Fase</div>
+          <div className="col-span-5 hidden sm:block">Descrição</div>
+          <div className="col-span-3 sm:col-span-2 text-right">Status</div>
+          <div className="col-span-1 text-center"></div>
+        </div>
+        
+        {/* Linhas da Tabela */}
+        {fases.map((fase) => {
+          const isConcluida = fase.status === "concluida";
+          const isAtual = fase.status === "em_andamento";
+          const isPendente = fase.status === "pendente" || fase.status === "bloqueada";
+          const isExpanded = expandedFaseId === fase.id;
+          
+          return (
+            <div key={fase.id} className="border-b last:border-b-0">
+              {/* Linha principal */}
               <div 
-                className="h-full bg-[#0D0D0D] rounded-full transition-all duration-500"
-                style={{ width: `${progressoGeral}%` }}
-              />
-            </div>
-            <span className="text-lg font-bold text-[#0D0D0D]">{progressoGeral}%</span>
-          </div>
-
-          {/* Timeline horizontal */}
-          <div className="relative py-6">
-            {/* Linha de fundo */}
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#0D0D0D]/20 rounded-full -translate-y-1/2" />
-            
-            {/* Linha de progresso */}
-            <div 
-              className="absolute top-1/2 left-0 h-1 bg-[#0D0D0D] rounded-full -translate-y-1/2 transition-all duration-500"
-              style={{ width: `${progressoGeral}%` }}
-            />
-
-            {/* Pins das fases - Círculos numerados */}
-            <div className="relative flex justify-between">
-              {fases.map((fase, index) => {
-                const isConcluida = fase.status === "concluida";
-                const isAtual = fase.status === "em_andamento";
+                className={cn(
+                  "grid grid-cols-12 gap-2 px-4 py-3 items-center text-sm transition-colors cursor-pointer hover:bg-[#E9EBC6]/10",
+                  isAtual && "bg-[#E9EBC6]/20 border-l-4 border-l-[#0D0D0D]",
+                  isConcluida && "bg-green-50/50"
+                )}
+                onClick={() => handleRowClick(fase.id)}
+              >
+                {/* Número */}
+                <div className={cn(
+                  "col-span-1 font-bold",
+                  isConcluida && "text-green-600",
+                  isAtual && "text-[#0D0D0D]",
+                  isPendente && "text-[#0D0D0D]/40"
+                )}>
+                  {fase.fase_numero}
+                </div>
                 
-                return (
-                  <div 
-                    key={fase.id} 
-                    className="flex flex-col items-center relative"
-                    style={{ width: `${100 / fases.length}%` }}
+                {/* Indicador + Nome */}
+                <div className="col-span-3 flex items-center gap-2">
+                  {isConcluida && <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />}
+                  {isAtual && <div className="w-2 h-2 rounded-full bg-[#0D0D0D] animate-pulse shrink-0" />}
+                  {isPendente && <Circle className="h-4 w-4 text-[#0D0D0D]/30 shrink-0" />}
+                  
+                  <span className={cn(
+                    "font-medium truncate",
+                    isConcluida && "text-green-700",
+                    isAtual && "text-[#0D0D0D] font-semibold",
+                    isPendente && "text-[#0D0D0D]/60"
+                  )}>
+                    {fase.nome_fase}
+                  </span>
+                </div>
+                
+                {/* Descrição */}
+                <div className={cn(
+                  "col-span-5 truncate hidden sm:block",
+                  isConcluida && "text-green-600/70",
+                  isAtual && "text-[#0D0D0D]/80",
+                  isPendente && "text-[#0D0D0D]/40"
+                )}>
+                  {fase.descricao || "—"}
+                </div>
+                
+                {/* Status Badge */}
+                <div className="col-span-3 sm:col-span-2 flex justify-end">
+                  <Badge 
+                    variant="outline"
+                    className={cn(
+                      "text-xs",
+                      isConcluida && "bg-green-600 text-white border-green-600",
+                      isAtual && "bg-[#0D0D0D] text-white border-[#0D0D0D]",
+                      isPendente && "border-[#0D0D0D]/30 text-[#0D0D0D]/60"
+                    )}
                   >
-                    {/* Círculo numerado */}
-                    <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all relative z-10",
-                      isConcluida && "bg-green-600 text-white",
-                      isAtual && "bg-[#0D0D0D] text-white ring-4 ring-[#0D0D0D]/30 scale-110",
-                      !isConcluida && !isAtual && "bg-white/60 text-[#0D0D0D]/60 border-2 border-[#0D0D0D]/20"
-                    )}>
-                      {fase.fase_numero}
+                    {isConcluida ? "Concluída" : isAtual ? "Em Andamento" : "Pendente"}
+                  </Badge>
+                </div>
+
+                {/* Expand indicator */}
+                <div className="col-span-1 flex justify-center text-[#0D0D0D]/40">
+                  {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                </div>
+              </div>
+
+              {/* Detalhes expandidos */}
+              {isExpanded && (
+                <div className="px-4 py-4 bg-[#E9EBC6]/10 border-t border-[#E9EBC6]/30">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Datas */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium text-[#0D0D0D]/80">
+                        <Calendar className="h-4 w-4" />
+                        Datas
+                      </div>
+                      <div className="text-sm space-y-1 text-[#0D0D0D]/60">
+                        <p>Início: {fase.data_inicio ? format(new Date(fase.data_inicio), "dd/MM/yyyy", { locale: ptBR }) : "—"}</p>
+                        <p>Conclusão: {fase.data_conclusao ? format(new Date(fase.data_conclusao), "dd/MM/yyyy", { locale: ptBR }) : "—"}</p>
+                      </div>
                     </div>
 
-                    {/* Bandeira de chegada na última fase */}
-                    {index === fases.length - 1 && isConcluida && (
-                      <Flag className="absolute -top-4 h-5 w-5 text-green-600" />
+                    {/* Sessão */}
+                    {fase.sessao && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm font-medium text-[#0D0D0D]/80">
+                          <Calendar className="h-4 w-4" />
+                          Sessão
+                        </div>
+                        <div className="text-sm space-y-1 text-[#0D0D0D]/60">
+                          <p className="font-medium text-[#0D0D0D]/80">{fase.sessao.titulo}</p>
+                          {fase.sessao.data_sessao && (
+                            <p>{format(new Date(fase.sessao.data_sessao), "dd/MM/yyyy", { locale: ptBR })}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Projeto */}
+                    {fase.projeto && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm font-medium text-[#0D0D0D]/80">
+                          <Folder className="h-4 w-4" />
+                          Projeto
+                        </div>
+                        <div className="text-sm space-y-1 text-[#0D0D0D]/60">
+                          <p className="font-medium text-[#0D0D0D]/80">{fase.projeto.titulo}</p>
+                          <p className="truncate">{fase.projeto.objetivo_projeto}</p>
+                        </div>
+                      </div>
                     )}
                   </div>
-                );
-              })}
-            </div>
-          </div>
 
-          {/* Stats rápidas - Cards brancos */}
-          <div className="grid grid-cols-3 gap-3 mt-6">
-            <div className="text-center bg-white/70 rounded-lg py-3 px-2">
-              <div className="text-2xl font-bold text-green-600">{fasesConcluidas}</div>
-              <div className="text-xs text-[#0D0D0D]/60 font-medium">Concluídas</div>
-            </div>
-            <div className="text-center bg-white/70 rounded-lg py-3 px-2">
-              <div className="text-2xl font-bold text-[#0D0D0D]">
-                {faseAtual ? faseAtual.fase_numero : "-"}
-              </div>
-              <div className="text-xs text-[#0D0D0D]/60 font-medium">Fase Atual</div>
-            </div>
-            <div className="text-center bg-white/70 rounded-lg py-3 px-2">
-              <div className="text-2xl font-bold text-amber-600">
-                {fases.length - fasesConcluidas - (faseAtual ? 1 : 0)}
-              </div>
-              <div className="text-xs text-[#0D0D0D]/60 font-medium">Restantes</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                  {/* Tarefas */}
+                  {fase.tarefas && fase.tarefas.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30">
+                      <div className="flex items-center gap-2 text-sm font-medium text-[#0D0D0D]/80 mb-2">
+                        <ListTodo className="h-4 w-4" />
+                        Tarefas ({fase.tarefas.filter(t => t.concluida).length}/{fase.tarefas.length})
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {fase.tarefas.slice(0, 4).map((tarefa) => (
+                          <div 
+                            key={tarefa.id} 
+                            className={cn(
+                              "text-sm px-2 py-1 rounded flex items-center gap-2",
+                              tarefa.concluida ? "text-green-700 bg-green-50" : "text-[#0D0D0D]/60"
+                            )}
+                          >
+                            {tarefa.concluida ? (
+                              <CheckCircle2 className="h-3 w-3 text-green-600 shrink-0" />
+                            ) : (
+                              <Circle className="h-3 w-3 text-[#0D0D0D]/30 shrink-0" />
+                            )}
+                            <span className="truncate">{tarefa.titulo}</span>
+                          </div>
+                        ))}
+                        {fase.tarefas.length > 4 && (
+                          <div className="text-xs text-[#0D0D0D]/40">
+                            +{fase.tarefas.length - 4} tarefas...
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
-      {/* Cards de Fases - Detalhados */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-foreground">
-          Detalhes das Fases
-        </h3>
-        <div className="space-y-3">
-          {fases.map((fase) => (
-            <FaseCard 
-              key={fase.id} 
-              fase={fase} 
-              onEdit={readonly ? undefined : handleEditFase}
-              readonly={readonly}
-            />
-          ))}
-        </div>
+                  {/* Observações */}
+                  {fase.observacoes && (
+                    <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30">
+                      <p className="text-sm text-[#0D0D0D]/60">
+                        <span className="font-medium">Observações:</span> {fase.observacoes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Botão Editar */}
+                  {!readonly && (
+                    <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30 flex justify-end">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditFase(fase);
+                        }}
+                        className="border-[#0D0D0D]/20 text-[#0D0D0D]/80 hover:bg-[#E9EBC6]/20"
+                      >
+                        <Pencil className="h-3 w-3 mr-1" />
+                        Editar Fase
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Modal de Edição */}
