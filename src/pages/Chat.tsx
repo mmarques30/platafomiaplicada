@@ -280,7 +280,9 @@ const Chat = () => {
               alt="Mari"
               className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full mb-4 object-cover"
             />
-            <h2 className="text-xl md:text-2xl font-bold mb-2">Sou a MarIAna 🧠</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-2">
+              Sou a Mar<span className="text-primary">IA</span>na
+            </h2>
             <p className="text-muted-foreground max-w-md text-sm md:text-base">
               Sua mentora de IA Aplicada. Qual sua dúvida hoje?
             </p>
