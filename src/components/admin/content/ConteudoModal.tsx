@@ -66,12 +66,14 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
       destaque: false,
       ativo: true,
       ordem: 0,
+      visivel_gratuitos: true,
     },
   });
 
   const tipo = watch('tipo');
   const destaque = watch('destaque');
   const ativo = watch('ativo');
+  const visivelGratuitos = watch('visivel_gratuitos');
 
   useEffect(() => {
     if (conteudo) {
@@ -85,6 +87,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
         ativo: conteudo.ativo,
         ordem: conteudo.ordem,
         autor: conteudo.autor || '',
+        visivel_gratuitos: conteudo.visivel_gratuitos ?? true,
       });
       setImagemPreview(conteudo.imagem_url);
       setPdfFileName(conteudo.arquivo_pdf_url ? 'Arquivo anexado' : null);
@@ -105,6 +108,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
         destaque: false,
         ativo: true,
         ordem: 0,
+        visivel_gratuitos: true,
       });
       setImagemPreview(null);
       setPdfFileName(null);
@@ -510,7 +514,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                 </div>
               </div>
 
-              <div className="flex gap-6">
+              <div className="flex gap-6 flex-wrap">
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={destaque}
@@ -525,6 +529,14 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                     onCheckedChange={(v) => setValue('ativo', v)}
                   />
                   <Label>Ativo</Label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={visivelGratuitos}
+                    onCheckedChange={(v) => setValue('visivel_gratuitos', v)}
+                  />
+                  <Label className="text-green-600">Visível p/ Gratuitos</Label>
                 </div>
               </div>
             </div>
