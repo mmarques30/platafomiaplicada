@@ -4,20 +4,12 @@ import { PlayersList } from "@/components/comunidade/PlayersList";
 import { RankingEngajamento } from "@/components/comunidade/RankingEngajamento";
 import { CommunityHeroDashboard } from "@/components/comunidade/CommunityHeroDashboard";
 import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
-import { FreeCommunityDashboard } from "@/components/comunidade/FreeCommunityDashboard";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
-import { useUserRole } from "@/hooks/useUserRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Comunidade() {
   const { data: ranking } = useRankingEngajamento();
-  const { isVisitante, isLoading } = useUserRole();
-
-  // Se for visitante/gratuito, mostrar dashboard específico
-  if (!isLoading && isVisitante) {
-    return <FreeCommunityDashboard />;
-  }
 
   return (
     <div className="min-h-screen bg-background">

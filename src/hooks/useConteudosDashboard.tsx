@@ -14,14 +14,13 @@ export interface ConteudoDashboard {
   destaque: boolean;
   ativo: boolean;
   ordem: number;
-  visivel_gratuitos: boolean;
   created_at: string;
   updated_at: string;
 }
 
-export function useConteudosDashboard(tipo?: TipoConteudo, apenasGratuitos?: boolean) {
+export function useConteudosDashboard(tipo?: TipoConteudo) {
   return useQuery({
-    queryKey: ['conteudos-dashboard', tipo, apenasGratuitos],
+    queryKey: ['conteudos-dashboard', tipo],
     queryFn: async () => {
       let query = supabase
         .from('conteudos_dashboard')
@@ -33,10 +32,6 @@ export function useConteudosDashboard(tipo?: TipoConteudo, apenasGratuitos?: boo
 
       if (tipo) {
         query = query.eq('tipo', tipo);
-      }
-
-      if (apenasGratuitos) {
-        query = query.eq('visivel_gratuitos', true);
       }
 
       const { data, error } = await query;

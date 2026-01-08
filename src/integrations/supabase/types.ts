@@ -867,7 +867,6 @@ export type Database = {
           tipo: string
           titulo: string
           updated_at: string
-          visivel_gratuitos: boolean | null
         }
         Insert: {
           arquivo_pdf_url?: string | null
@@ -887,7 +886,6 @@ export type Database = {
           tipo: string
           titulo: string
           updated_at?: string
-          visivel_gratuitos?: boolean | null
         }
         Update: {
           arquivo_pdf_url?: string | null
@@ -907,7 +905,6 @@ export type Database = {
           tipo?: string
           titulo?: string
           updated_at?: string
-          visivel_gratuitos?: boolean | null
         }
         Relationships: []
       }
@@ -1713,7 +1710,6 @@ export type Database = {
           titulo: string
           updated_at: string | null
           url: string
-          visivel_gratuitos: boolean | null
         }
         Insert: {
           arquivos_url?: Json | null
@@ -1729,7 +1725,6 @@ export type Database = {
           titulo: string
           updated_at?: string | null
           url: string
-          visivel_gratuitos?: boolean | null
         }
         Update: {
           arquivos_url?: Json | null
@@ -1745,7 +1740,6 @@ export type Database = {
           titulo?: string
           updated_at?: string | null
           url?: string
-          visivel_gratuitos?: boolean | null
         }
         Relationships: []
       }

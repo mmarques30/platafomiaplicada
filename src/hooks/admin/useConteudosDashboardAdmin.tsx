@@ -27,7 +27,6 @@ export interface ConteudoDashboardAdmin {
   destaque: boolean;
   ativo: boolean;
   ordem: number;
-  visivel_gratuitos: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -47,7 +46,6 @@ export interface ConteudoFormData {
   destaque?: boolean;
   ativo?: boolean;
   ordem?: number;
-  visivel_gratuitos?: boolean;
 }
 
 export function useConteudosDashboardAdmin() {
@@ -99,7 +97,6 @@ export function useCreateConteudo() {
           destaque: data.destaque ?? false,
           ativo: data.ativo ?? true,
           ordem: data.ordem ?? 0,
-          visivel_gratuitos: data.visivel_gratuitos ?? true,
         });
 
       if (error) throw error;
