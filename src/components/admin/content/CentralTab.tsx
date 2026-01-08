@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Star, FileText, Newspaper, Lightbulb } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, FileText, Newspaper, Lightbulb, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -140,6 +140,7 @@ export function CentralTab() {
               <TableHead>Tipo</TableHead>
               <TableHead className="text-center">Destaque</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-center">Gratuitos</TableHead>
               <TableHead>Criado em</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -152,13 +153,14 @@ export function CentralTab() {
                   <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-8 mx-auto" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-8 mx-auto" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
                 </TableRow>
               ))
             ) : conteudosFiltrados?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   Nenhum conteúdo encontrado
                 </TableCell>
               </TableRow>
@@ -184,8 +186,14 @@ export function CentralTab() {
                       {conteudo.ativo ? "Ativo" : "Inativo"}
                     </Badge>
                   </TableCell>
+                  <TableCell className="text-center">
+                    {conteudo.visivel_gratuitos ? (
+                      <Eye className="h-4 w-4 text-green-500 mx-auto" />
+                    ) : (
+                      <EyeOff className="h-4 w-4 text-muted-foreground mx-auto" />
+                    )}
+                  </TableCell>
                   <TableCell>
-                    {format(new Date(conteudo.created_at), "dd/MM/yyyy", { locale: ptBR })}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-1 justify-end">
