@@ -1,20 +1,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, ExternalLink, GraduationCap, Download, Code, Table as TableIcon, ChevronDown } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, ExternalLink, GraduationCap, Code, Table as TableIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CopyButton } from "@/components/shared/CopyButton";
 import { Json } from "@/integrations/supabase/types";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 type Material = {
   id: string;
@@ -50,15 +44,15 @@ const getFileName = (url: string): string => {
 const getFileIcon = (url: string) => {
   const fileName = getFileName(url).toLowerCase();
   if (fileName.endsWith('.pdf') || fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-    return FileText;
+    return { Icon: FileText, color: "text-red-500" };
   }
   if (fileName.endsWith('.csv') || fileName.endsWith('.xml') || fileName.endsWith('.xlsx')) {
-    return TableIcon;
+    return { Icon: TableIcon, color: "text-green-600" };
   }
   if (fileName.endsWith('.html') || fileName.endsWith('.htm')) {
-    return Code;
+    return { Icon: Code, color: "text-orange-500" };
   }
-  return FileText;
+  return { Icon: FileText, color: "text-muted-foreground" };
 };
 
 const getArquivoUrls = (arquivos_url: Json | null): string[] => {
@@ -144,8 +138,7 @@ export function MateriaisGratuitosTab() {
               <TableRow>
                 <TableHead className="w-[300px]">Título</TableHead>
                 <TableHead>Categoria</TableHead>
-                <TableHead>Descrição</TableHead>
-                <TableHead className="w-[250px]">Ação</TableHead>
+                <TableHead className="w-[120px]">Materiais</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -153,8 +146,7 @@ export function MateriaisGratuitosTab() {
                 <TableRow key={i}>
                   <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -165,94 +157,94 @@ export function MateriaisGratuitosTab() {
       {/* Materials Table View */}
       {!isLoading && filteredMateriais && filteredMateriais.length > 0 && (
         <div className="border border-border rounded-lg overflow-x-auto">
-          <Table className="min-w-[600px]">
+          <Table className="min-w-[500px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[180px] md:w-[300px]">Título</TableHead>
-                <TableHead className="w-[100px] md:w-auto">Categoria</TableHead>
-                <TableHead className="hidden md:table-cell">Descrição</TableHead>
-                <TableHead className="w-[100px] md:w-[250px]">Ação</TableHead>
+                <TableHead className="w-[250px] md:w-[400px]">Título</TableHead>
+                <TableHead className="w-[120px] md:w-auto">Categoria</TableHead>
+                <TableHead className="w-[120px]">Materiais</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredMateriais.map((material) => {
-                const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
-                const Icon = categoria?.icon || FileText;
-                const arquivos = getArquivoUrls(material.arquivos_url);
-                const links = getLinksUrls(material.links_url);
-                const allLinks = material.url ? [material.url, ...links] : links;
-                
-                return (
-                  <TableRow key={material.id}>
-                    <TableCell className="font-medium">{material.titulo}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-primary" />
-                        <span className="text-sm">{categoria?.label}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-md hidden md:table-cell">
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {material.descricao || "—"}
-                      </p>
-                    </TableCell>
-                    <TableCell className="py-2">
-                      <div className="flex flex-wrap gap-1 md:gap-2">
-                        {allLinks.slice(0, 1).map((url, index) => (
-                          <Button
-                            key={index}
-                            size="sm"
-                            variant="default"
-                            asChild
-                            onClick={() => handleAccessClick(material)}
-                            className="text-xs md:text-sm px-2 md:px-3"
-                          >
-                            <a href={url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-3 w-3 md:h-4 md:w-4 mr-1" />
-                              <span className="hidden md:inline">Acessar</span>
-                              <span className="md:hidden">Ir</span>
-                            </a>
-                          </Button>
-                        ))}
-                        {arquivos.length > 0 && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3">
-                                <Download className="h-3 w-3" />
-                                <span className="hidden md:inline ml-1">
-                                  {arquivos.length} arquivo{arquivos.length > 1 ? 's' : ''}
-                                </span>
-                                <ChevronDown className="h-3 w-3 ml-1" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-64">
-                              {arquivos.map((url, idx) => {
-                                const FileIcon = getFileIcon(url);
-                                const fileName = getFileName(url);
-                                return (
-                                  <DropdownMenuItem key={idx} asChild>
-                                    <a 
-                                      href={url} 
-                                      download={fileName}
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="flex items-center gap-2 cursor-pointer"
-                                    >
-                                      <FileIcon className="h-4 w-4 shrink-0" />
-                                      <span className="truncate flex-1">{fileName}</span>
-                                      <Download className="h-3 w-3 shrink-0 text-muted-foreground" />
-                                    </a>
-                                  </DropdownMenuItem>
-                                );
-                              })}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              <TooltipProvider>
+                {filteredMateriais.map((material) => {
+                  const categoria = CATEGORIAS.find((c) => c.value === material.categoria);
+                  const CatIcon = categoria?.icon || FileText;
+                  const arquivos = getArquivoUrls(material.arquivos_url);
+                  const links = getLinksUrls(material.links_url);
+                  const allLinks = material.url ? [material.url, ...links] : links;
+                  
+                  return (
+                    <TableRow key={material.id}>
+                      <TableCell className="font-medium">{material.titulo}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <CatIcon className="h-4 w-4 text-primary" />
+                          <span className="text-sm hidden md:inline">{categoria?.label}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-2">
+                        <div className="flex items-center gap-1.5">
+                          {/* Links */}
+                          {allLinks.map((url, index) => (
+                            <Tooltip key={`link-${index}`}>
+                              <TooltipTrigger asChild>
+                                <a
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={() => handleAccessClick(material)}
+                                  className={cn(
+                                    "p-1.5 rounded-md hover:bg-primary/10 transition-colors",
+                                    "text-primary hover:text-primary"
+                                  )}
+                                >
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Acessar link</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          ))}
+                          
+                          {/* Documents */}
+                          {arquivos.map((url, idx) => {
+                            const { Icon: FileIcon, color } = getFileIcon(url);
+                            const fileName = getFileName(url);
+                            return (
+                              <Tooltip key={`file-${idx}`}>
+                                <TooltipTrigger asChild>
+                                  <a
+                                    href={url}
+                                    download={fileName}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={cn(
+                                      "p-1.5 rounded-md hover:bg-muted transition-colors",
+                                      color
+                                    )}
+                                  >
+                                    <FileIcon className="h-4 w-4" />
+                                  </a>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="max-w-[200px] truncate">{fileName}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+
+                          {/* Empty state */}
+                          {allLinks.length === 0 && arquivos.length === 0 && (
+                            <span className="text-muted-foreground text-sm">—</span>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TooltipProvider>
             </TableBody>
           </Table>
         </div>
