@@ -1,31 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { TipoConteudo, ConteudoDashboard } from "./useConteudosDashboard";
 
-export type TipoConteudo = 'newsletter' | 'noticia' | 'dica' | 'material';
-
-export interface ConteudoDashboard {
-  id: string;
-  tipo: TipoConteudo;
-  titulo: string;
-  resumo: string;
-  conteudo: string | null;
-  link_externo: string | null;
-  imagem_url: string | null;
-  destaque: boolean;
-  ativo: boolean;
-  ordem: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export function useConteudosDashboard(tipo?: TipoConteudo) {
+export function useConteudosDashboardGratuito(tipo?: TipoConteudo) {
   return useQuery({
-    queryKey: ['conteudos-dashboard', tipo],
+    queryKey: ['conteudos-dashboard-gratuito', tipo],
     queryFn: async () => {
       let query = supabase
         .from('conteudos_dashboard')
         .select('*')
         .eq('ativo', true)
+        .eq('visivel_gratuitos', true)
         .order('destaque', { ascending: false })
         .order('created_at', { ascending: false })
         .limit(10);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Star, FileText, Newspaper, Lightbulb } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, FileText, Newspaper, Lightbulb, Globe, Video, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -40,14 +40,16 @@ import { ConteudoModal } from "./ConteudoModal";
 
 const tipoIcons: Record<TipoConteudo, React.ReactNode> = {
   newsletter: <Newspaper className="h-4 w-4" />,
-  noticia: <FileText className="h-4 w-4" />,
+  noticia: <Globe className="h-4 w-4" />,
   dica: <Lightbulb className="h-4 w-4" />,
+  material: <Video className="h-4 w-4" />,
 };
 
 const tipoLabels: Record<TipoConteudo, string> = {
   newsletter: "Newsletter",
   noticia: "Notícia",
   dica: "Dica",
+  material: "Material",
 };
 
 export function CentralTab() {
@@ -105,6 +107,7 @@ export function CentralTab() {
               <SelectItem value="newsletter">Newsletter</SelectItem>
               <SelectItem value="noticia">Notícia</SelectItem>
               <SelectItem value="dica">Dica</SelectItem>
+              <SelectItem value="material">Material</SelectItem>
             </SelectContent>
           </Select>
 
@@ -139,6 +142,7 @@ export function CentralTab() {
               <TableHead>Título</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead className="text-center">Destaque</TableHead>
+              <TableHead className="text-center">Gratuito</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Criado em</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -151,6 +155,7 @@ export function CentralTab() {
                   <TableCell><Skeleton className="h-4 w-48" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-8 mx-auto" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-8 mx-auto" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-16" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
@@ -158,7 +163,7 @@ export function CentralTab() {
               ))
             ) : conteudosFiltrados?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   Nenhum conteúdo encontrado
                 </TableCell>
               </TableRow>
@@ -177,6 +182,11 @@ export function CentralTab() {
                   <TableCell className="text-center">
                     {conteudo.destaque && (
                       <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mx-auto" />
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {conteudo.visivel_gratuitos && (
+                      <Eye className="h-4 w-4 text-green-500 mx-auto" />
                     )}
                   </TableCell>
                   <TableCell>

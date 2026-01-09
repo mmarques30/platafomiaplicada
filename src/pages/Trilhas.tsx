@@ -6,6 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCardBloqueavel } from "@/components/shared/TrilhaCardBloqueavel";
 import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
+import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
+import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
+import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
 import {
   Carousel,
   CarouselContent,
@@ -33,68 +36,91 @@ export default function Trilhas() {
     enabled: isVisitante && !loadingRole,
   });
 
-  const showLoading = loadingRole || (isVisitante && loadingTrilhas);
+  const showLoading = loadingRole;
 
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-4 md:py-6 px-4">
-        <div className="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
-          <div>
-            <PageTitle primary="Trilhas" secondary="de Aprendizado" />
-          </div>
-          
-          {isVisitante && (
-            <Link 
-              to="/aplique"
-              className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-red-600 bg-red-50/50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/30 text-sm sm:text-base font-medium transition-colors whitespace-nowrap"
-            >
-              <Zap className="h-4 w-4" />
-              Ter acesso ao Academy
-            </Link>
-          )}
-        </div>
-
-        {/* Banner PWA para visitantes */}
-        {isVisitante && <PWAInstallBanner />}
-
-        <div className="mt-8">
-          {showLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-[400px] rounded-xl" />
-              ))}
+        {/* Visitante: Layout estilo Dashboard */}
+        {isVisitante ? (
+          <div className="space-y-6">
+            {/* Header com saudação */}
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
+              <WelcomeHeader />
+              <Link 
+                to="/aplique"
+                className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-red-600 bg-red-50/50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/30 text-sm sm:text-base font-medium transition-colors whitespace-nowrap"
+              >
+                <Zap className="h-4 w-4" />
+                Ter acesso ao Academy
+              </Link>
             </div>
-          ) : isVisitante ? (
-            // VISITANTE: Carrossel de trilhas bloqueadas
-            <div className="relative px-0 md:px-14">
-              <Carousel opts={{ align: "start", loop: false }} className="w-full">
-                <CarouselContent className="-ml-4">
-                  {trilhasVisitante?.map((trilha) => (
-                    <CarouselItem key={trilha.id} className="pl-4 basis-2/5 sm:basis-1/3 md:basis-1/4 lg:basis-1/5">
-                      <TrilhaCardBloqueavel
-                        id={trilha.id}
-                        titulo={trilha.titulo}
-                        imagem_url={trilha.imagem_url}
-                        bloqueada={true}
-                        isVisitante={true}
-                        temConteudoDisponivel={false}
-                      />
-                    </CarouselItem>
+
+            {/* Banner PWA */}
+            <PWAInstallBanner />
+
+            {/* Central de Conteúdo Gratuito */}
+            <CentralConteudoGratuito />
+
+            {/* Ticker de métricas */}
+            <RankingTickerGratuito />
+
+            {/* Trilhas bloqueadas */}
+            <div className="space-y-4">
+              <PageTitle primary="Trilhas" secondary="de Aprendizado" />
+              
+              {loadingTrilhas ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Skeleton key={i} className="h-[200px] rounded-xl" />
                   ))}
-                </CarouselContent>
-                {(trilhasVisitante?.length ?? 0) > 4 && (
-                  <>
-                    <CarouselPrevious className="hidden md:flex absolute -left-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
-                    <CarouselNext className="hidden md:flex absolute -right-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
-                  </>
-                )}
-              </Carousel>
+                </div>
+              ) : (
+                <div className="relative px-0 md:px-14">
+                  <Carousel opts={{ align: "start", loop: false }} className="w-full">
+                    <CarouselContent className="-ml-4">
+                      {trilhasVisitante?.map((trilha) => (
+                        <CarouselItem key={trilha.id} className="pl-4 basis-2/5 sm:basis-1/3 md:basis-1/4 lg:basis-1/5">
+                          <TrilhaCardBloqueavel
+                            id={trilha.id}
+                            titulo={trilha.titulo}
+                            imagem_url={trilha.imagem_url}
+                            bloqueada={true}
+                            isVisitante={true}
+                            temConteudoDisponivel={false}
+                          />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    {(trilhasVisitante?.length ?? 0) > 4 && (
+                      <>
+                        <CarouselPrevious className="hidden md:flex absolute -left-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
+                        <CarouselNext className="hidden md:flex absolute -right-12 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white border-0 shadow-xl h-10 w-10" />
+                      </>
+                    )}
+                  </Carousel>
+                </div>
+              )}
             </div>
-          ) : (
-            // MENTORADO: Vídeos por trilha (comportamento atual)
-            <UltimosConteudos />
-          )}
-        </div>
+          </div>
+        ) : (
+          // Mentorado: comportamento original
+          <>
+            <div className="mb-6 md:mb-8">
+              <PageTitle primary="Trilhas" secondary="de Aprendizado" />
+            </div>
+            
+            {showLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-[400px] rounded-xl" />
+                ))}
+              </div>
+            ) : (
+              <UltimosConteudos />
+            )}
+          </>
+        )}
       </main>
     </div>
   );
