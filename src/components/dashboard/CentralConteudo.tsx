@@ -1,22 +1,28 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Newspaper, Globe, Lightbulb, ArrowRight } from "lucide-react";
+import { Newspaper, Globe, Lightbulb, ArrowRight, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConteudosDashboard, TipoConteudo } from "@/hooks/useConteudosDashboard";
+import { useMateriaisGratuitos } from "@/hooks/useMateriaisGratuitos";
 import { ConteudoCard } from "./ConteudoCard";
+import { MaterialCard } from "./MaterialCard";
 import logo3d from "@/assets/logo-3d.png";
 import { Link } from "react-router-dom";
 
+type TabValue = TipoConteudo | "material";
+
 const tabs = [
-  { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
-  { value: "noticia" as TipoConteudo, label: "Noticias IA", icon: Globe },
-  { value: "dica" as TipoConteudo, label: "Dicas Praticas", icon: Lightbulb },
+  { value: "newsletter" as TabValue, label: "Newsletter", icon: Newspaper },
+  { value: "noticia" as TabValue, label: "Noticias IA", icon: Globe },
+  { value: "dica" as TabValue, label: "Dicas Praticas", icon: Lightbulb },
+  { value: "material" as TabValue, label: "Materiais Gratuitos", icon: FileText },
 ];
 
 export function CentralConteudo() {
-  const [activeTab, setActiveTab] = useState<TipoConteudo>("newsletter");
-  const { data: conteudos, isLoading } = useConteudosDashboard(activeTab);
+  const [activeTab, setActiveTab] = useState<TabValue>("newsletter");
+  const { data: conteudos, isLoading } = useConteudosDashboard(activeTab !== "material" ? activeTab as TipoConteudo : "newsletter");
+  const { data: materiais, isLoading: isLoadingMateriais } = useMateriaisGratuitos(10);
 
   return (
     <section className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-primary/30 sm:border-2 bg-gradient-to-br from-primary/10 via-card to-primary/5 shadow-lg sm:shadow-xl shadow-primary/10 dark:border-primary/40 dark:from-primary/15 dark:to-primary/5">
@@ -47,8 +53,8 @@ export function CentralConteudo() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo)} className="w-full">
-          <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 md:mb-6 border border-primary/30 dark:border-primary/40">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="w-full">
+          <TabsList className="w-full md:w-auto grid grid-cols-4 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 md:mb-6 border border-primary/30 dark:border-primary/40">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.value}
@@ -72,7 +78,30 @@ export function CentralConteudo() {
                   transition={{ duration: 0.2 }}
                   className="flex gap-2.5 sm:gap-4 overflow-x-auto pb-3 sm:pb-4 scrollbar-thin snap-x snap-mandatory -mx-1 px-1"
                 >
-                  {isLoading ? (
+                  {tab.value === "material" ? (
+                    isLoadingMateriais ? (
+                      <>
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0">
+                            <div className="h-[160px] sm:h-[200px] w-full rounded-lg sm:rounded-xl bg-primary/20 animate-pulse" />
+                          </div>
+                        ))}
+                      </>
+                    ) : materiais && materiais.length > 0 ? (
+                      materiais.map((material) => (
+                        <div key={material.id} className="snap-start">
+                          <MaterialCard material={material} />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="w-full py-12 text-center">
+                        <tab.icon className="w-12 h-12 mx-auto text-primary/30 mb-3" />
+                        <p className="text-muted-foreground">
+                          Nenhum material disponivel
+                        </p>
+                      </div>
+                    )
+                  ) : isLoading ? (
                     <>
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0">
