@@ -81,7 +81,7 @@ export function MaterialCard({ material }: MaterialCardProps) {
       </div>
 
       {/* Content */}
-      <h4 className="font-semibold text-foreground mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-primary transition-colors text-sm sm:text-base">
+      <h4 className="font-semibold text-foreground mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-primary transition-colors text-sm sm:text-base min-h-[2.5rem] sm:min-h-[3rem]">
         {material.titulo}
       </h4>
       <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3 mb-2.5 sm:mb-4">
