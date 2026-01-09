@@ -66,12 +66,14 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
       destaque: false,
       ativo: true,
       ordem: 0,
+      visivel_gratuitos: false,
     },
   });
 
   const tipo = watch('tipo');
   const destaque = watch('destaque');
   const ativo = watch('ativo');
+  const visivelGratuitos = watch('visivel_gratuitos');
 
   useEffect(() => {
     if (conteudo) {
@@ -85,6 +87,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
         ativo: conteudo.ativo,
         ordem: conteudo.ordem,
         autor: conteudo.autor || '',
+        visivel_gratuitos: conteudo.visivel_gratuitos ?? false,
       });
       setImagemPreview(conteudo.imagem_url);
       setPdfFileName(conteudo.arquivo_pdf_url ? 'Arquivo anexado' : null);
@@ -105,6 +108,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
         destaque: false,
         ativo: true,
         ordem: 0,
+        visivel_gratuitos: false,
       });
       setImagemPreview(null);
       setPdfFileName(null);
@@ -236,6 +240,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                     <SelectItem value="newsletter">Newsletter</SelectItem>
                     <SelectItem value="noticia">Notícia</SelectItem>
                     <SelectItem value="dica">Dica</SelectItem>
+                    <SelectItem value="material">Material (Aulas ao Vivo)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -525,6 +530,14 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                     onCheckedChange={(v) => setValue('ativo', v)}
                   />
                   <Label>Ativo</Label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={visivelGratuitos}
+                    onCheckedChange={(v) => setValue('visivel_gratuitos', v)}
+                  />
+                  <Label>Visível para Gratuitos</Label>
                 </div>
               </div>
             </div>

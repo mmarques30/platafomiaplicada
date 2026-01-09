@@ -3144,6 +3144,15 @@ export type Database = {
         Args: { p_projeto_id: string; p_user_id: string }
         Returns: number
       }
+      get_gratuito_stats: {
+        Args: never
+        Returns: {
+          online_visitantes: number
+          total_conteudos_gratuitos: number
+          total_materiais_gratuitos: number
+          total_visitantes: number
+        }[]
+      }
       get_modulos_stats: {
         Args: never
         Returns: {

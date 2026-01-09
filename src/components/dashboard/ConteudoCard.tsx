@@ -12,12 +12,14 @@ const iconMap = {
   newsletter: Newspaper,
   noticia: Globe,
   dica: Lightbulb,
+  material: Calendar,
 };
 
 const iconBgMap = {
   newsletter: "bg-primary",
   noticia: "bg-primary/90",
   dica: "bg-primary/80",
+  material: "bg-primary/70",
 };
 
 export function ConteudoCard({ conteudo }: ConteudoCardProps) {
