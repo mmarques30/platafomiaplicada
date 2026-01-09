@@ -84,7 +84,7 @@ export function MaterialCard({ material }: MaterialCardProps) {
         {material.titulo}
       </h4>
       <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3 mb-2.5 sm:mb-4">
-        {material.descricao || "Material gratuito disponível para acesso"}
+        {material.descricao}
       </p>
 
       {/* Footer */}
