@@ -71,6 +71,7 @@ export function MaterialCard({ material }: MaterialCardProps) {
         transition-all duration-300 cursor-pointer
         shadow-md sm:shadow-lg hover:shadow-xl hover:shadow-primary/20
         min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0
+        min-h-[160px] sm:min-h-[180px]
       `}
       onClick={handleClick}
     >
