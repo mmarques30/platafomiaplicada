@@ -1,23 +1,36 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Newspaper, Globe, Lightbulb, Video, ArrowRight } from "lucide-react";
+import { Newspaper, Globe, Lightbulb, FileText, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useConteudosDashboardGratuito } from "@/hooks/useConteudosDashboardGratuito";
+import { useMateriaisGratuitos } from "@/hooks/useMateriaisGratuitos";
 import { TipoConteudo } from "@/hooks/useConteudosDashboard";
 import { ConteudoCard } from "./ConteudoCard";
+import { MaterialCard } from "./MaterialCard";
 import logo3d from "@/assets/logo-3d.png";
 import { Link } from "react-router-dom";
 
+type TabValue = TipoConteudo | "material";
+
 const tabs = [
-  { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
-  { value: "noticia" as TipoConteudo, label: "Notícias IA", icon: Globe },
-  { value: "dica" as TipoConteudo, label: "Dicas Práticas", icon: Lightbulb },
-  { value: "material" as TipoConteudo, label: "Materiais", icon: Video },
+  { value: "newsletter" as TabValue, label: "Newsletter", icon: Newspaper },
+  { value: "noticia" as TabValue, label: "Notícias IA", icon: Globe },
+  { value: "dica" as TabValue, label: "Dicas Práticas", icon: Lightbulb },
+  { value: "material" as TabValue, label: "Materiais", icon: FileText },
 ];
 
 export function CentralConteudoGratuito() {
-  const [activeTab, setActiveTab] = useState<TipoConteudo>("newsletter");
-  const { data: conteudos, isLoading } = useConteudosDashboardGratuito(activeTab);
+  const [activeTab, setActiveTab] = useState<TabValue>("newsletter");
+  
+  // Para conteúdos (newsletter, noticia, dica)
+  const { data: conteudos, isLoading: isLoadingConteudos } = useConteudosDashboardGratuito(
+    activeTab !== "material" ? activeTab as TipoConteudo : undefined
+  );
+  
+  // Para materiais (da tabela materiais_gratuitos)
+  const { data: materiais, isLoading: isLoadingMateriais } = useMateriaisGratuitos(10);
+  
+  const isLoading = activeTab === "material" ? isLoadingMateriais : isLoadingConteudos;
 
   return (
     <section className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-primary/30 sm:border-2 bg-gradient-to-br from-primary/10 via-card to-primary/5 shadow-lg sm:shadow-xl shadow-primary/10 dark:border-primary/40 dark:from-primary/15 dark:to-primary/5">
@@ -48,7 +61,7 @@ export function CentralConteudoGratuito() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo)} className="w-full">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="w-full">
           <TabsList className="w-full md:w-auto grid grid-cols-4 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 md:mb-6 border border-primary/30 dark:border-primary/40">
             {tabs.map((tab) => (
               <TabsTrigger
@@ -81,7 +94,13 @@ export function CentralConteudoGratuito() {
                         </div>
                       ))}
                     </>
-                  ) : conteudos && conteudos.length > 0 ? (
+                  ) : activeTab === "material" && materiais && materiais.length > 0 ? (
+                    materiais.map((material) => (
+                      <div key={material.id} className="snap-start">
+                        <MaterialCard material={material} />
+                      </div>
+                    ))
+                  ) : activeTab !== "material" && conteudos && conteudos.length > 0 ? (
                     conteudos.map((conteudo) => (
                       <div key={conteudo.id} className="snap-start">
                         <ConteudoCard conteudo={conteudo} />
