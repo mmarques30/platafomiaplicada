@@ -93,7 +93,7 @@ export function TopHeader() {
       <div className="relative h-14 w-full">
         {/* LEFT: SidebarTrigger + Logo + Mobile Menu */}
         <div className="absolute left-0 top-0 h-full flex items-center gap-2 ml-1 md:ml-2">
-          <SidebarTrigger className="h-10 w-10 md:h-7 md:w-7 text-white/80 hover:text-white hover:bg-white/10 transition-colors" />
+          <SidebarTrigger className="h-10 w-10 md:h-8 md:w-8 text-white hover:text-white hover:bg-white/20 bg-white/10 rounded-md transition-colors" />
           <Link to="/" className="hidden sm:block">
             <img 
               src={logoHeaderDark} 
