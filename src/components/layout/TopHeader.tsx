@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Bell, ChevronDown, RefreshCw, Menu, Home, BookOpen, Library, X } from "lucide-react";
+import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library } from "lucide-react";
 import logoHeaderDark from "@/assets/logo-header-dark.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,14 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetClose,
-} from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { NavLink, useNavigate, Link, useLocation } from "react-router-dom";
@@ -102,156 +94,6 @@ export function TopHeader() {
             />
           </Link>
           
-          {/* Mobile Menu Button - only visible on mobile/tablet */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="lg:hidden h-9 w-9 text-white/80 hover:text-white hover:bg-white/10"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 bg-[#0D0D0D] border-white/10 p-0">
-              <SheetHeader className="p-4 border-b border-white/10">
-                <SheetTitle className="text-white text-left">Menu</SheetTitle>
-              </SheetHeader>
-              <nav className="flex flex-col p-4 gap-1">
-                <SheetClose asChild>
-                  <NavLink 
-                    to="/" 
-                    end
-                    className={({ isActive }) => cn(
-                      "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                      isActive ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                    )}
-                  >
-                    <Home className="h-5 w-5" />
-                    Página Inicial
-                  </NavLink>
-                </SheetClose>
-                
-                {/* Cursos Section */}
-                <div className="mt-4 mb-2 px-3 text-xs font-semibold text-white/40 uppercase tracking-wider">
-                  Cursos
-                </div>
-                {plan !== "club" && (
-                  <SheetClose asChild>
-                    <Link 
-                      to="/trilhas" 
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                        location.pathname.startsWith('/trilhas') ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                      )}
-                    >
-                      <BookOpen className="h-5 w-5" />
-                      Academy
-                    </Link>
-                  </SheetClose>
-                )}
-                {(hasAccessTo("lab") || isAdmin) && isProdutoAtivo("lab") && (
-                  <SheetClose asChild>
-                    <Link 
-                      to="/lab" 
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                        location.pathname.startsWith('/lab') ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                      )}
-                    >
-                      <BookOpen className="h-5 w-5" />
-                      Lab
-                    </Link>
-                  </SheetClose>
-                )}
-                {(hasAccessTo("club") || isAdmin) && isProdutoAtivo("club") && (
-                  <SheetClose asChild>
-                    <Link 
-                      to="/mentoria" 
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                        location.pathname.startsWith('/mentoria') ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                      )}
-                    >
-                      <BookOpen className="h-5 w-5" />
-                      Club
-                    </Link>
-                  </SheetClose>
-                )}
-                {(hasAccessTo("skills") || isAdmin) && isProdutoAtivo("skills") && (
-                  <SheetClose asChild>
-                    <Link 
-                      to="/skills" 
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                        location.pathname.startsWith('/skills') ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                      )}
-                    >
-                      <BookOpen className="h-5 w-5" />
-                      Skills
-                    </Link>
-                  </SheetClose>
-                )}
-                
-                {/* Bibliotecas Section - only for non-visitors */}
-                {!isVisitante && (
-                  <>
-                    <div className="mt-4 mb-2 px-3 text-xs font-semibold text-white/40 uppercase tracking-wider">
-                      Bibliotecas
-                    </div>
-                    <SheetClose asChild>
-                      <Link 
-                        to="/ia-copie-use" 
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                          location.pathname.startsWith('/ia-copie-use') ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                        )}
-                      >
-                        <Library className="h-5 w-5" />
-                        IA "Copie e Use"
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link 
-                        to="/biblioteca-ferramentas" 
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                          location.pathname.startsWith('/biblioteca-ferramentas') ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                        )}
-                      >
-                        <Library className="h-5 w-5" />
-                        Biblioteca de Ferramentas
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link 
-                        to="/biblioteca-prompts" 
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                          location.pathname.startsWith('/biblioteca-prompts') ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                        )}
-                      >
-                        <Library className="h-5 w-5" />
-                        Biblioteca de Prompts
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link 
-                        to="/metodos-aplicar" 
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                          location.pathname.startsWith('/metodos-aplicar') ? "bg-primary/20 text-primary" : "text-white/70 hover:bg-white/10 hover:text-white"
-                        )}
-                      >
-                        <Library className="h-5 w-5" />
-                        Métodos para Aplicar
-                      </Link>
-                    </SheetClose>
-                  </>
-                )}
-              </nav>
-            </SheetContent>
-          </Sheet>
         </div>
 
         {/* CENTER: Horizontal Navigation - centralizado na viewport com posição absoluta */}
