@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { useIdleLogout } from "@/hooks/useIdleLogout";
 
 export function AdminLayout() {
@@ -8,7 +9,8 @@ export function AdminLayout() {
   
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full">
+      <AdminHeader />
+      <div className="flex min-h-screen w-full pt-14 md:pt-0">
         <AdminSidebar />
         <SidebarInset>
           <main className="flex-1 p-8">
