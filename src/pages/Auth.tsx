@@ -10,11 +10,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { AnimatedLogo } from "@/components/auth/AnimatedLogo";
 import { FloatingTestimonial } from "@/components/auth/FloatingTestimonial";
+import { RecuperarSenhaModal } from "@/components/auth/RecuperarSenhaModal";
 
 export default function Auth() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [showRecuperarSenha, setShowRecuperarSenha] = useState(false);
 
   // Redirecionar usuários já autenticados
   useEffect(() => {
@@ -225,6 +227,17 @@ export default function Auth() {
                 >
                   {isLoading ? "Acessando..." : "Acessar"}
                 </Button>
+
+                {/* Link esqueceu a senha */}
+                <div className="text-center mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowRecuperarSenha(true)}
+                    className="text-sm text-white/50 hover:text-[#9EB038] transition-colors"
+                  >
+                    Esqueceu a senha?
+                  </button>
+                </div>
               </form>
 
               <GoogleButton />
@@ -339,11 +352,17 @@ export default function Auth() {
             </a>{" "}
             e{" "}
             <a href="/politicavendas" className="text-[#9EB038] hover:underline">
-              Política de Privacidade
+            Política de Privacidade
             </a>
           </p>
         </div>
       </div>
+
+      {/* Modal de recuperação de senha */}
+      <RecuperarSenhaModal
+        open={showRecuperarSenha}
+        onOpenChange={setShowRecuperarSenha}
+      />
     </div>
   );
 }

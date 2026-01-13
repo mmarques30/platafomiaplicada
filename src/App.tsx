@@ -80,6 +80,8 @@ import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
 import FormularioAplica from "./pages/FormularioAplica";
 import Instalar from "./pages/Instalar";
 import Central from "./pages/Central";
+import RedefinirSenha from "./pages/RedefinirSenha";
+import HistoricoSenhas from "./pages/admin/HistoricoSenhas";
 import { PWAUpdatePrompt } from "./components/shared/PWAUpdatePrompt";
 
 const queryClient = new QueryClient();
@@ -101,6 +103,7 @@ function AppContent() {
         <Route path="/formularioaplica" element={<FormularioAplica />} />
         <Route path="/politicauso" element={<PoliticaUso />} />
         <Route path="/politicavendas" element={<PoliticaVendas />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         
 
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
@@ -170,6 +173,7 @@ function AppContent() {
             <Route path="comunidade" element={<GerenciarComunidade />} />
             <Route path="politicas" element={<GerenciarPoliticas />} />
             <Route path="pesquisas" element={<GerenciarPesquisas />} />
+            <Route path="historico-senhas" element={<HistoricoSenhas />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
