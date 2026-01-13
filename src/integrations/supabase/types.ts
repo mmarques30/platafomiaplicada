@@ -1990,6 +1990,57 @@ export type Database = {
           },
         ]
       }
+      password_reset_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          email: string
+          erro_mensagem: string | null
+          id: string
+          ip_address: string | null
+          status: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          email: string
+          erro_mensagem?: string | null
+          id?: string
+          ip_address?: string | null
+          status?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          email?: string
+          erro_mensagem?: string | null
+          id?: string
+          ip_address?: string | null
+          status?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "password_reset_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "password_reset_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       pesquisas: {
         Row: {
           ativo: boolean | null
