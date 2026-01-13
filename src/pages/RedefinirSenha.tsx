@@ -1,63 +1,31 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Check, X, Loader2, Lock, CheckCircle } from "lucide-react";
+import { Check, X, Loader2, Lock, CheckCircle, AlertTriangle } from "lucide-react";
 
 export default function RedefinirSenha() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [senhaAlterada, setSenhaAlterada] = useState(false);
-  const [verificandoToken, setVerificandoToken] = useState(true);
-  const [tokenValido, setTokenValido] = useState(false);
+  const [tokenValido, setTokenValido] = useState(true);
 
-  // Verificar se há uma sessão de recuperação ativa
+  const token = searchParams.get('token');
+  const email = searchParams.get('email');
+
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        // Se há sessão, o token foi validado pelo Supabase
-        if (session) {
-          setTokenValido(true);
-        } else {
-          // Verificar se há hash com token de recuperação
-          const hashParams = new URLSearchParams(window.location.hash.substring(1));
-          const accessToken = hashParams.get("access_token");
-          const type = hashParams.get("type");
-          
-          if (accessToken && type === "recovery") {
-            // Supabase vai processar automaticamente
-            setTokenValido(true);
-          } else {
-            setTokenValido(false);
-          }
-        }
-      } catch (error) {
-        console.error("Erro ao verificar sessão:", error);
-        setTokenValido(false);
-      } finally {
-        setVerificandoToken(false);
-      }
-    };
-
-    // Listener para mudanças de auth (quando o token é processado)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setTokenValido(true);
-        setVerificandoToken(false);
-      }
-    });
-
-    checkSession();
-
-    return () => subscription.unsubscribe();
-  }, []);
+    // Verificar se temos token e email na URL
+    if (!token || !email) {
+      setTokenValido(false);
+    }
+  }, [token, email]);
 
   // Validações de senha
   const temMinimo8 = novaSenha.length >= 8;
@@ -74,62 +42,49 @@ export default function RedefinirSenha() {
       return;
     }
 
+    if (!token || !email) {
+      toast.error("Token ou email inválido");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // 1. Atualizar senha via Supabase Auth
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: novaSenha,
+      // Chamar edge function para redefinir senha com token
+      const { data, error } = await supabase.functions.invoke('reset-password-with-token', {
+        body: { 
+          token, 
+          email: decodeURIComponent(email), 
+          novaSenha 
+        }
       });
 
-      if (updateError) throw updateError;
-
-      // 2. Buscar dados do usuário atual
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        // 3. Atualizar profile
-        await supabase
-          .from("profiles")
-          .update({
-            senha_temporaria: false,
-            senha_alterada_em: new Date().toISOString(),
-          })
-          .eq("id", user.id);
-
-        // 4. Atualizar status da solicitação de reset
-        await supabase
-          .from("password_reset_requests")
-          .update({
-            status: "senha_alterada",
-            completed_at: new Date().toISOString(),
-          })
-          .eq("email", user.email?.toLowerCase())
-          .eq("status", "link_enviado")
-          .order("created_at", { ascending: false })
-          .limit(1);
-
-        // 5. Registrar na auditoria
-        await supabase.from("auditoria_conteudo").insert({
-          tabela: "profiles",
-          registro_id: user.id,
-          operacao: "PASSWORD_RECOVERY",
-          user_id: user.id,
-          dados_novos: {
-            acao: "Senha redefinida pelo usuário via link de recuperação",
-            email: user.email,
-          },
-        });
+      if (error) {
+        console.error("Error resetting password:", error);
+        toast.error("Erro ao redefinir senha. Tente novamente.");
+        return;
       }
 
-      setSenhaAlterada(true);
-      toast.success("Senha alterada com sucesso!");
+      if (data?.error) {
+        toast.error(data.error);
+        if (data.error.includes('expirado') || data.error.includes('inválido')) {
+          setTokenValido(false);
+        }
+        return;
+      }
 
-      // Fazer logout para forçar novo login com a nova senha
-      setTimeout(async () => {
+      if (data?.success) {
+        toast.success("Senha alterada com sucesso!");
+        setSenhaAlterada(true);
+
+        // Fazer logout de qualquer sessão ativa
         await supabase.auth.signOut();
-        navigate("/auth");
-      }, 3000);
+
+        // Redirecionar após 3 segundos
+        setTimeout(() => {
+          navigate("/auth");
+        }, 3000);
+      }
     } catch (error: any) {
       console.error("Erro ao redefinir senha:", error);
       toast.error(error.message || "Erro ao redefinir senha. Tente novamente.");
@@ -138,24 +93,12 @@ export default function RedefinirSenha() {
     }
   };
 
-  // Loading enquanto verifica token
-  if (verificandoToken) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#151515]">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin text-[#9EB038] mx-auto" />
-          <p className="text-white/60">Verificando link de recuperação...</p>
-        </div>
-      </div>
-    );
-  }
-
   // Token inválido ou expirado
   if (!tokenValido) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#151515] p-6">
         <div className="w-full max-w-md text-center space-y-6 bg-[#1a1a1a] p-8 rounded-2xl border border-white/10">
-          <X className="h-16 w-16 text-red-500 mx-auto" />
+          <AlertTriangle className="h-16 w-16 text-red-500 mx-auto" />
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-white">Link inválido ou expirado</h1>
             <p className="text-white/60">
@@ -198,9 +141,11 @@ export default function RedefinirSenha() {
         <div className="text-center space-y-2">
           <Lock className="h-12 w-12 text-[#9EB038] mx-auto" />
           <h1 className="text-2xl font-bold text-white">Criar nova senha</h1>
-          <p className="text-white/60 text-sm">
-            Digite sua nova senha abaixo
-          </p>
+          {email && (
+            <p className="text-white/60 text-sm">
+              Olá! Crie uma nova senha para <span className="text-white">{decodeURIComponent(email)}</span>
+            </p>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -258,13 +203,7 @@ export default function RedefinirSenha() {
         </form>
 
         <p className="text-center text-xs text-white/40">
-          Lembrou a senha?{" "}
-          <button
-            onClick={() => navigate("/auth")}
-            className="text-[#9EB038] hover:underline"
-          >
-            Voltar para login
-          </button>
+          Este link expira em 15 minutos por segurança.
         </p>
       </div>
     </div>
