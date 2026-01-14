@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Eye, Search, Download } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import { FormularioDetalhesDrawer } from "@/components/admin/FormularioDetalhesDrawer";
 
 interface DiagnosticosTableProps {
@@ -48,29 +48,23 @@ export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
     switch (plano) {
       case "academy":
         return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-      case "club":
-      case "boost":
-      case "legacy":
-        return "bg-purple-500/10 text-purple-500 border-purple-500/20";
-      case "lab":
-        return "bg-green-500/10 text-green-500 border-green-500/20";
-      case "skills":
-        return "bg-orange-500/10 text-orange-500 border-orange-500/20";
+      case "business":
+        return "bg-primary/10 text-primary border-primary/20";
       default:
-        return "";
+        return "bg-muted text-muted-foreground";
     }
   };
 
-  // Contadores
+  // Contadores - apenas planos existentes
   const totalAcademy = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "academy").length || 0;
-  const totalClub = formularios?.filter((f: any) => ["club", "boost", "legacy"].includes(f.profiles?.plano_mentoria)).length || 0;
+  const totalBusiness = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "business").length || 0;
   const totalCompletos = formularios?.filter((f: any) => !!f.completado).length || 0;
   const totalIncompletos = formularios?.filter((f: any) => !f.completado).length || 0;
 
   return (
     <div className="space-y-4">
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         <div className="bg-muted/50 rounded-lg p-3">
           <p className="text-sm text-muted-foreground">Total</p>
           <p className="text-2xl font-bold">{formularios?.length || 0}</p>
@@ -79,13 +73,17 @@ export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
           <p className="text-sm text-blue-500">Academy</p>
           <p className="text-2xl font-bold">{totalAcademy}</p>
         </div>
-        <div className="bg-purple-500/10 rounded-lg p-3">
-          <p className="text-sm text-purple-500">Club/Boost/Legacy</p>
-          <p className="text-2xl font-bold">{totalClub}</p>
+        <div className="bg-primary/10 rounded-lg p-3">
+          <p className="text-sm text-primary">Business</p>
+          <p className="text-2xl font-bold">{totalBusiness}</p>
         </div>
         <div className="bg-green-500/10 rounded-lg p-3">
           <p className="text-sm text-green-500">Completos</p>
           <p className="text-2xl font-bold">{totalCompletos}</p>
+        </div>
+        <div className="bg-amber-500/10 rounded-lg p-3">
+          <p className="text-sm text-amber-500">Incompletos</p>
+          <p className="text-2xl font-bold">{totalIncompletos}</p>
         </div>
       </div>
 
@@ -108,11 +106,7 @@ export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
           <SelectContent>
             <SelectItem value="all">Todos os planos</SelectItem>
             <SelectItem value="academy">Academy</SelectItem>
-            <SelectItem value="club">Club</SelectItem>
-            <SelectItem value="boost">Boost</SelectItem>
-            <SelectItem value="legacy">Legacy</SelectItem>
-            <SelectItem value="lab">Lab</SelectItem>
-            <SelectItem value="skills">Skills</SelectItem>
+            <SelectItem value="business">Business</SelectItem>
           </SelectContent>
         </Select>
 
