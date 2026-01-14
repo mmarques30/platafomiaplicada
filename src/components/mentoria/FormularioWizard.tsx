@@ -3,24 +3,53 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
-import { formSchema, type FormData } from "./schema";
+import { 
+  formSchema, academyFormSchema, businessFormSchema,
+  type FormData, type AcademyFormData, type BusinessFormData 
+} from "./schema";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { ProgressBar } from "./ProgressBar";
-import { Step1InformacoesPessoais } from "./Step1InformacoesPessoais";
-import { Step2ExperienciaIA } from "./Step2ExperienciaIA";
-import { Step3Objetivos } from "./Step3Objetivos";
-import { Step4CenarioAtual } from "./Step4CenarioAtual";
-import { Step5EstiloAprendizagem } from "./Step5EstiloAprendizagem";
-import { Step6Motivacao } from "./Step6Motivacao";
-import { Step7Expectativas } from "./Step7Expectativas";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { X, Save } from "lucide-react";
+import { X, Save, Crown } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Academy Steps
+import { AcademyStep1Perfil } from "./steps/academy/AcademyStep1Perfil";
+import { AcademyStep2Experiencia } from "./steps/academy/AcademyStep2Experiencia";
+import { AcademyStep3Objetivos } from "./steps/academy/AcademyStep3Objetivos";
+import { AcademyStep4Desafios } from "./steps/academy/AcademyStep4Desafios";
+import { AcademyStep5Comprometimento } from "./steps/academy/AcademyStep5Comprometimento";
+
+// Business Steps
+import { BusinessStep1Perfil } from "./steps/business/BusinessStep1Perfil";
+import { BusinessStep2Construir } from "./steps/business/BusinessStep2Construir";
+import { BusinessStep3Contexto } from "./steps/business/BusinessStep3Contexto";
+import { BusinessStep4Acompanhamento } from "./steps/business/BusinessStep4Acompanhamento";
+import { BusinessStep5Aprendizado } from "./steps/business/BusinessStep5Aprendizado";
+import { BusinessStep6Expectativas } from "./steps/business/BusinessStep6Expectativas";
 
 const STEP_KEY = "diagnostico_current_step";
+
+const academyStepLabels = [
+  { id: 1, titulo: "Perfil" },
+  { id: 2, titulo: "IA" },
+  { id: 3, titulo: "Objetivos" },
+  { id: 4, titulo: "Desafios" },
+  { id: 5, titulo: "Pronto!" },
+];
+
+const businessStepLabels = [
+  { id: 1, titulo: "Perfil" },
+  { id: 2, titulo: "Solução" },
+  { id: 3, titulo: "Contexto" },
+  { id: 4, titulo: "Projeto" },
+  { id: 5, titulo: "Aprender" },
+  { id: 6, titulo: "Sucesso" },
+];
 
 interface FormularioWizardProps {
   onCancelar?: () => void;
@@ -31,10 +60,14 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   const [currentStep, setCurrentStep] = useState(0);
   const [draftSaved, setDraftSaved] = useState(false);
   const { formulario, finalizarFormulario, salvarRascunho, isSaving } = useMentoriaForm();
-  const { plan } = useUserPlan();
+  const { plan, isBusiness } = useUserPlan();
   const navigate = useNavigate();
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const totalSteps = isBusiness ? 6 : 5;
+  const stepLabels = isBusiness ? businessStepLabels : academyStepLabels;
+
+  // Use appropriate schema based on plan
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: formulario ? {
@@ -47,8 +80,6 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
       nivel_comprometimento: 5,
     },
   });
-
-  const totalSteps = 7;
 
   // Restore step from localStorage on mount
   useEffect(() => {
@@ -63,7 +94,7 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
         });
       }
     }
-  }, [formulario]);
+  }, [formulario, totalSteps]);
 
   // Auto-save draft on form changes (debounced)
   useEffect(() => {
@@ -111,19 +142,14 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
 
   const onSubmit = async (data: FormData) => {
     try {
-      // Finalizar formulário
       await finalizarFormulario(data);
-      
-      // Clear localStorage on success
       localStorage.removeItem(STEP_KEY);
       
-      // Mostrar toast informando sobre geração de insight
       toast({
         title: "Gerando sua análise personalizada...",
         description: "Aguarde alguns segundos enquanto a IA analisa seu perfil"
       });
 
-      // Auto-gerar insight após finalização
       if (formulario?.id) {
         const { error } = await supabase.functions.invoke('gerar-insight-mentoria', {
           body: { formulario_id: formulario.id }
@@ -139,7 +165,6 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
         }
       }
 
-      // Callback ou navegação
       if (onFinalizado) {
         onFinalizado();
       } else {
@@ -154,28 +179,73 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   };
 
   const getStepFields = (step: number): (keyof FormData)[] => {
+    if (isBusiness) {
+      switch (step) {
+        case 0: return ["nome_completo", "tamanho_empresa"] as (keyof FormData)[];
+        case 1: return [] as (keyof FormData)[];
+        case 2: return [] as (keyof FormData)[];
+        case 3: return [] as (keyof FormData)[];
+        case 4: return [] as (keyof FormData)[];
+        case 5: return [] as (keyof FormData)[];
+        default: return [];
+      }
+    }
+    
+    // Academy steps
     switch (step) {
-      case 0:
-        return ["nome_completo", "idade", "profissao", "area_atuacao", "tempo_experiencia", "tamanho_empresa"];
-      case 1:
-        return ["nivel_ia", "frequencia_uso_ia"];
-      case 2:
-        return ["objetivo_principal", "area_aplicacao_ia", "meta_3_meses", "meta_12_meses"];
-      case 3:
-        return ["desafio_1", "desafio_2", "desafio_3", "tempo_disponivel", "maior_ladrao_tempo", "nivel_autonomia"];
-      case 4:
-        return ["estilo_aprendizagem", "preferencia_aprendizado", "melhor_horario", "tipo_feedback"];
-      case 5:
-        return ["motivacao_mentoria", "nivel_comprometimento", "zona_conforto"];
-      case 6:
-        return ["tipo_suporte", "frequencia_feedback", "preferencia_sessoes"];
-      default:
-        return [];
+      case 0: return ["nome_completo", "idade", "profissao", "area_atuacao", "tempo_experiencia"];
+      case 1: return ["nivel_ia", "frequencia_uso_ia"];
+      case 2: return ["objetivo_principal", "area_aplicacao_ia", "meta_3_meses"];
+      case 3: return ["desafio_1", "desafio_2", "desafio_3", "tempo_disponivel", "maior_ladrao_tempo"];
+      case 4: return ["estilo_aprendizagem", "preferencia_aprendizado", "nivel_comprometimento"];
+      default: return [];
+    }
+  };
+
+  // Render Academy Steps
+  const renderAcademyStep = () => {
+    const academyForm = form as unknown as ReturnType<typeof useForm<AcademyFormData>>;
+    
+    switch (currentStep) {
+      case 0: return <AcademyStep1Perfil form={academyForm} onNext={nextStep} />;
+      case 1: return <AcademyStep2Experiencia form={academyForm} onNext={nextStep} onPrev={prevStep} />;
+      case 2: return <AcademyStep3Objetivos form={academyForm} onNext={nextStep} onPrev={prevStep} />;
+      case 3: return <AcademyStep4Desafios form={academyForm} onNext={nextStep} onPrev={prevStep} />;
+      case 4: return <AcademyStep5Comprometimento form={academyForm} onPrev={prevStep} onSubmit={form.handleSubmit(onSubmit)} isSubmitting={isSaving} />;
+      default: return null;
+    }
+  };
+
+  // Render Business Steps
+  const renderBusinessStep = () => {
+    const businessForm = form as unknown as ReturnType<typeof useForm<BusinessFormData>>;
+    
+    switch (currentStep) {
+      case 0: return <BusinessStep1Perfil form={businessForm} onNext={nextStep} />;
+      case 1: return <BusinessStep2Construir form={businessForm} onNext={nextStep} onPrev={prevStep} />;
+      case 2: return <BusinessStep3Contexto form={businessForm} onNext={nextStep} onPrev={prevStep} />;
+      case 3: return <BusinessStep4Acompanhamento form={businessForm} onNext={nextStep} onPrev={prevStep} />;
+      case 4: return <BusinessStep5Aprendizado form={businessForm} onNext={nextStep} onPrev={prevStep} />;
+      case 5: return <BusinessStep6Expectativas form={businessForm} onPrev={prevStep} onSubmit={form.handleSubmit(onSubmit)} isSubmitting={isSaving} />;
+      default: return null;
     }
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className={cn(
+      "w-full max-w-4xl mx-auto relative overflow-hidden",
+      isBusiness && "bg-gradient-to-br from-slate-900 via-purple-950/50 to-slate-900 border-purple-500/30"
+    )}>
+      {/* Business Premium Badge */}
+      {isBusiness && (
+        <div className="absolute top-4 right-4 z-10">
+          <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full flex items-center gap-1.5 shadow-lg shadow-purple-500/25">
+            <Crown className="h-3.5 w-3.5" />
+            Business
+          </span>
+        </div>
+      )}
+
       <CardContent className="pt-6">
         {onCancelar && (
           <div className="flex justify-end mb-4">
@@ -192,7 +262,12 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
         )}
         
         <div className="flex items-center justify-between mb-2">
-          <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+          <ProgressBar 
+            currentStep={currentStep} 
+            totalSteps={totalSteps} 
+            steps={stepLabels}
+            isBusiness={isBusiness}
+          />
           {draftSaved && (
             <span className="flex items-center gap-1 text-xs text-primary animate-in fade-in duration-300">
               <Save className="h-3 w-3" />
@@ -203,20 +278,7 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            {currentStep === 0 && <Step1InformacoesPessoais form={form} onNext={nextStep} />}
-            {currentStep === 1 && <Step2ExperienciaIA form={form} onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 2 && <Step3Objetivos form={form} onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 3 && <Step4CenarioAtual form={form} onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 4 && <Step5EstiloAprendizagem form={form} onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 5 && <Step6Motivacao form={form} onNext={nextStep} onPrev={prevStep} />}
-            {currentStep === 6 && (
-              <Step7Expectativas
-                form={form}
-                onPrev={prevStep}
-                onSubmit={form.handleSubmit(onSubmit)}
-                isSubmitting={isSaving}
-              />
-            )}
+            {isBusiness ? renderBusinessStep() : renderAcademyStep()}
           </form>
         </Form>
       </CardContent>
