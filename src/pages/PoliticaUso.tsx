@@ -22,19 +22,15 @@ export default function PoliticaUso() {
         .from("documentos_legais")
         .select("*")
         .eq("slug", "termos-uso")
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) return null;
 
-      // Se não logado, mostrar versão de visitantes
-      const isPublicAccess = !user;
-      
       return {
         ...data,
-        conteudo: isPublicAccess ? (data.conteudo_visitantes || data.conteudo_mentorados) : data.conteudo_mentorados,
-        tituloExibicao: isPublicAccess 
-          ? "Política de Uso – Acesso Gratuito – IAPLICADA" 
-          : data.titulo
+        conteudo: data.conteudo_visitantes || data.conteudo_mentorados,
+        tituloExibicao: data.titulo
       };
     },
     staleTime: 1000 * 60 * 10,

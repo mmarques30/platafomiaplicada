@@ -73,7 +73,8 @@ import Avance from "./pages/Avance";
 import CandidatarMentoria from "./pages/CandidatarMentoria";
 import GerenciarCandidaturas from "./pages/admin/GerenciarCandidaturas";
 import VideosBonus from "./pages/VideosBonus";
-import PoliticaVendas from "./pages/PoliticaVendas";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import PoliticaServicos from "./pages/PoliticaServicos";
 import PoliticaUso from "./pages/PoliticaUso";
 import GerenciarPoliticas from "./pages/admin/GerenciarPoliticas";
 import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
@@ -101,8 +102,8 @@ function AppContent() {
         <Route path="/aplique" element={<Aplique />} />
         <Route path="/avance" element={<Avance />} />
         <Route path="/formularioaplica" element={<FormularioAplica />} />
-        <Route path="/politicauso" element={<PoliticaUso />} />
-        <Route path="/politicavendas" element={<PoliticaVendas />} />
+        <Route path="/termos-uso" element={<PoliticaUso />} />
+        <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         
 
@@ -146,6 +147,7 @@ function AppContent() {
             <Route path="/videos-bonus" element={<VideosBonus />} />
             <Route path="/central" element={<Central />} />
             <Route path="/instalar" element={<Instalar />} />
+            <Route path="/politica-servicos" element={<PoliticaServicos />} />
           </Route>
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />

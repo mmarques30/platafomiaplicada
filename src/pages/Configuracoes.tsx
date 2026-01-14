@@ -290,28 +290,23 @@ export default function Configuracoes() {
           </CardContent>
         </Card>
 
-        {/* Políticas e Termos */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Políticas e Termos
-            </CardTitle>
-            <CardDescription>Consulte os documentos legais da plataforma</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            {!isVisitante && (
-              <Link to="/politicavendas">
-                <Button variant="outline">Política de Vendas</Button>
+        {/* Políticas e Termos - Apenas para clientes pagantes */}
+        {!isVisitante && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Políticas e Termos
+              </CardTitle>
+              <CardDescription>Consulte os documentos legais da plataforma</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Link to="/politica-servicos">
+                <Button variant="outline">Política de Serviços</Button>
               </Link>
-            )}
-            <Link to="/politicauso">
-              <Button variant="outline">
-                {isVisitante ? "Política de Uso" : "Termos de Uso"}
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
       </div>
     </div>
