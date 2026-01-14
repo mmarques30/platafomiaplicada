@@ -10,7 +10,7 @@ import { RoadmapTimeline } from "@/components/mentoria/painel/RoadmapTimeline";
 import { PontosAtencao } from "@/components/mentoria/painel/PontosAtencao";
 import { ProximaSessao } from "@/components/mentoria/painel/ProximaSessao";
 import { ProjetoPreparacaoSection } from "@/components/mentoria/painel/ProjetoPreparacaoSection";
-import { Loader2, ArrowLeft, FileText, Edit, Target, Briefcase } from "lucide-react";
+import { Loader2, ArrowLeft, FileText, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { formatProjetoTitulo } from "@/lib/utils";
@@ -116,15 +116,6 @@ export default function MentoriaPainelDiagnostico() {
             >
               <FileText className="w-4 h-4" />
               Ver Diagnóstico Completo
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={() => navigate(isAcademyRoute ? "/diagnostico/formulario?edit=true" : "/mentoria/diagnostico?edit=true")}
-              className="gap-2"
-            >
-              <Edit className="w-4 h-4" />
-              Editar Diagnóstico
             </Button>
             
             {!isAcademyRoute && (

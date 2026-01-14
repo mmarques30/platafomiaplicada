@@ -1,15 +1,13 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { User, Brain, Target, AlertTriangle, Lightbulb, Heart, CheckCircle2 } from "lucide-react";
 
 interface ResumoDiagnosticoProps {
   formulario: any;
-  onEditar?: () => void;
 }
 
-export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoProps) {
+export function ResumoDiagnostico({ formulario }: ResumoDiagnosticoProps) {
   if (!formulario) return null;
 
   const formatDate = (date: string) => {
@@ -194,11 +192,6 @@ export function ResumoDiagnostico({ formulario, onEditar }: ResumoDiagnosticoPro
       </CardContent>
 
       <CardFooter className="flex gap-3 pt-6 border-t">
-        {onEditar && (
-          <Button onClick={onEditar} className="bg-aplicada-green hover:bg-aplicada-green/90">
-            Editar Respostas
-          </Button>
-        )}
         <Button variant="outline" onClick={() => window.print()}>
           Imprimir
         </Button>

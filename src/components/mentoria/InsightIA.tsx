@@ -2,11 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Target, Rocket, AlertTriangle, Focus, Loader2, CheckCircle2, Wrench } from "lucide-react";
+import { Sparkles, Target, Rocket, AlertTriangle, Focus, Loader2, CheckCircle2, Wrench, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { EtapaEvolucao, Etapa } from "./EtapaEvolucao";
 
 interface FerramentaPrioritaria {
   nome: string;
@@ -37,10 +38,9 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
       
       toast({
         title: "Insight gerado com sucesso!",
-        description: "Confira abaixo a análise personalizada"
+        description: "Confira abaixo sua jornada de evolução personalizada"
       });
 
-      // Callback para recarregar dados
       if (onInsightGerado) {
         onInsightGerado();
       } else {
@@ -58,34 +58,35 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
     }
   };
 
+  // Estado inicial - sem insight
   if (!insight) {
     return (
-      <Card className="mt-6 border-accent/30 bg-gradient-to-br from-accent/5 to-primary/5">
+      <Card className="mt-6 border-aplicada-green/30 bg-gradient-to-br from-aplicada-dark to-aplicada-dark/90">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="text-accent h-6 w-6" />
-            Análise Personalizada por IA
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Sparkles className="text-aplicada-green h-6 w-6" />
+            Sua Jornada de Evolução com IA
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            Gere uma análise personalizada com insights e recomendações estratégicas baseadas no seu diagnóstico.
+          <p className="text-white/70">
+            Gere sua jornada personalizada com etapas claras de evolução, ferramentas que deve dominar e trilhas para estudar.
           </p>
           <Button 
             onClick={gerarInsight} 
             disabled={isGenerating}
             size="lg"
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto bg-aplicada-green hover:bg-aplicada-green/90 text-white"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Gerando análise...
+                Gerando sua jornada...
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 h-5 w-5" />
-                Gerar Análise com IA
+                Gerar Minha Jornada com IA
               </>
             )}
           </Button>
@@ -94,16 +95,114 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
     );
   }
 
+  // Verificar se tem etapas de evolução (novo formato)
+  const etapasEvolucao = insight.etapas_evolucao as Etapa[] | undefined;
   const ferramentasPrioritarias = (insight.ferramentas_prioritarias as FerramentaPrioritaria[] | undefined) || [];
 
+  // Novo layout com etapas de evolução
+  if (etapasEvolucao && etapasEvolucao.length > 0) {
+    return (
+      <div className="mt-6 bg-aplicada-dark rounded-2xl p-6 md:p-8 border border-aplicada-green/20">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3 bg-aplicada-green rounded-full shadow-lg shadow-aplicada-green/30">
+            <TrendingUp className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white">Sua Jornada de Evolução</h2>
+            <p className="text-aplicada-green">Etapas personalizadas para seu desenvolvimento em IA</p>
+          </div>
+        </div>
+
+        {/* Ferramentas Prioritárias - Destaque */}
+        {ferramentasPrioritarias.length > 0 && (
+          <div className="mb-8 p-5 rounded-xl bg-gradient-to-r from-aplicada-green/20 to-aplicada-green/5 border border-aplicada-green/30">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <Wrench className="h-5 w-5 text-aplicada-green" />
+              Ferramentas de IA para Dominar
+            </h3>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {ferramentasPrioritarias
+                .sort((a, b) => a.nivel_prioridade - b.nivel_prioridade)
+                .slice(0, 6)
+                .map((ferramenta, i) => (
+                  <div 
+                    key={i} 
+                    className="p-4 rounded-lg bg-aplicada-dark border border-aplicada-green/20 hover:border-aplicada-green/50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          className={i === 0 ? "bg-aplicada-green text-white" : "bg-aplicada-green/20 text-aplicada-green"}
+                        >
+                          #{i + 1}
+                        </Badge>
+                        <span className="font-semibold text-white">{ferramenta.nome}</span>
+                      </div>
+                      {ferramenta.gratuito && (
+                        <Badge variant="outline" className="text-xs bg-green-500/10 text-green-400 border-green-500/30">
+                          Grátis
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-aplicada-green/70 mb-1">{ferramenta.categoria}</p>
+                    <p className="text-sm text-white/70">{ferramenta.motivo}</p>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Timeline de Etapas */}
+        <div className="space-y-0">
+          {etapasEvolucao.map((etapa, index) => (
+            <EtapaEvolucao 
+              key={etapa.numero}
+              etapa={etapa}
+              isFirst={index === 0}
+              isLast={index === etapasEvolucao.length - 1}
+            />
+          ))}
+        </div>
+
+        {/* Alerta de Sucesso */}
+        {planoJaCriado && (
+          <Alert className="mt-8 border-aplicada-green/30 bg-aplicada-green/10">
+            <CheckCircle2 className="h-4 w-4 text-aplicada-green" />
+            <AlertDescription className="text-white/90">
+              <strong className="text-aplicada-green">Plano de mentoria criado!</strong>
+              <p className="text-sm mt-1">
+                Seus objetivos e projetos iniciais já estão disponíveis na seção de Mentoria.
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Footer */}
+        <div className="mt-8 pt-4 border-t border-aplicada-green/20">
+          <p className="text-xs text-white/50 text-center">
+            Jornada gerada em {new Date(formulario.insight_gerado_em).toLocaleDateString('pt-BR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Layout legado (accordion) para insights antigos sem etapas_evolucao
   return (
-    <Card className="mt-6 border-accent/30 bg-gradient-to-br from-accent/5 via-primary/5 to-background">
+    <Card className="mt-6 border-aplicada-green/30 bg-gradient-to-br from-aplicada-dark via-aplicada-dark/95 to-aplicada-dark/90">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="text-accent h-6 w-6" />
+        <CardTitle className="flex items-center gap-2 text-white">
+          <Sparkles className="text-aplicada-green h-6 w-6" />
           Sua Análise Personalizada por IA
         </CardTitle>
-        <p className="text-sm text-muted-foreground mt-2">
+        <p className="text-sm text-white/60 mt-2">
           Baseada nas informações do seu formulário diagnóstico
         </p>
       </CardHeader>
@@ -111,15 +210,15 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
         <Accordion type="single" collapsible className="w-full space-y-2">
           {/* Ferramentas de IA para Focar */}
           {ferramentasPrioritarias.length > 0 && (
-            <AccordionItem value="ferramentas" className="border-2 border-accent/50 rounded-lg px-4 bg-gradient-to-r from-accent/10 to-primary/10">
+            <AccordionItem value="ferramentas" className="border-2 border-aplicada-green/50 rounded-lg px-4 bg-gradient-to-r from-aplicada-green/10 to-aplicada-green/5">
               <AccordionTrigger className="hover:no-underline">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-accent/20">
-                    <Wrench className="h-5 w-5 text-accent" />
+                  <div className="p-2 rounded-full bg-aplicada-green/20">
+                    <Wrench className="h-5 w-5 text-aplicada-green" />
                   </div>
                   <div className="text-left">
-                    <span className="font-semibold">Ferramentas de IA para Focar</span>
-                    <p className="text-xs text-muted-foreground font-normal">
+                    <span className="font-semibold text-white">Ferramentas de IA para Focar</span>
+                    <p className="text-xs text-white/60 font-normal">
                       {ferramentasPrioritarias.length} ferramentas prioritárias
                     </p>
                   </div>
@@ -132,26 +231,25 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
                     .map((ferramenta, i) => (
                       <div 
                         key={i} 
-                        className="p-4 rounded-lg bg-background border border-border/50 hover:border-accent/50 transition-colors"
+                        className="p-4 rounded-lg bg-aplicada-dark border border-aplicada-green/30 hover:border-aplicada-green/50 transition-colors"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <Badge 
-                              variant={i === 0 ? "default" : "secondary"}
-                              className={i === 0 ? "bg-accent" : ""}
+                              className={i === 0 ? "bg-aplicada-green text-white" : "bg-aplicada-green/20 text-aplicada-green"}
                             >
                               #{i + 1}
                             </Badge>
-                            <span className="font-semibold">{ferramenta.nome}</span>
+                            <span className="font-semibold text-white">{ferramenta.nome}</span>
                           </div>
                           {ferramenta.gratuito && (
-                            <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/30">
+                            <Badge variant="outline" className="text-xs bg-green-500/10 text-green-400 border-green-500/30">
                               Gratuito
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground mb-2">{ferramenta.categoria}</p>
-                        <p className="text-sm">{ferramenta.motivo}</p>
+                        <p className="text-xs text-aplicada-green/70 mb-2">{ferramenta.categoria}</p>
+                        <p className="text-sm text-white/80">{ferramenta.motivo}</p>
                       </div>
                     ))}
                 </div>
@@ -160,38 +258,38 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
           )}
 
           {/* Análise do Perfil */}
-          <AccordionItem value="perfil" className="border border-border/50 rounded-lg px-4 bg-card">
+          <AccordionItem value="perfil" className="border border-aplicada-green/30 rounded-lg px-4 bg-aplicada-dark/50">
             <AccordionTrigger className="hover:no-underline">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Target className="h-5 w-5 text-primary" />
+                <div className="p-2 rounded-full bg-aplicada-green/10">
+                  <Target className="h-5 w-5 text-aplicada-green" />
                 </div>
-                <span className="font-semibold text-left">Análise do Seu Perfil</span>
+                <span className="font-semibold text-left text-white">Análise do Seu Perfil</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pt-4 pb-2">
-              <p className="text-sm leading-relaxed text-foreground/90">
+              <p className="text-sm leading-relaxed text-white/80">
                 {insight.analise_perfil}
               </p>
             </AccordionContent>
           </AccordionItem>
 
           {/* Principais Oportunidades */}
-          <AccordionItem value="oportunidades" className="border border-border/50 rounded-lg px-4 bg-card">
+          <AccordionItem value="oportunidades" className="border border-aplicada-green/30 rounded-lg px-4 bg-aplicada-dark/50">
             <AccordionTrigger className="hover:no-underline">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-accent/10">
-                  <Rocket className="h-5 w-5 text-accent" />
+                <div className="p-2 rounded-full bg-aplicada-green/10">
+                  <Rocket className="h-5 w-5 text-aplicada-green" />
                 </div>
-                <span className="font-semibold text-left">Principais Oportunidades</span>
+                <span className="font-semibold text-left text-white">Principais Oportunidades</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pt-4 pb-2">
               <ul className="space-y-3">
                 {insight.oportunidades?.map((op: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 p-3 bg-background/50 rounded-lg border border-border/30">
-                    <span className="text-accent font-bold text-lg flex-shrink-0">{i + 1}.</span>
-                    <span className="text-sm leading-relaxed">{op}</span>
+                  <li key={i} className="flex items-start gap-3 p-3 bg-aplicada-dark rounded-lg border border-aplicada-green/20">
+                    <span className="text-aplicada-green font-bold text-lg flex-shrink-0">{i + 1}.</span>
+                    <span className="text-sm leading-relaxed text-white/80">{op}</span>
                   </li>
                 ))}
               </ul>
@@ -199,21 +297,21 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
           </AccordionItem>
 
           {/* Primeiros Passos */}
-          <AccordionItem value="passos" className="border border-border/50 rounded-lg px-4 bg-card">
+          <AccordionItem value="passos" className="border border-aplicada-green/30 rounded-lg px-4 bg-aplicada-dark/50">
             <AccordionTrigger className="hover:no-underline">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Focus className="h-5 w-5 text-primary" />
+                <div className="p-2 rounded-full bg-aplicada-green/10">
+                  <Focus className="h-5 w-5 text-aplicada-green" />
                 </div>
-                <span className="font-semibold text-left">Seus Primeiros Passos</span>
+                <span className="font-semibold text-left text-white">Seus Primeiros Passos</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pt-4 pb-2">
               <ul className="space-y-3">
                 {insight.primeiros_passos?.map((passo: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
-                    <span className="text-primary font-bold text-lg flex-shrink-0">{i + 1}.</span>
-                    <span className="text-sm leading-relaxed font-medium">{passo}</span>
+                  <li key={i} className="flex items-start gap-3 p-4 bg-aplicada-green/10 rounded-lg border border-aplicada-green/20">
+                    <span className="text-aplicada-green font-bold text-lg flex-shrink-0">{i + 1}.</span>
+                    <span className="text-sm leading-relaxed font-medium text-white/90">{passo}</span>
                   </li>
                 ))}
               </ul>
@@ -221,18 +319,18 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
           </AccordionItem>
 
           {/* Alerta de Desafios */}
-          <AccordionItem value="desafios" className="border border-border/50 rounded-lg px-4 bg-card">
+          <AccordionItem value="desafios" className="border border-aplicada-green/30 rounded-lg px-4 bg-aplicada-dark/50">
             <AccordionTrigger className="hover:no-underline">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-yellow-500/10">
                   <AlertTriangle className="h-5 w-5 text-yellow-500" />
                 </div>
-                <span className="font-semibold text-left">Fique Atento</span>
+                <span className="font-semibold text-left text-white">Fique Atento</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pt-4 pb-2">
-              <div className="p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-lg">
-                <p className="text-sm leading-relaxed text-foreground/90">
+              <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                <p className="text-sm leading-relaxed text-white/80">
                   {insight.alerta_desafios}
                 </p>
               </div>
@@ -240,18 +338,18 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
           </AccordionItem>
 
           {/* Recomendação de Foco */}
-          <AccordionItem value="foco" className="border border-accent/50 rounded-lg px-4 bg-card">
+          <AccordionItem value="foco" className="border border-aplicada-green/50 rounded-lg px-4 bg-aplicada-dark/50">
             <AccordionTrigger className="hover:no-underline">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-accent/10">
-                  <Target className="h-5 w-5 text-accent" />
+                <div className="p-2 rounded-full bg-aplicada-green/10">
+                  <Target className="h-5 w-5 text-aplicada-green" />
                 </div>
-                <span className="font-semibold text-left">Recomendação de Foco</span>
+                <span className="font-semibold text-left text-white">Recomendação de Foco</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pt-4 pb-2">
-              <div className="p-4 bg-accent/10 border-2 border-accent/30 rounded-lg">
-                <p className="text-sm font-medium leading-relaxed">
+              <div className="p-4 bg-aplicada-green/10 border-2 border-aplicada-green/30 rounded-lg">
+                <p className="text-sm font-medium leading-relaxed text-white">
                   {insight.recomendacao_foco}
                 </p>
               </div>
@@ -260,10 +358,10 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
         </Accordion>
 
         {planoJaCriado && (
-          <Alert className="mt-6 border-primary/30 bg-primary/10">
-            <CheckCircle2 className="h-4 w-4 text-primary" />
-            <AlertDescription className="text-foreground/80">
-              <strong>Plano de mentoria criado com sucesso!</strong>
+          <Alert className="mt-6 border-aplicada-green/30 bg-aplicada-green/10">
+            <CheckCircle2 className="h-4 w-4 text-aplicada-green" />
+            <AlertDescription className="text-white/90">
+              <strong className="text-aplicada-green">Plano de mentoria criado com sucesso!</strong>
               <p className="text-sm mt-1">
                 Seus objetivos e tarefas iniciais já estão disponíveis na seção de Mentoria.
               </p>
@@ -271,8 +369,8 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
           </Alert>
         )}
 
-        <div className="mt-6 pt-4 border-t border-border/50">
-          <p className="text-xs text-muted-foreground text-center">
+        <div className="mt-6 pt-4 border-t border-aplicada-green/20">
+          <p className="text-xs text-white/50 text-center">
             Análise gerada em {new Date(formulario.insight_gerado_em).toLocaleDateString('pt-BR', {
               day: '2-digit',
               month: 'long',
