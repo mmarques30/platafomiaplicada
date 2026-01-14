@@ -24,27 +24,9 @@ export function Step6Motivacao({ form, onNext, onPrev }: StepProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Motivação</h2>
-        <p className="text-muted-foreground">O que te move</p>
+        <h2 className="text-2xl font-bold mb-2">Comprometimento e Limites</h2>
+        <p className="text-muted-foreground">Nos ajude a entender seus limites e disposição</p>
       </div>
-
-      <FormField
-        control={form.control}
-        name="motivacao_mentoria"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>O que te motivou a buscar esta mentoria agora? *</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Teve algum gatilho específico?"
-                className="min-h-[100px]"
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
 
       <FormField
         control={form.control}
@@ -69,7 +51,7 @@ export function Step6Motivacao({ form, onNext, onPrev }: StepProps) {
         name="nivel_comprometimento"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Nível de comprometimento (1-10):</FormLabel>
+            <FormLabel>Nível de comprometimento (1-10): *</FormLabel>
             <FormControl>
               <div className="space-y-4">
                 <Slider

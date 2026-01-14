@@ -1,11 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Sparkles, Target, Rocket, AlertTriangle, Focus, Loader2, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, Target, Rocket, AlertTriangle, Focus, Loader2, CheckCircle2, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+
+interface FerramentaPrioritaria {
+  nome: string;
+  categoria: string;
+  motivo: string;
+  nivel_prioridade: number;
+  gratuito: boolean;
+}
 
 interface InsightIAProps {
   formulario: any;
@@ -85,6 +94,8 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
     );
   }
 
+  const ferramentasPrioritarias = (insight.ferramentas_prioritarias as FerramentaPrioritaria[] | undefined) || [];
+
   return (
     <Card className="mt-6 border-accent/30 bg-gradient-to-br from-accent/5 via-primary/5 to-background">
       <CardHeader>
@@ -98,6 +109,56 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
       </CardHeader>
       <CardContent>
         <Accordion type="single" collapsible className="w-full space-y-2">
+          {/* Ferramentas de IA para Focar */}
+          {ferramentasPrioritarias.length > 0 && (
+            <AccordionItem value="ferramentas" className="border-2 border-accent/50 rounded-lg px-4 bg-gradient-to-r from-accent/10 to-primary/10">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-accent/20">
+                    <Wrench className="h-5 w-5 text-accent" />
+                  </div>
+                  <div className="text-left">
+                    <span className="font-semibold">Ferramentas de IA para Focar</span>
+                    <p className="text-xs text-muted-foreground font-normal">
+                      {ferramentasPrioritarias.length} ferramentas prioritárias
+                    </p>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-4 pb-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {ferramentasPrioritarias
+                    .sort((a, b) => a.nivel_prioridade - b.nivel_prioridade)
+                    .map((ferramenta, i) => (
+                      <div 
+                        key={i} 
+                        className="p-4 rounded-lg bg-background border border-border/50 hover:border-accent/50 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Badge 
+                              variant={i === 0 ? "default" : "secondary"}
+                              className={i === 0 ? "bg-accent" : ""}
+                            >
+                              #{i + 1}
+                            </Badge>
+                            <span className="font-semibold">{ferramenta.nome}</span>
+                          </div>
+                          {ferramenta.gratuito && (
+                            <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/30">
+                              Gratuito
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">{ferramenta.categoria}</p>
+                        <p className="text-sm">{ferramenta.motivo}</p>
+                      </div>
+                    ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
           {/* Análise do Perfil */}
           <AccordionItem value="perfil" className="border border-border/50 rounded-lg px-4 bg-card">
             <AccordionTrigger className="hover:no-underline">

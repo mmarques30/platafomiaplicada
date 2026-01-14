@@ -54,20 +54,20 @@ export const step5Schema = z.object({
   limitacoes_tecnicas: z.string().optional(),
 });
 
-// Step 6: Motivação
+// Step 6: Comprometimento e Limites (simplificado - já são mentorados)
 export const step6Schema = z.object({
-  motivacao_mentoria: z.string().min(20, "Descreva sua motivação (mínimo 20 caracteres)"),
+  motivacao_mentoria: z.string().optional(), // Tornado opcional - já são clientes
   maior_medo_ia: z.string().optional(),
   nivel_comprometimento: z.number().min(1).max(10),
   zona_conforto: z.string().min(1, "Selecione uma opção"),
   nao_negociaveis: z.string().optional(),
 });
 
-// Step 7: Expectativas
+// Step 7: Prioridades (simplificado - já são mentorados)
 export const step7Schema = z.object({
-  tipo_suporte: z.string().min(1, "Selecione o tipo de suporte"),
-  frequencia_feedback: z.string().min(1, "Selecione a frequência"),
-  preferencia_sessoes: z.string().min(1, "Selecione a preferência"),
+  tipo_suporte: z.string().optional(), // Tornado opcional - definido pelo produto
+  frequencia_feedback: z.string().optional(), // Tornado opcional - definido pelo produto
+  preferencia_sessoes: z.string().optional(), // Tornado opcional - definido pelo produto
   duvidas_preocupacoes: z.string().optional(),
   vitoria_30_dias: z.string().optional(),
   quick_wins: z.array(z.string()).default([]),

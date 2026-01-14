@@ -8,7 +8,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
@@ -33,120 +32,9 @@ export function Step7Expectativas({ form, onPrev, onSubmit, isSubmitting }: Step
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Expectativas</h2>
-        <p className="text-muted-foreground">O que espera da mentoria</p>
+        <h2 className="text-2xl font-bold mb-2">Suas Prioridades</h2>
+        <p className="text-muted-foreground">O que você quer conquistar primeiro</p>
       </div>
-
-      <FormField
-        control={form.control}
-        name="tipo_suporte"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Que tipo de suporte você mais precisa? *</FormLabel>
-            <FormControl>
-              <RadioGroup onValueChange={field.onChange} value={field.value}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="tecnico" id="tecnico" />
-                  <label htmlFor="tecnico" className="cursor-pointer">Técnico (como fazer)</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="estrategico" id="estrategico" />
-                  <label htmlFor="estrategico" className="cursor-pointer">Estratégico (o que fazer)</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="motivacional" id="motivacional" />
-                  <label htmlFor="motivacional" className="cursor-pointer">Motivacional (apoio e energia)</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="pratico" id="pratico" />
-                  <label htmlFor="pratico" className="cursor-pointer">Prático (implementação)</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="todos" id="todos" />
-                  <label htmlFor="todos" className="cursor-pointer">Todos acima</label>
-                </div>
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="frequencia_feedback"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Frequência ideal de feedback: *</FormLabel>
-            <FormControl>
-              <RadioGroup onValueChange={field.onChange} value={field.value}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="tempo-real" id="tempo-real" />
-                  <label htmlFor="tempo-real" className="cursor-pointer">Tempo real (durante as sessões)</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="semanal" id="semanal" />
-                  <label htmlFor="semanal" className="cursor-pointer">Semanal</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="quinzenal" id="quinzenal" />
-                  <label htmlFor="quinzenal" className="cursor-pointer">Quinzenal</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="mensal" id="mensal" />
-                  <label htmlFor="mensal" className="cursor-pointer">Mensal</label>
-                </div>
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="preferencia_sessoes"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Prefere sessões: *</FormLabel>
-            <FormControl>
-              <RadioGroup onValueChange={field.onChange} value={field.value}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="estruturadas" id="estruturadas" />
-                  <label htmlFor="estruturadas" className="cursor-pointer">Bem estruturadas com agenda</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="flexiveis" id="flexiveis" />
-                  <label htmlFor="flexiveis" className="cursor-pointer">Flexíveis conforme necessidade</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="mix" id="mix" />
-                  <label htmlFor="mix" className="cursor-pointer">Mix dos dois</label>
-                </div>
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="duvidas_preocupacoes"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Tem alguma pergunta ou preocupação específica antes de começarmos?</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Compartilhe suas dúvidas..."
-                className="min-h-[80px]"
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
 
       <FormField
         control={form.control}
@@ -171,7 +59,7 @@ export function Step7Expectativas({ form, onPrev, onSubmit, isSubmitting }: Step
         name="quick_wins"
         render={() => (
           <FormItem>
-            <FormLabel>Marque 3 coisas que você quer aprender URGENTE:</FormLabel>
+            <FormLabel>Marque até 3 coisas que você quer aprender URGENTE:</FormLabel>
             <div className="space-y-2">
               {quickWinsOptions.map((item) => (
                 <FormField

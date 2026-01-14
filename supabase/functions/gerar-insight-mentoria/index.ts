@@ -7,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const buildSystemPrompt = (catalogoConteudo: string) => `Você é um mentor especialista em IA aplicada ao trabalho. 
+const buildSystemPrompt = (catalogoConteudo: string, catalogoFerramentas: string) => `Você é um mentor especialista em IA aplicada ao trabalho. 
 Analise o formulário diagnóstico e gere um insight personalizado completo com:
 
 1. **Análise do Perfil**: Resumo do estágio atual do mentorado (2-3 frases)
@@ -16,9 +16,18 @@ Analise o formulário diagnóstico e gere um insight personalizado completo com:
 4. **Alerta de Desafios**: Possíveis obstáculos baseados no contexto dele
 5. **Recomendação de Foco**: Prioridade estratégica para os próximos 30 dias
 6. **Objetivos Estratégicos**: 3-5 objetivos divididos em curto_prazo, medio_prazo e longo_prazo
-7. **Projetos Sugeridos**: 2-3 projetos práticos com trilhas e módulos recomendados do catálogo abaixo
+7. **Ferramentas Prioritárias**: 3-5 ferramentas de IA que o mentorado DEVE dominar, ordenadas por prioridade
+8. **Projetos Sugeridos**: 2-3 projetos práticos com trilhas, módulos e FERRAMENTAS específicas recomendadas
 
 ${catalogoConteudo}
+
+${catalogoFerramentas}
+
+IMPORTANTE SOBRE FERRAMENTAS:
+- Selecione ferramentas do catálogo acima que são ESSENCIAIS para o perfil do mentorado
+- Para cada projeto, indique 2-3 ferramentas específicas que serão usadas
+- Justifique brevemente por que cada ferramenta é importante para aquele projeto
+- Use os nomes exatos das ferramentas do catálogo
 
 IMPORTANTE SOBRE RECOMENDAÇÕES DE CONTEÚDO:
 - Para cada projeto, selecione trilhas e módulos do catálogo acima que ajudem na preparação
@@ -35,6 +44,15 @@ Responda APENAS com JSON válido neste formato exato:
   "primeiros_passos": ["passo1", "passo2", "passo3"],
   "alerta_desafios": "texto aqui",
   "recomendacao_foco": "texto aqui",
+  "ferramentas_prioritarias": [
+    {
+      "nome": "ChatGPT",
+      "categoria": "LLM Conversacional",
+      "motivo": "Por que é essencial para este perfil",
+      "nivel_prioridade": 1,
+      "gratuito": false
+    }
+  ],
   "objetivos": [
     {"objetivo": "texto", "tipo": "curto_prazo", "prioridade": 1},
     {"objetivo": "texto", "tipo": "medio_prazo", "prioridade": 2}
@@ -45,6 +63,12 @@ Responda APENAS com JSON válido neste formato exato:
       "descricao": "descrição breve",
       "objetivo_projeto": "o que alcançar",
       "contribuicao_plano": "como contribui",
+      "ferramentas_projeto": [
+        {
+          "nome": "ChatGPT",
+          "uso_no_projeto": "Como será usado especificamente neste projeto"
+        }
+      ],
       "trilhas_recomendadas": [
         {"trilha_id": "uuid-da-trilha", "titulo": "Nome da Trilha", "prioridade": "essencial", "status": "disponivel"}
       ],
@@ -111,6 +135,17 @@ serve(async (req) => {
       console.error("Erro ao buscar módulos:", modulosError);
     }
 
+    // Buscar ferramentas de IA disponíveis
+    const { data: ferramentas, error: ferramentasError } = await supabaseClient
+      .from("ferramentas_ia")
+      .select("id, nome, categoria, objetivo, o_que_entrega, gratuito, vale_a_pena, avaliacao_mari")
+      .eq("ativo", true)
+      .order("avaliacao_mari", { ascending: false });
+    
+    if (ferramentasError) {
+      console.error("Erro ao buscar ferramentas:", ferramentasError);
+    }
+
     // Montar catálogo para a IA
     const trilhasFormatadas = (trilhas || []).map(t => 
       `- "${t.titulo}" (${t.categoria}${t.nivel ? `, ${t.nivel}` : ''}) [${t.ativo ? 'DISPONÍVEL' : 'EM BREVE'}] ID: ${t.id}${t.descricao ? ` - ${t.descricao}` : ''}`
@@ -144,7 +179,19 @@ MÓDULOS POR TRILHA:
 ${modulosFormatados || 'Nenhum módulo cadastrado'}
 `;
 
+    // Montar catálogo de ferramentas
+    const ferramentasFormatadas = (ferramentas || []).map(f => 
+      `- "${f.nome}" (${f.categoria}) - ${f.objetivo}. ${f.o_que_entrega}. [${f.gratuito ? 'GRATUITO' : 'PAGO'}]${f.vale_a_pena ? ' ⭐ Recomendado' : ''}`
+    ).join('\n');
+
+    const catalogoFerramentas = `
+CATÁLOGO DE FERRAMENTAS DE IA:
+
+${ferramentasFormatadas || 'Nenhuma ferramenta cadastrada'}
+`;
+
     console.log("Catálogo de conteúdos montado:", catalogoConteudo.substring(0, 500) + "...");
+    console.log("Catálogo de ferramentas montado:", catalogoFerramentas.substring(0, 500) + "...");
 
     // Preparar contexto detalhado para IA
     const contexto = `
@@ -185,14 +232,14 @@ APRENDIZAGEM:
 - Preferência: ${formulario.preferencia_aprendizado || "Não informado"}
 - Melhor horário: ${formulario.melhor_horario || "Não informado"}
 
-MOTIVAÇÃO:
+COMPROMETIMENTO:
 - Nível de comprometimento: ${formulario.nivel_comprometimento || "Não informado"}/10
-- Motivação para mentoria: ${formulario.motivacao_mentoria || "Não informado"}
 - Maior medo com IA: ${formulario.maior_medo_ia || "Não informado"}
+- Zona de conforto: ${formulario.zona_conforto || "Não informado"}
 
-EXPECTATIVAS:
-- Tipo de suporte: ${formulario.tipo_suporte || "Não informado"}
+PRIORIDADES:
 - O que seria uma vitória em 30 dias: ${formulario.vitoria_30_dias || "Não informado"}
+- Quick wins desejados: ${Array.isArray(formulario.quick_wins) ? formulario.quick_wins.join(", ") : "Não informado"}
     `.trim();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -202,7 +249,7 @@ EXPECTATIVAS:
 
     console.log("Gerando insight para formulário:", formulario_id);
 
-    const systemPrompt = buildSystemPrompt(catalogoConteudo);
+    const systemPrompt = buildSystemPrompt(catalogoConteudo, catalogoFerramentas);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -274,7 +321,7 @@ EXPECTATIVAS:
       console.log("Objetivos salvos com sucesso");
     }
 
-    // Salvar projetos sugeridos com trilhas e módulos
+    // Salvar projetos sugeridos com trilhas, módulos e ferramentas
     if (insight.projetos && Array.isArray(insight.projetos)) {
       for (const proj of insight.projetos) {
         // Processar trilhas recomendadas - adicionar video_ids para cada módulo
@@ -307,6 +354,7 @@ EXPECTATIVAS:
             tipo: "operacional",
             trilhas_recomendadas: proj.trilhas_recomendadas || [],
             modulos_obrigatorios: modulosComVideos,
+            ferramentas_projeto: proj.ferramentas_projeto || [],
             progresso_preparacao: 0
           });
         
@@ -328,7 +376,8 @@ EXPECTATIVAS:
         dados_novos: {
           plano_gerado: true,
           objetivos_count: insight.objetivos?.length || 0,
-          projetos_count: insight.projetos?.length || 0
+          projetos_count: insight.projetos?.length || 0,
+          ferramentas_count: insight.ferramentas_prioritarias?.length || 0
         }
       });
 

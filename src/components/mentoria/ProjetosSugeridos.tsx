@@ -1,10 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Lightbulb, ExternalLink, MessageSquare, Sparkles } from "lucide-react";
+import { Lightbulb, ExternalLink, MessageSquare, Sparkles, Wrench } from "lucide-react";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
+
+interface FerramentaProjeto {
+  nome: string;
+  uso_no_projeto: string;
+}
 
 export function ProjetosSugeridos() {
   const { projetos, isLoading } = useMentoriaProjetos();
@@ -43,6 +48,7 @@ export function ProjetosSugeridos() {
       <CardContent className="space-y-4">
         {projetosSugeridos.map((projeto) => {
           const temFeedback = projeto.comentarios_mentor || projeto.devolutiva_mentor;
+          const ferramentas = ((projeto as any).ferramentas_projeto as FerramentaProjeto[] | null) || [];
 
           return (
             <div
@@ -72,6 +78,26 @@ export function ProjetosSugeridos() {
                   <strong>Contribuição:</strong> {projeto.contribuicao_plano}
                 </p>
               </div>
+
+              {/* Ferramentas do Projeto */}
+              {ferramentas.length > 0 && (
+                <div className="mt-4 p-3 rounded-lg bg-accent/5 border border-accent/20">
+                  <div className="flex items-center gap-2 text-accent font-medium text-sm mb-2">
+                    <Wrench className="h-4 w-4" />
+                    Ferramentas para Dominar
+                  </div>
+                  <div className="space-y-2">
+                    {ferramentas.map((tool, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <Badge variant="outline" className="bg-background shrink-0">
+                          {tool.nome}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">{tool.uso_no_projeto}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Feedback da mentora */}
               {temFeedback && (
