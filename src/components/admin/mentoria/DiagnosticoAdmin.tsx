@@ -343,10 +343,7 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
                 ✕
               </Button>
             </div>
-            <ResumoDiagnostico 
-              formulario={diagnostico}
-              onEditar={allowManualInput ? () => { setViewModalOpen(false); setFormModalOpen(true); } : undefined}
-            />
+            <ResumoDiagnostico formulario={diagnostico} />
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useUserPlan } from "@/hooks/useUserPlan";
@@ -10,18 +10,9 @@ import { InsightIA } from "@/components/mentoria/InsightIA";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { ArrowLeft, Loader2, Info, Download } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function MentoriaDiagnostico() {
   const navigate = useNavigate();
@@ -30,9 +21,6 @@ export default function MentoriaDiagnostico() {
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [modoEdicao, setModoEdicao] = useState(false);
-  const [criandoNovo, setCriandoNovo] = useState(false);
-  const [confirmarNovoOpen, setConfirmarNovoOpen] = useState(false);
 
   // Redirecionar visitantes - não devem acessar esta página
   useEffect(() => {
@@ -43,8 +31,7 @@ export default function MentoriaDiagnostico() {
   }, [isVisitante, roleLoading, navigate]);
 
   const naoPreencheu = !formulario?.completado;
-  const preenchido = formulario?.completado && !modoEdicao && !criandoNovo;
-  const preenchidoPorAdmin = formulario?.preenchido_por === 'admin';
+  const preenchido = formulario?.completado;
   
   // Check if accessed via /diagnostico route (Academy-specific)
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');
@@ -67,8 +54,6 @@ export default function MentoriaDiagnostico() {
 
   const handleFormularioFinalizado = () => {
     setMostrarFormulario(false);
-    setModoEdicao(false);
-    setCriandoNovo(false);
     refetch();
   };
 
@@ -98,14 +83,10 @@ export default function MentoriaDiagnostico() {
         <HeroMentoria onIniciar={() => setMostrarFormulario(true)} />
       )}
 
-      {/* Formulário Wizard - quando está preenchendo ou editando */}
-      {(mostrarFormulario || modoEdicao || criandoNovo) && (
+      {/* Formulário Wizard - quando está preenchendo */}
+      {mostrarFormulario && !preenchido && (
         <FormularioWizard 
-          onCancelar={() => {
-            setMostrarFormulario(false);
-            setModoEdicao(false);
-            setCriandoNovo(false);
-          }}
+          onCancelar={() => setMostrarFormulario(false)}
           onFinalizado={handleFormularioFinalizado}
         />
       )}
@@ -135,55 +116,14 @@ export default function MentoriaDiagnostico() {
               </AlertDescription>
             </Alert>
           )}
-          
-          {!preenchidoPorAdmin && (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Deseja atualizar seu diagnóstico?</AlertTitle>
-              <AlertDescription className="mt-2 flex items-center gap-3 flex-wrap">
-                <span>Você pode editar o diagnóstico atual ou preencher um novo do zero.</span>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setConfirmarNovoOpen(true)}
-                >
-                  Preencher Novo Diagnóstico
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
 
-          <ResumoDiagnostico 
-            formulario={formulario} 
-            onEditar={preenchidoPorAdmin ? undefined : () => setModoEdicao(true)}
-          />
+          <ResumoDiagnostico formulario={formulario} />
           <InsightIA 
             formulario={formulario}
             onInsightGerado={refetch}
           />
         </div>
       )}
-
-      {/* AlertDialog de confirmação para criar novo diagnóstico */}
-      <AlertDialog open={confirmarNovoOpen} onOpenChange={setConfirmarNovoOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Criar novo diagnóstico?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Você já possui um diagnóstico preenchido. Ao criar um novo, o diagnóstico atual será substituído. 
-              Seus insights e plano de ação atual serão perdidos. Deseja continuar?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              setCriandoNovo(true);
-              setConfirmarNovoOpen(false);
-            }}>
-              Criar Novo Diagnóstico
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

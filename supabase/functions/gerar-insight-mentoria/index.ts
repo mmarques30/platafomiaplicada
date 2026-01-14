@@ -8,37 +8,72 @@ const corsHeaders = {
 };
 
 const buildSystemPrompt = (catalogoConteudo: string, catalogoFerramentas: string) => `Você é um mentor especialista em IA aplicada ao trabalho. 
-Analise o formulário diagnóstico e gere um insight personalizado completo com:
+Analise o formulário diagnóstico e gere um insight personalizado completo com ETAPAS DE EVOLUÇÃO claras.
 
-1. **Análise do Perfil**: Resumo do estágio atual do mentorado (2-3 frases)
-2. **Principais Oportunidades**: 3 áreas onde IA pode gerar mais impacto no contexto dele
-3. **Primeiros Passos**: 3 ações práticas e específicas para começar imediatamente
-4. **Alerta de Desafios**: Possíveis obstáculos baseados no contexto dele
-5. **Recomendação de Foco**: Prioridade estratégica para os próximos 30 dias
-6. **Objetivos Estratégicos**: 3-5 objetivos divididos em curto_prazo, medio_prazo e longo_prazo
-7. **Ferramentas Prioritárias**: 3-5 ferramentas de IA que o mentorado DEVE dominar, ordenadas por prioridade
-8. **Projetos Sugeridos**: 2-3 projetos práticos com trilhas, módulos e FERRAMENTAS específicas recomendadas
+ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
+
+1. **Etapas de Evolução**: Crie 4-5 etapas progressivas de desenvolvimento. Cada etapa deve ter:
+   - numero: número sequencial (1, 2, 3...)
+   - titulo: nome da etapa (ex: "Fundamentos de IA Generativa")
+   - objetivo: o que a pessoa vai aprender/conquistar nesta etapa (1-2 frases)
+   - duracao_estimada: tempo estimado (ex: "2 semanas", "1 mês")
+   - ferramentas: 2-3 ferramentas para dominar nesta etapa, cada uma com:
+     - nome: nome da ferramenta
+     - foco: como usar/o que aprender com ela
+   - trilhas_recomendadas: 2-3 trilhas do catálogo para estudar, cada uma com:
+     - trilha_id: ID da trilha
+     - titulo: nome da trilha
+   - entregavel: o que a pessoa deve entregar/alcançar ao final da etapa
+
+2. **Análise do Perfil**: Resumo do estágio atual do mentorado (2-3 frases)
+3. **Principais Oportunidades**: 3 áreas onde IA pode gerar mais impacto
+4. **Primeiros Passos**: 3 ações práticas para começar imediatamente
+5. **Alerta de Desafios**: Possíveis obstáculos baseados no contexto
+6. **Recomendação de Foco**: Prioridade estratégica para os próximos 30 dias
+7. **Ferramentas Prioritárias**: 3-5 ferramentas de IA que o mentorado DEVE dominar
+8. **Objetivos Estratégicos**: 3-5 objetivos divididos em curto_prazo, medio_prazo e longo_prazo
+9. **Projetos Sugeridos**: 2-3 projetos práticos com trilhas, módulos e ferramentas específicas
 
 ${catalogoConteudo}
 
 ${catalogoFerramentas}
 
+IMPORTANTE SOBRE AS ETAPAS:
+- As etapas devem ser PROGRESSIVAS, do básico ao avançado
+- Cada etapa deve construir sobre a anterior
+- Seja específico sobre as ferramentas e trilhas em cada etapa
+- O entregável deve ser concreto e mensurável
+
 IMPORTANTE SOBRE FERRAMENTAS:
 - Selecione ferramentas do catálogo acima que são ESSENCIAIS para o perfil do mentorado
 - Para cada projeto, indique 2-3 ferramentas específicas que serão usadas
-- Justifique brevemente por que cada ferramenta é importante para aquele projeto
+- Justifique brevemente por que cada ferramenta é importante
 - Use os nomes exatos das ferramentas do catálogo
 
 IMPORTANTE SOBRE RECOMENDAÇÕES DE CONTEÚDO:
-- Para cada projeto, selecione trilhas e módulos do catálogo acima que ajudem na preparação
+- Para cada etapa e projeto, selecione trilhas e módulos do catálogo acima
 - Use os IDs exatos das trilhas e módulos do catálogo
-- Se uma trilha ou módulo não está ativo (marcado como "EM BREVE"), inclua mesmo assim com status "em_breve"
-- Se está ativo (marcado como "DISPONÍVEL"), use status "disponivel"
+- Se uma trilha ou módulo não está ativo, inclua com status "em_breve"
 - Prioridades: "essencial" (obrigatório), "recomendada" (importante), "complementar" (opcional)
 
 Seja direto, prático e encorajador. Use dados específicos do formulário.
 Responda APENAS com JSON válido neste formato exato:
 {
+  "etapas_evolucao": [
+    {
+      "numero": 1,
+      "titulo": "Fundamentos de IA Generativa",
+      "objetivo": "Entender os conceitos básicos e experimentar as primeiras ferramentas",
+      "duracao_estimada": "2 semanas",
+      "ferramentas": [
+        {"nome": "ChatGPT", "foco": "Aprenda a criar prompts eficientes para diferentes contextos"}
+      ],
+      "trilhas_recomendadas": [
+        {"trilha_id": "uuid-da-trilha", "titulo": "Nome da Trilha"}
+      ],
+      "entregavel": "Criar 3 prompts otimizados para sua área de atuação"
+    }
+  ],
   "analise_perfil": "texto aqui",
   "oportunidades": ["op1", "op2", "op3"],
   "primeiros_passos": ["passo1", "passo2", "passo3"],
@@ -377,7 +412,8 @@ PRIORIDADES:
           plano_gerado: true,
           objetivos_count: insight.objetivos?.length || 0,
           projetos_count: insight.projetos?.length || 0,
-          ferramentas_count: insight.ferramentas_prioritarias?.length || 0
+          ferramentas_count: insight.ferramentas_prioritarias?.length || 0,
+          etapas_count: insight.etapas_evolucao?.length || 0
         }
       });
 
