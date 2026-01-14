@@ -496,6 +496,182 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
                 </AccordionContent>
               </AccordionItem>
             )}
+
+            {/* Suas Respostas do Diagnóstico */}
+            <AccordionItem value="respostas" className="border border-border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-muted">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <span className="font-medium text-sm text-foreground">Suas Respostas do Diagnóstico</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-2 pb-4">
+                <div className="space-y-4">
+                  {/* Perfil */}
+                  {(formulario.nome_completo || formulario.profissao || formulario.area_atuacao) && (
+                    <div>
+                      <span className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">Perfil Profissional</span>
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {formulario.nome_completo && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Nome</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.nome_completo}</p>
+                          </div>
+                        )}
+                        {formulario.idade && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Idade</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.idade} anos</p>
+                          </div>
+                        )}
+                        {formulario.profissao && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Profissão</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.profissao}</p>
+                          </div>
+                        )}
+                        {formulario.area_atuacao && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Área</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.area_atuacao}</p>
+                          </div>
+                        )}
+                        {formulario.tempo_experiencia && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Experiência</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.tempo_experiencia}</p>
+                          </div>
+                        )}
+                        {formulario.tamanho_empresa && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Empresa</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.tamanho_empresa}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Experiência IA */}
+                  {(formulario.nivel_ia || formulario.frequencia_uso_ia) && (
+                    <div>
+                      <span className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">Experiência com IA</span>
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        {formulario.nivel_ia && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Nível</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.nivel_ia}</p>
+                          </div>
+                        )}
+                        {formulario.frequencia_uso_ia && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Frequência de Uso</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.frequencia_uso_ia}</p>
+                          </div>
+                        )}
+                      </div>
+                      {formulario.maior_dificuldade_ia && (
+                        <div className="bg-muted/50 rounded-lg p-2 mt-2">
+                          <span className="text-xs text-muted-foreground">Maior Dificuldade</span>
+                          <p className="text-sm text-foreground">{formulario.maior_dificuldade_ia}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Objetivos */}
+                  {(formulario.objetivo_principal || formulario.meta_3_meses || formulario.meta_12_meses) && (
+                    <div>
+                      <span className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">Objetivos</span>
+                      <div className="space-y-2">
+                        {formulario.objetivo_principal && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Objetivo Principal</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.objetivo_principal}</p>
+                          </div>
+                        )}
+                        <div className="grid sm:grid-cols-2 gap-2">
+                          {formulario.meta_3_meses && (
+                            <div className="bg-muted/50 rounded-lg p-2">
+                              <span className="text-xs text-muted-foreground">Meta 3 meses</span>
+                              <p className="text-sm text-foreground">{formulario.meta_3_meses}</p>
+                            </div>
+                          )}
+                          {formulario.meta_12_meses && (
+                            <div className="bg-muted/50 rounded-lg p-2">
+                              <span className="text-xs text-muted-foreground">Meta 12 meses</span>
+                              <p className="text-sm text-foreground">{formulario.meta_12_meses}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Desafios */}
+                  {(formulario.desafio_1 || formulario.desafio_2 || formulario.desafio_3) && (
+                    <div>
+                      <span className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">Desafios</span>
+                      <div className="space-y-2">
+                        {formulario.desafio_1 && (
+                          <div className="flex items-start gap-2 bg-amber-500/10 rounded-lg p-2 border-l-2 border-amber-500">
+                            <span className="text-xs font-bold text-amber-600 shrink-0">1</span>
+                            <p className="text-sm text-foreground">{formulario.desafio_1}</p>
+                          </div>
+                        )}
+                        {formulario.desafio_2 && (
+                          <div className="flex items-start gap-2 bg-amber-500/10 rounded-lg p-2 border-l-2 border-amber-500">
+                            <span className="text-xs font-bold text-amber-600 shrink-0">2</span>
+                            <p className="text-sm text-foreground">{formulario.desafio_2}</p>
+                          </div>
+                        )}
+                        {formulario.desafio_3 && (
+                          <div className="flex items-start gap-2 bg-amber-500/10 rounded-lg p-2 border-l-2 border-amber-500">
+                            <span className="text-xs font-bold text-amber-600 shrink-0">3</span>
+                            <p className="text-sm text-foreground">{formulario.desafio_3}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Aprendizagem e Comprometimento */}
+                  {(formulario.estilo_aprendizagem || formulario.nivel_comprometimento) && (
+                    <div>
+                      <span className="text-xs font-semibold uppercase text-muted-foreground mb-2 block">Aprendizagem</span>
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {formulario.estilo_aprendizagem && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Estilo</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.estilo_aprendizagem}</p>
+                          </div>
+                        )}
+                        {formulario.melhor_horario && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Melhor Horário</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.melhor_horario}</p>
+                          </div>
+                        )}
+                        {formulario.tempo_disponivel && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Tempo Disponível</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.tempo_disponivel}</p>
+                          </div>
+                        )}
+                        {formulario.nivel_comprometimento && (
+                          <div className="bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Comprometimento</span>
+                            <p className="text-sm font-medium text-foreground">{formulario.nivel_comprometimento}/10</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
 
           {/* Etapas de Evolução (se existirem) - SOMENTE PARA BUSINESS */}
