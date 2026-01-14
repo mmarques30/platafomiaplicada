@@ -24,9 +24,8 @@ interface VisaoGeralTabProps {
     };
     distribuicaoPlanos: {
       academy: number;
-      lab: number;
       skills: number;
-      club: number;
+      business: number;
       sem_plano: number;
     };
   };

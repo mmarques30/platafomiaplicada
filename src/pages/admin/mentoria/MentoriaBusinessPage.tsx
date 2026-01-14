@@ -453,7 +453,7 @@ export default function MentoriaBusinessPage() {
         onOpenChange={setSessaoModalOpen}
         sessao={editingSessao}
         userId={selectedUserId}
-        onSave={(data) => {
+        onSubmit={(data) => {
           if (editingSessao) {
             updateSessao({ ...editingSessao, ...data });
           } else {
@@ -468,7 +468,7 @@ export default function MentoriaBusinessPage() {
         onOpenChange={setRecursoModalOpen}
         recurso={editingRecurso}
         userId={selectedUserId}
-        onSave={(data) => {
+        onSubmit={(data) => {
           if (editingRecurso) {
             updateRecurso({ ...editingRecurso, ...data });
           } else {
@@ -483,7 +483,7 @@ export default function MentoriaBusinessPage() {
         onOpenChange={setProjetoModalOpen}
         projeto={editingProjeto}
         userId={selectedUserId}
-        onSave={(data) => {
+        onSubmit={(data) => {
           if (editingProjeto) {
             updateProjeto({ ...editingProjeto, ...data });
           } else {
@@ -498,7 +498,7 @@ export default function MentoriaBusinessPage() {
         onOpenChange={setBonusModalOpen}
         bonus={editingBonus}
         userId={selectedUserId}
-        onSave={(data) => {
+        onSubmit={(data) => {
           if (editingBonus) {
             updateBonus({ ...editingBonus, ...data });
           } else {
