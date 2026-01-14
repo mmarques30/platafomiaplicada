@@ -7,7 +7,7 @@ export interface UserProfile {
   nome_completo: string;
   email: string | null;
   avatar_url: string | null;
-  plano_mentoria: "academy" | "lab" | "skills" | "club" | "legacy" | "boost" | null;
+  plano_mentoria: "academy" | "skills" | "business" | null;
   data_expiracao_acesso: string | null;
   created_at: string | null;
   conta_ativa: boolean | null;

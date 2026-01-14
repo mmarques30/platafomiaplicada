@@ -124,9 +124,8 @@ export function useAdminDashboard() {
       // Calcular distribuição por plano
       const distribuicaoPlanos = {
         academy: users?.filter(u => u.plano_mentoria === "academy").length || 0,
-        lab: users?.filter(u => u.plano_mentoria === "lab").length || 0,
         skills: users?.filter(u => u.plano_mentoria === "skills").length || 0,
-        club: users?.filter(u => u.plano_mentoria === "club").length || 0,
+        business: users?.filter(u => u.plano_mentoria === "business").length || 0,
         sem_plano: users?.filter(u => !u.plano_mentoria).length || 0,
       };
 
