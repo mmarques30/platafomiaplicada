@@ -4,26 +4,23 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 interface DistribuicaoPlanosProps {
   distribuicao: {
     academy: number;
-    lab: number;
     skills: number;
-    club: number;
+    business: number;
     sem_plano: number;
   };
 }
 
 const COLORS = {
   academy: "#22c55e",
-  lab: "#3b82f6",
   skills: "#f59e0b",
-  club: "#8b5cf6",
+  business: "#8b5cf6",
   sem_plano: "#6b7280",
 };
 
 const LABELS = {
   academy: "Academy",
-  lab: "Lab",
   skills: "Skills",
-  club: "Club",
+  business: "Business",
   sem_plano: "Sem Plano",
 };
 
