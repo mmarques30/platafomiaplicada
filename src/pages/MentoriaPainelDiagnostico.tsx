@@ -2,7 +2,6 @@ import { usePainelDiagnostico } from "@/hooks/usePainelDiagnostico";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { InformacoesMentorado } from "@/components/mentoria/painel/InformacoesMentorado";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProjetosPriorizados } from "@/components/mentoria/painel/ProjetosPriorizados";
 import { ProjetoPrincipal } from "@/components/mentoria/painel/ProjetoPrincipal";
 import { IntegracoesAutomacoes } from "@/components/mentoria/painel/IntegracoesAutomacoes";
@@ -10,12 +9,15 @@ import { RoadmapTimeline } from "@/components/mentoria/painel/RoadmapTimeline";
 import { PontosAtencao } from "@/components/mentoria/painel/PontosAtencao";
 import { ProximaSessao } from "@/components/mentoria/painel/ProximaSessao";
 import { ProjetoPreparacaoSection } from "@/components/mentoria/painel/ProjetoPreparacaoSection";
-import { Loader2, ArrowLeft, FileText, Briefcase } from "lucide-react";
+import { PainelDiagnosticoShell } from "@/components/mentoria/painel/PainelDiagnosticoShell";
+import { PainelCard, PainelCardHeader } from "@/components/mentoria/painel/PainelCard";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { formatProjetoTitulo } from "@/lib/utils";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { getPainelTheme } from "@/components/mentoria/painel/painelTheme";
 
 export default function MentoriaPainelDiagnostico() {
   const navigate = useNavigate();
@@ -25,7 +27,12 @@ export default function MentoriaPainelDiagnostico() {
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
   
-  // Redirecionar visitantes - não devem acessar esta página
+  // Determinar se é Business view (considera admin visualizando mentorado business)
+  const painelPlano = (isAdmin && userId) ? profile?.plano_mentoria : plan;
+  const isBusiness = painelPlano === "business";
+  const theme = getPainelTheme(isBusiness);
+  
+  // Redirecionar visitantes
   useEffect(() => {
     if (!roleLoading && isVisitante) {
       toast.info("Esta funcionalidade requer um plano ativo");
@@ -33,7 +40,6 @@ export default function MentoriaPainelDiagnostico() {
     }
   }, [isVisitante, roleLoading, navigate]);
   
-  // Check if accessed via /diagnostico route (Academy-specific)
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');
   
   const voltarUrl = isAdmin 
@@ -52,7 +58,6 @@ export default function MentoriaPainelDiagnostico() {
         ? 'Voltar para Meu Diagnóstico' 
         : 'Voltar para Mentoria';
 
-  // Não renderizar enquanto carrega ou se for visitante
   if (isLoading || roleLoading || isVisitante) {
     return (
       <div className="container mx-auto py-8 flex items-center justify-center min-h-[60vh]">
@@ -84,131 +89,79 @@ export default function MentoriaPainelDiagnostico() {
   const proximaSessao = sessoes.find(s => new Date(s.data_sessao) > new Date() && s.status === 'agendada');
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <div className="bg-background border-b border-border">
-        <div className="container mx-auto py-6 px-4 max-w-7xl">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(voltarUrl)}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {voltarLabel}
-          </Button>
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Painel de Diagnóstico
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            {diagnostico.nome_completo || profile?.nome_completo}
-          </p>
-        </div>
-      </div>
+    <PainelDiagnosticoShell
+      isBusiness={isBusiness}
+      diagnostico={diagnostico}
+      profile={profile}
+      voltarUrl={voltarUrl}
+      voltarLabel={voltarLabel}
+      isAcademyRoute={isAcademyRoute}
+    >
+      <div className={`grid gap-8 ${proximaSessao ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
+        {/* Coluna Principal */}
+        <div className={`space-y-8 ${proximaSessao ? 'lg:col-span-2' : 'lg:col-span-1'}`}>
+          <InformacoesMentorado diagnostico={diagnostico} profile={profile} isBusiness={isBusiness} />
 
-      {/* Quick Actions Bar */}
-      <div className="container mx-auto px-4 max-w-7xl -mt-4 mb-8">
-        <div className="bg-card rounded-lg shadow-sm border border-border p-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => navigate(isAcademyRoute ? "/diagnostico/formulario" : "/mentoria/diagnostico")}
-              className="gap-2"
-            >
-              <FileText className="w-4 h-4" />
-              Ver Diagnóstico Completo
-            </Button>
-            
-            {!isAcademyRoute && (
-              <Button
-                variant="outline"
-                onClick={() => navigate("/mentoria/projetos")}
-                className="gap-2"
-              >
-                <Briefcase className="w-4 h-4" />
-                Ver Todos Projetos
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+          {projetosPrioritarios.length > 0 && (
+            <ProjetosPriorizados projetos={projetosPrioritarios} isBusiness={isBusiness} />
+          )}
 
-      {/* Main Content */}
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
-        <div className={`grid gap-8 ${proximaSessao ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
-          {/* Coluna Principal */}
-          <div className={`space-y-8 ${proximaSessao ? 'lg:col-span-2' : 'lg:col-span-1'}`}>
-            {/* Informações do Mentorado */}
-            <InformacoesMentorado diagnostico={diagnostico} profile={profile} />
+          {projetoPrincipal && (
+            <ProjetoPrincipal projeto={projetoPrincipal} isBusiness={isBusiness} />
+          )}
 
-            {/* Projetos Priorizados */}
-            {projetosPrioritarios.length > 0 && (
-              <ProjetosPriorizados projetos={projetosPrioritarios} />
-            )}
+          <IntegracoesAutomacoes diagnostico={diagnostico} isBusiness={isBusiness} />
 
-            {/* Projeto Principal */}
-            {projetoPrincipal && (
-              <ProjetoPrincipal projeto={projetoPrincipal} />
-            )}
+          {sessoes.length > 0 && (
+            <RoadmapTimeline sessoes={sessoes} isBusiness={isBusiness} />
+          )}
 
-            {/* Integrações e Automações */}
-            <IntegracoesAutomacoes diagnostico={diagnostico} />
+          <PontosAtencao 
+            nome={diagnostico.nome_completo || profile?.nome_completo || ''} 
+            diagnostico={diagnostico}
+            isBusiness={isBusiness}
+          />
 
-            {/* Roadmap e Timeline */}
-            {sessoes.length > 0 && (
-              <RoadmapTimeline sessoes={sessoes} />
-            )}
-
-            {/* Pontos de Atenção Especiais */}
-            <PontosAtencao 
-              nome={diagnostico.nome_completo || profile?.nome_completo || ''} 
-              diagnostico={diagnostico} 
-            />
-
-            {/* Preparação para Projetos */}
-            {projetos.filter(p => p.status !== 'concluido' && p.status !== 'cancelado').length > 0 && (
-              <Card className="bg-card text-card-foreground border border-border">
-                <CardHeader>
-                  <CardTitle className="text-foreground">Preparação para Próximas Sessões</CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Conteúdos recomendados para seus projetos ativos
-                  </CardDescription>
-                </CardHeader>
-            <CardContent className="space-y-6">
-              {projetos
-                .filter(p => p.status !== 'concluido' && p.status !== 'cancelado')
-                .sort((a, b) => {
-                  // Projetos com data de entrega primeiro, ordenados por proximidade
-                  if (a.data_entrega && b.data_entrega) {
-                    return new Date(a.data_entrega).getTime() - new Date(b.data_entrega).getTime();
-                  }
-                  // Projetos com data de entrega vêm antes dos sem data
-                  if (a.data_entrega && !b.data_entrega) return -1;
-                  if (!a.data_entrega && b.data_entrega) return 1;
-                  // Se ambos não têm data, manter ordem alfabética pelo título
-                  return a.titulo.localeCompare(b.titulo);
-                })
-                .map(projeto => (
-                  <ProjetoPreparacaoSection 
-                    key={projeto.id}
-                    projeto={projeto}
-                    userId={userId || ''}
-                  />
-                ))}
-            </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Sidebar - só renderiza se houver sessão */}
-          {proximaSessao && (
-            <div className="lg:col-span-1">
-              <div className="sticky top-8">
-                <ProximaSessao sessao={proximaSessao} />
+          {projetos.filter(p => p.status !== 'concluido' && p.status !== 'cancelado').length > 0 && (
+            <PainelCard isBusiness={isBusiness}>
+              <PainelCardHeader 
+                title="Preparação para Próximas Sessões"
+                description="Conteúdos recomendados para seus projetos ativos"
+                isBusiness={isBusiness}
+              />
+              <div className="space-y-6">
+                {projetos
+                  .filter(p => p.status !== 'concluido' && p.status !== 'cancelado')
+                  .sort((a, b) => {
+                    if (a.data_entrega && b.data_entrega) {
+                      return new Date(a.data_entrega).getTime() - new Date(b.data_entrega).getTime();
+                    }
+                    if (a.data_entrega && !b.data_entrega) return -1;
+                    if (!a.data_entrega && b.data_entrega) return 1;
+                    return a.titulo.localeCompare(b.titulo);
+                  })
+                  .map(projeto => (
+                    <ProjetoPreparacaoSection 
+                      key={projeto.id}
+                      projeto={projeto}
+                      userId={userId || ''}
+                      isBusiness={isBusiness}
+                    />
+                  ))}
               </div>
-            </div>
+            </PainelCard>
           )}
         </div>
+
+        {/* Sidebar */}
+        {proximaSessao && (
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <ProximaSessao sessao={proximaSessao} isBusiness={isBusiness} />
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </PainelDiagnosticoShell>
   );
 }

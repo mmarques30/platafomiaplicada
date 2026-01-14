@@ -1,13 +1,18 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { User, Users, Building2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { PainelCard } from "./PainelCard";
+import { getPainelTheme } from "./painelTheme";
 
 interface Props {
   nome: string;
   diagnostico: any;
+  isBusiness?: boolean;
 }
 
-export const PontosAtencao = ({ nome, diagnostico }: Props) => {
+export const PontosAtencao = ({ nome, diagnostico, isBusiness = false }: Props) => {
   if (!diagnostico) return null;
+
+  const theme = getPainelTheme(isBusiness);
 
   const pontos = [
     {
@@ -45,24 +50,32 @@ export const PontosAtencao = ({ nome, diagnostico }: Props) => {
       {pontos.map((ponto, index) => {
         const Icon = ponto.icon;
         return (
-          <Card key={index} className="bg-card text-card-foreground border border-border shadow-sm">
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center text-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-aplicada-green-900 flex items-center justify-center mb-3">
-                  <Icon className="w-6 h-6 text-white" />
+          <PainelCard key={index} isBusiness={isBusiness}>
+            <div className="flex flex-col items-center text-center mb-4">
+              <div className={cn(
+                "w-12 h-12 rounded-full flex items-center justify-center mb-3",
+                theme.iconBg
+              )}>
+                <Icon className={cn("w-6 h-6", theme.iconColor)} />
+              </div>
+              <h3 className={cn("font-bold text-lg", theme.textPrimary)}>
+                {ponto.titulo}
+              </h3>
+            </div>
+            <div className="space-y-2 text-left">
+              {ponto.items.map((item, itemIndex) => (
+                <div key={itemIndex} className="flex items-start gap-2 text-sm">
+                  <span className={cn(
+                    "mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0",
+                    isBusiness ? "bg-violet-400" : "bg-aplicada-green-900"
+                  )} />
+                  <p className={cn("flex-1 leading-relaxed", theme.textSecondary)}>
+                    {item}
+                  </p>
                 </div>
-                <h3 className="font-bold text-foreground text-lg">{ponto.titulo}</h3>
-              </div>
-              <div className="space-y-2 text-left">
-                {ponto.items.map((item, itemIndex) => (
-                  <div key={itemIndex} className="flex items-start gap-2 text-sm">
-                    <span className="text-aplicada-green-900 mt-0.5 flex-shrink-0 font-bold">•</span>
-                    <p className="flex-1 text-card-foreground leading-relaxed">{item}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+              ))}
+            </div>
+          </PainelCard>
         );
       })}
     </div>
