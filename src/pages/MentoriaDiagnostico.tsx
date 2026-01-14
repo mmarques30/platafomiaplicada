@@ -4,7 +4,6 @@ import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
-import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
 import { InsightIA } from "@/components/mentoria/InsightIA";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -108,7 +107,6 @@ export default function MentoriaDiagnostico() {
             </Alert>
           )}
 
-          <ResumoDiagnostico formulario={formulario} />
           <InsightIA 
             formulario={formulario}
             onInsightGerado={refetch}
