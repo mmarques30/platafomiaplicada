@@ -2,12 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Target, Rocket, AlertTriangle, Focus, Loader2, CheckCircle2, Wrench, TrendingUp } from "lucide-react";
+import { Sparkles, Target, Rocket, AlertTriangle, Focus, Loader2, CheckCircle2, Wrench, PlayCircle, Lightbulb, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { EtapaEvolucao, Etapa } from "./EtapaEvolucao";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { useNavigate } from "react-router-dom";
 
 interface FerramentaPrioritaria {
   nome: string;
@@ -24,6 +26,10 @@ interface InsightIAProps {
 
 export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [expandirDetalhes, setExpandirDetalhes] = useState(false);
+  const { isBusiness } = useUserPlan();
+  const navigate = useNavigate();
+  
   const planoJaCriado = formulario?.plano_gerado;
   const insight = formulario?.insight_ia;
 
@@ -37,8 +43,8 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
       if (error) throw error;
       
       toast({
-        title: "Insight gerado com sucesso!",
-        description: "Confira abaixo sua jornada de evolução personalizada"
+        title: "Diagnóstico gerado com sucesso!",
+        description: "Confira abaixo suas recomendações personalizadas"
       });
 
       if (onInsightGerado) {
@@ -49,7 +55,7 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
     } catch (error: any) {
       console.error("Erro ao gerar insight:", error);
       toast({
-        title: "Erro ao gerar insight",
+        title: "Erro ao gerar diagnóstico",
         description: error.message || "Tente novamente mais tarde",
         variant: "destructive"
       });
@@ -61,32 +67,32 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
   // Estado inicial - sem insight
   if (!insight) {
     return (
-      <Card className="mt-6 border-aplicada-green/30 bg-gradient-to-br from-aplicada-dark to-aplicada-dark/90">
+      <Card className="mt-6 border-primary/30 bg-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
-            <Sparkles className="text-aplicada-green h-6 w-6" />
-            Sua Jornada de Evolução com IA
+          <CardTitle className="flex items-center gap-2 text-foreground">
+            <Sparkles className="text-primary h-6 w-6" />
+            Seu Diagnóstico Personalizado
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-white/70">
-            Gere sua jornada personalizada com etapas claras de evolução, ferramentas que deve dominar e trilhas para estudar.
+          <p className="text-muted-foreground">
+            Gere seu diagnóstico personalizado com ferramentas prioritárias, módulos recomendados e problemas para resolver com IA.
           </p>
           <Button 
             onClick={gerarInsight} 
             disabled={isGenerating}
             size="lg"
-            className="w-full sm:w-auto bg-aplicada-green hover:bg-aplicada-green/90 text-white"
+            className="w-full sm:w-auto"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Gerando sua jornada...
+                Gerando diagnóstico...
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 h-5 w-5" />
-                Gerar Minha Jornada com IA
+                Gerar Meu Diagnóstico com IA
               </>
             )}
           </Button>
@@ -95,292 +101,309 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
     );
   }
 
-  // Verificar se tem etapas de evolução (novo formato)
+  // Dados do insight
   const etapasEvolucao = insight.etapas_evolucao as Etapa[] | undefined;
   const ferramentasPrioritarias = (insight.ferramentas_prioritarias as FerramentaPrioritaria[] | undefined) || [];
+  
+  // Extrair problemas para resolver baseado nos desafios + oportunidades
+  const problemasResolver = [
+    formulario?.desafio_1,
+    formulario?.desafio_2,
+    formulario?.desafio_3,
+  ].filter(Boolean);
 
-  // Novo layout com etapas de evolução
-  if (etapasEvolucao && etapasEvolucao.length > 0) {
-    return (
-      <div className="mt-6 bg-aplicada-dark rounded-2xl p-6 md:p-8 border border-aplicada-green/20">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="p-3 bg-aplicada-green rounded-full shadow-lg shadow-aplicada-green/30">
-            <TrendingUp className="h-6 w-6 text-white" />
+  // Extrair trilhas recomendadas das etapas
+  const trilhasRecomendadas = etapasEvolucao?.flatMap(e => e.trilhas_recomendadas || []).slice(0, 4) || [];
+
+  return (
+    <div className="mt-6 bg-accent/30 rounded-2xl p-6 md:p-8 border border-border">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-border">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-primary/10 rounded-xl">
+            <Sparkles className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">Sua Jornada de Evolução</h2>
-            <p className="text-aplicada-green">Etapas personalizadas para seu desenvolvimento em IA</p>
+            <h2 className="text-xl font-bold text-foreground">Seu Diagnóstico Personalizado</h2>
+            <p className="text-sm text-muted-foreground">
+              Gerado em {new Date(formulario.insight_gerado_em).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+              })}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Ferramentas Prioritárias - Destaque */}
+      {/* ===== SEÇÕES PRINCIPAIS VISÍVEIS PARA TODOS ===== */}
+      <div className="space-y-6">
+        
+        {/* 1. Ferramentas para Começar */}
         {ferramentasPrioritarias.length > 0 && (
-          <div className="mb-8 p-5 rounded-xl bg-gradient-to-r from-aplicada-green/20 to-aplicada-green/5 border border-aplicada-green/30">
-            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <Wrench className="h-5 w-5 text-aplicada-green" />
-              Ferramentas de IA para Dominar
+          <section>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-3 flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              Ferramentas para Começar
             </h3>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {ferramentasPrioritarias
                 .sort((a, b) => a.nivel_prioridade - b.nivel_prioridade)
-                .slice(0, 6)
+                .slice(0, 4)
                 .map((ferramenta, i) => (
                   <div 
                     key={i} 
-                    className="p-4 rounded-lg bg-aplicada-dark border border-aplicada-green/20 hover:border-aplicada-green/50 transition-colors"
+                    className="p-4 bg-card rounded-xl border border-border hover:border-primary/40 transition-colors text-center"
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Badge 
-                          className={i === 0 ? "bg-aplicada-green text-white" : "bg-aplicada-green/20 text-aplicada-green"}
-                        >
-                          #{i + 1}
-                        </Badge>
-                        <span className="font-semibold text-white">{ferramenta.nome}</span>
-                      </div>
-                      {ferramenta.gratuito && (
-                        <Badge variant="outline" className="text-xs bg-green-500/10 text-green-400 border-green-500/30">
-                          Grátis
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-aplicada-green/70 mb-1">{ferramenta.categoria}</p>
-                    <p className="text-sm text-white/70">{ferramenta.motivo}</p>
+                    <Badge className={i === 0 ? "bg-primary text-primary-foreground mb-2" : "bg-primary/20 text-primary border-primary/30 mb-2"}>
+                      #{i + 1}
+                    </Badge>
+                    <p className="font-semibold text-foreground text-sm">{ferramenta.nome}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{ferramenta.categoria}</p>
+                    {ferramenta.gratuito && (
+                      <Badge variant="outline" className="text-xs mt-2 bg-green-500/10 text-green-600 border-green-500/30">
+                        Grátis
+                      </Badge>
+                    )}
                   </div>
                 ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Timeline de Etapas */}
-        <div className="space-y-0">
-          {etapasEvolucao.map((etapa, index) => (
-            <EtapaEvolucao 
-              key={etapa.numero}
-              etapa={etapa}
-              isFirst={index === 0}
-              isLast={index === etapasEvolucao.length - 1}
-            />
-          ))}
-        </div>
-
-        {/* Alerta de Sucesso */}
-        {planoJaCriado && (
-          <Alert className="mt-8 border-aplicada-green/30 bg-aplicada-green/10">
-            <CheckCircle2 className="h-4 w-4 text-aplicada-green" />
-            <AlertDescription className="text-white/90">
-              <strong className="text-aplicada-green">Plano de mentoria criado!</strong>
-              <p className="text-sm mt-1">
-                Seus objetivos e projetos iniciais já estão disponíveis na seção de Mentoria.
-              </p>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Footer */}
-        <div className="mt-8 pt-4 border-t border-aplicada-green/20">
-          <p className="text-xs text-white/50 text-center">
-            Jornada gerada em {new Date(formulario.insight_gerado_em).toLocaleDateString('pt-BR', {
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Layout legado (accordion) para insights antigos sem etapas_evolucao
-  return (
-    <Card className="mt-6 border-aplicada-green/30 bg-gradient-to-br from-aplicada-dark via-aplicada-dark/95 to-aplicada-dark/90">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-white">
-          <Sparkles className="text-aplicada-green h-6 w-6" />
-          Sua Análise Personalizada por IA
-        </CardTitle>
-        <p className="text-sm text-white/60 mt-2">
-          Baseada nas informações do seu formulário diagnóstico
-        </p>
-      </CardHeader>
-      <CardContent>
-        <Accordion type="single" collapsible className="w-full space-y-2">
-          {/* Ferramentas de IA para Focar */}
-          {ferramentasPrioritarias.length > 0 && (
-            <AccordionItem value="ferramentas" className="border-2 border-aplicada-green/50 rounded-lg px-4 bg-gradient-to-r from-aplicada-green/10 to-aplicada-green/5">
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-aplicada-green/20">
-                    <Wrench className="h-5 w-5 text-aplicada-green" />
+        {/* 2. Módulos Prioritários */}
+        {trilhasRecomendadas.length > 0 && (
+          <section>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-3 flex items-center gap-2">
+              <PlayCircle className="h-4 w-4" />
+              Módulos Prioritários
+            </h3>
+            <div className="space-y-2">
+              {trilhasRecomendadas.map((trilha, i) => (
+                <div 
+                  key={i} 
+                  className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20"
+                >
+                  <div className="flex items-center gap-3">
+                    <PlayCircle className="h-5 w-5 text-primary shrink-0" />
+                    <span className="font-medium text-foreground text-sm">{trilha.titulo}</span>
                   </div>
-                  <div className="text-left">
-                    <span className="font-semibold text-white">Ferramentas de IA para Focar</span>
-                    <p className="text-xs text-white/60 font-normal">
-                      {ferramentasPrioritarias.length} ferramentas prioritárias
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-primary hover:text-primary hover:bg-primary/10"
+                    onClick={() => navigate(`/trilhas/${trilha.trilha_id}`)}
+                  >
+                    Acessar
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 3. Problemas para Resolver com IA */}
+        {problemasResolver.length > 0 && (
+          <section>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-3 flex items-center gap-2">
+              <Lightbulb className="h-4 w-4" />
+              Problemas para Resolver com IA
+            </h3>
+            <div className="space-y-2">
+              {problemasResolver.map((problema, i) => (
+                <div 
+                  key={i} 
+                  className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border-l-4 border-amber-500"
+                >
+                  <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground">{problema}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {/* ===== BOTÃO EXPANDIR/RECOLHER DETALHES ===== */}
+      <div className="flex justify-center mt-6 pt-4 border-t border-border">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setExpandirDetalhes(!expandirDetalhes)}
+          className="gap-2"
+        >
+          {expandirDetalhes ? (
+            <>
+              <ChevronUp className="h-4 w-4" />
+              Recolher Detalhes
+            </>
+          ) : (
+            <>
+              <ChevronDown className="h-4 w-4" />
+              Expandir Detalhes
+            </>
+          )}
+        </Button>
+      </div>
+
+      {/* ===== SEÇÕES EXPANSÍVEIS (ACCORDIONS) ===== */}
+      {expandirDetalhes && (
+        <div className="mt-6 space-y-2">
+          <Accordion type="multiple" className="w-full space-y-2">
+            {/* Análise do Perfil */}
+            {insight.analise_perfil && (
+              <AccordionItem value="perfil" className="border border-border rounded-lg px-4 bg-card">
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Target className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="font-medium text-sm text-foreground">Análise do Perfil</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {insight.analise_perfil}
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            {/* Oportunidades */}
+            {insight.oportunidades?.length > 0 && (
+              <AccordionItem value="oportunidades" className="border border-border rounded-lg px-4 bg-card">
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Rocket className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="font-medium text-sm text-foreground">Oportunidades</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <ul className="space-y-2">
+                    {insight.oportunidades?.map((op: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 p-3 bg-accent/50 rounded-lg">
+                        <span className="text-primary font-bold text-sm shrink-0">{i + 1}.</span>
+                        <span className="text-sm text-muted-foreground">{op}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            {/* Primeiros Passos */}
+            {insight.primeiros_passos?.length > 0 && (
+              <AccordionItem value="passos" className="border border-border rounded-lg px-4 bg-card">
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Focus className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="font-medium text-sm text-foreground">Primeiros Passos</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <ul className="space-y-2">
+                    {insight.primeiros_passos?.map((passo: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                        <span className="text-primary font-bold text-sm shrink-0">{i + 1}.</span>
+                        <span className="text-sm font-medium text-foreground">{passo}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            {/* Pontos de Atenção */}
+            {insight.alerta_desafios && (
+              <AccordionItem value="desafios" className="border border-border rounded-lg px-4 bg-card">
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-amber-500/10">
+                      <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    </div>
+                    <span className="font-medium text-sm text-foreground">Pontos de Atenção</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <p className="text-sm text-amber-800 dark:text-amber-200">
+                      {insight.alerta_desafios}
                     </p>
                   </div>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pt-4 pb-4">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {ferramentasPrioritarias
-                    .sort((a, b) => a.nivel_prioridade - b.nivel_prioridade)
-                    .map((ferramenta, i) => (
-                      <div 
-                        key={i} 
-                        className="p-4 rounded-lg bg-aplicada-dark border border-aplicada-green/30 hover:border-aplicada-green/50 transition-colors"
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <Badge 
-                              className={i === 0 ? "bg-aplicada-green text-white" : "bg-aplicada-green/20 text-aplicada-green"}
-                            >
-                              #{i + 1}
-                            </Badge>
-                            <span className="font-semibold text-white">{ferramenta.nome}</span>
-                          </div>
-                          {ferramenta.gratuito && (
-                            <Badge variant="outline" className="text-xs bg-green-500/10 text-green-400 border-green-500/30">
-                              Gratuito
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-xs text-aplicada-green/70 mb-2">{ferramenta.categoria}</p>
-                        <p className="text-sm text-white/80">{ferramenta.motivo}</p>
-                      </div>
-                    ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            {/* Recomendação de Foco */}
+            {insight.recomendacao_foco && (
+              <AccordionItem value="foco" className="border border-primary/30 rounded-lg px-4 bg-card">
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Target className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="font-medium text-sm text-foreground">Recomendação de Foco</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-sm font-medium text-foreground">
+                      {insight.recomendacao_foco}
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+          </Accordion>
+
+          {/* Etapas de Evolução (se existirem) - SOMENTE PARA BUSINESS */}
+          {isBusiness && etapasEvolucao && etapasEvolucao.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-border">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-4 flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Jornada de Evolução
+              </h3>
+              <div className="space-y-0">
+                {etapasEvolucao.map((etapa, index) => (
+                  <EtapaEvolucao 
+                    key={etapa.numero}
+                    etapa={etapa}
+                    isFirst={index === 0}
+                    isLast={index === etapasEvolucao.length - 1}
+                  />
+                ))}
+              </div>
+            </div>
           )}
-
-          {/* Análise do Perfil */}
-          <AccordionItem value="perfil" className="border border-aplicada-green/30 rounded-lg px-4 bg-aplicada-dark/50">
-            <AccordionTrigger className="hover:no-underline">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-aplicada-green/10">
-                  <Target className="h-5 w-5 text-aplicada-green" />
-                </div>
-                <span className="font-semibold text-left text-white">Análise do Seu Perfil</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pt-4 pb-2">
-              <p className="text-sm leading-relaxed text-white/80">
-                {insight.analise_perfil}
-              </p>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Principais Oportunidades */}
-          <AccordionItem value="oportunidades" className="border border-aplicada-green/30 rounded-lg px-4 bg-aplicada-dark/50">
-            <AccordionTrigger className="hover:no-underline">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-aplicada-green/10">
-                  <Rocket className="h-5 w-5 text-aplicada-green" />
-                </div>
-                <span className="font-semibold text-left text-white">Principais Oportunidades</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pt-4 pb-2">
-              <ul className="space-y-3">
-                {insight.oportunidades?.map((op: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 p-3 bg-aplicada-dark rounded-lg border border-aplicada-green/20">
-                    <span className="text-aplicada-green font-bold text-lg flex-shrink-0">{i + 1}.</span>
-                    <span className="text-sm leading-relaxed text-white/80">{op}</span>
-                  </li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Primeiros Passos */}
-          <AccordionItem value="passos" className="border border-aplicada-green/30 rounded-lg px-4 bg-aplicada-dark/50">
-            <AccordionTrigger className="hover:no-underline">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-aplicada-green/10">
-                  <Focus className="h-5 w-5 text-aplicada-green" />
-                </div>
-                <span className="font-semibold text-left text-white">Seus Primeiros Passos</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pt-4 pb-2">
-              <ul className="space-y-3">
-                {insight.primeiros_passos?.map((passo: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 p-4 bg-aplicada-green/10 rounded-lg border border-aplicada-green/20">
-                    <span className="text-aplicada-green font-bold text-lg flex-shrink-0">{i + 1}.</span>
-                    <span className="text-sm leading-relaxed font-medium text-white/90">{passo}</span>
-                  </li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Alerta de Desafios */}
-          <AccordionItem value="desafios" className="border border-aplicada-green/30 rounded-lg px-4 bg-aplicada-dark/50">
-            <AccordionTrigger className="hover:no-underline">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-yellow-500/10">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                </div>
-                <span className="font-semibold text-left text-white">Fique Atento</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pt-4 pb-2">
-              <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                <p className="text-sm leading-relaxed text-white/80">
-                  {insight.alerta_desafios}
-                </p>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Recomendação de Foco */}
-          <AccordionItem value="foco" className="border border-aplicada-green/50 rounded-lg px-4 bg-aplicada-dark/50">
-            <AccordionTrigger className="hover:no-underline">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-aplicada-green/10">
-                  <Target className="h-5 w-5 text-aplicada-green" />
-                </div>
-                <span className="font-semibold text-left text-white">Recomendação de Foco</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pt-4 pb-2">
-              <div className="p-4 bg-aplicada-green/10 border-2 border-aplicada-green/30 rounded-lg">
-                <p className="text-sm font-medium leading-relaxed text-white">
-                  {insight.recomendacao_foco}
-                </p>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-
-        {planoJaCriado && (
-          <Alert className="mt-6 border-aplicada-green/30 bg-aplicada-green/10">
-            <CheckCircle2 className="h-4 w-4 text-aplicada-green" />
-            <AlertDescription className="text-white/90">
-              <strong className="text-aplicada-green">Plano de mentoria criado com sucesso!</strong>
-              <p className="text-sm mt-1">
-                Seus objetivos e tarefas iniciais já estão disponíveis na seção de Mentoria.
-              </p>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <div className="mt-6 pt-4 border-t border-aplicada-green/20">
-          <p className="text-xs text-white/50 text-center">
-            Análise gerada em {new Date(formulario.insight_gerado_em).toLocaleDateString('pt-BR', {
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </p>
         </div>
-      </CardContent>
-    </Card>
+      )}
+
+      {/* ===== ALERTA DE PLANO CRIADO - SOMENTE BUSINESS ===== */}
+      {isBusiness && planoJaCriado && (
+        <Alert className="mt-6 border-primary/30 bg-primary/5">
+          <CheckCircle2 className="h-4 w-4 text-primary" />
+          <AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <strong className="text-primary">Plano de mentoria criado!</strong>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Seus objetivos e projetos iniciais estão disponíveis.
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/mentoria')}
+              className="shrink-0"
+            >
+              Ver na Mentoria →
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+    </div>
   );
 }
