@@ -28,14 +28,14 @@ import { toast } from "@/hooks/use-toast";
 import { formatProjetoTitulo } from "@/lib/utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
-export default function MentoriaClubPage() {
+export default function MentoriaBusinessPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: allUsers = [] } = useUsers();
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
-  // Filtrar usuários Club (inclui club, boost, legacy)
-  const users = allUsers.filter(u => ["club", "boost", "legacy"].includes(u.plano_mentoria || ""));
+  // Filtrar usuários Business
+  const users = allUsers.filter(u => u.plano_mentoria === "business");
   const selectedUser = users.find(u => u.id === selectedUserId);
 
   const { sessoes, createSessao, updateSessao } = useMentoriaSessoes(selectedUserId);
@@ -87,13 +87,13 @@ export default function MentoriaClubPage() {
         </Button>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold">Mentoria Club</h1>
+            <h1 className="text-3xl font-bold">Mentoria Business</h1>
             <Badge variant="secondary" className="bg-purple-500/10 text-purple-500">
               {users.length} mentorados
             </Badge>
           </div>
           <p className="text-muted-foreground">
-            Gerenciar mentorados Club, Boost e Legacy - mentoria 1:1 completa
+            Gerenciar mentorados Business - consultoria e implementação personalizada
           </p>
         </div>
       </div>
@@ -102,7 +102,7 @@ export default function MentoriaClubPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Selecionar Mentorado Club
+            Selecionar Mentorado Business
           </CardTitle>
           <CardDescription>
             Escolha um mentorado para visualizar e gerenciar suas informações
@@ -111,15 +111,12 @@ export default function MentoriaClubPage() {
         <CardContent>
           <Select value={selectedUserId} onValueChange={setSelectedUserId}>
             <SelectTrigger className="w-full max-w-md">
-              <SelectValue placeholder="Selecione um mentorado Club" />
+              <SelectValue placeholder="Selecione um mentorado Business" />
             </SelectTrigger>
             <SelectContent>
               {users.map((user) => (
                 <SelectItem key={user.id} value={user.id}>
                   {user.nome_completo}
-                  <Badge variant="outline" className="ml-2 text-xs">
-                    {user.plano_mentoria}
-                  </Badge>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -131,9 +128,9 @@ export default function MentoriaClubPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Users className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Nenhum mentorado Club</p>
+            <p className="text-lg font-medium">Nenhum mentorado Business</p>
             <p className="text-sm text-muted-foreground">
-              Não há mentorados com plano Club, Boost ou Legacy cadastrados
+              Não há mentorados com plano Business cadastrados
             </p>
           </CardContent>
         </Card>
@@ -378,7 +375,7 @@ export default function MentoriaClubPage() {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Excluir Bônus</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tem certeza que deseja excluir este bônus? Esta ação não pode ser desfeita.
+                                  Tem certeza que deseja excluir o bônus "{bonusItem.nome}"? Esta ação não pode ser desfeita.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -393,51 +390,76 @@ export default function MentoriaClubPage() {
                       </div>
                       <CardDescription>{bonusItem.descricao}</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 text-sm">
-                        <Badge variant={bonusItem.liberado ? "default" : "secondary"}>
-                          {bonusItem.liberado ? "Liberado" : "Bloqueado"}
-                        </Badge>
-                        {bonusItem.link && (
-                          <a href={bonusItem.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
-                            <ExternalLink className="h-3 w-3" /> Acessar link
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Condição</p>
+                          <p className="font-medium">{bonusItem.condicao_tipo}</p>
+                          {bonusItem.condicao_descricao && (
+                            <p className="text-xs text-muted-foreground">{bonusItem.condicao_descricao}</p>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Status</p>
+                          <Badge variant={bonusItem.liberado ? "default" : "secondary"}>
+                            {bonusItem.liberado ? "Liberado" : "Bloqueado"}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {bonusItem.link && (
+                        <div className="flex items-center gap-2">
+                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                          <a href={bonusItem.link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                            Acessar link
                           </a>
-                        )}
-                        {arquivos.length > 0 && (
+                        </div>
+                      )}
+
+                      {arquivos.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">Arquivos:</p>
                           <div className="flex flex-wrap gap-2">
                             {arquivos.map((url, idx) => (
-                              <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline text-xs">
-                                <FileDown className="h-3 w-3" /> Arquivo {idx + 1}
+                              <a
+                                key={idx}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-xs bg-muted px-2 py-1 rounded hover:bg-muted/80"
+                              >
+                                <FileDown className="h-3 w-3" />
+                                Arquivo {idx + 1}
                               </a>
                             ))}
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
               })}
               {bonus.filter(b => b.user_id === selectedUserId).length === 0 && (
-                <p className="text-center text-muted-foreground py-8">Nenhum bônus cadastrado</p>
+                <p className="text-center text-muted-foreground py-8">Nenhum bônus cadastrado para este mentorado</p>
               )}
             </div>
           </TabsContent>
         </Tabs>
       )}
 
-      {/* Modals */}
+      {/* Modais */}
       <SessaoModal
         open={sessaoModalOpen}
         onOpenChange={setSessaoModalOpen}
         sessao={editingSessao}
         userId={selectedUserId}
-        onSubmit={(data) => {
+        onSave={(data) => {
           if (editingSessao) {
-            updateSessao({ ...data, id: editingSessao.id });
+            updateSessao({ ...editingSessao, ...data });
           } else {
             createSessao(data);
           }
-          setEditingSessao(undefined);
+          setSessaoModalOpen(false);
         }}
       />
 
@@ -445,13 +467,14 @@ export default function MentoriaClubPage() {
         open={recursoModalOpen}
         onOpenChange={setRecursoModalOpen}
         recurso={editingRecurso}
-        onSubmit={(data) => {
+        userId={selectedUserId}
+        onSave={(data) => {
           if (editingRecurso) {
-            updateRecurso({ ...data, id: editingRecurso.id });
+            updateRecurso({ ...editingRecurso, ...data });
           } else {
             createRecurso(data);
           }
-          setEditingRecurso(undefined);
+          setRecursoModalOpen(false);
         }}
       />
 
@@ -459,13 +482,14 @@ export default function MentoriaClubPage() {
         open={projetoModalOpen}
         onOpenChange={setProjetoModalOpen}
         projeto={editingProjeto}
-        onSubmit={(data) => {
+        userId={selectedUserId}
+        onSave={(data) => {
           if (editingProjeto) {
-            updateProjeto({ ...data, id: editingProjeto.id });
+            updateProjeto({ ...editingProjeto, ...data });
           } else {
             createProjeto(data);
           }
-          setEditingProjeto(undefined);
+          setProjetoModalOpen(false);
         }}
       />
 
@@ -474,13 +498,13 @@ export default function MentoriaClubPage() {
         onOpenChange={setBonusModalOpen}
         bonus={editingBonus}
         userId={selectedUserId}
-        onSubmit={(data) => {
+        onSave={(data) => {
           if (editingBonus) {
-            updateBonus({ ...data, id: editingBonus.id });
+            updateBonus({ ...editingBonus, ...data });
           } else {
             createBonus(data);
           }
-          setEditingBonus(undefined);
+          setBonusModalOpen(false);
         }}
       />
     </div>

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
-export type UserPlan = "academy" | "lab" | "skills" | "club" | null;
+export type UserPlan = "academy" | "skills" | "business" | null;
 
 export function useUserPlan() {
   const { user } = useAuth();
@@ -28,26 +28,22 @@ export function useUserPlan() {
 
   // Hierarquia de acesso:
   // Academy = base (acesso a trilhas)
-  // Lab = trilhas + mentoria em grupo
-  // Club = trilhas + mentoria 1:1 + lab
-  // Skills = trilhas (B2B)
+  // Skills = trilhas + gestão de equipe (B2B)
+  // Business = acesso completo + mentoria 1:1 + consultoria (B2B Premium)
   
-  const hasAccessTo = (product: "trilhas" | "lab" | "club" | "skills") => {
+  const hasAccessTo = (product: "trilhas" | "skills" | "business") => {
     if (!plan) return false;
     
     switch (product) {
       case "trilhas":
         // Todos os planos têm acesso a trilhas
-        return ["academy", "lab", "skills", "club"].includes(plan);
-      case "lab":
-        // Lab e Club têm acesso
-        return ["lab", "club"].includes(plan);
-      case "club":
-        // Apenas Club tem acesso
-        return plan === "club";
+        return ["academy", "skills", "business"].includes(plan);
       case "skills":
-        // Apenas Skills tem acesso
-        return plan === "skills";
+        // Skills e Business têm acesso
+        return ["skills", "business"].includes(plan);
+      case "business":
+        // Apenas Business tem acesso
+        return plan === "business";
       default:
         return false;
     }
@@ -58,8 +54,7 @@ export function useUserPlan() {
     hasAccessTo,
     isLoading,
     isAcademy: plan === "academy",
-    isLab: plan === "lab",
-    isClub: plan === "club",
     isSkills: plan === "skills",
+    isBusiness: plan === "business",
   };
 }

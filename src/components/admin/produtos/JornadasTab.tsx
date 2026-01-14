@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Users, Building2, RefreshCw } from "lucide-react";
+import { ArrowRight, Users, Building2 } from "lucide-react";
 
 export function JornadasTab() {
   const jornadas = [
@@ -10,43 +10,28 @@ export function JornadasTab() {
       descricao: "Para profissionais individuais",
       icon: Users,
       etapas: [
-        { produto: "Academy", valor: "R$1.397/ano", tipo: "inicial" },
-        { produto: "Lab", valor: "R$2.497 total", economia: "R$2.397", tipo: "upsell" },
-        { produto: "Club", valor: "R$6.497", economia: "R$1.500", tipo: "premium" },
+        { produto: "Academy", valor: "R$ 1.497/ano", tipo: "inicial" },
+        { produto: "Skills", valor: "R$ 4.497/ano", economia: "Upgrade para equipe", tipo: "upsell" },
       ],
     },
     {
-      id: "b2b",
-      titulo: "Jornada B2B",
-      descricao: "Para empresas e equipes",
+      id: "b2b-skills",
+      titulo: "Jornada B2B Skills",
+      descricao: "Para empresas que querem treinar equipes",
       icon: Building2,
       etapas: [
-        { produto: "Skills", valor: "R$297/mês", tipo: "inicial" },
-        { produto: "Lab", valor: "+R$1.100", economia: "R$2.397", tipo: "upsell" },
-        { produto: "Club", valor: "R$7.997", tipo: "premium" },
+        { produto: "Skills", valor: "R$ 4.497/ano", tipo: "inicial" },
+        { produto: "Business", valor: "R$ 9.997 - R$ 70k", economia: "Transformação completa", tipo: "premium" },
       ],
     },
     {
-      id: "consult",
-      titulo: "Jornada Consult",
-      descricao: "Transformação digital completa",
+      id: "b2b-business",
+      titulo: "Jornada B2B Business",
+      descricao: "Para empresas que precisam de transformação digital",
       icon: Building2,
       etapas: [
-        { produto: "Consult (Projeto)", valor: "R$15-50k", tipo: "inicial" },
-        { produto: "Skills (Recorrência)", valor: "R$297/mês", tipo: "upsell" },
-        { produto: "Lab (Equipe)", valor: "+R$1.100", economia: "R$2.397", tipo: "upsell" },
-        { produto: "Club (Líder)", valor: "R$7.997", tipo: "premium" },
-      ],
-    },
-    {
-      id: "renovacao",
-      titulo: "Jornada Renovação",
-      descricao: "Para clientes recorrentes",
-      icon: RefreshCw,
-      etapas: [
-        { produto: "Lab (1ª vez)", valor: "R$3.497", tipo: "inicial" },
-        { produto: "Lab (renovação)", valor: "R$2.497", economia: "R$1.000", tipo: "upsell" },
-        { produto: "Club", valor: "R$6.497", economia: "R$1.500", tipo: "premium" },
+        { produto: "Business", valor: "R$ 9.997 - R$ 70k", tipo: "inicial" },
+        { produto: "Skills (Recorrência)", valor: "+R$ 1.397/pessoa/ano", economia: "Novos liderados", tipo: "upsell" },
       ],
     },
   ];
@@ -98,7 +83,7 @@ export function JornadasTab() {
                         <p className="text-sm text-primary font-medium">{etapa.valor}</p>
                         {etapa.economia && (
                           <p className="text-xs text-green-600 mt-1">
-                            Economia: {etapa.economia}
+                            {etapa.economia}
                           </p>
                         )}
                       </div>
@@ -115,11 +100,12 @@ export function JornadasTab() {
       </div>
 
       <Card className="p-6 bg-muted/50">
-        <h3 className="font-semibold mb-2">💡 Dica</h3>
-        <p className="text-sm text-muted-foreground">
-          As jornadas são calculadas automaticamente com base nas regras de upsell configuradas.
-          Para modificar uma jornada, edite as regras de upsell na aba correspondente.
-        </p>
+        <h3 className="font-semibold mb-2">💡 Produtos Ativos</h3>
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p><strong>Academy</strong> - B2C Individual (R$ 1.497/ano)</p>
+          <p><strong>Skills</strong> - B2B Equipes (R$ 4.497/ano, mínimo 3 licenças)</p>
+          <p><strong>Business</strong> - B2B Consultoria (R$ 9.997 - R$ 70.000/projeto)</p>
+        </div>
       </Card>
     </div>
   );

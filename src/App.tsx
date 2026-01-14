@@ -56,7 +56,7 @@ import GerenciarConhecimento from "./pages/admin/GerenciarConhecimento";
 import GerenciarMentoria from "./pages/admin/GerenciarMentoria";
 import MentoriaBonusPage from "./pages/admin/mentoria/MentoriaBonusPage";
 import MentoriaAcademyPage from "./pages/admin/mentoria/MentoriaAcademyPage";
-import MentoriaClubPage from "./pages/admin/mentoria/MentoriaClubPage";
+import MentoriaBusinessPage from "./pages/admin/mentoria/MentoriaBusinessPage";
 import GerenciarProdutos from "./pages/admin/GerenciarProdutos";
 import MinhasTarefas from "./pages/admin/MinhasTarefas";
 import Auditoria from "./pages/admin/Auditoria";
@@ -161,7 +161,7 @@ function AppContent() {
             <Route path="conhecimento" element={<GerenciarConhecimento />} />
             <Route path="mentoria/bonus" element={<MentoriaBonusPage />} />
             <Route path="mentoria/academy" element={<MentoriaAcademyPage />} />
-            <Route path="mentoria/club" element={<MentoriaClubPage />} />
+            <Route path="mentoria/business" element={<MentoriaBusinessPage />} />
             <Route path="duvidas" element={<GerenciarTodasDuvidas />} />
             <Route path="produtos" element={<GerenciarProdutos />} />
             <Route path="materiais" element={<GerenciarMateriais />} />

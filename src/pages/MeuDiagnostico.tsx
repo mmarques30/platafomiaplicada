@@ -32,9 +32,9 @@ export default function MeuDiagnostico() {
     }
   }, [isVisitante, roleLoading, navigate]);
 
-  // Redirect Club/Lab para /mentoria (eles têm diagnóstico integrado)
+  // Redirect Business para /mentoria (eles têm diagnóstico integrado)
   useEffect(() => {
-    if (!planLoading && plan && ['club', 'lab'].includes(plan)) {
+    if (!planLoading && plan === 'business') {
       navigate('/mentoria', { replace: true });
     }
   }, [plan, planLoading, navigate]);

@@ -3351,7 +3351,7 @@ export type Database = {
         | "aluno_trilha"
         | "visitante"
         | "facilitador"
-      nivel_acesso_plano: "academy" | "lab" | "skills" | "club"
+      nivel_acesso_plano: "academy" | "lab" | "skills" | "club" | "business"
       plano_mentoria:
         | "club"
         | "pro"
@@ -3360,6 +3360,7 @@ export type Database = {
         | "academy"
         | "lab"
         | "skills"
+        | "business"
       status_projeto:
         | "planejamento"
         | "em_andamento"
@@ -3500,7 +3501,7 @@ export const Constants = {
         "visitante",
         "facilitador",
       ],
-      nivel_acesso_plano: ["academy", "lab", "skills", "club"],
+      nivel_acesso_plano: ["academy", "lab", "skills", "club", "business"],
       plano_mentoria: [
         "club",
         "pro",
@@ -3509,6 +3510,7 @@ export const Constants = {
         "academy",
         "lab",
         "skills",
+        "business",
       ],
       status_projeto: [
         "planejamento",
