@@ -2439,6 +2439,7 @@ export type Database = {
           data_entrega: string | null
           descricao: string
           devolutiva_mentor: string | null
+          ferramentas_projeto: Json | null
           id: string
           modulos_obrigatorios: Json | null
           objetivo_projeto: string
@@ -2461,6 +2462,7 @@ export type Database = {
           data_entrega?: string | null
           descricao: string
           devolutiva_mentor?: string | null
+          ferramentas_projeto?: Json | null
           id?: string
           modulos_obrigatorios?: Json | null
           objetivo_projeto: string
@@ -2483,6 +2485,7 @@ export type Database = {
           data_entrega?: string | null
           descricao?: string
           devolutiva_mentor?: string | null
+          ferramentas_projeto?: Json | null
           id?: string
           modulos_obrigatorios?: Json | null
           objetivo_projeto?: string
