@@ -2,7 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Target, Rocket, AlertTriangle, Focus, Loader2, CheckCircle2, Wrench, PlayCircle, Lightbulb, ChevronDown, ChevronUp } from "lucide-react";
+import { 
+  Sparkles, Target, Rocket, AlertTriangle, Focus, Loader2, CheckCircle2, 
+  Wrench, PlayCircle, Lightbulb, ChevronDown, ChevronUp, MessageSquare, 
+  Bot, Search, Image, FileText, Code, Presentation, Zap, ArrowRight
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +14,8 @@ import { toast } from "@/hooks/use-toast";
 import { EtapaEvolucao, Etapa } from "./EtapaEvolucao";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
 
 interface FerramentaPrioritaria {
   nome: string;
@@ -23,6 +29,46 @@ interface InsightIAProps {
   formulario: any;
   onInsightGerado?: () => void;
 }
+
+// Mapeamento de ícones para ferramentas
+const ferramentaIcons: Record<string, LucideIcon> = {
+  'ChatGPT': MessageSquare,
+  'GPT-4': MessageSquare,
+  'Claude': Bot,
+  'Perplexity': Search,
+  'Midjourney': Image,
+  'DALL-E': Image,
+  'Notion AI': FileText,
+  'Notion': FileText,
+  'Copilot': Code,
+  'GitHub Copilot': Code,
+  'Gamma': Presentation,
+  'Gemini': Sparkles,
+  'default': Wrench
+};
+
+const getFerramentaIcon = (nome: string): LucideIcon => {
+  const normalizedName = nome.toLowerCase();
+  for (const [key, icon] of Object.entries(ferramentaIcons)) {
+    if (normalizedName.includes(key.toLowerCase())) {
+      return icon;
+    }
+  }
+  return ferramentaIcons.default;
+};
+
+const getPriorityColor = (priority: number): string => {
+  switch (priority) {
+    case 1:
+      return "bg-primary text-primary-foreground shadow-lg shadow-primary/25";
+    case 2:
+      return "bg-blue-500 text-white";
+    case 3:
+      return "bg-purple-500 text-white";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
+};
 
 export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -112,16 +158,25 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
     formulario?.desafio_3,
   ].filter(Boolean);
 
+  // Extrair oportunidades do insight
+  const oportunidades = (insight.oportunidades as string[] | undefined) || [];
+
+  // Extrair primeiros passos do insight
+  const primeirosPassos = (insight.primeiros_passos as string[] | undefined) || [];
+
   // Extrair trilhas recomendadas das etapas
   const trilhasRecomendadas = etapasEvolucao?.flatMap(e => e.trilhas_recomendadas || []).slice(0, 4) || [];
+
+  const oportunidadeIcons = [Rocket, Lightbulb, Target, Zap];
+  const problemaIcons = [Zap, Lightbulb, Target];
 
   return (
     <div className="mt-6 bg-accent/30 rounded-2xl p-6 md:p-8 border border-border">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-border">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-primary/10 rounded-xl">
-            <Sparkles className="h-5 w-5 text-primary" />
+          <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl">
+            <Sparkles className="h-6 w-6 text-primary" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-foreground">Seu Diagnóstico Personalizado</h2>
@@ -136,93 +191,224 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
         </div>
       </div>
 
-      {/* ===== SEÇÕES PRINCIPAIS VISÍVEIS PARA TODOS ===== */}
-      <div className="space-y-6">
-        
-        {/* 1. Ferramentas para Começar */}
-        {ferramentasPrioritarias.length > 0 && (
-          <section>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-3 flex items-center gap-2">
-              <Wrench className="h-4 w-4" />
-              Ferramentas para Começar
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {ferramentasPrioritarias
-                .sort((a, b) => a.nivel_prioridade - b.nivel_prioridade)
-                .slice(0, 4)
-                .map((ferramenta, i) => (
+      {/* ===== FERRAMENTAS RECOMENDADAS - CARDS VISUAIS ===== */}
+      {ferramentasPrioritarias.length > 0 && (
+        <section className="mb-8">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-4 flex items-center gap-2">
+            <Wrench className="h-4 w-4" />
+            Ferramentas Recomendadas
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {ferramentasPrioritarias
+              .sort((a, b) => a.nivel_prioridade - b.nivel_prioridade)
+              .slice(0, 4)
+              .map((ferramenta, i) => {
+                const IconComponent = getFerramentaIcon(ferramenta.nome);
+                return (
                   <div 
                     key={i} 
-                    className="p-4 bg-card rounded-xl border border-border hover:border-primary/40 transition-colors text-center"
+                    className={cn(
+                      "relative p-5 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02] cursor-default",
+                      i === 0 
+                        ? "bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/40 shadow-lg shadow-primary/10" 
+                        : "bg-card border-border hover:border-primary/30"
+                    )}
                   >
-                    <Badge className={i === 0 ? "bg-primary text-primary-foreground mb-2" : "bg-primary/20 text-primary border-primary/30 mb-2"}>
+                    {/* Badge de Prioridade */}
+                    <div className={cn(
+                      "absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold",
+                      getPriorityColor(ferramenta.nivel_prioridade)
+                    )}>
                       #{i + 1}
-                    </Badge>
-                    <p className="font-semibold text-foreground text-sm">{ferramenta.nome}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{ferramenta.categoria}</p>
+                    </div>
+                    
+                    {/* Ícone */}
+                    <div className={cn(
+                      "w-12 h-12 rounded-xl flex items-center justify-center mb-3",
+                      i === 0 ? "bg-primary/20" : "bg-muted"
+                    )}>
+                      <IconComponent className={cn(
+                        "h-6 w-6",
+                        i === 0 ? "text-primary" : "text-muted-foreground"
+                      )} />
+                    </div>
+                    
+                    {/* Nome */}
+                    <p className="font-bold text-foreground text-sm mb-1">{ferramenta.nome}</p>
+                    
+                    {/* Categoria */}
+                    <p className="text-xs text-muted-foreground mb-3">{ferramenta.categoria}</p>
+                    
+                    {/* Badge Grátis */}
                     {ferramenta.gratuito && (
-                      <Badge variant="outline" className="text-xs mt-2 bg-green-500/10 text-green-600 border-green-500/30">
-                        Grátis
+                      <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-xs">
+                        ✓ Grátis
                       </Badge>
                     )}
                   </div>
-                ))}
-            </div>
-          </section>
-        )}
+                );
+              })}
+          </div>
+        </section>
+      )}
 
-        {/* 2. Módulos Prioritários */}
-        {trilhasRecomendadas.length > 0 && (
-          <section>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-3 flex items-center gap-2">
-              <PlayCircle className="h-4 w-4" />
-              Módulos Prioritários
-            </h3>
-            <div className="space-y-2">
-              {trilhasRecomendadas.map((trilha, i) => (
+      {/* ===== OPORTUNIDADES - CARDS COLORIDOS IMPACTANTES ===== */}
+      {oportunidades.length > 0 && (
+        <section className="mb-8">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-4 flex items-center gap-2">
+            <Rocket className="h-4 w-4" />
+            Suas Oportunidades
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            {oportunidades.slice(0, 4).map((op, i) => {
+              const OpIcon = oportunidadeIcons[i % oportunidadeIcons.length];
+              const gradients = [
+                "bg-gradient-to-r from-primary/15 via-primary/5 to-transparent border-l-primary",
+                "bg-gradient-to-r from-blue-500/15 via-blue-500/5 to-transparent border-l-blue-500",
+                "bg-gradient-to-r from-purple-500/15 via-purple-500/5 to-transparent border-l-purple-500",
+                "bg-gradient-to-r from-emerald-500/15 via-emerald-500/5 to-transparent border-l-emerald-500",
+              ];
+              const iconBgs = [
+                "bg-primary/20 text-primary",
+                "bg-blue-500/20 text-blue-500",
+                "bg-purple-500/20 text-purple-500",
+                "bg-emerald-500/20 text-emerald-500",
+              ];
+              return (
                 <div 
-                  key={i} 
-                  className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20"
+                  key={i}
+                  className={cn(
+                    "p-4 rounded-xl border-l-4 transition-all hover:shadow-md",
+                    gradients[i % gradients.length]
+                  )}
                 >
-                  <div className="flex items-center gap-3">
-                    <PlayCircle className="h-5 w-5 text-primary shrink-0" />
-                    <span className="font-medium text-foreground text-sm">{trilha.titulo}</span>
+                  <div className="flex items-start gap-3">
+                    <div className={cn("p-2 rounded-lg shrink-0", iconBgs[i % iconBgs.length])}>
+                      <OpIcon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold uppercase text-muted-foreground">
+                        Oportunidade {i + 1}
+                      </span>
+                      <p className="font-medium text-foreground mt-1 text-sm">{op}</p>
+                    </div>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-primary hover:text-primary hover:bg-primary/10"
-                    onClick={() => navigate(`/trilhas/${trilha.trilha_id}`)}
-                  >
-                    Acessar
-                  </Button>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              );
+            })}
+          </div>
+        </section>
+      )}
 
-        {/* 3. Problemas para Resolver com IA */}
-        {problemasResolver.length > 0 && (
-          <section>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-3 flex items-center gap-2">
-              <Lightbulb className="h-4 w-4" />
-              Problemas para Resolver com IA
-            </h3>
-            <div className="space-y-2">
-              {problemasResolver.map((problema, i) => (
-                <div 
-                  key={i} 
-                  className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border-l-4 border-amber-500"
-                >
-                  <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                  <span className="text-sm text-foreground">{problema}</span>
+      {/* ===== PRIMEIROS PASSOS - TIMELINE VISUAL ===== */}
+      {primeirosPassos.length > 0 && (
+        <section className="mb-8">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-4 flex items-center gap-2">
+            <Focus className="h-4 w-4" />
+            Primeiros Passos
+          </h3>
+          <div className="relative space-y-4">
+            {/* Linha vertical conectando os passos */}
+            <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-primary/20" />
+            
+            {primeirosPassos.slice(0, 5).map((passo, i) => (
+              <div key={i} className="relative flex items-start gap-4">
+                {/* Círculo numerado */}
+                <div className={cn(
+                  "relative z-10 flex items-center justify-center w-12 h-12 rounded-full font-bold text-sm shadow-lg shrink-0",
+                  i === 0 
+                    ? "bg-primary text-primary-foreground shadow-primary/25" 
+                    : "bg-card text-foreground border-2 border-primary/30"
+                )}>
+                  {i + 1}
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
+                
+                {/* Card do passo */}
+                <div className={cn(
+                  "flex-1 p-4 rounded-xl border transition-all hover:border-primary/40",
+                  i === 0 
+                    ? "bg-primary/5 border-primary/30" 
+                    : "bg-card border-border"
+                )}>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-medium text-foreground text-sm">{passo}</p>
+                    {i === 0 && (
+                      <Badge className="bg-primary/10 text-primary border-primary/30 shrink-0 text-xs">
+                        Próximo
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ===== PROBLEMAS PARA RESOLVER - CARDS COM ÍCONES ===== */}
+      {problemasResolver.length > 0 && (
+        <section className="mb-8">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-4 flex items-center gap-2">
+            <Lightbulb className="h-4 w-4" />
+            Desafios para Resolver com IA
+          </h3>
+          <div className="grid sm:grid-cols-3 gap-3">
+            {problemasResolver.map((problema, i) => {
+              const ProbIcon = problemaIcons[i % problemaIcons.length];
+              return (
+                <div 
+                  key={i}
+                  className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20 rounded-xl border border-amber-200 dark:border-amber-800/50"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/50">
+                      <ProbIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase">
+                      Foco #{i + 1}
+                    </span>
+                  </div>
+                  <p className="text-sm text-amber-900 dark:text-amber-100">{problema}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ===== MÓDULOS PRIORITÁRIOS ===== */}
+      {trilhasRecomendadas.length > 0 && (
+        <section className="mb-6">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-primary mb-3 flex items-center gap-2">
+            <PlayCircle className="h-4 w-4" />
+            Módulos Prioritários
+          </h3>
+          <div className="space-y-2">
+            {trilhasRecomendadas.map((trilha, i) => (
+              <div 
+                key={i} 
+                className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20 hover:border-primary/40 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 rounded-lg bg-primary/10">
+                    <PlayCircle className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="font-medium text-foreground text-sm">{trilha.titulo}</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
+                  onClick={() => navigate(`/trilhas/${trilha.trilha_id}`)}
+                >
+                  Acessar
+                  <ArrowRight className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ===== BOTÃO EXPANDIR/RECOLHER DETALHES ===== */}
       <div className="flex justify-center mt-6 pt-4 border-t border-border">
@@ -265,54 +451,6 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
                   <p className="text-sm leading-relaxed text-muted-foreground">
                     {insight.analise_perfil}
                   </p>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-
-            {/* Oportunidades */}
-            {insight.oportunidades?.length > 0 && (
-              <AccordionItem value="oportunidades" className="border border-border rounded-lg px-4 bg-card">
-                <AccordionTrigger className="hover:no-underline py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <Rocket className="h-4 w-4 text-primary" />
-                    </div>
-                    <span className="font-medium text-sm text-foreground">Oportunidades</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-2 pb-4">
-                  <ul className="space-y-2">
-                    {insight.oportunidades?.map((op: string, i: number) => (
-                      <li key={i} className="flex items-start gap-3 p-3 bg-accent/50 rounded-lg">
-                        <span className="text-primary font-bold text-sm shrink-0">{i + 1}.</span>
-                        <span className="text-sm text-muted-foreground">{op}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-
-            {/* Primeiros Passos */}
-            {insight.primeiros_passos?.length > 0 && (
-              <AccordionItem value="passos" className="border border-border rounded-lg px-4 bg-card">
-                <AccordionTrigger className="hover:no-underline py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <Focus className="h-4 w-4 text-primary" />
-                    </div>
-                    <span className="font-medium text-sm text-foreground">Primeiros Passos</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-2 pb-4">
-                  <ul className="space-y-2">
-                    {insight.primeiros_passos?.map((passo: string, i: number) => (
-                      <li key={i} className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
-                        <span className="text-primary font-bold text-sm shrink-0">{i + 1}.</span>
-                        <span className="text-sm font-medium text-foreground">{passo}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </AccordionContent>
               </AccordionItem>
             )}
