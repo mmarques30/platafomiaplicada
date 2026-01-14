@@ -358,12 +358,12 @@ export default function Auth() {
           {/* Termos */}
           <p className="text-center text-xs text-white/40 mt-8">
             Ao continuar, você concorda com nossos{" "}
-            <a href="/politicauso" className="text-[#9EB038] hover:underline">
+            <a href="/termos-uso" className="text-[#9EB038] hover:underline">
               Termos de Uso
             </a>{" "}
             e{" "}
-            <a href="/politicavendas" className="text-[#9EB038] hover:underline">
-            Política de Privacidade
+            <a href="/politica-privacidade" className="text-[#9EB038] hover:underline">
+              Política de Privacidade
             </a>
           </p>
         </div>

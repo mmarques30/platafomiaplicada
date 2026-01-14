@@ -4,37 +4,32 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, FileText } from "lucide-react";
+import { ArrowLeft, Shield } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-export default function PoliticaVendas() {
+export default function PoliticaPrivacidade() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const { data: documento, isLoading } = useQuery({
-    queryKey: ["documento-legal-publico", "politica-vendas", !!user],
+    queryKey: ["documento-legal-publico", "politica-privacidade", !!user],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("documentos_legais")
         .select("*")
-        .eq("slug", "politica-vendas")
-        .single();
+        .eq("slug", "politica-privacidade")
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) return null;
 
-      // Se não logado, mostrar versão de visitantes
-      const isPublicAccess = !user;
-      
       return {
         ...data,
-        conteudo: isPublicAccess ? (data.conteudo_visitantes || data.conteudo_mentorados) : data.conteudo_mentorados,
-        tituloExibicao: isPublicAccess 
-          ? "Política de Privacidade – IAPLICADA" 
-          : data.titulo
+        conteudo: data.conteudo_visitantes || data.conteudo_mentorados,
       };
     },
     staleTime: 1000 * 60 * 10,
@@ -96,8 +91,8 @@ export default function PoliticaVendas() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-6 w-6" />
-              {documento.tituloExibicao}
+              <Shield className="h-6 w-6" />
+              {documento.titulo}
             </CardTitle>
             {documento.ultima_atualizacao && (
               <p className="text-sm text-muted-foreground">
