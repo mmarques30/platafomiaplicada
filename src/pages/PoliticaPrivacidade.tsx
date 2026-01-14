@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Shield } from "lucide-react";
@@ -13,10 +12,10 @@ import { ptBR } from "date-fns/locale";
 
 export default function PoliticaPrivacidade() {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
+  // Busca o documento imediatamente, sem esperar autenticação
   const { data: documento, isLoading } = useQuery({
-    queryKey: ["documento-legal-publico", "politica-privacidade", !!user],
+    queryKey: ["documento-legal-publico", "politica-privacidade"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("documentos_legais")
@@ -36,8 +35,9 @@ export default function PoliticaPrivacidade() {
   });
 
   const handleVoltar = () => {
-    if (user) {
-      navigate("/configuracoes");
+    // Usa history.back() para voltar à página anterior, sem depender de auth
+    if (window.history.length > 1) {
+      navigate(-1);
     } else {
       navigate("/auth");
     }
