@@ -5,7 +5,6 @@ import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
-import { HeroMentoria } from "@/components/mentoria/HeroMentoria";
 import { InsightIA } from "@/components/mentoria/InsightIA";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -20,7 +19,6 @@ export default function MentoriaDiagnostico() {
   const { formulario, isLoading, refetch } = useMentoriaForm();
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
   // Redirecionar visitantes - não devem acessar esta página
   useEffect(() => {
@@ -53,7 +51,6 @@ export default function MentoriaDiagnostico() {
         : 'Voltar para Mentoria';
 
   const handleFormularioFinalizado = () => {
-    setMostrarFormulario(false);
     refetch();
   };
 
@@ -78,15 +75,9 @@ export default function MentoriaDiagnostico() {
         {voltarLabel}
       </Button>
 
-      {/* Hero Section - quando não preencheu */}
-      {naoPreencheu && !mostrarFormulario && (
-        <HeroMentoria onIniciar={() => setMostrarFormulario(true)} />
-      )}
-
-      {/* Formulário Wizard - quando está preenchendo */}
-      {mostrarFormulario && !preenchido && (
+      {/* Formulário Wizard - quando não preencheu */}
+      {naoPreencheu && (
         <FormularioWizard 
-          onCancelar={() => setMostrarFormulario(false)}
           onFinalizado={handleFormularioFinalizado}
         />
       )}
