@@ -120,26 +120,20 @@ export function BusinessDashboard({ diagnostico, userId }: BusinessDashboardProp
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-aplicada-dark via-slate-900 to-aplicada-dark">
-        <Loader2 className="h-12 w-12 animate-spin text-aplicada-green-600" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-aplicada-green-700" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-aplicada-dark via-slate-900 to-aplicada-dark">
-      {/* Background decorations */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-aplicada-green-700/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-aplicada-green-800/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10 container mx-auto py-6 px-4 space-y-6">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto py-6 px-4 space-y-6">
         {/* Back button */}
         <Button
           variant="ghost"
           onClick={() => navigate('/mentoria')}
-          className="text-slate-400 hover:text-slate-200 hover:bg-white/5 -ml-2"
+          className="-ml-2"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar para Mentoria

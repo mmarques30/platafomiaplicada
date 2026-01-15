@@ -2,8 +2,9 @@ import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, FileText, Briefcase, Crown } from "lucide-react";
+import { ArrowLeft, FileText, Briefcase, Crown, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { PageTitle } from "@/components/shared/PageTitle";
 import { getPainelTheme } from "./painelTheme";
 
 interface PainelDiagnosticoShellProps {
@@ -30,60 +31,48 @@ export const PainelDiagnosticoShell = ({
 
   if (isBusiness) {
     return (
-      <div className={cn("min-h-screen relative", theme.pageBg)}>
-        {/* Decorative blobs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-aplicada-green-700/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-aplicada-green-800/10 rounded-full blur-3xl" />
-        </div>
-
-        {/* Header Premium */}
-        <div className="relative border-b border-white/10">
-          <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="min-h-screen bg-background">
+        {/* Header - Limpo igual Academy */}
+        <div className="bg-background border-b border-border">
+          <div className="container mx-auto py-6 px-4 max-w-7xl">
             <Button
               variant="ghost"
               onClick={() => navigate(voltarUrl)}
-              className={cn("mb-6", theme.buttonOutline)}
+              className="mb-4"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               {voltarLabel}
             </Button>
             
-            <div className="flex items-center gap-4 mb-3">
-              <h1 className={cn(
-                "text-4xl md:text-5xl font-bold tracking-tight",
-                theme.textPrimary
-              )}>
-                Painel de Diagnóstico
-              </h1>
-              <Badge className={cn(
-                "px-3 py-1 text-sm font-semibold flex items-center gap-1.5",
-                theme.badgeBg,
-                theme.badgeText
-              )}>
-                <Crown className="w-3.5 h-3.5" />
-                Business
-              </Badge>
+            {/* Título seguindo padrão PageTitle */}
+            <div className="flex items-center gap-4 mb-2">
+              <div className="p-3 rounded-xl bg-aplicada-green-700/10 border border-aplicada-green-700/20">
+                <Crown className="h-6 w-6 text-aplicada-green-700" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <PageTitle primary="Painel de" secondary="Diagnóstico" />
+                  <Badge className="bg-aplicada-green-700 text-white border-0">
+                    <Crown className="w-3 h-3 mr-1" />
+                    Business
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground mt-1">
+                  {diagnostico.nome_completo || profile?.nome_completo}
+                </p>
+              </div>
             </div>
-            <p className={cn("text-lg", theme.textSecondary)}>
-              {diagnostico.nome_completo || profile?.nome_completo}
-            </p>
           </div>
         </div>
 
-        {/* Quick Actions Bar - Glass Style */}
-        <div className="container mx-auto px-4 max-w-7xl -mt-4 mb-8 relative z-10">
-          <div className={cn(
-            "rounded-xl border p-4 backdrop-blur-md",
-            theme.cardBg,
-            theme.cardBorder,
-            "shadow-lg"
-          )}>
+        {/* Quick Actions Bar - Igual Academy */}
+        <div className="container mx-auto px-4 max-w-7xl -mt-4 mb-8">
+          <div className="bg-card rounded-lg shadow-sm border border-border p-4">
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 variant="outline"
                 onClick={() => navigate(isAcademyRoute ? "/diagnostico/formulario" : "/mentoria/diagnostico")}
-                className={cn("gap-2", theme.buttonOutline)}
+                className="gap-2"
               >
                 <FileText className="w-4 h-4" />
                 Ver Diagnóstico Completo
@@ -93,7 +82,7 @@ export const PainelDiagnosticoShell = ({
                 <Button
                   variant="outline"
                   onClick={() => navigate("/mentoria/projetos")}
-                  className={cn("gap-2", theme.buttonOutline)}
+                  className="gap-2"
                 >
                   <Briefcase className="w-4 h-4" />
                   Ver Todos Projetos
@@ -104,7 +93,7 @@ export const PainelDiagnosticoShell = ({
         </div>
 
         {/* Main Content */}
-        <div className="container mx-auto py-8 px-4 max-w-7xl relative z-10">
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
           {children}
         </div>
       </div>

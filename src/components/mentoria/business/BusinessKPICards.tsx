@@ -21,34 +21,30 @@ export function BusinessKPICards({ data }: BusinessKPICardsProps) {
       value: `R$ ${data.roiEstimado.toLocaleString('pt-BR')}`,
       icon: TrendingUp,
       trend: data.roiTrend,
-      color: "from-emerald-500/20 to-emerald-600/20",
-      iconColor: "text-emerald-400",
-      borderColor: "border-emerald-500/30",
+      iconBg: "bg-emerald-500/10",
+      iconColor: "text-emerald-600",
     },
     {
       label: "Ferramentas Aprendidas",
       value: data.ferramentasAprendidas.toString(),
       icon: Wrench,
       trend: data.ferramentasTrend,
-      color: "from-aplicada-green-700/20 to-aplicada-green-800/20",
-      iconColor: "text-aplicada-green-600",
-      borderColor: "border-aplicada-green-700/30",
+      iconBg: "bg-aplicada-green-700/10",
+      iconColor: "text-aplicada-green-700",
     },
     {
       label: "Implementação",
       value: `${data.implementacao}%`,
       icon: Target,
-      color: "from-blue-500/20 to-blue-600/20",
-      iconColor: "text-blue-400",
-      borderColor: "border-blue-500/30",
+      iconBg: "bg-blue-500/10",
+      iconColor: "text-blue-600",
     },
     {
       label: "Proficiência Equipe",
       value: `${data.proficiencia}%`,
       icon: Users,
-      color: "from-amber-500/20 to-amber-600/20",
-      iconColor: "text-amber-400",
-      borderColor: "border-amber-500/30",
+      iconBg: "bg-amber-500/10",
+      iconColor: "text-amber-600",
     },
   ];
 
@@ -57,15 +53,15 @@ export function BusinessKPICards({ data }: BusinessKPICardsProps) {
       {kpis.map((kpi) => (
         <Card 
           key={kpi.label}
-          className={`bg-white/5 backdrop-blur-md border ${kpi.borderColor} hover:bg-white/8 transition-all duration-300 hover:translate-y-[-2px]`}
+          className="border-border hover:shadow-md transition-all duration-300"
         >
           <CardContent className="p-5">
             <div className="flex items-start justify-between mb-3">
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${kpi.color} flex items-center justify-center`}>
+              <div className={`w-10 h-10 rounded-xl ${kpi.iconBg} flex items-center justify-center`}>
                 <kpi.icon className={`h-5 w-5 ${kpi.iconColor}`} />
               </div>
               {kpi.trend !== undefined && (
-                <div className={`flex items-center gap-0.5 text-xs font-medium ${kpi.trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                <div className={`flex items-center gap-0.5 text-xs font-medium ${kpi.trend >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                   {kpi.trend >= 0 ? (
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   ) : (
@@ -76,10 +72,10 @@ export function BusinessKPICards({ data }: BusinessKPICardsProps) {
               )}
             </div>
             
-            <p className="text-2xl lg:text-3xl font-bold text-slate-100 mb-1">
+            <p className="text-2xl lg:text-3xl font-bold text-foreground mb-1">
               {kpi.value}
             </p>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted-foreground">
               {kpi.label}
             </p>
           </CardContent>

@@ -74,20 +74,20 @@ export function BusinessProjetosSection({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'concluida':
-        return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
+        return <CheckCircle2 className="h-4 w-4 text-emerald-600" />;
       case 'em_andamento':
-        return <Clock className="h-4 w-4 text-amber-400" />;
+        return <Clock className="h-4 w-4 text-amber-600" />;
       default:
-        return <Circle className="h-4 w-4 text-slate-500" />;
+        return <Circle className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; className: string }> = {
-      'em_andamento': { label: 'Em andamento', className: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
-      'concluido': { label: 'Concluído', className: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
-      'pendente': { label: 'Pendente', className: 'bg-slate-500/20 text-slate-300 border-slate-500/30' },
-      'pausado': { label: 'Pausado', className: 'bg-red-500/20 text-red-300 border-red-500/30' },
+      'em_andamento': { label: 'Em andamento', className: 'bg-amber-500/10 text-amber-700 border-amber-500/30' },
+      'concluido': { label: 'Concluído', className: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30' },
+      'pendente': { label: 'Pendente', className: 'bg-muted text-muted-foreground border-border' },
+      'pausado': { label: 'Pausado', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
     };
     const config = statusMap[status] || statusMap['pendente'];
     return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
@@ -112,18 +112,18 @@ export function BusinessProjetosSection({
 
   return (
     <>
-      <Card className="bg-white/5 backdrop-blur-md border-white/10">
+      <Card className="border-border">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-slate-100 flex items-center gap-2 text-lg font-semibold">
-              <FolderKanban className="h-5 w-5 text-aplicada-green-600" />
+            <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
+              <FolderKanban className="h-5 w-5 text-aplicada-green-700" />
               Projetos em Andamento
             </CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {projetos.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="text-center py-8 text-muted-foreground">
               <FolderKanban className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p>Nenhum projeto cadastrado ainda.</p>
               <p className="text-sm mt-1">Os projetos serão criados durante as sessões de mentoria.</p>
@@ -139,19 +139,19 @@ export function BusinessProjetosSection({
                   open={isOpen}
                   onOpenChange={() => toggleProjeto(projeto.id)}
                 >
-                  <div className="rounded-xl border border-white/10 bg-white/3 overflow-hidden">
+                  <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
                     <CollapsibleTrigger className="w-full">
-                      <div className="flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
+                      <div className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3">
                           {isOpen ? (
-                            <ChevronDown className="h-4 w-4 text-slate-400" />
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
                           ) : (
-                            <ChevronRight className="h-4 w-4 text-slate-400" />
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
                           )}
                           <div className="text-left">
-                            <h4 className="font-medium text-slate-100">{projeto.titulo}</h4>
+                            <h4 className="font-medium text-foreground">{projeto.titulo}</h4>
                             {projeto.prazo_final && (
-                              <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                                 <Calendar className="h-3 w-3" />
                                 Prazo: {format(new Date(projeto.prazo_final), "dd/MM/yyyy", { locale: ptBR })}
                               </p>
@@ -163,18 +163,18 @@ export function BusinessProjetosSection({
                     </CollapsibleTrigger>
                     
                     <CollapsibleContent>
-                      <div className="border-t border-white/5 p-4 space-y-3">
+                      <div className="border-t border-border p-4 space-y-3">
                         {projeto.descricao && (
-                          <p className="text-sm text-slate-400 mb-4">{projeto.descricao}</p>
+                          <p className="text-sm text-muted-foreground mb-4">{projeto.descricao}</p>
                         )}
                         
                         <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-medium text-slate-300">Atividades</span>
+                          <span className="text-sm font-medium text-foreground">Atividades</span>
                           <Button 
                             size="sm" 
                             variant="ghost"
                             onClick={() => handleAddAtividade(projeto.id)}
-                            className="h-7 text-xs text-aplicada-green-600 hover:text-aplicada-green-500 hover:bg-aplicada-green-700/10"
+                            className="h-7 text-xs text-aplicada-green-700 hover:text-aplicada-green-800 hover:bg-aplicada-green-700/10"
                           >
                             <Plus className="h-3.5 w-3.5 mr-1" />
                             Nova Atividade
@@ -182,7 +182,7 @@ export function BusinessProjetosSection({
                         </div>
                         
                         {projetoTarefas.length === 0 ? (
-                          <p className="text-sm text-slate-500 text-center py-4">
+                          <p className="text-sm text-muted-foreground text-center py-4">
                             Nenhuma atividade cadastrada
                           </p>
                         ) : (
@@ -190,7 +190,7 @@ export function BusinessProjetosSection({
                             {projetoTarefas.slice(0, 5).map((tarefa) => (
                               <div 
                                 key={tarefa.id}
-                                className="flex items-center justify-between p-3 rounded-lg bg-white/3 hover:bg-white/5 transition-colors group"
+                                className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group"
                               >
                                 <div className="flex items-center gap-3">
                                   <button 
@@ -203,11 +203,11 @@ export function BusinessProjetosSection({
                                     {getStatusIcon(tarefa.status)}
                                   </button>
                                   <div>
-                                    <span className={`text-sm ${tarefa.status === 'concluida' ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
+                                    <span className={`text-sm ${tarefa.status === 'concluida' ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                                       {tarefa.titulo}
                                     </span>
                                     {tarefa.prazo_entrega && (
-                                      <p className="text-xs text-slate-500">
+                                      <p className="text-xs text-muted-foreground">
                                         Prazo: {format(new Date(tarefa.prazo_entrega), "dd/MM", { locale: ptBR })}
                                       </p>
                                     )}
@@ -215,7 +215,7 @@ export function BusinessProjetosSection({
                                 </div>
                                 
                                 {tarefa.arquivo_entrega_url ? (
-                                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs">
+                                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-700 border-emerald-500/30 text-xs">
                                     Entregue
                                   </Badge>
                                 ) : (
@@ -228,7 +228,7 @@ export function BusinessProjetosSection({
                                         if (file) onUploadEntrega(tarefa.id, file);
                                       }}
                                     />
-                                    <Upload className="h-4 w-4 text-slate-400 hover:text-aplicada-green-600" />
+                                    <Upload className="h-4 w-4 text-muted-foreground hover:text-aplicada-green-700" />
                                   </label>
                                 )}
                               </div>
