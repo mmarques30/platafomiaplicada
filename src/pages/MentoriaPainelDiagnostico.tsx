@@ -34,16 +34,6 @@ export default function MentoriaPainelDiagnostico() {
   const isBusiness = isAdmin || painelPlano === "business";
   const theme = getPainelTheme(isBusiness);
   
-  // Debug temporário - remover após validação
-  console.log("🔍 Debug isBusiness:", {
-    isAdmin,
-    userId,
-    profileLoaded: !!profile,
-    profilePlanoMentoria: profile?.plano_mentoria,
-    planFromHook: plan,
-    painelPlano,
-    isBusiness
-  });
   
   // Redirecionar visitantes
   useEffect(() => {
@@ -79,21 +69,44 @@ export default function MentoriaPainelDiagnostico() {
     );
   }
 
+  // Estado vazio: mostrar shell com conteúdo simplificado
   if (!diagnostico) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-aplicada-dark mb-4">
-            Diagnóstico não encontrado
-          </h1>
-          <p className="text-muted-foreground mb-6">
-            Complete o formulário de diagnóstico para visualizar seu painel personalizado.
-          </p>
-          <Button onClick={() => navigate("/mentoria/diagnostico")}>
-            Preencher Diagnóstico
-          </Button>
+      <PainelDiagnosticoShell
+        isBusiness={isBusiness}
+        diagnostico={null}
+        profile={profile}
+        voltarUrl={voltarUrl}
+        voltarLabel={voltarLabel}
+        isAcademyRoute={isAcademyRoute}
+      >
+        <div className="flex items-center justify-center min-h-[40vh]">
+          <div className={cn(
+            "text-center p-8 rounded-xl border max-w-md",
+            theme.cardBg,
+            theme.cardBorder
+          )}>
+            <div className={cn(
+              "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4",
+              theme.accentBg
+            )}>
+              <Loader2 className={cn("w-8 h-8", theme.accentColor)} />
+            </div>
+            <h2 className={cn("text-xl font-semibold mb-2", theme.textPrimary)}>
+              Diagnóstico não preenchido
+            </h2>
+            <p className={cn("mb-6", theme.textMuted)}>
+              Complete o formulário de diagnóstico para visualizar seu painel personalizado com projetos, sessões e roadmap.
+            </p>
+            <Button 
+              onClick={() => navigate("/mentoria/diagnostico")}
+              className={isBusiness ? "bg-aplicada-green-700 hover:bg-aplicada-green-800" : ""}
+            >
+              Preencher Diagnóstico
+            </Button>
+          </div>
         </div>
-      </div>
+      </PainelDiagnosticoShell>
     );
   }
 

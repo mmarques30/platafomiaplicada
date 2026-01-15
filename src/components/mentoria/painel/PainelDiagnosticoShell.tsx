@@ -58,7 +58,7 @@ export const PainelDiagnosticoShell = ({
                   </Badge>
                 </div>
                 <p className="text-muted-foreground mt-1">
-                  {diagnostico.nome_completo || profile?.nome_completo}
+                  {diagnostico?.nome_completo || profile?.nome_completo || "Mentorado"}
                 </p>
               </div>
             </div>
@@ -118,7 +118,7 @@ export const PainelDiagnosticoShell = ({
             Painel de Diagnóstico
           </h1>
           <p className="text-lg text-muted-foreground">
-            {diagnostico.nome_completo || profile?.nome_completo}
+            {diagnostico?.nome_completo || profile?.nome_completo || "Mentorado"}
           </p>
         </div>
       </div>
