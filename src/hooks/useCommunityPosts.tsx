@@ -31,45 +31,59 @@ export function useCommunityPosts(categoryId?: string) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: posts, isLoading } = useQuery({
+  const { data: posts, isLoading, error } = useQuery({
     queryKey: ["community-posts", categoryId],
     queryFn: async () => {
-      let query = supabase
-        .from("community_posts")
-        .select(`
-          *,
-          profiles!community_posts_user_id_fkey(nome_completo, avatar_url, nivel_comunidade),
-          community_categories(name, emoji)
-        `)
-        .order("pinned", { ascending: false })
-        .order("created_at", { ascending: false });
+      try {
+        let query = supabase
+          .from("community_posts")
+          .select(`
+            *,
+            profiles!community_posts_user_id_fkey(nome_completo, avatar_url, nivel_comunidade),
+            community_categories(name, emoji)
+          `)
+          .order("pinned", { ascending: false })
+          .order("created_at", { ascending: false });
 
-      if (categoryId) {
-        query = query.eq("category_id", categoryId);
+        if (categoryId) {
+          query = query.eq("category_id", categoryId);
+        }
+
+        const { data, error } = await query;
+        if (error) {
+          console.warn("Erro ao buscar posts:", error);
+          return [];
+        }
+
+        // Check if user has liked each post
+        if (user && data && data.length > 0) {
+          const postIds = data.map((p: any) => p.id);
+          const { data: reactions, error: reactionsError } = await supabase
+            .from("community_reactions")
+            .select("post_id")
+            .eq("user_id", user.id)
+            .in("post_id", postIds);
+
+          if (reactionsError) {
+            console.warn("Erro ao buscar reações:", reactionsError);
+          }
+
+          const likedPostIds = new Set(reactions?.map((r) => r.post_id) || []);
+          return data.map((post: any) => ({
+            ...post,
+            user_has_liked: likedPostIds.has(post.id),
+          }));
+        }
+
+        return data || [];
+      } catch (error) {
+        console.warn("Erro inesperado ao buscar posts:", error);
+        return [];
       }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      // Check if user has liked each post
-      if (user) {
-        const postIds = data.map((p: any) => p.id);
-        const { data: reactions } = await supabase
-          .from("community_reactions")
-          .select("post_id")
-          .eq("user_id", user.id)
-          .in("post_id", postIds);
-
-        const likedPostIds = new Set(reactions?.map((r) => r.post_id) || []);
-        return data.map((post: any) => ({
-          ...post,
-          user_has_liked: likedPostIds.has(post.id),
-        }));
-      }
-
-      return data;
     },
     enabled: !!user,
+    retry: 1,
+    staleTime: 10000,
   });
 
   const createPost = useMutation({

@@ -18,15 +18,22 @@ export function useRankingEngajamento() {
   return useQuery({
     queryKey: ["ranking-engajamento"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_ranking_engajamento");
-      
-      if (error) {
-        console.error("Erro ao buscar ranking de engajamento:", error);
-        throw error;
+      try {
+        const { data, error } = await supabase.rpc("get_ranking_engajamento");
+        
+        if (error) {
+          console.warn("Erro ao buscar ranking de engajamento:", error);
+          return [];
+        }
+        
+        return (data as RankingEngajamentoItem[]) || [];
+      } catch (error) {
+        console.warn("Erro inesperado no ranking:", error);
+        return [];
       }
-      
-      return data as RankingEngajamentoItem[];
     },
-    refetchInterval: 60000, // Atualiza a cada 1 minuto
+    refetchInterval: 60000,
+    retry: 1,
+    staleTime: 30000,
   });
 }
