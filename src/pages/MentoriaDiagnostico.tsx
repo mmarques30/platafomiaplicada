@@ -32,10 +32,10 @@ export default function MentoriaDiagnostico() {
 
   // Redirecionar admin para o painel quando acessar via rota Academy
   useEffect(() => {
-    if (!roleLoading && isAdmin && isAcademyRoute && !formulario?.completado) {
+    if (!isLoading && !roleLoading && isAdmin && isAcademyRoute) {
       navigate("/diagnostico/painel", { replace: true });
     }
-  }, [isAdmin, roleLoading, isAcademyRoute, formulario, navigate]);
+  }, [isAdmin, isLoading, roleLoading, isAcademyRoute, navigate]);
 
   const naoPreencheu = !formulario?.completado;
   const preenchido = formulario?.completado;
