@@ -83,7 +83,7 @@ export default function MentoriaDiagnostico() {
 
       {/* Resumo + Insight - quando já preencheu */}
       {preenchido && (
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="w-full space-y-6">
           {formulario.preenchido_por === 'admin' && (
             <Alert>
               <Info className="h-4 w-4" />
