@@ -15,12 +15,14 @@ export const usePainelDiagnostico = (userId?: string) => {
         .from("formulario_diagnostico")
         .select("*")
         .eq("user_id", targetUserId)
-        .single();
+        .maybeSingle();
 
+      // maybeSingle retorna null se não houver registro, sem erro
       if (error) throw error;
       return data;
     },
     enabled: !!targetUserId,
+    retry: false, // Desabilitar retries para evitar flicker
   });
 
 
