@@ -25,9 +25,8 @@ interface NovoUsuarioModalProps {
 
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "lab", label: "Lab", description: "B2C Grupo - Mentoria em grupo" },
   { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
-  { value: "club", label: "Club", description: "B2C Premium - Mentoria 1:1" },
+  { value: "business", label: "Business", description: "B2C Premium - Mentoria 1:1 completa" },
 ];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {
