@@ -171,7 +171,7 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
   const problemaIcons = [Zap, Lightbulb, Target];
 
   return (
-    <div className="mt-6 bg-accent/30 rounded-2xl p-6 md:p-8 border border-border">
+    <div className="mt-6 bg-card rounded-2xl p-6 md:p-8 border border-border shadow-sm">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-4 border-b border-border">
         <div className="flex items-center gap-3">
@@ -259,7 +259,7 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
             <Rocket className="h-4 w-4" />
             Suas Oportunidades
           </h3>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             {oportunidades.slice(0, 4).map((op, i) => {
               const OpIcon = oportunidadeIcons[i % oportunidadeIcons.length];
               const gradients = [
