@@ -27,10 +27,11 @@ export default function MentoriaPainelDiagnostico() {
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
   
-  // Determinar se é Business view (considera admin visualizando mentorado business)
-  // Só calcula isBusiness quando o profile já estiver carregado (para evitar false negatives)
+  // Determinar se é Business view
+  // Admin sempre vê tema Business para preview premium
+  // Para mentorados, usa o plano real do usuário
   const painelPlano = (isAdmin && userId && profile) ? profile.plano_mentoria : plan;
-  const isBusiness = painelPlano === "business";
+  const isBusiness = isAdmin || painelPlano === "business";
   const theme = getPainelTheme(isBusiness);
   
   // Debug temporário - remover após validação
