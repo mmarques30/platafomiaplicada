@@ -5,12 +5,12 @@ import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
 import { InsightIA } from "@/components/mentoria/InsightIA";
+import { BusinessDashboard } from "@/components/mentoria/business/BusinessDashboard";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Loader2, Info, Download } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
 
 export default function MentoriaDiagnostico() {
   const navigate = useNavigate();
@@ -81,8 +81,13 @@ export default function MentoriaDiagnostico() {
         />
       )}
 
-      {/* Resumo + Insight - quando já preencheu */}
-      {preenchido && (
+      {/* Business Dashboard - quando já preencheu e é Business */}
+      {preenchido && plan === 'business' && (
+        <BusinessDashboard diagnostico={formulario} />
+      )}
+
+      {/* Resumo + Insight - quando já preencheu e é Academy */}
+      {preenchido && plan !== 'business' && (
         <div className="w-full space-y-6">
           {formulario.preenchido_por === 'admin' && (
             <Alert>
