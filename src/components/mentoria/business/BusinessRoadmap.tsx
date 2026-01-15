@@ -27,16 +27,6 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
     }
   };
 
-  const getNodeStyle = (status?: string, index?: number) => {
-    if (status === 'realizada') {
-      return 'bg-emerald-500 border-emerald-400';
-    }
-    if (status === 'agendada') {
-      return 'bg-amber-500 border-amber-400 animate-pulse';
-    }
-    return 'bg-slate-700 border-slate-600';
-  };
-
   // Gerar fases padrão se não houver sessões
   const defaultFases = [
     { id: '1', titulo: 'Diagnóstico', status: 'realizada', mes: 'Jan' },
@@ -60,14 +50,14 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
     <Card className="bg-white/5 backdrop-blur-md border-white/10">
       <CardHeader className="pb-2">
         <CardTitle className="text-slate-100 flex items-center gap-2 text-base font-semibold">
-          <MapPin className="h-5 w-5 text-violet-400" />
+          <MapPin className="h-5 w-5 text-aplicada-green-600" />
           Roadmap da Mentoria
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute top-6 left-0 right-0 h-1 bg-gradient-to-r from-violet-500/50 via-violet-500/30 to-slate-700/50 rounded-full" />
+          <div className="absolute top-6 left-0 right-0 h-1 bg-gradient-to-r from-aplicada-green-700/50 via-aplicada-green-600/30 to-slate-700/50 rounded-full" />
           
           {/* Timeline nodes */}
           <div className="relative flex justify-between">
@@ -123,13 +113,13 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
           <span className="text-slate-400">
             Progresso geral
           </span>
-          <span className="text-violet-400 font-medium">
+          <span className="text-aplicada-green-600 font-medium">
             {fases.filter(f => f.status === 'realizada').length} de {fases.length} etapas
           </span>
         </div>
         <div className="mt-2 h-2 bg-slate-800 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-gradient-to-r from-violet-600 to-purple-500 rounded-full transition-all duration-500"
+            className="h-full bg-gradient-to-r from-aplicada-green-700 to-aplicada-green-600 rounded-full transition-all duration-500"
             style={{ 
               width: `${(fases.filter(f => f.status === 'realizada').length / fases.length) * 100}%` 
             }}

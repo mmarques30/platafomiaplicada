@@ -5,14 +5,14 @@ export const getPainelTheme = (isBusiness: boolean) => {
   if (isBusiness) {
     return {
       // Backgrounds
-      pageBg: "bg-gradient-to-br from-slate-950 via-purple-950/30 to-slate-950",
+      pageBg: "bg-gradient-to-br from-aplicada-dark via-slate-900 to-aplicada-dark",
       cardBg: "bg-white/5 backdrop-blur-md",
       cardHoverBg: "hover:bg-white/8",
       mutedBg: "bg-white/3",
       
       // Borders
       cardBorder: "border-white/10",
-      accentBorder: "border-violet-500/50",
+      accentBorder: "border-aplicada-green-600/50",
       subtleBorder: "border-white/5",
       
       // Text
@@ -21,13 +21,13 @@ export const getPainelTheme = (isBusiness: boolean) => {
       textMuted: "text-slate-400",
       
       // Accents
-      accentColor: "text-violet-400",
-      accentBg: "bg-violet-500/20",
-      accentBorderColor: "border-l-violet-500/70",
+      accentColor: "text-aplicada-green-600",
+      accentBg: "bg-aplicada-green-700/20",
+      accentBorderColor: "border-l-aplicada-green-600/70",
       
       // Icons
-      iconBg: "bg-violet-500/20",
-      iconColor: "text-violet-400",
+      iconBg: "bg-aplicada-green-700/20",
+      iconColor: "text-aplicada-green-600",
       
       // Separators
       separator: "h-px bg-gradient-to-r from-transparent via-white/12 to-transparent",
@@ -39,7 +39,7 @@ export const getPainelTheme = (isBusiness: boolean) => {
       hoverState: "transition-all duration-300 hover:translate-y-[-1px]",
       
       // Badge
-      badgeBg: "bg-gradient-to-r from-violet-600 to-purple-600",
+      badgeBg: "bg-gradient-to-r from-aplicada-green-800 to-aplicada-green-700",
       badgeText: "text-white",
       
       // Table

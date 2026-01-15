@@ -120,18 +120,18 @@ export function BusinessDashboard({ diagnostico, userId }: BusinessDashboardProp
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/30 to-slate-950">
-        <Loader2 className="h-12 w-12 animate-spin text-violet-400" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-aplicada-dark via-slate-900 to-aplicada-dark">
+        <Loader2 className="h-12 w-12 animate-spin text-aplicada-green-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/30 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-aplicada-dark via-slate-900 to-aplicada-dark">
       {/* Background decorations */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-aplicada-green-700/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-aplicada-green-800/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 container mx-auto py-6 px-4 space-y-6">

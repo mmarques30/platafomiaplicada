@@ -19,13 +19,13 @@ export function BusinessAprendizadoSection({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Card - Quer Aprender? */}
-      <Card className="bg-gradient-to-br from-violet-950/50 to-purple-950/30 border-violet-500/20 overflow-hidden relative group hover:border-violet-500/40 transition-colors">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+      <Card className="bg-gradient-to-br from-aplicada-dark/80 to-slate-900 border-aplicada-green-700/20 overflow-hidden relative group hover:border-aplicada-green-700/40 transition-colors">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-aplicada-green-700/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
         
         <CardContent className="p-6 relative z-10">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0">
-              <GraduationCap className="h-6 w-6 text-violet-400" />
+            <div className="w-12 h-12 rounded-xl bg-aplicada-green-700/20 flex items-center justify-center shrink-0">
+              <GraduationCap className="h-6 w-6 text-aplicada-green-600" />
             </div>
             
             <div className="flex-1">
@@ -39,7 +39,7 @@ export function BusinessAprendizadoSection({
               
               <Button 
                 onClick={() => navigate('/trilhas')}
-                className="bg-violet-600 hover:bg-violet-700 text-white group"
+                className="bg-aplicada-green-700 hover:bg-aplicada-green-800 text-white group"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
                 Acessar Trilha Academy

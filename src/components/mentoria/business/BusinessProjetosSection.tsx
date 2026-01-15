@@ -116,7 +116,7 @@ export function BusinessProjetosSection({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-slate-100 flex items-center gap-2 text-lg font-semibold">
-              <FolderKanban className="h-5 w-5 text-violet-400" />
+              <FolderKanban className="h-5 w-5 text-aplicada-green-600" />
               Projetos em Andamento
             </CardTitle>
           </div>
@@ -174,7 +174,7 @@ export function BusinessProjetosSection({
                             size="sm" 
                             variant="ghost"
                             onClick={() => handleAddAtividade(projeto.id)}
-                            className="h-7 text-xs text-violet-400 hover:text-violet-300 hover:bg-violet-500/10"
+                            className="h-7 text-xs text-aplicada-green-600 hover:text-aplicada-green-500 hover:bg-aplicada-green-700/10"
                           >
                             <Plus className="h-3.5 w-3.5 mr-1" />
                             Nova Atividade
@@ -228,7 +228,7 @@ export function BusinessProjetosSection({
                                         if (file) onUploadEntrega(tarefa.id, file);
                                       }}
                                     />
-                                    <Upload className="h-4 w-4 text-slate-400 hover:text-violet-400" />
+                                    <Upload className="h-4 w-4 text-slate-400 hover:text-aplicada-green-600" />
                                   </label>
                                 )}
                               </div>

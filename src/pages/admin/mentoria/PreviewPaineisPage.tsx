@@ -11,10 +11,12 @@ import { ArrowLeft, Eye, GraduationCap, Briefcase, AlertCircle } from "lucide-re
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DiagnosticoAcademyPanel } from "@/components/mentoria/DiagnosticoAcademyPanel";
+import { BusinessDashboard } from "@/components/mentoria/business/BusinessDashboard";
 
 // Mock data para demonstração Academy
 const mockDiagnosticoAcademy = {
   id: "preview-academy-demo",
+  user_id: "preview-user-academy",
   nome_completo: "Maria Silva (Demonstração)",
   completado: true,
   insight_ia: {
@@ -55,30 +57,41 @@ const mockDiagnosticoAcademy = {
 // Mock data para demonstração Business
 const mockDiagnosticoBusiness = {
   id: "preview-business-demo",
+  user_id: "preview-user-business",
   nome_completo: "João Empresário (Demonstração)",
   completado: true,
   plano_mentoria: "business",
   area_atuacao: "Tecnologia",
   profissao: "Diretor de Operações",
+  tamanho_empresa: "50-100 funcionários",
+  tamanho_equipe: 15,
+  ferramentas_ia: ["ChatGPT", "Zapier", "Make"],
   objetivo_principal: "Implementar IA em toda a empresa para aumentar produtividade",
   meta_3_meses: "Ter 3 processos automatizados com IA",
   meta_12_meses: "Equipe 100% treinada em ferramentas de IA",
   desafio_1: "Resistência da equipe a mudanças",
   desafio_2: "Falta de tempo para aprender novas ferramentas",
   desafio_3: "Escolher as ferramentas certas para cada processo",
-  projetos: [
-    { id: "1", nome: "Automação de Atendimento", status: "em_andamento", prioridade: 1 },
-    { id: "2", nome: "IA para Análise de Vendas", status: "pendente", prioridade: 2 },
-    { id: "3", nome: "Chatbot Interno", status: "pendente", prioridade: 3 },
-  ],
-  sessoes: [
-    { id: "1", data: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), tipo: "Sessão de Projeto" },
-  ],
+  created_at: new Date().toISOString(),
+  insight_ia: {
+    ferramentas_prioritarias: [
+      { nome: "ChatGPT Enterprise", categoria: "Base de IA", prioridade: 1 },
+      { nome: "Zapier", categoria: "Automação", prioridade: 2 },
+      { nome: "Make", categoria: "Integração", prioridade: 3 },
+    ],
+    roadmap: [
+      { etapa: "Mês 1", titulo: "Diagnóstico e Setup", descricao: "Mapeamento de processos e configuração inicial" },
+      { etapa: "Mês 2-3", titulo: "Automações Prioritárias", descricao: "Implementar 3 automações de alto impacto" },
+      { etapa: "Mês 4-6", titulo: "Treinamento da Equipe", descricao: "Capacitação gradual do time" },
+    ],
+    analise_perfil: "Líder com visão estratégica, busca resultados mensuráveis. Foco em ROI e escalabilidade."
+  },
 };
 
 // Mock vazio para demonstrar estado sem dados
 const mockEmpty = {
   id: "preview-empty",
+  user_id: "preview-user-empty",
   nome_completo: "Usuário Novo (Sem Diagnóstico)",
   completado: false,
   insight_ia: null,
@@ -124,13 +137,11 @@ export default function PreviewPaineisPage() {
     enabled: !!selectedUserId && viewMode === "user",
   });
 
-  const getDiagnosticoData = () => {
+  const getDiagnosticoData = (type: "academy" | "business") => {
     if (showEmptyState) return mockEmpty;
     if (viewMode === "user" && diagnosticoUsuario) return diagnosticoUsuario;
-    return mockDiagnosticoAcademy;
+    return type === "academy" ? mockDiagnosticoAcademy : mockDiagnosticoBusiness;
   };
-
-  const diagnosticoData = getDiagnosticoData();
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
@@ -250,7 +261,7 @@ export default function PreviewPaineisPage() {
             {/* Container com borda de preview */}
             <div className="border-2 border-dashed border-amber-500/30 rounded-xl p-4 pt-6 bg-card/50">
               <DiagnosticoAcademyPanel 
-                diagnostico={diagnosticoData}
+                diagnostico={getDiagnosticoData("academy")}
               />
             </div>
 
@@ -269,101 +280,26 @@ export default function PreviewPaineisPage() {
         <TabsContent value="business">
           <div className="relative">
             {/* Indicador de Preview */}
-            <div className="absolute -top-3 left-4 z-10">
+            <div className="absolute -top-3 left-4 z-20">
               <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
                 <Eye className="h-3 w-3 mr-1" />
                 MODO PREVIEW
               </Badge>
             </div>
 
-            {/* Container com borda de preview */}
-            <div className="border-2 border-dashed border-amber-500/30 rounded-xl p-4 pt-6 bg-card/50">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5 text-aplicada-green-700" />
-                    Painel Business - {mockDiagnosticoBusiness.nome_completo}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Info do mentorado */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-lg bg-muted/50">
-                      <p className="text-sm text-muted-foreground">Área de Atuação</p>
-                      <p className="font-medium">{mockDiagnosticoBusiness.area_atuacao}</p>
-                    </div>
-                    <div className="p-4 rounded-lg bg-muted/50">
-                      <p className="text-sm text-muted-foreground">Profissão</p>
-                      <p className="font-medium">{mockDiagnosticoBusiness.profissao}</p>
-                    </div>
-                    <div className="p-4 rounded-lg bg-muted/50">
-                      <p className="text-sm text-muted-foreground">Meta 3 meses</p>
-                      <p className="font-medium">{mockDiagnosticoBusiness.meta_3_meses}</p>
-                    </div>
-                  </div>
-
-                  {/* Projetos */}
-                  <div>
-                    <h3 className="font-semibold mb-3">Projetos Priorizados</h3>
-                    <div className="space-y-2">
-                      {mockDiagnosticoBusiness.projetos.map((projeto, idx) => (
-                        <div key={projeto.id} className="flex items-center gap-3 p-3 rounded-lg border">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-aplicada-green-700/10 text-aplicada-green-700 font-bold text-sm">
-                            {idx + 1}
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-medium">{projeto.nome}</p>
-                            <p className="text-sm text-muted-foreground capitalize">
-                              Status: {projeto.status.replace("_", " ")}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Desafios */}
-                  <div>
-                    <h3 className="font-semibold mb-3">Principais Desafios</h3>
-                    <div className="space-y-2">
-                      <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20">
-                        <p className="text-sm">{mockDiagnosticoBusiness.desafio_1}</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/20">
-                        <p className="text-sm">{mockDiagnosticoBusiness.desafio_2}</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
-                        <p className="text-sm">{mockDiagnosticoBusiness.desafio_3}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Próxima sessão */}
-                  {mockDiagnosticoBusiness.sessoes.length > 0 && (
-                    <div className="p-4 rounded-lg bg-aplicada-green-700/5 border border-aplicada-green-700/20">
-                      <h3 className="font-semibold mb-2">Próxima Sessão</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(mockDiagnosticoBusiness.sessoes[0].data).toLocaleDateString('pt-BR', {
-                          weekday: 'long',
-                          day: 'numeric',
-                          month: 'long',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                      <p className="text-sm font-medium mt-1">{mockDiagnosticoBusiness.sessoes[0].tipo}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+            {/* Container com borda de preview - usa o BusinessDashboard real */}
+            <div className="border-2 border-dashed border-amber-500/30 rounded-xl overflow-hidden">
+              <BusinessDashboard 
+                diagnostico={getDiagnosticoData("business")}
+              />
             </div>
 
             {/* Aviso */}
             <div className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
               <span>
-                Você está visualizando o painel como um usuário Business veria. 
-                Os dados mostrados são de demonstração.
+                Você está visualizando o painel Business real, com cores da marca IAplicada. 
+                {viewMode === "demo" ? " Os dados mostrados são de demonstração." : " Os dados são reais do usuário selecionado."}
               </span>
             </div>
           </div>
