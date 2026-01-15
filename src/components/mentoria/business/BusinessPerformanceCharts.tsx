@@ -38,7 +38,8 @@ interface BusinessPerformanceChartsProps {
   entregasHistorico: EntregaHistorico[];
 }
 
-const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe'];
+// Using brand colors - aplicada-green variants
+const COLORS = ['#9EB038', '#7A8C2A', '#5C6A20', '#4A5519', '#3D4615'];
 
 export function BusinessPerformanceCharts({ 
   projetosProgresso, 
@@ -67,7 +68,7 @@ export function BusinessPerformanceCharts({
       <Card className="bg-white/5 backdrop-blur-md border-white/10 lg:col-span-2">
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-100 flex items-center gap-2 text-base font-semibold">
-            <BarChart3 className="h-5 w-5 text-violet-400" />
+            <BarChart3 className="h-5 w-5 text-aplicada-green-600" />
             Progresso por Projeto
           </CardTitle>
         </CardHeader>
@@ -92,7 +93,7 @@ export function BusinessPerformanceCharts({
                 <Bar 
                   dataKey="progresso" 
                   name="Progresso"
-                  fill="#8b5cf6" 
+                  fill="#9EB038" 
                   radius={[0, 4, 4, 0]}
                   background={{ fill: 'rgba(255,255,255,0.05)' }}
                 />
@@ -106,7 +107,7 @@ export function BusinessPerformanceCharts({
       <Card className="bg-white/5 backdrop-blur-md border-white/10">
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-100 flex items-center gap-2 text-base font-semibold">
-            <PieChartIcon className="h-5 w-5 text-violet-400" />
+            <PieChartIcon className="h-5 w-5 text-aplicada-green-600" />
             Ferramentas por Categoria
           </CardTitle>
         </CardHeader>
@@ -144,7 +145,7 @@ export function BusinessPerformanceCharts({
       <Card className="bg-white/5 backdrop-blur-md border-white/10 lg:col-span-3">
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-100 flex items-center gap-2 text-base font-semibold">
-            <TrendingUp className="h-5 w-5 text-violet-400" />
+            <TrendingUp className="h-5 w-5 text-aplicada-green-600" />
             Histórico de Entregas vs Meta
           </CardTitle>
         </CardHeader>
@@ -168,10 +169,10 @@ export function BusinessPerformanceCharts({
                   type="monotone" 
                   dataKey="entregas" 
                   name="Entregas"
-                  stroke="#8b5cf6" 
+                  stroke="#9EB038" 
                   strokeWidth={2}
-                  dot={{ fill: '#8b5cf6', strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: '#a78bfa' }}
+                  dot={{ fill: '#9EB038', strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: '#B5C940' }}
                 />
                 <Line 
                   type="monotone" 

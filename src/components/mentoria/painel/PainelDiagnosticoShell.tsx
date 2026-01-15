@@ -33,8 +33,8 @@ export const PainelDiagnosticoShell = ({
       <div className={cn("min-h-screen relative", theme.pageBg)}>
         {/* Decorative blobs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-aplicada-green-700/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-aplicada-green-800/10 rounded-full blur-3xl" />
         </div>
 
         {/* Header Premium */}
