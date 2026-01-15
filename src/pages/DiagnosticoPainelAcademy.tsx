@@ -22,12 +22,9 @@ export default function DiagnosticoPainelAcademy() {
     }
   }, [isVisitante, roleLoading, navigate]);
 
-  // Redirecionar se não preencheu o formulário (admin pode ver sem preencher)
-  useEffect(() => {
-    if (!isLoading && !roleLoading && !isAdmin && !formulario?.completado) {
-      navigate("/diagnostico/formulario", { replace: true });
-    }
-  }, [formulario, isLoading, roleLoading, isAdmin, navigate]);
+  // Não redirecionar automaticamente daqui (evita loop de replaceState).
+  // Se o diagnóstico não estiver preenchido, mostramos um estado vazio com CTA abaixo.
+
 
   if (isLoading || roleLoading || isVisitante) {
     return (
@@ -38,7 +35,36 @@ export default function DiagnosticoPainelAcademy() {
   }
 
   if (!formulario && !isAdmin) {
-    return null;
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-5xl">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/trilhas")}
+          className="mb-6 text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar para Trilhas
+        </Button>
+
+        <header className="flex items-center gap-4 mb-8">
+          <div className="p-4 rounded-2xl bg-aplicada-green-700/10 border border-aplicada-green-700/20">
+            <Sparkles className="h-8 w-8 text-aplicada-green-700" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Meu Diagnóstico</h1>
+            <p className="text-muted-foreground">Complete o formulário para gerar seu painel</p>
+          </div>
+        </header>
+
+        <div className="border border-border rounded-xl bg-card p-8 text-center">
+          <p className="text-muted-foreground mb-6">
+            Você ainda não preencheu o diagnóstico. Preencha agora para ver seu painel e o feedback.
+          </p>
+          <Button onClick={() => navigate("/diagnostico/formulario")}>Preencher diagnóstico</Button>
+        </div>
+      </div>
+    );
   }
 
   const nomeCompleto = formulario?.nome_completo || "Admin";
