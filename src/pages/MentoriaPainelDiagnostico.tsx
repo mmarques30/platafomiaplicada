@@ -28,9 +28,21 @@ export default function MentoriaPainelDiagnostico() {
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
   
   // Determinar se é Business view (considera admin visualizando mentorado business)
-  const painelPlano = (isAdmin && userId) ? profile?.plano_mentoria : plan;
+  // Só calcula isBusiness quando o profile já estiver carregado (para evitar false negatives)
+  const painelPlano = (isAdmin && userId && profile) ? profile.plano_mentoria : plan;
   const isBusiness = painelPlano === "business";
   const theme = getPainelTheme(isBusiness);
+  
+  // Debug temporário - remover após validação
+  console.log("🔍 Debug isBusiness:", {
+    isAdmin,
+    userId,
+    profileLoaded: !!profile,
+    profilePlanoMentoria: profile?.plano_mentoria,
+    planFromHook: plan,
+    painelPlano,
+    isBusiness
+  });
   
   // Redirecionar visitantes
   useEffect(() => {
