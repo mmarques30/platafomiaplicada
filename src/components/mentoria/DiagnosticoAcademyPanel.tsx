@@ -31,27 +31,6 @@ interface DiagnosticoAcademyPanelProps {
   };
 }
 
-// Map de ícones para categorias de ferramentas
-const ferramentaIcons: Record<string, string> = {
-  "ChatGPT": "💬",
-  "Claude": "🧠",
-  "Gemini": "✨",
-  "Perplexity": "🔍",
-  "Notion AI": "📝",
-  "Gamma": "🎨",
-  "Canva": "🖼️",
-  "Midjourney": "🎭",
-  "ElevenLabs": "🎙️",
-  "Otter.ai": "📋",
-  "Fireflies": "🔥",
-  "Make": "⚡",
-  "Zapier": "🔗",
-  "N8n": "🔄",
-  "GitHub Copilot": "👨‍💻",
-  "Cursor": "💻",
-  "v0": "🚀",
-  "Lovable": "💜",
-};
 
 export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanelProps) {
   const navigate = useNavigate();
@@ -171,8 +150,8 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
                 className="bg-card border border-aplicada-green-800/20 hover:border-aplicada-green-700/40 transition-colors"
               >
                 <CardContent className="p-4 text-center">
-                  <div className="w-12 h-12 mx-auto rounded-xl bg-aplicada-green-700/10 flex items-center justify-center mb-3 text-2xl">
-                    {ferramentaIcons[ferramenta.nome] || "🤖"}
+                  <div className="w-12 h-12 mx-auto rounded-xl bg-aplicada-green-700/10 flex items-center justify-center mb-3">
+                    <Bot className="h-6 w-6 text-aplicada-green-700" />
                   </div>
                   <p className="font-semibold text-foreground text-sm">{ferramenta.nome}</p>
                   {ferramenta.categoria && (
