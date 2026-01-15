@@ -12,7 +12,7 @@ import { FeedbackMentora } from "@/components/mentoria/FeedbackMentora";
 export default function DiagnosticoPainelAcademy() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
-  const { isVisitante, isLoading: roleLoading } = useUserRole();
+  const { isVisitante, isAdmin, isLoading: roleLoading } = useUserRole();
 
   // Redirecionar visitantes
   useEffect(() => {
@@ -22,12 +22,12 @@ export default function DiagnosticoPainelAcademy() {
     }
   }, [isVisitante, roleLoading, navigate]);
 
-  // Redirecionar se não preencheu o formulário
+  // Redirecionar se não preencheu o formulário (admin pode ver sem preencher)
   useEffect(() => {
-    if (!isLoading && !formulario?.completado) {
+    if (!isLoading && !roleLoading && !isAdmin && !formulario?.completado) {
       navigate("/diagnostico/formulario", { replace: true });
     }
-  }, [formulario, isLoading, navigate]);
+  }, [formulario, isLoading, roleLoading, isAdmin, navigate]);
 
   if (isLoading || roleLoading || isVisitante) {
     return (
@@ -37,11 +37,11 @@ export default function DiagnosticoPainelAcademy() {
     );
   }
 
-  if (!formulario) {
+  if (!formulario && !isAdmin) {
     return null;
   }
 
-  const nomeCompleto = formulario.nome_completo || "Mentorado";
+  const nomeCompleto = formulario?.nome_completo || "Admin";
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
