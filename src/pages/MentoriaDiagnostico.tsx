@@ -19,6 +19,9 @@ export default function MentoriaDiagnostico() {
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
 
+  // Check if accessed via /diagnostico route (Academy-specific) - moved up
+  const isAcademyRoute = location.pathname.startsWith('/diagnostico');
+
   // Redirecionar visitantes - não devem acessar esta página
   useEffect(() => {
     if (!roleLoading && isVisitante) {
@@ -27,11 +30,15 @@ export default function MentoriaDiagnostico() {
     }
   }, [isVisitante, roleLoading, navigate]);
 
+  // Redirecionar admin para o painel quando acessar via rota Academy
+  useEffect(() => {
+    if (!roleLoading && isAdmin && isAcademyRoute && !formulario?.completado) {
+      navigate("/diagnostico/painel", { replace: true });
+    }
+  }, [isAdmin, roleLoading, isAcademyRoute, formulario, navigate]);
+
   const naoPreencheu = !formulario?.completado;
   const preenchido = formulario?.completado;
-  
-  // Check if accessed via /diagnostico route (Academy-specific)
-  const isAcademyRoute = location.pathname.startsWith('/diagnostico');
   
   const voltarUrl = isAdmin 
     ? '/mentoria' 
