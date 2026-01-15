@@ -19,10 +19,10 @@ export default function MeuDiagnostico() {
     }
   }, [isVisitante, roleLoading, navigate]);
 
-  // Redirect Business para /mentoria (eles têm diagnóstico integrado)
+  // Redirect Business para /mentoria/diagnostico (dashboard robusto)
   useEffect(() => {
     if (!planLoading && plan === 'business') {
-      navigate('/mentoria', { replace: true });
+      navigate('/mentoria/diagnostico', { replace: true });
     }
   }, [plan, planLoading, navigate]);
 
