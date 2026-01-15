@@ -63,7 +63,7 @@ export default function MentoriaDiagnostico() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="container mx-auto py-8 px-2">
       {/* Botão de voltar */}
       <Button
         variant="ghost"
