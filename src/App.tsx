@@ -26,6 +26,7 @@ import Ecossistema from "./pages/Ecossistema";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MeuDiagnostico from "./pages/MeuDiagnostico";
+import DiagnosticoPainelAcademy from "./pages/DiagnosticoPainelAcademy";
 import MinhasDuvidas from "./pages/MinhasDuvidas";
 
 import MentoriaSessoes from "./pages/MentoriaSessoes";
@@ -125,7 +126,7 @@ function AppContent() {
             <Route path="/meu-diagnostico" element={<MeuDiagnostico />} />
             <Route path="/minhas-duvidas" element={<MinhasDuvidas />} />
             <Route path="/diagnostico/formulario" element={<MentoriaDiagnostico />} />
-            <Route path="/diagnostico/painel" element={<MentoriaPainelDiagnostico />} />
+            <Route path="/diagnostico/painel" element={<DiagnosticoPainelAcademy />} />
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
