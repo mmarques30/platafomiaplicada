@@ -49,8 +49,8 @@ export function BusinessPerformanceCharts({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-slate-800 border border-white/10 rounded-lg p-3 shadow-xl">
-          <p className="text-slate-100 font-medium">{label}</p>
+        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+          <p className="text-foreground font-medium">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {entry.value}{entry.name === 'Progresso' || entry.name === 'Meta' ? '%' : ''}
@@ -65,10 +65,10 @@ export function BusinessPerformanceCharts({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* Progresso por Projeto - Bar Chart */}
-      <Card className="bg-white/5 backdrop-blur-md border-white/10 lg:col-span-2">
+      <Card className="border-border lg:col-span-2">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 flex items-center gap-2 text-base font-semibold">
-            <BarChart3 className="h-5 w-5 text-aplicada-green-600" />
+          <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
+            <BarChart3 className="h-5 w-5 text-aplicada-green-700" />
             Progresso por Projeto
           </CardTitle>
         </CardHeader>
@@ -76,17 +76,17 @@ export function BusinessPerformanceCharts({
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={projetosProgresso} layout="vertical" margin={{ left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis 
                   type="number" 
                   domain={[0, 100]} 
-                  tick={{ fill: '#94a3b8', fontSize: 12 }}
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                   tickFormatter={(value) => `${value}%`}
                 />
                 <YAxis 
                   type="category" 
                   dataKey="nome" 
-                  tick={{ fill: '#94a3b8', fontSize: 12 }}
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                   width={120}
                 />
                 <Tooltip content={<CustomTooltip />} />
@@ -95,7 +95,7 @@ export function BusinessPerformanceCharts({
                   name="Progresso"
                   fill="#9EB038" 
                   radius={[0, 4, 4, 0]}
-                  background={{ fill: 'rgba(255,255,255,0.05)' }}
+                  background={{ fill: 'hsl(var(--muted))' }}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -104,10 +104,10 @@ export function BusinessPerformanceCharts({
       </Card>
 
       {/* Distribuição de Ferramentas - Pie Chart */}
-      <Card className="bg-white/5 backdrop-blur-md border-white/10">
+      <Card className="border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 flex items-center gap-2 text-base font-semibold">
-            <PieChartIcon className="h-5 w-5 text-aplicada-green-600" />
+          <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
+            <PieChartIcon className="h-5 w-5 text-aplicada-green-700" />
             Ferramentas por Categoria
           </CardTitle>
         </CardHeader>
@@ -133,7 +133,7 @@ export function BusinessPerformanceCharts({
                 <Legend 
                   verticalAlign="bottom" 
                   height={36}
-                  formatter={(value) => <span className="text-slate-300 text-xs">{value}</span>}
+                  formatter={(value) => <span className="text-muted-foreground text-xs">{value}</span>}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -142,10 +142,10 @@ export function BusinessPerformanceCharts({
       </Card>
 
       {/* Histórico de Entregas - Line Chart */}
-      <Card className="bg-white/5 backdrop-blur-md border-white/10 lg:col-span-3">
+      <Card className="border-border lg:col-span-3">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 flex items-center gap-2 text-base font-semibold">
-            <TrendingUp className="h-5 w-5 text-aplicada-green-600" />
+          <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
+            <TrendingUp className="h-5 w-5 text-aplicada-green-700" />
             Histórico de Entregas vs Meta
           </CardTitle>
         </CardHeader>
@@ -153,17 +153,17 @@ export function BusinessPerformanceCharts({
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={entregasHistorico}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis 
                   dataKey="mes" 
-                  tick={{ fill: '#94a3b8', fontSize: 12 }}
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 />
                 <YAxis 
-                  tick={{ fill: '#94a3b8', fontSize: 12 }}
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend 
-                  formatter={(value) => <span className="text-slate-300 text-sm">{value}</span>}
+                  formatter={(value) => <span className="text-muted-foreground text-sm">{value}</span>}
                 />
                 <Line 
                   type="monotone" 
@@ -178,10 +178,10 @@ export function BusinessPerformanceCharts({
                   type="monotone" 
                   dataKey="meta" 
                   name="Meta"
-                  stroke="#64748b" 
+                  stroke="hsl(var(--muted-foreground))" 
                   strokeWidth={2}
                   strokeDasharray="5 5"
-                  dot={{ fill: '#64748b', strokeWidth: 2 }}
+                  dot={{ fill: 'hsl(var(--muted-foreground))', strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>

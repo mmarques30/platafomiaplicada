@@ -19,11 +19,11 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
   const getStatusIcon = (status?: string) => {
     switch (status) {
       case 'realizada':
-        return <CheckCircle2 className="h-5 w-5 text-emerald-400" />;
+        return <CheckCircle2 className="h-5 w-5 text-emerald-600" />;
       case 'agendada':
-        return <Clock className="h-5 w-5 text-amber-400" />;
+        return <Clock className="h-5 w-5 text-amber-600" />;
       default:
-        return <Circle className="h-5 w-5 text-slate-500" />;
+        return <Circle className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
@@ -47,17 +47,17 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
     : defaultFases;
 
   return (
-    <Card className="bg-white/5 backdrop-blur-md border-white/10">
+    <Card className="border-border">
       <CardHeader className="pb-2">
-        <CardTitle className="text-slate-100 flex items-center gap-2 text-base font-semibold">
-          <MapPin className="h-5 w-5 text-aplicada-green-600" />
+        <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
+          <MapPin className="h-5 w-5 text-aplicada-green-700" />
           Roadmap da Mentoria
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute top-6 left-0 right-0 h-1 bg-gradient-to-r from-aplicada-green-700/50 via-aplicada-green-600/30 to-slate-700/50 rounded-full" />
+          <div className="absolute top-6 left-0 right-0 h-1 bg-gradient-to-r from-aplicada-green-700/50 via-aplicada-green-700/30 to-muted rounded-full" />
           
           {/* Timeline nodes */}
           <div className="relative flex justify-between">
@@ -77,10 +77,10 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
                       w-12 h-12 rounded-full flex items-center justify-center
                       border-2 transition-all duration-300
                       ${isCompleted 
-                        ? 'bg-emerald-500/20 border-emerald-500 shadow-lg shadow-emerald-500/20' 
+                        ? 'bg-emerald-500/10 border-emerald-500' 
                         : isCurrent
-                          ? 'bg-amber-500/20 border-amber-500 shadow-lg shadow-amber-500/20'
-                          : 'bg-slate-800 border-slate-600'
+                          ? 'bg-amber-500/10 border-amber-500'
+                          : 'bg-muted border-border'
                       }
                     `}
                   >
@@ -91,14 +91,14 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
                   <div className="mt-3 text-center">
                     <p className={`text-sm font-medium ${
                       isCompleted 
-                        ? 'text-emerald-400' 
+                        ? 'text-emerald-600' 
                         : isCurrent 
-                          ? 'text-amber-400'
-                          : 'text-slate-400'
+                          ? 'text-amber-600'
+                          : 'text-muted-foreground'
                     }`}>
                       {fase.titulo}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5 capitalize">
+                    <p className="text-xs text-muted-foreground mt-0.5 capitalize">
                       {fase.mes}
                     </p>
                   </div>
@@ -110,14 +110,14 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
         
         {/* Progress indicator */}
         <div className="mt-6 flex items-center justify-between text-sm">
-          <span className="text-slate-400">
+          <span className="text-muted-foreground">
             Progresso geral
           </span>
-          <span className="text-aplicada-green-600 font-medium">
+          <span className="text-aplicada-green-700 font-medium">
             {fases.filter(f => f.status === 'realizada').length} de {fases.length} etapas
           </span>
         </div>
-        <div className="mt-2 h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-aplicada-green-700 to-aplicada-green-600 rounded-full transition-all duration-500"
             style={{ 
