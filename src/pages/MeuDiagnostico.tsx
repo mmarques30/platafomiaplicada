@@ -9,7 +9,7 @@ export default function MeuDiagnostico() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
   const { plan, isLoading: planLoading } = useUserPlan();
-  const { isVisitante, isLoading: roleLoading } = useUserRole();
+  const { isVisitante, isAdmin, isLoading: roleLoading } = useUserRole();
 
   // Redirecionar visitantes - não devem acessar esta página
   useEffect(() => {
@@ -29,13 +29,14 @@ export default function MeuDiagnostico() {
   // Redirecionar automaticamente para formulário ou painel
   useEffect(() => {
     if (!isLoading && !roleLoading && !planLoading && !isVisitante && plan !== 'business') {
-      if (!formulario?.completado) {
-        navigate('/diagnostico/formulario', { replace: true });
-      } else {
+      // Admin sempre vai para o painel, nunca para o formulário
+      if (isAdmin || formulario?.completado) {
         navigate('/diagnostico/painel', { replace: true });
+      } else {
+        navigate('/diagnostico/formulario', { replace: true });
       }
     }
-  }, [formulario, isLoading, roleLoading, planLoading, isVisitante, plan, navigate]);
+  }, [formulario, isLoading, roleLoading, planLoading, isVisitante, plan, isAdmin, navigate]);
 
   // Tela de loading enquanto redireciona
   return (
