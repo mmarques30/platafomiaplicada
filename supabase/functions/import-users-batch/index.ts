@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
 
     console.log(`Starting batch import of ${users.length} users`)
 
-    const planosValidos = ['academy', 'lab', 'skills', 'club', 'legacy', 'boost'];
+    const planosValidos = ['academy', 'skills', 'business'];
     if (planoMentoria && !planosValidos.includes(planoMentoria)) {
       throw new Error(`Plano de mentoria inválido. Valores aceitos: ${planosValidos.join(', ')}`)
     }

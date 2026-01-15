@@ -4,13 +4,10 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const planoNomes = {
+const planoNomes: Record<string, string> = {
   academy: "IAplicada Academy",
-  lab: "IAplicada Lab",
   skills: "IAplicada Skills",
-  club: "IAplicada Club",
-  legacy: "IAplicada Legacy",
-  boost: "IAplicada Boost",
+  business: "IAplicada Business",
 };
 
 export function MeuPlanoCard() {

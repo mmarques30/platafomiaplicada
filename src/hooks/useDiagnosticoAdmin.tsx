@@ -123,13 +123,50 @@ export function useDiagnosticoAdmin(userId?: string) {
     },
   });
 
+  const deletarDiagnostico = useMutation({
+    mutationFn: async (diagnosticoId: string) => {
+      // Primeiro deletar objetivos associados (FK)
+      const { error: objetivosError } = await supabase
+        .from("objetivos_mentoria")
+        .delete()
+        .eq("formulario_id", diagnosticoId);
+
+      if (objetivosError) throw objetivosError;
+
+      // Deletar o diagnóstico
+      const { error } = await supabase
+        .from("formulario_diagnostico")
+        .delete()
+        .eq("id", diagnosticoId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Diagnóstico excluído",
+        description: "O diagnóstico foi excluído com sucesso.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-formularios"] });
+      queryClient.invalidateQueries({ queryKey: ["diagnostico-admin"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir diagnóstico",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     diagnostico,
     isLoading,
     uploadArquivo: uploadArquivo.mutate,
     salvarDiagnostico: salvarDiagnostico.mutate,
     deletarArquivo: deletarArquivo.mutate,
+    deletarDiagnostico: deletarDiagnostico.mutate,
     isUploading: uploadArquivo.isPending,
     isSaving: salvarDiagnostico.isPending,
+    isDeleting: deletarDiagnostico.isPending,
   };
 }

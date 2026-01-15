@@ -45,9 +45,8 @@ interface EditUserModalProps {
 
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "lab", label: "Lab", description: "B2C Grupo - Mentoria em grupo" },
   { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
-  { value: "club", label: "Club", description: "B2C Premium - Mentoria 1:1" },
+  { value: "business", label: "Business", description: "B2C Premium - Mentoria 1:1 completa" },
 ];
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
@@ -56,7 +55,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const resetPassword = useResetUserPassword();
   
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
-  const [selectedPlano, setSelectedPlano] = useState<"academy" | "lab" | "skills" | "club" | null>(null);
+  const [selectedPlano, setSelectedPlano] = useState<"academy" | "skills" | "business" | null>(null);
   const [dataExpiracao, setDataExpiracao] = useState<Date | undefined>();
   const [contaAtiva, setContaAtiva] = useState(true);
   const [origemConsultoria, setOrigemConsultoria] = useState(false);
@@ -73,7 +72,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setValue("linkedin", user.linkedin || "");
       
       setSelectedRoles(user.roles as AppRole[]);
-      setSelectedPlano((user.plano_mentoria as "academy" | "lab" | "skills" | "club") || null);
+      setSelectedPlano((user.plano_mentoria as "academy" | "skills" | "business") || null);
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
       setOrigemConsultoria(user.origem_consultoria ?? false);
@@ -100,7 +99,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         profissao: data.profissao || null,
         idade: data.idade ? parseInt(data.idade) : null,
         linkedin: data.linkedin || null,
-        plano_mentoria: selectedPlano || null,
+        plano_mentoria: selectedPlano as any,
         data_expiracao_acesso: dataExpiracao?.toISOString() || null,
         conta_ativa: contaAtiva,
         origem_consultoria: origemConsultoria,
@@ -236,7 +235,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                           ? "border-primary bg-primary/10"
                           : "hover:border-primary/50"
                       )}
-                      onClick={() => setSelectedPlano(plano.value as "academy" | "lab" | "skills" | "club")}
+                      onClick={() => setSelectedPlano(plano.value as "academy" | "skills" | "business")}
                     >
                       <p className={cn(
                         "font-semibold mb-1 text-sm",
