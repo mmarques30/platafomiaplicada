@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
     console.log('Creating user:', { email, nomeCompleto, roles, planoMentoria, origemConsultoria, empresaConsultoria })
 
     // Validar planoMentoria
-    const planosValidos = ['academy', 'lab', 'skills', 'club', 'legacy', 'boost'];
+    const planosValidos = ['academy', 'skills', 'business'];
     if (planoMentoria && !planosValidos.includes(planoMentoria)) {
       throw new Error(`Plano de mentoria inválido. Valores aceitos: ${planosValidos.join(', ')}`)
     }

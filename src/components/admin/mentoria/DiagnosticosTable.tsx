@@ -1,13 +1,24 @@
 import { useState } from "react";
 import { useFormularios } from "@/hooks/admin/useFormularios";
+import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Eye, Search } from "lucide-react";
+import { Eye, Search, Trash2 } from "lucide-react";
 import { FormularioDetalhesDrawer } from "@/components/admin/FormularioDetalhesDrawer";
 
 interface DiagnosticosTableProps {
@@ -16,11 +27,14 @@ interface DiagnosticosTableProps {
 
 export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
   const { data: formularios, isLoading } = useFormularios();
+  const { deletarDiagnostico, isDeleting } = useDiagnosticoAdmin();
   const [searchTerm, setSearchTerm] = useState("");
   const [planoFilter, setPlanoFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedFormulario, setSelectedFormulario] = useState<any>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [formularioToDelete, setFormularioToDelete] = useState<any>(null);
 
   const filteredFormularios = formularios?.filter((form: any) => {
     const nomeCompleto = form.profiles?.nome_completo || form.nome_completo || "";
@@ -41,6 +55,19 @@ export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
     } else {
       setSelectedFormulario(form);
       setDrawerOpen(true);
+    }
+  };
+
+  const handleDeleteClick = (form: any) => {
+    setFormularioToDelete(form);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (formularioToDelete) {
+      deletarDiagnostico(formularioToDelete.id);
+      setDeleteDialogOpen(false);
+      setFormularioToDelete(null);
     }
   };
 
@@ -179,10 +206,20 @@ export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
                     {format(new Date(form.created_at), "dd/MM/yyyy", { locale: ptBR })}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => handleViewDetails(form)}>
-                      <Eye className="h-4 w-4 mr-2" />
-                      Ver
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleViewDetails(form)}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        Ver
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteClick(form)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -197,6 +234,30 @@ export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir diagnóstico?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o diagnóstico de{" "}
+              <strong>{formularioToDelete?.profiles?.nome_completo || formularioToDelete?.nome_completo || "este usuário"}</strong>?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Excluindo..." : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
