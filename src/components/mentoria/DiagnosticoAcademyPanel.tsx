@@ -251,7 +251,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-amber-600 mb-2">
-                    🎯 Foco dos Próximos 30 Dias
+                    Foco dos Próximos 30 Dias
                   </h2>
                   <p className="text-foreground leading-relaxed font-medium">{recomendacaoFoco}</p>
                 </div>
@@ -272,13 +272,49 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-red-500 mb-2">
-                    ⚠️ Alerta de Desafios
+                    Alerta de Desafios
                   </h2>
                   <p className="text-foreground leading-relaxed">{alertaDesafios}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
+        </section>
+      )}
+
+      {/* Seção: Ferramentas Prioritárias - Movida para cima */}
+      {ferramentas.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
+            <Bot className="h-5 w-5" />
+            Ferramentas que Você Vai Dominar
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {ferramentas.slice(0, 8).map((ferramenta, index) => (
+              <Card 
+                key={index}
+                className="bg-card border border-aplicada-green-800/20 hover:border-aplicada-green-700/40 transition-colors"
+              >
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 mx-auto rounded-xl bg-aplicada-green-700/10 flex items-center justify-center mb-3">
+                    <Bot className="h-6 w-6 text-aplicada-green-700" />
+                  </div>
+                  <p className="font-semibold text-foreground text-sm">{ferramenta.nome}</p>
+                  {ferramenta.categoria && (
+                    <p className="text-xs text-muted-foreground mt-1">{ferramenta.categoria}</p>
+                  )}
+                  {(ferramenta.prioridade || ferramenta.nivel_prioridade) && (
+                    <Badge variant="outline" className="mt-2 text-xs border-aplicada-green-700/30 text-aplicada-green-700">
+                      Prioridade {ferramenta.prioridade || ferramenta.nivel_prioridade}
+                    </Badge>
+                  )}
+                  {ferramenta.motivo && (
+                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{ferramenta.motivo}</p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </section>
       )}
 
@@ -527,42 +563,6 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
               </AccordionItem>
             ))}
           </Accordion>
-        </section>
-      )}
-
-      {/* Seção: Ferramentas Prioritárias */}
-      {ferramentas.length > 0 && (
-        <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <Bot className="h-5 w-5" />
-            Ferramentas que Você Vai Dominar
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {ferramentas.slice(0, 8).map((ferramenta, index) => (
-              <Card 
-                key={index}
-                className="bg-card border border-aplicada-green-800/20 hover:border-aplicada-green-700/40 transition-colors"
-              >
-                <CardContent className="p-4 text-center">
-                  <div className="w-12 h-12 mx-auto rounded-xl bg-aplicada-green-700/10 flex items-center justify-center mb-3">
-                    <Bot className="h-6 w-6 text-aplicada-green-700" />
-                  </div>
-                  <p className="font-semibold text-foreground text-sm">{ferramenta.nome}</p>
-                  {ferramenta.categoria && (
-                    <p className="text-xs text-muted-foreground mt-1">{ferramenta.categoria}</p>
-                  )}
-                  {(ferramenta.prioridade || ferramenta.nivel_prioridade) && (
-                    <Badge variant="outline" className="mt-2 text-xs border-aplicada-green-700/30 text-aplicada-green-700">
-                      Prioridade {ferramenta.prioridade || ferramenta.nivel_prioridade}
-                    </Badge>
-                  )}
-                  {ferramenta.motivo && (
-                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{ferramenta.motivo}</p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </section>
       )}
 
