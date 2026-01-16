@@ -24,6 +24,8 @@ export const useMentoriaForm = () => {
       return data;
     },
     enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutos - evita refetch desnecessário
+    gcTime: 10 * 60 * 1000, // 10 minutos - mantém em cache
   });
 
   // Salvar/Atualizar formulário usando upsert para evitar erro de chave duplicada

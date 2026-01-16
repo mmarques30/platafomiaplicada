@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
@@ -6,6 +6,7 @@ const IDLE_MS = 3 * 60 * 60 * 1000; // 3 horas de inatividade
 const FIVE_MIN_MS = 5 * 60 * 1000; // 5 minutos
 const CHANNEL = "idle-session";
 const KEY = "last-activity-ts";
+const DEBOUNCE_MS = 1000; // 1 segundo de debounce para evitar chamadas excessivas
 
 export function useIdleLogout(idleMs = IDLE_MS) {
   const { user, signOut } = useAuth();
@@ -13,10 +14,9 @@ export function useIdleLogout(idleMs = IDLE_MS) {
   const warningTimerRef = useRef<number | null>(null);
   const warningToastIdRef = useRef<string | number | null>(null);
   const bcRef = useRef<BroadcastChannel | null>(null);
+  const lastResetRef = useRef<number>(0);
 
-  const showWarning = () => {
-    console.log("[IdleLogout] showWarning - aviso de sessão expira em 5 min");
-    
+  const showWarning = useCallback(() => {
     if (warningToastIdRef.current) {
       toast.dismiss(warningToastIdRef.current);
     }
@@ -28,8 +28,9 @@ export function useIdleLogout(idleMs = IDLE_MS) {
         action: {
           label: "Continuar conectado",
           onClick: () => {
-            console.log("[IdleLogout] Usuário clicou em 'Continuar conectado'");
-            resetTimer();
+            // Reset manual pelo usuário - força reset ignorando debounce
+            lastResetRef.current = 0;
+            resetTimerInternal();
             bcRef.current?.postMessage({ type: "extend-session" });
           },
         },
@@ -38,12 +39,11 @@ export function useIdleLogout(idleMs = IDLE_MS) {
         },
       }
     );
-  };
+  }, []);
 
-  const resetTimer = () => {
+  const resetTimerInternal = useCallback(() => {
     const now = Date.now();
     localStorage.setItem(KEY, String(now));
-    console.log("[IdleLogout] resetTimer chamado em", new Date().toISOString());
     
     if (warningToastIdRef.current) {
       toast.dismiss(warningToastIdRef.current);
@@ -57,17 +57,25 @@ export function useIdleLogout(idleMs = IDLE_MS) {
     const warningMs = Math.max(idleMs - FIVE_MIN_MS, 0);
     
     warningTimerRef.current = window.setTimeout(() => {
-      console.log("[IdleLogout] Aviso disparado pelo TIMER após", warningMs, "ms");
       showWarning();
       bcRef.current?.postMessage({ type: "show-warning" });
     }, warningMs);
     
     timerRef.current = window.setTimeout(() => {
-      console.log("[IdleLogout] Logout disparado pelo TIMER (idleMs)", { idleMs });
       bcRef.current?.postMessage({ type: "logout" });
       signOut();
     }, idleMs);
-  };
+  }, [idleMs, showWarning, signOut]);
+
+  // resetTimer com debounce para evitar chamadas excessivas
+  const resetTimer = useCallback(() => {
+    const now = Date.now();
+    // Debounce: só executa se passou mais de DEBOUNCE_MS desde a última execução
+    if (now - lastResetRef.current < DEBOUNCE_MS) return;
+    lastResetRef.current = now;
+    
+    resetTimerInternal();
+  }, [resetTimerInternal]);
 
   useEffect(() => {
     if (!user) return;
@@ -76,19 +84,18 @@ export function useIdleLogout(idleMs = IDLE_MS) {
     bcRef.current = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHANNEL) : null;
 
     const onMessage = (ev: MessageEvent<any>) => {
-      console.log("[IdleLogout] Mensagem recebida no BroadcastChannel:", ev.data);
-      
       if (ev.data?.type === "activity") {
         resetTimer();
       }
       if (ev.data?.type === "extend-session") {
-        resetTimer();
+        // Força reset ignorando debounce
+        lastResetRef.current = 0;
+        resetTimerInternal();
       }
       if (ev.data?.type === "show-warning") {
         showWarning();
       }
       if (ev.data?.type === "logout") {
-        console.log("[IdleLogout] Logout recebido via BroadcastChannel");
         signOut();
       }
     };
@@ -110,7 +117,7 @@ export function useIdleLogout(idleMs = IDLE_MS) {
     document.addEventListener("visibilitychange", onActivity, { passive: true });
 
     // Inicializa estado de atividade
-    resetTimer();
+    resetTimerInternal();
 
     // Verificação periódica via localStorage (fallback para sincronização entre abas)
     const warningMs = Math.max(idleMs - FIVE_MIN_MS, 0);
@@ -118,15 +125,12 @@ export function useIdleLogout(idleMs = IDLE_MS) {
     const checkInterval = window.setInterval(() => {
       const ts = Number(localStorage.getItem(KEY) || "0");
       const elapsed = Date.now() - ts;
-      console.log("[IdleLogout] checkInterval", { ts, elapsed, warningMs, idleMs });
       
       if (elapsed > warningMs && elapsed < idleMs && !warningToastIdRef.current) {
-        console.log("[IdleLogout] Aviso disparado pelo INTERVALO", { elapsed, warningMs, idleMs });
         showWarning();
       }
       
       if (ts && elapsed > idleMs) {
-        console.log("[IdleLogout] Logout disparado pelo INTERVALO (elapsed > idleMs)", { elapsed, idleMs });
         bcRef.current?.postMessage({ type: "logout" });
         signOut();
       }
@@ -141,5 +145,5 @@ export function useIdleLogout(idleMs = IDLE_MS) {
       if (bcRef.current) bcRef.current.close();
       clearInterval(checkInterval);
     };
-  }, [user?.id, signOut, idleMs]);
+  }, [user?.id, signOut, idleMs, resetTimer, resetTimerInternal, showWarning]);
 }

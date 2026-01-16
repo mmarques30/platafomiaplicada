@@ -23,6 +23,8 @@ export const usePainelDiagnostico = (userId?: string) => {
     },
     enabled: !!targetUserId,
     retry: false, // Desabilitar retries para evitar flicker
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos
   });
 
 
@@ -41,6 +43,8 @@ export const usePainelDiagnostico = (userId?: string) => {
       return data;
     },
     enabled: !!targetUserId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const { data: sessoes, isLoading: isLoadingSessoes } = useQuery({
@@ -58,6 +62,8 @@ export const usePainelDiagnostico = (userId?: string) => {
       return data;
     },
     enabled: !!targetUserId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const { data: tarefas, isLoading: isLoadingTarefas } = useQuery({
@@ -75,6 +81,8 @@ export const usePainelDiagnostico = (userId?: string) => {
       return data;
     },
     enabled: !!targetUserId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
@@ -92,6 +100,8 @@ export const usePainelDiagnostico = (userId?: string) => {
       return data;
     },
     enabled: !!targetUserId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   return {

@@ -15,15 +15,12 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
 
   const needsRoleCheck = Boolean(requireRole) || (Array.isArray(requireAnyRole) && requireAnyRole.length > 0);
 
-  // Debug logs
-  useEffect(() => {
-    console.log("[ProtectedRoute] Auth Loading:", authLoading);
-    console.log("[ProtectedRoute] Role Loading:", roleLoading);
-    console.log("[ProtectedRoute] User:", user?.email);
-    console.log("[ProtectedRoute] Roles:", roles);
-    console.log("[ProtectedRoute] Require Role:", requireRole);
-    console.log("[ProtectedRoute] Require Any Role:", requireAnyRole);
-  }, [authLoading, roleLoading, user, roles, requireRole, requireAnyRole]);
+  // Debug logs - apenas em desenvolvimento
+  // useEffect(() => {
+  //   if (import.meta.env.DEV) {
+  //     console.log("[ProtectedRoute]", { authLoading, roleLoading, user: user?.email, roles });
+  //   }
+  // }, [authLoading, roleLoading, user, roles]);
 
   // Enquanto estiver carregando auth ou papéis (quando necessário), apenas mostra loader
   if (authLoading || (needsRoleCheck && roleLoading)) {
@@ -36,18 +33,15 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
 
   // Após carregar auth, se não houver usuário, redireciona para /auth
   if (!user) {
-    console.log("[ProtectedRoute] No user - redirecting to auth");
     return <Navigate to="/auth" replace />;
   }
 
   // Checagem de papéis somente quando necessário
   if (requireRole && !hasRole(requireRole)) {
-    console.log("[ProtectedRoute] Missing required role:", requireRole);
     return <Navigate to="/" replace />;
   }
 
   if (requireAnyRole && !requireAnyRole.some(role => hasRole(role))) {
-    console.log("[ProtectedRoute] Missing any of required roles:", requireAnyRole);
     return <Navigate to="/" replace />;
   }
 
