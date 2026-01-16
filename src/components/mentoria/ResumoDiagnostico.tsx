@@ -26,7 +26,7 @@ interface ResumoDiagnosticoProps {
 }
 
 export function ResumoDiagnostico({ formulario }: ResumoDiagnosticoProps) {
-  const [expandido, setExpandido] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>([]);
   
   if (!formulario) return null;
 
@@ -83,7 +83,7 @@ export function ResumoDiagnostico({ formulario }: ResumoDiagnosticoProps) {
     sections.push("prioridades");
   }
 
-  const accordionValue = expandido ? sections : [];
+  const allExpanded = openSections.length === sections.length;
 
   return (
     <div className="max-w-5xl mx-auto rounded-2xl bg-card border border-border overflow-hidden">
@@ -128,10 +128,16 @@ export function ResumoDiagnostico({ formulario }: ResumoDiagnosticoProps) {
         <Button 
           variant="ghost" 
           size="sm"
-          onClick={() => setExpandido(!expandido)}
+          onClick={() => {
+            if (allExpanded) {
+              setOpenSections([]);
+            } else {
+              setOpenSections(sections);
+            }
+          }}
           className="text-muted-foreground hover:text-foreground"
         >
-          {expandido ? (
+          {allExpanded ? (
             <>
               <ChevronUp className="h-4 w-4 mr-1" />
               Recolher Tudo
@@ -149,8 +155,8 @@ export function ResumoDiagnostico({ formulario }: ResumoDiagnosticoProps) {
       <div className="p-6">
         <Accordion 
           type="multiple" 
-          value={accordionValue}
-          onValueChange={(value) => setExpandido(value.length === sections.length)}
+          value={openSections}
+          onValueChange={setOpenSections}
           className="space-y-3"
         >
           {/* Perfil Profissional */}
