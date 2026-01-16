@@ -6,6 +6,7 @@ import { ArrowLeft, FileText, Briefcase, Crown, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { getPainelTheme } from "./painelTheme";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface PainelDiagnosticoShellProps {
   children: ReactNode;
@@ -27,7 +28,15 @@ export const PainelDiagnosticoShell = ({
   isAcademyRoute,
 }: PainelDiagnosticoShellProps) => {
   const navigate = useNavigate();
+  const { isAdmin } = useUserRole();
   const theme = getPainelTheme(isBusiness);
+
+  // Helper: gera URL correta para "Ver Diagnóstico Completo"
+  const getDiagnosticoUrl = () => {
+    if (!isAcademyRoute) return "/mentoria/diagnostico";
+    // Academy route: admin vai para painel, usuário comum vai para formulário
+    return isAdmin ? "/diagnostico/painel" : "/diagnostico/formulario";
+  };
 
   if (isBusiness) {
     return (
@@ -71,7 +80,7 @@ export const PainelDiagnosticoShell = ({
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 variant="outline"
-                onClick={() => navigate(isAcademyRoute ? "/diagnostico/formulario" : "/mentoria/diagnostico")}
+                onClick={() => navigate(getDiagnosticoUrl())}
                 className="gap-2"
               >
                 <FileText className="w-4 h-4" />
@@ -129,7 +138,7 @@ export const PainelDiagnosticoShell = ({
           <div className="flex flex-wrap items-center gap-3">
             <Button
               variant="outline"
-              onClick={() => navigate(isAcademyRoute ? "/diagnostico/formulario" : "/mentoria/diagnostico")}
+              onClick={() => navigate(getDiagnosticoUrl())}
               className="gap-2"
             >
               <FileText className="w-4 h-4" />
