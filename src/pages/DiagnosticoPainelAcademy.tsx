@@ -3,9 +3,10 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Brain, Video, Sparkles } from "lucide-react";
+import { Loader2, ArrowLeft, Brain, Video, Sparkles, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { DiagnosticoAcademyPanel } from "@/components/mentoria/DiagnosticoAcademyPanel";
 import { FeedbackMentora } from "@/components/mentoria/FeedbackMentora";
 
@@ -34,40 +35,10 @@ export default function DiagnosticoPainelAcademy() {
     );
   }
 
-  if (!formulario && !isAdmin) {
-    return (
-      <div className="container mx-auto py-8 px-4 max-w-5xl">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate("/trilhas")}
-          className="mb-6 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar para Trilhas
-        </Button>
+  // Removido: condição que impedia admin de ver a página com abas
+  // Agora sempre mostra a estrutura completa com abas, mesmo sem diagnóstico
 
-        <header className="flex items-center gap-4 mb-8">
-          <div className="p-4 rounded-2xl bg-aplicada-green-700/10 border border-aplicada-green-700/20">
-            <Sparkles className="h-8 w-8 text-aplicada-green-700" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Meu Diagnóstico</h1>
-            <p className="text-muted-foreground">Complete o formulário para gerar seu painel</p>
-          </div>
-        </header>
-
-        <div className="border border-border rounded-xl bg-card p-8 text-center">
-          <p className="text-muted-foreground mb-6">
-            Você ainda não preencheu o diagnóstico. Preencha agora para ver seu painel e o feedback.
-          </p>
-          <Button onClick={() => navigate("/diagnostico/formulario")}>Preencher diagnóstico</Button>
-        </div>
-      </div>
-    );
-  }
-
-  const nomeCompleto = formulario?.nome_completo || "Admin";
+  const nomeCompleto = formulario?.nome_completo || (isAdmin ? "Admin" : "Mentorado");
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
@@ -113,7 +84,35 @@ export default function DiagnosticoPainelAcademy() {
         </TabsList>
 
         <TabsContent value="diagnostico" className="mt-6">
-          <DiagnosticoAcademyPanel diagnostico={formulario} />
+          {formulario ? (
+            <DiagnosticoAcademyPanel diagnostico={formulario} />
+          ) : (
+            <Card className="border-dashed border-2">
+              <CardContent className="py-12">
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-aplicada-green-700/10 flex items-center justify-center">
+                    <FileText className="h-8 w-8 text-aplicada-green-700" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-medium">Diagnóstico não preenchido</h3>
+                    <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                      {isAdmin 
+                        ? "Você ainda não preencheu seu diagnóstico pessoal. Preencha para gerar seu plano de desenvolvimento com IA."
+                        : "Preencha o diagnóstico para ver seu plano personalizado e receber feedback da mentora."
+                      }
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => navigate("/diagnostico/formulario")}
+                    className="bg-aplicada-green-700 hover:bg-aplicada-green-800"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Preencher diagnóstico
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="feedback" className="mt-6">
