@@ -55,14 +55,14 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Scrollable container */}
-        <div className="relative overflow-x-auto pb-2">
-          <div className="relative min-w-max">
+        {/* Container */}
+        <div className="relative pb-2">
+          <div className="relative">
             {/* Timeline line */}
-            <div className="absolute top-6 left-10 right-10 h-1 bg-gradient-to-r from-aplicada-green-700/50 via-aplicada-green-700/30 to-muted rounded-full" />
+            <div className="absolute top-6 left-[5%] right-[5%] h-1 bg-gradient-to-r from-aplicada-green-700/50 via-aplicada-green-700/30 to-muted rounded-full" />
             
             {/* Timeline nodes */}
-            <div className="relative flex gap-4 px-2">
+            <div className="relative flex justify-between px-4">
               {fases.map((fase, index) => {
                 const isCompleted = fase.status === 'realizada';
                 const isCurrent = fase.status === 'agendada';
@@ -70,7 +70,7 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
                 return (
                   <div 
                     key={fase.id} 
-                    className="flex flex-col items-center w-20 shrink-0"
+                    className="flex flex-col items-center flex-1 max-w-[160px]"
                   >
                     {/* Node */}
                     <div 
@@ -89,17 +89,17 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
                     </div>
                     
                     {/* Label */}
-                    <div className="mt-3 text-center w-full">
-                      <p className={`text-xs font-medium truncate ${
+                    <div className="mt-3 text-center w-full px-1">
+                      <p className={`text-sm font-medium text-center leading-tight ${
                         isCompleted 
                           ? 'text-emerald-600' 
                           : isCurrent 
                             ? 'text-amber-600'
                             : 'text-muted-foreground'
-                      }`} title={fase.titulo}>
+                      }`}>
                         {fase.titulo}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-0.5 capitalize">
+                      <p className="text-xs text-muted-foreground mt-1 capitalize">
                         {fase.mes}
                       </p>
                     </div>
