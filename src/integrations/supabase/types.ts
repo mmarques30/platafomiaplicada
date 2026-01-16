@@ -1614,6 +1614,54 @@ export type Database = {
         }
         Relationships: []
       }
+      formularios_sistema: {
+        Row: {
+          ativo: boolean | null
+          categoria: string
+          created_at: string | null
+          descricao: string | null
+          etapas: number | null
+          icon: string | null
+          id: string
+          rota_admin: string | null
+          rota_form: string | null
+          slug: string
+          tipo: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria: string
+          created_at?: string | null
+          descricao?: string | null
+          etapas?: number | null
+          icon?: string | null
+          id?: string
+          rota_admin?: string | null
+          rota_form?: string | null
+          slug: string
+          tipo: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string
+          created_at?: string | null
+          descricao?: string | null
+          etapas?: number | null
+          icon?: string | null
+          id?: string
+          rota_admin?: string | null
+          rota_form?: string | null
+          slug?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ia_copie_use: {
         Row: {
           arquivos_url: Json | null
