@@ -324,9 +324,8 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="academy">🎓 Academy (todos os planos)</SelectItem>
-                <SelectItem value="lab">🔬 Lab (Lab + Club)</SelectItem>
-                <SelectItem value="skills">🏢 Skills (Skills + Club)</SelectItem>
-                <SelectItem value="club">⭐ Club (apenas Club)</SelectItem>
+                <SelectItem value="skills">🏢 Skills (Skills + Business)</SelectItem>
+                <SelectItem value="business">⭐ Business (apenas Business)</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">

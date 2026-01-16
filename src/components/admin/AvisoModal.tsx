@@ -20,15 +20,15 @@ export function AvisoModal({ open, onOpenChange, aviso }: AvisoModalProps) {
   const createAviso = useCreateAviso();
   const updateAviso = useUpdateAviso();
   const { register, handleSubmit, reset, setValue, watch } = useForm();
-  const [visivelPara, setVisivelPara] = useState<string[]>(['visitante', 'academy', 'lab', 'skills', 'club']);
+  const [visivelPara, setVisivelPara] = useState<string[]>(['visitante', 'academy', 'skills', 'business']);
 
   useEffect(() => {
     if (aviso) {
       reset(aviso);
-      setVisivelPara(aviso.visivel_para || ['visitante', 'academy', 'lab', 'skills', 'club']);
+      setVisivelPara(aviso.visivel_para || ['visitante', 'academy', 'skills', 'business']);
     } else {
       reset({ titulo: "", mensagem: "", tipo: "info", data_expiracao: "", ativo: true });
-      setVisivelPara(['visitante', 'academy', 'lab', 'skills', 'club']);
+      setVisivelPara(['visitante', 'academy', 'skills', 'business']);
     }
   }, [aviso, reset, open]);
 
@@ -83,9 +83,8 @@ export function AvisoModal({ open, onOpenChange, aviso }: AvisoModalProps) {
               {[
                 { value: "visitante", label: "Visitantes" },
                 { value: "academy", label: "Academy" },
-                { value: "lab", label: "Lab" },
                 { value: "skills", label: "Skills" },
-                { value: "club", label: "Club" }
+                { value: "business", label: "Business" }
               ].map((plano) => (
                 <div key={plano.value} className="flex items-center space-x-2">
                   <Checkbox
