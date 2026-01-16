@@ -55,56 +55,58 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute top-6 left-0 right-0 h-1 bg-gradient-to-r from-aplicada-green-700/50 via-aplicada-green-700/30 to-muted rounded-full" />
-          
-          {/* Timeline nodes */}
-          <div className="relative flex justify-between">
-            {fases.map((fase, index) => {
-              const isCompleted = fase.status === 'realizada';
-              const isCurrent = fase.status === 'agendada';
-              
-              return (
-                <div 
-                  key={fase.id} 
-                  className="flex flex-col items-center"
-                  style={{ flex: 1 }}
-                >
-                  {/* Node */}
+        {/* Scrollable container */}
+        <div className="relative overflow-x-auto pb-2">
+          <div className="relative min-w-max">
+            {/* Timeline line */}
+            <div className="absolute top-6 left-10 right-10 h-1 bg-gradient-to-r from-aplicada-green-700/50 via-aplicada-green-700/30 to-muted rounded-full" />
+            
+            {/* Timeline nodes */}
+            <div className="relative flex gap-4 px-2">
+              {fases.map((fase, index) => {
+                const isCompleted = fase.status === 'realizada';
+                const isCurrent = fase.status === 'agendada';
+                
+                return (
                   <div 
-                    className={`
-                      w-12 h-12 rounded-full flex items-center justify-center
-                      border-2 transition-all duration-300
-                      ${isCompleted 
-                        ? 'bg-emerald-500/10 border-emerald-500' 
-                        : isCurrent
-                          ? 'bg-amber-500/10 border-amber-500'
-                          : 'bg-muted border-border'
-                      }
-                    `}
+                    key={fase.id} 
+                    className="flex flex-col items-center w-20 shrink-0"
                   >
-                    {getStatusIcon(fase.status)}
+                    {/* Node */}
+                    <div 
+                      className={`
+                        w-12 h-12 rounded-full flex items-center justify-center
+                        border-2 transition-all duration-300
+                        ${isCompleted 
+                          ? 'bg-emerald-500/10 border-emerald-500' 
+                          : isCurrent
+                            ? 'bg-amber-500/10 border-amber-500'
+                            : 'bg-muted border-border'
+                        }
+                      `}
+                    >
+                      {getStatusIcon(fase.status)}
+                    </div>
+                    
+                    {/* Label */}
+                    <div className="mt-3 text-center w-full">
+                      <p className={`text-xs font-medium truncate ${
+                        isCompleted 
+                          ? 'text-emerald-600' 
+                          : isCurrent 
+                            ? 'text-amber-600'
+                            : 'text-muted-foreground'
+                      }`} title={fase.titulo}>
+                        {fase.titulo}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5 capitalize">
+                        {fase.mes}
+                      </p>
+                    </div>
                   </div>
-                  
-                  {/* Label */}
-                  <div className="mt-3 text-center">
-                    <p className={`text-sm font-medium ${
-                      isCompleted 
-                        ? 'text-emerald-600' 
-                        : isCurrent 
-                          ? 'text-amber-600'
-                          : 'text-muted-foreground'
-                    }`}>
-                      {fase.titulo}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5 capitalize">
-                      {fase.mes}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
         

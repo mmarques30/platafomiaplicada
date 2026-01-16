@@ -9,7 +9,7 @@ import { BusinessKPICards } from "./BusinessKPICards";
 import { BusinessPerformanceCharts } from "./BusinessPerformanceCharts";
 import { BusinessProjetosSection } from "./BusinessProjetosSection";
 import { BusinessRoadmap } from "./BusinessRoadmap";
-import { BusinessAprendizadoSection } from "./BusinessAprendizadoSection";
+
 
 interface FormularioDiagnostico {
   id: string;
@@ -179,11 +179,6 @@ export function BusinessDashboard({ diagnostico, userId }: BusinessDashboardProp
           </div>
         </div>
 
-        {/* Aprendizado Section */}
-        <BusinessAprendizadoSection 
-          tamanhoEquipe={diagnostico.tamanho_equipe}
-          temInteresseAprendizado={true}
-        />
       </div>
     </div>
   );
