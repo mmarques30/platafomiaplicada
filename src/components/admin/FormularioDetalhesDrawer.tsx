@@ -17,11 +17,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
-import { Sparkles, Calendar, User, Target, Brain, Clock, MessageSquare, Trash2, GraduationCap, LucideIcon } from "lucide-react";
+import { Sparkles, Calendar, User, Target, Brain, Clock, MessageSquare, Trash2, GraduationCap, LucideIcon, ChevronDown, Lightbulb, Wrench, BookOpen } from "lucide-react";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
 
 interface FormularioDetalhesDrawerProps {
@@ -70,9 +75,123 @@ const Field = ({ label, value, fullWidth = false }: FieldProps) => {
   );
 };
 
+// Componente para renderizar o Insight IA formatado
+const InsightContent = ({ insight }: { insight: any }) => {
+  if (!insight || typeof insight !== 'object') {
+    return <p className="text-sm text-muted-foreground">{String(insight)}</p>;
+  }
+
+  const { projetos, objetivos, oportunidades, ...outros } = insight;
+
+  return (
+    <div className="space-y-4">
+      {/* Projetos Sugeridos */}
+      {projetos && Array.isArray(projetos) && projetos.length > 0 && (
+        <div>
+          <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
+            <Target className="h-4 w-4 text-primary" />
+            Projetos Sugeridos
+          </h4>
+          <div className="space-y-3">
+            {projetos.map((projeto: any, idx: number) => (
+              <div key={idx} className="border rounded-lg p-3 bg-background">
+                <h5 className="font-medium text-sm">{projeto.titulo}</h5>
+                {projeto.descricao && (
+                  <p className="text-xs text-muted-foreground mt-1">{projeto.descricao}</p>
+                )}
+                {projeto.objetivo_projeto && (
+                  <p className="text-xs mt-2">
+                    <span className="font-medium">Objetivo:</span> {projeto.objetivo_projeto}
+                  </p>
+                )}
+                {projeto.contribuicao_plano && (
+                  <p className="text-xs mt-1">
+                    <span className="font-medium">Contribuição:</span> {projeto.contribuicao_plano}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {projeto.ferramentas_projeto && Array.isArray(projeto.ferramentas_projeto) && (
+                    <div className="flex items-center gap-1 text-xs">
+                      <Wrench className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">
+                        {projeto.ferramentas_projeto.join(", ")}
+                      </span>
+                    </div>
+                  )}
+                  {projeto.trilhas_recomendadas && Array.isArray(projeto.trilhas_recomendadas) && (
+                    <div className="flex items-center gap-1 text-xs">
+                      <BookOpen className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">
+                        {projeto.trilhas_recomendadas.join(", ")}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Objetivos */}
+      {objetivos && Array.isArray(objetivos) && objetivos.length > 0 && (
+        <div>
+          <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
+            <Target className="h-4 w-4 text-primary" />
+            Objetivos Identificados
+          </h4>
+          <div className="space-y-2">
+            {objetivos.map((obj: any, idx: number) => (
+              <div key={idx} className="flex items-start gap-2 text-sm">
+                <Badge variant="outline" className="text-xs shrink-0">
+                  {obj.tipo || `#${idx + 1}`}
+                </Badge>
+                <span>{obj.objetivo || obj}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Oportunidades */}
+      {oportunidades && Array.isArray(oportunidades) && oportunidades.length > 0 && (
+        <div>
+          <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
+            <Lightbulb className="h-4 w-4 text-primary" />
+            Oportunidades
+          </h4>
+          <ul className="space-y-1">
+            {oportunidades.map((op: any, idx: number) => (
+              <li key={idx} className="text-sm flex items-start gap-2">
+                <span className="text-primary">•</span>
+                <span>{typeof op === 'string' ? op : op.descricao || JSON.stringify(op)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Outros campos não mapeados */}
+      {Object.keys(outros).length > 0 && (
+        <div className="pt-2 border-t">
+          {Object.entries(outros).map(([key, value]: [string, any]) => (
+            <div key={key} className="text-sm py-1">
+              <span className="font-medium capitalize">{key.replace(/_/g, ' ')}: </span>
+              <span className="text-muted-foreground">
+                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export function FormularioDetalhesDrawer({ formulario, open, onOpenChange }: FormularioDetalhesDrawerProps) {
   const { deletarDiagnostico, isDeleting } = useDiagnosticoAdmin();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [insightOpen, setInsightOpen] = useState(false);
 
   if (!formulario) return null;
 
@@ -105,31 +224,36 @@ export function FormularioDetalhesDrawer({ formulario, open, onOpenChange }: For
           </DrawerHeader>
 
           <ScrollArea className="h-[calc(90vh-200px)] px-6 pb-6">
-            {/* Insight IA */}
+            {/* Insight IA - Colapsável */}
             {formulario.insight_ia && (
-              <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold">Insight Gerado pela IA</h3>
-                  {formulario.insight_gerado_em && (
-                    <span className="text-xs text-muted-foreground ml-auto">
-                      {format(new Date(formulario.insight_gerado_em), "dd/MM/yyyy")}
-                    </span>
-                  )}
-                </div>
-                <div className="space-y-2 text-sm">
-                  {typeof formulario.insight_ia === 'object' ? (
-                    Object.entries(formulario.insight_ia).map(([key, value]: [string, any]) => (
-                      <div key={key}>
-                        <span className="font-medium capitalize">{key.replace(/_/g, ' ')}: </span>
-                        <span>{typeof value === 'object' ? JSON.stringify(value) : value}</span>
+              <Collapsible open={insightOpen} onOpenChange={setInsightOpen} className="mb-6">
+                <CollapsibleTrigger asChild>
+                  <button className="w-full p-4 bg-primary/5 border border-primary/20 rounded-lg hover:bg-primary/10 transition-colors text-left">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <span className="font-semibold">Insight Gerado pela IA</span>
+                        {formulario.insight_gerado_em && (
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(formulario.insight_gerado_em), "dd/MM/yyyy")}
+                          </span>
+                        )}
                       </div>
-                    ))
-                  ) : (
-                    <p>{formulario.insight_ia}</p>
-                  )}
-                </div>
-              </div>
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${insightOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                    {!insightOpen && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Clique para ver a análise detalhada
+                      </p>
+                    )}
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="mt-2 p-4 border border-primary/20 rounded-lg bg-background">
+                    <InsightContent insight={formulario.insight_ia} />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             )}
 
             {/* Informações Pessoais */}
