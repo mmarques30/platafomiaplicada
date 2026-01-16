@@ -17,13 +17,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
-import { Sparkles, Calendar, User, Target, Brain, Clock, MessageSquare, Trash2 } from "lucide-react";
+import { Sparkles, Calendar, User, Target, Brain, Clock, MessageSquare, Trash2, GraduationCap, LucideIcon } from "lucide-react";
 import { useDiagnosticoAdmin } from "@/hooks/useDiagnosticoAdmin";
 
 interface FormularioDetalhesDrawerProps {
@@ -31,6 +29,46 @@ interface FormularioDetalhesDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+interface SectionProps {
+  icon: LucideIcon;
+  title: string;
+  children: React.ReactNode;
+}
+
+const Section = ({ icon: Icon, title, children }: SectionProps) => (
+  <div className="mb-6">
+    <div className="flex items-center gap-2 mb-3 pb-2 border-b">
+      <Icon className="h-4 w-4 text-primary" />
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h3>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+      {children}
+    </div>
+  </div>
+);
+
+interface FieldProps {
+  label: string;
+  value: any;
+  fullWidth?: boolean;
+}
+
+const Field = ({ label, value, fullWidth = false }: FieldProps) => {
+  if (!value) return null;
+  
+  const displayValue = Array.isArray(value) ? value.join(", ") : value;
+  const isLongText = typeof displayValue === 'string' && displayValue.length > 80;
+  
+  return (
+    <div className={`py-1.5 ${fullWidth || isLongText ? 'md:col-span-2' : ''}`}>
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <p className="text-sm mt-0.5">{displayValue}</p>
+    </div>
+  );
+};
 
 export function FormularioDetalhesDrawer({ formulario, open, onOpenChange }: FormularioDetalhesDrawerProps) {
   const { deletarDiagnostico, isDeleting } = useDiagnosticoAdmin();
@@ -42,17 +80,6 @@ export function FormularioDetalhesDrawer({ formulario, open, onOpenChange }: For
     deletarDiagnostico(formulario.id);
     setDeleteDialogOpen(false);
     onOpenChange(false);
-  };
-
-  const renderField = (label: string, value: any) => {
-    if (!value) return null;
-    
-    return (
-      <div className="mb-4">
-        <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
-        <p className="text-sm">{Array.isArray(value) ? value.join(", ") : value}</p>
-      </div>
-    );
   };
 
   return (
@@ -105,139 +132,78 @@ export function FormularioDetalhesDrawer({ formulario, open, onOpenChange }: For
               </div>
             )}
 
-            <Separator className="my-4" />
+            {/* Informações Pessoais */}
+            <Section icon={User} title="Informações Pessoais">
+              <Field label="Nome Completo" value={formulario.nome_completo} />
+              <Field label="Idade" value={formulario.idade} />
+              <Field label="LinkedIn" value={formulario.linkedin} />
+              <Field label="Profissão" value={formulario.profissao} />
+              <Field label="Área de Atuação" value={formulario.area_atuacao} />
+              <Field label="Outra Área" value={formulario.area_atuacao_outro} />
+              <Field label="Tempo de Experiência" value={formulario.tempo_experiencia} />
+              <Field label="Tamanho da Empresa" value={formulario.tamanho_empresa} />
+            </Section>
 
-            {/* Etapas do Formulário */}
-            <Accordion type="multiple" defaultValue={["step1", "step3", "step7"]} className="w-full">
-              {/* Etapa 1: Informações Pessoais */}
-              <AccordionItem value="step1">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span>Etapa 1: Informações Pessoais</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  {renderField("Nome Completo", formulario.nome_completo)}
-                  {renderField("Idade", formulario.idade)}
-                  {renderField("LinkedIn", formulario.linkedin)}
-                  {renderField("Profissão", formulario.profissao)}
-                  {renderField("Área de Atuação", formulario.area_atuacao)}
-                  {renderField("Outra Área", formulario.area_atuacao_outro)}
-                  {renderField("Tempo de Experiência", formulario.tempo_experiencia)}
-                  {renderField("Tamanho da Empresa", formulario.tamanho_empresa)}
-                </AccordionContent>
-              </AccordionItem>
+            {/* Experiência com IA */}
+            <Section icon={Brain} title="Experiência com IA">
+              <Field label="Nível em IA" value={formulario.nivel_ia} />
+              <Field label="Ferramentas IA Utilizadas" value={formulario.ferramentas_ia} />
+              <Field label="Outras Ferramentas" value={formulario.outras_ferramentas} />
+              <Field label="Frequência de Uso" value={formulario.frequencia_uso_ia} />
+              <Field label="Experiência com IA" value={formulario.experiencia_ia} fullWidth />
+              <Field label="Maior Dificuldade" value={formulario.maior_dificuldade_ia} fullWidth />
+            </Section>
 
-              {/* Etapa 2: Experiência com IA */}
-              <AccordionItem value="step2">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Brain className="h-4 w-4" />
-                    <span>Etapa 2: Experiência com IA</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  {renderField("Nível em IA", formulario.nivel_ia)}
-                  {renderField("Ferramentas IA Utilizadas", formulario.ferramentas_ia)}
-                  {renderField("Outras Ferramentas", formulario.outras_ferramentas)}
-                  {renderField("Frequência de Uso", formulario.frequencia_uso_ia)}
-                  {renderField("Experiência com IA", formulario.experiencia_ia)}
-                  {renderField("Maior Dificuldade", formulario.maior_dificuldade_ia)}
-                </AccordionContent>
-              </AccordionItem>
+            {/* Objetivos */}
+            <Section icon={Target} title="Objetivos">
+              <Field label="Objetivo Principal" value={formulario.objetivo_principal} fullWidth />
+              <Field label="Objetivo Específico" value={formulario.objetivo_especifico} fullWidth />
+              <Field label="Área de Aplicação" value={formulario.area_aplicacao_ia} />
+              <Field label="Meta 3 Meses" value={formulario.meta_3_meses} fullWidth />
+              <Field label="Meta 12 Meses" value={formulario.meta_12_meses} fullWidth />
+              <Field label="Métricas de Sucesso" value={formulario.metricas_sucesso} fullWidth />
+            </Section>
 
-              {/* Etapa 3: Objetivos */}
-              <AccordionItem value="step3">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Target className="h-4 w-4" />
-                    <span>Etapa 3: Objetivos</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  {renderField("Objetivo Principal", formulario.objetivo_principal)}
-                  {renderField("Objetivo Específico", formulario.objetivo_especifico)}
-                  {renderField("Área de Aplicação", formulario.area_aplicacao_ia)}
-                  {renderField("Meta 3 Meses", formulario.meta_3_meses)}
-                  {renderField("Meta 12 Meses", formulario.meta_12_meses)}
-                  {renderField("Métricas de Sucesso", formulario.metricas_sucesso)}
-                </AccordionContent>
-              </AccordionItem>
+            {/* Cenário Atual */}
+            <Section icon={MessageSquare} title="Cenário Atual">
+              <Field label="Desafio Principal" value={formulario.desafio_1} fullWidth />
+              <Field label="Segundo Desafio" value={formulario.desafio_2} fullWidth />
+              <Field label="Terceiro Desafio" value={formulario.desafio_3} fullWidth />
+              <Field label="Lidera Equipe?" value={formulario.lidera_equipe ? "Sim" : formulario.lidera_equipe === false ? "Não" : null} />
+              <Field label="Tamanho da Equipe" value={formulario.tamanho_equipe} />
+              <Field label="Processo a Otimizar" value={formulario.processo_otimizar} fullWidth />
+              <Field label="Maior Ladrão de Tempo" value={formulario.maior_ladrao_tempo} fullWidth />
+              <Field label="Quick Wins" value={formulario.quick_wins} fullWidth />
+            </Section>
 
-              {/* Etapa 4: Cenário Atual */}
-              <AccordionItem value="step4">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    <span>Etapa 4: Cenário Atual</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  {renderField("Desafio Principal", formulario.desafio_1)}
-                  {renderField("Segundo Desafio", formulario.desafio_2)}
-                  {renderField("Terceiro Desafio", formulario.desafio_3)}
-                  {renderField("Lidera Equipe?", formulario.lidera_equipe ? "Sim" : "Não")}
-                  {renderField("Tamanho da Equipe", formulario.tamanho_equipe)}
-                  {renderField("Processo a Otimizar", formulario.processo_otimizar)}
-                  {renderField("Maior Ladrão de Tempo", formulario.maior_ladrao_tempo)}
-                  {renderField("Quick Wins", formulario.quick_wins)}
-                </AccordionContent>
-              </AccordionItem>
+            {/* Estilo de Aprendizagem */}
+            <Section icon={GraduationCap} title="Estilo de Aprendizagem">
+              <Field label="Estilo de Aprendizagem" value={formulario.estilo_aprendizagem} />
+              <Field label="Preferência de Aprendizado" value={formulario.preferencia_aprendizado} />
+              <Field label="Preferência de Sessões" value={formulario.preferencia_sessoes} />
+              <Field label="Frequência de Feedback" value={formulario.frequencia_feedback} />
+              <Field label="Tipo de Suporte" value={formulario.tipo_suporte} />
+              <Field label="Melhor Horário" value={formulario.melhor_horario} />
+            </Section>
 
-              {/* Etapa 5: Estilo de Aprendizagem */}
-              <AccordionItem value="step5">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Brain className="h-4 w-4" />
-                    <span>Etapa 5: Estilo de Aprendizagem</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  {renderField("Estilo de Aprendizagem", formulario.estilo_aprendizagem)}
-                  {renderField("Preferência de Aprendizado", formulario.preferencia_aprendizado)}
-                  {renderField("Preferência de Sessões", formulario.preferencia_sessoes)}
-                  {renderField("Frequência de Feedback", formulario.frequencia_feedback)}
-                  {renderField("Tipo de Suporte", formulario.tipo_suporte)}
-                  {renderField("Melhor Horário", formulario.melhor_horario)}
-                </AccordionContent>
-              </AccordionItem>
+            {/* Motivação */}
+            <Section icon={Sparkles} title="Motivação">
+              <Field label="Não Negociáveis" value={formulario.nao_negociaveis} fullWidth />
+              <Field label="Zona de Conforto" value={formulario.zona_conforto} fullWidth />
+              <Field label="Maior Medo com IA" value={formulario.maior_medo_ia} fullWidth />
+              <Field label="Nível de Autonomia" value={formulario.nivel_autonomia} />
+              <Field label="Limitações Técnicas" value={formulario.limitacoes_tecnicas} fullWidth />
+              <Field label="Tipo de Feedback" value={formulario.tipo_feedback} />
+            </Section>
 
-              {/* Etapa 6: Motivação */}
-              <AccordionItem value="step6">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" />
-                    <span>Etapa 6: Motivação</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  {renderField("Não Negociáveis", formulario.nao_negociaveis)}
-                  {renderField("Zona de Conforto", formulario.zona_conforto)}
-                  {renderField("Maior Medo com IA", formulario.maior_medo_ia)}
-                  {renderField("Nível de Autonomia", formulario.nivel_autonomia)}
-                  {renderField("Limitações Técnicas", formulario.limitacoes_tecnicas)}
-                  {renderField("Tipo de Feedback", formulario.tipo_feedback)}
-                </AccordionContent>
-              </AccordionItem>
-
-              {/* Etapa 7: Expectativas */}
-              <AccordionItem value="step7">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>Etapa 7: Expectativas</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  {renderField("Motivação para Mentoria", formulario.motivacao_mentoria)}
-                  {renderField("Vitória em 30 Dias", formulario.vitoria_30_dias)}
-                  {renderField("Dúvidas/Preocupações", formulario.duvidas_preocupacoes)}
-                  {renderField("Tempo Disponível", formulario.tempo_disponivel)}
-                  {renderField("Nível de Comprometimento", formulario.nivel_comprometimento ? `${formulario.nivel_comprometimento}/10` : null)}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+            {/* Expectativas */}
+            <Section icon={Clock} title="Expectativas">
+              <Field label="Motivação para Mentoria" value={formulario.motivacao_mentoria} fullWidth />
+              <Field label="Vitória em 30 Dias" value={formulario.vitoria_30_dias} fullWidth />
+              <Field label="Dúvidas/Preocupações" value={formulario.duvidas_preocupacoes} fullWidth />
+              <Field label="Tempo Disponível" value={formulario.tempo_disponivel} />
+              <Field label="Nível de Comprometimento" value={formulario.nivel_comprometimento ? `${formulario.nivel_comprometimento}/10` : null} />
+            </Section>
           </ScrollArea>
 
           <DrawerFooter className="border-t">
