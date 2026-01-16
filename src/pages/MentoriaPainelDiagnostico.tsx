@@ -11,6 +11,7 @@ import { ProximaSessao } from "@/components/mentoria/painel/ProximaSessao";
 import { ProjetoPreparacaoSection } from "@/components/mentoria/painel/ProjetoPreparacaoSection";
 import { PainelDiagnosticoShell } from "@/components/mentoria/painel/PainelDiagnosticoShell";
 import { PainelCard, PainelCardHeader } from "@/components/mentoria/painel/PainelCard";
+import { BusinessDashboard } from "@/components/mentoria/business/BusinessDashboard";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -27,11 +28,11 @@ export default function MentoriaPainelDiagnostico() {
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
   
-  // Determinar se é Business view
-  // Admin sempre vê tema Business para preview premium
-  // Para mentorados, usa o plano real do usuário
-  const painelPlano = (isAdmin && userId && profile) ? profile.plano_mentoria : plan;
-  const isBusiness = isAdmin || painelPlano === "business";
+  // Determinar se é Business view baseado no plano do mentorado visualizado
+  // Se estamos visualizando outro usuário (userId), usamos o plano do profile desse usuário
+  // Senão, usamos o plano do próprio usuário logado
+  const painelPlano = userId && profile ? profile.plano_mentoria : plan;
+  const isBusiness = painelPlano === "business";
   const theme = getPainelTheme(isBusiness);
   
   
@@ -110,6 +111,17 @@ export default function MentoriaPainelDiagnostico() {
     );
   }
 
+  // Se for Business, renderiza o BusinessDashboard completo
+  if (isBusiness) {
+    return (
+      <BusinessDashboard 
+        diagnostico={diagnostico}
+        userId={userId || diagnostico.user_id}
+      />
+    );
+  }
+
+  // Para Academy ou outros planos, mantém a estrutura de widgets
   const projetosPrioritarios = projetos.slice(0, 5);
   const projetoPrincipal = projetos[0];
   const proximaSessao = sessoes.find(s => new Date(s.data_sessao) > new Date() && s.status === 'agendada');
