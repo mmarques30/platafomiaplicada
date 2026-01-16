@@ -2,7 +2,7 @@ import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useNavigate } from "react-router-dom";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 export default function MeuDiagnostico() {
@@ -10,33 +10,41 @@ export default function MeuDiagnostico() {
   const { formulario, isLoading } = useMentoriaForm();
   const { plan, isLoading: planLoading } = useUserPlan();
   const { isVisitante, isAdmin, isLoading: roleLoading } = useUserRole();
+  
+  // Ref para garantir que o redirect aconteça apenas UMA vez
+  const hasRedirected = useRef(false);
 
-  // Redirecionar visitantes - não devem acessar esta página
+  // Lógica de redirecionamento UNIFICADA - aguarda TODOS os loadings
   useEffect(() => {
-    if (!roleLoading && isVisitante) {
+    // Aguardar TUDO carregar antes de tomar qualquer decisão
+    if (isLoading || roleLoading || planLoading) return;
+    
+    // Evitar múltiplos redirects
+    if (hasRedirected.current) return;
+
+    // Visitante -> trilhas
+    if (isVisitante) {
+      hasRedirected.current = true;
       toast.info("Esta funcionalidade requer um plano ativo");
       navigate("/trilhas", { replace: true });
+      return;
     }
-  }, [isVisitante, roleLoading, navigate]);
 
-  // Redirect Business para /mentoria/diagnostico (dashboard robusto)
-  useEffect(() => {
-    if (!planLoading && plan === 'business') {
+    // Business -> mentoria/diagnostico (dashboard robusto)
+    if (plan === 'business') {
+      hasRedirected.current = true;
       navigate('/mentoria/diagnostico', { replace: true });
+      return;
     }
-  }, [plan, planLoading, navigate]);
 
-  // Redirecionar automaticamente para formulário ou painel
-  useEffect(() => {
-    if (!isLoading && !roleLoading && !planLoading && !isVisitante && plan !== 'business') {
-      // Admin sempre vai para o painel, nunca para o formulário
-      if (isAdmin || formulario?.completado) {
-        navigate('/diagnostico/painel', { replace: true });
-      } else {
-        navigate('/diagnostico/formulario', { replace: true });
-      }
+    // Academy: admin ou completado -> painel, senão -> formulário
+    hasRedirected.current = true;
+    if (isAdmin || formulario?.completado) {
+      navigate('/diagnostico/painel', { replace: true });
+    } else {
+      navigate('/diagnostico/formulario', { replace: true });
     }
-  }, [formulario, isLoading, roleLoading, planLoading, isVisitante, plan, isAdmin, navigate]);
+  }, [isLoading, roleLoading, planLoading, isVisitante, plan, isAdmin, formulario, navigate]);
 
   // Tela de loading enquanto redireciona
   return (
