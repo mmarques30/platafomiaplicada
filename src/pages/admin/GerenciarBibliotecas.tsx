@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FerramentasTab } from "@/components/admin/bibliotecas/FerramentasTab";
 import { PromptsTab } from "@/components/admin/bibliotecas/PromptsTab";
@@ -8,15 +9,32 @@ import { FormulariosCustomizados } from "@/components/admin/formularios/Formular
 import { PromptsAnalyticsTab } from "@/components/admin/bibliotecas/PromptsAnalyticsTab";
 import { PageTitle } from "@/components/shared/PageTitle";
 
+const validTabs = ["ferramentas", "prompts", "analytics-prompts", "ia-copie-use", "metodos", "formularios"];
+
 export default function GerenciarBibliotecas() {
-  const [activeTab, setActiveTab] = useState("ferramentas");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "ferramentas";
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam && validTabs.includes(tabParam) && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchParams({ tab: value });
+  };
 
   return (
     <div>
       <PageTitle primary="Gerenciar" secondary="Bibliotecas" />
       <div className="mb-8" />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="ferramentas">Ferramentas IA</TabsTrigger>
           <TabsTrigger value="prompts">Prompts</TabsTrigger>

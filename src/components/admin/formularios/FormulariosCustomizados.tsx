@@ -74,160 +74,173 @@ export const FormulariosCustomizados = () => {
   }
 
   return (
-    <div className="space-y-4">
-      <FilterBar
-        filters={[
-          {
-            id: 'status',
-            label: 'Status',
-            placeholder: 'Todos os status',
-            options: [
-              { value: 'todos', label: 'Todos os status' },
-              { value: 'ativo', label: 'Ativo' },
-              { value: 'arquivado', label: 'Arquivado' }
-            ],
-            value: statusFilter,
-            onChange: setStatusFilter
-          },
-          {
-            id: 'visibilidade',
-            label: 'Visibilidade',
-            placeholder: 'Todas',
-            options: [
-              { value: 'todas', label: 'Todas' },
-              { value: 'todos_mentorados', label: 'Todos os Mentorados' },
-              { value: 'especificos', label: 'Específicos' }
-            ],
-            value: visibilidadeFilter,
-            onChange: setVisibilidadeFilter
-          },
-          {
-            id: 'expiracao',
-            label: 'Expiração',
-            placeholder: 'Todos',
-            options: [
-              { value: 'todos', label: 'Todos' },
-              { value: 'vigente', label: 'Vigente' },
-              { value: 'expirado', label: 'Expirado' }
-            ],
-            value: expiracaoFilter,
-            onChange: setExpiracaoFilter
-          }
-        ]}
-        totalItems={formularios.length}
-        filteredItems={filteredFormularios.length}
-        actionButton={
-          <Button onClick={() => setShowModal(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Criar Formulário
-          </Button>
-        }
-      />
-
+    <div className="space-y-8">
+      {/* Formulários do Sistema */}
+      <FormulariosDoSistema />
+      
+      <Separator className="my-8" />
+      
+      {/* Formulários Customizados */}
       <div className="space-y-4">
-        {filteredFormularios.length === 0 ? (
-          <Card className="p-8 text-center">
-            <p className="text-muted-foreground mb-4">
-              Nenhum formulário criado ainda
-            </p>
+        <div className="flex items-center gap-2 mb-4">
+          <Edit className="h-5 w-5 text-primary" />
+          <h3 className="text-lg font-semibold">Formulários Customizados</h3>
+        </div>
+
+        <FilterBar
+          filters={[
+            {
+              id: 'status',
+              label: 'Status',
+              placeholder: 'Todos os status',
+              options: [
+                { value: 'todos', label: 'Todos os status' },
+                { value: 'ativo', label: 'Ativo' },
+                { value: 'arquivado', label: 'Arquivado' }
+              ],
+              value: statusFilter,
+              onChange: setStatusFilter
+            },
+            {
+              id: 'visibilidade',
+              label: 'Visibilidade',
+              placeholder: 'Todas',
+              options: [
+                { value: 'todas', label: 'Todas' },
+                { value: 'todos_mentorados', label: 'Todos os Mentorados' },
+                { value: 'especificos', label: 'Específicos' }
+              ],
+              value: visibilidadeFilter,
+              onChange: setVisibilidadeFilter
+            },
+            {
+              id: 'expiracao',
+              label: 'Expiração',
+              placeholder: 'Todos',
+              options: [
+                { value: 'todos', label: 'Todos' },
+                { value: 'vigente', label: 'Vigente' },
+                { value: 'expirado', label: 'Expirado' }
+              ],
+              value: expiracaoFilter,
+              onChange: setExpiracaoFilter
+            }
+          ]}
+          totalItems={formularios.length}
+          filteredItems={filteredFormularios.length}
+          actionButton={
             <Button onClick={() => setShowModal(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Criar Primeiro Formulário
+              Criar Formulário
             </Button>
-          </Card>
-        ) : (
-          formularios.map((formulario) => {
-            const diasRestantes = getDiasRestantes(formulario.data_expiracao);
-            const expirado = formulario.data_expiracao && isPast(new Date(formulario.data_expiracao));
+          }
+        />
 
-            return (
-              <Card key={formulario.id} className="p-6">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-lg font-semibold">
-                        {formulario.titulo}
-                      </h3>
-                      <Badge variant={getStatusColor(formulario.status, formulario.data_expiracao)}>
-                        {getStatusLabel(formulario.status, formulario.data_expiracao)}
-                      </Badge>
-                    </div>
+        <div className="space-y-4">
+          {filteredFormularios.length === 0 ? (
+            <Card className="p-8 text-center">
+              <p className="text-muted-foreground mb-4">
+                Nenhum formulário customizado criado ainda
+              </p>
+              <Button onClick={() => setShowModal(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Criar Primeiro Formulário
+              </Button>
+            </Card>
+          ) : (
+            formularios.map((formulario) => {
+              const diasRestantes = getDiasRestantes(formulario.data_expiracao);
+              const expirado = formulario.data_expiracao && isPast(new Date(formulario.data_expiracao));
 
-                    {formulario.descricao && (
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {formulario.descricao}
-                      </p>
-                    )}
-
-                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        Para: {formulario.visibilidade === "todos" 
-                          ? "Todos os mentorados" 
-                          : `${formulario.mentorados_ids.length} mentorado(s)`}
+              return (
+                <Card key={formulario.id} className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-semibold">
+                          {formulario.titulo}
+                        </h3>
+                        <Badge variant={getStatusColor(formulario.status, formulario.data_expiracao)}>
+                          {getStatusLabel(formulario.status, formulario.data_expiracao)}
+                        </Badge>
                       </div>
 
-                      {formulario.data_expiracao && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {expirado ? "Expirou em: " : "Expira em: "}
-                          {format(new Date(formulario.data_expiracao), "dd/MM/yyyy", { locale: ptBR })}
-                          {diasRestantes !== null && diasRestantes > 0 && (
-                            <span className="text-orange-500">
-                              ({diasRestantes} {diasRestantes === 1 ? "dia" : "dias"})
-                            </span>
-                          )}
-                        </div>
+                      {formulario.descricao && (
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {formulario.descricao}
+                        </p>
                       )}
 
-                      <div className="flex items-center gap-1">
-                        <CheckCircle2 className="h-4 w-4" />
-                        Respostas: {formulario.total_respostas}
-                      </div>
+                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          Para: {formulario.visibilidade === "todos" 
+                            ? "Todos os mentorados" 
+                            : `${formulario.mentorados_ids.length} mentorado(s)`}
+                        </div>
 
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {formulario.perguntas_geradas.tempo_estimado}
+                        {formulario.data_expiracao && (
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            {expirado ? "Expirou em: " : "Expira em: "}
+                            {format(new Date(formulario.data_expiracao), "dd/MM/yyyy", { locale: ptBR })}
+                            {diasRestantes !== null && diasRestantes > 0 && (
+                              <span className="text-orange-500">
+                                ({diasRestantes} {diasRestantes === 1 ? "dia" : "dias"})
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-1">
+                          <CheckCircle2 className="h-4 w-4" />
+                          Respostas: {formulario.total_respostas}
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {formulario.perguntas_geradas.tempo_estimado}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex gap-2 ml-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedFormularioId(formulario.id)}
-                    >
-                      <Eye className="mr-2 h-4 w-4" />
-                      Ver Respostas
-                    </Button>
-
-                    {formulario.status === "ativo" && !expirado && (
+                    <div className="flex gap-2 ml-4">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleArquivar(formulario.id)}
+                        onClick={() => setSelectedFormularioId(formulario.id)}
                       >
-                        <Archive className="mr-2 h-4 w-4" />
-                        Arquivar
+                        <Eye className="mr-2 h-4 w-4" />
+                        Ver Respostas
                       </Button>
-                    )}
 
-                    {(formulario.status === "arquivado" || expirado) && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleReabrir(formulario.id)}
-                      >
-                        Reabrir
-                      </Button>
-                    )}
+                      {formulario.status === "ativo" && !expirado && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleArquivar(formulario.id)}
+                        >
+                          <Archive className="mr-2 h-4 w-4" />
+                          Arquivar
+                        </Button>
+                      )}
+
+                      {(formulario.status === "arquivado" || expirado) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleReabrir(formulario.id)}
+                        >
+                          Reabrir
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Card>
-            );
-          })
-        )}
+                </Card>
+              );
+            })
+          )}
+        </div>
       </div>
 
       <FormularioCustomizadoModal
