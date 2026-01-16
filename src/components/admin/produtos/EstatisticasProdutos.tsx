@@ -11,10 +11,8 @@ export function EstatisticasProdutos() {
 
   const produtos = [
     { key: "academy", nome: "Academy", cor: "bg-blue-500" },
-    { key: "lab", nome: "Lab", cor: "bg-purple-500" },
-    { key: "skills", nome: "Skills", cor: "bg-green-500" },
-    { key: "club", nome: "Club", cor: "bg-orange-500" },
-    { key: "consult", nome: "Consult", cor: "bg-emerald-500" },
+    { key: "skills", nome: "Skills", cor: "bg-orange-500" },
+    { key: "business", nome: "Business", cor: "bg-purple-500" },
   ];
 
   return (
@@ -110,7 +108,7 @@ export function EstatisticasProdutos() {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
               <div>
-                <p className="text-sm font-medium">Academy → Lab</p>
+                <p className="text-sm font-medium">Academy → Skills</p>
                 <p className="text-xs text-muted-foreground">Clientes elegíveis</p>
               </div>
               <span className="text-2xl font-bold">{stats?.academy || 0}</span>
@@ -118,34 +116,18 @@ export function EstatisticasProdutos() {
 
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
               <div>
-                <p className="text-sm font-medium">Skills → Lab</p>
+                <p className="text-sm font-medium">Academy → Business</p>
+                <p className="text-xs text-muted-foreground">Clientes elegíveis</p>
+              </div>
+              <span className="text-2xl font-bold">{stats?.academy || 0}</span>
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+              <div>
+                <p className="text-sm font-medium">Skills → Business</p>
                 <p className="text-xs text-muted-foreground">Clientes elegíveis</p>
               </div>
               <span className="text-2xl font-bold">{stats?.skills || 0}</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-              <div>
-                <p className="text-sm font-medium">Skills → Consult</p>
-                <p className="text-xs text-muted-foreground">Clientes elegíveis</p>
-              </div>
-              <span className="text-2xl font-bold">{stats?.skills || 0}</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-              <div>
-                <p className="text-sm font-medium">Lab → Club</p>
-                <p className="text-xs text-muted-foreground">Clientes elegíveis</p>
-              </div>
-              <span className="text-2xl font-bold">{stats?.lab || 0}</span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-              <div>
-                <p className="text-sm font-medium">Consult → Club</p>
-                <p className="text-xs text-muted-foreground">Clientes elegíveis</p>
-              </div>
-              <span className="text-2xl font-bold">{stats?.consult || 0}</span>
             </div>
           </div>
         </Card>

@@ -43,9 +43,8 @@ type FormData = {
 const PUBLICO_ALVO_OPTIONS: { value: PublicoAlvo; label: string }[] = [
   { value: 'todos', label: 'Todos os mentorados' },
   { value: 'academy', label: 'Plano Academy' },
-  { value: 'lab', label: 'Plano Lab' },
-  { value: 'club', label: 'Plano Club' },
   { value: 'skills', label: 'Plano Skills' },
+  { value: 'business', label: 'Plano Business' },
   { value: 'usuarios_especificos', label: 'Usuários específicos (liberação individual)' },
 ];
 

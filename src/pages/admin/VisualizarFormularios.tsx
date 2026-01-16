@@ -62,20 +62,19 @@ export default function VisualizarFormularios() {
 
   // Contadores
   const totalAcademy = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "academy").length || 0;
-  const totalClub = formularios?.filter((f: any) => ["club", "boost", "legacy"].includes(f.profiles?.plano_mentoria)).length || 0;
+  const totalSkills = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "skills").length || 0;
+  const totalBusiness = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "business").length || 0;
 
   const getPlanoBadgeColor = (plano: string) => {
     switch (plano) {
       case "academy":
         return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-      case "club":
-      case "boost":
-      case "legacy":
+      case "skills":
+        return "bg-orange-500/10 text-orange-500 border-orange-500/20";
+      case "business":
         return "bg-purple-500/10 text-purple-500 border-purple-500/20";
-      case "lab":
-        return "bg-green-500/10 text-green-500 border-green-500/20";
       default:
-        return "";
+        return "bg-gray-500/10 text-gray-500 border-gray-500/20";
     }
   };
 
@@ -112,7 +111,7 @@ export default function VisualizarFormularios() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total</CardTitle>
@@ -129,12 +128,20 @@ export default function VisualizarFormularios() {
             <div className="text-2xl font-bold">{totalAcademy}</div>
           </CardContent>
         </Card>
-        <Card className="border-purple-500/20">
+        <Card className="border-orange-500/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-purple-500">Club/Boost/Legacy</CardTitle>
+            <CardTitle className="text-sm font-medium text-orange-500">Skills</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalClub}</div>
+            <div className="text-2xl font-bold">{totalSkills}</div>
+          </CardContent>
+        </Card>
+        <Card className="border-purple-500/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-purple-500">Business</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalBusiness}</div>
           </CardContent>
         </Card>
         <Card>
@@ -170,10 +177,8 @@ export default function VisualizarFormularios() {
               <SelectContent>
                 <SelectItem value="all">Todos os planos</SelectItem>
                 <SelectItem value="academy">Academy</SelectItem>
-                <SelectItem value="club">Club</SelectItem>
-                <SelectItem value="boost">Boost</SelectItem>
-                <SelectItem value="legacy">Legacy</SelectItem>
-                <SelectItem value="lab">Lab</SelectItem>
+                <SelectItem value="skills">Skills</SelectItem>
+                <SelectItem value="business">Business</SelectItem>
               </SelectContent>
             </Select>
 

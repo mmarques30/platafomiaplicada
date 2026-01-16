@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "./useAuth";
 
-export type PublicoAlvo = 'todos' | 'academy' | 'lab' | 'club' | 'skills' | 'usuario_especifico' | 'usuarios_especificos';
+export type PublicoAlvo = 'todos' | 'academy' | 'skills' | 'business' | 'usuario_especifico' | 'usuarios_especificos';
 
 export type BonusUsuarioElegivel = {
   id: string;
@@ -50,9 +50,8 @@ export const getPublicoAlvoLabel = (publico: PublicoAlvo): string => {
   const labels: Record<PublicoAlvo, string> = {
     todos: 'Todos os mentorados',
     academy: 'Plano Academy',
-    lab: 'Plano Lab',
-    club: 'Plano Club',
     skills: 'Plano Skills',
+    business: 'Plano Business',
     usuario_especifico: 'Usuário específico',
     usuarios_especificos: 'Usuários específicos'
   };

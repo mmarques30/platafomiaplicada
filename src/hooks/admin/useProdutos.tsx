@@ -260,15 +260,13 @@ export function useEstatisticasProdutos() {
 
       const stats = {
         academy: 0,
-        lab: 0,
         skills: 0,
-        club: 0,
-        consult: 0,
+        business: 0,
         total: data.length,
       };
 
       data.forEach((profile) => {
-        if (profile.plano_mentoria) {
+        if (profile.plano_mentoria && profile.plano_mentoria in stats) {
           stats[profile.plano_mentoria as keyof typeof stats]++;
         }
       });
