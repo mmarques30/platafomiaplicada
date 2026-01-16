@@ -19,8 +19,12 @@ export default function MentoriaDiagnostico() {
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
 
-  // Check if accessed via /diagnostico route (Academy-specific) - moved up
+  // Check if accessed via /diagnostico route (Academy-specific)
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');
+  const isFormularioRoute = location.pathname === '/diagnostico/formulario';
+  
+  // Verificar se admin quer explicitamente editar (via query param)
+  const canEdit = new URLSearchParams(location.search).get("edit") === "1";
 
   // Redirecionar visitantes - não devem acessar esta página
   useEffect(() => {
@@ -29,6 +33,14 @@ export default function MentoriaDiagnostico() {
       navigate("/trilhas", { replace: true });
     }
   }, [isVisitante, roleLoading, navigate]);
+
+  // GUARD DEFINITIVO: Admin em /diagnostico/formulario SEM ?edit=1 => vai para painel
+  useEffect(() => {
+    if (roleLoading) return;
+    if (isAdmin && isFormularioRoute && !canEdit) {
+      navigate("/diagnostico/painel", { replace: true });
+    }
+  }, [isAdmin, isFormularioRoute, canEdit, roleLoading, navigate]);
 
   // Admin pode acessar esta rota sem redirecionamento automático.
   // (Evita loop de replaceState entre /diagnostico/formulario e /diagnostico/painel)

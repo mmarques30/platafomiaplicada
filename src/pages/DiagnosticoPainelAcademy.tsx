@@ -103,7 +103,7 @@ export default function DiagnosticoPainelAcademy() {
                     </p>
                   </div>
                   <Button 
-                    onClick={() => navigate("/diagnostico/formulario")}
+                    onClick={() => navigate(isAdmin ? "/diagnostico/formulario?edit=1" : "/diagnostico/formulario")}
                     className="bg-aplicada-green-700 hover:bg-aplicada-green-800"
                   >
                     <FileText className="h-4 w-4 mr-2" />
