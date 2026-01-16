@@ -158,26 +158,19 @@ export function BusinessDashboard({ diagnostico, userId }: BusinessDashboardProp
           entregasHistorico={chartData.entregasHistorico}
         />
 
-        {/* Two column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Projetos - 2 columns */}
-          <div className="lg:col-span-2">
-            <BusinessProjetosSection 
-              projetos={projetos}
-              tarefas={tarefas}
-              onCreateTarefa={handleCreateTarefa}
-              onUpdateTarefa={handleUpdateTarefa}
-              onUploadEntrega={handleUploadEntrega}
-              isCreating={isCreating}
-              isUpdating={isUpdating}
-            />
-          </div>
+        {/* Roadmap - largura total, horizontal */}
+        <BusinessRoadmap sessoes={sessoes} />
 
-          {/* Roadmap - 1 column */}
-          <div className="lg:col-span-1">
-            <BusinessRoadmap sessoes={sessoes} />
-          </div>
-        </div>
+        {/* Projetos em Andamento - largura total, abaixo do roadmap */}
+        <BusinessProjetosSection 
+          projetos={projetos}
+          tarefas={tarefas}
+          onCreateTarefa={handleCreateTarefa}
+          onUpdateTarefa={handleUpdateTarefa}
+          onUploadEntrega={handleUploadEntrega}
+          isCreating={isCreating}
+          isUpdating={isUpdating}
+        />
 
       </div>
     </div>
