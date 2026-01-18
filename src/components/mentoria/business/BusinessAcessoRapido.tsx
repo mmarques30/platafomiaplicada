@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   ClipboardCheck, 
   Calendar, 
-  Route, 
+  Map, 
   FolderKanban, 
   ListTodo, 
   BookOpen 
@@ -12,12 +12,13 @@ interface QuickNavItem {
   title: string;
   path: string;
   icon: React.ElementType;
+  external?: boolean;
 }
 
 const navItems: QuickNavItem[] = [
   { title: "Diagnóstico", path: "/mentoria/diagnostico", icon: ClipboardCheck },
   { title: "Sessões", path: "/mentoria/sessoes", icon: Calendar },
-  { title: "Roadmap", path: "/mentoria?tab=roadmap", icon: Route },
+  { title: "MAPA", path: "https://mapa.iaplicada.com.br", icon: Map, external: true },
   { title: "Projetos", path: "/mentoria/projetos", icon: FolderKanban },
   { title: "Tarefas", path: "/mentoria/tarefas", icon: ListTodo },
   { title: "Materiais", path: "/mentoria/recursos", icon: BookOpen },
@@ -33,7 +34,7 @@ export function BusinessAcessoRapido() {
         {navItems.map((item) => (
           <button
             key={item.path}
-            onClick={() => navigate(item.path)}
+            onClick={() => item.external ? window.open(item.path, "_blank") : navigate(item.path)}
             className="flex flex-col items-center gap-2 p-3 rounded-lg 
                        hover:bg-white/5 transition-all group flex-1"
           >
@@ -50,7 +51,7 @@ export function BusinessAcessoRapido() {
         {navItems.map((item) => (
           <button
             key={item.path}
-            onClick={() => navigate(item.path)}
+            onClick={() => item.external ? window.open(item.path, "_blank") : navigate(item.path)}
             className="flex flex-col items-center gap-2 p-3 rounded-lg 
                        hover:bg-white/5 transition-all group"
           >
