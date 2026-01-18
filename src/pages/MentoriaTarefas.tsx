@@ -26,7 +26,7 @@ import { PageTitle } from "@/components/shared/PageTitle";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type ViewMode = "cards" | "tabela" | "kanban";
+type ViewMode = "tabela" | "kanban";
 
 export default function MentoriaTarefas() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function MentoriaTarefas() {
   const [entregaFile, setEntregaFile] = useState<File | null>(null);
   const [linkExterno, setLinkExterno] = useState("");
   const [selectedTarefa, setSelectedTarefa] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const [viewMode, setViewMode] = useState<ViewMode>("tabela");
 
   const tarefaSelecionada = tarefas.find(t => t.id === selectedTarefa);
 
@@ -160,39 +160,6 @@ export default function MentoriaTarefas() {
     </div>
   );
 
-  // Card simples para lista
-  const TarefaCardSimples = ({ tarefa }: { tarefa: any }) => (
-    <Card 
-      className="cursor-pointer hover:shadow-md transition-shadow"
-      onClick={() => handleOpenTarefa(tarefa.id)}
-    >
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              {getPrioridadeBadge(tarefa.prioridade)}
-              {getStatusBadge(tarefa.status)}
-              <Badge variant="outline">{tarefa.tipo}</Badge>
-            </div>
-            <h4 className="font-semibold">{tarefa.titulo}</h4>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{tarefa.descricao}</p>
-          </div>
-          <Button size="sm" variant="ghost" className="ml-2">
-            <Eye className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground mt-3">
-          <div className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            {format(new Date(tarefa.prazo_entrega), "dd/MM/yyyy", { locale: ptBR })}
-          </div>
-          <div className="flex items-center gap-1">
-            {getDiasRestantes(tarefa.prazo_entrega)}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   if (isLoading) return <div className="p-8">Carregando...</div>;
 
@@ -211,15 +178,6 @@ export default function MentoriaTarefas() {
         
         {/* Toggle de visualização */}
         <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
-          <Button
-            variant={viewMode === "cards" ? "secondary" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("cards")}
-            className="gap-2"
-          >
-            <FileText className="h-4 w-4" />
-            Cards
-          </Button>
           <Button
             variant={viewMode === "tabela" ? "secondary" : "ghost"}
             size="sm"
@@ -277,20 +235,6 @@ export default function MentoriaTarefas() {
         </Card>
       </div>
 
-      {/* Visualização Cards */}
-      {viewMode === "cards" && (
-        <div className="space-y-3">
-          {todasTarefas.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center text-muted-foreground">
-                Nenhuma tarefa encontrada
-              </CardContent>
-            </Card>
-          ) : (
-            todasTarefas.map(tarefa => <TarefaCardSimples key={tarefa.id} tarefa={tarefa} />)
-          )}
-        </div>
-      )}
 
       {/* Visualização Tabela */}
       {viewMode === "tabela" && (
