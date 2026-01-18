@@ -15,7 +15,7 @@ import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 import { BusinessTarefasCard } from "@/components/mentoria/BusinessTarefasCard";
 import { MapaAppCard } from "@/components/mentoria/MapaAppCard";
 import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
-import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
+import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Mentoria() {
@@ -48,10 +48,10 @@ export default function Mentoria() {
           </TabsTrigger>
           {isBusiness && (
             <TabsTrigger
-              value="progresso-conteudo"
+              value="evolucao-aprendizado"
               className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
             >
-              Progresso Conteúdo
+              Evolução Aprendizado
             </TabsTrigger>
           )}
         </TabsList>
@@ -91,10 +91,10 @@ export default function Mentoria() {
           )}
         </TabsContent>
 
-        {/* Aba Progresso Conteúdo - Apenas Business */}
+        {/* Aba Evolução Aprendizado - Apenas Business */}
         {isBusiness && (
-          <TabsContent value="progresso-conteudo" className="mt-0 space-y-6">
-            <BusinessProgressoConteudo />
+          <TabsContent value="evolucao-aprendizado" className="mt-0 space-y-6">
+            <BusinessEvolucaoAprendizado />
           </TabsContent>
         )}
 
