@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { MentoriaHeroDashboard } from "@/components/mentoria/MentoriaHeroDashboard";
 import { StatusDiagnostico } from "@/components/mentoria/StatusDiagnostico";
 import { ProximaSessao } from "@/components/mentoria/ProximaSessao";
@@ -18,7 +19,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Mentoria() {
   const { user } = useAuth();
-  const { isBusiness } = useUserPlan();
+  const { isAdmin } = useUserRole();
+  const { isBusiness } = useEffectivePlan(isAdmin);
 
   return (
     <div className="container mx-auto py-4 md:py-8 px-4 max-w-7xl">
