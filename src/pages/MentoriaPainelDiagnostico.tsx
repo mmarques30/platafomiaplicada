@@ -47,12 +47,13 @@ export default function MentoriaPainelDiagnostico() {
   
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');
   
+  // Academy vai direto para /evolucao para evitar flash de roadmap
   const voltarUrl = isAdmin 
     ? '/mentoria' 
     : !effectivePlan 
       ? '/comunidade' 
       : (effectivePlan === 'academy' || isAcademyRoute)
-        ? '/meu-diagnostico' 
+        ? '/evolucao' 
         : '/mentoria';
   
   const voltarLabel = isAdmin 
@@ -60,7 +61,7 @@ export default function MentoriaPainelDiagnostico() {
     : !effectivePlan 
       ? 'Voltar para Comunidade' 
       : (effectivePlan === 'academy' || isAcademyRoute)
-        ? 'Voltar para Meu Diagnóstico' 
+        ? 'Voltar para Minha Evolução' 
         : 'Voltar para Mentoria';
 
   if (isLoading || roleLoading || isVisitante) {

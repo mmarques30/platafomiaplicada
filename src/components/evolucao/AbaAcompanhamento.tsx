@@ -10,10 +10,14 @@ import { ptBR } from "date-fns/locale";
 import { ResumoProjetos } from "./ResumoProjetos";
 import { ListaProjetosSimples } from "./ListaProjetosSimples";
 import { HeroAcompanhamento } from "./HeroAcompanhamento";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export function AbaAcompanhamento() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
+  const { isAdmin } = useUserRole();
+  const { isBusiness } = useEffectivePlan(isAdmin);
 
   const completo = formulario?.completado || false;
   const preenchidoPorAdmin = formulario?.preenchido_por === "admin";
@@ -86,13 +90,13 @@ export function AbaAcompanhamento() {
                   )}
                   <div className="flex gap-2 pt-2">
                     <Button
-                      onClick={() => navigate("/mentoria/painel-diagnostico")}
+                      onClick={() => navigate(isBusiness ? "/mentoria/painel-diagnostico" : "/diagnostico/painel")}
                       className="flex-1"
                     >
                       Ver Painel de Diagnóstico
                     </Button>
                     <Button
-                      onClick={() => navigate("/mentoria/diagnostico")}
+                      onClick={() => navigate(isBusiness ? "/mentoria/diagnostico" : "/diagnostico/formulario")}
                       variant="outline"
                     >
                       Editar
@@ -111,7 +115,7 @@ export function AbaAcompanhamento() {
                     </div>
                   </div>
                   <Button
-                    onClick={() => navigate("/mentoria/diagnostico")}
+                    onClick={() => navigate(isBusiness ? "/mentoria/diagnostico" : "/diagnostico/formulario")}
                     className="w-full"
                   >
                     Iniciar Diagnóstico
