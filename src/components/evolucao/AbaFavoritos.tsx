@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Search } from "lucide-react";
 import FavoritoRow from "@/components/favoritos/FavoritoRow";
 
@@ -113,57 +113,61 @@ export function AbaFavoritos() {
 
   return (
     <div className="space-y-6">
-      <div className="mb-6">
-        <div className="relative max-w-md">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Buscar nos favoritos..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
         </div>
+        <Select value={activeTab} onValueChange={setActiveTab}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filtrar por tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="trilha">Trilhas</SelectItem>
+            <SelectItem value="video">Vídeos</SelectItem>
+            <SelectItem value="ferramenta">Ferramentas</SelectItem>
+            <SelectItem value="prompt">Prompts</SelectItem>
+            <SelectItem value="metodo">Métodos</SelectItem>
+            <SelectItem value="ia_copie_use">IA Copie e Use</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="w-full overflow-x-auto flex-nowrap h-auto gap-1 justify-start">
-          <TabsTrigger value="todos" className="text-xs whitespace-nowrap">Todos</TabsTrigger>
-          <TabsTrigger value="trilha" className="text-xs whitespace-nowrap">Trilhas</TabsTrigger>
-          <TabsTrigger value="video" className="text-xs whitespace-nowrap">Vídeos</TabsTrigger>
-          <TabsTrigger value="ferramenta" className="text-xs whitespace-nowrap">Ferramentas</TabsTrigger>
-          <TabsTrigger value="prompt" className="text-xs whitespace-nowrap">Prompts</TabsTrigger>
-          <TabsTrigger value="metodo" className="text-xs whitespace-nowrap">Métodos</TabsTrigger>
-          <TabsTrigger value="ia_copie_use" className="text-xs whitespace-nowrap">IA Copie e Use</TabsTrigger>
-        </TabsList>
-        <TabsContent value={activeTab} className="space-y-4">
-          {!filteredFavoritos || filteredFavoritos.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Heart className="h-16 w-16 text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Nenhum favorito encontrado</h3>
-                <p className="text-muted-foreground text-center">
-                  {searchTerm ? "Tente ajustar sua busca" : "Comece a favoritar conteúdos"}
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="p-0">
-                {filteredFavoritos.map((favorito) => {
-                  const { item, link } = getFavoritoDetails(favorito);
-                  if (!item) return null;
-                  
-                  return (
-                    <FavoritoRow
-                      key={favorito.id}
-                      tipo={favorito.tipo}
-                      titulo={item?.titulo || item?.nome}
-                      descricao={item?.descricao || item?.objetivo || "Sem descrição"}
-                      link={link}
-                      onRemove={() => toggleFavorito.mutate({ tipo: favorito.tipo, item_id: favorito.item_id })}
-                      isRemoving={toggleFavorito.isPending}
-                    />
-                  );
-                })}
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
+
+      <div className="space-y-4">
+        {!filteredFavoritos || filteredFavoritos.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Heart className="h-16 w-16 text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Nenhum favorito encontrado</h3>
+              <p className="text-muted-foreground text-center">
+                {searchTerm ? "Tente ajustar sua busca" : "Comece a favoritar conteúdos"}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-0">
+              {filteredFavoritos.map((favorito) => {
+                const { item, link } = getFavoritoDetails(favorito);
+                if (!item) return null;
+                
+                return (
+                  <FavoritoRow
+                    key={favorito.id}
+                    tipo={favorito.tipo}
+                    titulo={item?.titulo || item?.nome}
+                    descricao={item?.descricao || item?.objetivo || "Sem descrição"}
+                    link={link}
+                    onRemove={() => toggleFavorito.mutate({ tipo: favorito.tipo, item_id: favorito.item_id })}
+                    isRemoving={toggleFavorito.isPending}
+                  />
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
