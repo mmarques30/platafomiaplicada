@@ -100,8 +100,7 @@ export function BusinessTarefasCard() {
     <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-primary" />
+          <CardTitle className="text-lg font-semibold">
             Tarefas Pendentes
           </CardTitle>
           <div className="flex items-center gap-2">

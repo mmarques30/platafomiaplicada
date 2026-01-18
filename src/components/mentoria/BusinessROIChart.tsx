@@ -87,8 +87,7 @@ export function BusinessROIChart() {
     <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
+          <CardTitle className="text-lg font-semibold">
             Projeção de ROI vs Projetos
           </CardTitle>
           <div className="flex items-center gap-4 text-sm">
