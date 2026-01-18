@@ -911,6 +911,78 @@ export type Database = {
         }
         Relationships: []
       }
+      contratos_business: {
+        Row: {
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          entregas_esperadas: Json | null
+          id: string
+          modulos_contratados: number
+          observacoes: string | null
+          reports_frequencia: string | null
+          reunioes_mensais: number
+          roi_projetado: number | null
+          status: string | null
+          suporte_tipo: string | null
+          tempo_consultoria_meses: number
+          updated_at: string
+          user_id: string
+          valor_contrato: number | null
+        }
+        Insert: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          entregas_esperadas?: Json | null
+          id?: string
+          modulos_contratados?: number
+          observacoes?: string | null
+          reports_frequencia?: string | null
+          reunioes_mensais?: number
+          roi_projetado?: number | null
+          status?: string | null
+          suporte_tipo?: string | null
+          tempo_consultoria_meses?: number
+          updated_at?: string
+          user_id: string
+          valor_contrato?: number | null
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          entregas_esperadas?: Json | null
+          id?: string
+          modulos_contratados?: number
+          observacoes?: string | null
+          reports_frequencia?: string | null
+          reunioes_mensais?: number
+          roi_projetado?: number | null
+          status?: string | null
+          suporte_tipo?: string | null
+          tempo_consultoria_meses?: number
+          updated_at?: string
+          user_id?: string
+          valor_contrato?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_business_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_business_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       cursos: {
         Row: {
           ativo: boolean | null
@@ -2663,6 +2735,47 @@ export type Database = {
             columns: ["produto_origem_id"]
             isOneToOne: false
             referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports_business: {
+        Row: {
+          arquivo_url: string | null
+          contrato_id: string
+          created_at: string
+          data_envio: string
+          descricao: string | null
+          id: string
+          periodo_referencia: string | null
+          titulo: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          contrato_id: string
+          created_at?: string
+          data_envio?: string
+          descricao?: string | null
+          id?: string
+          periodo_referencia?: string | null
+          titulo: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          contrato_id?: string
+          created_at?: string
+          data_envio?: string
+          descricao?: string | null
+          id?: string
+          periodo_referencia?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
             referencedColumns: ["id"]
           },
         ]
