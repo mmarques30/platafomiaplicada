@@ -1,33 +1,38 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  Calendar, 
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { 
   CheckCircle2, 
   Clock, 
   FileText, 
-  MessageSquare, 
-  ExternalLink,
+  BookOpen,
   Download
 } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
-import { format, parseISO, isPast, isFuture } from "date-fns";
+import { format, parseISO, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export function BusinessExecutiveRoadmap() {
-  const { contrato, reports, progresso, tempoRestante, isLoading } = useContratosBusiness();
+  const { contrato, reports, progresso, isLoading } = useContratosBusiness();
   const { sessoes } = useMentoriaSessoes();
 
-  // Usar todas as sessões como reuniões de alinhamento
-  const reunioesAlinhamento = sessoes || [];
+  // Usar todas as sessões como reuniões recorrentes
+  const reunioesRecorrentes = sessoes || [];
 
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-32 bg-muted rounded-xl" />
+        <div className="h-12 bg-muted rounded-xl" />
         <div className="h-48 bg-muted rounded-xl" />
         <div className="grid md:grid-cols-3 gap-4">
           <div className="h-40 bg-muted rounded-xl" />
@@ -53,6 +58,13 @@ export function BusinessExecutiveRoadmap() {
   const entregasConcluidas = isPreview ? 0 : entregas.filter(e => e.status === "concluida").length;
   const progressoAtual = isPreview ? 0 : progresso.percentual;
 
+  // Dados de exemplo para guias de uso
+  const guiasExemplo = [
+    { titulo: "Como usar a plataforma", descricao: "Guia completo de navegação" },
+    { titulo: "Boas práticas de IA", descricao: "Dicas para maximizar resultados" },
+    { titulo: "FAQ - Perguntas frequentes", descricao: "Respostas às dúvidas comuns" },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Banner de Preview */}
@@ -67,16 +79,21 @@ export function BusinessExecutiveRoadmap() {
         </Card>
       )}
 
+      {/* Progresso Geral do Roadmap */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="font-medium">Progresso do Roadmap</span>
+          <span className="text-muted-foreground">
+            {entregasConcluidas}/{entregas.length} entregas ({progressoAtual}%)
+          </span>
+        </div>
+        <Progress value={progressoAtual} className="h-2" />
+      </div>
 
       {/* Timeline de Entregas */}
       <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center justify-between">
-            <span>Entregas Esperadas</span>
-            <span className="text-sm font-normal text-muted-foreground">
-              {entregasConcluidas}/{entregas.length} ({progressoAtual}%)
-            </span>
-          </CardTitle>
+          <CardTitle className="text-lg">Entregas Esperadas</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative">
@@ -136,69 +153,71 @@ export function BusinessExecutiveRoadmap() {
         </CardContent>
       </Card>
 
-      {/* Grid: Reuniões, Reports, Suporte */}
+      {/* Grid: Reuniões, Documentos, Guias */}
       <div className="grid md:grid-cols-3 gap-4">
-        {/* Reuniões de Alinhamento */}
+        {/* Reuniões Recorrentes - Formato Tabela */}
         <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-primary" />
-              Reuniões Mensais
-            </CardTitle>
+            <CardTitle className="text-base">Reuniões Recorrentes</CardTitle>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[180px]">
               {isPreview ? (
                 <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-60">
-                  <Calendar className="h-8 w-8 text-muted-foreground/50 mb-2" />
                   <p className="text-muted-foreground text-sm">
                     As reuniões aparecerão aqui após o início do contrato
                   </p>
                 </div>
-              ) : reunioesAlinhamento.length === 0 ? (
+              ) : reunioesRecorrentes.length === 0 ? (
                 <p className="text-muted-foreground text-sm text-center py-4">
                   Nenhuma reunião agendada
                 </p>
               ) : (
-                <div className="space-y-2">
-                  {reunioesAlinhamento.map((reuniao) => {
-                    const data = parseISO(reuniao.data_sessao);
-                    const passada = isPast(data);
-                    
-                    return (
-                      <div 
-                        key={reuniao.id}
-                        className={`flex items-center justify-between p-2 rounded-lg ${
-                          passada 
-                            ? 'bg-muted/30' 
-                            : 'bg-primary/10 border border-primary/20'
-                        }`}
-                      >
-                        <span className={`text-sm ${passada ? 'text-muted-foreground' : 'font-medium'}`}>
-                          {format(data, "dd MMM", { locale: ptBR })}
-                        </span>
-                        {passada ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Badge variant="secondary" className="text-xs">
-                            Próxima
-                          </Badge>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Data</TableHead>
+                      <TableHead className="text-xs text-right">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reunioesRecorrentes.map((reuniao) => {
+                      const data = parseISO(reuniao.data_sessao);
+                      const passada = isPast(data);
+                      
+                      return (
+                        <TableRow key={reuniao.id}>
+                          <TableCell className="text-sm py-2">
+                            {format(data, "dd MMM yyyy", { locale: ptBR })}
+                          </TableCell>
+                          <TableCell className="text-right py-2">
+                            {passada ? (
+                              <span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                                <CheckCircle2 className="h-3 w-3" />
+                                Realizada
+                              </span>
+                            ) : (
+                              <Badge variant="secondary" className="text-xs">
+                                Agendada
+                              </Badge>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               )}
             </ScrollArea>
           </CardContent>
         </Card>
 
-        {/* Reports Enviados */}
+        {/* Documentos Suporte */}
         <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="h-4 w-4 text-primary" />
-              Reports Enviados
+              Documentos Suporte
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -207,12 +226,12 @@ export function BusinessExecutiveRoadmap() {
                 <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-60">
                   <FileText className="h-8 w-8 text-muted-foreground/50 mb-2" />
                   <p className="text-muted-foreground text-sm">
-                    Os reports serão listados aqui
+                    Os documentos de suporte aparecerão aqui
                   </p>
                 </div>
               ) : reports.length === 0 ? (
                 <p className="text-muted-foreground text-sm text-center py-4">
-                  Nenhum report enviado
+                  Nenhum documento disponível
                 </p>
               ) : (
                 <div className="space-y-2">
@@ -228,14 +247,12 @@ export function BusinessExecutiveRoadmap() {
                         </p>
                       </div>
                       {report.arquivo_url && (
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 flex-shrink-0"
+                        <button 
+                          className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-md hover:bg-muted"
                           onClick={() => window.open(report.arquivo_url!, '_blank')}
                         >
                           <Download className="h-4 w-4" />
-                        </Button>
+                        </button>
                       )}
                     </div>
                   ))}
@@ -245,51 +262,37 @@ export function BusinessExecutiveRoadmap() {
           </CardContent>
         </Card>
 
-        {/* Suporte */}
+        {/* Guias de Uso */}
         <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-primary" />
-              Suporte
+              <BookOpen className="h-4 w-4 text-primary" />
+              Guias de Uso
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="text-center py-2">
-                {isPreview ? (
-                  <Badge variant="outline" className="text-sm py-1.5 px-4 border-dashed">
-                    Tipo a definir
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="text-sm py-1.5 px-4 bg-primary/10 text-primary">
-                    {contrato?.suporte_tipo === 'prioritario' 
-                      ? '⚡ Prioritário' 
-                      : contrato?.suporte_tipo === 'whatsapp' 
-                        ? '📱 WhatsApp' 
-                        : '📧 E-mail'}
-                  </Badge>
-                )}
-              </div>
-              
-              <p className="text-xs text-muted-foreground text-center">
-                Frequência de reports: {isPreview ? '—' : (contrato?.reports_frequencia || 'Mensal')}
-              </p>
-              
-              <Button 
-                variant="outline" 
-                className="w-full"
-                disabled={isPreview}
-                onClick={() => {
-                  if (!isPreview) {
-                    window.open("https://wa.me/5511999999999", "_blank");
-                  }
-                }}
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Abrir Chat
-                <ExternalLink className="h-3 w-3 ml-2" />
-              </Button>
-            </div>
+            <ScrollArea className="h-[180px]">
+              {isPreview ? (
+                <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-60">
+                  <BookOpen className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                  <p className="text-muted-foreground text-sm">
+                    Os guias de uso aparecerão aqui
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {guiasExemplo.map((guia, index) => (
+                    <div 
+                      key={index}
+                      className="p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                    >
+                      <p className="text-sm font-medium">{guia.titulo}</p>
+                      <p className="text-xs text-muted-foreground">{guia.descricao}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
           </CardContent>
         </Card>
       </div>
