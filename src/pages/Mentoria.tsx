@@ -15,6 +15,7 @@ import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 import { BusinessTarefasCard } from "@/components/mentoria/BusinessTarefasCard";
 import { MapaAppCard } from "@/components/mentoria/MapaAppCard";
 import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
+import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Mentoria() {
@@ -32,7 +33,7 @@ export default function Mentoria() {
 
       {/* Tabs - Diferente para Business vs Academy */}
       <Tabs defaultValue="visao-geral" className="w-full mt-6">
-        <TabsList className="w-full md:w-auto grid grid-cols-2 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6">
+        <TabsList className={`w-full md:w-auto grid ${isBusiness ? 'grid-cols-3' : 'grid-cols-2'} md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6`}>
           <TabsTrigger
             value="visao-geral"
             className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
@@ -45,6 +46,14 @@ export default function Mentoria() {
           >
             Roadmap
           </TabsTrigger>
+          {isBusiness && (
+            <TabsTrigger
+              value="progresso-conteudo"
+              className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+            >
+              Progresso Conteúdo
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* Aba Visão Geral - Diferente para Business */}
@@ -81,6 +90,13 @@ export default function Mentoria() {
             </>
           )}
         </TabsContent>
+
+        {/* Aba Progresso Conteúdo - Apenas Business */}
+        {isBusiness && (
+          <TabsContent value="progresso-conteudo" className="mt-0 space-y-6">
+            <BusinessProgressoConteudo />
+          </TabsContent>
+        )}
 
       </Tabs>
     </div>
