@@ -12,7 +12,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { EtapaEvolucao, Etapa } from "./EtapaEvolucao";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
@@ -60,7 +61,8 @@ const getFerramentaIcon = (nome: string): LucideIcon => {
 export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [expandirDetalhes, setExpandirDetalhes] = useState(false);
-  const { isBusiness } = useUserPlan();
+  const { isAdmin } = useUserRole();
+  const { isBusiness } = useEffectivePlan(isAdmin);
   const navigate = useNavigate();
   
   const planoJaCriado = formulario?.plano_gerado;

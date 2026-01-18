@@ -73,6 +73,33 @@ export function useEffectivePlan(isAdmin: boolean) {
     // Context not available, use defaults
   }
 
+  // Função centralizada para verificar acesso efetivo
+  const hasEffectiveAccessTo = (product: "trilhas" | "skills" | "business") => {
+    // Determinar o plano atual considerando simulação
+    let currentPlan: UserPlan | null = null;
+    
+    if (isAdmin && isViewingAs && viewAs) {
+      currentPlan = viewAs === "visitante" ? null : viewAs as UserPlan;
+    } else if (isAdmin) {
+      currentPlan = "business"; // Admin sem viewAs vê como business
+    } else {
+      currentPlan = plan;
+    }
+    
+    if (!currentPlan) return false;
+    
+    switch (product) {
+      case "trilhas":
+        return ["academy", "skills", "business"].includes(currentPlan);
+      case "skills":
+        return ["skills", "business"].includes(currentPlan);
+      case "business":
+        return currentPlan === "business";
+      default:
+        return false;
+    }
+  };
+
   // Se admin está usando "ver como", usar essa visão
   if (isAdmin && isViewingAs && viewAs) {
     const isSimulatingVisitante = viewAs === "visitante";
@@ -82,6 +109,7 @@ export function useEffectivePlan(isAdmin: boolean) {
       plan,
       effectivePlan: simulatedPlan,
       hasAccessTo,
+      hasEffectiveAccessTo,
       isLoading,
       // Flags efetivas (baseadas na simulação)
       isBusiness: viewAs === "business",
@@ -107,6 +135,7 @@ export function useEffectivePlan(isAdmin: boolean) {
     plan,
     effectivePlan: isAdmin ? "business" as UserPlan : plan,
     hasAccessTo,
+    hasEffectiveAccessTo,
     isLoading,
     // Flags efetivas (consideram admin)
     isBusiness: effectiveIsBusiness,
