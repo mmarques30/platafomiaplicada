@@ -49,10 +49,19 @@ export function AdminViewProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAdminViewContext() {
+// Safe hook that doesn't throw when outside provider
+export function useAdminViewContext(): AdminViewContextType {
   const context = useContext(AdminViewContext);
+  
+  // Return default values if outside provider (safe fallback)
   if (context === undefined) {
-    throw new Error("useAdminViewContext must be used within an AdminViewProvider");
+    return {
+      viewAs: null,
+      setViewAs: () => {},
+      isViewingAs: false,
+      resetView: () => {},
+    };
   }
+  
   return context;
 }
