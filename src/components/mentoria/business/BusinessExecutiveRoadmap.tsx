@@ -4,15 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  Briefcase, 
   Calendar, 
   CheckCircle2, 
-  Circle, 
   Clock, 
   FileText, 
   MessageSquare, 
-  Package,
-  Timer,
   ExternalLink,
   Download
 } from "lucide-react";
@@ -71,87 +67,21 @@ export function BusinessExecutiveRoadmap() {
         </Card>
       )}
 
-      {/* Header do Contrato */}
-      <Card className={`border-border/50 bg-gradient-to-br from-primary/5 via-card to-accent/5 ${isPreview ? 'opacity-75' : ''}`}>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                <Briefcase className="h-7 w-7 text-primary-foreground" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold">Contrato Business</h2>
-                <p className="text-muted-foreground text-sm">
-                  {isPreview ? (
-                    <>— módulos • — meses de consultoria</>
-                  ) : (
-                    <>
-                      {contrato.modulos_contratados} módulo{contrato.modulos_contratados > 1 ? 's' : ''} • 
-                      {contrato.tempo_consultoria_meses} meses de consultoria
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-3">
-              {isPreview ? (
-                <Badge variant="outline" className="text-sm py-1.5 px-3 border-dashed border-amber-500/50 text-amber-600 dark:text-amber-400">
-                  <Clock className="h-4 w-4 mr-1.5" />
-                  Aguardando Configuração
-                </Badge>
-              ) : (
-                <>
-                  {tempoRestante && !tempoRestante.expirado && (
-                    <Badge variant="outline" className="text-sm py-1.5 px-3">
-                      <Timer className="h-4 w-4 mr-1.5" />
-                      {tempoRestante.meses} mês{tempoRestante.meses > 1 ? 'es' : ''} restante{tempoRestante.meses > 1 ? 's' : ''}
-                    </Badge>
-                  )}
-                  {tempoRestante?.expirado && (
-                    <Badge variant="destructive" className="text-sm py-1.5 px-3">
-                      Contrato Expirado
-                    </Badge>
-                  )}
-                </>
-              )}
-              <Badge variant="secondary" className="text-sm py-1.5 px-3 bg-primary/10 text-primary">
-                {entregasConcluidas} de {entregas.length} entregas
-              </Badge>
-            </div>
-          </div>
-          
-          {/* Barra de Progresso */}
-          <div className="mt-6">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-muted-foreground">Progresso Geral</span>
-              <span className="font-semibold">{progressoAtual}%</span>
-            </div>
-            <Progress value={progressoAtual} className="h-2" />
-            {isPreview && (
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                Será atualizado após início do contrato
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Timeline de Entregas */}
       <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Package className="h-5 w-5 text-primary" />
-            Entregas Esperadas
-            {isPreview && (
-              <Badge variant="outline" className="text-xs ml-2 border-dashed">Exemplo</Badge>
-            )}
+          <CardTitle className="text-lg flex items-center justify-between">
+            <span>Entregas Esperadas</span>
+            <span className="text-sm font-normal text-muted-foreground">
+              {entregasConcluidas}/{entregas.length} ({progressoAtual}%)
+            </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-border" />
+            <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-border" />
             
             <div className={`space-y-4 ${isPreview ? 'opacity-60' : ''}`}>
               {entregas.map((entrega, index) => {
@@ -159,16 +89,16 @@ export function BusinessExecutiveRoadmap() {
                 const isEmAndamento = entrega.status === "em_andamento";
                 
                 return (
-                  <div key={index} className="relative pl-10">
-                    {/* Status dot */}
-                    <div className="absolute left-2 top-1">
-                      {isConcluida ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      ) : isEmAndamento ? (
-                        <Clock className="h-5 w-5 text-yellow-500" />
-                      ) : (
-                        <Circle className="h-5 w-5 text-muted-foreground" />
-                      )}
+                  <div key={index} className="relative pl-8">
+                    {/* Status dot - bullet simples */}
+                    <div className="absolute left-0 top-3">
+                      <div className={`h-4 w-4 rounded-full border-2 border-background ${
+                        isConcluida 
+                          ? 'bg-green-500' 
+                          : isEmAndamento 
+                            ? 'bg-yellow-500' 
+                            : 'bg-zinc-900 dark:bg-zinc-100'
+                      }`} />
                     </div>
                     
                     <div className={`p-3 rounded-lg ${
@@ -203,11 +133,6 @@ export function BusinessExecutiveRoadmap() {
               })}
             </div>
           </div>
-          {isPreview && (
-            <p className="text-xs text-muted-foreground text-center mt-4 py-2 border-t border-dashed">
-              ℹ️ As entregas reais serão configuradas no seu contrato
-            </p>
-          )}
         </CardContent>
       </Card>
 
