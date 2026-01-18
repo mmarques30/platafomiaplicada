@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useAdminViewContext, AdminViewMode } from "@/contexts/AdminViewContext";
 
 export type UserPlan = "academy" | "skills" | "business" | null;
 
@@ -56,11 +57,48 @@ export function useUserPlan() {
   };
 }
 
-// Hook separado para obter plano efetivo considerando admin
+// Hook separado para obter plano efetivo considerando admin e viewAs
 export function useEffectivePlan(isAdmin: boolean) {
   const { plan, hasAccessTo, isLoading, isAcademy, isSkills, isBusiness } = useUserPlan();
+  
+  // Obter o viewAs do context (safe access)
+  let viewAs: AdminViewMode = null;
+  let isViewingAs = false;
+  
+  try {
+    const context = useAdminViewContext();
+    viewAs = context.viewAs;
+    isViewingAs = context.isViewingAs;
+  } catch {
+    // Context not available, use defaults
+  }
 
-  // Admin sempre vê a interface Business para fins de visualização
+  // Se admin está usando "ver como", usar essa visão
+  if (isAdmin && isViewingAs && viewAs) {
+    const isSimulatingVisitante = viewAs === "visitante";
+    const simulatedPlan = isSimulatingVisitante ? null : viewAs as UserPlan;
+    
+    return {
+      plan,
+      effectivePlan: simulatedPlan,
+      hasAccessTo,
+      isLoading,
+      // Flags efetivas (baseadas na simulação)
+      isBusiness: viewAs === "business",
+      isSkills: viewAs === "skills",
+      isAcademy: viewAs === "academy",
+      isVisitante: viewAs === "visitante",
+      // Flags do plano real
+      rawIsBusiness: isBusiness,
+      rawIsSkills: isSkills,
+      rawIsAcademy: isAcademy,
+      // Info de simulação
+      isSimulating: true,
+      simulatingAs: viewAs,
+    };
+  }
+
+  // Admin sem viewAs vê como business (padrão)
   const effectiveIsBusiness = isAdmin || isBusiness;
   const effectiveIsSkills = !effectiveIsBusiness && isSkills;
   const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills;
@@ -74,9 +112,13 @@ export function useEffectivePlan(isAdmin: boolean) {
     isBusiness: effectiveIsBusiness,
     isSkills: effectiveIsSkills,
     isAcademy: effectiveIsAcademy,
+    isVisitante: false,
     // Flags do plano real (sem considerar admin)
     rawIsBusiness: isBusiness,
     rawIsSkills: isSkills,
     rawIsAcademy: isAcademy,
+    // Info de simulação
+    isSimulating: false,
+    simulatingAs: null,
   };
 }

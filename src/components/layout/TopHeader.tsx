@@ -23,6 +23,9 @@ import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
 import { useProdutosAtivos } from "@/hooks/admin/useProdutos";
 import { cn } from "@/lib/utils";
 import { forceFullAppReload } from "@/lib/pwaUpdate";
+import { AdminViewSelector } from "@/components/admin/AdminViewSelector";
+import { useAdminView } from "@/hooks/useAdminView";
+
 export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,6 +34,7 @@ export function TopHeader() {
   const { hasAccessTo, plan } = useUserPlan();
   const { profile } = useUserProfile();
   const { data: produtosAtivos } = useProdutosAtivos();
+  const { viewAs, isViewingAs, resetView } = useAdminView(isAdmin);
   
   // Verifica se um produto está ativo pelo slug
   const isProdutoAtivo = (slug: string) => {
@@ -190,8 +194,9 @@ export function TopHeader() {
           )}
         </nav>
 
-        {/* RIGHT: Refresh + Notifications + Avatar - posição absoluta à direita */}
+        {/* RIGHT: Admin View Selector + Refresh + Notifications + Avatar */}
         <div className="absolute right-0 top-0 h-full flex items-center gap-1 pr-4">
+          {isAdmin && <AdminViewSelector isAdmin={isAdmin} />}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
