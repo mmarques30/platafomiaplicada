@@ -1,15 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { useUserRole } from "./useUserRole";
 
 export type UserPlan = "academy" | "skills" | "business" | null;
 
 export function useUserPlan() {
   const { user } = useAuth();
-  const { isAdmin } = useUserRole();
 
-  const { data: plan, isLoading: planLoading } = useQuery({
+  const { data: plan, isLoading } = useQuery({
     queryKey: ["user-plan", user?.id],
     queryFn: async () => {
       if (!user) return null;
@@ -38,36 +36,47 @@ export function useUserPlan() {
     
     switch (product) {
       case "trilhas":
-        // Todos os planos têm acesso a trilhas
         return ["academy", "skills", "business"].includes(plan);
       case "skills":
-        // Skills e Business têm acesso
         return ["skills", "business"].includes(plan);
       case "business":
-        // Apenas Business tem acesso
         return plan === "business";
       default:
         return false;
     }
   };
 
+  return {
+    plan,
+    hasAccessTo,
+    isLoading,
+    isAcademy: plan === "academy",
+    isSkills: plan === "skills",
+    isBusiness: plan === "business",
+  };
+}
+
+// Hook separado para obter plano efetivo considerando admin
+export function useEffectivePlan(isAdmin: boolean) {
+  const { plan, hasAccessTo, isLoading, isAcademy, isSkills, isBusiness } = useUserPlan();
+
   // Admin sempre vê a interface Business para fins de visualização
-  const effectiveIsBusiness = isAdmin || plan === "business";
-  const effectiveIsSkills = !effectiveIsBusiness && plan === "skills";
+  const effectiveIsBusiness = isAdmin || isBusiness;
+  const effectiveIsSkills = !effectiveIsBusiness && isSkills;
   const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills;
 
   return {
     plan,
-    effectivePlan: isAdmin ? "business" : plan,
+    effectivePlan: isAdmin ? "business" as UserPlan : plan,
     hasAccessTo,
-    isLoading: planLoading,
+    isLoading,
     // Flags efetivas (consideram admin)
     isBusiness: effectiveIsBusiness,
     isSkills: effectiveIsSkills,
     isAcademy: effectiveIsAcademy,
     // Flags do plano real (sem considerar admin)
-    rawIsBusiness: plan === "business",
-    rawIsSkills: plan === "skills",
-    rawIsAcademy: plan === "academy",
+    rawIsBusiness: isBusiness,
+    rawIsSkills: isSkills,
+    rawIsAcademy: isAcademy,
   };
 }
