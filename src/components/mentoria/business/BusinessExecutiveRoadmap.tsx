@@ -42,27 +42,37 @@ export function BusinessExecutiveRoadmap() {
     );
   }
 
-  if (!contrato) {
-    return (
-      <Card className="border-border/50 bg-card/50">
-        <CardContent className="py-12 text-center">
-          <Briefcase className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-          <h3 className="text-lg font-semibold mb-2">Contrato Não Encontrado</h3>
-          <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Seu contrato Business ainda não foi configurado. Entre em contato com a equipe para iniciar sua jornada.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Flag para modo preview (sem contrato ativo)
+  const isPreview = !contrato;
 
-  const entregas = contrato.entregas_esperadas || [];
-  const entregasConcluidas = entregas.filter(e => e.status === "concluida").length;
+  // Dados de exemplo para o modo preview
+  const entregasExemplo = [
+    { titulo: "Diagnóstico Inicial", tipo: "Análise", status: "pendente", prazo: null },
+    { titulo: "Desenvolvimento de Solução", tipo: "Implementação", status: "pendente", prazo: null },
+    { titulo: "Treinamento da Equipe", tipo: "Capacitação", status: "pendente", prazo: null },
+    { titulo: "Go-Live e Acompanhamento", tipo: "Entrega", status: "pendente", prazo: null },
+  ];
+
+  const entregas = isPreview ? entregasExemplo : (contrato?.entregas_esperadas || []);
+  const entregasConcluidas = isPreview ? 0 : entregas.filter(e => e.status === "concluida").length;
+  const progressoAtual = isPreview ? 0 : progresso.percentual;
 
   return (
     <div className="space-y-6">
+      {/* Banner de Preview */}
+      {isPreview && (
+        <Card className="border-dashed border-2 border-amber-500/30 bg-amber-500/5">
+          <CardContent className="py-4 text-center">
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              <Clock className="h-4 w-4 inline mr-2" />
+              Pré-visualização do Roadmap — Os dados serão preenchidos após a configuração do seu contrato
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header do Contrato */}
-      <Card className="border-border/50 bg-gradient-to-br from-primary/5 via-card to-accent/5">
+      <Card className={`border-border/50 bg-gradient-to-br from-primary/5 via-card to-accent/5 ${isPreview ? 'opacity-75' : ''}`}>
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -72,23 +82,38 @@ export function BusinessExecutiveRoadmap() {
               <div>
                 <h2 className="text-xl font-bold">Contrato Business</h2>
                 <p className="text-muted-foreground text-sm">
-                  {contrato.modulos_contratados} módulo{contrato.modulos_contratados > 1 ? 's' : ''} • 
-                  {contrato.tempo_consultoria_meses} meses de consultoria
+                  {isPreview ? (
+                    <>— módulos • — meses de consultoria</>
+                  ) : (
+                    <>
+                      {contrato.modulos_contratados} módulo{contrato.modulos_contratados > 1 ? 's' : ''} • 
+                      {contrato.tempo_consultoria_meses} meses de consultoria
+                    </>
+                  )}
                 </p>
               </div>
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
-              {tempoRestante && !tempoRestante.expirado && (
-                <Badge variant="outline" className="text-sm py-1.5 px-3">
-                  <Timer className="h-4 w-4 mr-1.5" />
-                  {tempoRestante.meses} mês{tempoRestante.meses > 1 ? 'es' : ''} restante{tempoRestante.meses > 1 ? 's' : ''}
+              {isPreview ? (
+                <Badge variant="outline" className="text-sm py-1.5 px-3 border-dashed border-amber-500/50 text-amber-600 dark:text-amber-400">
+                  <Clock className="h-4 w-4 mr-1.5" />
+                  Aguardando Configuração
                 </Badge>
-              )}
-              {tempoRestante?.expirado && (
-                <Badge variant="destructive" className="text-sm py-1.5 px-3">
-                  Contrato Expirado
-                </Badge>
+              ) : (
+                <>
+                  {tempoRestante && !tempoRestante.expirado && (
+                    <Badge variant="outline" className="text-sm py-1.5 px-3">
+                      <Timer className="h-4 w-4 mr-1.5" />
+                      {tempoRestante.meses} mês{tempoRestante.meses > 1 ? 'es' : ''} restante{tempoRestante.meses > 1 ? 's' : ''}
+                    </Badge>
+                  )}
+                  {tempoRestante?.expirado && (
+                    <Badge variant="destructive" className="text-sm py-1.5 px-3">
+                      Contrato Expirado
+                    </Badge>
+                  )}
+                </>
               )}
               <Badge variant="secondary" className="text-sm py-1.5 px-3 bg-primary/10 text-primary">
                 {entregasConcluidas} de {entregas.length} entregas
@@ -100,79 +125,88 @@ export function BusinessExecutiveRoadmap() {
           <div className="mt-6">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-muted-foreground">Progresso Geral</span>
-              <span className="font-semibold">{progresso.percentual}%</span>
+              <span className="font-semibold">{progressoAtual}%</span>
             </div>
-            <Progress value={progresso.percentual} className="h-2" />
+            <Progress value={progressoAtual} className="h-2" />
+            {isPreview && (
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Será atualizado após início do contrato
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Timeline de Entregas */}
-      <Card className="border-border/50 bg-card/50">
+      <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Package className="h-5 w-5 text-primary" />
             Entregas Esperadas
+            {isPreview && (
+              <Badge variant="outline" className="text-xs ml-2 border-dashed">Exemplo</Badge>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {entregas.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-6">
-              Nenhuma entrega configurada ainda.
-            </p>
-          ) : (
-            <div className="relative">
-              {/* Timeline line */}
-              <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-border" />
-              
-              <div className="space-y-4">
-                {entregas.map((entrega, index) => {
-                  const isConcluida = entrega.status === "concluida";
-                  const isEmAndamento = entrega.status === "em_andamento";
-                  
-                  return (
-                    <div key={index} className="relative pl-10">
-                      {/* Status dot */}
-                      <div className="absolute left-2 top-1">
-                        {isConcluida ? (
-                          <CheckCircle2 className="h-5 w-5 text-green-500" />
-                        ) : isEmAndamento ? (
-                          <Clock className="h-5 w-5 text-yellow-500" />
-                        ) : (
-                          <Circle className="h-5 w-5 text-muted-foreground" />
-                        )}
-                      </div>
-                      
-                      <div className={`p-3 rounded-lg ${
-                        isConcluida 
-                          ? 'bg-green-500/10 border border-green-500/20' 
-                          : isEmAndamento 
-                            ? 'bg-yellow-500/10 border border-yellow-500/20'
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-border" />
+            
+            <div className={`space-y-4 ${isPreview ? 'opacity-60' : ''}`}>
+              {entregas.map((entrega, index) => {
+                const isConcluida = entrega.status === "concluida";
+                const isEmAndamento = entrega.status === "em_andamento";
+                
+                return (
+                  <div key={index} className="relative pl-10">
+                    {/* Status dot */}
+                    <div className="absolute left-2 top-1">
+                      {isConcluida ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      ) : isEmAndamento ? (
+                        <Clock className="h-5 w-5 text-yellow-500" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    
+                    <div className={`p-3 rounded-lg ${
+                      isConcluida 
+                        ? 'bg-green-500/10 border border-green-500/20' 
+                        : isEmAndamento 
+                          ? 'bg-yellow-500/10 border border-yellow-500/20'
+                          : isPreview
+                            ? 'bg-muted/30 border border-dashed border-border'
                             : 'bg-muted/50'
-                      }`}>
-                        <div className="flex items-center justify-between">
-                          <span className={`font-medium ${isConcluida ? 'text-green-600 dark:text-green-400' : ''}`}>
-                            {entrega.titulo}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            {entrega.tipo && (
-                              <Badge variant="outline" className="text-xs">
-                                {entrega.tipo}
-                              </Badge>
-                            )}
-                            {entrega.prazo && (
-                              <span className="text-xs text-muted-foreground">
-                                {format(parseISO(entrega.prazo), "dd MMM", { locale: ptBR })}
-                              </span>
-                            )}
-                          </div>
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <span className={`font-medium ${isConcluida ? 'text-green-600 dark:text-green-400' : ''}`}>
+                          {entrega.titulo}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {entrega.tipo && (
+                            <Badge variant="outline" className="text-xs">
+                              {entrega.tipo}
+                            </Badge>
+                          )}
+                          {entrega.prazo && (
+                            <span className="text-xs text-muted-foreground">
+                              {format(parseISO(entrega.prazo), "dd MMM", { locale: ptBR })}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
+          </div>
+          {isPreview && (
+            <p className="text-xs text-muted-foreground text-center mt-4 py-2 border-t border-dashed">
+              ℹ️ As entregas reais serão configuradas no seu contrato
+            </p>
           )}
         </CardContent>
       </Card>
@@ -180,7 +214,7 @@ export function BusinessExecutiveRoadmap() {
       {/* Grid: Reuniões, Reports, Suporte */}
       <div className="grid md:grid-cols-3 gap-4">
         {/* Reuniões de Alinhamento */}
-        <Card className="border-border/50 bg-card/50">
+        <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Calendar className="h-4 w-4 text-primary" />
@@ -189,7 +223,14 @@ export function BusinessExecutiveRoadmap() {
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[180px]">
-              {reunioesAlinhamento.length === 0 ? (
+              {isPreview ? (
+                <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-60">
+                  <Calendar className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                  <p className="text-muted-foreground text-sm">
+                    As reuniões aparecerão aqui após o início do contrato
+                  </p>
+                </div>
+              ) : reunioesAlinhamento.length === 0 ? (
                 <p className="text-muted-foreground text-sm text-center py-4">
                   Nenhuma reunião agendada
                 </p>
@@ -228,7 +269,7 @@ export function BusinessExecutiveRoadmap() {
         </Card>
 
         {/* Reports Enviados */}
-        <Card className="border-border/50 bg-card/50">
+        <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="h-4 w-4 text-primary" />
@@ -237,7 +278,14 @@ export function BusinessExecutiveRoadmap() {
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[180px]">
-              {reports.length === 0 ? (
+              {isPreview ? (
+                <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-60">
+                  <FileText className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                  <p className="text-muted-foreground text-sm">
+                    Os reports serão listados aqui
+                  </p>
+                </div>
+              ) : reports.length === 0 ? (
                 <p className="text-muted-foreground text-sm text-center py-4">
                   Nenhum report enviado
                 </p>
@@ -273,7 +321,7 @@ export function BusinessExecutiveRoadmap() {
         </Card>
 
         {/* Suporte */}
-        <Card className="border-border/50 bg-card/50">
+        <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <MessageSquare className="h-4 w-4 text-primary" />
@@ -283,25 +331,33 @@ export function BusinessExecutiveRoadmap() {
           <CardContent>
             <div className="space-y-4">
               <div className="text-center py-2">
-                <Badge variant="secondary" className="text-sm py-1.5 px-4 bg-primary/10 text-primary">
-                  {contrato.suporte_tipo === 'prioritario' 
-                    ? '⚡ Prioritário' 
-                    : contrato.suporte_tipo === 'whatsapp' 
-                      ? '📱 WhatsApp' 
-                      : '📧 E-mail'}
-                </Badge>
+                {isPreview ? (
+                  <Badge variant="outline" className="text-sm py-1.5 px-4 border-dashed">
+                    Tipo a definir
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="text-sm py-1.5 px-4 bg-primary/10 text-primary">
+                    {contrato?.suporte_tipo === 'prioritario' 
+                      ? '⚡ Prioritário' 
+                      : contrato?.suporte_tipo === 'whatsapp' 
+                        ? '📱 WhatsApp' 
+                        : '📧 E-mail'}
+                  </Badge>
+                )}
               </div>
               
               <p className="text-xs text-muted-foreground text-center">
-                Frequência de reports: {contrato.reports_frequencia || 'Mensal'}
+                Frequência de reports: {isPreview ? '—' : (contrato?.reports_frequencia || 'Mensal')}
               </p>
               
               <Button 
                 variant="outline" 
                 className="w-full"
+                disabled={isPreview}
                 onClick={() => {
-                  // TODO: Configurar link de suporte
-                  window.open("https://wa.me/5511999999999", "_blank");
+                  if (!isPreview) {
+                    window.open("https://wa.me/5511999999999", "_blank");
+                  }
                 }}
               >
                 <MessageSquare className="h-4 w-4 mr-2" />
