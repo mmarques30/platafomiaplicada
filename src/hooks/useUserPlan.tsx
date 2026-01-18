@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useUserRole } from "./useUserRole";
 
 export type UserPlan = "academy" | "skills" | "business" | null;
 
 export function useUserPlan() {
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
 
-  const { data: plan, isLoading } = useQuery({
+  const { data: plan, isLoading: planLoading } = useQuery({
     queryKey: ["user-plan", user?.id],
     queryFn: async () => {
       if (!user) return null;
@@ -49,12 +51,23 @@ export function useUserPlan() {
     }
   };
 
+  // Admin sempre vê a interface Business para fins de visualização
+  const effectiveIsBusiness = isAdmin || plan === "business";
+  const effectiveIsSkills = !effectiveIsBusiness && plan === "skills";
+  const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills;
+
   return {
     plan,
+    effectivePlan: isAdmin ? "business" : plan,
     hasAccessTo,
-    isLoading,
-    isAcademy: plan === "academy",
-    isSkills: plan === "skills",
-    isBusiness: plan === "business",
+    isLoading: planLoading,
+    // Flags efetivas (consideram admin)
+    isBusiness: effectiveIsBusiness,
+    isSkills: effectiveIsSkills,
+    isAcademy: effectiveIsAcademy,
+    // Flags do plano real (sem considerar admin)
+    rawIsBusiness: plan === "business",
+    rawIsSkills: plan === "skills",
+    rawIsAcademy: plan === "academy",
   };
 }
