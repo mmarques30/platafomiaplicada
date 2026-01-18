@@ -59,13 +59,10 @@ export default function Mentoria() {
         <TabsContent value="visao-geral" className="mt-0 space-y-4">
           {isBusiness ? (
             <>
-              {/* Business: ROI Chart + Tarefas Card + MAPA Card */}
+              {/* Business: ROI → MAPA → Tarefas */}
               <BusinessROIChart />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <BusinessTarefasCard />
-                <MapaAppCard />
-              </div>
+              <MapaAppCard />
+              <BusinessTarefasCard />
             </>
           ) : (
             <>
