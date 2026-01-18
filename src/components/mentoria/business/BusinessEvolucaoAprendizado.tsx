@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useBusinessEvolucaoAprendizado, AtividadeItem } from "@/hooks/useBusinessEvolucaoAprendizado";
-import { Video, FileText, MousePointerClick, ChevronDown, ChevronUp, Star } from "lucide-react";
+import { Clock, FileText, Wrench, ChevronDown, ChevronUp, Star } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -62,13 +62,13 @@ export function BusinessEvolucaoAprendizado() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-border/50">
-              <CardHeader className="pb-2">
-                <Skeleton className="h-5 w-32" />
+            <Card key={i} className="border-aplicada-green-300 bg-aplicada-green-100">
+              <CardHeader className="pb-1 pt-3">
+                <Skeleton className="h-4 w-24" />
               </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-20 mb-2" />
-                <Skeleton className="h-4 w-40" />
+              <CardContent className="pb-3">
+                <Skeleton className="h-7 w-16 mb-1" />
+                <Skeleton className="h-3 w-32" />
               </CardContent>
             </Card>
           ))}
@@ -101,18 +101,6 @@ export function BusinessEvolucaoAprendizado() {
     return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: ptBR });
   };
 
-  const getActivityIcon = (tipo: string) => {
-    switch (tipo) {
-      case "video":
-        return <Video className="h-4 w-4 text-blue-500" />;
-      case "prompt":
-        return <FileText className="h-4 w-4 text-green-500" />;
-      case "acesso":
-        return <MousePointerClick className="h-4 w-4 text-purple-500" />;
-      default:
-        return null;
-    }
-  };
 
   const isFavorito = (itemId: string) => {
     return data?.favoritos.includes(itemId);
@@ -120,57 +108,58 @@ export function BusinessEvolucaoAprendizado() {
 
   return (
     <div className="space-y-6">
-      {/* Cards de Métricas - Simplificados */}
+      {/* Cards de Métricas - Compactos e Verde */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Videos */}
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Vídeos Assistidos
+        {/* Tempo de Tela */}
+        <Card className="border-aplicada-green-300 bg-aplicada-green-100">
+          <CardHeader className="pb-1 pt-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              Tempo de Tela
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">
-              {data?.videos.total || 0}
+          <CardContent className="pb-3">
+            <div className="text-2xl font-bold text-foreground">
+              {formatTempo(data?.videos.tempoTotalMinutos || 0)}
             </div>
-            <div className="flex flex-col gap-1 mt-2 text-sm text-muted-foreground">
-              <div>{formatTempo(data?.videos.tempoTotalMinutos || 0)} assistidos</div>
-              <div>{data?.videos.percentualConcluido || 0}% concluídos</div>
+            <div className="text-xs text-muted-foreground">
+              assistindo vídeos
             </div>
           </CardContent>
         </Card>
 
-        {/* Prompts */}
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+        {/* Prompts Consumidos */}
+        <Card className="border-aplicada-green-300 bg-aplicada-green-100">
+          <CardHeader className="pb-1 pt-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <FileText className="h-3.5 w-3.5" />
               Prompts Consumidos
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">
+          <CardContent className="pb-3">
+            <div className="text-2xl font-bold text-foreground">
               {data?.prompts.total || 0}
             </div>
-            <div className="mt-2 text-sm text-muted-foreground">
-              Prompts copiados e utilizados
+            <div className="text-xs text-muted-foreground">
+              prompts copiados
             </div>
           </CardContent>
         </Card>
 
-        {/* Interações */}
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Interações
+        {/* Ferramentas Criadas */}
+        <Card className="border-aplicada-green-300 bg-aplicada-green-100">
+          <CardHeader className="pb-1 pt-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <Wrench className="h-3.5 w-3.5" />
+              Ferramentas Criadas
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">
-              {(data?.interacoes.totalAcessos || 0) + (data?.interacoes.totalCliques || 0)}
+          <CardContent className="pb-3">
+            <div className="text-2xl font-bold text-foreground">
+              {data?.ferramentas.total || 0}
             </div>
-            <div className="flex flex-col gap-1 mt-2 text-sm text-muted-foreground">
-              <div>{data?.interacoes.totalAcessos || 0} acessos a conteúdos</div>
-              <div>{data?.interacoes.totalCliques || 0} cliques rastreados</div>
+            <div className="text-xs text-muted-foreground">
+              ferramentas compartilhadas
             </div>
           </CardContent>
         </Card>
@@ -229,9 +218,6 @@ export function BusinessEvolucaoAprendizado() {
                   key={atividade.id}
                   className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                 >
-                  <div className="flex-shrink-0">
-                    {getActivityIcon(atividade.tipo)}
-                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-foreground truncate">

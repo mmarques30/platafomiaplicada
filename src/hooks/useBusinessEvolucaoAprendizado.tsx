@@ -21,9 +21,8 @@ export interface EvolucaoAprendizadoData {
   prompts: {
     total: number;
   };
-  interacoes: {
-    totalAcessos: number;
-    totalCliques: number;
+  ferramentas: {
+    total: number;
   };
   atividades: AtividadeItem[];
   favoritos: string[];
@@ -39,14 +38,14 @@ export function useBusinessEvolucaoAprendizado() {
         return {
           videos: { total: 0, tempoTotalMinutos: 0, percentualConcluido: 0, ultimoAcesso: null },
           prompts: { total: 0 },
-          interacoes: { totalAcessos: 0, totalCliques: 0 },
+          ferramentas: { total: 0 },
           atividades: [],
           favoritos: []
         };
       }
 
       // Buscar dados em paralelo
-      const [videosResult, promptsResult, acessosResult, cliquesResult, favoritosResult] = await Promise.all([
+      const [videosResult, promptsResult, acessosResult, ferramentasResult, favoritosResult] = await Promise.all([
         // Videos assistidos
         supabase
           .from("progresso_videos")
@@ -68,12 +67,12 @@ export function useBusinessEvolucaoAprendizado() {
           .eq("user_id", user.id)
           .order("accessed_at", { ascending: false }),
         
-        // Cliques em botões
+        // Ferramentas criadas pelo usuário
         supabase
-          .from("button_click_logs")
-          .select("*")
+          .from("ferramentas_compartilhadas")
+          .select("*", { count: "exact" })
           .eq("user_id", user.id)
-          .order("clicked_at", { ascending: false }),
+          .eq("ativo", true),
         
         // Favoritos do usuário
         supabase
@@ -93,9 +92,11 @@ export function useBusinessEvolucaoAprendizado() {
       // Processar prompts
       const prompts = promptsResult.data || [];
 
-      // Processar interações
+      // Processar ferramentas
+      const ferramentas = ferramentasResult.data || [];
+
+      // Processar acessos
       const acessos = acessosResult.data || [];
-      const cliques = cliquesResult.data || [];
 
       // Processar favoritos
       const favoritos = (favoritosResult.data || []).map(f => f.item_id);
@@ -142,9 +143,8 @@ export function useBusinessEvolucaoAprendizado() {
         prompts: {
           total: prompts.length
         },
-        interacoes: {
-          totalAcessos: acessos.length,
-          totalCliques: cliques.length
+        ferramentas: {
+          total: ferramentas.length
         },
         atividades,
         favoritos
