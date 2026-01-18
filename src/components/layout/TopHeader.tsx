@@ -143,8 +143,8 @@ export function TopHeader() {
                 </DropdownMenuItem>
               )}
               
-              {/* Skills: só aparece se TEM acesso skills */}
-              {hasEffectiveAccessTo("skills") && isProdutoAtivo("skills") && (
+              {/* Skills: aparece APENAS se o plano efetivo É skills (não para business) */}
+              {isSkills && isProdutoAtivo("skills") && (
                 <DropdownMenuItem asChild>
                   <Link to="/skills" className="cursor-pointer">
                     Skills
