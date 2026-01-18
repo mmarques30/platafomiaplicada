@@ -8,7 +8,8 @@ import {
   type FormData, type AcademyFormData, type BusinessFormData 
 } from "./schema";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { ProgressBar } from "./ProgressBar";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,7 +61,8 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   const [currentStep, setCurrentStep] = useState(0);
   const [draftSaved, setDraftSaved] = useState(false);
   const { formulario, finalizarFormulario, salvarRascunho, isSaving } = useMentoriaForm();
-  const { plan, isBusiness } = useUserPlan();
+  const { isAdmin } = useUserRole();
+  const { effectivePlan, isBusiness } = useEffectivePlan(isAdmin);
   const navigate = useNavigate();
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -168,7 +170,7 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
       if (onFinalizado) {
         onFinalizado();
       } else {
-        const destino = plan === 'academy' ? '/evolucao' : '/mentoria';
+        const destino = effectivePlan === 'academy' ? '/evolucao' : '/mentoria';
         setTimeout(() => {
           navigate(destino);
         }, 1500);

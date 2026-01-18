@@ -16,7 +16,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { NavLink, useNavigate, Link, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
@@ -24,17 +24,15 @@ import { useProdutosAtivos } from "@/hooks/admin/useProdutos";
 import { cn } from "@/lib/utils";
 import { forceFullAppReload } from "@/lib/pwaUpdate";
 import { AdminViewSelector } from "@/components/admin/AdminViewSelector";
-import { useAdminView } from "@/hooks/useAdminView";
 
 export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { isAdmin, isVisitante } = useUserRole();
-  const { hasAccessTo, plan } = useUserPlan();
+  const { isAdmin } = useUserRole();
+  const { effectivePlan, isBusiness, isSkills, isAcademy, isVisitante, hasEffectiveAccessTo } = useEffectivePlan(isAdmin);
   const { profile } = useUserProfile();
   const { data: produtosAtivos } = useProdutosAtivos();
-  const { viewAs, isViewingAs, resetView } = useAdminView(isAdmin);
   
   // Verifica se um produto está ativo pelo slug
   const isProdutoAtivo = (slug: string) => {
@@ -127,8 +125,8 @@ export function TopHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
-              {/* Academy: não aparece para plano Business pois já têm acesso completo */}
-              {plan !== "business" && (
+              {/* Academy: sempre visível, é o acesso base para todos os planos */}
+              {hasEffectiveAccessTo("trilhas") && (
                 <DropdownMenuItem asChild>
                   <Link to="/trilhas" className="cursor-pointer">
                     Academy
@@ -136,7 +134,8 @@ export function TopHeader() {
                 </DropdownMenuItem>
               )}
               
-              {(hasAccessTo("business") || isAdmin) && isProdutoAtivo("business") && (
+              {/* Business: só aparece se TEM acesso business */}
+              {hasEffectiveAccessTo("business") && isProdutoAtivo("business") && (
                 <DropdownMenuItem asChild>
                   <Link to="/mentoria" className="cursor-pointer">
                     Business
@@ -144,7 +143,8 @@ export function TopHeader() {
                 </DropdownMenuItem>
               )}
               
-              {(hasAccessTo("skills") || isAdmin) && isProdutoAtivo("skills") && (
+              {/* Skills: só aparece se TEM acesso skills */}
+              {hasEffectiveAccessTo("skills") && isProdutoAtivo("skills") && (
                 <DropdownMenuItem asChild>
                   <Link to="/skills" className="cursor-pointer">
                     Skills

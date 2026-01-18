@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "./useUserRole";
-import { useUserPlan } from "./useUserPlan";
+import { useEffectivePlan } from "./useUserPlan";
 
 export const useAvisosPublicos = () => {
-  const { isVisitante } = useUserRole();
-  const { plan } = useUserPlan();
+  const { isAdmin } = useUserRole();
+  const { effectivePlan, isVisitante } = useEffectivePlan(isAdmin);
   
-  // Determinar o "tier" do usuário para filtrar
-  const userTier = isVisitante ? 'visitante' : (plan || 'academy');
+  // Determinar o "tier" do usuário para filtrar (considera simulação admin)
+  const userTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
 
   return useQuery({
     queryKey: ["avisos-publicos", userTier],
@@ -28,11 +28,11 @@ export const useAvisosPublicos = () => {
 };
 
 export const useAvisosAtivosCount = () => {
-  const { isVisitante, isLoading: loadingRole } = useUserRole();
-  const { plan } = useUserPlan();
+  const { isAdmin, isLoading: loadingRole } = useUserRole();
+  const { effectivePlan, isVisitante } = useEffectivePlan(isAdmin);
   
-  // Determinar o "tier" do usuário para filtrar
-  const userTier = isVisitante ? 'visitante' : (plan || 'academy');
+  // Determinar o "tier" do usuário para filtrar (considera simulação admin)
+  const userTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
 
   return useQuery({
     queryKey: ["avisos-ativos-count", userTier],

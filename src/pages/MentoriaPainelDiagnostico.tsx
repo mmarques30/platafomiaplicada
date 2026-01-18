@@ -1,5 +1,5 @@
 import { usePainelDiagnostico } from "@/hooks/usePainelDiagnostico";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffectivePlan, useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { InformacoesMentorado } from "@/components/mentoria/painel/InformacoesMentorado";
 import { ProjetosPriorizados } from "@/components/mentoria/painel/ProjetosPriorizados";
@@ -27,38 +27,39 @@ export default function MentoriaPainelDiagnostico() {
   const { diagnostico, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
+  const { effectivePlan, isVisitante: effectiveIsVisitante, isBusiness: effectiveIsBusiness } = useEffectivePlan(isAdmin);
   
   // Determinar se é Business view baseado no plano do mentorado visualizado
   // Se estamos visualizando outro usuário (userId), usamos o plano do profile desse usuário
-  // Senão, usamos o plano do próprio usuário logado
-  const painelPlano = userId && profile ? profile.plano_mentoria : plan;
+  // Senão, usamos o plano efetivo (que considera simulação admin)
+  const painelPlano = userId && profile ? profile.plano_mentoria : effectivePlan;
   const isBusiness = painelPlano === "business";
   const theme = getPainelTheme(isBusiness);
   
   
-  // Redirecionar visitantes
+  // Redirecionar visitantes (considera simulação)
   useEffect(() => {
-    if (!roleLoading && isVisitante) {
+    if (!roleLoading && effectiveIsVisitante) {
       toast.info("Esta funcionalidade requer um plano ativo");
       navigate("/trilhas", { replace: true });
     }
-  }, [isVisitante, roleLoading, navigate]);
+  }, [effectiveIsVisitante, roleLoading, navigate]);
   
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');
   
   const voltarUrl = isAdmin 
     ? '/mentoria' 
-    : !plan 
+    : !effectivePlan 
       ? '/comunidade' 
-      : (plan === 'academy' || isAcademyRoute)
+      : (effectivePlan === 'academy' || isAcademyRoute)
         ? '/meu-diagnostico' 
         : '/mentoria';
   
   const voltarLabel = isAdmin 
     ? 'Voltar para Mentoria' 
-    : !plan 
+    : !effectivePlan 
       ? 'Voltar para Comunidade' 
-      : (plan === 'academy' || isAcademyRoute)
+      : (effectivePlan === 'academy' || isAcademyRoute)
         ? 'Voltar para Meu Diagnóstico' 
         : 'Voltar para Mentoria';
 

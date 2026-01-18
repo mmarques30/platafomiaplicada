@@ -1,6 +1,6 @@
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useNavigate } from "react-router-dom";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -8,8 +8,8 @@ import { toast } from "sonner";
 export default function MeuDiagnostico() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
-  const { plan, isLoading: planLoading } = useUserPlan();
-  const { isVisitante, isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { effectivePlan, isVisitante, isBusiness, isLoading: planLoading } = useEffectivePlan(isAdmin);
   
   // Ref para garantir que o redirect aconteça apenas UMA vez
   const hasRedirected = useRef(false);
@@ -31,7 +31,7 @@ export default function MeuDiagnostico() {
     }
 
     // Business -> mentoria/diagnostico (dashboard robusto)
-    if (plan === 'business') {
+    if (isBusiness) {
       hasRedirected.current = true;
       navigate('/mentoria/diagnostico', { replace: true });
       return;
@@ -44,7 +44,7 @@ export default function MeuDiagnostico() {
     } else {
       navigate('/diagnostico/formulario', { replace: true });
     }
-  }, [isLoading, roleLoading, planLoading, isVisitante, plan, isAdmin, formulario, navigate]);
+  }, [isLoading, roleLoading, planLoading, isVisitante, isBusiness, isAdmin, formulario, navigate]);
 
   // Tela de loading enquanto redireciona
   return (

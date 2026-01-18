@@ -13,13 +13,15 @@ import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
 import { BonusEvolucao } from "@/components/evolucao/BonusEvolucao";
 import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { PageTitle } from "@/components/shared/PageTitle";
 
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
-  const { isAcademy } = useUserPlan();
+  const { isAdmin } = useUserRole();
+  const { isAcademy } = useEffectivePlan(isAdmin);
   
   const [modalFerramentaOpen, setModalFerramentaOpen] = useState(false);
 
