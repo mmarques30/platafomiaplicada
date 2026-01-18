@@ -77,6 +77,15 @@ export function AppSidebar() {
     );
   };
 
+  // Helper para determinar URL dinâmica baseada no plano
+  const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
+    if (menu.menu_key === 'meu_progresso') {
+      // Business vai para /mentoria (Visão Geral), demais para /evolucao
+      return effectivePlan === 'business' ? '/mentoria' : '/evolucao';
+    }
+    return menu.url || "/";
+  };
+
   // Auto-expandir menu quando rota ativa está em submenu
   useEffect(() => {
     const newExpanded: string[] = [];
@@ -121,7 +130,7 @@ export function AppSidebar() {
                         <CollapsibleTrigger asChild>
                           <div className="flex items-center w-full">
                             <NavLink
-                              to={menu.url || "/"}
+                              to={getMenuUrl(menu)}
                             className={cn(
                               "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
                               isActive 
