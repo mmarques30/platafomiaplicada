@@ -27,7 +27,7 @@ export function BusinessAcessoRapido() {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-[hsl(72,6%,18%)] rounded-xl p-4 mt-4 border border-primary/20">
+    <div className="bg-[#0D0D0D] rounded-xl p-4 mt-4 border border-white/10">
       {/* Desktop: 6 colunas lado a lado */}
       <div className="hidden sm:flex justify-between items-center">
         {navItems.map((item) => (

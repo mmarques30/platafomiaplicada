@@ -17,14 +17,29 @@ export function BusinessTarefasCard() {
   const tarefasAtrasadas = tarefasPendentes.filter(t => 
     t.prazo_entrega && isPast(parseISO(t.prazo_entrega))
   );
-  
-  const tarefasExibir = tarefasPendentes.slice(0, 4);
 
   const getDiasRestantes = (prazoEntrega: string | null) => {
     if (!prazoEntrega) return null;
     const dias = differenceInDays(parseISO(prazoEntrega), new Date());
     return dias;
   };
+
+  // Ordenar por urgência: vencidas primeiro, depois por prazo mais próximo
+  const tarefasOrdenadas = [...tarefasPendentes].sort((a, b) => {
+    const diasA = getDiasRestantes(a.prazo_entrega);
+    const diasB = getDiasRestantes(b.prazo_entrega);
+    
+    // Sem prazo vai pro final
+    if (diasA === null && diasB === null) return 0;
+    if (diasA === null) return 1;
+    if (diasB === null) return -1;
+    
+    // Ordenar por dias (vencidas primeiro = dias negativos)
+    return diasA - diasB;
+  });
+
+  // Pegar apenas 3 mais urgentes
+  const tarefasExibir = tarefasOrdenadas.slice(0, 3);
 
   const getPrazoBadge = (prazo: string | null) => {
     const dias = getDiasRestantes(prazo);
@@ -71,9 +86,9 @@ export function BusinessTarefasCard() {
           <div className="h-5 w-32 bg-muted rounded" />
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-12 bg-muted rounded" />
+              <div key={i} className="h-20 bg-muted rounded" />
             ))}
           </div>
         </CardContent>
@@ -109,24 +124,25 @@ export function BusinessTarefasCard() {
           </div>
         ) : (
           <>
-            {tarefasExibir.map((tarefa) => (
-              <div
-                key={tarefa.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{tarefa.titulo}</p>
+            {/* Layout horizontal: 3 colunas no desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {tarefasExibir.map((tarefa) => (
+                <div
+                  key={tarefa.id}
+                  className="flex flex-col p-3 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium truncate flex-1 mr-2">{tarefa.titulo}</p>
+                    {getPrazoBadge(tarefa.prazo_entrega)}
+                  </div>
                   {tarefa.descricao && (
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">
+                    <p className="text-xs text-muted-foreground line-clamp-2">
                       {tarefa.descricao}
                     </p>
                   )}
                 </div>
-                <div className="ml-3 flex-shrink-0">
-                  {getPrazoBadge(tarefa.prazo_entrega)}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
             
             <Button
               variant="ghost"
