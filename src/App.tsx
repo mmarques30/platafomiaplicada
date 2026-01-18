@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { TrocarSenhaModal } from "./components/auth/TrocarSenhaModal";
 import { useAuth } from "./hooks/useAuth";
 import { useVersionCheck } from "./hooks/useVersionCheck";
+import { AdminViewProvider } from "./contexts/AdminViewContext";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Trilhas from "./pages/Trilhas";
@@ -192,7 +193,9 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <TooltipProvider>
         <BrowserRouter>
-          <AppContent />
+          <AdminViewProvider>
+            <AppContent />
+          </AdminViewProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
