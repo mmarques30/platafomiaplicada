@@ -1,17 +1,19 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useVisitantes } from "@/hooks/useVisitantes";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { EditVisitanteModal } from "@/components/admin/EditVisitanteModal";
+import { NovoVisitanteModal } from "@/components/admin/NovoVisitanteModal";
 import { VisitorAccessDrawer } from "@/components/admin/VisitorAccessDrawer";
 import { useContentAccessMetrics } from "@/hooks/admin/useContentAccessMetrics";
 import { useAcademyPurchaseClicks } from "@/hooks/admin/useButtonClickLogs";
 import { StatsCard } from "@/components/admin/StatsCard";
-import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText, MousePointerClick, Download, ChevronDown } from "lucide-react";
+import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText, MousePointerClick, Download, ChevronDown, Search, UserPlus } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -21,18 +23,31 @@ export default function GerenciarVisitantes() {
   const { data: metrics, isLoading: isLoadingMetrics } = useContentAccessMetrics();
   const { data: academyClicks, isLoading: isLoadingClicks } = useAcademyPurchaseClicks();
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [novoVisitanteModalOpen, setNovoVisitanteModalOpen] = useState(false);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedVisitante, setSelectedVisitante] = useState<typeof visitantes[0] | null>(null);
   const [showAllVisitors, setShowAllVisitors] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Estados para seções colapsáveis (fechadas por padrão)
   const [topContentOpen, setTopContentOpen] = useState(false);
   const [engajamentoOpen, setEngajamentoOpen] = useState(false);
   const [academyClicksOpen, setAcademyClicksOpen] = useState(false);
   const [visitantesListOpen, setVisitantesListOpen] = useState(false);
+
+  // Filtrar visitantes pela busca
+  const filteredVisitantes = useMemo(() => {
+    if (!searchTerm.trim()) return visitantes;
+    const term = searchTerm.toLowerCase();
+    return visitantes.filter(v => 
+      v.nome_completo?.toLowerCase().includes(term) ||
+      v.email?.toLowerCase().includes(term) ||
+      v.telefone?.includes(term)
+    );
+  }, [visitantes, searchTerm]);
 
   const handleEdit = (visitante: typeof visitantes[0]) => {
     setSelectedVisitante(visitante);
@@ -540,10 +555,29 @@ export default function GerenciarVisitantes() {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
+              {/* Barra de busca e botão de cadastrar */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar por nome, email ou telefone..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <Button onClick={() => setNovoVisitanteModalOpen(true)} className="gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Cadastrar Visitante
+                </Button>
+              </div>
+
               {isLoading ? (
                 <div className="text-center py-8 text-muted-foreground">Carregando...</div>
-              ) : visitantes.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">Nenhum visitante cadastrado</div>
+              ) : filteredVisitantes.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  {searchTerm ? "Nenhum visitante encontrado com os critérios de busca" : "Nenhum visitante cadastrado"}
+                </div>
               ) : (
                 <div className="overflow-x-auto rounded-md border">
                   <Table>
@@ -559,7 +593,7 @@ export default function GerenciarVisitantes() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {visitantes.map((visitante) => {
+                      {filteredVisitantes.map((visitante) => {
                         const accessCount = metrics?.accessesByUser?.[visitante.email || ''] || 0;
                         return (
                           <TableRow key={visitante.id}>
@@ -632,6 +666,7 @@ export default function GerenciarVisitantes() {
       </AlertDialog>
 
       <EditVisitanteModal open={editModalOpen} onOpenChange={setEditModalOpen} visitante={selectedVisitante} />
+      <NovoVisitanteModal open={novoVisitanteModalOpen} onOpenChange={setNovoVisitanteModalOpen} />
       <VisitorAccessDrawer visitante={selectedVisitante} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

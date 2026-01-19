@@ -48,6 +48,36 @@ export function useVisitantes() {
     },
   });
 
+  const createVisitante = useMutation({
+    mutationFn: async (data: {
+      email: string;
+      password: string;
+      nome_completo: string;
+      telefone?: string;
+    }) => {
+      const { data: result, error } = await supabase.functions.invoke("admin-create-user", {
+        body: {
+          email: data.email,
+          password: data.password,
+          nome_completo: data.nome_completo,
+          telefone: data.telefone,
+          is_visitante: true
+        }
+      });
+      
+      if (error) throw error;
+      if (result?.error) throw new Error(result.error);
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["visitantes"] });
+      toast.success("Visitante cadastrado com sucesso!");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao cadastrar visitante");
+    },
+  });
+
   const convertToMentorado = useMutation({
     mutationFn: async (userId: string) => {
       // Remover role visitante
@@ -108,6 +138,7 @@ export function useVisitantes() {
     visitantes: visitantes || [],
     isLoading,
     updateVisitante,
+    createVisitante,
     convertToMentorado,
     deleteVisitante,
   };
