@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FolderKanban, Settings, ArrowRight } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { PageTitle } from "@/components/shared/PageTitle";
@@ -9,53 +9,90 @@ interface EnvironmentCardProps {
   title: string;
   description: string;
   icon: React.ReactNode;
-  onClick: () => void;
+  to: string;
   disabled?: boolean;
   variant?: "default" | "admin";
 }
 
-function EnvironmentCard({ title, description, icon, onClick, disabled, variant = "default" }: EnvironmentCardProps) {
-  return (
-    <Card 
-      className={cn(
-        "cursor-pointer transition-all duration-200 hover:shadow-lg group",
-        disabled && "opacity-50 cursor-not-allowed",
-        variant === "admin" && "border-primary/30 bg-primary/5"
-      )}
-      onClick={disabled ? undefined : onClick}
-    >
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div className={cn(
-            "p-3 rounded-xl transition-colors",
-            variant === "admin" 
-              ? "bg-primary/10 text-primary group-hover:bg-primary/20" 
-              : "bg-muted text-muted-foreground group-hover:bg-muted/80"
-          )}>
-            {icon}
+function EnvironmentCard({ title, description, icon, to, disabled, variant = "default" }: EnvironmentCardProps) {
+  if (disabled) {
+    return (
+      <Card 
+        className={cn(
+          "opacity-50 cursor-not-allowed",
+          variant === "admin" && "border-primary/30 bg-primary/5"
+        )}
+      >
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div className={cn(
+              "p-3 rounded-xl transition-colors",
+              variant === "admin" 
+                ? "bg-primary/10 text-primary" 
+                : "bg-muted text-muted-foreground"
+            )}>
+              {icon}
+            </div>
+            <ArrowRight className={cn(
+              "h-5 w-5",
+              variant === "admin" ? "text-primary" : "text-muted-foreground"
+            )} />
           </div>
-          <ArrowRight className={cn(
-            "h-5 w-5 transition-transform group-hover:translate-x-1",
+          <CardTitle className="mt-4 text-lg">{title}</CardTitle>
+          <CardDescription className="text-sm">{description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className={cn(
+            "text-xs font-medium uppercase tracking-wider",
             variant === "admin" ? "text-primary" : "text-muted-foreground"
-          )} />
-        </div>
-        <CardTitle className="mt-4 text-lg">{title}</CardTitle>
-        <CardDescription className="text-sm">{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className={cn(
-          "text-xs font-medium uppercase tracking-wider",
-          variant === "admin" ? "text-primary" : "text-muted-foreground"
-        )}>
-          Clique para acessar
-        </div>
-      </CardContent>
-    </Card>
+          )}>
+            Clique para acessar
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <NavLink to={to} className="block">
+      <Card 
+        className={cn(
+          "cursor-pointer transition-all duration-200 hover:shadow-lg group h-full",
+          variant === "admin" && "border-primary/30 bg-primary/5"
+        )}
+      >
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div className={cn(
+              "p-3 rounded-xl transition-colors",
+              variant === "admin" 
+                ? "bg-primary/10 text-primary group-hover:bg-primary/20" 
+                : "bg-muted text-muted-foreground group-hover:bg-muted/80"
+            )}>
+              {icon}
+            </div>
+            <ArrowRight className={cn(
+              "h-5 w-5 transition-transform group-hover:translate-x-1",
+              variant === "admin" ? "text-primary" : "text-muted-foreground"
+            )} />
+          </div>
+          <CardTitle className="mt-4 text-lg">{title}</CardTitle>
+          <CardDescription className="text-sm">{description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className={cn(
+            "text-xs font-medium uppercase tracking-wider",
+            variant === "admin" ? "text-primary" : "text-muted-foreground"
+          )}>
+            Clique para acessar
+          </div>
+        </CardContent>
+      </Card>
+    </NavLink>
   );
 }
 
 export default function AdminEnvironmentSelector() {
-  const navigate = useNavigate();
   const { isAdmin } = useUserRole();
 
   return (
@@ -72,7 +109,7 @@ export default function AdminEnvironmentSelector() {
           title="Projetos"
           description="Gerencie projetos, tarefas e acompanhe o progresso das equipes"
           icon={<FolderKanban className="h-6 w-6" />}
-          onClick={() => navigate("/admin/projetos")}
+          to="/admin/projetos"
         />
 
         {isAdmin && (
@@ -80,7 +117,7 @@ export default function AdminEnvironmentSelector() {
             title="Gestão"
             description="Usuários, conteúdo, configurações e ferramentas administrativas"
             icon={<Settings className="h-6 w-6" />}
-            onClick={() => navigate("/admin/gestao")}
+            to="/admin/gestao"
             variant="admin"
           />
         )}
