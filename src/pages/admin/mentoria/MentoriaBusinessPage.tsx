@@ -14,6 +14,8 @@ import { ArrowLeft, Users, FileText, CheckSquare, Calendar, BookOpen, FolderKanb
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { ProcessoRoadmap } from "@/components/admin/mentoria/ProcessoRoadmap";
+import { EtapasManager } from "@/components/admin/business/EtapasManager";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import RecursoModal from "@/components/admin/mentoria/RecursoModal";
@@ -138,7 +140,7 @@ export default function MentoriaBusinessPage() {
 
       {selectedUserId && (
         <Tabs defaultValue="diagnostico" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="diagnostico">
               <FileText className="h-4 w-4 mr-2" />
               Diagnóstico
@@ -146,6 +148,10 @@ export default function MentoriaBusinessPage() {
             <TabsTrigger value="roadmap">
               <Route className="h-4 w-4 mr-2" />
               Roadmap
+            </TabsTrigger>
+            <TabsTrigger value="etapas">
+              <Route className="h-4 w-4 mr-2" />
+              Etapas
             </TabsTrigger>
             <TabsTrigger value="projetos">
               <FolderKanban className="h-4 w-4 mr-2" />
@@ -175,6 +181,10 @@ export default function MentoriaBusinessPage() {
 
           <TabsContent value="roadmap" className="space-y-4">
             <ProcessoRoadmap userId={selectedUserId} isAdmin={true} />
+          </TabsContent>
+
+          <TabsContent value="etapas" className="space-y-4">
+            <EtapasManager userId={selectedUserId} userName={selectedUser?.nome_completo} />
           </TabsContent>
 
           <TabsContent value="projetos" className="space-y-4">
