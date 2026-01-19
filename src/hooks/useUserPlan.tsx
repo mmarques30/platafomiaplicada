@@ -8,24 +8,30 @@ export type UserPlan = "academy" | "skills" | "business" | null;
 export function useUserPlan() {
   const { user } = useAuth();
 
-  const { data: plan, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["user-plan", user?.id],
     queryFn: async () => {
-      if (!user) return null;
+      if (!user) return { plan: null, isVisitante: false };
       const { data, error } = await supabase
         .from("profiles")
-        .select("plano_mentoria")
+        .select("plano_mentoria, is_visitante")
         .eq("id", user.id)
         .single();
 
       if (error) throw error;
-      return data?.plano_mentoria as UserPlan;
+      return {
+        plan: data?.plano_mentoria as UserPlan,
+        isVisitante: data?.is_visitante ?? false
+      };
     },
     enabled: !!user,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
     refetchOnWindowFocus: false,
   });
+
+  const plan = data?.plan ?? null;
+  const isProfileVisitante = data?.isVisitante ?? false;
 
   // Hierarquia de acesso PARALELA:
   // Academy = base para todos
@@ -54,12 +60,13 @@ export function useUserPlan() {
     isAcademy: plan === "academy",
     isSkills: plan === "skills",
     isBusiness: plan === "business",
+    isVisitante: isProfileVisitante,
   };
 }
 
 // Hook separado para obter plano efetivo considerando admin e viewAs
 export function useEffectivePlan(isAdmin: boolean) {
-  const { plan, hasAccessTo, isLoading, isAcademy, isSkills, isBusiness } = useUserPlan();
+  const { plan, hasAccessTo, isLoading, isAcademy, isSkills, isBusiness, isVisitante: isRealVisitante } = useUserPlan();
   
   // Obter o viewAs do context (safe access)
   let viewAs: AdminViewMode = null;
@@ -134,6 +141,9 @@ export function useEffectivePlan(isAdmin: boolean) {
   const effectiveIsBusiness = isAdmin || isBusiness;
   const effectiveIsSkills = !effectiveIsBusiness && isSkills;
   const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills;
+  
+  // Visitante real: flag do profile OU não tem plano (sem ser admin)
+  const effectiveIsVisitante = isRealVisitante || (!isAdmin && !plan);
 
   return {
     plan,
@@ -145,7 +155,7 @@ export function useEffectivePlan(isAdmin: boolean) {
     isBusiness: effectiveIsBusiness,
     isSkills: effectiveIsSkills,
     isAcademy: effectiveIsAcademy,
-    isVisitante: false,
+    isVisitante: effectiveIsVisitante,
     // Flags do plano real (sem considerar admin)
     rawIsBusiness: isBusiness,
     rawIsSkills: isSkills,
