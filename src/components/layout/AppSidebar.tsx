@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, Zap } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, Zap, EyeOff } from "lucide-react";
+import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -33,6 +34,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin, isMentorado } = useUserRole();
   const { effectivePlan, isVisitante } = useEffectivePlan(isAdmin);
+  const { isViewingAs, resetView } = useAdminViewContext();
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
   const collapsed = !open;
@@ -320,7 +322,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isAdmin && (
+        {isAdmin && !isViewingAs && (
           <SidebarGroup>
             <SidebarGroupLabel className="px-4 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider">
               Administração
@@ -351,6 +353,24 @@ export function AppSidebar() {
                         </>
                       )}
                     </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {isAdmin && isViewingAs && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu className="space-y-1 px-3">
+                <SidebarMenuItem>
+                  <SidebarMenuButton 
+                    onClick={resetView}
+                    className="group relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                  >
+                    <EyeOff className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                    {!collapsed && <span className="text-sm">Sair da Simulação</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
