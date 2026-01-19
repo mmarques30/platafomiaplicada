@@ -149,7 +149,7 @@ export function useUpdateUser() {
         profissao?: string | null;
         idade?: number | null;
         linkedin?: string | null;
-        plano_mentoria?: "academy" | "lab" | "skills" | "club" | "boost" | "legacy" | null;
+        plano_mentoria?: "academy" | "skills" | "business" | null;
         data_expiracao_acesso?: string | null;
         conta_ativa?: boolean;
         origem_consultoria?: boolean;

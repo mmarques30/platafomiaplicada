@@ -27,20 +27,20 @@ export function useUserPlan() {
     refetchOnWindowFocus: false,
   });
 
-  // Hierarquia de acesso:
-  // Academy = base (acesso a trilhas)
-  // Skills = trilhas + gestão de equipe (B2B)
-  // Business = acesso completo + mentoria 1:1 + consultoria (B2B Premium)
+  // Hierarquia de acesso PARALELA:
+  // Academy = base para todos
+  // Skills = skills + academy
+  // Business = business + academy
   
   const hasAccessTo = (product: "trilhas" | "skills" | "business") => {
     if (!plan) return false;
     
     switch (product) {
-      case "trilhas":
+      case "trilhas": // academy - base para todos
         return ["academy", "skills", "business"].includes(plan);
-      case "skills":
-        return ["skills", "business"].includes(plan);
-      case "business":
+      case "skills": // apenas skills
+        return plan === "skills";
+      case "business": // apenas business
         return plan === "business";
       default:
         return false;
@@ -73,7 +73,7 @@ export function useEffectivePlan(isAdmin: boolean) {
     // Context not available, use defaults
   }
 
-  // Função centralizada para verificar acesso efetivo
+  // Função centralizada para verificar acesso efetivo (hierarquia paralela)
   const hasEffectiveAccessTo = (product: "trilhas" | "skills" | "business") => {
     // Determinar o plano atual considerando simulação
     let currentPlan: UserPlan | null = null;
@@ -88,12 +88,16 @@ export function useEffectivePlan(isAdmin: boolean) {
     
     if (!currentPlan) return false;
     
+    // Hierarquia paralela:
+    // Academy = base para todos
+    // Skills = skills + academy
+    // Business = business + academy
     switch (product) {
-      case "trilhas":
+      case "trilhas": // academy - base para todos
         return ["academy", "skills", "business"].includes(currentPlan);
-      case "skills":
-        return ["skills", "business"].includes(currentPlan);
-      case "business":
+      case "skills": // apenas skills
+        return currentPlan === "skills";
+      case "business": // apenas business
         return currentPlan === "business";
       default:
         return false;
