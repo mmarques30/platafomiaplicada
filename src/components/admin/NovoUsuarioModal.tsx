@@ -16,7 +16,7 @@ import { useCreateUser } from "@/hooks/admin/useUsers";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-type AppRole = "admin" | "mentorado" | "aluno_trilha";
+type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha";
 
 interface NovoUsuarioModalProps {
   open: boolean;
@@ -137,6 +137,16 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
                 />
                 <Label htmlFor="admin" className="cursor-pointer">
                   Administrador
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="equipe"
+                  checked={selectedRoles.includes("equipe")}
+                  onCheckedChange={() => toggleRole("equipe")}
+                />
+                <Label htmlFor="equipe" className="cursor-pointer">
+                  Equipe
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
