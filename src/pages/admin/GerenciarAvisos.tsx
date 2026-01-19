@@ -209,6 +209,7 @@ export default function GerenciarAvisos() {
         { value: 'todos', label: 'Todos os Tipos' },
         { value: 'aula_ao_vivo', label: 'Aula ao Vivo' },
         { value: 'qa', label: 'Q&A' },
+        { value: 'live_youtube', label: 'Live YouTube' },
         { value: 'outro', label: 'Outro' },
       ]
     },
@@ -243,6 +244,7 @@ export default function GerenciarAvisos() {
     switch (tipo) {
       case 'aula_ao_vivo': return 'Aula ao Vivo';
       case 'qa': return 'Q&A';
+      case 'live_youtube': return 'Live YouTube';
       case 'outro': return 'Outro';
       default: return '-';
     }
@@ -252,6 +254,7 @@ export default function GerenciarAvisos() {
     switch (tipo) {
       case 'aula_ao_vivo': return 'default';
       case 'qa': return 'secondary';
+      case 'live_youtube': return 'destructive';
       default: return 'outline';
     }
   };

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useTodasAulas } from "@/hooks/useCalendarioAulas";
 import { format, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Loader2, Clock, Video, HelpCircle, Calendar as CalendarIcon } from "lucide-react";
+import { Loader2, Clock, Video, HelpCircle, Calendar as CalendarIcon, Youtube } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tipoEventoConfig = {
@@ -25,6 +25,14 @@ const tipoEventoConfig = {
     textColor: "text-aplicada-green-500",
     legendColor: "bg-aplicada-green-500 ring-aplicada-green-500/30",
     icon: HelpCircle,
+  },
+  live_youtube: {
+    label: "Live YouTube",
+    color: "bg-red-500",
+    borderColor: "border-red-500",
+    textColor: "text-red-500",
+    legendColor: "bg-red-500 ring-red-500/30",
+    icon: Youtube,
   },
   outro: {
     label: "Outro",
@@ -66,6 +74,10 @@ export function CalendarioVisaoCalendario() {
     .filter(aula => aula.data_aula && aula.tipo_evento === 'qa')
     .map(aula => parseISO(aula.data_aula!));
   
+  const liveYoutube = aulas
+    .filter(aula => aula.data_aula && aula.tipo_evento === 'live_youtube')
+    .map(aula => parseISO(aula.data_aula!));
+
   const outrosEventos = aulas
     .filter(aula => aula.data_aula && aula.tipo_evento === 'outro')
     .map(aula => parseISO(aula.data_aula!));
@@ -100,6 +112,10 @@ export function CalendarioVisaoCalendario() {
         <div className="flex items-center gap-2">
           <span className="w-4 h-4 rounded-full bg-aplicada-green-500 ring-2 ring-aplicada-green-500/30" />
           <span className="text-sm font-medium text-foreground">Q&A</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-4 h-4 rounded-full bg-red-500 ring-2 ring-red-500/30" />
+          <span className="text-sm font-medium text-foreground">Live YouTube</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-4 h-4 rounded-full bg-aplicada-green-800 ring-2 ring-aplicada-green-800/30" />
@@ -138,11 +154,13 @@ export function CalendarioVisaoCalendario() {
           modifiers={{
             aulaAoVivo: aulasAoVivo,
             qa: qaSessions,
+            liveYoutube: liveYoutube,
             outro: outrosEventos,
           }}
           modifiersClassNames={{
             aulaAoVivo: "border-2 border-aplicada-green-700 font-bold text-foreground bg-aplicada-green-700/10",
             qa: "border-2 border-aplicada-green-500 font-bold text-foreground bg-aplicada-green-500/10",
+            liveYoutube: "border-2 border-red-500 font-bold text-foreground bg-red-500/10",
             outro: "border-2 border-aplicada-green-800 font-bold text-foreground bg-aplicada-green-800/10",
           }}
         />

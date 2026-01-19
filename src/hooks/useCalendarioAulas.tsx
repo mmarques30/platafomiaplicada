@@ -11,7 +11,7 @@ export interface AulaSemanal {
   descricao: string | null;
   ativo: boolean | null;
   realizada: boolean | null;
-  tipo_evento: 'aula_ao_vivo' | 'qa' | 'outro' | null;
+  tipo_evento: 'aula_ao_vivo' | 'qa' | 'outro' | 'live_youtube' | null;
   link_reuniao: string | null;
   recorrente: boolean | null;
   created_at: string | null;
@@ -26,7 +26,7 @@ export interface CreateAulaInput {
   descricao?: string | null;
   ativo?: boolean;
   realizada?: boolean;
-  tipo_evento?: 'aula_ao_vivo' | 'qa' | 'outro';
+  tipo_evento?: 'aula_ao_vivo' | 'qa' | 'outro' | 'live_youtube';
   link_reuniao?: string | null;
   recorrente?: boolean;
 }

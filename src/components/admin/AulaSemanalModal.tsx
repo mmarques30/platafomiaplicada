@@ -22,7 +22,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
   const [descricao, setDescricao] = useState("");
   const [ativo, setAtivo] = useState(true);
   const [realizada, setRealizada] = useState(false);
-  const [tipoEvento, setTipoEvento] = useState<'aula_ao_vivo' | 'qa' | 'outro'>('aula_ao_vivo');
+  const [tipoEvento, setTipoEvento] = useState<'aula_ao_vivo' | 'qa' | 'outro' | 'live_youtube'>('aula_ao_vivo');
   const [linkReuniao, setLinkReuniao] = useState("");
   const [recorrente, setRecorrente] = useState(false);
 
@@ -37,7 +37,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
       setDescricao(aula.descricao || "");
       setAtivo(aula.ativo ?? true);
       setRealizada(aula.realizada ?? false);
-      setTipoEvento(aula.tipo_evento || 'aula_ao_vivo');
+      setTipoEvento((aula.tipo_evento as 'aula_ao_vivo' | 'qa' | 'outro' | 'live_youtube') || 'aula_ao_vivo');
       setLinkReuniao(aula.link_reuniao || "");
       setRecorrente(aula.recorrente ?? false);
     } else {
@@ -107,7 +107,7 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
 
           <div className="space-y-2">
             <Label htmlFor="tipo_evento">Tipo de Evento</Label>
-            <Select value={tipoEvento} onValueChange={(v) => setTipoEvento(v as 'aula_ao_vivo' | 'qa' | 'outro')}>
+            <Select value={tipoEvento} onValueChange={(v) => setTipoEvento(v as 'aula_ao_vivo' | 'qa' | 'outro' | 'live_youtube')}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
@@ -122,6 +122,12 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
                   <span className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-blue-500" />
                     Q&A
+                  </span>
+                </SelectItem>
+                <SelectItem value="live_youtube">
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-red-500" />
+                    Live YouTube
                   </span>
                 </SelectItem>
                 <SelectItem value="outro">
