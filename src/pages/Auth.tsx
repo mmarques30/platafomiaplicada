@@ -136,6 +136,15 @@ export default function Auth() {
             {/* Aba Entrar */}
             <TabsContent value="entrar" className="mt-0">
 
+              <div className="space-y-2 mb-6 text-center">
+                <h1 className="text-2xl md:text-3xl font-semibold text-white">
+                  Bem vindo Aplicado
+                </h1>
+                <p className="text-white/60 text-sm">
+                  Aprenda a aplicar IA e ter resultados reais.
+                </p>
+              </div>
+
               {/* Tabs abaixo do subtítulo */}
               <TabsList className="grid w-full grid-cols-2 bg-white/5 p-1 rounded-lg mb-8">
                 <TabsTrigger 
@@ -211,7 +220,7 @@ export default function Auth() {
                   Explore a plataforma
                 </h1>
                 <p className="text-white/60 text-sm">
-                  Crie uma conta grátis e conheça a comunidade IAplicada
+                  Crie uma conta grátis e se prepare para o futuro.
                 </p>
               </div>
 
