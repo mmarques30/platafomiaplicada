@@ -51,7 +51,7 @@ export default function CadastrarUsuario() {
       },
       {
         onSuccess: () => {
-          navigate("/admin/usuarios");
+          navigate("/admin/gestao/usuarios");
         },
       }
     );
@@ -272,7 +272,7 @@ export default function CadastrarUsuario() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate("/admin/usuarios")}
+                onClick={() => navigate("/admin/gestao/usuarios")}
               >
                 Cancelar
               </Button>
