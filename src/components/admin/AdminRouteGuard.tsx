@@ -7,10 +7,17 @@ interface AdminRouteGuardProps {
 }
 
 export function AdminRouteGuard({ children, requireAdmin = false }: AdminRouteGuardProps) {
-  const { isAdmin, isEquipe, isLoading } = useUserRole();
+  const { isAdmin, isEquipe, isLoading, roles } = useUserRole();
   
-  // Se ainda carregando, não redireciona (deixa o ProtectedRoute pai lidar)
-  if (isLoading) return null;
+  // Se ainda carregando E não tem roles em cache, mostra loading
+  // Se tem roles em cache, usa elas mesmo durante loading
+  if (isLoading && roles.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   
   // Se requer admin e não é admin, redireciona para seletor de ambiente
   if (requireAdmin && !isAdmin) {
