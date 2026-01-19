@@ -15,16 +15,20 @@ import {
   Clock, 
   FileText, 
   BookOpen,
-  Download
+  Download,
+  ChevronRight
 } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
+import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
+import { useNavigate } from "react-router-dom";
 import { format, parseISO, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
-
 export function BusinessExecutiveRoadmap() {
   const { contrato, reports, progresso, isLoading } = useContratosBusiness();
   const { sessoes } = useMentoriaSessoes();
+  const { data: etapas } = useEtapasBusiness(contrato?.id);
+  const navigate = useNavigate();
 
   // Usar todas as sessões como reuniões recorrentes
   const reunioesRecorrentes = sessoes || [];
@@ -106,29 +110,37 @@ export function BusinessExecutiveRoadmap() {
                 const isEmAndamento = entrega.status === "em_andamento";
                 
                 return (
-                  <div key={index} className="relative pl-8">
+                  <div 
+                    key={index} 
+                    className={`relative pl-8 ${!isPreview && etapas?.[index] ? 'cursor-pointer group' : ''}`}
+                    onClick={() => {
+                      if (!isPreview && etapas?.[index]) {
+                        navigate(`/mentoria/etapa/${etapas[index].id}`);
+                      }
+                    }}
+                  >
                     {/* Status dot - bullet simples */}
                     <div className="absolute left-0 top-3">
                       <div className={`h-4 w-4 rounded-full border-2 border-background ${
                         isConcluida 
-                          ? 'bg-green-500' 
+                          ? 'bg-emerald-500' 
                           : isEmAndamento 
-                            ? 'bg-yellow-500' 
+                            ? 'bg-amber-500' 
                             : 'bg-zinc-900 dark:bg-zinc-100'
                       }`} />
                     </div>
                     
-                    <div className={`p-3 rounded-lg ${
+                    <div className={`p-3 rounded-lg transition-colors ${
                       isConcluida 
-                        ? 'bg-green-500/10 border border-green-500/20' 
+                        ? 'bg-emerald-500/10 border border-emerald-500/20' 
                         : isEmAndamento 
-                          ? 'bg-yellow-500/10 border border-yellow-500/20'
+                          ? 'bg-amber-500/10 border border-amber-500/20'
                           : isPreview
                             ? 'bg-muted/30 border border-dashed border-border'
-                            : 'bg-muted/50'
+                            : 'bg-muted/50 group-hover:bg-muted/70'
                     }`}>
                       <div className="flex items-center justify-between">
-                        <span className={`font-medium ${isConcluida ? 'text-green-600 dark:text-green-400' : ''}`}>
+                        <span className={`font-medium ${isConcluida ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>
                           {entrega.titulo}
                         </span>
                         <div className="flex items-center gap-2">
@@ -141,6 +153,9 @@ export function BusinessExecutiveRoadmap() {
                             <span className="text-xs text-muted-foreground">
                               {format(parseISO(entrega.prazo), "dd MMM", { locale: ptBR })}
                             </span>
+                          )}
+                          {!isPreview && etapas?.[index] && (
+                            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                           )}
                         </div>
                       </div>
