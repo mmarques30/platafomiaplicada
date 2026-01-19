@@ -7,7 +7,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, Search, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
-import { format, parseISO, isBefore, isAfter, startOfDay } from "date-fns";
+import { format, isBefore, startOfDay } from "date-fns";
+
+// Parse date string as local date (without UTC offset)
+const parseLocalDate = (dateString: string): Date => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +38,7 @@ export function CalendarioVisaoTabela() {
 
       // Filtro de status
       if (statusFiltro !== "todas") {
-        const dataAula = aula.data_aula ? parseISO(aula.data_aula) : null;
+        const dataAula = aula.data_aula ? parseLocalDate(aula.data_aula) : null;
         const hoje = startOfDay(new Date());
         
         switch (statusFiltro) {
@@ -53,7 +59,7 @@ export function CalendarioVisaoTabela() {
 
       // Filtro de mês
       if (mesFiltro !== "todos" && aula.data_aula) {
-        const mesAula = format(parseISO(aula.data_aula), "MM");
+        const mesAula = format(parseLocalDate(aula.data_aula), "MM");
         if (mesAula !== mesFiltro) return false;
       }
 
@@ -99,7 +105,7 @@ export function CalendarioVisaoTabela() {
       };
     }
 
-    const dataAula = startOfDay(parseISO(aula.data_aula));
+    const dataAula = startOfDay(parseLocalDate(aula.data_aula));
     const hoje = startOfDay(new Date());
     const isPassada = isBefore(dataAula, hoje);
 
@@ -191,7 +197,7 @@ export function CalendarioVisaoTabela() {
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{aula.descricao}</p>
                 )}
                 <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground mb-3">
-                  <span>📅 {aula.data_aula ? format(parseISO(aula.data_aula), "dd/MM/yyyy", { locale: ptBR }) : "-"}</span>
+                  <span>📅 {aula.data_aula ? format(parseLocalDate(aula.data_aula), "dd/MM/yyyy", { locale: ptBR }) : "-"}</span>
                   <span>🕐 {aula.horario || "-"}</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -266,7 +272,7 @@ export function CalendarioVisaoTabela() {
                     </TableCell>
                     <TableCell>
                       {aula.data_aula
-                        ? format(parseISO(aula.data_aula), "dd/MM/yyyy", { locale: ptBR })
+                        ? format(parseLocalDate(aula.data_aula), "dd/MM/yyyy", { locale: ptBR })
                         : "-"}
                     </TableCell>
                     <TableCell>{aula.horario || "-"}</TableCell>
@@ -329,7 +335,7 @@ export function CalendarioVisaoTabela() {
                 <span className="text-muted-foreground">Data:</span>
                 <span className="ml-2 font-medium">
                   {aulaDetalhes?.data_aula
-                    ? format(parseISO(aulaDetalhes.data_aula), "dd/MM/yyyy", { locale: ptBR })
+                    ? format(parseLocalDate(aulaDetalhes.data_aula), "dd/MM/yyyy", { locale: ptBR })
                     : "-"}
                 </span>
               </div>

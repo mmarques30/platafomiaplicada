@@ -4,7 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useTodasAulas } from "@/hooks/useCalendarioAulas";
-import { format, isSameDay, parseISO } from "date-fns";
+import { format, isSameDay } from "date-fns";
+
+// Parse date string as local date (without UTC offset)
+const parseLocalDate = (dateString: string): Date => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
 import { ptBR } from "date-fns/locale";
 import { Loader2, Clock, Video, HelpCircle, Calendar as CalendarIcon, Youtube } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -68,24 +74,24 @@ export function CalendarioVisaoCalendario() {
   // Agrupar datas por tipo de evento
   const aulasAoVivo = aulas
     .filter(aula => aula.data_aula && (aula.tipo_evento === 'aula_ao_vivo' || !aula.tipo_evento))
-    .map(aula => parseISO(aula.data_aula!));
+    .map(aula => parseLocalDate(aula.data_aula!));
   
   const qaSessions = aulas
     .filter(aula => aula.data_aula && aula.tipo_evento === 'qa')
-    .map(aula => parseISO(aula.data_aula!));
+    .map(aula => parseLocalDate(aula.data_aula!));
   
   const liveYoutube = aulas
     .filter(aula => aula.data_aula && aula.tipo_evento === 'live_youtube')
-    .map(aula => parseISO(aula.data_aula!));
+    .map(aula => parseLocalDate(aula.data_aula!));
 
   const outrosEventos = aulas
     .filter(aula => aula.data_aula && aula.tipo_evento === 'outro')
-    .map(aula => parseISO(aula.data_aula!));
+    .map(aula => parseLocalDate(aula.data_aula!));
 
   // Encontrar aulas do dia selecionado
   const aulasDoDia = selectedDate
     ? aulas.filter(
-        aula => aula.data_aula && isSameDay(parseISO(aula.data_aula), selectedDate)
+        aula => aula.data_aula && isSameDay(parseLocalDate(aula.data_aula), selectedDate)
       )
     : [];
 
@@ -93,7 +99,7 @@ export function CalendarioVisaoCalendario() {
     setSelectedDate(date);
     if (date) {
       const temAulas = aulas.some(
-        aula => aula.data_aula && isSameDay(parseISO(aula.data_aula), date)
+        aula => aula.data_aula && isSameDay(parseLocalDate(aula.data_aula), date)
       );
       if (temAulas) {
         setShowModal(true);
