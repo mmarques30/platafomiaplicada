@@ -32,7 +32,7 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, isMentorado } = useUserRole();
+  const { isAdmin, isMentorado, isEquipe } = useUserRole();
   const { effectivePlan, isVisitante } = useEffectivePlan(isAdmin);
   const { isViewingAs, resetView } = useAdminViewContext();
   const { signOut } = useAuth();
@@ -322,7 +322,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isAdmin && !isViewingAs && (
+        {(isAdmin || isEquipe) && !isViewingAs && (
           <SidebarGroup>
             <SidebarGroupLabel className="px-4 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider">
               Administração

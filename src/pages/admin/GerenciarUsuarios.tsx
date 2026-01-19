@@ -57,6 +57,8 @@ export default function GerenciarUsuários() {
     switch (role) {
       case "admin":
         return "destructive";
+      case "equipe":
+        return "default";
       case "mentorado":
         return "default";
       case "aluno_trilha":
@@ -70,6 +72,8 @@ export default function GerenciarUsuários() {
     switch (role) {
       case "admin":
         return "Admin";
+      case "equipe":
+        return "Equipe";
       case "mentorado":
         return "Mentorado";
       case "aluno_trilha":
@@ -154,6 +158,7 @@ export default function GerenciarUsuários() {
           <SelectContent>
             <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="equipe">Equipe</SelectItem>
             <SelectItem value="mentorado">Mentorado</SelectItem>
             <SelectItem value="aluno_trilha">Aluno Trilha</SelectItem>
             <SelectItem value="none">Sem Role</SelectItem>
