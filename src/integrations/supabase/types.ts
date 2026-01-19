@@ -1243,6 +1243,56 @@ export type Database = {
           },
         ]
       }
+      etapas_business: {
+        Row: {
+          contrato_id: string | null
+          created_at: string | null
+          data_conclusao: string | null
+          data_prevista: string | null
+          id: string
+          marcos_proxima_etapa: string[] | null
+          numero_etapa: number
+          objetivo: string | null
+          status: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          contrato_id?: string | null
+          created_at?: string | null
+          data_conclusao?: string | null
+          data_prevista?: string | null
+          id?: string
+          marcos_proxima_etapa?: string[] | null
+          numero_etapa: number
+          objetivo?: string | null
+          status?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          contrato_id?: string | null
+          created_at?: string | null
+          data_conclusao?: string | null
+          data_prevista?: string | null
+          id?: string
+          marcos_proxima_etapa?: string[] | null
+          numero_etapa?: number
+          objetivo?: string | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "etapas_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exercicios_praticos: {
         Row: {
           ativo: boolean | null
@@ -1808,6 +1858,62 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      instrucoes_etapa: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          dicas: string | null
+          etapa_id: string | null
+          ferramenta: string | null
+          gerado_por_ia: boolean | null
+          id: string
+          ordem: number | null
+          prompt_sugerido: string | null
+          recursos_url: string | null
+          responsavel: string
+          status: string | null
+          titulo: string
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          dicas?: string | null
+          etapa_id?: string | null
+          ferramenta?: string | null
+          gerado_por_ia?: boolean | null
+          id?: string
+          ordem?: number | null
+          prompt_sugerido?: string | null
+          recursos_url?: string | null
+          responsavel: string
+          status?: string | null
+          titulo: string
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          dicas?: string | null
+          etapa_id?: string | null
+          ferramenta?: string | null
+          gerado_por_ia?: boolean | null
+          id?: string
+          ordem?: number | null
+          prompt_sugerido?: string | null
+          recursos_url?: string | null
+          responsavel?: string
+          status?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instrucoes_etapa_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas_business"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       knowledge_base: {
         Row: {
@@ -3034,6 +3140,7 @@ export type Database = {
           data_acordo: string
           data_conclusao: string | null
           descricao: string
+          etapa_id: string | null
           feedback_mentor: string | null
           id: string
           link_externo: string | null
@@ -3054,6 +3161,7 @@ export type Database = {
           data_acordo?: string
           data_conclusao?: string | null
           descricao: string
+          etapa_id?: string | null
           feedback_mentor?: string | null
           id?: string
           link_externo?: string | null
@@ -3074,6 +3182,7 @@ export type Database = {
           data_acordo?: string
           data_conclusao?: string | null
           descricao?: string
+          etapa_id?: string | null
           feedback_mentor?: string | null
           id?: string
           link_externo?: string | null
@@ -3088,6 +3197,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tarefas_mentoria_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas_business"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tarefas_mentoria_projeto_id_fkey"
             columns: ["projeto_id"]

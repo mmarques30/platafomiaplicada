@@ -37,6 +37,7 @@ import MentoriaTarefas from "./pages/MentoriaTarefas";
 import MentoriaDuvidas from "./pages/MentoriaDuvidas";
 import MentoriaPainelDiagnostico from "./pages/MentoriaPainelDiagnostico";
 import MentoriaProcesso from "./pages/MentoriaProcesso";
+import MentoriaEtapa from "./pages/MentoriaEtapa";
 import FormulariosDisponiveis from "./pages/FormulariosDisponiveis";
 import ResponderFormulario from "./pages/ResponderFormulario";
 import IACopieUse from "./pages/IACopieUse";
@@ -142,6 +143,7 @@ function AppContent() {
             <Route path="/mentoria/projetos" element={<MentoriaProjetos />} />
             <Route path="/mentoria/tarefas" element={<MentoriaTarefas />} />
             <Route path="/mentoria/duvidas" element={<MentoriaDuvidas />} />
+            <Route path="/mentoria/etapa/:etapaId" element={<MentoriaEtapa />} />
             <Route path="/ia-copie-use" element={<IACopieUse />} />
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
             <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />
