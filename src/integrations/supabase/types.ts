@@ -3515,6 +3515,7 @@ export type Database = {
         | "aluno_trilha"
         | "visitante"
         | "facilitador"
+        | "equipe"
       nivel_acesso_plano: "academy" | "lab" | "skills" | "club" | "business"
       plano_mentoria:
         | "club"
@@ -3664,6 +3665,7 @@ export const Constants = {
         "aluno_trilha",
         "visitante",
         "facilitador",
+        "equipe",
       ],
       nivel_acesso_plano: ["academy", "lab", "skills", "club", "business"],
       plano_mentoria: [
