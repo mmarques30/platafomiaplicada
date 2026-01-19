@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, Search, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
-import { format, parseISO, isPast, isFuture } from "date-fns";
+import { format, parseISO, isBefore, isAfter, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,7 @@ export function CalendarioVisaoTabela() {
       // Filtro de status
       if (statusFiltro !== "todas") {
         const dataAula = aula.data_aula ? parseISO(aula.data_aula) : null;
+        const hoje = startOfDay(new Date());
         
         switch (statusFiltro) {
           case "ativas":
@@ -42,10 +43,10 @@ export function CalendarioVisaoTabela() {
             if (aula.ativo) return false;
             break;
           case "passadas":
-            if (!dataAula || !isPast(dataAula)) return false;
+            if (!dataAula || !isBefore(startOfDay(dataAula), hoje)) return false;
             break;
           case "futuras":
-            if (!dataAula || !isFuture(dataAula)) return false;
+            if (!dataAula || isBefore(startOfDay(dataAula), hoje)) return false;
             break;
         }
       }
@@ -98,8 +99,9 @@ export function CalendarioVisaoTabela() {
       };
     }
 
-    const dataAula = parseISO(aula.data_aula);
-    const isPassada = isPast(dataAula);
+    const dataAula = startOfDay(parseISO(aula.data_aula));
+    const hoje = startOfDay(new Date());
+    const isPassada = isBefore(dataAula, hoje);
 
     if (isPassada) {
       return {
