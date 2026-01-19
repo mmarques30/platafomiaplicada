@@ -13,14 +13,14 @@ import { Link } from "react-router-dom";
 type TabValue = TipoConteudo | "material";
 
 const tabs = [
-  { value: "newsletter" as TabValue, label: "Newsletter", icon: Newspaper },
   { value: "noticia" as TabValue, label: "Noticias IA", icon: Globe },
   { value: "dica" as TabValue, label: "Dicas Praticas", icon: Lightbulb },
   { value: "material" as TabValue, label: "Materiais Gratuitos", icon: FileText },
+  { value: "newsletter" as TabValue, label: "Newsletter", icon: Newspaper },
 ];
 
 export function CentralConteudo() {
-  const [activeTab, setActiveTab] = useState<TabValue>("newsletter");
+  const [activeTab, setActiveTab] = useState<TabValue>("noticia");
   const { data: conteudos, isLoading } = useConteudosDashboard(activeTab !== "material" ? activeTab as TipoConteudo : "newsletter");
   const { data: materiais, isLoading: isLoadingMateriais } = useMateriaisGratuitos(10);
 

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Newspaper, Globe, Lightbulb, FileText, ExternalLink, ImageIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,9 +14,9 @@ import logo3d from "@/assets/logo-3d.png";
 
 const tabs = [
   { value: "todos" as const, label: "Todos", icon: FileText },
-  { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
   { value: "noticia" as TipoConteudo, label: "Notícias IA", icon: Globe },
   { value: "dica" as TipoConteudo, label: "Dicas Práticas", icon: Lightbulb },
+  { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
 ];
 
 const tipoIcons = {
@@ -31,7 +32,15 @@ const tipoBadgeColors = {
 };
 
 export default function Central() {
-  const [activeTab, setActiveTab] = useState<TipoConteudo | "todos">("todos");
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab') as TipoConteudo | null;
+  const [activeTab, setActiveTab] = useState<TipoConteudo | "todos">(tabFromUrl || "todos");
+
+  useEffect(() => {
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
   const [selectedConteudo, setSelectedConteudo] = useState<any>(null);
   
   const { data: newsletters, isLoading: loadingNewsletter } = useConteudosDashboard("newsletter");
