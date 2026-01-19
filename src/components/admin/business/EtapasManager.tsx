@@ -13,7 +13,6 @@ import {
   ChevronRight, 
   Calendar,
   Edit,
-  Trash2,
   Loader2
 } from "lucide-react";
 import { format } from "date-fns";
@@ -26,11 +25,13 @@ import {
   useInstrucoesEtapa,
   type EtapaBusiness 
 } from "@/hooks/useEtapasBusiness";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { UploadTranscricaoModal } from "./UploadTranscricaoModal";
 import { cn } from "@/lib/utils";
 
 interface EtapasManagerProps {
-  contratoId: string;
+  contratoId?: string;
+  userId?: string;
   userName?: string;
 }
 
@@ -268,12 +269,26 @@ function EditEtapaDialog({
   );
 }
 
-export function EtapasManager({ contratoId, userName }: EtapasManagerProps) {
+export function EtapasManager({ contratoId: propContratoId, userId, userName }: EtapasManagerProps) {
+  // Buscar contrato se userId fornecido mas contratoId não
+  const { contrato } = useContratosBusiness(userId);
+  const contratoId = propContratoId || contrato?.id;
+  
   const { data: etapas, isLoading, refetch } = useEtapasBusiness(contratoId);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [editingEtapa, setEditingEtapa] = useState<EtapaBusiness | null>(null);
 
   const proximoNumero = (etapas?.length || 0) + 1;
+
+  if (!contratoId) {
+    return (
+      <Card>
+        <CardContent className="py-8 text-center">
+          <p className="text-muted-foreground">Nenhum contrato Business encontrado para este usuário.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (

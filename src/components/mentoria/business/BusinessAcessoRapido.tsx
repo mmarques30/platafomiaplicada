@@ -5,7 +5,7 @@ import {
   Map, 
   FolderKanban, 
   ListTodo, 
-  BookOpen 
+  FileText 
 } from "lucide-react";
 
 interface QuickNavItem {
@@ -21,7 +21,7 @@ const navItems: QuickNavItem[] = [
   { title: "MAPA", path: "https://mapa.iaplicada.com.br", icon: Map, external: true },
   { title: "Projetos", path: "/mentoria/projetos", icon: FolderKanban },
   { title: "Tarefas", path: "/mentoria/tarefas", icon: ListTodo },
-  { title: "Materiais", path: "/mentoria/recursos", icon: BookOpen },
+  { title: "Instruções", path: "/mentoria?tab=roadmap", icon: FileText },
 ];
 
 export function BusinessAcessoRapido() {
