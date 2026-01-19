@@ -43,6 +43,7 @@ export function ConteudoCard({ conteudo }: ConteudoCardProps) {
         transition-all duration-300 cursor-pointer
         shadow-md sm:shadow-lg hover:shadow-xl hover:shadow-primary/20
         min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0
+        h-[200px] sm:h-[240px] flex flex-col
       `}
       onClick={handleClick}
     >
@@ -61,15 +62,17 @@ export function ConteudoCard({ conteudo }: ConteudoCardProps) {
       </div>
 
       {/* Content */}
-      <h4 className="font-semibold text-foreground mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-primary transition-colors text-sm sm:text-base">
-        {conteudo.titulo}
-      </h4>
-      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3 mb-2.5 sm:mb-4">
-        {conteudo.resumo}
-      </p>
+      <div className="flex-grow overflow-hidden">
+        <h4 className="font-semibold text-foreground mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-primary transition-colors text-sm sm:text-base">
+          {conteudo.titulo}
+        </h4>
+        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 sm:line-clamp-4">
+          {conteudo.resumo}
+        </p>
+      </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground">
+      <div className="flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground mt-auto pt-2">
         <div className="flex items-center gap-1 sm:gap-1.5">
           <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
           <span>{format(new Date(conteudo.created_at), "dd MMM yyyy", { locale: ptBR })}</span>
