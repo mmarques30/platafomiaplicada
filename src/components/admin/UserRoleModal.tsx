@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useUpdateUserRoles } from "@/hooks/admin/useUsers";
 
-type AppRole = "admin" | "mentorado" | "aluno_trilha";
+type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha";
 
 interface UserRoleModalProps {
   open: boolean;
@@ -23,6 +23,7 @@ interface UserRoleModalProps {
 
 const AVAILABLE_ROLES: { value: AppRole; label: string }[] = [
   { value: "admin", label: "Administrador" },
+  { value: "equipe", label: "Equipe" },
   { value: "mentorado", label: "Mentorado" },
   { value: "aluno_trilha", label: "Aluno Trilha" },
 ];

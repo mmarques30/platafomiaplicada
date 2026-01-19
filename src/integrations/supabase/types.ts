@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_permissions: {
+        Row: {
+          admin_label: string
+          admin_path: string
+          can_access: boolean | null
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          admin_label: string
+          admin_path: string
+          can_access?: boolean | null
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          admin_label?: string
+          admin_path?: string
+          can_access?: boolean | null
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       auditoria_conteudo: {
         Row: {
           campos_alterados: string[] | null

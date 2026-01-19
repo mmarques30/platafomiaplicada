@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -24,28 +24,23 @@ import {
 import {
   LayoutDashboard,
   Users,
-  UserPlus,
-  UserCheck,
   BookOpen,
-  Library,
   Bell,
   GraduationCap,
   ArrowLeft,
-  FileSearch,
   CheckSquare,
   Package,
   Settings,
   MessagesSquare,
-  Gift,
-  MessageCircle,
-  Database,
-  FileText,
   ChevronDown,
   Briefcase,
   Smartphone,
+  Shield,
   LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useAdminPermissions } from "@/hooks/useAdminPermissions";
 
 interface MenuItem {
   path: string;
@@ -59,6 +54,7 @@ interface MenuGroup {
   icon: LucideIcon;
   path?: string;
   items?: MenuItem[];
+  adminOnly?: boolean;
 }
 
 const menuGroups: MenuGroup[] = [
@@ -128,6 +124,7 @@ const menuGroups: MenuGroup[] = [
       { path: "/admin/menus", label: "Menus" },
       { path: "/admin/auditoria", label: "Auditoria do Sistema" },
       { path: "/admin/conhecimento", label: "Base de Conhecimento" },
+      { path: "/admin/permissoes-equipe", label: "Permissões Equipe" },
     ],
   },
   {
@@ -143,16 +140,52 @@ export function AdminSidebar() {
   const navigate = useNavigate();
   const { state } = useSidebar();
   const [openGroups, setOpenGroups] = useState<string[]>([]);
+  const { isAdmin, isEquipe } = useUserRole();
+  const { canAccessPath } = useAdminPermissions();
+
+  // Filtrar menus baseado nas permissões
+  const filteredMenuGroups = useMemo(() => {
+    // Admin vê tudo
+    if (isAdmin) return menuGroups;
+
+    // Equipe vê apenas o que tem permissão
+    if (isEquipe) {
+      return menuGroups
+        .map((group) => {
+          // Itens standalone
+          if (group.type === "standalone") {
+            // Sempre permitir "Instalar App" e verificar permissão para outros
+            if (group.path === "/instalar") return group;
+            return canAccessPath(group.path!) ? group : null;
+          }
+
+          // Grupos com subitems
+          const filteredItems = group.items?.filter((item) => {
+            // Ocultar "Permissões Equipe" para não-admins
+            if (item.path === "/admin/permissoes-equipe") return false;
+            return canAccessPath(item.path);
+          });
+
+          // Se não tem items permitidos, ocultar o grupo
+          if (!filteredItems?.length) return null;
+
+          return { ...group, items: filteredItems };
+        })
+        .filter(Boolean) as MenuGroup[];
+    }
+
+    return [];
+  }, [isAdmin, isEquipe, canAccessPath]);
 
   // Auto-expand group containing current route
   useEffect(() => {
-    const currentGroup = menuGroups.find(
+    const currentGroup = filteredMenuGroups.find(
       (g) => g.type === "group" && g.items?.some((i) => location.pathname === i.path)
     );
     if (currentGroup && !openGroups.includes(currentGroup.label)) {
       setOpenGroups((prev) => [...prev, currentGroup.label]);
     }
-  }, [location.pathname]);
+  }, [location.pathname, filteredMenuGroups]);
 
   const toggleGroup = (label: string, open: boolean) => {
     if (open) {
@@ -171,7 +204,9 @@ export function AdminSidebar() {
       <SidebarHeader className="border-b">
         <div className="flex items-center justify-between p-2">
           {state === "expanded" && (
-            <h2 className="text-xl font-bold">Painel Admin</h2>
+            <h2 className="text-xl font-bold">
+              {isEquipe && !isAdmin ? "Painel Equipe" : "Painel Admin"}
+            </h2>
           )}
           <SidebarTrigger />
         </div>
@@ -182,7 +217,7 @@ export function AdminSidebar() {
           <SidebarGroupLabel>Navegação</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuGroups.map((group) => {
+              {filteredMenuGroups.map((group) => {
                 const Icon = group.icon;
 
                 if (group.type === "standalone") {

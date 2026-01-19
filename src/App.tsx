@@ -86,6 +86,7 @@ import Instalar from "./pages/Instalar";
 import Central from "./pages/Central";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import HistoricoSenhas from "./pages/admin/HistoricoSenhas";
+import GerenciarPermissoesEquipe from "./pages/admin/GerenciarPermissoesEquipe";
 import { PWAUpdatePrompt } from "./components/shared/PWAUpdatePrompt";
 
 const queryClient = new QueryClient();
@@ -155,7 +156,7 @@ function AppContent() {
           
           <Route path="/candidatar-mentoria" element={<CandidatarMentoria />} />
           
-          <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
+          <Route path="/admin" element={<ProtectedRoute requireAnyRole={["admin", "equipe"]}><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="usuarios" element={<GerenciarUsuarios />} />
             <Route path="visitantes" element={<GerenciarVisitantes />} />
@@ -180,6 +181,7 @@ function AppContent() {
             <Route path="politicas" element={<GerenciarPoliticas />} />
             <Route path="pesquisas" element={<GerenciarPesquisas />} />
             <Route path="historico-senhas" element={<HistoricoSenhas />} />
+            <Route path="permissoes-equipe" element={<GerenciarPermissoesEquipe />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
