@@ -12,7 +12,7 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
 type StatusFilter = "todas" | "ativas" | "inativas" | "passadas" | "futuras";
-type TipoFilter = "todos" | "aula_ao_vivo" | "qa" | "outro";
+type TipoFilter = "todos" | "aula_ao_vivo" | "qa" | "outro" | "live_youtube";
 
 export function CalendarioVisaoTabela() {
   const { data: aulas, isLoading } = useTodasAulas();
@@ -153,6 +153,7 @@ export function CalendarioVisaoTabela() {
               <SelectItem value="todos">Todos os tipos</SelectItem>
               <SelectItem value="aula_ao_vivo">Aula ao Vivo</SelectItem>
               <SelectItem value="qa">Q&A</SelectItem>
+              <SelectItem value="live_youtube">Live YouTube</SelectItem>
               <SelectItem value="outro">Outro</SelectItem>
             </SelectContent>
           </Select>
@@ -195,18 +196,20 @@ export function CalendarioVisaoTabela() {
                 </div>
                 <div className="flex items-center justify-between">
                   {aula.tipo_evento && (
-                    <span
-                      className={cn(
-                        "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full",
-                        aula.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
-                        aula.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
-                        aula.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
-                      )}
-                    >
-                      {aula.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
-                      {aula.tipo_evento === "qa" && "Q&A"}
-                      {aula.tipo_evento === "outro" && "Outro"}
-                    </span>
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full",
+                          aula.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
+                          aula.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
+                          aula.tipo_evento === "live_youtube" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
+                          aula.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                        )}
+                      >
+                        {aula.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
+                        {aula.tipo_evento === "qa" && "Q&A"}
+                        {aula.tipo_evento === "live_youtube" && "Live YouTube"}
+                        {aula.tipo_evento === "outro" && "Outro"}
+                      </span>
                   )}
                   <span
                     className={cn(
@@ -274,11 +277,13 @@ export function CalendarioVisaoTabela() {
                             "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full whitespace-nowrap",
                             aula.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
                             aula.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
+                            aula.tipo_evento === "live_youtube" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
                             aula.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
                           )}
                         >
                           {aula.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
                           {aula.tipo_evento === "qa" && "Q&A"}
+                          {aula.tipo_evento === "live_youtube" && "Live YouTube"}
                           {aula.tipo_evento === "outro" && "Outro"}
                         </span>
                       ) : "-"}
@@ -342,11 +347,13 @@ export function CalendarioVisaoTabela() {
                     "ml-2 px-2.5 py-1 text-xs font-medium rounded-full",
                     aulaDetalhes.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
                     aulaDetalhes.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
+                    aulaDetalhes.tipo_evento === "live_youtube" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
                     aulaDetalhes.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
                   )}
                 >
                   {aulaDetalhes.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
                   {aulaDetalhes.tipo_evento === "qa" && "Q&A"}
+                  {aulaDetalhes.tipo_evento === "live_youtube" && "Live YouTube"}
                   {aulaDetalhes.tipo_evento === "outro" && "Outro"}
                 </span>
               </div>

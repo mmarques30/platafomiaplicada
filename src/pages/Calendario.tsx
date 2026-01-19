@@ -3,7 +3,7 @@ import { CalendarioVisaoCalendario } from "@/components/calendario/CalendarioVis
 import { CalendarioVisaoTabela } from "@/components/calendario/CalendarioVisaoTabela";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, History, Clock, Video, HelpCircle, CheckCircle } from "lucide-react";
+import { Calendar, History, Clock, Video, HelpCircle, CheckCircle, Youtube } from "lucide-react";
 import { useProximaAula } from "@/hooks/useCalendarioAulas";
 import { format, parseISO, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -14,6 +14,7 @@ import { PageTitle } from "@/components/shared/PageTitle";
 const tipoEventoConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   aula_ao_vivo: { label: "Aula ao Vivo", icon: Video, color: "text-primary" },
   qa: { label: "Q&A", icon: HelpCircle, color: "text-blue-500" },
+  live_youtube: { label: "Live YouTube", icon: Youtube, color: "text-red-500" },
   outro: { label: "Evento", icon: Calendar, color: "text-orange-500" },
 };
 
