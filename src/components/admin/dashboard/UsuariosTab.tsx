@@ -168,7 +168,7 @@ export function UsuariosTab({ data }: UsuariosTabProps) {
             value={data.visitantes.total}
             description="Cadastros via aba Visitantes"
             icon={UserPlus}
-            onClick={() => navigate("/admin/gestao/visitantes")}
+            onClick={() => navigate("/admin/visitantes")}
           />
           <StatsCard
             title="Novos Visitantes"

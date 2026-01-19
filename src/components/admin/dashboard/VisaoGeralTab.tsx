@@ -45,21 +45,21 @@ export function VisaoGeralTab({ data }: VisaoGeralTabProps) {
             value={data.alertas.tarefasAtrasadas}
             icon={AlertTriangle}
             severity="error"
-            onClick={() => navigate("/admin/projetos/minhas-tarefas")}
+            onClick={() => navigate("/admin/minhas-tarefas")}
           />
           <AlertCard
             title="Dúvidas Pendentes"
             value={data.alertas.duvidasPendentes}
             icon={HelpCircle}
             severity="warning"
-            onClick={() => navigate("/admin/gestao/duvidas")}
+            onClick={() => navigate("/admin/mentoria")}
           />
           <AlertCard
             title="Diagnósticos Incompletos"
             value={data.alertas.diagnosticosIncompletos}
             icon={FileText}
             severity="warning"
-            onClick={() => navigate("/admin/gestao/formularios")}
+            onClick={() => navigate("/admin/mentoria")}
           />
         </div>
       </div>

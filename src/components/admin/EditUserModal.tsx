@@ -22,7 +22,7 @@ import { useUpdateUser, useResetUserPassword } from "@/hooks/admin/useUsers";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-type AppRole = "admin" | "mentorado" | "aluno_trilha" | "equipe";
+type AppRole = "admin" | "mentorado" | "aluno_trilha";
 
 interface EditUserModalProps {
   open: boolean;
@@ -181,14 +181,6 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                       onCheckedChange={() => toggleRole("admin")}
                     />
                     <Label htmlFor="role-admin" className="cursor-pointer">Administrador</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="role-equipe"
-                      checked={selectedRoles.includes("equipe")}
-                      onCheckedChange={() => toggleRole("equipe")}
-                    />
-                    <Label htmlFor="role-equipe" className="cursor-pointer">Equipe</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox

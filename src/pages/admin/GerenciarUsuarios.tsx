@@ -57,8 +57,6 @@ export default function GerenciarUsuários() {
     switch (role) {
       case "admin":
         return "destructive";
-      case "equipe":
-        return "default";
       case "mentorado":
         return "default";
       case "aluno_trilha":
@@ -72,8 +70,6 @@ export default function GerenciarUsuários() {
     switch (role) {
       case "admin":
         return "Admin";
-      case "equipe":
-        return "Equipe";
       case "mentorado":
         return "Mentorado";
       case "aluno_trilha":
@@ -128,7 +124,7 @@ export default function GerenciarUsuários() {
         <PageTitle primary="Gerenciar" secondary="Usuários" />
         <div className="flex gap-2">
           <Button 
-            onClick={() => navigate('/admin/gestao/importar-usuarios')}
+            onClick={() => navigate('/admin/importar-usuarios')}
             variant="outline"
           >
             <Upload className="h-4 w-4 mr-2" />
@@ -158,7 +154,6 @@ export default function GerenciarUsuários() {
           <SelectContent>
             <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="equipe">Equipe</SelectItem>
             <SelectItem value="mentorado">Mentorado</SelectItem>
             <SelectItem value="aluno_trilha">Aluno Trilha</SelectItem>
             <SelectItem value="none">Sem Role</SelectItem>

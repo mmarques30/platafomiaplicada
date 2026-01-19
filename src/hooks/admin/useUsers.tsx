@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-type AppRole = "admin" | "mentorado" | "aluno_trilha" | "equipe";
+type AppRole = "admin" | "mentorado" | "aluno_trilha";
 
 export function useUsers() {
   return useQuery({
