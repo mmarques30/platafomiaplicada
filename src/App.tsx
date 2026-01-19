@@ -47,6 +47,7 @@ import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
 import { AdminLayout } from "./components/admin/AdminLayout";
+import { AdminRouteGuard } from "./components/admin/AdminRouteGuard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminEnvironmentSelector from "./pages/admin/AdminEnvironmentSelector";
 import ProjetosDashboard from "./pages/admin/ProjetosDashboard";
@@ -165,29 +166,29 @@ function AppContent() {
             <Route path="projetos/tarefas" element={<MinhasTarefas />} />
             
             {/* Ambiente Gestão - apenas admin */}
-            <Route path="gestao" element={<ProtectedRoute requireRole="admin"><AdminDashboard /></ProtectedRoute>} />
-            <Route path="gestao/usuarios" element={<ProtectedRoute requireRole="admin"><GerenciarUsuarios /></ProtectedRoute>} />
-            <Route path="gestao/visitantes" element={<ProtectedRoute requireRole="admin"><GerenciarVisitantes /></ProtectedRoute>} />
-            <Route path="gestao/candidaturas" element={<ProtectedRoute requireRole="admin"><GerenciarCandidaturas /></ProtectedRoute>} />
-            <Route path="gestao/conteudo" element={<ProtectedRoute requireRole="admin"><GerenciarConteudo /></ProtectedRoute>} />
-            <Route path="gestao/bibliotecas" element={<ProtectedRoute requireRole="admin"><GerenciarBibliotecas /></ProtectedRoute>} />
-            <Route path="gestao/avisos" element={<ProtectedRoute requireRole="admin"><GerenciarAvisos /></ProtectedRoute>} />
-            <Route path="gestao/conhecimento" element={<ProtectedRoute requireRole="admin"><GerenciarConhecimento /></ProtectedRoute>} />
-            <Route path="gestao/mentoria/bonus" element={<ProtectedRoute requireRole="admin"><MentoriaBonusPage /></ProtectedRoute>} />
-            <Route path="gestao/mentoria/academy" element={<ProtectedRoute requireRole="admin"><MentoriaAcademyPage /></ProtectedRoute>} />
-            <Route path="gestao/mentoria/business" element={<ProtectedRoute requireRole="admin"><MentoriaBusinessPage /></ProtectedRoute>} />
-            <Route path="gestao/mentoria/preview-paineis" element={<ProtectedRoute requireRole="admin"><PreviewPaineisPage /></ProtectedRoute>} />
-            <Route path="gestao/duvidas" element={<ProtectedRoute requireRole="admin"><GerenciarTodasDuvidas /></ProtectedRoute>} />
-            <Route path="gestao/produtos" element={<ProtectedRoute requireRole="admin"><GerenciarProdutos /></ProtectedRoute>} />
-            <Route path="gestao/materiais" element={<ProtectedRoute requireRole="admin"><GerenciarMateriais /></ProtectedRoute>} />
-            <Route path="gestao/formularios" element={<ProtectedRoute requireRole="admin"><VisualizarFormularios /></ProtectedRoute>} />
-            <Route path="gestao/menus" element={<ProtectedRoute requireRole="admin"><GerenciarMenus /></ProtectedRoute>} />
-            <Route path="gestao/auditoria" element={<ProtectedRoute requireRole="admin"><Auditoria /></ProtectedRoute>} />
-            <Route path="gestao/importar-usuarios" element={<ProtectedRoute requireRole="admin"><ImportarUsuarios /></ProtectedRoute>} />
-            <Route path="gestao/comunidade" element={<ProtectedRoute requireRole="admin"><GerenciarComunidade /></ProtectedRoute>} />
-            <Route path="gestao/politicas" element={<ProtectedRoute requireRole="admin"><GerenciarPoliticas /></ProtectedRoute>} />
-            <Route path="gestao/pesquisas" element={<ProtectedRoute requireRole="admin"><GerenciarPesquisas /></ProtectedRoute>} />
-            <Route path="gestao/historico-senhas" element={<ProtectedRoute requireRole="admin"><HistoricoSenhas /></ProtectedRoute>} />
+            <Route path="gestao" element={<AdminRouteGuard requireAdmin><AdminDashboard /></AdminRouteGuard>} />
+            <Route path="gestao/usuarios" element={<AdminRouteGuard requireAdmin><GerenciarUsuarios /></AdminRouteGuard>} />
+            <Route path="gestao/visitantes" element={<AdminRouteGuard requireAdmin><GerenciarVisitantes /></AdminRouteGuard>} />
+            <Route path="gestao/candidaturas" element={<AdminRouteGuard requireAdmin><GerenciarCandidaturas /></AdminRouteGuard>} />
+            <Route path="gestao/conteudo" element={<AdminRouteGuard requireAdmin><GerenciarConteudo /></AdminRouteGuard>} />
+            <Route path="gestao/bibliotecas" element={<AdminRouteGuard requireAdmin><GerenciarBibliotecas /></AdminRouteGuard>} />
+            <Route path="gestao/avisos" element={<AdminRouteGuard requireAdmin><GerenciarAvisos /></AdminRouteGuard>} />
+            <Route path="gestao/conhecimento" element={<AdminRouteGuard requireAdmin><GerenciarConhecimento /></AdminRouteGuard>} />
+            <Route path="gestao/mentoria/bonus" element={<AdminRouteGuard requireAdmin><MentoriaBonusPage /></AdminRouteGuard>} />
+            <Route path="gestao/mentoria/academy" element={<AdminRouteGuard requireAdmin><MentoriaAcademyPage /></AdminRouteGuard>} />
+            <Route path="gestao/mentoria/business" element={<AdminRouteGuard requireAdmin><MentoriaBusinessPage /></AdminRouteGuard>} />
+            <Route path="gestao/mentoria/preview-paineis" element={<AdminRouteGuard requireAdmin><PreviewPaineisPage /></AdminRouteGuard>} />
+            <Route path="gestao/duvidas" element={<AdminRouteGuard requireAdmin><GerenciarTodasDuvidas /></AdminRouteGuard>} />
+            <Route path="gestao/produtos" element={<AdminRouteGuard requireAdmin><GerenciarProdutos /></AdminRouteGuard>} />
+            <Route path="gestao/materiais" element={<AdminRouteGuard requireAdmin><GerenciarMateriais /></AdminRouteGuard>} />
+            <Route path="gestao/formularios" element={<AdminRouteGuard requireAdmin><VisualizarFormularios /></AdminRouteGuard>} />
+            <Route path="gestao/menus" element={<AdminRouteGuard requireAdmin><GerenciarMenus /></AdminRouteGuard>} />
+            <Route path="gestao/auditoria" element={<AdminRouteGuard requireAdmin><Auditoria /></AdminRouteGuard>} />
+            <Route path="gestao/importar-usuarios" element={<AdminRouteGuard requireAdmin><ImportarUsuarios /></AdminRouteGuard>} />
+            <Route path="gestao/comunidade" element={<AdminRouteGuard requireAdmin><GerenciarComunidade /></AdminRouteGuard>} />
+            <Route path="gestao/politicas" element={<AdminRouteGuard requireAdmin><GerenciarPoliticas /></AdminRouteGuard>} />
+            <Route path="gestao/pesquisas" element={<AdminRouteGuard requireAdmin><GerenciarPesquisas /></AdminRouteGuard>} />
+            <Route path="gestao/historico-senhas" element={<AdminRouteGuard requireAdmin><HistoricoSenhas /></AdminRouteGuard>} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
