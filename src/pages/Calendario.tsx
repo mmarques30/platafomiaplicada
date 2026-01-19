@@ -5,7 +5,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, History, Clock, Video, HelpCircle, CheckCircle, Youtube } from "lucide-react";
 import { useProximaAula } from "@/hooks/useCalendarioAulas";
-import { format, parseISO, isSameDay } from "date-fns";
+import { format, isSameDay } from "date-fns";
+
+// Helper function to parse date string as local date (avoiding timezone issues)
+function parseLocalDate(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -45,7 +51,7 @@ function ProximoEncontroCard() {
   }
 
   const hoje = new Date();
-  const dataAula = proximaAula.data_aula ? parseISO(proximaAula.data_aula) : null;
+  const dataAula = proximaAula.data_aula ? parseLocalDate(proximaAula.data_aula) : null;
   const isHoje = dataAula && isSameDay(dataAula, hoje);
 
   const tipoEvento = proximaAula.tipo_evento || "aula_ao_vivo";
