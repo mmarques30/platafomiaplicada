@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Newspaper, Globe, Lightbulb, ExternalLink, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Newspaper, Globe, Lightbulb, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ConteudoDashboard } from "@/hooks/useConteudosDashboard";
@@ -23,13 +24,12 @@ const iconBgMap = {
 };
 
 export function ConteudoCard({ conteudo }: ConteudoCardProps) {
+  const navigate = useNavigate();
   const Icon = iconMap[conteudo.tipo];
   const iconBgClass = iconBgMap[conteudo.tipo];
 
   const handleClick = () => {
-    if (conteudo.link_externo) {
-      window.open(conteudo.link_externo, "_blank");
-    }
+    navigate(`/central?tab=${conteudo.tipo}`);
   };
 
   return (
@@ -72,14 +72,11 @@ export function ConteudoCard({ conteudo }: ConteudoCardProps) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground mt-auto pt-2">
+      <div className="flex items-center text-[10px] sm:text-xs text-muted-foreground mt-auto pt-2">
         <div className="flex items-center gap-1 sm:gap-1.5">
           <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
           <span>{format(new Date(conteudo.created_at), "dd MMM yyyy", { locale: ptBR })}</span>
         </div>
-        {conteudo.link_externo && (
-          <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-        )}
       </div>
     </motion.div>
   );
