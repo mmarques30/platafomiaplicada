@@ -31,7 +31,7 @@ export default function MentoriaAcademyPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/admin/mentoria")}>
+        <Button variant="ghost" size="icon" onClick={() => navigate("/admin/gestao")}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>

@@ -150,7 +150,7 @@ export default function PreviewPaineisPage() {
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={() => navigate("/admin/mentoria/academy")}
+          onClick={() => navigate("/admin/gestao/mentoria/academy")}
           className="gap-2"
         >
           <ArrowLeft className="h-4 w-4" />

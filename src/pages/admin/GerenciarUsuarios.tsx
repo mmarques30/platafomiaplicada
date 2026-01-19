@@ -128,7 +128,7 @@ export default function GerenciarUsuários() {
         <PageTitle primary="Gerenciar" secondary="Usuários" />
         <div className="flex gap-2">
           <Button 
-            onClick={() => navigate('/admin/importar-usuarios')}
+            onClick={() => navigate('/admin/gestao/importar-usuarios')}
             variant="outline"
           >
             <Upload className="h-4 w-4 mr-2" />
