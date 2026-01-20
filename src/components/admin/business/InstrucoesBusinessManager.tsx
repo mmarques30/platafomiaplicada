@@ -50,7 +50,6 @@ const statusConfig = {
 
 const responsavelConfig = {
   voce: { label: "Cliente", className: "bg-blue-500/10 text-blue-600" },
-  mentor: { label: "Consultoria", className: "bg-purple-500/10 text-purple-600" },
   conjunto: { label: "Conjunto", className: "bg-amber-500/10 text-amber-600" },
 };
 
@@ -195,7 +194,6 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
                 <SelectContent>
                   <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="voce">Cliente</SelectItem>
-                  <SelectItem value="mentor">Consultoria</SelectItem>
                   <SelectItem value="conjunto">Conjunto</SelectItem>
                 </SelectContent>
               </Select>
