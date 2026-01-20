@@ -15,7 +15,7 @@ export const MODULOS_DISPONIVEIS = [
   "Compras",
   "Produção",
   "BI Avançado",
-  "Agente IA",
+  "Agente Analista de IA",
   "IA Conversacional",
   "Geração de Documentos"
 ];
