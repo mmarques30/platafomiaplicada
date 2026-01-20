@@ -1,5 +1,6 @@
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -15,17 +16,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function DiagnosticoPainelAcademy() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
-  const { isVisitante, isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isVisitante, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
 
   // Redirecionar visitantes
   useEffect(() => {
-    if (!roleLoading && isVisitante) {
+    // Aguardar loading completo antes de decidir redirect
+    if (planLoading) return;
+    
+    if (isVisitante) {
       toast.info("Esta funcionalidade requer um plano ativo");
       navigate("/trilhas", { replace: true });
     }
-  }, [isVisitante, roleLoading, navigate]);
+  }, [isVisitante, planLoading, navigate]);
 
-  const isPageLoading = isLoading || roleLoading;
+  const isPageLoading = isLoading || planLoading;
+  const isRealAdmin = isAdmin && !isSimulating;
   const nomeCompleto = formulario?.nome_completo || (isAdmin ? "Admin" : "Mentorado");
 
   // Não renderiza nada se for visitante (aguarda redirecionamento)
@@ -41,7 +47,7 @@ export default function DiagnosticoPainelAcademy() {
         {isPageLoading ? (
           <Skeleton className="h-5 w-40 mt-2" />
         ) : (
-          nomeCompleto && nomeCompleto !== "Admin" && (
+          nomeCompleto && (nomeCompleto !== "Admin" || isSimulating) && (
             <p className="text-muted-foreground mt-2">{nomeCompleto}</p>
           )
         )}
@@ -88,14 +94,14 @@ export default function DiagnosticoPainelAcademy() {
                   <div className="space-y-2">
                     <h3 className="text-lg font-medium">Diagnóstico não preenchido</h3>
                     <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                      {isAdmin 
+                      {isRealAdmin 
                         ? "Você ainda não preencheu seu diagnóstico pessoal. Preencha para gerar seu plano de desenvolvimento com IA."
                         : "Preencha o diagnóstico para ver seu plano personalizado e receber feedback da mentora."
                       }
                     </p>
                   </div>
                   <Button 
-                    onClick={() => navigate(isAdmin ? "/diagnostico/formulario?edit=1" : "/diagnostico/formulario")}
+                    onClick={() => navigate(isRealAdmin ? "/diagnostico/formulario?edit=1" : "/diagnostico/formulario")}
                     className="bg-primary hover:bg-primary/90"
                   >
                     <FileText className="h-4 w-4 mr-2" />
