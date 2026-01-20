@@ -94,7 +94,7 @@ export function InstrucaoFormModal({
     if (open) {
       if (instrucao) {
         // Carregar dados existentes
-        const recursos = instrucao.recursos as RecursosInstrucao | null;
+        const recursos = instrucao.recursos as unknown as RecursosInstrucao | null;
         setPassos(recursos?.passos || []);
         setTextoOrientativo(recursos?.texto_orientativo || '');
         
@@ -174,6 +174,8 @@ export function InstrucaoFormModal({
           ferramenta: data.ferramenta || null,
           dicas: data.dicas || null,
           recursos: recursosData as unknown as Json,
+          recursos_url: null,
+          prompt_sugerido: null,
           ordem: data.ordem || 0,
           status: 'pendente',
           gerado_por_ia: false,

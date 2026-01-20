@@ -110,6 +110,7 @@ export function UploadTranscricaoModal({
           ordem: index + 1,
           status: 'pendente' as const,
           recursos_url: null,
+          recursos: null,
           gerado_por_ia: true,
         })),
       });

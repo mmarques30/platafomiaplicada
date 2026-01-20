@@ -60,7 +60,7 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
   const isConcluida = instrucao.status === 'concluida';
 
   // Parse recursos JSONB
-  const recursos = instrucao.recursos as RecursosInstrucao | null;
+  const recursos = instrucao.recursos as unknown as RecursosInstrucao | null;
   const passos = recursos?.passos || [];
   const temPassos = passos.length > 0;
   const temDetalhes = temPassos || instrucao.dicas;
