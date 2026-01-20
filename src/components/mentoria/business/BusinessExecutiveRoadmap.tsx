@@ -1,16 +1,20 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { 
-  CheckCircle2, 
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { 
   Clock, 
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  FileText
 } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
-import { useTasksByUser } from "@/hooks/useTasksBusiness";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -18,13 +22,8 @@ import { ptBR } from "date-fns/locale";
 export function BusinessExecutiveRoadmap() {
   const { contrato, reports, isLoading } = useContratosBusiness();
   const { data: etapas } = useEtapasBusiness(contrato?.id);
-  const { user } = useAuth();
-  const { data: tasks } = useTasksByUser(user?.id);
   const navigate = useNavigate();
-
-  const tasksPendentes = tasks?.filter(t => 
-    t.status === 'pendente' || t.status === 'revisao_solicitada'
-  ).length || 0;
+  const [reportsExpanded, setReportsExpanded] = useState(false);
 
   if (isLoading) {
     return (
@@ -120,7 +119,7 @@ export function BusinessExecutiveRoadmap() {
                           ? 'bg-emerald-500' 
                           : isEmAndamento 
                             ? 'bg-amber-500' 
-                            : 'bg-zinc-900 dark:bg-zinc-100'
+                            : 'bg-muted-foreground'
                       }`} />
                     </div>
                     
@@ -162,52 +161,76 @@ export function BusinessExecutiveRoadmap() {
         </CardContent>
       </Card>
 
-      {/* Card Tasks - Horizontal Full Width */}
+      {/* Card de Reports */}
       <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
-              Tasks
-              {!isPreview && tasksPendentes > 0 && (
-                <Badge variant="destructive" className="text-xs">{tasksPendentes}</Badge>
-              )}
-            </CardTitle>
-            {!isPreview && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate('/mentoria/validacoes')}
-              >
-                Ver Tasks
-              </Button>
-            )}
-          </div>
+          <CardTitle className="text-base">Reports</CardTitle>
         </CardHeader>
         <CardContent>
           {isPreview ? (
             <p className="text-muted-foreground text-sm text-center py-4">
-              Suas tasks aparecerão aqui
+              Seus reports executivos aparecerão aqui
             </p>
-          ) : tasksPendentes === 0 ? (
+          ) : !reports || reports.length === 0 ? (
             <div className="flex items-center justify-center py-4">
-              <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
-              <p className="text-sm text-muted-foreground">Nenhuma task pendente</p>
+              <FileText className="h-5 w-5 text-muted-foreground mr-2" />
+              <p className="text-sm text-muted-foreground">
+                Nenhum report disponível ainda
+              </p>
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {tasks?.filter(t => t.status === 'pendente' || t.status === 'revisao_solicitada').slice(0, 3).map((task) => (
-                <div 
-                  key={task.id}
-                  className="p-3 rounded-lg bg-muted/50 border border-border"
+            <div className="space-y-2">
+              {/* 2 Reports Visíveis */}
+              {reports.slice(0, 2).map((report) => (
+                <div
+                  key={report.id}
+                  onClick={() => navigate(`/mentoria/reports#${report.id}`)}
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors border border-border/50"
                 >
-                  <p className="text-sm font-medium truncate">{task.titulo}</p>
-                  {task.prazo && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Prazo: {format(new Date(task.prazo), "dd/MM", { locale: ptBR })}
-                    </p>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">{report.titulo}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {report.data_envio && format(parseISO(report.data_envio), "dd MMM yyyy", { locale: ptBR })}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
               ))}
+
+              {/* Dropdown para reports ocultos */}
+              {reports.length > 2 && (
+                <Collapsible open={reportsExpanded} onOpenChange={setReportsExpanded}>
+                  <CollapsibleTrigger className="flex items-center justify-center w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <ChevronDown className={`h-4 w-4 mr-1 transition-transform ${reportsExpanded ? 'rotate-180' : ''}`} />
+                    {reportsExpanded 
+                      ? 'Ocultar' 
+                      : `Ver mais ${reports.length - 2} reports`}
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-2 pt-2">
+                    {reports.slice(2).map((report) => (
+                      <div
+                        key={report.id}
+                        onClick={() => navigate(`/mentoria/reports#${report.id}`)}
+                        className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors border border-border/50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <FileText className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-sm font-medium">{report.titulo}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {report.data_envio && format(parseISO(report.data_envio), "dd MMM yyyy", { locale: ptBR })}
+                            </p>
+                          </div>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    ))}
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
             </div>
           )}
         </CardContent>
