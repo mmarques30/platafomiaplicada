@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Calendar, Target, Plus, Pencil, Trash2, Flag, User, Users, Briefcase } from "lucide-react";
+import { ArrowLeft, Calendar, Target, Plus, Pencil, Trash2, Flag, User, Users } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
@@ -47,7 +47,6 @@ const statusConfig = {
 
 const responsavelConfig = {
   voce: { label: "Cliente", icon: User, color: "text-blue-600" },
-  mentor: { label: "Consultoria", icon: Briefcase, color: "text-emerald-600" },
   conjunto: { label: "Conjunto", icon: Users, color: "text-amber-600" },
 };
 
@@ -66,7 +65,7 @@ export default function AdminEtapaBusinessPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [instrucaoToDelete, setInstrucaoToDelete] = useState<InstrucaoEtapa | null>(null);
   const [marcosModalOpen, setMarcosModalOpen] = useState(false);
-  const [selectedResponsavel, setSelectedResponsavel] = useState<'voce' | 'mentor' | 'conjunto'>('voce');
+  const [selectedResponsavel, setSelectedResponsavel] = useState<'voce' | 'conjunto'>('voce');
 
   const handleToggleStatus = (id: string, novoStatus: 'pendente' | 'concluida') => {
     updateInstrucao.mutate({ id, etapaId: etapaId!, status: novoStatus });
@@ -77,7 +76,7 @@ export default function AdminEtapaBusinessPage() {
     setInstrucaoModalOpen(true);
   };
 
-  const handleAddInstrucao = (responsavel: 'voce' | 'mentor' | 'conjunto') => {
+  const handleAddInstrucao = (responsavel: 'voce' | 'conjunto') => {
     setEditingInstrucao(null);
     setSelectedResponsavel(responsavel);
     setInstrucaoModalOpen(true);
@@ -101,7 +100,6 @@ export default function AdminEtapaBusinessPage() {
   };
 
   const instrucoesVoce = instrucoes.filter(i => i.responsavel === 'voce');
-  const instrucoesMentor = instrucoes.filter(i => i.responsavel === 'mentor');
   const instrucoesConjunto = instrucoes.filter(i => i.responsavel === 'conjunto');
 
   const calcularProgresso = (lista: InstrucaoEtapa[]) => {
@@ -143,7 +141,7 @@ export default function AdminEtapaBusinessPage() {
 
   const renderInstrucaoSection = (
     lista: InstrucaoEtapa[],
-    responsavel: 'voce' | 'mentor' | 'conjunto'
+    responsavel: 'voce' | 'conjunto'
   ) => {
     const config = responsavelConfig[responsavel];
     const Icon = config.icon;
@@ -267,7 +265,6 @@ export default function AdminEtapaBusinessPage() {
       ) : (
         <div className="space-y-4">
           {renderInstrucaoSection(instrucoesVoce, 'voce')}
-          {renderInstrucaoSection(instrucoesMentor, 'mentor')}
           {renderInstrucaoSection(instrucoesConjunto, 'conjunto')}
         </div>
       )}
