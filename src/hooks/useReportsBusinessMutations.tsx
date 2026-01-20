@@ -10,6 +10,36 @@ export interface ReportBusinessInput {
   arquivo_url?: string | null;
   periodo_referencia?: string | null;
   data_envio?: string;
+  tipo?: string;
+  conteudo_html?: string | null;
+  metricas?: Record<string, unknown> | null;
+  gerado_por_ia?: boolean;
+  resumo_executivo?: string | null;
+}
+
+export interface ReportGeradoIA {
+  titulo: string;
+  resumo_executivo: string;
+  destaques: string[];
+  proximos_passos: string[];
+  observacoes: string;
+  metricas: {
+    etapas: { concluidas: number; total: number; percentual: number };
+    entregas: { concluidas: number; total: number; percentual: number };
+    tarefas: { concluidas: number; total: number };
+    videos_assistidos: number;
+  };
+  conteudo_html: string;
+  periodo_referencia: string;
+}
+
+export interface PublicLink {
+  id: string;
+  report_id: string;
+  public_token: string;
+  expires_at: string | null;
+  views_count: number;
+  created_at: string;
 }
 
 export function useReportsBusinessMutations(contratoId?: string) {
@@ -49,15 +79,15 @@ export function useReportsBusinessMutations(contratoId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reports-business", contratoId] });
       toast({
-        title: "Documento criado!",
-        description: "O documento foi adicionado com sucesso.",
+        title: "Report criado!",
+        description: "O report foi adicionado com sucesso.",
       });
     },
     onError: (error) => {
-      console.error("Erro ao criar documento:", error);
+      console.error("Erro ao criar report:", error);
       toast({
-        title: "Erro ao criar documento",
-        description: "Ocorreu um erro ao adicionar o documento.",
+        title: "Erro ao criar report",
+        description: "Ocorreu um erro ao adicionar o report.",
         variant: "destructive",
       });
     },
@@ -78,15 +108,15 @@ export function useReportsBusinessMutations(contratoId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reports-business", contratoId] });
       toast({
-        title: "Documento atualizado!",
-        description: "O documento foi atualizado com sucesso.",
+        title: "Report atualizado!",
+        description: "O report foi atualizado com sucesso.",
       });
     },
     onError: (error) => {
-      console.error("Erro ao atualizar documento:", error);
+      console.error("Erro ao atualizar report:", error);
       toast({
-        title: "Erro ao atualizar documento",
-        description: "Ocorreu um erro ao atualizar o documento.",
+        title: "Erro ao atualizar report",
+        description: "Ocorreu um erro ao atualizar o report.",
         variant: "destructive",
       });
     },
@@ -104,15 +134,15 @@ export function useReportsBusinessMutations(contratoId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reports-business", contratoId] });
       toast({
-        title: "Documento excluído!",
-        description: "O documento foi removido com sucesso.",
+        title: "Report excluído!",
+        description: "O report foi removido com sucesso.",
       });
     },
     onError: (error) => {
-      console.error("Erro ao excluir documento:", error);
+      console.error("Erro ao excluir report:", error);
       toast({
-        title: "Erro ao excluir documento",
-        description: "Ocorreu um erro ao remover o documento.",
+        title: "Erro ao excluir report",
+        description: "Ocorreu um erro ao remover o report.",
         variant: "destructive",
       });
     },
@@ -125,4 +155,133 @@ export function useReportsBusinessMutations(contratoId?: string) {
     updateReport,
     deleteReport,
   };
+}
+
+// Hook para gerar report via IA
+export function useGerarReportIA() {
+  return useMutation({
+    mutationFn: async ({ 
+      contrato_id, 
+      user_id, 
+      periodo, 
+      tipo 
+    }: { 
+      contrato_id: string; 
+      user_id: string; 
+      periodo: string; 
+      tipo: 'semanal' | 'mensal' | 'trimestral';
+    }) => {
+      const { data, error } = await supabase.functions.invoke('gerar-report-business', {
+        body: { contrato_id, user_id, periodo, tipo },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      
+      return data as ReportGeradoIA;
+    },
+    onError: (error) => {
+      console.error('Erro ao gerar report via IA:', error);
+      toast({
+        title: "Erro ao gerar report",
+        description: "Não foi possível gerar o report. Tente novamente.",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// Hook para criar link público
+export function useCreatePublicLink() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ reportId, expiresInDays }: { reportId: string; expiresInDays?: number }) => {
+      const publicToken = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
+      const expiresAt = expiresInDays 
+        ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString()
+        : null;
+
+      const { data, error } = await supabase
+        .from("reports_public_links")
+        .insert({
+          report_id: reportId,
+          public_token: publicToken,
+          expires_at: expiresAt,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as PublicLink;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["report-public-links"] });
+      toast({
+        title: "Link criado!",
+        description: "O link público foi gerado com sucesso.",
+      });
+    },
+    onError: (error) => {
+      console.error("Erro ao criar link público:", error);
+      toast({
+        title: "Erro ao criar link",
+        description: "Não foi possível gerar o link público.",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// Hook para buscar links públicos de um report
+export function usePublicLinks(reportId?: string) {
+  return useQuery({
+    queryKey: ["report-public-links", reportId],
+    queryFn: async () => {
+      if (!reportId) return [];
+
+      const { data, error } = await supabase
+        .from("reports_public_links")
+        .select("*")
+        .eq("report_id", reportId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data as PublicLink[];
+    },
+    enabled: !!reportId,
+  });
+}
+
+// Hook para buscar report por token público
+export function useReportByToken(token?: string) {
+  return useQuery({
+    queryKey: ["report-by-token", token],
+    queryFn: async () => {
+      if (!token) return null;
+
+      // Buscar link público
+      const { data: linkData, error: linkError } = await supabase
+        .from("reports_public_links")
+        .select("*, reports_business(*)")
+        .eq("public_token", token)
+        .single();
+
+      if (linkError) throw linkError;
+
+      // Verificar expiração
+      if (linkData.expires_at && new Date(linkData.expires_at) < new Date()) {
+        throw new Error("Link expirado");
+      }
+
+      // Incrementar visualizações
+      await supabase
+        .from("reports_public_links")
+        .update({ views_count: (linkData.views_count || 0) + 1 })
+        .eq("id", linkData.id);
+
+      return linkData.reports_business as ReportBusiness;
+    },
+    enabled: !!token,
+  });
 }

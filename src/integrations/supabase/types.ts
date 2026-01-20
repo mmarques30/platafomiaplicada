@@ -3084,32 +3084,47 @@ export type Database = {
       reports_business: {
         Row: {
           arquivo_url: string | null
+          conteudo_html: string | null
           contrato_id: string
           created_at: string
           data_envio: string
           descricao: string | null
+          gerado_por_ia: boolean | null
           id: string
+          metricas: Json | null
           periodo_referencia: string | null
+          resumo_executivo: string | null
+          tipo: string | null
           titulo: string
         }
         Insert: {
           arquivo_url?: string | null
+          conteudo_html?: string | null
           contrato_id: string
           created_at?: string
           data_envio?: string
           descricao?: string | null
+          gerado_por_ia?: boolean | null
           id?: string
+          metricas?: Json | null
           periodo_referencia?: string | null
+          resumo_executivo?: string | null
+          tipo?: string | null
           titulo: string
         }
         Update: {
           arquivo_url?: string | null
+          conteudo_html?: string | null
           contrato_id?: string
           created_at?: string
           data_envio?: string
           descricao?: string | null
+          gerado_por_ia?: boolean | null
           id?: string
+          metricas?: Json | null
           periodo_referencia?: string | null
+          resumo_executivo?: string | null
+          tipo?: string | null
           titulo?: string
         }
         Relationships: [
@@ -3118,6 +3133,41 @@ export type Database = {
             columns: ["contrato_id"]
             isOneToOne: false
             referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports_public_links: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          public_token: string
+          report_id: string | null
+          views_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          public_token: string
+          report_id?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          public_token?: string
+          report_id?: string | null
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_public_links_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports_business"
             referencedColumns: ["id"]
           },
         ]
