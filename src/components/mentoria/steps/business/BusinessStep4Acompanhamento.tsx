@@ -35,10 +35,10 @@ const comunicacaoOptions = [
 export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps) {
   return (
     <div className="space-y-6">
-      {/* Premium Header */}
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-purple-500/30">
-          <MessageSquare className="h-5 w-5 text-purple-400" />
+        <div className="p-2 rounded-lg bg-primary/10">
+          <MessageSquare className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-foreground">Acompanhamento do Projeto</h3>
@@ -59,9 +59,9 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 className="space-y-2"
               >
                 {acompanhamentoOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                  <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`acomp-${opt.value}`} />
-                    <label htmlFor={`acomp-${opt.value}`} className="text-sm cursor-pointer flex-1">
+                    <label htmlFor={`acomp-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
@@ -86,9 +86,9 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 className="space-y-2"
               >
                 {envolvimentoOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                  <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`env-${opt.value}`} />
-                    <label htmlFor={`env-${opt.value}`} className="text-sm cursor-pointer flex-1">
+                    <label htmlFor={`env-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
@@ -109,7 +109,6 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
             <FormControl>
               <Input 
                 placeholder="Ex: Meu sócio, diretor de TI, ninguém mais..." 
-                className="bg-card border-border" 
                 {...field} 
               />
             </FormControl>
@@ -131,7 +130,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 className="grid grid-cols-2 md:grid-cols-4 gap-2"
               >
                 {comunicacaoOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                  <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`com-${opt.value}`} />
                     <label htmlFor={`com-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
@@ -150,10 +149,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
           <ArrowLeft className="h-4 w-4" />
           Anterior
         </Button>
-        <Button 
-          onClick={onNext} 
-          className="gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
-        >
+        <Button onClick={onNext} className="gap-2">
           Próximo
           <ArrowRight className="h-4 w-4" />
         </Button>

@@ -41,10 +41,10 @@ const volumeOptions = [
 export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
   return (
     <div className="space-y-6">
-      {/* Premium Header */}
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-purple-500/30">
-          <Layers className="h-5 w-5 text-purple-400" />
+        <div className="p-2 rounded-lg bg-primary/10">
+          <Layers className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-foreground">Contexto da Entrega</h3>
@@ -65,9 +65,9 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
                 className="grid grid-cols-2 gap-2"
               >
                 {urgenciaOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-3 p-3 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                  <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`urg-${opt.value}`} />
-                    <label htmlFor={`urg-${opt.value}`} className="text-sm cursor-pointer flex-1">
+                    <label htmlFor={`urg-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
@@ -92,7 +92,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
                   control={form.control}
                   name="sistemas_integrar"
                   render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2 p-3 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                    <FormItem className="flex items-center space-x-2">
                       <FormControl>
                         <Checkbox
                           checked={field.value?.includes(sistema.id)}
@@ -124,7 +124,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
           <FormItem>
             <FormLabel>Outros sistemas</FormLabel>
             <FormControl>
-              <Input placeholder="Liste outros sistemas que usa" className="bg-card border-border" {...field} />
+              <Input placeholder="Liste outros sistemas que usa" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -140,7 +140,6 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
             <FormControl>
               <Input 
                 placeholder="Ex: Equipe de atendimento (5 pessoas), eu mesmo, etc." 
-                className="bg-card border-border" 
                 {...field} 
               />
             </FormControl>
@@ -162,9 +161,9 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
                 className="grid grid-cols-2 gap-2"
               >
                 {volumeOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-3 p-3 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                  <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`vol-${opt.value}`} />
-                    <label htmlFor={`vol-${opt.value}`} className="text-sm cursor-pointer flex-1">
+                    <label htmlFor={`vol-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
@@ -181,10 +180,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
           <ArrowLeft className="h-4 w-4" />
           Anterior
         </Button>
-        <Button 
-          onClick={onNext} 
-          className="gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
-        >
+        <Button onClick={onNext} className="gap-2">
           Próximo
           <ArrowRight className="h-4 w-4" />
         </Button>

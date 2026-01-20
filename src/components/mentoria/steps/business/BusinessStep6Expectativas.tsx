@@ -15,10 +15,10 @@ interface StepProps {
 export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting }: StepProps) {
   return (
     <div className="space-y-6">
-      {/* Premium Header */}
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-purple-500/30">
-          <Trophy className="h-5 w-5 text-purple-400" />
+        <div className="p-2 rounded-lg bg-primary/10">
+          <Trophy className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-foreground">Expectativas e Sucesso</h3>
@@ -35,7 +35,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
             <FormControl>
               <Textarea
                 placeholder="Ex: Redução de 50% no tempo de resposta aos clientes, economia de 20h semanais da equipe..."
-                className="min-h-[100px] bg-card border-border"
+                className="min-h-[100px]"
                 {...field}
               />
             </FormControl>
@@ -53,7 +53,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
             <FormControl>
               <Textarea
                 placeholder="Conte suas preocupações para que possamos endereçá-las..."
-                className="min-h-[80px] bg-card border-border"
+                className="min-h-[80px]"
                 {...field}
               />
             </FormControl>
@@ -71,7 +71,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
             <FormControl>
               <Textarea
                 placeholder="Descreva o que você considera um marco de sucesso nos primeiros 30 dias..."
-                className="min-h-[100px] bg-card border-border"
+                className="min-h-[100px]"
                 {...field}
               />
             </FormControl>
@@ -89,7 +89,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
             <FormControl>
               <Textarea
                 placeholder="Ex: Não podemos expor dados de clientes, não pode ter erros de cálculo, etc..."
-                className="min-h-[80px] bg-card border-border"
+                className="min-h-[80px]"
                 {...field}
               />
             </FormControl>
@@ -98,9 +98,9 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         )}
       />
 
-      <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20">
+      <div className="p-4 rounded-lg bg-muted/50 border border-border">
         <p className="text-sm text-foreground/80">
-          <strong className="text-purple-400">Próximos passos:</strong> Após enviar este formulário, 
+          <strong className="text-primary">Próximos passos:</strong> Após enviar este formulário, 
           vamos analisar suas informações e entrar em contato para alinhar os detalhes do projeto.
         </p>
       </div>
@@ -110,11 +110,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
           <ArrowLeft className="h-4 w-4" />
           Anterior
         </Button>
-        <Button 
-          onClick={onSubmit} 
-          disabled={isSubmitting} 
-          className="gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
-        >
+        <Button onClick={onSubmit} disabled={isSubmitting} className="gap-2">
           {isSubmitting ? (
             <>Finalizando...</>
           ) : (

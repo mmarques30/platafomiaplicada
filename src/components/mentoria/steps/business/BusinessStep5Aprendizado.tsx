@@ -38,10 +38,10 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
 
   return (
     <div className="space-y-6">
-      {/* Premium Header */}
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-purple-500/30">
-          <GraduationCap className="h-5 w-5 text-purple-400" />
+        <div className="p-2 rounded-lg bg-primary/10">
+          <GraduationCap className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-foreground">Interesse em Aprendizado</h3>
@@ -49,9 +49,9 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
         </div>
       </div>
 
-      <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20 mb-6">
+      <div className="p-4 rounded-lg bg-muted/50 border border-border mb-6">
         <p className="text-sm text-foreground/80">
-          <strong className="text-purple-400">Opcional:</strong> Além da entrega da solução, você e/ou sua equipe 
+          <strong className="text-primary">Opcional:</strong> Além da entrega da solução, você e/ou sua equipe 
           podem aprender a usar IA. Isso é um diferencial do plano Business.
         </p>
       </div>
@@ -69,9 +69,9 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
                 className="space-y-2"
               >
                 {querAprenderOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                  <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`aprender-${opt.value}`} />
-                    <label htmlFor={`aprender-${opt.value}`} className="text-sm cursor-pointer flex-1">
+                    <label htmlFor={`aprender-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
@@ -93,7 +93,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
               <FormControl>
                 <Textarea
                   placeholder="Ex: Quero aprender a criar prompts melhores, usar ChatGPT para análise de dados..."
-                  className="min-h-[80px] bg-card border-border"
+                  className="min-h-[80px]"
                   {...field}
                 />
               </FormControl>
@@ -116,9 +116,9 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
                 className="space-y-2"
               >
                 {equipeOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                  <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`equipe-${opt.value}`} />
-                    <label htmlFor={`equipe-${opt.value}`} className="text-sm cursor-pointer flex-1">
+                    <label htmlFor={`equipe-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
@@ -142,7 +142,6 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
                   <Input
                     type="number"
                     placeholder="Número de pessoas"
-                    className="bg-card border-border"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value) || "")}
                     value={field.value || ""}
@@ -166,7 +165,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
                     className="grid grid-cols-2 gap-2"
                   >
                     {disponibilidadeOptions.map((opt) => (
-                      <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border border-border bg-card/50 hover:border-purple-500/40 transition-all">
+                      <div key={opt.value} className="flex items-center space-x-2">
                         <RadioGroupItem value={opt.value} id={`disp-${opt.value}`} />
                         <label htmlFor={`disp-${opt.value}`} className="text-sm cursor-pointer">
                           {opt.label}
@@ -187,10 +186,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
           <ArrowLeft className="h-4 w-4" />
           Anterior
         </Button>
-        <Button 
-          onClick={onNext} 
-          className="gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
-        >
+        <Button onClick={onNext} className="gap-2">
           Próximo
           <ArrowRight className="h-4 w-4" />
         </Button>

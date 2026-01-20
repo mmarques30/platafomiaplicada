@@ -35,20 +35,15 @@ export function ProgressBar({ currentStep, totalSteps, steps, isBusiness = false
             key={step.id}
             className={cn(
               "flex flex-col items-center transition-all duration-300",
-              index <= currentStep 
-                ? isBusiness ? "text-purple-400" : "text-primary" 
-                : "text-muted-foreground"
+              index <= currentStep ? "text-primary" : "text-muted-foreground"
             )}
           >
             <div
               className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm mb-1 transition-all duration-300",
                 index <= currentStep
-                  ? isBusiness 
-                    ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg shadow-purple-500/25" 
-                    : "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground",
-                index === currentStep && isBusiness && "ring-2 ring-purple-400/50 ring-offset-2 ring-offset-slate-900"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground"
               )}
             >
               {step.id}
@@ -59,38 +54,12 @@ export function ProgressBar({ currentStep, totalSteps, steps, isBusiness = false
       </div>
       
       {/* Progress Bar */}
-      <div className={cn(
-        "relative h-2 rounded-full overflow-hidden",
-        isBusiness ? "bg-purple-950/50" : "bg-secondary"
-      )}>
+      <div className="relative h-2 rounded-full overflow-hidden bg-secondary">
         <div
-          className={cn(
-            "h-full transition-all duration-500 ease-out",
-            isBusiness 
-              ? "bg-gradient-to-r from-purple-500 to-violet-500" 
-              : "bg-primary"
-          )}
+          className="h-full transition-all duration-500 ease-out bg-primary"
           style={{ width: `${progress}%` }}
         />
-        
-        {/* Shimmer effect for Business */}
-        {isBusiness && (
-          <div 
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"
-            style={{ 
-              width: `${progress}%`,
-              animation: 'shimmer 2s infinite',
-            }}
-          />
-        )}
       </div>
-
-      <style>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
     </div>
   );
 }
