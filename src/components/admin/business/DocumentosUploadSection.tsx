@@ -1,19 +1,20 @@
 import { useState, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
-  FileText, 
-  Upload, 
   Sparkles, 
   Trash2, 
   CheckCircle2,
   Clock,
-  FileUp
+  FileUp,
+  ChevronDown,
+  ChevronRight,
+  FileText
 } from "lucide-react";
 import { useDocumentosBusiness, DocumentoBusiness } from "@/hooks/useDocumentosBusiness";
 import { useProcessarDocumentos, ResultadoProcessamento } from "@/hooks/useProcessarDocumentos";
@@ -37,6 +38,7 @@ export function DocumentosUploadSection({
   const [tipo, setTipo] = useState<'proposta' | 'transcricao' | 'anexo' | 'solucao' | 'outro'>("proposta");
   const [resultadoIA, setResultadoIA] = useState<ResultadoProcessamento | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -47,7 +49,6 @@ export function DocumentosUploadSection({
     try {
       const url = await uploadDocumento(file, contratoId, tipo);
       
-      // Ler conteúdo do arquivo se for texto
       let conteudoTexto = "";
       if (file.type === "text/plain" || file.name.endsWith(".md") || file.name.endsWith(".txt")) {
         conteudoTexto = await file.text();
@@ -83,13 +84,11 @@ export function DocumentosUploadSection({
   };
 
   const handleProcessar = async () => {
-    // Juntar todo o conteúdo dos documentos não processados
     const textosParaProcessar = documentos
       .filter(d => !d.processado && d.conteudo_texto)
       .map(d => d.conteudo_texto)
       .join("\n\n---\n\n");
 
-    // Adicionar texto atual se houver
     const textoFinal = texto.trim() 
       ? `${textosParaProcessar}\n\n---\n\n${texto}` 
       : textosParaProcessar;
@@ -112,18 +111,18 @@ export function DocumentosUploadSection({
 
   const getStatusIcon = (doc: DocumentoBusiness) => {
     if (doc.processado) {
-      return <CheckCircle2 className="h-4 w-4 text-emerald-600" />;
+      return <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />;
     }
-    return <Clock className="h-4 w-4 text-muted-foreground" />;
+    return <Clock className="h-3.5 w-3.5 text-muted-foreground" />;
   };
 
   const getTipoBadge = (tipo: string) => {
     const tipoMap: Record<string, { label: string; className: string }> = {
       'proposta': { label: 'Proposta', className: 'bg-blue-500/10 text-blue-700 border-blue-500/30' },
       'transcricao': { label: 'Transcrição', className: 'bg-purple-500/10 text-purple-700 border-purple-500/30' },
-      'anexo': { label: 'Anexo', className: 'bg-gray-500/10 text-gray-600 border-gray-500/30' },
+      'anexo': { label: 'Anexo', className: 'bg-muted text-muted-foreground' },
       'solucao': { label: 'Solução', className: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30' },
-      'outro': { label: 'Outro', className: 'bg-gray-500/10 text-gray-600 border-gray-500/30' },
+      'outro': { label: 'Outro', className: 'bg-muted text-muted-foreground' },
     };
     const config = tipoMap[tipo] || tipoMap['outro'];
     return <Badge variant="outline" className={`text-xs ${config.className}`}>{config.label}</Badge>;
@@ -133,31 +132,38 @@ export function DocumentosUploadSection({
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Documentos da Solução
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Upload de Arquivo */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Select value={tipo} onValueChange={(v: any) => setTipo(v)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="proposta">Proposta Comercial</SelectItem>
-                  <SelectItem value="transcricao">Transcrição de Call</SelectItem>
-                  <SelectItem value="anexo">Anexo</SelectItem>
-                  <SelectItem value="solucao">Documento de Solução</SelectItem>
-                  <SelectItem value="outro">Outro</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <div className="flex-1">
+      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+        <Card className="border-border/50 border-dashed bg-muted/20">
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-xl">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Sparkles className="h-4 w-4" />
+                <span className="text-sm font-medium">Geração de Entregas com IA</span>
+                {documentos.length > 0 && (
+                  <Badge variant="secondary" className="text-xs">{documentos.length} docs</Badge>
+                )}
+              </div>
+              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </div>
+          </CollapsibleTrigger>
+          
+          <CollapsibleContent>
+            <CardContent className="pt-0 pb-4 space-y-4">
+              {/* Upload controls */}
+              <div className="flex items-center gap-2">
+                <Select value={tipo} onValueChange={(v: any) => setTipo(v)}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs">
+                    <SelectValue placeholder="Tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="proposta">Proposta</SelectItem>
+                    <SelectItem value="transcricao">Transcrição</SelectItem>
+                    <SelectItem value="anexo">Anexo</SelectItem>
+                    <SelectItem value="solucao">Solução</SelectItem>
+                    <SelectItem value="outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+                
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -168,92 +174,93 @@ export function DocumentosUploadSection({
                 />
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={createDocumento.isPending}
-                  className="w-full"
+                  className="h-8"
                 >
-                  <FileUp className="h-4 w-4 mr-2" />
-                  Upload de Arquivo
+                  <FileUp className="h-3.5 w-3.5 mr-1.5" />
+                  Upload
                 </Button>
               </div>
-            </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator />
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">ou cole o texto</span>
+                </div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">ou cole o texto</span>
-              </div>
-            </div>
 
-            <div className="space-y-2">
               <Textarea
                 value={texto}
                 onChange={(e) => setTexto(e.target.value)}
-                placeholder="Cole aqui o texto da proposta, transcrição de call ou outro documento..."
-                className="min-h-[120px]"
+                placeholder="Cole aqui a proposta, transcrição ou documento..."
+                className="min-h-[80px] text-sm bg-background"
               />
-              <div className="flex justify-between">
+
+              <div className="flex justify-between items-center">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleAddTexto}
                   disabled={!texto.trim() || createDocumento.isPending}
+                  className="h-8"
                 >
-                  <Upload className="h-4 w-4 mr-2" />
                   Salvar Texto
                 </Button>
                 
                 <Button
+                  size="sm"
                   onClick={handleProcessar}
                   disabled={!temConteudoParaProcessar || isProcessing}
-                  className="bg-primary"
+                  className="h-8"
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  {isProcessing ? "Processando..." : "Processar com IA e Gerar Entregas"}
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                  {isProcessing ? "Processando..." : "Gerar Entregas"}
                 </Button>
               </div>
-            </div>
-          </div>
 
-          {/* Lista de Documentos */}
-          {documentos.length > 0 && (
-            <div className="space-y-2 mt-4">
-              <Label className="text-sm text-muted-foreground">Documentos Carregados</Label>
-              <div className="space-y-2">
-                {documentos.map((doc) => (
-                  <div 
-                    key={doc.id}
-                    className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
-                  >
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(doc)}
-                      <div>
-                        <p className="text-sm font-medium">{doc.titulo}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {doc.processado ? "Processado" : "Pendente"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {getTipoBadge(doc.tipo)}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(doc.id)}
-                        className="h-8 w-8 text-destructive hover:text-destructive"
+              {/* Lista de Documentos */}
+              {documentos.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <p className="text-xs text-muted-foreground font-medium">Documentos Carregados</p>
+                  <div className="space-y-1.5">
+                    {documentos.map((doc) => (
+                      <div 
+                        key={doc.id}
+                        className="flex items-center justify-between p-2.5 rounded-lg border border-border/50 bg-background"
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {getStatusIcon(doc)}
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium truncate">{doc.titulo}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {doc.processado ? "Processado" : "Pendente"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {getTipoBadge(doc.tipo)}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(doc.id)}
+                            className="h-7 w-7 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                </div>
+              )}
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       <GeracaoEntregasModal
         open={modalOpen}

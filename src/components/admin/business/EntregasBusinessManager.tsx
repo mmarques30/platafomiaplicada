@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -8,8 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Package, Clock, AlertCircle, CheckCircle2, FolderKanban } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Clock, AlertCircle, CheckCircle2, FolderKanban } from "lucide-react";
 import { useEntregasBusiness, EntregaBusiness, EntregaInput } from "@/hooks/useEntregasBusiness";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useQueryClient } from "@tanstack/react-query";
+import { DocumentosUploadSection } from "./DocumentosUploadSection";
 
 interface EntregasBusinessManagerProps {
   contratoId: string;
@@ -18,32 +21,28 @@ interface EntregasBusinessManagerProps {
 }
 
 const PRIORIDADE_CONFIG = {
-  baixa: { label: "Baixa", variant: "outline" as const, color: "text-muted-foreground" },
-  media: { label: "Média", variant: "secondary" as const, color: "text-blue-600" },
-  alta: { label: "Alta", variant: "default" as const, color: "text-orange-600" },
-  critica: { label: "Crítica", variant: "destructive" as const, color: "text-red-600" },
+  baixa: { label: "Baixa", variant: "outline" as const },
+  media: { label: "Média", variant: "secondary" as const },
+  alta: { label: "Alta", variant: "default" as const },
+  critica: { label: "Crítica", variant: "destructive" as const },
 };
 
 const STATUS_CONFIG = {
-  pendente: { label: "Pendente", icon: Clock, color: "text-yellow-600" },
+  pendente: { label: "Pendente", icon: Clock, color: "text-amber-600" },
   em_andamento: { label: "Em Andamento", icon: AlertCircle, color: "text-blue-600" },
-  concluida: { label: "Concluída", icon: CheckCircle2, color: "text-green-600" },
+  concluida: { label: "Concluída", icon: CheckCircle2, color: "text-emerald-600" },
   cancelada: { label: "Cancelada", icon: AlertCircle, color: "text-muted-foreground" },
 };
 
-const TIPO_CONFIG = {
-  ativa: { label: "Ativa", color: "bg-green-100 text-green-800" },
-  backlog: { label: "Backlog", color: "bg-yellow-100 text-yellow-800" },
-  futura: { label: "Futura", color: "bg-gray-100 text-gray-800" },
-};
-
 export function EntregasBusinessManager({ contratoId, userId, userName }: EntregasBusinessManagerProps) {
+  const queryClient = useQueryClient();
   const { entregas, entregasAtivas, entregasBacklog, isLoading, createEntrega, updateEntrega, deleteEntrega } = useEntregasBusiness(contratoId);
+  const { contrato } = useContratosBusiness(userId);
   
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEntrega, setEditingEntrega] = useState<EntregaBusiness | null>(null);
   const [ativasOpen, setAtivasOpen] = useState(true);
-  const [backlogOpen, setBacklogOpen] = useState(true);
+  const [backlogOpen, setBacklogOpen] = useState(false);
 
   const [formData, setFormData] = useState<Partial<EntregaInput>>({
     titulo: "",
@@ -56,6 +55,9 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
     tem_instrucoes: false,
     justificativa_backlog: "",
   });
+
+  // Get modulos from contract
+  const modulosSelecionados = (contrato as any)?.modulos_selecionados || [];
 
   const handleOpenModal = (entrega?: EntregaBusiness) => {
     if (entrega) {
@@ -99,91 +101,103 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
     setModalOpen(false);
   };
 
+  const handleEntregasGeradas = () => {
+    queryClient.invalidateQueries({ queryKey: ["entregas-business", contratoId] });
+  };
+
   const renderEntregaCard = (entrega: EntregaBusiness) => {
     const prioridade = PRIORIDADE_CONFIG[entrega.prioridade];
     const status = STATUS_CONFIG[entrega.status];
     const StatusIcon = status.icon;
 
     return (
-      <Card key={entrega.id} className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <CardTitle className="text-base">{entrega.titulo}</CardTitle>
-                <Badge variant={prioridade.variant} className="text-xs">
-                  {prioridade.label}
-                </Badge>
-              </div>
-              {entrega.modulo_relacionado && (
-                <p className="text-xs text-muted-foreground">Módulo: {entrega.modulo_relacionado}</p>
-              )}
+      <div 
+        key={entrega.id} 
+        className="p-3 rounded-xl border border-border/50 bg-card hover:shadow-sm transition-all"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1.5">
+              <h4 className="font-medium text-sm truncate">{entrega.titulo}</h4>
+              <Badge variant={prioridade.variant} className="text-xs shrink-0">
+                {prioridade.label}
+              </Badge>
             </div>
-            <div className="flex items-center gap-1">
+            
+            {entrega.modulo_relacionado && (
+              <p className="text-xs text-muted-foreground mb-1">
+                Módulo: {entrega.modulo_relacionado}
+              </p>
+            )}
+            
+            {entrega.descricao && (
+              <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                {entrega.descricao}
+              </p>
+            )}
+            
+            <div className="flex flex-wrap items-center gap-2">
               <div className={`flex items-center gap-1 text-xs ${status.color}`}>
-                <StatusIcon className="h-3.5 w-3.5" />
+                <StatusIcon className="h-3 w-3" />
                 {status.label}
               </div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          {entrega.descricao && (
-            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{entrega.descricao}</p>
-          )}
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              
               {entrega.prazo_previsto && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
                   {new Date(entrega.prazo_previsto).toLocaleDateString("pt-BR")}
                 </span>
               )}
+              
               {entrega.tem_instrucoes && (
                 <Badge variant="outline" className="text-xs">
-                  Com instruções
+                  Instruções
                 </Badge>
               )}
             </div>
-            
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleOpenModal(entrega)}>
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7">
-                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Excluir Entrega</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Tem certeza que deseja excluir "{entrega.titulo}"? Esta ação não pode ser desfeita.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => deleteEntrega.mutate(entrega.id)}>
-                      Excluir
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
           </div>
-        </CardContent>
-      </Card>
+          
+          <div className="flex items-center gap-0.5 shrink-0">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-7 w-7" 
+              onClick={() => handleOpenModal(entrega)}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Excluir Entrega</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tem certeza que deseja excluir "{entrega.titulo}"? Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteEntrega.mutate(entrega.id)}>
+                    Excluir
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </div>
     );
   };
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="border-border/50 shadow-sm">
         <CardContent className="py-8 text-center">
-          <p className="text-muted-foreground">Carregando entregas...</p>
+          <p className="text-sm text-muted-foreground">Carregando entregas...</p>
         </CardContent>
       </Card>
     );
@@ -191,88 +205,70 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
 
   return (
     <div className="space-y-4">
+      {/* Header compacto */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <FolderKanban className="h-6 w-6" />
-            Entregas de {userName}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Gerencie as entregas do projeto Business
-          </p>
+        <div className="flex items-center gap-2">
+          <FolderKanban className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Entregas</h2>
+          <Badge variant="secondary" className="text-xs">
+            {entregas.length} total
+          </Badge>
         </div>
-        <Button onClick={() => handleOpenModal()}>
-          <Plus className="h-4 w-4 mr-2" />
+        <Button size="sm" onClick={() => handleOpenModal()}>
+          <Plus className="h-4 w-4 mr-1" />
           Nova Entrega
         </Button>
       </div>
 
+      {/* Upload de Documentos com IA */}
+      <DocumentosUploadSection 
+        contratoId={contratoId}
+        modulosContratados={modulosSelecionados}
+        onEntregasGeradas={handleEntregasGeradas}
+      />
+
       {/* Entregas Ativas */}
       <Collapsible open={ativasOpen} onOpenChange={setAtivasOpen}>
-        <Card>
-          <CollapsibleTrigger asChild>
-            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {ativasOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                  <CardTitle className="text-lg">Entregas Ativas</CardTitle>
-                  <Badge variant="secondary">{entregasAtivas.length}</Badge>
-                </div>
-              </div>
-            </CardHeader>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <CardContent className="pt-0">
-              {entregasAtivas.length > 0 ? (
-                <div className="grid gap-3">
-                  {entregasAtivas.map(renderEntregaCard)}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-4">
-                  Nenhuma entrega ativa cadastrada
-                </p>
-              )}
-            </CardContent>
-          </CollapsibleContent>
-        </Card>
+        <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors">
+          {ativasOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          <span className="font-medium text-sm">Entregas Ativas</span>
+          <Badge variant="secondary" className="ml-auto text-xs">{entregasAtivas.length}</Badge>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 space-y-2">
+          {entregasAtivas.length > 0 ? (
+            entregasAtivas.map(renderEntregaCard)
+          ) : (
+            <p className="text-center text-sm text-muted-foreground py-4">
+              Nenhuma entrega ativa cadastrada
+            </p>
+          )}
+        </CollapsibleContent>
       </Collapsible>
 
       {/* Backlog / Futuras */}
       <Collapsible open={backlogOpen} onOpenChange={setBacklogOpen}>
-        <Card>
-          <CollapsibleTrigger asChild>
-            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {backlogOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                  <CardTitle className="text-lg">Backlog / Futuras</CardTitle>
-                  <Badge variant="outline">{entregasBacklog.length}</Badge>
-                </div>
-              </div>
-            </CardHeader>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <CardContent className="pt-0">
-              {entregasBacklog.length > 0 ? (
-                <div className="grid gap-3">
-                  {entregasBacklog.map(renderEntregaCard)}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-4">
-                  Nenhuma entrega no backlog
-                </p>
-              )}
-            </CardContent>
-          </CollapsibleContent>
-        </Card>
+        <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors">
+          {backlogOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          <span className="font-medium text-sm">Backlog / Futuras</span>
+          <Badge variant="outline" className="ml-auto text-xs">{entregasBacklog.length}</Badge>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 space-y-2">
+          {entregasBacklog.length > 0 ? (
+            entregasBacklog.map(renderEntregaCard)
+          ) : (
+            <p className="text-center text-sm text-muted-foreground py-4">
+              Nenhuma entrega no backlog
+            </p>
+          )}
+        </CollapsibleContent>
       </Collapsible>
 
       {/* Modal Nova/Editar Entrega */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editingEntrega ? "Editar Entrega" : "Nova Entrega"}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base">{editingEntrega ? "Editar Entrega" : "Nova Entrega"}</DialogTitle>
+            <DialogDescription className="text-sm">
               {editingEntrega ? "Atualize os dados da entrega" : "Adicione uma nova entrega ao projeto"}
             </DialogDescription>
           </DialogHeader>
@@ -284,6 +280,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                 value={formData.titulo}
                 onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
                 placeholder="Ex: CRM de Pacientes"
+                className="mt-1"
               />
             </div>
 
@@ -294,17 +291,18 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                 onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
                 placeholder="Descreva a entrega..."
                 rows={3}
+                className="mt-1"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-sm font-medium">Tipo</label>
                 <Select
                   value={formData.tipo}
                   onValueChange={(v) => setFormData({ ...formData, tipo: v as EntregaInput["tipo"] })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -321,7 +319,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                   value={formData.prioridade}
                   onValueChange={(v) => setFormData({ ...formData, prioridade: v as EntregaInput["prioridade"] })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -334,14 +332,14 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-sm font-medium">Status</label>
                 <Select
                   value={formData.status}
                   onValueChange={(v) => setFormData({ ...formData, status: v as EntregaInput["status"] })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -359,6 +357,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                   type="date"
                   value={formData.prazo_previsto}
                   onChange={(e) => setFormData({ ...formData, prazo_previsto: e.target.value })}
+                  className="mt-1"
                 />
               </div>
             </div>
@@ -369,6 +368,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                 value={formData.modulo_relacionado}
                 onChange={(e) => setFormData({ ...formData, modulo_relacionado: e.target.value })}
                 placeholder="Ex: CRM, Dashboard, Financeiro..."
+                className="mt-1"
               />
             </div>
 
@@ -380,16 +380,17 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                   onChange={(e) => setFormData({ ...formData, justificativa_backlog: e.target.value })}
                   placeholder="Por que esta entrega está no backlog?"
                   rows={2}
+                  className="mt-1"
                 />
               </div>
             )}
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)}>
+            <Button variant="outline" size="sm" onClick={() => setModalOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleSubmit} disabled={!formData.titulo?.trim()}>
+            <Button size="sm" onClick={handleSubmit} disabled={!formData.titulo?.trim()}>
               {editingEntrega ? "Salvar" : "Criar Entrega"}
             </Button>
           </DialogFooter>

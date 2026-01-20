@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -8,7 +8,7 @@ import {
   Clock, 
   CheckCircle2, 
   XCircle, 
-  AlertCircle,
+  RotateCcw,
   FileText,
   ExternalLink,
   ChevronDown,
@@ -16,7 +16,7 @@ import {
   Trash2,
   Edit,
   Eye,
-  RotateCcw
+  ClipboardCheck
 } from 'lucide-react';
 import { useTasksBusiness, useUpdateTask, useDeleteTask, TaskBusiness } from '@/hooks/useTasksBusiness';
 import { useEntregasBusiness } from '@/hooks/useEntregasBusiness';
@@ -50,18 +50,18 @@ const TIPO_LABELS: Record<string, string> = {
 };
 
 const PRIORIDADE_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  baixa: { label: 'Baixa', variant: 'secondary' },
-  media: { label: 'Média', variant: 'default' },
-  alta: { label: 'Alta', variant: 'destructive' },
+  baixa: { label: 'Baixa', variant: 'outline' },
+  media: { label: 'Média', variant: 'secondary' },
+  alta: { label: 'Alta', variant: 'default' },
   urgente: { label: 'Urgente', variant: 'destructive' },
 };
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  pendente: { label: 'Pendente', icon: <Clock className="h-4 w-4" />, color: 'text-yellow-600' },
-  em_analise: { label: 'Em Análise', icon: <Eye className="h-4 w-4" />, color: 'text-blue-600' },
-  aprovado: { label: 'Aprovado', icon: <CheckCircle2 className="h-4 w-4" />, color: 'text-green-600' },
-  rejeitado: { label: 'Rejeitado', icon: <XCircle className="h-4 w-4" />, color: 'text-red-600' },
-  revisao_solicitada: { label: 'Revisão Solicitada', icon: <RotateCcw className="h-4 w-4" />, color: 'text-orange-600' },
+  pendente: { label: 'Pendente', icon: <Clock className="h-3.5 w-3.5" />, color: 'text-amber-600' },
+  em_analise: { label: 'Em Análise', icon: <Eye className="h-3.5 w-3.5" />, color: 'text-blue-600' },
+  aprovado: { label: 'Aprovado', icon: <CheckCircle2 className="h-3.5 w-3.5" />, color: 'text-emerald-600' },
+  rejeitado: { label: 'Rejeitado', icon: <XCircle className="h-3.5 w-3.5" />, color: 'text-red-600' },
+  revisao_solicitada: { label: 'Revisão', icon: <RotateCcw className="h-3.5 w-3.5" />, color: 'text-orange-600' },
 };
 
 const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId, userId }) => {
@@ -93,7 +93,7 @@ const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId,
   const getEtapaNome = (etapaId: string | null) => {
     if (!etapaId || !etapas) return null;
     const etapa = etapas.find(e => e.id === etapaId);
-    return etapa ? `Etapa ${etapa.numero_etapa}: ${etapa.titulo}` : null;
+    return etapa ? `Etapa ${etapa.numero_etapa}` : null;
   };
 
   const handleEdit = (task: TaskBusiness) => {
@@ -123,110 +123,110 @@ const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId,
     const etapaNome = getEtapaNome(task.etapa_id);
 
     return (
-      <Card key={task.id} className="mb-3">
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <span className={statusConfig.color}>{statusConfig.icon}</span>
-                <h4 className="font-medium">{task.titulo}</h4>
-              </div>
-              
-              <div className="flex flex-wrap gap-2 mb-2">
-                {task.tipo && (
-                  <Badge variant="outline">{TIPO_LABELS[task.tipo] || task.tipo}</Badge>
-                )}
-                <Badge variant={prioridadeConfig.variant}>{prioridadeConfig.label}</Badge>
-                {task.prazo && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {format(new Date(task.prazo), "dd/MM/yyyy", { locale: ptBR })}
-                  </Badge>
-                )}
-              </div>
-
-              {task.descricao && (
-                <p className="text-sm text-muted-foreground mb-2">{task.descricao}</p>
+      <div key={task.id} className="p-3 rounded-xl border border-border/50 bg-card hover:shadow-sm transition-all">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className={statusConfig.color}>{statusConfig.icon}</span>
+              <h4 className="font-medium text-sm truncate">{task.titulo}</h4>
+            </div>
+            
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {task.tipo && (
+                <Badge variant="outline" className="text-xs">{TIPO_LABELS[task.tipo] || task.tipo}</Badge>
               )}
-
-              {(entregaNome || etapaNome) && (
-                <div className="text-xs text-muted-foreground mb-2">
-                  {entregaNome && <span>Entrega: {entregaNome}</span>}
-                  {entregaNome && etapaNome && <span className="mx-2">•</span>}
-                  {etapaNome && <span>{etapaNome}</span>}
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                {task.documento_url && (
-                  <Button variant="ghost" size="sm" asChild>
-                    <a href={task.documento_url} target="_blank" rel="noopener noreferrer">
-                      <FileText className="h-4 w-4 mr-1" />
-                      Documento
-                    </a>
-                  </Button>
-                )}
-                {task.link_referencia && (
-                  <Button variant="ghost" size="sm" asChild>
-                    <a href={task.link_referencia} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4 mr-1" />
-                      Link
-                    </a>
-                  </Button>
-                )}
-              </div>
-
-              {task.resposta_mentorado && (
-                <div className="mt-3 p-3 bg-muted rounded-lg">
-                  <p className="text-xs font-medium mb-1">Resposta do mentorado:</p>
-                  <p className="text-sm">{task.resposta_mentorado}</p>
-                  {task.data_resposta && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Respondido em {format(new Date(task.data_resposta), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                    </p>
-                  )}
-                </div>
+              <Badge variant={prioridadeConfig.variant} className="text-xs">{prioridadeConfig.label}</Badge>
+              {task.prazo && (
+                <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {format(new Date(task.prazo), "dd/MM", { locale: ptBR })}
+                </Badge>
               )}
             </div>
 
-            {showActions && (
-              <div className="flex flex-col gap-1">
-                {task.status === 'em_analise' && (
-                  <>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleApproveFromAdmin(task.id)}
-                    >
-                      <CheckCircle2 className="h-4 w-4 mr-1" />
-                      Aprovar
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleRequestRevision(task.id)}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-1" />
-                      Pedir Revisão
-                    </Button>
-                  </>
+            {task.descricao && (
+              <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{task.descricao}</p>
+            )}
+
+            {(entregaNome || etapaNome) && (
+              <div className="text-xs text-muted-foreground mb-2">
+                {entregaNome && <span>Entrega: {entregaNome}</span>}
+                {entregaNome && etapaNome && <span className="mx-1.5">•</span>}
+                {etapaNome && <span>{etapaNome}</span>}
+              </div>
+            )}
+
+            <div className="flex gap-1.5">
+              {task.documento_url && (
+                <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
+                  <a href={task.documento_url} target="_blank" rel="noopener noreferrer">
+                    <FileText className="h-3 w-3 mr-1" />
+                    Doc
+                  </a>
+                </Button>
+              )}
+              {task.link_referencia && (
+                <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
+                  <a href={task.link_referencia} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    Link
+                  </a>
+                </Button>
+              )}
+            </div>
+
+            {task.resposta_mentorado && (
+              <div className="mt-2 p-2.5 bg-muted/50 rounded-lg">
+                <p className="text-xs font-medium mb-0.5">Resposta:</p>
+                <p className="text-xs text-muted-foreground">{task.resposta_mentorado}</p>
+                {task.data_resposta && (
+                  <p className="text-xs text-muted-foreground/70 mt-1">
+                    {format(new Date(task.data_resposta), "dd/MM 'às' HH:mm", { locale: ptBR })}
+                  </p>
                 )}
-                <Button variant="ghost" size="sm" onClick={() => handleEdit(task)}>
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-destructive"
-                  onClick={() => setDeleteTaskId(task.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+
+          {showActions && (
+            <div className="flex flex-col gap-1 shrink-0">
+              {task.status === 'em_analise' && (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => handleApproveFromAdmin(task.id)}
+                  >
+                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    Aprovar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => handleRequestRevision(task.id)}
+                  >
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Revisar
+                  </Button>
+                </>
+              )}
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit(task)}>
+                <Edit className="h-3.5 w-3.5" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 text-destructive"
+                onClick={() => setDeleteTaskId(task.id)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
     );
   };
 
@@ -240,18 +240,18 @@ const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId,
       open={expandedSections[sectionKey]}
       onOpenChange={(open) => setExpandedSections(prev => ({ ...prev, [sectionKey]: open }))}
     >
-      <CollapsibleTrigger className="flex items-center gap-2 w-full text-left mb-3">
+      <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors">
         {expandedSections[sectionKey] ? (
           <ChevronDown className="h-4 w-4" />
         ) : (
           <ChevronRight className="h-4 w-4" />
         )}
-        <span className="font-medium">{title}</span>
-        <Badge variant="secondary">{tasks.length}</Badge>
+        <span className="font-medium text-sm">{title}</span>
+        <Badge variant="secondary" className="ml-auto text-xs">{tasks.length}</Badge>
       </CollapsibleTrigger>
-      <CollapsibleContent>
+      <CollapsibleContent className="pt-3 space-y-2">
         {tasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-2">Nenhuma task nesta categoria</p>
+          <p className="text-sm text-muted-foreground py-2 text-center">Nenhuma task</p>
         ) : (
           tasks.map(task => renderTaskCard(task, showActions))
         )}
@@ -261,9 +261,9 @@ const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId,
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="py-8 text-center text-muted-foreground">
-          Carregando tasks...
+      <Card className="border-border/50 shadow-sm">
+        <CardContent className="py-8 text-center">
+          <p className="text-sm text-muted-foreground">Carregando tasks...</p>
         </CardContent>
       </Card>
     );
@@ -271,23 +271,27 @@ const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId,
 
   return (
     <>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5" />
-            Tasks de Validação
-          </CardTitle>
-          <Button onClick={() => { setEditingTask(null); setIsModalOpen(true); }}>
-            <Plus className="h-4 w-4 mr-2" />
+      <div className="space-y-4">
+        {/* Header compacto */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ClipboardCheck className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">Tasks de Validação</h2>
+            <Badge variant="secondary" className="text-xs">{tasks?.length || 0}</Badge>
+          </div>
+          <Button size="sm" onClick={() => { setEditingTask(null); setIsModalOpen(true); }}>
+            <Plus className="h-4 w-4 mr-1" />
             Nova Task
           </Button>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </div>
+
+        {/* Seções de Tasks */}
+        <div className="space-y-3">
           {renderSection('Pendentes', pendentes, 'pendentes')}
           {renderSection('Em Análise / Revisão', emAnalise, 'em_analise')}
           {renderSection('Concluídas', concluidas, 'concluidas', false)}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <NovaTaskModal
         open={isModalOpen}
