@@ -943,58 +943,112 @@ export type Database = {
       }
       contratos_business: {
         Row: {
+          cnpj: string | null
           created_at: string
+          creditos_iniciais: number | null
+          data_assinatura: string | null
           data_fim: string | null
           data_inicio: string | null
+          duracao_academy_meses: number | null
+          endereco: string | null
           entregas_esperadas: Json | null
           id: string
           modulos_contratados: number
+          modulos_selecionados: Json | null
+          multa_rescisao_percentual: number | null
+          numero_parcelas: number | null
           observacoes: string | null
+          razao_social: string | null
           reports_frequencia: string | null
+          representante_cpf: string | null
+          representante_email: string | null
+          representante_nome: string | null
+          representante_rg: string | null
           reunioes_mensais: number
           roi_projetado: number | null
           status: string | null
           suporte_tipo: string | null
+          tabela_manutencao: Json | null
           tempo_consultoria_meses: number
           updated_at: string
           user_id: string
           valor_contrato: number | null
+          valor_credito_adicional: number | null
+          valor_entrada: number | null
+          valor_hora_tecnica: number | null
+          valor_parcela: number | null
         }
         Insert: {
+          cnpj?: string | null
           created_at?: string
+          creditos_iniciais?: number | null
+          data_assinatura?: string | null
           data_fim?: string | null
           data_inicio?: string | null
+          duracao_academy_meses?: number | null
+          endereco?: string | null
           entregas_esperadas?: Json | null
           id?: string
           modulos_contratados?: number
+          modulos_selecionados?: Json | null
+          multa_rescisao_percentual?: number | null
+          numero_parcelas?: number | null
           observacoes?: string | null
+          razao_social?: string | null
           reports_frequencia?: string | null
+          representante_cpf?: string | null
+          representante_email?: string | null
+          representante_nome?: string | null
+          representante_rg?: string | null
           reunioes_mensais?: number
           roi_projetado?: number | null
           status?: string | null
           suporte_tipo?: string | null
+          tabela_manutencao?: Json | null
           tempo_consultoria_meses?: number
           updated_at?: string
           user_id: string
           valor_contrato?: number | null
+          valor_credito_adicional?: number | null
+          valor_entrada?: number | null
+          valor_hora_tecnica?: number | null
+          valor_parcela?: number | null
         }
         Update: {
+          cnpj?: string | null
           created_at?: string
+          creditos_iniciais?: number | null
+          data_assinatura?: string | null
           data_fim?: string | null
           data_inicio?: string | null
+          duracao_academy_meses?: number | null
+          endereco?: string | null
           entregas_esperadas?: Json | null
           id?: string
           modulos_contratados?: number
+          modulos_selecionados?: Json | null
+          multa_rescisao_percentual?: number | null
+          numero_parcelas?: number | null
           observacoes?: string | null
+          razao_social?: string | null
           reports_frequencia?: string | null
+          representante_cpf?: string | null
+          representante_email?: string | null
+          representante_nome?: string | null
+          representante_rg?: string | null
           reunioes_mensais?: number
           roi_projetado?: number | null
           status?: string | null
           suporte_tipo?: string | null
+          tabela_manutencao?: Json | null
           tempo_consultoria_meses?: number
           updated_at?: string
           user_id?: string
           valor_contrato?: number | null
+          valor_credito_adicional?: number | null
+          valor_entrada?: number | null
+          valor_hora_tecnica?: number | null
+          valor_parcela?: number | null
         }
         Relationships: [
           {

@@ -6,9 +6,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import { useContratosBusiness, EntregaEsperada } from "@/hooks/useContratosBusiness";
 import { useContratoBusinessMutations } from "@/hooks/useContratoBusinessMutations";
-import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2 } from "lucide-react";
+import { ContratoImportSection } from "./ContratoImportSection";
+import { ContratoPreviewPDF } from "./ContratoPreviewPDF";
+import { ContratoParseResult } from "@/hooks/useParseContratoTexto";
+import { MODULOS_DISPONIVEIS, ContratoData } from "@/lib/contratoBusinessTemplate";
+import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2, Building2, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 
 interface ContratoBusinessManagerProps {
@@ -24,6 +30,7 @@ const tiposEntrega = [
   { value: "relatorio", label: "Relatório" },
   { value: "workshop", label: "Workshop" },
   { value: "consultoria", label: "Consultoria" },
+  { value: "documento", label: "Documento" },
   { value: "outro", label: "Outro" },
 ];
 
@@ -37,6 +44,18 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
   const { contrato, isLoading } = useContratosBusiness(userId);
   const { createContrato, updateContrato } = useContratoBusinessMutations();
 
+  // Dados da Contratante
+  const [dadosContratante, setDadosContratante] = useState({
+    razao_social: "",
+    cnpj: "",
+    endereco: "",
+    representante_nome: "",
+    representante_cpf: "",
+    representante_rg: "",
+    representante_email: "",
+  });
+
+  // Dados do Contrato
   const [formData, setFormData] = useState({
     modulos_contratados: 6,
     tempo_consultoria_meses: 6,
@@ -45,15 +64,42 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
     suporte_tipo: "chat",
     data_inicio: "",
     data_fim: "",
-    valor_contrato: "",
-    roi_projetado: "",
+    data_assinatura: "",
     observacoes: "",
+  });
+
+  // Módulos selecionados
+  const [modulosSelecionados, setModulosSelecionados] = useState<string[]>([]);
+
+  // Valores
+  const [valores, setValores] = useState({
+    valor_contrato: "",
+    valor_entrada: "",
+    numero_parcelas: "6",
+    valor_parcela: "",
+    creditos_iniciais: "300",
+    valor_credito_adicional: "1",
+    duracao_academy_meses: "12",
+    roi_projetado: "",
+    multa_rescisao_percentual: "30",
+    valor_hora_tecnica: "250",
   });
 
   const [entregas, setEntregas] = useState<EntregaEsperada[]>([]);
 
+  // Carregar dados existentes
   useEffect(() => {
     if (contrato) {
+      setDadosContratante({
+        razao_social: (contrato as any).razao_social || "",
+        cnpj: (contrato as any).cnpj || "",
+        endereco: (contrato as any).endereco || "",
+        representante_nome: (contrato as any).representante_nome || "",
+        representante_cpf: (contrato as any).representante_cpf || "",
+        representante_rg: (contrato as any).representante_rg || "",
+        representante_email: (contrato as any).representante_email || "",
+      });
+
       setFormData({
         modulos_contratados: contrato.modulos_contratados || 6,
         tempo_consultoria_meses: contrato.tempo_consultoria_meses || 6,
@@ -62,17 +108,98 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
         suporte_tipo: contrato.suporte_tipo || "chat",
         data_inicio: contrato.data_inicio || "",
         data_fim: contrato.data_fim || "",
-        valor_contrato: contrato.valor_contrato?.toString() || "",
-        roi_projetado: contrato.roi_projetado?.toString() || "",
+        data_assinatura: (contrato as any).data_assinatura || "",
         observacoes: contrato.observacoes || "",
       });
+
+      setModulosSelecionados((contrato as any).modulos_selecionados || []);
+
+      setValores({
+        valor_contrato: contrato.valor_contrato?.toString() || "",
+        valor_entrada: (contrato as any).valor_entrada?.toString() || "",
+        numero_parcelas: (contrato as any).numero_parcelas?.toString() || "6",
+        valor_parcela: (contrato as any).valor_parcela?.toString() || "",
+        creditos_iniciais: (contrato as any).creditos_iniciais?.toString() || "300",
+        valor_credito_adicional: (contrato as any).valor_credito_adicional?.toString() || "1",
+        duracao_academy_meses: (contrato as any).duracao_academy_meses?.toString() || "12",
+        roi_projetado: contrato.roi_projetado?.toString() || "",
+        multa_rescisao_percentual: (contrato as any).multa_rescisao_percentual?.toString() || "30",
+        valor_hora_tecnica: (contrato as any).valor_hora_tecnica?.toString() || "250",
+      });
+
       setEntregas(contrato.entregas_esperadas || []);
     }
   }, [contrato]);
 
+  // Handler para dados parseados pela IA
+  const handleDataParsed = (parsed: ContratoParseResult) => {
+    if (parsed.contratante) {
+      setDadosContratante({
+        razao_social: parsed.contratante.razao_social || "",
+        cnpj: parsed.contratante.cnpj || "",
+        endereco: parsed.contratante.endereco || "",
+        representante_nome: parsed.contratante.representante_nome || "",
+        representante_cpf: parsed.contratante.representante_cpf || "",
+        representante_rg: parsed.contratante.representante_rg || "",
+        representante_email: parsed.contratante.representante_email || "",
+      });
+    }
+
+    if (parsed.contrato) {
+      setFormData(prev => ({
+        ...prev,
+        modulos_contratados: parsed.contrato.modulos_contratados || prev.modulos_contratados,
+        tempo_consultoria_meses: parsed.contrato.tempo_consultoria_meses || prev.tempo_consultoria_meses,
+        reunioes_mensais: parsed.contrato.reunioes_mensais || prev.reunioes_mensais,
+        reports_frequencia: parsed.contrato.reports_frequencia || prev.reports_frequencia,
+        suporte_tipo: parsed.contrato.suporte_tipo || prev.suporte_tipo,
+        data_inicio: parsed.contrato.data_inicio || prev.data_inicio,
+        data_fim: parsed.contrato.data_fim || prev.data_fim,
+        data_assinatura: parsed.contrato.data_assinatura || prev.data_assinatura,
+      }));
+    }
+
+    if (parsed.modulos_selecionados?.length) {
+      setModulosSelecionados(parsed.modulos_selecionados);
+    }
+
+    if (parsed.valores) {
+      setValores(prev => ({
+        valor_contrato: parsed.valores.valor_contrato?.toString() || prev.valor_contrato,
+        valor_entrada: parsed.valores.valor_entrada?.toString() || prev.valor_entrada,
+        numero_parcelas: parsed.valores.numero_parcelas?.toString() || prev.numero_parcelas,
+        valor_parcela: parsed.valores.valor_parcela?.toString() || prev.valor_parcela,
+        creditos_iniciais: parsed.valores.creditos_iniciais?.toString() || prev.creditos_iniciais,
+        valor_credito_adicional: parsed.valores.valor_credito_adicional?.toString() || prev.valor_credito_adicional,
+        duracao_academy_meses: parsed.valores.duracao_academy_meses?.toString() || prev.duracao_academy_meses,
+        roi_projetado: parsed.valores.roi_projetado?.toString() || prev.roi_projetado,
+        multa_rescisao_percentual: parsed.valores.multa_rescisao_percentual?.toString() || prev.multa_rescisao_percentual,
+        valor_hora_tecnica: parsed.valores.valor_hora_tecnica?.toString() || prev.valor_hora_tecnica,
+      }));
+    }
+
+    if (parsed.entregas_esperadas?.length) {
+      setEntregas(parsed.entregas_esperadas.map(e => ({
+        titulo: e.titulo,
+        tipo: e.tipo || "implementacao",
+        prazo: e.prazo,
+        status: (e.status as EntregaEsperada["status"]) || "pendente",
+      })));
+    }
+  };
+
   const handleSave = () => {
     const data = {
       user_id: userId,
+      // Contratante
+      razao_social: dadosContratante.razao_social || null,
+      cnpj: dadosContratante.cnpj || null,
+      endereco: dadosContratante.endereco || null,
+      representante_nome: dadosContratante.representante_nome || null,
+      representante_cpf: dadosContratante.representante_cpf || null,
+      representante_rg: dadosContratante.representante_rg || null,
+      representante_email: dadosContratante.representante_email || null,
+      // Contrato
       modulos_contratados: formData.modulos_contratados,
       tempo_consultoria_meses: formData.tempo_consultoria_meses,
       reunioes_mensais: formData.reunioes_mensais,
@@ -80,9 +207,21 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
       suporte_tipo: formData.suporte_tipo,
       data_inicio: formData.data_inicio || null,
       data_fim: formData.data_fim || null,
-      valor_contrato: formData.valor_contrato ? Number(formData.valor_contrato) : null,
-      roi_projetado: formData.roi_projetado ? Number(formData.roi_projetado) : null,
+      data_assinatura: formData.data_assinatura || null,
       observacoes: formData.observacoes || null,
+      modulos_selecionados: modulosSelecionados,
+      // Valores
+      valor_contrato: valores.valor_contrato ? Number(valores.valor_contrato) : null,
+      valor_entrada: valores.valor_entrada ? Number(valores.valor_entrada) : null,
+      numero_parcelas: valores.numero_parcelas ? Number(valores.numero_parcelas) : null,
+      valor_parcela: valores.valor_parcela ? Number(valores.valor_parcela) : null,
+      creditos_iniciais: valores.creditos_iniciais ? Number(valores.creditos_iniciais) : null,
+      valor_credito_adicional: valores.valor_credito_adicional ? Number(valores.valor_credito_adicional) : null,
+      duracao_academy_meses: valores.duracao_academy_meses ? Number(valores.duracao_academy_meses) : null,
+      roi_projetado: valores.roi_projetado ? Number(valores.roi_projetado) : null,
+      multa_rescisao_percentual: valores.multa_rescisao_percentual ? Number(valores.multa_rescisao_percentual) : null,
+      valor_hora_tecnica: valores.valor_hora_tecnica ? Number(valores.valor_hora_tecnica) : null,
+      // Entregas
       entregas_esperadas: entregas,
     };
 
@@ -91,6 +230,14 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
     } else {
       createContrato.mutate(data);
     }
+  };
+
+  const toggleModulo = (modulo: string) => {
+    setModulosSelecionados(prev => 
+      prev.includes(modulo) 
+        ? prev.filter(m => m !== modulo)
+        : [...prev, modulo]
+    );
   };
 
   const addEntrega = () => {
@@ -115,6 +262,24 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
     setEntregas(entregas.filter((_, i) => i !== index));
   };
 
+  // Preparar dados para o PDF
+  const contratoDataForPDF: ContratoData = {
+    ...dadosContratante,
+    ...formData,
+    modulos_selecionados: modulosSelecionados,
+    valor_contrato: valores.valor_contrato ? Number(valores.valor_contrato) : null,
+    valor_entrada: valores.valor_entrada ? Number(valores.valor_entrada) : null,
+    numero_parcelas: valores.numero_parcelas ? Number(valores.numero_parcelas) : null,
+    valor_parcela: valores.valor_parcela ? Number(valores.valor_parcela) : null,
+    creditos_iniciais: valores.creditos_iniciais ? Number(valores.creditos_iniciais) : null,
+    valor_credito_adicional: valores.valor_credito_adicional ? Number(valores.valor_credito_adicional) : null,
+    duracao_academy_meses: valores.duracao_academy_meses ? Number(valores.duracao_academy_meses) : null,
+    roi_projetado: valores.roi_projetado ? Number(valores.roi_projetado) : null,
+    multa_rescisao_percentual: valores.multa_rescisao_percentual ? Number(valores.multa_rescisao_percentual) : null,
+    valor_hora_tecnica: valores.valor_hora_tecnica ? Number(valores.valor_hora_tecnica) : null,
+    entregas_esperadas: entregas,
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -127,22 +292,109 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
 
   return (
     <div className="space-y-6">
+      {/* Seção de Importação com IA */}
+      <ContratoImportSection onDataParsed={handleDataParsed} />
+
+      {/* Dados da Contratante */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Dados da Contratante
+          </CardTitle>
+          <CardDescription>
+            Informações da empresa e representante legal
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="razao_social">Razão Social</Label>
+              <Input
+                id="razao_social"
+                value={dadosContratante.razao_social}
+                onChange={(e) => setDadosContratante({ ...dadosContratante, razao_social: e.target.value })}
+                placeholder="Nome da empresa"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cnpj">CNPJ</Label>
+              <Input
+                id="cnpj"
+                value={dadosContratante.cnpj}
+                onChange={(e) => setDadosContratante({ ...dadosContratante, cnpj: e.target.value })}
+                placeholder="XX.XXX.XXX/XXXX-XX"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="endereco">Endereço</Label>
+            <Input
+              id="endereco"
+              value={dadosContratante.endereco}
+              onChange={(e) => setDadosContratante({ ...dadosContratante, endereco: e.target.value })}
+              placeholder="Endereço completo"
+            />
+          </div>
+
+          <Separator />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="representante_nome">Representante Legal</Label>
+              <Input
+                id="representante_nome"
+                value={dadosContratante.representante_nome}
+                onChange={(e) => setDadosContratante({ ...dadosContratante, representante_nome: e.target.value })}
+                placeholder="Nome completo"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="representante_email">Email</Label>
+              <Input
+                id="representante_email"
+                type="email"
+                value={dadosContratante.representante_email}
+                onChange={(e) => setDadosContratante({ ...dadosContratante, representante_email: e.target.value })}
+                placeholder="email@empresa.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="representante_cpf">CPF</Label>
+              <Input
+                id="representante_cpf"
+                value={dadosContratante.representante_cpf}
+                onChange={(e) => setDadosContratante({ ...dadosContratante, representante_cpf: e.target.value })}
+                placeholder="XXX.XXX.XXX-XX"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="representante_rg">RG</Label>
+              <Input
+                id="representante_rg"
+                value={dadosContratante.representante_rg}
+                onChange={(e) => setDadosContratante({ ...dadosContratante, representante_rg: e.target.value })}
+                placeholder="Número do RG"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Informações do Contrato */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            {contrato ? "Editar Contrato" : "Criar Contrato"}
+            Informações do Contrato
           </CardTitle>
           <CardDescription>
-            {contrato 
-              ? `Editando contrato de ${userName || "mentorado"}`
-              : `Definir termos do contrato Business para ${userName || "mentorado"}`
-            }
+            Datas, módulos e configurações gerais
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Informações básicas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="data_inicio">Data Início</Label>
               <Input
@@ -162,23 +414,35 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="modulos">Módulos Contratados</Label>
+              <Label htmlFor="data_assinatura">Data Assinatura</Label>
               <Input
-                id="modulos"
-                type="number"
-                min={1}
-                value={formData.modulos_contratados}
-                onChange={(e) => setFormData({ ...formData, modulos_contratados: Number(e.target.value) })}
+                id="data_assinatura"
+                type="date"
+                value={formData.data_assinatura}
+                onChange={(e) => setFormData({ ...formData, data_assinatura: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tempo">Tempo (meses)</Label>
+              <Label htmlFor="tempo">Duração (meses)</Label>
               <Input
                 id="tempo"
                 type="number"
                 min={1}
                 value={formData.tempo_consultoria_meses}
                 onChange={(e) => setFormData({ ...formData, tempo_consultoria_meses: Number(e.target.value) })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="modulos">Nº Módulos</Label>
+              <Input
+                id="modulos"
+                type="number"
+                min={1}
+                value={formData.modulos_contratados}
+                onChange={(e) => setFormData({ ...formData, modulos_contratados: Number(e.target.value) })}
               />
             </div>
             <div className="space-y-2">
@@ -224,28 +488,31 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="valor">Valor Contrato (R$)</Label>
-              <Input
-                id="valor"
-                type="number"
-                min={0}
-                value={formData.valor_contrato}
-                onChange={(e) => setFormData({ ...formData, valor_contrato: e.target.value })}
-                placeholder="Opcional"
-              />
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <Label>Módulos Selecionados</Label>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {MODULOS_DISPONIVEIS.map((modulo) => (
+                <div key={modulo} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`modulo-${modulo}`}
+                    checked={modulosSelecionados.includes(modulo)}
+                    onCheckedChange={() => toggleModulo(modulo)}
+                  />
+                  <Label htmlFor={`modulo-${modulo}`} className="text-sm font-normal cursor-pointer">
+                    {modulo}
+                  </Label>
+                </div>
+              ))}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="roi">ROI Projetado (%)</Label>
-              <Input
-                id="roi"
-                type="number"
-                min={0}
-                value={formData.roi_projetado}
-                onChange={(e) => setFormData({ ...formData, roi_projetado: e.target.value })}
-                placeholder="Opcional"
-              />
-            </div>
+            {modulosSelecionados.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {modulosSelecionados.length} módulo(s) selecionado(s): {modulosSelecionados.join(", ")}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -257,6 +524,141 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
               placeholder="Observações gerais sobre o contrato..."
               rows={3}
             />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Valores e Pagamento */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            Valores e Pagamento
+          </CardTitle>
+          <CardDescription>
+            Configurações financeiras do contrato
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="valor_contrato">Valor Total (R$)</Label>
+              <Input
+                id="valor_contrato"
+                type="number"
+                min={0}
+                step="0.01"
+                value={valores.valor_contrato}
+                onChange={(e) => setValores({ ...valores, valor_contrato: e.target.value })}
+                placeholder="50000.00"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="valor_entrada">Entrada (R$)</Label>
+              <Input
+                id="valor_entrada"
+                type="number"
+                min={0}
+                step="0.01"
+                value={valores.valor_entrada}
+                onChange={(e) => setValores({ ...valores, valor_entrada: e.target.value })}
+                placeholder="10000.00"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="numero_parcelas">Nº Parcelas</Label>
+              <Input
+                id="numero_parcelas"
+                type="number"
+                min={1}
+                value={valores.numero_parcelas}
+                onChange={(e) => setValores({ ...valores, numero_parcelas: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="valor_parcela">Valor Parcela (R$)</Label>
+              <Input
+                id="valor_parcela"
+                type="number"
+                min={0}
+                step="0.01"
+                value={valores.valor_parcela}
+                onChange={(e) => setValores({ ...valores, valor_parcela: e.target.value })}
+                placeholder="6666.67"
+              />
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="creditos_iniciais">Créditos Iniciais</Label>
+              <Input
+                id="creditos_iniciais"
+                type="number"
+                min={0}
+                value={valores.creditos_iniciais}
+                onChange={(e) => setValores({ ...valores, creditos_iniciais: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="valor_credito">Valor/Crédito (R$)</Label>
+              <Input
+                id="valor_credito"
+                type="number"
+                min={0}
+                step="0.01"
+                value={valores.valor_credito_adicional}
+                onChange={(e) => setValores({ ...valores, valor_credito_adicional: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="duracao_academy">Academy (meses)</Label>
+              <Input
+                id="duracao_academy"
+                type="number"
+                min={1}
+                value={valores.duracao_academy_meses}
+                onChange={(e) => setValores({ ...valores, duracao_academy_meses: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="roi">ROI Projetado (%)</Label>
+              <Input
+                id="roi"
+                type="number"
+                min={0}
+                value={valores.roi_projetado}
+                onChange={(e) => setValores({ ...valores, roi_projetado: e.target.value })}
+                placeholder="200"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="multa">Multa Rescisão (%)</Label>
+              <Input
+                id="multa"
+                type="number"
+                min={0}
+                max={100}
+                value={valores.multa_rescisao_percentual}
+                onChange={(e) => setValores({ ...valores, multa_rescisao_percentual: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="hora_tecnica">Hora Técnica (R$)</Label>
+              <Input
+                id="hora_tecnica"
+                type="number"
+                min={0}
+                step="0.01"
+                value={valores.valor_hora_tecnica}
+                onChange={(e) => setValores({ ...valores, valor_hora_tecnica: e.target.value })}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -363,8 +765,10 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
         </CardContent>
       </Card>
 
-      {/* Botão Salvar */}
-      <div className="flex justify-end">
+      {/* Botões de Ação */}
+      <div className="flex justify-between items-center">
+        <ContratoPreviewPDF contratoData={contratoDataForPDF} nomeCliente={userName} />
+        
         <Button
           onClick={handleSave}
           disabled={createContrato.isPending || updateContrato.isPending}
