@@ -2,26 +2,25 @@ import { useNavigate } from "react-router-dom";
 import { 
   ClipboardCheck, 
   Calendar, 
-  Map, 
   FolderKanban, 
-  AlertCircle, 
-  FileText 
+  CheckSquare, 
+  FileText,
+  Package
 } from "lucide-react";
 
 interface QuickNavItem {
   title: string;
   path: string;
   icon: React.ElementType;
-  external?: boolean;
 }
 
 const navItems: QuickNavItem[] = [
   { title: "Diagnóstico", path: "/mentoria/diagnostico", icon: ClipboardCheck },
   { title: "Sessões", path: "/mentoria/sessoes", icon: Calendar },
   { title: "Etapas", path: "/mentoria?tab=roadmap", icon: FolderKanban },
-  { title: "Pendências", path: "/mentoria/validacoes", icon: AlertCircle },
-  { title: "Reports", path: "/mentoria/reports", icon: FileText },
-  { title: "MAPA", path: "https://mapa.iaplicada.com.br", icon: Map, external: true },
+  { title: "Instruções", path: "/mentoria?tab=roadmap", icon: FileText },
+  { title: "Entregas", path: "/mentoria/entregas", icon: Package },
+  { title: "Tasks", path: "/mentoria/validacoes", icon: CheckSquare },
 ];
 
 export function BusinessAcessoRapido() {
@@ -33,8 +32,8 @@ export function BusinessAcessoRapido() {
       <div className="hidden sm:flex justify-between items-center">
         {navItems.map((item) => (
           <button
-            key={item.path}
-            onClick={() => item.external ? window.open(item.path, "_blank") : navigate(item.path)}
+            key={item.title}
+            onClick={() => navigate(item.path)}
             className="flex flex-col items-center gap-2 p-3 rounded-lg 
                        hover:bg-white/5 transition-all group flex-1"
           >
@@ -50,8 +49,8 @@ export function BusinessAcessoRapido() {
       <div className="grid grid-cols-3 gap-2 sm:hidden">
         {navItems.map((item) => (
           <button
-            key={item.path}
-            onClick={() => item.external ? window.open(item.path, "_blank") : navigate(item.path)}
+            key={item.title}
+            onClick={() => navigate(item.path)}
             className="flex flex-col items-center gap-2 p-3 rounded-lg 
                        hover:bg-white/5 transition-all group"
           >

@@ -1,14 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { 
   CheckCircle2, 
   Clock, 
-  FileText,
-  ChevronRight,
-  AlertTriangle
+  ChevronRight
 } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
@@ -165,116 +162,56 @@ export function BusinessExecutiveRoadmap() {
         </CardContent>
       </Card>
 
-      {/* Grid: Reports e Pendências (Tasks) */}
-      <div className="grid md:grid-cols-2 gap-4">
-        {/* Card Reports */}
-        <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
-          <CardHeader className="pb-2">
+      {/* Card Tasks - Horizontal Full Width */}
+      <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
-              <FileText className="h-4 w-4 text-primary" />
-              Reports
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[120px]">
-              {isPreview ? (
-                <div className="flex flex-col items-center justify-center h-full py-4 text-center opacity-60">
-                  <FileText className="h-6 w-6 text-muted-foreground/50 mb-2" />
-                  <p className="text-muted-foreground text-sm">
-                    Reports disponíveis após início do contrato
-                  </p>
-                </div>
-              ) : reports.length === 0 ? (
-                <p className="text-muted-foreground text-sm text-center py-4">
-                  Nenhum report disponível
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {reports.slice(0, 3).map((report) => (
-                    <div 
-                      key={report.id}
-                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
-                      onClick={() => report.arquivo_url && window.open(report.arquivo_url, '_blank')}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{report.titulo}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {format(parseISO(report.data_envio), "dd MMM", { locale: ptBR })}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  ))}
-                  {reports.length > 3 && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="w-full text-xs"
-                      onClick={() => navigate('/mentoria/reports')}
-                    >
-                      Ver todos ({reports.length})
-                    </Button>
-                  )}
-                </div>
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
-        {/* Card Pendências (Tasks) */}
-        <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
-              Pendências
+              Tasks
               {!isPreview && tasksPendentes > 0 && (
                 <Badge variant="destructive" className="text-xs">{tasksPendentes}</Badge>
               )}
             </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[120px]">
-              {isPreview ? (
-                <div className="flex flex-col items-center justify-center h-full py-4 text-center opacity-60">
-                  <CheckCircle2 className="h-6 w-6 text-muted-foreground/50 mb-2" />
-                  <p className="text-muted-foreground text-sm">
-                    Suas pendências aparecerão aqui
-                  </p>
+            {!isPreview && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/mentoria/validacoes')}
+              >
+                Ver Tasks
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isPreview ? (
+            <p className="text-muted-foreground text-sm text-center py-4">
+              Suas tasks aparecerão aqui
+            </p>
+          ) : tasksPendentes === 0 ? (
+            <div className="flex items-center justify-center py-4">
+              <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
+              <p className="text-sm text-muted-foreground">Nenhuma task pendente</p>
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {tasks?.filter(t => t.status === 'pendente' || t.status === 'revisao_solicitada').slice(0, 3).map((task) => (
+                <div 
+                  key={task.id}
+                  className="p-3 rounded-lg bg-muted/50 border border-border"
+                >
+                  <p className="text-sm font-medium truncate">{task.titulo}</p>
+                  {task.prazo && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Prazo: {format(new Date(task.prazo), "dd/MM", { locale: ptBR })}
+                    </p>
+                  )}
                 </div>
-              ) : tasksPendentes === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full py-4 text-center">
-                  <CheckCircle2 className="h-6 w-6 text-green-500 mb-2" />
-                  <p className="text-sm text-muted-foreground">Nenhuma pendência!</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {tasks?.filter(t => t.status === 'pendente').slice(0, 2).map((task) => (
-                    <div 
-                      key={task.id}
-                      className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20"
-                    >
-                      <p className="text-sm font-medium truncate">{task.titulo}</p>
-                      {task.prazo && (
-                        <p className="text-xs text-muted-foreground">
-                          Prazo: {format(new Date(task.prazo), "dd/MM", { locale: ptBR })}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                  <Button 
-                    variant="default" 
-                    size="sm" 
-                    className="w-full text-xs"
-                    onClick={() => navigate('/mentoria/validacoes')}
-                  >
-                    Ver todas pendências
-                  </Button>
-                </div>
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
-      </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
