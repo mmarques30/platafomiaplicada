@@ -27,7 +27,7 @@ export default function MentoriaPainelDiagnostico() {
   const { diagnostico, projetos, sessoes, profile, isLoading } = usePainelDiagnostico(userId);
   const { plan } = useUserPlan();
   const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
-  const { effectivePlan, isVisitante: effectiveIsVisitante, isBusiness: effectiveIsBusiness } = useEffectivePlan(isAdmin);
+  const { effectivePlan, isVisitante: effectiveIsVisitante, isBusiness: effectiveIsBusiness, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading);
   
   // Determinar se é Business view baseado no plano do mentorado visualizado
   // Se estamos visualizando outro usuário (userId), usamos o plano do profile desse usuário
@@ -39,11 +39,12 @@ export default function MentoriaPainelDiagnostico() {
   
   // Redirecionar visitantes (considera simulação)
   useEffect(() => {
-    if (!roleLoading && effectiveIsVisitante) {
+    if (effectivePlanLoading) return;
+    if (effectiveIsVisitante) {
       toast.info("Esta funcionalidade requer um plano ativo");
       navigate("/trilhas", { replace: true });
     }
-  }, [effectiveIsVisitante, roleLoading, navigate]);
+  }, [effectiveIsVisitante, effectivePlanLoading, navigate]);
   
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');
   
@@ -64,7 +65,7 @@ export default function MentoriaPainelDiagnostico() {
         ? 'Voltar para Minha Evolução' 
         : 'Voltar para Mentoria';
 
-  if (isLoading || roleLoading || isVisitante) {
+  if (isLoading || roleLoading || effectivePlanLoading) {
     return (
       <div className="container mx-auto py-8 flex items-center justify-center min-h-[60vh]">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
