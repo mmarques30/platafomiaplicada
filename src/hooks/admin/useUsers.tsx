@@ -10,7 +10,7 @@ export function useUsers() {
     queryFn: async () => {
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("*, plano_mentoria, email_acesso_enviado, adicionado_grupo_whatsapp, origem_consultoria, empresa_consultoria")
+        .select("*, plano_mentoria, email_acesso_enviado, adicionado_grupo_whatsapp")
         .eq("is_visitante", false)
         .order("created_at", { ascending: false });
 
@@ -95,16 +95,12 @@ export function useCreateUser() {
       nomeCompleto,
       roles,
       planoMentoria,
-      origemConsultoria,
-      empresaConsultoria,
     }: {
       email: string;
       password: string;
       nomeCompleto: string;
       roles: AppRole[];
       planoMentoria?: string | null;
-      origemConsultoria?: boolean;
-      empresaConsultoria?: string | null;
     }) => {
       // Chamar edge function ao invés de fazer diretamente
       const { data, error } = await supabase.functions.invoke("create-user-admin", {
@@ -114,8 +110,6 @@ export function useCreateUser() {
           nomeCompleto, 
           roles,
           planoMentoria,
-          origemConsultoria,
-          empresaConsultoria
         },
       });
 
@@ -152,8 +146,6 @@ export function useUpdateUser() {
         plano_mentoria?: "academy" | "skills" | "business" | null;
         data_expiracao_acesso?: string | null;
         conta_ativa?: boolean;
-        origem_consultoria?: boolean;
-        empresa_consultoria?: string | null;
         roles?: AppRole[];
       };
     }) => {
