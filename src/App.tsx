@@ -60,6 +60,7 @@ import GerenciarMentoria from "./pages/admin/GerenciarMentoria";
 import MentoriaBonusPage from "./pages/admin/mentoria/MentoriaBonusPage";
 import MentoriaAcademyPage from "./pages/admin/mentoria/MentoriaAcademyPage";
 import MentoriaBusinessPage from "./pages/admin/mentoria/MentoriaBusinessPage";
+import AdminEtapaBusinessPage from "./pages/admin/mentoria/AdminEtapaBusinessPage";
 import PreviewPaineisPage from "./pages/admin/mentoria/PreviewPaineisPage";
 import GerenciarProdutos from "./pages/admin/GerenciarProdutos";
 import MinhasTarefas from "./pages/admin/MinhasTarefas";
@@ -170,6 +171,7 @@ function AppContent() {
             <Route path="mentoria/bonus" element={<MentoriaBonusPage />} />
             <Route path="mentoria/academy" element={<MentoriaAcademyPage />} />
             <Route path="mentoria/business" element={<MentoriaBusinessPage />} />
+            <Route path="mentoria/business/etapa/:etapaId" element={<AdminEtapaBusinessPage />} />
             <Route path="mentoria/preview-paineis" element={<PreviewPaineisPage />} />
             <Route path="duvidas" element={<GerenciarTodasDuvidas />} />
             <Route path="produtos" element={<GerenciarProdutos />} />
