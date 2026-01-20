@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Clock, AlertCircle, CheckCircle2, FolderKanban } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Clock, AlertCircle, CheckCircle2, FolderKanban, CalendarDays } from "lucide-react";
 import { useEntregasBusiness, EntregaBusiness, EntregaInput } from "@/hooks/useEntregasBusiness";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useQueryClient } from "@tanstack/react-query";
 import { DocumentosUploadSection } from "./DocumentosUploadSection";
 
@@ -38,6 +39,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
   const queryClient = useQueryClient();
   const { entregas, entregasAtivas, entregasBacklog, isLoading, createEntrega, updateEntrega, deleteEntrega } = useEntregasBusiness(contratoId);
   const { contrato } = useContratosBusiness(userId);
+  const { data: etapas = [] } = useEtapasBusiness(contratoId);
   
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEntrega, setEditingEntrega] = useState<EntregaBusiness | null>(null);
@@ -48,6 +50,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
     titulo: "",
     descricao: "",
     modulo_relacionado: "",
+    etapa_id: "",
     tipo: "ativa",
     status: "pendente",
     prioridade: "media",
@@ -58,6 +61,13 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
 
   // Get modulos from contract
   const modulosSelecionados = (contrato as any)?.modulos_selecionados || [];
+  
+  // Helper to get etapa name by id
+  const getEtapaNome = (etapaId?: string) => {
+    if (!etapaId) return null;
+    const etapa = etapas.find(e => e.id === etapaId);
+    return etapa ? `Encontro ${etapa.numero_etapa}: ${etapa.titulo}` : null;
+  };
 
   const handleOpenModal = (entrega?: EntregaBusiness) => {
     if (entrega) {
@@ -66,6 +76,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
         titulo: entrega.titulo,
         descricao: entrega.descricao || "",
         modulo_relacionado: entrega.modulo_relacionado || "",
+        etapa_id: entrega.etapa_id || "",
         tipo: entrega.tipo,
         status: entrega.status,
         prioridade: entrega.prioridade,
@@ -79,6 +90,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
         titulo: "",
         descricao: "",
         modulo_relacionado: "",
+        etapa_id: "",
         tipo: "ativa",
         status: "pendente",
         prioridade: "media",
@@ -109,6 +121,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
     const prioridade = PRIORIDADE_CONFIG[entrega.prioridade];
     const status = STATUS_CONFIG[entrega.status];
     const StatusIcon = status.icon;
+    const etapaNome = getEtapaNome(entrega.etapa_id);
 
     return (
       <div 
@@ -123,6 +136,13 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                 {prioridade.label}
               </Badge>
             </div>
+            
+            {etapaNome && (
+              <p className="text-xs text-primary/80 mb-1 flex items-center gap-1">
+                <CalendarDays className="h-3 w-3" />
+                {etapaNome}
+              </p>
+            )}
             
             {entrega.modulo_relacionado && (
               <p className="text-xs text-muted-foreground mb-1">
@@ -360,6 +380,26 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                   className="mt-1"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Etapa (Encontro) Relacionada</label>
+              <Select
+                value={formData.etapa_id || "none"}
+                onValueChange={(v) => setFormData({ ...formData, etapa_id: v === "none" ? "" : v })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Selecione uma etapa..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Nenhuma etapa</SelectItem>
+                  {etapas.map((etapa) => (
+                    <SelectItem key={etapa.id} value={etapa.id}>
+                      Encontro {etapa.numero_etapa}: {etapa.titulo}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

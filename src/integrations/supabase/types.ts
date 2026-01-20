@@ -1382,6 +1382,7 @@ export type Database = {
           contrato_id: string | null
           created_at: string | null
           descricao: string | null
+          etapa_id: string | null
           id: string
           justificativa_backlog: string | null
           modulo_relacionado: string | null
@@ -1398,6 +1399,7 @@ export type Database = {
           contrato_id?: string | null
           created_at?: string | null
           descricao?: string | null
+          etapa_id?: string | null
           id?: string
           justificativa_backlog?: string | null
           modulo_relacionado?: string | null
@@ -1414,6 +1416,7 @@ export type Database = {
           contrato_id?: string | null
           created_at?: string | null
           descricao?: string | null
+          etapa_id?: string | null
           id?: string
           justificativa_backlog?: string | null
           modulo_relacionado?: string | null
@@ -1432,6 +1435,13 @@ export type Database = {
             columns: ["contrato_id"]
             isOneToOne: false
             referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_business_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas_business"
             referencedColumns: ["id"]
           },
         ]
