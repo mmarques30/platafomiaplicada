@@ -184,13 +184,48 @@ export const useMentoriaSessoes = (userId?: string) => {
     return json as SessaoMentoria[];
   };
 
+  const deleteSessao = useMutation({
+    mutationFn: async (id: string) => {
+      const token = await getAccessTokenOrThrow();
+
+      const res = await fetch(`${supabaseUrl}/rest/v1/sessoes_mentoria?id=eq.${id}`, {
+        method: "DELETE",
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const json = await res.json().catch(() => null);
+        const message = json?.message || json?.error_description || json?.error || `Erro (${res.status})`;
+        throw new Error(message);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sessoes-mentoria"] });
+      toast({
+        title: "Sessão excluída com sucesso!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir sessão",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+
   return {
     sessoes: sessoes || [],
     isLoading,
     createSessao: createSessao.mutate,
     updateSessao: updateSessao.mutate,
+    deleteSessao: deleteSessao.mutate,
     bulkCreateSessoes,
     isCreating: createSessao.isPending,
-    isUpdating: updateSessao.isPending
+    isUpdating: updateSessao.isPending,
+    isDeleting: deleteSessao.isPending
   };
 };

@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
+import { Trash2 } from "lucide-react";
 
 const formatDateForInput = (dateString?: string) => {
   if (!dateString) return "";
@@ -23,6 +24,7 @@ type SessaoModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: Partial<SessaoMentoria>) => void;
+  onDelete?: (id: string) => void;
   sessao?: SessaoMentoria;
   userId?: string;
   isLoading?: boolean;
@@ -32,6 +34,7 @@ export default function SessaoModal({
   open,
   onOpenChange,
   onSubmit,
+  onDelete,
   sessao,
   userId,
   isLoading
@@ -184,13 +187,28 @@ export default function SessaoModal({
             </p>
           </div>
 
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Salvando..." : "Salvar"}
-            </Button>
+          <div className="flex justify-between">
+            {sessao && onDelete && (
+              <Button 
+                type="button" 
+                variant="destructive" 
+                onClick={() => {
+                  onDelete(sessao.id);
+                  onOpenChange(false);
+                }}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir
+              </Button>
+            )}
+            <div className="flex gap-3 ml-auto">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Salvando..." : "Salvar"}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
