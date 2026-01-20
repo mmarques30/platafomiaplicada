@@ -23,7 +23,7 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Building2 } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { PageTitle } from "@/components/shared/PageTitle";
@@ -219,20 +219,6 @@ export default function GerenciarUsuários() {
                     ) : (
                       <Badge variant="outline" className="border-gray-400 text-gray-600">
                         Sem Plano
-                      </Badge>
-                    )}
-                    {(user as any).origem_consultoria && (
-                      <Badge 
-                        variant="outline"
-                        className="border-amber-500 text-amber-700 gap-1"
-                        title={
-                          (user as any).empresa_consultoria 
-                            ? `Consultoria: ${(user as any).empresa_consultoria}` 
-                            : "Acesso via Consultoria"
-                        }
-                      >
-                        <Building2 className="h-3 w-3" />
-                        Consult
                       </Badge>
                     )}
                   </div>
