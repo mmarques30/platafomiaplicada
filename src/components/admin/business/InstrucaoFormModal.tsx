@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,18 +26,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useCreateInstrucao, useUpdateInstrucao, type InstrucaoEtapa } from "@/hooks/useEtapasBusiness";
+import { PassosInstrucaoEditor } from "./PassosInstrucaoEditor";
+import { 
+  PassoInstrucao, 
+  RecursosInstrucao, 
+  usePersonalizarInstrucaoIA 
+} from "@/hooks/useInstrucaoRecursos";
+import type { Json } from "@/integrations/supabase/types";
 
 const formSchema = z.object({
   titulo: z.string().min(1, "Título é obrigatório"),
   descricao: z.string().optional(),
   responsavel: z.enum(["voce", "mentor", "conjunto"]),
   ferramenta: z.enum(["claude", "lovable", "reuniao", "outro"]).optional(),
-  prompt_sugerido: z.string().optional(),
   dicas: z.string().optional(),
-  recursos_url: z.string().url("URL inválida").optional().or(z.literal("")),
   ordem: z.number().min(0).optional(),
 });
 
@@ -49,6 +55,10 @@ interface InstrucaoFormModalProps {
   etapaId: string;
   instrucao?: InstrucaoEtapa | null;
   defaultResponsavel?: 'voce' | 'mentor' | 'conjunto';
+  contexto?: {
+    etapaTitulo?: string;
+    contratoNomeEmpresa?: string;
+  };
 }
 
 export function InstrucaoFormModal({
@@ -57,10 +67,16 @@ export function InstrucaoFormModal({
   etapaId,
   instrucao,
   defaultResponsavel = 'voce',
+  contexto,
 }: InstrucaoFormModalProps) {
   const createInstrucao = useCreateInstrucao();
   const updateInstrucao = useUpdateInstrucao();
+  const { personalizarInstrucao, isPersonalizing } = usePersonalizarInstrucaoIA();
   const isEditing = !!instrucao;
+
+  // Estado para passos e texto orientativo
+  const [passos, setPassos] = useState<PassoInstrucao[]>([]);
+  const [textoOrientativo, setTextoOrientativo] = useState('');
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -69,9 +85,7 @@ export function InstrucaoFormModal({
       descricao: "",
       responsavel: defaultResponsavel,
       ferramenta: "outro",
-      prompt_sugerido: "",
       dicas: "",
-      recursos_url: "",
       ordem: 0,
     },
   });
@@ -79,33 +93,65 @@ export function InstrucaoFormModal({
   useEffect(() => {
     if (open) {
       if (instrucao) {
+        // Carregar dados existentes
+        const recursos = instrucao.recursos as RecursosInstrucao | null;
+        setPassos(recursos?.passos || []);
+        setTextoOrientativo(recursos?.texto_orientativo || '');
+        
         form.reset({
           titulo: instrucao.titulo,
           descricao: instrucao.descricao || "",
           responsavel: instrucao.responsavel as 'voce' | 'mentor' | 'conjunto',
           ferramenta: (instrucao.ferramenta as 'claude' | 'lovable' | 'reuniao' | 'outro') || "outro",
-          prompt_sugerido: instrucao.prompt_sugerido || "",
           dicas: instrucao.dicas || "",
-          recursos_url: instrucao.recursos_url || "",
           ordem: instrucao.ordem || 0,
         });
       } else {
+        // Limpar para nova instrução
+        setPassos([]);
+        setTextoOrientativo('');
         form.reset({
           titulo: "",
           descricao: "",
           responsavel: defaultResponsavel,
           ferramenta: "outro",
-          prompt_sugerido: "",
           dicas: "",
-          recursos_url: "",
           ordem: 0,
         });
       }
     }
   }, [open, instrucao, defaultResponsavel, form]);
 
+  const handlePersonalizar = async () => {
+    if (!textoOrientativo.trim()) {
+      toast.error("Digite um texto orientativo para personalizar");
+      return;
+    }
+
+    const resultado = await personalizarInstrucao(
+      textoOrientativo,
+      passos,
+      {
+        ...contexto,
+        instrucaoTitulo: form.getValues('titulo'),
+      }
+    );
+
+    if (resultado) {
+      form.setValue('descricao', resultado);
+      toast.success("Descrição personalizada gerada!");
+    }
+  };
+
   const onSubmit = async (data: FormData) => {
     try {
+      // Montar objeto de recursos
+      const recursosData: RecursosInstrucao = {
+        passos,
+        texto_orientativo: textoOrientativo || undefined,
+        instrucao_personalizada: data.descricao || undefined,
+      };
+
       if (isEditing && instrucao) {
         await updateInstrucao.mutateAsync({
           id: instrucao.id,
@@ -114,9 +160,8 @@ export function InstrucaoFormModal({
           descricao: data.descricao || null,
           responsavel: data.responsavel,
           ferramenta: data.ferramenta || null,
-          prompt_sugerido: data.prompt_sugerido || null,
           dicas: data.dicas || null,
-          recursos_url: data.recursos_url || null,
+          recursos: recursosData as unknown as Json,
           ordem: data.ordem,
         });
         toast.success("Instrução atualizada com sucesso");
@@ -127,9 +172,8 @@ export function InstrucaoFormModal({
           descricao: data.descricao || null,
           responsavel: data.responsavel,
           ferramenta: data.ferramenta || null,
-          prompt_sugerido: data.prompt_sugerido || null,
           dicas: data.dicas || null,
-          recursos_url: data.recursos_url || null,
+          recursos: recursosData as unknown as Json,
           ordem: data.ordem || 0,
           status: 'pendente',
           gerado_por_ia: false,
@@ -147,7 +191,7 @@ export function InstrucaoFormModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Instrução" : "Nova Instrução"}
@@ -155,7 +199,8 @@ export function InstrucaoFormModal({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Campos básicos */}
             <FormField
               control={form.control}
               name="titulo"
@@ -164,25 +209,6 @@ export function InstrucaoFormModal({
                   <FormLabel>Título *</FormLabel>
                   <FormControl>
                     <Input placeholder="Ex: Mapear processos atuais" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="descricao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Descreva o que deve ser feito..."
-                      className="resize-none"
-                      rows={3}
-                      {...field}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -238,25 +264,74 @@ export function InstrucaoFormModal({
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="prompt_sugerido"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prompt Sugerido</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Cole aqui um prompt que pode ajudar na execução..."
-                      className="resize-none font-mono text-sm"
-                      rows={4}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <Separator />
+
+            {/* Editor de Passos */}
+            <PassosInstrucaoEditor
+              passos={passos}
+              onChange={setPassos}
+              etapaId={etapaId}
             />
 
+            <Separator />
+
+            {/* Seção de IA */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground">
+                ORIENTAÇÃO PARA IA (opcional)
+              </h4>
+              
+              <Textarea
+                placeholder="Cole aqui o texto orientativo. A IA irá usar este conteúdo para personalizar a descrição da instrução considerando o contexto do projeto e os recursos anexados..."
+                value={textoOrientativo}
+                onChange={(e) => setTextoOrientativo(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePersonalizar}
+                disabled={isPersonalizing || !textoOrientativo.trim()}
+                className="w-full"
+              >
+                {isPersonalizing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Personalizando...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Personalizar via IA
+                  </>
+                )}
+              </Button>
+
+              <FormField
+                control={form.control}
+                name="descricao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição (editável)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Descrição da instrução para o cliente..."
+                        className="resize-none"
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Separator />
+
+            {/* Campos adicionais */}
             <FormField
               control={form.control}
               name="dicas"
@@ -270,20 +345,6 @@ export function InstrucaoFormModal({
                       rows={2}
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="recursos_url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL de Material de Apoio</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
