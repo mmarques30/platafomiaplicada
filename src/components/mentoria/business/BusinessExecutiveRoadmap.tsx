@@ -94,7 +94,7 @@ export function BusinessExecutiveRoadmap() {
       {/* Timeline de Entregas (Etapas) */}
       <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Entregas Esperadas</CardTitle>
+          <CardTitle className="text-lg">Etapas do Projeto</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative">
