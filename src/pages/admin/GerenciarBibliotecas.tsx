@@ -7,7 +7,8 @@ import { IACopieUseTab } from "@/components/admin/bibliotecas/IACopieUseTab";
 import { MetodosTab } from "@/components/admin/bibliotecas/MetodosTab";
 import { FormulariosCustomizados } from "@/components/admin/formularios/FormulariosCustomizados";
 import { PromptsAnalyticsTab } from "@/components/admin/bibliotecas/PromptsAnalyticsTab";
-import { PageTitle } from "@/components/shared/PageTitle";
+import { adminTheme } from "@/components/admin/adminTheme";
+import { Library, Wrench, MessageSquare, BarChart3, Copy, BookOpen, FileText } from "lucide-react";
 
 const validTabs = ["ferramentas", "prompts", "analytics-prompts", "ia-copie-use", "metodos", "formularios"];
 
@@ -30,41 +31,61 @@ export default function GerenciarBibliotecas() {
   };
 
   return (
-    <div>
-      <PageTitle primary="Gerenciar" secondary="Bibliotecas" />
-      <div className="mb-8" />
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <Library className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Gerenciar Bibliotecas</h1>
+      </div>
 
-      <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="ferramentas">Ferramentas IA</TabsTrigger>
-          <TabsTrigger value="prompts">Prompts</TabsTrigger>
-          <TabsTrigger value="analytics-prompts">Analytics Prompts</TabsTrigger>
-          <TabsTrigger value="ia-copie-use">IA Copie e Use</TabsTrigger>
-          <TabsTrigger value="metodos">Métodos</TabsTrigger>
-          <TabsTrigger value="formularios">Formulários</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+        <TabsList className={adminTheme.tabsList}>
+          <TabsTrigger value="ferramentas" className={adminTheme.tabsTrigger}>
+            <Wrench className={adminTheme.tabsIcon} />
+            Ferramentas IA
+          </TabsTrigger>
+          <TabsTrigger value="prompts" className={adminTheme.tabsTrigger}>
+            <MessageSquare className={adminTheme.tabsIcon} />
+            Prompts
+          </TabsTrigger>
+          <TabsTrigger value="analytics-prompts" className={adminTheme.tabsTrigger}>
+            <BarChart3 className={adminTheme.tabsIcon} />
+            Analytics Prompts
+          </TabsTrigger>
+          <TabsTrigger value="ia-copie-use" className={adminTheme.tabsTrigger}>
+            <Copy className={adminTheme.tabsIcon} />
+            IA Copie e Use
+          </TabsTrigger>
+          <TabsTrigger value="metodos" className={adminTheme.tabsTrigger}>
+            <BookOpen className={adminTheme.tabsIcon} />
+            Métodos
+          </TabsTrigger>
+          <TabsTrigger value="formularios" className={adminTheme.tabsTrigger}>
+            <FileText className={adminTheme.tabsIcon} />
+            Formulários
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="ferramentas">
+        <TabsContent value="ferramentas" className={adminTheme.tabsContent}>
           <FerramentasTab />
         </TabsContent>
 
-        <TabsContent value="prompts">
+        <TabsContent value="prompts" className={adminTheme.tabsContent}>
           <PromptsTab />
         </TabsContent>
 
-        <TabsContent value="analytics-prompts">
+        <TabsContent value="analytics-prompts" className={adminTheme.tabsContent}>
           <PromptsAnalyticsTab />
         </TabsContent>
 
-        <TabsContent value="ia-copie-use">
+        <TabsContent value="ia-copie-use" className={adminTheme.tabsContent}>
           <IACopieUseTab />
         </TabsContent>
 
-        <TabsContent value="metodos">
+        <TabsContent value="metodos" className={adminTheme.tabsContent}>
           <MetodosTab />
         </TabsContent>
 
-        <TabsContent value="formularios">
+        <TabsContent value="formularios" className={adminTheme.tabsContent}>
           <FormulariosCustomizados />
         </TabsContent>
       </Tabs>

@@ -5,7 +5,8 @@ import { ModeracaoTab } from "@/components/admin/comunidade/ModeracaoTab";
 import { ConversasIATab } from "@/components/admin/comunidade/ConversasIATab";
 import { EstatisticasComunidadeTab } from "@/components/admin/comunidade/EstatisticasComunidadeTab";
 import { FerramentasCompartilhadasTab } from "@/components/admin/comunidade/FerramentasCompartilhadasTab";
-import { Users, Crown, Tags } from "lucide-react";
+import { Users, Crown, Tags, MessagesSquare } from "lucide-react";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 type MainTab = "categorias" | "gratuita" | "pagantes";
 type GratuitaSubTab = "moderacao" | "estatisticas";
@@ -13,21 +14,14 @@ type PagantesSubTab = "conversas" | "ferramentas";
 
 export default function GerenciarComunidade() {
   const [mainTab, setMainTab] = useState<MainTab>("categorias");
-  const [gratuitaSubTab, setGratuitaSubTab] =
-    useState<GratuitaSubTab>("moderacao");
-  const [pagantesSubTab, setPagantesSubTab] =
-    useState<PagantesSubTab>("conversas");
+  const [gratuitaSubTab, setGratuitaSubTab] = useState<GratuitaSubTab>("moderacao");
+  const [pagantesSubTab, setPagantesSubTab] = useState<PagantesSubTab>("conversas");
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Gerenciar Comunidade
-        </h1>
-        <p className="text-muted-foreground">
-          Configure categorias, modere posts, visualize conversas com MarIAna e
-          estatísticas da comunidade
-        </p>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <MessagesSquare className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Gerenciar Comunidade</h1>
       </div>
 
       {/* Main Tabs */}
@@ -36,32 +30,23 @@ export default function GerenciarComunidade() {
         onValueChange={(v) => setMainTab(v as MainTab)}
         className="space-y-4"
       >
-        <TabsList className="bg-muted/50 p-1 rounded-lg h-auto flex-wrap gap-1">
-          <TabsTrigger
-            value="categorias"
-            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex items-center gap-2"
-          >
-            <Tags className="h-4 w-4" />
+        <TabsList className={adminTheme.tabsList}>
+          <TabsTrigger value="categorias" className={adminTheme.tabsTrigger}>
+            <Tags className={adminTheme.tabsIcon} />
             Categorias
           </TabsTrigger>
-          <TabsTrigger
-            value="gratuita"
-            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex items-center gap-2"
-          >
-            <Users className="h-4 w-4" />
+          <TabsTrigger value="gratuita" className={adminTheme.tabsTrigger}>
+            <Users className={adminTheme.tabsIcon} />
             Comunidade Gratuita
           </TabsTrigger>
-          <TabsTrigger
-            value="pagantes"
-            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex items-center gap-2"
-          >
-            <Crown className="h-4 w-4" />
+          <TabsTrigger value="pagantes" className={adminTheme.tabsTrigger}>
+            <Crown className={adminTheme.tabsIcon} />
             Comunidade Pagantes
           </TabsTrigger>
         </TabsList>
 
         {/* Categorias Tab */}
-        <TabsContent value="categorias">
+        <TabsContent value="categorias" className={adminTheme.tabsContent}>
           <CategoriasTab />
         </TabsContent>
 
@@ -71,26 +56,20 @@ export default function GerenciarComunidade() {
             value={gratuitaSubTab}
             onValueChange={(v) => setGratuitaSubTab(v as GratuitaSubTab)}
           >
-            <TabsList className="bg-muted/30 p-1 rounded-lg">
-              <TabsTrigger
-                value="moderacao"
-                className="rounded-md px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-              >
+            <TabsList className={adminTheme.tabsList}>
+              <TabsTrigger value="moderacao" className={adminTheme.tabsTrigger}>
                 Moderação
               </TabsTrigger>
-              <TabsTrigger
-                value="estatisticas"
-                className="rounded-md px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-              >
+              <TabsTrigger value="estatisticas" className={adminTheme.tabsTrigger}>
                 Estatísticas
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="moderacao" className="mt-4">
+            <TabsContent value="moderacao" className={adminTheme.tabsContent}>
               <ModeracaoTab />
             </TabsContent>
 
-            <TabsContent value="estatisticas" className="mt-4">
+            <TabsContent value="estatisticas" className={adminTheme.tabsContent}>
               <EstatisticasComunidadeTab />
             </TabsContent>
           </Tabs>
@@ -102,26 +81,20 @@ export default function GerenciarComunidade() {
             value={pagantesSubTab}
             onValueChange={(v) => setPagantesSubTab(v as PagantesSubTab)}
           >
-            <TabsList className="bg-muted/30 p-1 rounded-lg">
-              <TabsTrigger
-                value="conversas"
-                className="rounded-md px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-              >
+            <TabsList className={adminTheme.tabsList}>
+              <TabsTrigger value="conversas" className={adminTheme.tabsTrigger}>
                 Conversas IA
               </TabsTrigger>
-              <TabsTrigger
-                value="ferramentas"
-                className="rounded-md px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-              >
+              <TabsTrigger value="ferramentas" className={adminTheme.tabsTrigger}>
                 Ferramentas
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="conversas" className="mt-4">
+            <TabsContent value="conversas" className={adminTheme.tabsContent}>
               <ConversasIATab />
             </TabsContent>
 
-            <TabsContent value="ferramentas" className="mt-4">
+            <TabsContent value="ferramentas" className={adminTheme.tabsContent}>
               <FerramentasCompartilhadasTab />
             </TabsContent>
           </Tabs>

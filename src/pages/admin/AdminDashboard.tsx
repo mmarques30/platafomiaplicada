@@ -8,7 +8,7 @@ import { EngajamentoTab } from "@/components/admin/dashboard/EngajamentoTab";
 import { PaginaGratuitaTab } from "@/components/admin/dashboard/PaginaGratuitaTab";
 import { ConteudoTab } from "@/components/admin/dashboard/ConteudoTab";
 import { MentoriaTab } from "@/components/admin/dashboard/MentoriaTab";
-import { PageTitle } from "@/components/shared/PageTitle";
+import { adminTheme } from "@/components/admin/adminTheme";
 import {
   LayoutDashboard,
   Users,
@@ -23,18 +23,21 @@ export default function AdminDashboard() {
 
   if (isLoading || !data) {
     return (
-      <div>
-        <PageTitle primary="Dashboard" secondary="Administrativo" />
-        <div className="space-y-6">
-          <Skeleton className="h-12 w-full max-w-xl" />
+      <div className={adminTheme.page}>
+        <div className={adminTheme.pageTitleWrapper}>
+          <LayoutDashboard className={adminTheme.pageIcon} />
+          <h1 className={adminTheme.pageTitle}>Dashboard Administrativo</h1>
+        </div>
+        <div className="space-y-4 mt-4">
+          <Skeleton className="h-10 w-full max-w-xl" />
           <div className="grid gap-4 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-32" />
+              <Skeleton key={i} className="h-28" />
             ))}
           </div>
           <div className="grid gap-4 md:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-32" />
+              <Skeleton key={i} className="h-28" />
             ))}
           </div>
         </div>
@@ -43,64 +46,63 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      <PageTitle primary="Dashboard" secondary="Administrativo" />
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <LayoutDashboard className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Dashboard Administrativo</h1>
+      </div>
 
       <PWAInstallBanner />
 
-      <Tabs defaultValue="visao-geral" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
-          <TabsTrigger value="visao-geral" className="gap-2">
-            <LayoutDashboard className="h-4 w-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Visão Geral</span>
-            <span className="sm:hidden">Geral</span>
+      <Tabs defaultValue="visao-geral" className="space-y-4">
+        <TabsList className={adminTheme.tabsList}>
+          <TabsTrigger value="visao-geral" className={adminTheme.tabsTrigger}>
+            <LayoutDashboard className={adminTheme.tabsIcon} />
+            Visão Geral
           </TabsTrigger>
-          <TabsTrigger value="usuarios" className="gap-2">
-            <Users className="h-4 w-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Usuários</span>
-            <span className="sm:hidden">Users</span>
+          <TabsTrigger value="usuarios" className={adminTheme.tabsTrigger}>
+            <Users className={adminTheme.tabsIcon} />
+            Usuários
           </TabsTrigger>
-          <TabsTrigger value="engajamento" className="gap-2">
-            <TrendingUp className="h-4 w-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Engajamento</span>
-            <span className="sm:hidden">Engaj.</span>
+          <TabsTrigger value="engajamento" className={adminTheme.tabsTrigger}>
+            <TrendingUp className={adminTheme.tabsIcon} />
+            Engajamento
           </TabsTrigger>
-          <TabsTrigger value="pagina-gratuita" className="gap-2">
-            <Eye className="h-4 w-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Página Gratuita</span>
-            <span className="sm:hidden">Grátis</span>
+          <TabsTrigger value="pagina-gratuita" className={adminTheme.tabsTrigger}>
+            <Eye className={adminTheme.tabsIcon} />
+            Página Gratuita
           </TabsTrigger>
-          <TabsTrigger value="conteudo" className="gap-2">
-            <Video className="h-4 w-4 hidden sm:inline" />
+          <TabsTrigger value="conteudo" className={adminTheme.tabsTrigger}>
+            <Video className={adminTheme.tabsIcon} />
             Conteúdo
           </TabsTrigger>
-          <TabsTrigger value="mentoria" className="gap-2">
-            <GraduationCap className="h-4 w-4 hidden sm:inline" />
+          <TabsTrigger value="mentoria" className={adminTheme.tabsTrigger}>
+            <GraduationCap className={adminTheme.tabsIcon} />
             Mentoria
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="visao-geral">
+        <TabsContent value="visao-geral" className={adminTheme.tabsContent}>
           <VisaoGeralTab data={data} />
         </TabsContent>
 
-        <TabsContent value="usuarios">
+        <TabsContent value="usuarios" className={adminTheme.tabsContent}>
           <UsuariosTab data={data} />
         </TabsContent>
 
-        <TabsContent value="engajamento">
+        <TabsContent value="engajamento" className={adminTheme.tabsContent}>
           <EngajamentoTab />
         </TabsContent>
 
-        <TabsContent value="pagina-gratuita">
+        <TabsContent value="pagina-gratuita" className={adminTheme.tabsContent}>
           <PaginaGratuitaTab />
         </TabsContent>
 
-        <TabsContent value="conteudo">
+        <TabsContent value="conteudo" className={adminTheme.tabsContent}>
           <ConteudoTab data={data} />
         </TabsContent>
 
-        <TabsContent value="mentoria">
+        <TabsContent value="mentoria" className={adminTheme.tabsContent}>
           <MentoriaTab data={data} />
         </TabsContent>
       </Tabs>

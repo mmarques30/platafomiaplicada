@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Search, ArrowUp, ArrowDown, Repeat } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ArrowUp, ArrowDown, Repeat, Bell, Calendar } from "lucide-react";
 import { AvisoModal } from "@/components/admin/AvisoModal";
 import { AulaSemanalModal } from "@/components/admin/AulaSemanalModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { FilterBar } from "@/components/admin/content/FilterBar";
 import { Input } from "@/components/ui/input";
 import { format, addDays, subDays, isAfter, isBefore, startOfDay } from "date-fns";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function GerenciarAvisos() {
   const { data: avisos, isLoading } = useAvisos();
@@ -74,19 +75,16 @@ export default function GerenciarAvisos() {
     let result = aulas || [];
     const hoje = startOfDay(new Date());
 
-    // Busca por tema
     if (buscaTema.trim()) {
       result = result.filter(a => 
         a.tema.toLowerCase().includes(buscaTema.toLowerCase())
       );
     }
 
-    // Filtro por tipo de evento
     if (tipoEventoFilter !== 'todos') {
       result = result.filter(a => a.tipo_evento === tipoEventoFilter);
     }
 
-    // Filtro por status (ativo/inativo)
     if (statusAulaFilter === 'ativo') {
       result = result.filter(a => a.ativo);
     } else if (statusAulaFilter === 'inativo') {
@@ -97,7 +95,6 @@ export default function GerenciarAvisos() {
       result = result.filter(a => !a.realizada);
     }
 
-    // Filtro por período
     if (periodoFilter === 'proximos7') {
       const limite = addDays(hoje, 7);
       result = result.filter(a => {
@@ -121,7 +118,6 @@ export default function GerenciarAvisos() {
       });
     }
 
-    // Ordenação
     result = [...result].sort((a, b) => {
       if (!a.data_aula && !b.data_aula) return 0;
       if (!a.data_aula) return 1;
@@ -133,20 +129,6 @@ export default function GerenciarAvisos() {
 
     return result;
   }, [aulas, buscaTema, tipoEventoFilter, statusAulaFilter, periodoFilter, ordenacaoAula]);
-
-  const clearAvisosFilters = () => {
-    setStatusAvisoFilter('todos');
-    setTipoAvisoFilter('todos');
-    setOrdenacaoAviso('recente');
-  };
-
-  const clearAulasFilters = () => {
-    setBuscaTema('');
-    setPeriodoFilter('todos');
-    setTipoEventoFilter('todos');
-    setStatusAulaFilter('todos');
-    setOrdenacaoAula('asc');
-  };
 
   const avisosFilters = [
     {
@@ -262,13 +244,22 @@ export default function GerenciarAvisos() {
   if (isLoading) return <div>Carregando...</div>;
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">Gerenciar Avisos e Conteúdo</h1>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <Bell className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Gerenciar Avisos e Encontros</h1>
+      </div>
 
       <Tabs defaultValue="avisos" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="avisos">Avisos</TabsTrigger>
-          <TabsTrigger value="encontros">Encontros IAplicada</TabsTrigger>
+        <TabsList className={adminTheme.tabsList}>
+          <TabsTrigger value="avisos" className={adminTheme.tabsTrigger}>
+            <Bell className={adminTheme.tabsIcon} />
+            Avisos
+          </TabsTrigger>
+          <TabsTrigger value="encontros" className={adminTheme.tabsTrigger}>
+            <Calendar className={adminTheme.tabsIcon} />
+            Encontros IAplicada
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="avisos" className="space-y-4">
@@ -277,37 +268,37 @@ export default function GerenciarAvisos() {
             totalItems={avisos?.length || 0}
             filteredItems={avisosFiltrados.length}
             actionButton={
-              <Button onClick={() => setIsModalOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button size="sm" onClick={() => setIsModalOpen(true)}>
+                <Plus className="mr-1.5 h-3.5 w-3.5" />
                 Novo Aviso
               </Button>
             }
           />
 
-          <div className="border rounded-lg">
+          <div className={adminTheme.tableContainer}>
             <Table>
-              <TableHeader>
+              <TableHeader className={adminTheme.tableHeader}>
                 <TableRow>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Visível Para</TableHead>
-                  <TableHead>Expiração</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Título</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Tipo</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Visível Para</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Expiração</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Status</TableHead>
+                  <TableHead className={`${adminTheme.tableHeaderCell} text-right`}>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {avisosFiltrados.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                       Nenhum aviso encontrado
                     </TableCell>
                   </TableRow>
                 ) : (
                   avisosFiltrados.map((aviso) => (
-                    <TableRow key={aviso.id}>
+                    <TableRow key={aviso.id} className={adminTheme.tableRow}>
                       <TableCell className="font-medium">{aviso.titulo}</TableCell>
-                      <TableCell><Badge>{aviso.tipo}</Badge></TableCell>
+                      <TableCell><Badge variant="secondary" className="text-xs">{aviso.tipo}</Badge></TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {aviso.visivel_para?.map((plano: string) => (
@@ -317,18 +308,18 @@ export default function GerenciarAvisos() {
                           )) || <span className="text-muted-foreground text-xs">Todos</span>}
                         </div>
                       </TableCell>
-                      <TableCell>{aviso.data_expiracao ? format(new Date(aviso.data_expiracao), "dd/MM/yyyy") : "-"}</TableCell>
+                      <TableCell className="text-sm">{aviso.data_expiracao ? format(new Date(aviso.data_expiracao), "dd/MM/yyyy") : "-"}</TableCell>
                       <TableCell>
-                        <Badge variant={aviso.ativo ? "default" : "secondary"}>
+                        <Badge variant={aviso.ativo ? "default" : "secondary"} className="text-xs">
                           {aviso.ativo ? "Ativo" : "Inativo"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="sm" onClick={() => { setEditingAviso(aviso); setIsModalOpen(true); }}>
-                          <Edit className="h-4 w-4" />
+                      <TableCell className="text-right space-x-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditingAviso(aviso); setIsModalOpen(true); }}>
+                          <Edit className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(aviso.id)}>
-                          <Trash2 className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDeleteId(aviso.id)}>
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -340,14 +331,13 @@ export default function GerenciarAvisos() {
         </TabsContent>
 
         <TabsContent value="encontros" className="space-y-4">
-          {/* Campo de busca por tema */}
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por tema..."
               value={buscaTema}
               onChange={(e) => setBuscaTema(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-9"
             />
           </div>
 
@@ -356,20 +346,20 @@ export default function GerenciarAvisos() {
             totalItems={aulas?.length || 0}
             filteredItems={aulasFiltradas.length}
             actionButton={
-              <Button onClick={() => { setEditingAula(null); setIsAulaModalOpen(true); }}>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button size="sm" onClick={() => { setEditingAula(null); setIsAulaModalOpen(true); }}>
+                <Plus className="mr-1.5 h-3.5 w-3.5" />
                 Novo Encontro
               </Button>
             }
           />
 
-          <div className="border rounded-lg">
+          <div className={adminTheme.tableContainer}>
             <Table>
-              <TableHeader>
+              <TableHeader className={adminTheme.tableHeader}>
                 <TableRow>
-                  <TableHead>Tema</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Tema</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Tipo</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>
                     <div className="flex items-center gap-1">
                       Data
                       {ordenacaoAula === 'asc' ? (
@@ -379,70 +369,72 @@ export default function GerenciarAvisos() {
                       )}
                     </div>
                   </TableHead>
-                  <TableHead>Horário</TableHead>
-                  <TableHead>Recorrente</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Realização</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Horário</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Recorrente</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Status</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Realização</TableHead>
+                  <TableHead className={`${adminTheme.tableHeaderCell} text-right`}>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoadingAulas ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center">Carregando...</TableCell>
+                    <TableCell colSpan={8} className="text-center py-8">Carregando...</TableCell>
                   </TableRow>
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
-                    <TableRow key={aula.id}>
+                    <TableRow key={aula.id} className={adminTheme.tableRow}>
                       <TableCell className="font-medium">{aula.tema}</TableCell>
                       <TableCell>
-                        <Badge variant={getTipoEventoBadgeVariant(aula.tipo_evento)}>
+                        <Badge variant={getTipoEventoBadgeVariant(aula.tipo_evento)} className="text-xs">
                           {getTipoEventoLabel(aula.tipo_evento)}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-sm">
                         {aula.data_aula ? format(new Date(aula.data_aula), "dd/MM/yyyy") : "-"}
                       </TableCell>
-                      <TableCell>{aula.horario || "-"}</TableCell>
+                      <TableCell className="text-sm">{aula.horario || "-"}</TableCell>
                       <TableCell>
                         {aula.recorrente && (
                           <Repeat className="h-4 w-4 text-primary" />
                         )}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={aula.ativo ? "default" : "secondary"}>
+                        <Badge variant={aula.ativo ? "default" : "secondary"} className="text-xs">
                           {aula.ativo ? "Ativo" : "Inativo"}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={aula.realizada ? "default" : "outline"} className={aula.realizada ? "bg-green-600" : ""}>
+                        <Badge variant={aula.realizada ? "default" : "outline"} className={`text-xs ${aula.realizada ? "bg-green-600" : ""}`}>
                           {aula.realizada ? "Realizada" : "Pendente"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right space-x-2">
+                      <TableCell className="text-right space-x-1">
                         <Button 
                           variant="ghost" 
-                          size="sm" 
+                          size="icon"
+                          className="h-8 w-8"
                           onClick={() => { 
                             setEditingAula(aula); 
                             setIsAulaModalOpen(true); 
                           }}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-3.5 w-3.5" />
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="sm" 
+                          size="icon"
+                          className="h-8 w-8"
                           onClick={() => setDeleteAulaId(aula.id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                       Nenhum encontro encontrado
                     </TableCell>
                   </TableRow>
@@ -471,41 +463,37 @@ export default function GerenciarAvisos() {
         aula={editingAula} 
       />
 
+      {/* Delete Aviso Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão do aviso</AlertDialogTitle>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja excluir este aviso? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { 
-              if (deleteId) deleteAviso.mutate(deleteId); 
-              setDeleteId(null); 
-            }}>
-              Deletar
+            <AlertDialogAction onClick={() => { if (deleteId) deleteAviso.mutate(deleteId); setDeleteId(null); }}>
+              Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Delete Aula Dialog */}
       <AlertDialog open={!!deleteAulaId} onOpenChange={() => setDeleteAulaId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão do encontro</AlertDialogTitle>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja excluir este encontro? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { 
-              if (deleteAulaId) deleteAula.mutate(deleteAulaId); 
-              setDeleteAulaId(null); 
-            }}>
-              Deletar
+            <AlertDialogAction onClick={() => { if (deleteAulaId) deleteAula.mutate(deleteAulaId); setDeleteAulaId(null); }}>
+              Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

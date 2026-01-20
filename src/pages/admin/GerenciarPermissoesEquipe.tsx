@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Shield, Users } from "lucide-react";
-import { PageTitle } from "@/components/shared/PageTitle";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function GerenciarPermissoesEquipe() {
   const { allPermissions, isLoading, togglePermission } = useManageAdminPermissions();
@@ -21,9 +21,12 @@ export default function GerenciarPermissoesEquipe() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <PageTitle primary="Permissões" secondary="da Equipe" />
-        <Card>
+      <div className={adminTheme.page}>
+        <div className={adminTheme.pageTitleWrapper}>
+          <Shield className={adminTheme.pageIcon} />
+          <h1 className={adminTheme.pageTitle}>Permissões da Equipe</h1>
+        </div>
+        <Card className={adminTheme.card}>
           <CardContent className="p-6">
             <div className="space-y-4">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -64,20 +67,19 @@ export default function GerenciarPermissoesEquipe() {
   const categoryOrder = ["Geral", "Usuários", "Conteúdo", "Mentoria", "Comunicação", "Gestão", "Sistema"];
 
   return (
-    <div className="space-y-6">
-      <PageTitle 
-        primary="Permissões" 
-        secondary="da Equipe"
-        icon={<Shield className="h-7 w-7 text-primary" />}
-      />
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <Shield className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Permissões da Equipe</h1>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+      <Card className={adminTheme.card}>
+        <CardHeader className={adminTheme.cardHeader}>
+          <CardTitle className={`${adminTheme.cardTitle} flex items-center gap-2`}>
+            <Users className="h-4 w-4" />
             Páginas do Painel Administrativo
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm">
             Ative ou desative o acesso a cada página para usuários da equipe. 
             Administradores sempre têm acesso total.
           </CardDescription>
@@ -90,18 +92,18 @@ export default function GerenciarPermissoesEquipe() {
 
               return (
                 <div key={category}>
-                  <h3 className="font-semibold text-sm text-muted-foreground mb-3 uppercase tracking-wider">
+                  <h3 className="font-semibold text-xs text-muted-foreground mb-3 uppercase tracking-wider">
                     {category}
                   </h3>
                   <div className="space-y-2">
                     {permissions.map((permission) => (
                       <div
                         key={permission.id}
-                        className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                        className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-card hover:bg-muted/30 transition-colors"
                       >
                         <div className="flex-1">
-                          <p className="font-medium">{permission.admin_label}</p>
-                          <p className="text-sm text-muted-foreground">{permission.admin_path}</p>
+                          <p className="font-medium text-sm">{permission.admin_label}</p>
+                          <p className="text-xs text-muted-foreground">{permission.admin_path}</p>
                         </div>
                         <Switch
                           checked={permission.can_access}

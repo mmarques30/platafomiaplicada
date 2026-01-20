@@ -20,9 +20,10 @@ import {
 } from "@/components/ui/select";
 import { useCandidaturas } from "@/hooks/useCandidaturasMentoria";
 import { CandidaturaDetalhesDrawer } from "@/components/admin/CandidaturaDetalhesDrawer";
-import { Eye, Search, UserCheck, Users, TrendingUp } from "lucide-react";
+import { Eye, Search, UserCheck, Users, TrendingUp, ClipboardList } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 const statusColors: Record<string, string> = {
   nova: "bg-yellow-500",
@@ -67,124 +68,121 @@ export default function GerenciarCandidaturas() {
     : 0;
 
   return (
-    <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Candidaturas à Mentoria</h1>
-          <p className="text-muted-foreground">
-            Gerencie todas as candidaturas recebidas
-          </p>
-        </div>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <ClipboardList className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Candidaturas à Mentoria</h1>
+        <Badge variant="secondary" className="text-xs">{candidaturas?.length || 0}</Badge>
+      </div>
 
-        {/* Métricas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total de Candidaturas
-              </CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{candidaturas?.length || 0}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Novas (7d)</CardTitle>
-              <UserCheck className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{novas7d}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
-                Taxa de Aprovação
-              </CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{taxaAprovacao}%</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filtros */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por nome ou email..."
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todas">Todas</SelectItem>
-                  <SelectItem value="nova">Nova</SelectItem>
-                  <SelectItem value="em_analise">Em Análise</SelectItem>
-                  <SelectItem value="aprovada">Aprovada</SelectItem>
-                  <SelectItem value="reprovada">Reprovada</SelectItem>
-                  <SelectItem value="aguardando_contato">
-                    Aguardando Contato
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Métricas */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className={adminTheme.card}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total de Candidaturas
+            </CardTitle>
+            <Users className={adminTheme.statsIcon} />
+          </CardHeader>
+          <CardContent>
+            <div className={adminTheme.statsValue}>{candidaturas?.length || 0}</div>
           </CardContent>
         </Card>
 
-        {/* Tabela */}
-        <Card>
-          <CardContent className="pt-6">
-            {isLoading ? (
-              <div className="text-center py-8">Carregando...</div>
-            ) : candidaturasFiltradas && candidaturasFiltradas.length > 0 ? (
-              <div className="overflow-x-auto">
-                <Table>
-                <TableHeader>
+        <Card className={adminTheme.card}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Novas (7d)</CardTitle>
+            <UserCheck className={adminTheme.statsIcon} />
+          </CardHeader>
+          <CardContent>
+            <div className={adminTheme.statsValue}>{novas7d}</div>
+          </CardContent>
+        </Card>
+
+        <Card className={adminTheme.card}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Taxa de Aprovação
+            </CardTitle>
+            <TrendingUp className={adminTheme.statsIcon} />
+          </CardHeader>
+          <CardContent>
+            <div className={adminTheme.statsValue}>{taxaAprovacao}%</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filtros */}
+      <Card className={adminTheme.card}>
+        <CardContent className="pt-4">
+          <div className="flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nome ou email..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="pl-10 h-9"
+              />
+            </div>
+            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+              <SelectTrigger className="w-[200px] h-9">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todas</SelectItem>
+                <SelectItem value="nova">Nova</SelectItem>
+                <SelectItem value="em_analise">Em Análise</SelectItem>
+                <SelectItem value="aprovada">Aprovada</SelectItem>
+                <SelectItem value="reprovada">Reprovada</SelectItem>
+                <SelectItem value="aguardando_contato">Aguardando Contato</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Tabela */}
+      <Card className={adminTheme.card}>
+        <CardContent className="pt-4">
+          {isLoading ? (
+            <div className="text-center py-8">Carregando...</div>
+          ) : candidaturasFiltradas && candidaturasFiltradas.length > 0 ? (
+            <div className={adminTheme.tableContainer}>
+              <Table>
+                <TableHeader className={adminTheme.tableHeader}>
                   <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Cargo</TableHead>
-                    <TableHead>Origem</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Ações</TableHead>
+                    <TableHead className={adminTheme.tableHeaderCell}>Nome</TableHead>
+                    <TableHead className={adminTheme.tableHeaderCell}>Email</TableHead>
+                    <TableHead className={adminTheme.tableHeaderCell}>Cargo</TableHead>
+                    <TableHead className={adminTheme.tableHeaderCell}>Origem</TableHead>
+                    <TableHead className={adminTheme.tableHeaderCell}>Status</TableHead>
+                    <TableHead className={adminTheme.tableHeaderCell}>Data</TableHead>
+                    <TableHead className={adminTheme.tableHeaderCell}>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {candidaturasFiltradas?.map((candidatura) => (
-                    <TableRow key={candidatura.id}>
+                    <TableRow key={candidatura.id} className={adminTheme.tableRow}>
                       <TableCell className="font-medium">
                         {candidatura.nome_completo}
                       </TableCell>
-                      <TableCell>{candidatura.email}</TableCell>
-                      <TableCell className="capitalize">
+                      <TableCell className="text-sm">{candidatura.email}</TableCell>
+                      <TableCell className="capitalize text-sm">
                         {candidatura.cargo_atual || "-"}
                       </TableCell>
                       <TableCell>
                         {candidatura.origem_pagina === 'aplique' && candidatura.is_visitante_origem ? (
-                          <Badge className="bg-yellow-500 text-white">
+                          <Badge className="bg-yellow-500 text-white text-xs">
                             Visitante (Aplique)
                           </Badge>
                         ) : candidatura.origem_pagina === 'avance' && candidatura.plano_origem ? (
-                          <Badge className={
+                          <Badge className={`text-xs ${
                             candidatura.plano_origem === 'academy' ? 'bg-green-500 text-white' :
                             candidatura.plano_origem === 'lab' ? 'bg-blue-500 text-white' :
                             candidatura.plano_origem === 'club' ? 'bg-purple-500 text-white' :
                             'bg-gray-500 text-white'
-                          }>
+                          }`}>
                             {candidatura.plano_origem === 'academy' ? 'Academy (Avance)' :
                              candidatura.plano_origem === 'lab' ? 'Lab (Avance)' :
                              candidatura.plano_origem === 'club' ? 'Club (Avance)' :
@@ -192,56 +190,47 @@ export default function GerenciarCandidaturas() {
                              'Avance'}
                           </Badge>
                         ) : (
-                          <Badge variant="outline">
-                            Direto
-                          </Badge>
+                          <Badge variant="outline" className="text-xs">Direto</Badge>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          className={`${
-                            statusColors[candidatura.status]
-                          } text-white`}
-                        >
+                        <Badge className={`${statusColors[candidatura.status]} text-white text-xs`}>
                           {statusLabels[candidatura.status]}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        {format(
-                          new Date(candidatura.created_at),
-                          "dd/MM/yyyy",
-                          { locale: ptBR }
-                        )}
+                      <TableCell className="text-sm">
+                        {format(new Date(candidatura.created_at), "dd/MM/yyyy", { locale: ptBR })}
                       </TableCell>
                       <TableCell>
                         <Button
                           size="sm"
                           variant="outline"
+                          className="h-8 text-xs"
                           onClick={() => setSelectedCandidatura(candidatura)}
                         >
-                          <Eye className="h-4 w-4 mr-2" />
-                          Ver Detalhes
+                          <Eye className="h-3.5 w-3.5 mr-1" />
+                          Ver
                         </Button>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                Nenhuma candidatura encontrada
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhuma candidatura encontrada
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-        {/* Drawer de Detalhes */}
-        <CandidaturaDetalhesDrawer
-          candidatura={selectedCandidatura}
-          open={!!selectedCandidatura}
-          onClose={() => setSelectedCandidatura(null)}
-        />
-      </div>
+      {/* Drawer de Detalhes */}
+      <CandidaturaDetalhesDrawer
+        candidatura={selectedCandidatura}
+        open={!!selectedCandidatura}
+        onClose={() => setSelectedCandidatura(null)}
+      />
+    </div>
   );
 }

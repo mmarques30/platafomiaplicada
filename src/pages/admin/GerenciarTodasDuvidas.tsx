@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useTodasDuvidas } from "@/hooks/useTodasDuvidas";
 import { formatDistanceToNow } from "date-fns";
@@ -28,6 +27,7 @@ import { MessageCircle, Search, AlertCircle, CheckCircle2, Clock, Video, Setting
 import { ResponderDuvidaModal } from "@/components/admin/mentoria/ResponderDuvidaModal";
 import { CategoriasQATab } from "@/components/admin/mentoria/CategoriasQATab";
 import type { DuvidaMentoria } from "@/hooks/useDuvidasMentoria";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function GerenciarTodasDuvidas() {
   const { duvidas, isLoading } = useTodasDuvidas();
@@ -57,11 +57,11 @@ export default function GerenciarTodasDuvidas() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "respondida":
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+        return <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />;
       case "em_analise":
-        return <AlertCircle className="h-4 w-4 text-blue-600" />;
+        return <AlertCircle className="h-3.5 w-3.5 text-blue-600" />;
       default:
-        return <Clock className="h-4 w-4 text-yellow-600" />;
+        return <Clock className="h-3.5 w-3.5 text-yellow-600" />;
     }
   };
 
@@ -117,29 +117,25 @@ export default function GerenciarTodasDuvidas() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className={adminTheme.page}>
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <MessageCircle className="h-8 w-8 text-primary" />
-          Central de Dúvidas
-        </h1>
-        <p className="text-muted-foreground">
-          Gerencie todas as dúvidas dos mentorados e categorias Q&A
-        </p>
+      <div className={adminTheme.pageTitleWrapper}>
+        <MessageCircle className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Central de Dúvidas</h1>
+        <Badge variant="secondary" className="text-xs">{duvidas.length}</Badge>
       </div>
 
       {/* Categorias Q&A - Collapsible */}
       <Collapsible>
-        <Card>
+        <Card className={adminTheme.card}>
           <CollapsibleTrigger asChild>
-            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-              <CardTitle className="flex items-center justify-between">
+            <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors py-3">
+              <CardTitle className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
+                  <Settings className="h-4 w-4" />
                   Gerenciar Categorias Q&A
                 </span>
-                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </CardTitle>
             </CardHeader>
           </CollapsibleTrigger>
@@ -153,59 +149,49 @@ export default function GerenciarTodasDuvidas() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total de Dúvidas
-            </CardTitle>
+        <Card className={adminTheme.card}>
+          <CardHeader className="pb-2 pt-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground">Total de Dúvidas</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-3">
             <p className="text-2xl font-bold">{duvidas.length}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pendentes
-            </CardTitle>
+        <Card className={adminTheme.card}>
+          <CardHeader className="pb-2 pt-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground">Pendentes</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-3">
             <p className="text-2xl font-bold text-yellow-600">
               {duvidas.filter((d) => d.status === "pendente").length}
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Em Análise
-            </CardTitle>
+        <Card className={adminTheme.card}>
+          <CardHeader className="pb-2 pt-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground">Em Análise</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-3">
             <p className="text-2xl font-bold text-blue-600">
               {duvidas.filter((d) => d.status === "em_analise").length}
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Respondidas
-            </CardTitle>
+        <Card className={adminTheme.card}>
+          <CardHeader className="pb-2 pt-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground">Respondidas</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-3">
             <p className="text-2xl font-bold text-green-600">
               {duvidas.filter((d) => d.status === "respondida").length}
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Solicitações Q&A
-            </CardTitle>
+        <Card className={adminTheme.card}>
+          <CardHeader className="pb-2 pt-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground">Solicitações Q&A</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-3">
             <p className="text-2xl font-bold text-primary">
               {duvidas.filter((d) => d.publicar_qa).length}
             </p>
@@ -214,11 +200,11 @@ export default function GerenciarTodasDuvidas() {
       </div>
 
       {/* Filtros */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
+      <Card className={adminTheme.card}>
+        <CardHeader className="py-3">
+          <CardTitle className="text-sm">Filtros</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pb-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -226,11 +212,11 @@ export default function GerenciarTodasDuvidas() {
                 placeholder="Buscar por título ou mentorado..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
+                className="pl-9 h-9"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="h-9">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -241,7 +227,7 @@ export default function GerenciarTodasDuvidas() {
               </SelectContent>
             </Select>
             <Select value={prioridadeFilter} onValueChange={setPrioridadeFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="h-9">
                 <SelectValue placeholder="Prioridade" />
               </SelectTrigger>
               <SelectContent>
@@ -255,7 +241,7 @@ export default function GerenciarTodasDuvidas() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select value={qaFilter} onValueChange={setQaFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="h-9">
                 <SelectValue placeholder="Status Q&A" />
               </SelectTrigger>
               <SelectContent>
@@ -265,7 +251,7 @@ export default function GerenciarTodasDuvidas() {
               </SelectContent>
             </Select>
             <Select value={categoriaQAFilter} onValueChange={setCategoriaQAFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="h-9">
                 <SelectValue placeholder="Categoria Q&A" />
               </SelectTrigger>
               <SelectContent>
@@ -282,92 +268,95 @@ export default function GerenciarTodasDuvidas() {
       </Card>
 
       {/* Tabela de Dúvidas */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Dúvidas ({filteredDuvidas.length})</CardTitle>
+      <Card className={adminTheme.card}>
+        <CardHeader className="py-3">
+          <CardTitle className="text-sm">Dúvidas ({filteredDuvidas.length})</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Mentorado</TableHead>
-                <TableHead>Título</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Prioridade</TableHead>
-                <TableHead>Q&A</TableHead>
-                <TableHead>SLA</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredDuvidas.length === 0 ? (
+        <CardContent className="pb-4">
+          <div className={adminTheme.tableContainer}>
+            <Table>
+              <TableHeader className={adminTheme.tableHeader}>
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                    Nenhuma dúvida encontrada
-                  </TableCell>
+                  <TableHead className={adminTheme.tableHeaderCell}>Mentorado</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Título</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Status</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Prioridade</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Q&A</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>SLA</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Data</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Ações</TableHead>
                 </TableRow>
-              ) : (
-                filteredDuvidas.map((duvida) => {
-                  const slaInfo = getSLAInfo(duvida.prazo_sla, duvida.status, duvida.atrasada);
-                  return (
-                    <TableRow key={duvida.id}>
-                      <TableCell className="font-medium">
-                        {duvida.profiles.nome_completo}
-                      </TableCell>
-                      <TableCell className="max-w-xs truncate">{duvida.titulo}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {getStatusIcon(duvida.status)}
-                          <span className="text-sm">{getStatusLabel(duvida.status)}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getPrioridadeColor(duvida.prioridade)}>
-                          {duvida.prioridade.charAt(0).toUpperCase() + duvida.prioridade.slice(1)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {duvida.publicar_qa ? (
-                          <div className="flex items-center gap-2">
-                            <Badge variant="default" className="bg-primary">
-                              {duvida.categorias_qa?.nome || "Q&A"}
-                            </Badge>
-                            {duvida.video_qa_url && (
-                              <Video className="h-4 w-4 text-primary" />
-                            )}
+              </TableHeader>
+              <TableBody>
+                {filteredDuvidas.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      Nenhuma dúvida encontrada
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredDuvidas.map((duvida) => {
+                    const slaInfo = getSLAInfo(duvida.prazo_sla, duvida.status, duvida.atrasada);
+                    return (
+                      <TableRow key={duvida.id} className={adminTheme.tableRow}>
+                        <TableCell className="font-medium text-sm">
+                          {duvida.profiles.nome_completo}
+                        </TableCell>
+                        <TableCell className="max-w-xs truncate text-sm">{duvida.titulo}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1.5">
+                            {getStatusIcon(duvida.status)}
+                            <span className="text-xs">{getStatusLabel(duvida.status)}</span>
                           </div>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className={`text-sm font-medium ${slaInfo.color}`}>
-                          {slaInfo.text}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {formatDistanceToNow(new Date(duvida.created_at), {
-                          addSuffix: true,
-                          locale: ptBR,
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        {duvida.status !== "respondida" && (
-                          <Button
-                            size="sm"
-                            onClick={() => setSelectedDuvida(duvida as any)}
-                          >
-                            Responder
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={getPrioridadeColor(duvida.prioridade)} className="text-xs">
+                            {duvida.prioridade.charAt(0).toUpperCase() + duvida.prioridade.slice(1)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {duvida.publicar_qa ? (
+                            <div className="flex items-center gap-1.5">
+                              <Badge variant="default" className="bg-primary text-xs">
+                                {duvida.categorias_qa?.nome || "Q&A"}
+                              </Badge>
+                              {duvida.video_qa_url && (
+                                <Video className="h-3.5 w-3.5 text-primary" />
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <span className={`text-xs font-medium ${slaInfo.color}`}>
+                            {slaInfo.text}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(duvida.created_at), {
+                            addSuffix: true,
+                            locale: ptBR,
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          {duvida.status !== "respondida" && (
+                            <Button
+                              size="sm"
+                              className="h-8 text-xs"
+                              onClick={() => setSelectedDuvida(duvida as any)}
+                            >
+                              Responder
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
