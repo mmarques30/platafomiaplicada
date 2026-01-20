@@ -9,7 +9,7 @@ export default function MeuDiagnostico() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
-  const { effectivePlan, isVisitante, isBusiness, isLoading: planLoading } = useEffectivePlan(isAdmin);
+  const { effectivePlan, isVisitante, isBusiness, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
   
   // Ref para garantir que o redirect aconteça apenas UMA vez
   const hasRedirected = useRef(false);
@@ -17,7 +17,8 @@ export default function MeuDiagnostico() {
   // Lógica de redirecionamento UNIFICADA - aguarda TODOS os loadings
   useEffect(() => {
     // Aguardar TUDO carregar antes de tomar qualquer decisão
-    if (isLoading || roleLoading || planLoading) return;
+    // roleLoading já está incluído em planLoading via useEffectivePlan
+    if (isLoading || planLoading) return;
     
     // Evitar múltiplos redirects
     if (hasRedirected.current) return;
@@ -44,7 +45,7 @@ export default function MeuDiagnostico() {
     } else {
       navigate('/diagnostico/formulario', { replace: true });
     }
-  }, [isLoading, roleLoading, planLoading, isVisitante, isBusiness, isAdmin, formulario, navigate]);
+  }, [isLoading, planLoading, isVisitante, isBusiness, isAdmin, formulario, navigate]);
 
   // Tela de loading enquanto redireciona
   return (

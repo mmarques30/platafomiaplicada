@@ -65,8 +65,11 @@ export function useUserPlan() {
 }
 
 // Hook separado para obter plano efetivo considerando admin e viewAs
-export function useEffectivePlan(isAdmin: boolean) {
-  const { plan, hasAccessTo, isLoading, isAcademy, isSkills, isBusiness, isVisitante: isRealVisitante } = useUserPlan();
+export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = false) {
+  const { plan, hasAccessTo, isLoading: planLoading, isAcademy, isSkills, isBusiness, isVisitante: isRealVisitante } = useUserPlan();
+  
+  // isLoading combinado inclui o carregamento do role para evitar race conditions
+  const isLoading = planLoading || isAdminLoading;
   
   // Obter o viewAs do context (safe access)
   let viewAs: AdminViewMode = null;
