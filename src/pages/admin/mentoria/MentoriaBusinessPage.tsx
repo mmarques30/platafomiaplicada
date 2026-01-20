@@ -8,7 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, CheckSquare, Calendar, FolderKanban, Route, Plus, RefreshCw, Target, Pencil, Trash2, ClipboardList } from "lucide-react";
+import { ArrowLeft, Users, FileText, CheckSquare, Calendar, FolderKanban, Route, Plus, RefreshCw, Target, Pencil, Trash2, ClipboardList, ClipboardCheck } from "lucide-react";
+import TasksBusinessManager from "@/components/admin/business/TasksBusinessManager";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
 import { EtapasManager } from "@/components/admin/business/EtapasManager";
 import { ContratoBusinessManager } from "@/components/admin/business/ContratoBusinessManager";
@@ -118,7 +120,7 @@ export default function MentoriaBusinessPage() {
 
       {selectedUserId && (
         <Tabs defaultValue="contrato" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="contrato">
               <ClipboardList className="h-4 w-4 mr-2" />
               Contrato
@@ -135,9 +137,13 @@ export default function MentoriaBusinessPage() {
               <Calendar className="h-4 w-4 mr-2" />
               Sessões
             </TabsTrigger>
-            <TabsTrigger value="projetos">
+            <TabsTrigger value="entregas">
               <FolderKanban className="h-4 w-4 mr-2" />
-              Projetos
+              Entregas
+            </TabsTrigger>
+            <TabsTrigger value="tasks">
+              <ClipboardCheck className="h-4 w-4 mr-2" />
+              Tasks
             </TabsTrigger>
             <TabsTrigger value="tarefas">
               <CheckSquare className="h-4 w-4 mr-2" />
