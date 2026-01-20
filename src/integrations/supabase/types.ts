@@ -943,21 +943,31 @@ export type Database = {
       }
       contratos_business: {
         Row: {
+          cases_referencia: string | null
           cnpj: string | null
+          contexto_transformacao: string | null
           created_at: string
           creditos_iniciais: number | null
           data_assinatura: string | null
           data_fim: string | null
           data_inicio: string | null
+          desafios_estrategicos: Json | null
+          desafios_operacionais: Json | null
+          dores_mapeadas: Json | null
           duracao_academy_meses: number | null
           endereco: string | null
           entregas_esperadas: Json | null
+          fases_projeto: Json | null
+          garantias: Json | null
           id: string
+          metricas_performance: Json | null
           modulos_contratados: number
           modulos_selecionados: Json | null
           multa_rescisao_percentual: number | null
+          nome_empresa: string | null
           numero_parcelas: number | null
           observacoes: string | null
+          proximos_passos: Json | null
           razao_social: string | null
           reports_frequencia: string | null
           representante_cpf: string | null
@@ -966,6 +976,8 @@ export type Database = {
           representante_rg: string | null
           reunioes_mensais: number
           roi_projetado: number | null
+          setor_atuacao: string | null
+          solucao_proposta: Json | null
           status: string | null
           suporte_tipo: string | null
           tabela_manutencao: Json | null
@@ -979,21 +991,31 @@ export type Database = {
           valor_parcela: number | null
         }
         Insert: {
+          cases_referencia?: string | null
           cnpj?: string | null
+          contexto_transformacao?: string | null
           created_at?: string
           creditos_iniciais?: number | null
           data_assinatura?: string | null
           data_fim?: string | null
           data_inicio?: string | null
+          desafios_estrategicos?: Json | null
+          desafios_operacionais?: Json | null
+          dores_mapeadas?: Json | null
           duracao_academy_meses?: number | null
           endereco?: string | null
           entregas_esperadas?: Json | null
+          fases_projeto?: Json | null
+          garantias?: Json | null
           id?: string
+          metricas_performance?: Json | null
           modulos_contratados?: number
           modulos_selecionados?: Json | null
           multa_rescisao_percentual?: number | null
+          nome_empresa?: string | null
           numero_parcelas?: number | null
           observacoes?: string | null
+          proximos_passos?: Json | null
           razao_social?: string | null
           reports_frequencia?: string | null
           representante_cpf?: string | null
@@ -1002,6 +1024,8 @@ export type Database = {
           representante_rg?: string | null
           reunioes_mensais?: number
           roi_projetado?: number | null
+          setor_atuacao?: string | null
+          solucao_proposta?: Json | null
           status?: string | null
           suporte_tipo?: string | null
           tabela_manutencao?: Json | null
@@ -1015,21 +1039,31 @@ export type Database = {
           valor_parcela?: number | null
         }
         Update: {
+          cases_referencia?: string | null
           cnpj?: string | null
+          contexto_transformacao?: string | null
           created_at?: string
           creditos_iniciais?: number | null
           data_assinatura?: string | null
           data_fim?: string | null
           data_inicio?: string | null
+          desafios_estrategicos?: Json | null
+          desafios_operacionais?: Json | null
+          dores_mapeadas?: Json | null
           duracao_academy_meses?: number | null
           endereco?: string | null
           entregas_esperadas?: Json | null
+          fases_projeto?: Json | null
+          garantias?: Json | null
           id?: string
+          metricas_performance?: Json | null
           modulos_contratados?: number
           modulos_selecionados?: Json | null
           multa_rescisao_percentual?: number | null
+          nome_empresa?: string | null
           numero_parcelas?: number | null
           observacoes?: string | null
+          proximos_passos?: Json | null
           razao_social?: string | null
           reports_frequencia?: string | null
           representante_cpf?: string | null
@@ -1038,6 +1072,8 @@ export type Database = {
           representante_rg?: string | null
           reunioes_mensais?: number
           roi_projetado?: number | null
+          setor_atuacao?: string | null
+          solucao_proposta?: Json | null
           status?: string | null
           suporte_tipo?: string | null
           tabela_manutencao?: Json | null
@@ -3406,6 +3442,97 @@ export type Database = {
             columns: ["sessao_id"]
             isOneToOne: false
             referencedRelation: "sessoes_mentoria"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks_business: {
+        Row: {
+          arquivo_resposta_url: string | null
+          contrato_id: string | null
+          created_at: string | null
+          created_by: string | null
+          data_resposta: string | null
+          descricao: string | null
+          documento_url: string | null
+          entrega_id: string | null
+          etapa_id: string | null
+          id: string
+          instrucoes_validacao: string | null
+          link_referencia: string | null
+          prazo: string | null
+          prioridade: string | null
+          resposta_mentorado: string | null
+          status: string | null
+          tipo: string | null
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          arquivo_resposta_url?: string | null
+          contrato_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data_resposta?: string | null
+          descricao?: string | null
+          documento_url?: string | null
+          entrega_id?: string | null
+          etapa_id?: string | null
+          id?: string
+          instrucoes_validacao?: string | null
+          link_referencia?: string | null
+          prazo?: string | null
+          prioridade?: string | null
+          resposta_mentorado?: string | null
+          status?: string | null
+          tipo?: string | null
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          arquivo_resposta_url?: string | null
+          contrato_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data_resposta?: string | null
+          descricao?: string | null
+          documento_url?: string | null
+          entrega_id?: string | null
+          etapa_id?: string | null
+          id?: string
+          instrucoes_validacao?: string | null
+          link_referencia?: string | null
+          prazo?: string | null
+          prioridade?: string | null
+          resposta_mentorado?: string | null
+          status?: string | null
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_business_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "entregas_business"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_business_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas_business"
             referencedColumns: ["id"]
           },
         ]
