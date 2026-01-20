@@ -32,8 +32,8 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, isMentorado } = useUserRole();
-  const { effectivePlan, isVisitante } = useEffectivePlan(isAdmin);
+  const { isAdmin, isMentorado, isLoading: roleLoading } = useUserRole();
+  const { effectivePlan, isVisitante, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading);
   const { isViewingAs, resetView } = useAdminViewContext();
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
@@ -58,14 +58,16 @@ export function AppSidebar() {
   const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key);
   
   // Filtrar para visitantes: apenas início (sem submenus expansíveis)
-  const mainMenus = isVisitante 
+  // Enquanto loading, não filtra como visitante para evitar flicker
+  const isLoadingState = roleLoading || effectivePlanLoading;
+  const mainMenus = (!isLoadingState && isVisitante)
     ? allMainMenus.filter(menu => menu.menu_key === 'inicio')
     : allMainMenus;
   
   // Obter submenus de um parent
   const getSubMenus = (parentKey: string) => {
-    // Visitantes não têm submenus - retornar vazio
-    if (isVisitante) {
+    // Visitantes não têm submenus - retornar vazio (só quando não está carregando)
+    if (!isLoadingState && isVisitante) {
       return [];
     }
     return sidebarMenus.filter(menu => menu.parent_key === parentKey);
