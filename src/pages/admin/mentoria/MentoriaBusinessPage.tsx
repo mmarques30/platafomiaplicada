@@ -7,12 +7,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks } from "lucide-react";
 import TasksBusinessManager from "@/components/admin/business/TasksBusinessManager";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { EtapasManager } from "@/components/admin/business/EtapasManager";
 import { ContratoBusinessManager } from "@/components/admin/business/ContratoBusinessManager";
 import { ReportsBusinessManager } from "@/components/admin/business/ReportsBusinessManager";
+import { InstrucoesBusinessManager } from "@/components/admin/business/InstrucoesBusinessManager";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
@@ -126,6 +127,10 @@ export default function MentoriaBusinessPage() {
               <FolderKanban className="h-3.5 w-3.5" />
               Entregas
             </TabsTrigger>
+            <TabsTrigger value="instrucoes" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <ListChecks className="h-3.5 w-3.5" />
+              Instruções
+            </TabsTrigger>
             <TabsTrigger value="tasks" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <ClipboardCheck className="h-3.5 w-3.5" />
               Tasks
@@ -211,6 +216,25 @@ export default function MentoriaBusinessPage() {
                   <FolderKanban className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
                   <p className="font-medium">Crie um contrato primeiro</p>
                   <p className="text-sm text-muted-foreground">Para gerenciar entregas, crie o contrato na aba "Contrato"</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Aba Instruções */}
+          <TabsContent value="instrucoes" className="space-y-4 mt-4">
+            {contrato?.id ? (
+              <InstrucoesBusinessManager 
+                contratoId={contrato.id}
+                userId={selectedUserId}
+                userName={selectedUser?.nome_completo}
+              />
+            ) : (
+              <Card className="border-border/50">
+                <CardContent className="py-10 text-center">
+                  <ListChecks className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+                  <p className="font-medium">Crie um contrato primeiro</p>
+                  <p className="text-sm text-muted-foreground">Para ver as instruções, crie o contrato na aba "Contrato"</p>
                 </CardContent>
               </Card>
             )}

@@ -27,6 +27,7 @@ import {
 } from "@/hooks/useEtapasBusiness";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { UploadTranscricaoModal } from "./UploadTranscricaoModal";
+import { GerarEtapasIAModal } from "./GerarEtapasIAModal";
 import { cn } from "@/lib/utils";
 
 interface EtapasManagerProps {
@@ -276,9 +277,11 @@ export function EtapasManager({ contratoId: propContratoId, userId, userName }: 
   
   const { data: etapas, isLoading, refetch } = useEtapasBusiness(contratoId);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [gerarIAModalOpen, setGerarIAModalOpen] = useState(false);
   const [editingEtapa, setEditingEtapa] = useState<EtapaBusiness | null>(null);
 
   const proximoNumero = (etapas?.length || 0) + 1;
+  const hasEtapas = etapas && etapas.length > 0;
 
   if (!contratoId) {
     return (
@@ -310,15 +313,25 @@ export function EtapasManager({ contratoId: propContratoId, userId, userName }: 
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setUploadModalOpen(true)}
-            disabled={!etapas || etapas.length === 0}
-          >
-            <Sparkles className="h-4 w-4 mr-2" />
-            Gerar via IA
-          </Button>
+          {contrato && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setGerarIAModalOpen(true)}
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              {hasEtapas ? "Regenerar via IA" : "Gerar Roadmap via IA"}
+            </Button>
+          )}
+          {hasEtapas && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setUploadModalOpen(true)}
+            >
+              Gerar Instruções
+            </Button>
+          )}
           <NovaEtapaDialog 
             contratoId={contratoId} 
             proximoNumero={proximoNumero}
@@ -357,6 +370,15 @@ export function EtapasManager({ contratoId: propContratoId, userId, userName }: 
           open={uploadModalOpen}
           onOpenChange={setUploadModalOpen}
           etapas={etapas}
+          onSuccess={() => refetch()}
+        />
+      )}
+
+      {contrato && (
+        <GerarEtapasIAModal
+          open={gerarIAModalOpen}
+          onOpenChange={setGerarIAModalOpen}
+          contrato={contrato}
           onSuccess={() => refetch()}
         />
       )}
