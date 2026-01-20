@@ -83,15 +83,15 @@ Responda APENAS com um JSON válido no seguinte formato (sem markdown, sem expli
   ]
 }`;
 
-    // Chamar Lovable AI (Gemini)
-    const response = await fetch("https://api.totallynothuman.ai/v1/chat/completions", {
+    // Chamar Lovable AI Gateway
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           {
             role: "system",
@@ -108,6 +108,18 @@ Responda APENAS com um JSON válido no seguinte formato (sem markdown, sem expli
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Créditos insuficientes. Por favor, adicione créditos à sua conta." }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       const errorText = await response.text();
       console.error("Erro na API:", errorText);
       throw new Error(`Erro na API de IA: ${response.status}`);

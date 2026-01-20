@@ -130,15 +130,15 @@ Responda APENAS com JSON válido:
   "observacoes": "texto..."
 }`;
 
-    // Chamar Lovable AI
-    const response = await fetch("https://api.totallynothuman.ai/v1/chat/completions", {
+    // Chamar Lovable AI Gateway
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           {
             role: "system",
@@ -155,6 +155,18 @@ Responda APENAS com JSON válido:
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Créditos insuficientes. Por favor, adicione créditos à sua conta." }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       throw new Error(`Erro na API de IA: ${response.status}`);
     }
 
