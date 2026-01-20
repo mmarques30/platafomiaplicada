@@ -8,13 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useContratosBusiness, EntregaEsperada } from "@/hooks/useContratosBusiness";
 import { useContratoBusinessMutations } from "@/hooks/useContratoBusinessMutations";
 import { ContratoImportSection } from "./ContratoImportSection";
 import { ContratoPreviewPDF } from "./ContratoPreviewPDF";
 import { ContratoParseResult } from "@/hooks/useParseContratoTexto";
 import { MODULOS_DISPONIVEIS, ContratoData } from "@/lib/contratoBusinessTemplate";
-import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2, Building2, DollarSign } from "lucide-react";
+import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2, Building2, DollarSign, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 
 interface ContratoBusinessManagerProps {
@@ -88,6 +89,30 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
   });
 
   const [entregas, setEntregas] = useState<EntregaEsperada[]>([]);
+
+  // Estados para controlar seções colapsáveis
+  const [secoesAbertas, setSecoesAbertas] = useState({
+    contratante: true,
+    contrato: false,
+    valores: false,
+    entregas: false,
+  });
+
+  const toggleSecao = (secao: keyof typeof secoesAbertas) => {
+    setSecoesAbertas(prev => ({ ...prev, [secao]: !prev[secao] }));
+  };
+
+  const todasAbertas = Object.values(secoesAbertas).every(v => v);
+
+  const toggleTodasSecoes = () => {
+    const novoValor = !todasAbertas;
+    setSecoesAbertas({
+      contratante: novoValor,
+      contrato: novoValor,
+      valores: novoValor,
+      entregas: novoValor,
+    });
+  };
 
   // Carregar dados existentes
   useEffect(() => {
@@ -317,526 +342,605 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Seção de Importação com IA */}
       <ContratoImportSection onDataParsed={handleDataParsed} />
 
+      {/* Botão para expandir/recolher tudo */}
+      <div className="flex justify-end">
+        <Button variant="ghost" size="sm" onClick={toggleTodasSecoes}>
+          {todasAbertas ? (
+            <>
+              <ChevronUp className="h-4 w-4 mr-2" />
+              Recolher Tudo
+            </>
+          ) : (
+            <>
+              <ChevronDown className="h-4 w-4 mr-2" />
+              Expandir Tudo
+            </>
+          )}
+        </Button>
+      </div>
+
       {/* Dados da Contratante */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Dados da Contratante
-          </CardTitle>
-          <CardDescription>
-            Informações da empresa e representante legal
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="razao_social">Razão Social</Label>
-              <Input
-                id="razao_social"
-                value={dadosContratante.razao_social}
-                onChange={(e) => setDadosContratante({ ...dadosContratante, razao_social: e.target.value })}
-                placeholder="Nome da empresa"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cnpj">CNPJ</Label>
-              <Input
-                id="cnpj"
-                value={dadosContratante.cnpj}
-                onChange={(e) => setDadosContratante({ ...dadosContratante, cnpj: e.target.value })}
-                placeholder="XX.XXX.XXX/XXXX-XX"
-              />
-            </div>
-          </div>
+      <Collapsible open={secoesAbertas.contratante} onOpenChange={() => toggleSecao('contratante')}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Dados da Contratante
+                  </CardTitle>
+                  <CardDescription>
+                    Informações da empresa e representante legal
+                  </CardDescription>
+                </div>
+                {secoesAbertas.contratante ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="razao_social">Razão Social</Label>
+                  <Input
+                    id="razao_social"
+                    value={dadosContratante.razao_social}
+                    onChange={(e) => setDadosContratante({ ...dadosContratante, razao_social: e.target.value })}
+                    placeholder="Nome da empresa"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cnpj">CNPJ</Label>
+                  <Input
+                    id="cnpj"
+                    value={dadosContratante.cnpj}
+                    onChange={(e) => setDadosContratante({ ...dadosContratante, cnpj: e.target.value })}
+                    placeholder="XX.XXX.XXX/XXXX-XX"
+                  />
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="endereco">Endereço</Label>
-            <Input
-              id="endereco"
-              value={dadosContratante.endereco}
-              onChange={(e) => setDadosContratante({ ...dadosContratante, endereco: e.target.value })}
-              placeholder="Endereço completo"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="endereco">Endereço</Label>
+                <Input
+                  id="endereco"
+                  value={dadosContratante.endereco}
+                  onChange={(e) => setDadosContratante({ ...dadosContratante, endereco: e.target.value })}
+                  placeholder="Endereço completo"
+                />
+              </div>
 
-          <Separator />
+              <Separator />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="representante_nome">Representante Legal</Label>
-              <Input
-                id="representante_nome"
-                value={dadosContratante.representante_nome}
-                onChange={(e) => setDadosContratante({ ...dadosContratante, representante_nome: e.target.value })}
-                placeholder="Nome completo"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="representante_email">Email</Label>
-              <Input
-                id="representante_email"
-                type="email"
-                value={dadosContratante.representante_email}
-                onChange={(e) => setDadosContratante({ ...dadosContratante, representante_email: e.target.value })}
-                placeholder="email@empresa.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="representante_cpf">CPF</Label>
-              <Input
-                id="representante_cpf"
-                value={dadosContratante.representante_cpf}
-                onChange={(e) => setDadosContratante({ ...dadosContratante, representante_cpf: e.target.value })}
-                placeholder="XXX.XXX.XXX-XX"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="representante_rg">RG</Label>
-              <Input
-                id="representante_rg"
-                value={dadosContratante.representante_rg}
-                onChange={(e) => setDadosContratante({ ...dadosContratante, representante_rg: e.target.value })}
-                placeholder="Número do RG"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="representante_nome">Representante Legal</Label>
+                  <Input
+                    id="representante_nome"
+                    value={dadosContratante.representante_nome}
+                    onChange={(e) => setDadosContratante({ ...dadosContratante, representante_nome: e.target.value })}
+                    placeholder="Nome completo"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="representante_email">Email</Label>
+                  <Input
+                    id="representante_email"
+                    type="email"
+                    value={dadosContratante.representante_email}
+                    onChange={(e) => setDadosContratante({ ...dadosContratante, representante_email: e.target.value })}
+                    placeholder="email@empresa.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="representante_cpf">CPF</Label>
+                  <Input
+                    id="representante_cpf"
+                    value={dadosContratante.representante_cpf}
+                    onChange={(e) => setDadosContratante({ ...dadosContratante, representante_cpf: e.target.value })}
+                    placeholder="XXX.XXX.XXX-XX"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="representante_rg">RG</Label>
+                  <Input
+                    id="representante_rg"
+                    value={dadosContratante.representante_rg}
+                    onChange={(e) => setDadosContratante({ ...dadosContratante, representante_rg: e.target.value })}
+                    placeholder="Número do RG"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Informações do Contrato */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Informações do Contrato
-          </CardTitle>
-          <CardDescription>
-            Datas, módulos e configurações gerais
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="data_inicio">Data Início</Label>
-              <Input
-                id="data_inicio"
-                type="date"
-                value={formData.data_inicio}
-                onChange={(e) => setFormData({ ...formData, data_inicio: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="data_fim">Data Fim</Label>
-              <Input
-                id="data_fim"
-                type="date"
-                value={formData.data_fim}
-                onChange={(e) => setFormData({ ...formData, data_fim: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="data_assinatura">Data Assinatura</Label>
-              <Input
-                id="data_assinatura"
-                type="date"
-                value={formData.data_assinatura}
-                onChange={(e) => setFormData({ ...formData, data_assinatura: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tempo">Duração (meses)</Label>
-              <Input
-                id="tempo"
-                type="number"
-                min={1}
-                value={formData.tempo_consultoria_meses}
-                onChange={(e) => setFormData({ ...formData, tempo_consultoria_meses: Number(e.target.value) })}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="modulos">Nº Módulos</Label>
-              <Input
-                id="modulos"
-                type="number"
-                min={1}
-                value={formData.modulos_contratados}
-                onChange={(e) => setFormData({ ...formData, modulos_contratados: Number(e.target.value) })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="reunioes">Reuniões Mensais</Label>
-              <Input
-                id="reunioes"
-                type="number"
-                min={0}
-                value={formData.reunioes_mensais}
-                onChange={(e) => setFormData({ ...formData, reunioes_mensais: Number(e.target.value) })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="reports">Frequência Reports</Label>
-              <Select
-                value={formData.reports_frequencia}
-                onValueChange={(v) => setFormData({ ...formData, reports_frequencia: v })}
-              >
-                <SelectTrigger id="reports">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="semanal">Semanal</SelectItem>
-                  <SelectItem value="quinzenal">Quinzenal</SelectItem>
-                  <SelectItem value="mensal">Mensal</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="suporte">Tipo de Suporte</Label>
-              <Select
-                value={formData.suporte_tipo}
-                onValueChange={(v) => setFormData({ ...formData, suporte_tipo: v })}
-              >
-                <SelectTrigger id="suporte">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="email">Email</SelectItem>
-                  <SelectItem value="chat">Chat</SelectItem>
-                  <SelectItem value="reuniao">Reunião</SelectItem>
-                  <SelectItem value="prioritario">Prioritário</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-4">
-            <Label>Módulos Disponíveis</Label>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {MODULOS_DISPONIVEIS.map((modulo) => (
-                <div key={modulo} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`modulo-${modulo}`}
-                    checked={modulosSelecionados.includes(modulo)}
-                    onCheckedChange={() => toggleModulo(modulo)}
-                  />
-                  <Label htmlFor={`modulo-${modulo}`} className="text-sm font-normal cursor-pointer">
-                    {modulo}
-                  </Label>
+      <Collapsible open={secoesAbertas.contrato} onOpenChange={() => toggleSecao('contrato')}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Informações do Contrato
+                  </CardTitle>
+                  <CardDescription>
+                    Datas, módulos e configurações gerais
+                  </CardDescription>
                 </div>
-              ))}
-            </div>
+                {secoesAbertas.contrato ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="data_inicio">Data Início</Label>
+                  <Input
+                    id="data_inicio"
+                    type="date"
+                    value={formData.data_inicio}
+                    onChange={(e) => setFormData({ ...formData, data_inicio: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="data_fim">Data Fim</Label>
+                  <Input
+                    id="data_fim"
+                    type="date"
+                    value={formData.data_fim}
+                    onChange={(e) => setFormData({ ...formData, data_fim: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="data_assinatura">Data Assinatura</Label>
+                  <Input
+                    id="data_assinatura"
+                    type="date"
+                    value={formData.data_assinatura}
+                    onChange={(e) => setFormData({ ...formData, data_assinatura: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tempo">Duração (meses)</Label>
+                  <Input
+                    id="tempo"
+                    type="number"
+                    min={1}
+                    value={formData.tempo_consultoria_meses}
+                    onChange={(e) => setFormData({ ...formData, tempo_consultoria_meses: Number(e.target.value) })}
+                  />
+                </div>
+              </div>
 
-            {/* Módulos Customizados */}
-            {modulosCustom.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Módulos Personalizados</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="modulos">Nº Módulos</Label>
+                  <Input
+                    id="modulos"
+                    type="number"
+                    min={1}
+                    value={formData.modulos_contratados}
+                    onChange={(e) => setFormData({ ...formData, modulos_contratados: Number(e.target.value) })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reunioes">Reuniões Mensais</Label>
+                  <Input
+                    id="reunioes"
+                    type="number"
+                    min={0}
+                    value={formData.reunioes_mensais}
+                    onChange={(e) => setFormData({ ...formData, reunioes_mensais: Number(e.target.value) })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reports">Frequência Reports</Label>
+                  <Select
+                    value={formData.reports_frequencia}
+                    onValueChange={(v) => setFormData({ ...formData, reports_frequencia: v })}
+                  >
+                    <SelectTrigger id="reports">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="semanal">Semanal</SelectItem>
+                      <SelectItem value="quinzenal">Quinzenal</SelectItem>
+                      <SelectItem value="mensal">Mensal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="suporte">Tipo de Suporte</Label>
+                  <Select
+                    value={formData.suporte_tipo}
+                    onValueChange={(v) => setFormData({ ...formData, suporte_tipo: v })}
+                  >
+                    <SelectTrigger id="suporte">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="email">Email</SelectItem>
+                      <SelectItem value="chat">Chat</SelectItem>
+                      <SelectItem value="reuniao">Reunião</SelectItem>
+                      <SelectItem value="prioritario">Prioritário</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <Label>Módulos Disponíveis</Label>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {modulosCustom.map((modulo) => (
-                    <div key={modulo} className="flex items-center space-x-2 bg-muted/50 px-2 py-1 rounded">
+                  {MODULOS_DISPONIVEIS.map((modulo) => (
+                    <div key={modulo} className="flex items-center space-x-2">
                       <Checkbox
-                        id={`modulo-custom-${modulo}`}
+                        id={`modulo-${modulo}`}
                         checked={modulosSelecionados.includes(modulo)}
                         onCheckedChange={() => toggleModulo(modulo)}
                       />
-                      <Label htmlFor={`modulo-custom-${modulo}`} className="text-sm font-normal cursor-pointer flex-1">
+                      <Label htmlFor={`modulo-${modulo}`} className="text-sm font-normal cursor-pointer">
                         {modulo}
                       </Label>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Módulos Customizados */}
+                {modulosCustom.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Módulos Personalizados</Label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {modulosCustom.map((modulo) => (
+                        <div key={modulo} className="flex items-center space-x-2 bg-muted/50 px-2 py-1 rounded">
+                          <Checkbox
+                            id={`modulo-custom-${modulo}`}
+                            checked={modulosSelecionados.includes(modulo)}
+                            onCheckedChange={() => toggleModulo(modulo)}
+                          />
+                          <Label htmlFor={`modulo-custom-${modulo}`} className="text-sm font-normal cursor-pointer flex-1">
+                            {modulo}
+                          </Label>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-5 w-5 text-destructive hover:text-destructive"
+                            onClick={() => handleRemoveModuloCustom(modulo)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Adicionar Novo Módulo */}
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1 space-y-1">
+                    <Label className="text-xs">Adicionar Módulo Personalizado</Label>
+                    <Input
+                      value={novoModulo}
+                      onChange={(e) => setNovoModulo(e.target.value)}
+                      placeholder="Nome do novo módulo"
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddModulo()}
+                    />
+                  </div>
+                  <Button variant="outline" onClick={handleAddModulo} disabled={!novoModulo.trim()}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Adicionar
+                  </Button>
+                </div>
+
+                {modulosSelecionados.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {modulosSelecionados.length} módulo(s) selecionado(s): {modulosSelecionados.join(", ")}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="observacoes">Observações</Label>
+                <Textarea
+                  id="observacoes"
+                  value={formData.observacoes}
+                  onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+                  placeholder="Observações gerais sobre o contrato..."
+                  rows={3}
+                />
+              </div>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+
+      {/* Valores e Pagamento */}
+      <Collapsible open={secoesAbertas.valores} onOpenChange={() => toggleSecao('valores')}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5" />
+                    Valores e Pagamento
+                  </CardTitle>
+                  <CardDescription>
+                    Configurações financeiras do contrato
+                  </CardDescription>
+                </div>
+                {secoesAbertas.valores ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="valor_contrato">Valor Total (R$)</Label>
+                  <Input
+                    id="valor_contrato"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={valores.valor_contrato}
+                    onChange={(e) => setValores({ ...valores, valor_contrato: e.target.value })}
+                    placeholder="50000.00"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="valor_entrada">Entrada (R$)</Label>
+                  <Input
+                    id="valor_entrada"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={valores.valor_entrada}
+                    onChange={(e) => setValores({ ...valores, valor_entrada: e.target.value })}
+                    placeholder="10000.00"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="numero_parcelas">Nº Parcelas</Label>
+                  <Input
+                    id="numero_parcelas"
+                    type="number"
+                    min={1}
+                    value={valores.numero_parcelas}
+                    onChange={(e) => setValores({ ...valores, numero_parcelas: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="valor_parcela">Valor Parcela (R$)</Label>
+                  <Input
+                    id="valor_parcela"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={valores.valor_parcela}
+                    onChange={(e) => setValores({ ...valores, valor_parcela: e.target.value })}
+                    placeholder="6666.67"
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="creditos_iniciais">Créditos Iniciais</Label>
+                  <Input
+                    id="creditos_iniciais"
+                    type="number"
+                    min={0}
+                    value={valores.creditos_iniciais}
+                    onChange={(e) => setValores({ ...valores, creditos_iniciais: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="valor_credito">Valor/Crédito (R$)</Label>
+                  <Input
+                    id="valor_credito"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={valores.valor_credito_adicional}
+                    onChange={(e) => setValores({ ...valores, valor_credito_adicional: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="duracao_academy">Academy (meses)</Label>
+                  <Input
+                    id="duracao_academy"
+                    type="number"
+                    min={1}
+                    value={valores.duracao_academy_meses}
+                    onChange={(e) => setValores({ ...valores, duracao_academy_meses: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="roi">ROI Projetado (%)</Label>
+                  <Input
+                    id="roi"
+                    type="number"
+                    min={0}
+                    value={valores.roi_projetado}
+                    onChange={(e) => setValores({ ...valores, roi_projetado: e.target.value })}
+                    placeholder="200"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="multa">Multa Rescisão (%)</Label>
+                  <Input
+                    id="multa"
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={valores.multa_rescisao_percentual}
+                    onChange={(e) => setValores({ ...valores, multa_rescisao_percentual: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hora_tecnica">Hora Técnica (R$)</Label>
+                  <Input
+                    id="hora_tecnica"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={valores.valor_hora_tecnica}
+                    onChange={(e) => setValores({ ...valores, valor_hora_tecnica: e.target.value })}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+
+      {/* Entregas Esperadas */}
+      <Collapsible open={secoesAbertas.entregas} onOpenChange={() => toggleSecao('entregas')}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    Entregas Esperadas
+                  </CardTitle>
+                  <CardDescription>
+                    Defina as entregas que aparecerão na timeline do mentorado
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    onClick={(e) => { e.stopPropagation(); addEntrega(); }} 
+                    variant="outline" 
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Adicionar
+                  </Button>
+                  {secoesAbertas.entregas ? (
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
+              {entregas.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Nenhuma entrega definida</p>
+                  <p className="text-sm">Clique em "Adicionar" para criar entregas</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {entregas.map((entrega, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-1 md:grid-cols-[1fr_150px_150px_140px_40px] gap-3 items-end p-4 rounded-lg border bg-muted/30"
+                    >
+                      <div className="space-y-1">
+                        <Label className="text-xs">Título da Entrega</Label>
+                        <Input
+                          value={entrega.titulo}
+                          onChange={(e) => updateEntrega(index, "titulo", e.target.value)}
+                          placeholder="Ex: Diagnóstico Inicial"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Tipo</Label>
+                        <Select
+                          value={entrega.tipo}
+                          onValueChange={(v) => updateEntrega(index, "tipo", v)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {tiposEntrega.map((tipo) => (
+                              <SelectItem key={tipo.value} value={tipo.value}>
+                                {tipo.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Prazo</Label>
+                        <Input
+                          type="date"
+                          value={entrega.prazo}
+                          onChange={(e) => updateEntrega(index, "prazo", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Status</Label>
+                        <Select
+                          value={entrega.status}
+                          onValueChange={(v) => updateEntrega(index, "status", v as EntregaEsperada["status"])}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {statusEntrega.map((s) => (
+                              <SelectItem key={s.value} value={s.value}>
+                                <Badge className={s.color} variant="secondary">
+                                  {s.label}
+                                </Badge>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 text-destructive hover:text-destructive"
-                        onClick={() => handleRemoveModuloCustom(modulo)}
+                        onClick={() => removeEntrega(index)}
+                        className="text-destructive hover:text-destructive"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Adicionar Novo Módulo */}
-            <div className="flex gap-2 items-end">
-              <div className="flex-1 space-y-1">
-                <Label className="text-xs">Adicionar Módulo Personalizado</Label>
-                <Input
-                  value={novoModulo}
-                  onChange={(e) => setNovoModulo(e.target.value)}
-                  placeholder="Nome do novo módulo"
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddModulo()}
-                />
-              </div>
-              <Button variant="outline" onClick={handleAddModulo} disabled={!novoModulo.trim()}>
-                <Plus className="h-4 w-4 mr-2" />
-                Adicionar
-              </Button>
-            </div>
-
-            {modulosSelecionados.length > 0 && (
-              <p className="text-xs text-muted-foreground">
-                {modulosSelecionados.length} módulo(s) selecionado(s): {modulosSelecionados.join(", ")}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="observacoes">Observações</Label>
-            <Textarea
-              id="observacoes"
-              value={formData.observacoes}
-              onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-              placeholder="Observações gerais sobre o contrato..."
-              rows={3}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Valores e Pagamento */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            Valores e Pagamento
-          </CardTitle>
-          <CardDescription>
-            Configurações financeiras do contrato
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="valor_contrato">Valor Total (R$)</Label>
-              <Input
-                id="valor_contrato"
-                type="number"
-                min={0}
-                step="0.01"
-                value={valores.valor_contrato}
-                onChange={(e) => setValores({ ...valores, valor_contrato: e.target.value })}
-                placeholder="50000.00"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="valor_entrada">Entrada (R$)</Label>
-              <Input
-                id="valor_entrada"
-                type="number"
-                min={0}
-                step="0.01"
-                value={valores.valor_entrada}
-                onChange={(e) => setValores({ ...valores, valor_entrada: e.target.value })}
-                placeholder="10000.00"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="numero_parcelas">Nº Parcelas</Label>
-              <Input
-                id="numero_parcelas"
-                type="number"
-                min={1}
-                value={valores.numero_parcelas}
-                onChange={(e) => setValores({ ...valores, numero_parcelas: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="valor_parcela">Valor Parcela (R$)</Label>
-              <Input
-                id="valor_parcela"
-                type="number"
-                min={0}
-                step="0.01"
-                value={valores.valor_parcela}
-                onChange={(e) => setValores({ ...valores, valor_parcela: e.target.value })}
-                placeholder="6666.67"
-              />
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="creditos_iniciais">Créditos Iniciais</Label>
-              <Input
-                id="creditos_iniciais"
-                type="number"
-                min={0}
-                value={valores.creditos_iniciais}
-                onChange={(e) => setValores({ ...valores, creditos_iniciais: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="valor_credito">Valor/Crédito (R$)</Label>
-              <Input
-                id="valor_credito"
-                type="number"
-                min={0}
-                step="0.01"
-                value={valores.valor_credito_adicional}
-                onChange={(e) => setValores({ ...valores, valor_credito_adicional: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="duracao_academy">Academy (meses)</Label>
-              <Input
-                id="duracao_academy"
-                type="number"
-                min={1}
-                value={valores.duracao_academy_meses}
-                onChange={(e) => setValores({ ...valores, duracao_academy_meses: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="roi">ROI Projetado (%)</Label>
-              <Input
-                id="roi"
-                type="number"
-                min={0}
-                value={valores.roi_projetado}
-                onChange={(e) => setValores({ ...valores, roi_projetado: e.target.value })}
-                placeholder="200"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="multa">Multa Rescisão (%)</Label>
-              <Input
-                id="multa"
-                type="number"
-                min={0}
-                max={100}
-                value={valores.multa_rescisao_percentual}
-                onChange={(e) => setValores({ ...valores, multa_rescisao_percentual: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hora_tecnica">Hora Técnica (R$)</Label>
-              <Input
-                id="hora_tecnica"
-                type="number"
-                min={0}
-                step="0.01"
-                value={valores.valor_hora_tecnica}
-                onChange={(e) => setValores({ ...valores, valor_hora_tecnica: e.target.value })}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Entregas Esperadas */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Entregas Esperadas
-              </CardTitle>
-              <CardDescription>
-                Defina as entregas que aparecerão na timeline do mentorado
-              </CardDescription>
-            </div>
-            <Button onClick={addEntrega} variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {entregas.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Nenhuma entrega definida</p>
-              <p className="text-sm">Clique em "Adicionar" para criar entregas</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {entregas.map((entrega, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-1 md:grid-cols-[1fr_150px_150px_140px_40px] gap-3 items-end p-4 rounded-lg border bg-muted/30"
-                >
-                  <div className="space-y-1">
-                    <Label className="text-xs">Título da Entrega</Label>
-                    <Input
-                      value={entrega.titulo}
-                      onChange={(e) => updateEntrega(index, "titulo", e.target.value)}
-                      placeholder="Ex: Diagnóstico Inicial"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Tipo</Label>
-                    <Select
-                      value={entrega.tipo}
-                      onValueChange={(v) => updateEntrega(index, "tipo", v)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tiposEntrega.map((tipo) => (
-                          <SelectItem key={tipo.value} value={tipo.value}>
-                            {tipo.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Prazo</Label>
-                    <Input
-                      type="date"
-                      value={entrega.prazo}
-                      onChange={(e) => updateEntrega(index, "prazo", e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Status</Label>
-                    <Select
-                      value={entrega.status}
-                      onValueChange={(v) => updateEntrega(index, "status", v as EntregaEsperada["status"])}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {statusEntrega.map((s) => (
-                          <SelectItem key={s.value} value={s.value}>
-                            <Badge className={s.color} variant="secondary">
-                              {s.label}
-                            </Badge>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeEntrega(index)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              )}
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Botões de Ação */}
       <div className="flex justify-between items-center">
