@@ -3322,6 +3322,7 @@ export type Database = {
           created_at: string
           data_sessao: string
           duracao: number | null
+          etapa_id: string | null
           feedback_entregas: string | null
           id: string
           notas: string | null
@@ -3337,6 +3338,7 @@ export type Database = {
           created_at?: string
           data_sessao: string
           duracao?: number | null
+          etapa_id?: string | null
           feedback_entregas?: string | null
           id?: string
           notas?: string | null
@@ -3352,6 +3354,7 @@ export type Database = {
           created_at?: string
           data_sessao?: string
           duracao?: number | null
+          etapa_id?: string | null
           feedback_entregas?: string | null
           id?: string
           notas?: string | null
@@ -3363,7 +3366,15 @@ export type Database = {
           user_id?: string
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sessoes_mentoria_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas_business"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       signup_attempts: {
         Row: {
