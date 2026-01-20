@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useContratosBusiness, ReportBusiness } from "@/hooks/useContratosBusiness";
 import { useReportsBusinessMutations } from "@/hooks/useReportsBusinessMutations";
-import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning } from "lucide-react";
+import { GerarReportIAModal } from "./GerarReportIAModal";
+import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning, Sparkles, Eye, TrendingUp, ListChecks, Video, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -22,6 +24,9 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
   const { reports, isLoading: isLoadingReports, createReport, updateReport, deleteReport } = useReportsBusinessMutations(contrato?.id);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [gerarIAModalOpen, setGerarIAModalOpen] = useState(false);
+  const [htmlPreviewOpen, setHtmlPreviewOpen] = useState(false);
+  const [selectedHtml, setSelectedHtml] = useState<string | null>(null);
   const [editingReport, setEditingReport] = useState<ReportBusiness | null>(null);
   const [formData, setFormData] = useState({
     titulo: "",
@@ -81,6 +86,11 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
     deleteReport.mutate(id);
   };
 
+  const handleViewHtml = (html: string) => {
+    setSelectedHtml(html);
+    setHtmlPreviewOpen(true);
+  };
+
   if (isLoadingContrato) {
     return (
       <Card>
@@ -111,18 +121,24 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Documentos de Suporte
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FileText className="h-4 w-4" />
+                Reports e Documentos
               </CardTitle>
-              <CardDescription>
-                Gerencie os documentos e relatórios de {userName || "mentorado"}
+              <CardDescription className="text-sm">
+                Reports executivos e documentos de suporte para {userName || "mentorado"}
               </CardDescription>
             </div>
-            <Button onClick={() => handleOpenModal()}>
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Documento
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => setGerarIAModalOpen(true)}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Gerar via IA
+              </Button>
+              <Button size="sm" onClick={() => handleOpenModal()}>
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Documento
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -134,24 +150,60 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
             <div className="text-center py-8 text-muted-foreground">
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Nenhum documento cadastrado</p>
-              <p className="text-sm">Clique em "Novo Documento" para adicionar</p>
+              <p className="text-sm">Use "Gerar via IA" para criar um report automático ou adicione manualmente</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {reports.map((report) => (
                 <div
                   key={report.id}
                   className="flex items-start justify-between p-4 rounded-lg border bg-card hover:shadow-sm transition-shadow"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <FileText className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">{report.titulo}</h4>
-                      {report.descricao && (
-                        <p className="text-sm text-muted-foreground mt-1">{report.descricao}</p>
+                  <div className="flex items-start gap-4 flex-1">
+                    <div className={`p-2 rounded-lg ${report.gerado_por_ia ? 'bg-primary/10' : 'bg-muted'}`}>
+                      {report.gerado_por_ia ? (
+                        <Sparkles className="h-4 w-4 text-primary" />
+                      ) : (
+                        <FileText className="h-4 w-4 text-muted-foreground" />
                       )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-medium text-sm">{report.titulo}</h4>
+                        {report.gerado_por_ia && (
+                          <Badge variant="secondary" className="text-[10px] gap-1">
+                            <Sparkles className="h-2.5 w-2.5" />
+                            IA
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {report.descricao && (
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{report.descricao}</p>
+                      )}
+                      
+                      {/* Métricas inline para reports gerados por IA */}
+                      {report.gerado_por_ia && report.metricas && (
+                        <div className="flex items-center gap-4 mt-2 text-xs">
+                          <span className="flex items-center gap-1 text-muted-foreground">
+                            <TrendingUp className="h-3 w-3" />
+                            Etapas: {(report.metricas as any)?.etapas?.percentual || 0}%
+                          </span>
+                          <span className="flex items-center gap-1 text-muted-foreground">
+                            <CheckCircle className="h-3 w-3" />
+                            Entregas: {(report.metricas as any)?.entregas?.concluidas || 0}/{(report.metricas as any)?.entregas?.total || 0}
+                          </span>
+                          <span className="flex items-center gap-1 text-muted-foreground">
+                            <ListChecks className="h-3 w-3" />
+                            Tarefas: {(report.metricas as any)?.tarefas?.concluidas || 0}
+                          </span>
+                          <span className="flex items-center gap-1 text-muted-foreground">
+                            <Video className="h-3 w-3" />
+                            Vídeos: {(report.metricas as any)?.videos_assistidos || 0}
+                          </span>
+                        </div>
+                      )}
+                      
                       <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
@@ -163,12 +215,26 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  
+                  <div className="flex items-center gap-1">
+                    {report.conteudo_html && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleViewHtml(report.conteudo_html!)}
+                        title="Visualizar HTML"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    )}
                     {report.arquivo_url && (
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-8 w-8"
                         onClick={() => window.open(report.arquivo_url!, "_blank")}
+                        title="Abrir arquivo"
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Button>
@@ -176,13 +242,15 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-8 w-8"
                       onClick={() => handleOpenModal(report)}
+                      title="Editar"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Excluir">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </AlertDialogTrigger>
@@ -208,6 +276,38 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
           )}
         </CardContent>
       </Card>
+
+      {/* Modal de Geração via IA */}
+      <GerarReportIAModal
+        open={gerarIAModalOpen}
+        onOpenChange={setGerarIAModalOpen}
+        contratoId={contrato.id}
+        userId={userId}
+        onSuccess={() => {}}
+      />
+
+      {/* Modal de Preview HTML */}
+      <Dialog open={htmlPreviewOpen} onOpenChange={setHtmlPreviewOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Preview do Report</DialogTitle>
+          </DialogHeader>
+          <div className="border rounded-lg overflow-auto max-h-[70vh] bg-white">
+            {selectedHtml && (
+              <iframe
+                srcDoc={selectedHtml}
+                className="w-full h-[65vh] border-0"
+                title="Report Preview"
+              />
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setHtmlPreviewOpen(false)}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal de Criação/Edição */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
