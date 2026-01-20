@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { Json } from "@/integrations/supabase/types";
 
 export interface EtapaBusiness {
   id: string;
@@ -27,6 +28,7 @@ export interface InstrucaoEtapa {
   prompt_sugerido: string | null;
   dicas: string | null;
   recursos_url: string | null;
+  recursos: Json | null;
   status: 'pendente' | 'em_andamento' | 'concluida';
   gerado_por_ia: boolean;
   created_at: string;
