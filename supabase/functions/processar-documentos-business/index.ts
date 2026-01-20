@@ -35,7 +35,7 @@ Analise o seguinte documento e extraia as entregas do projeto, separando em:
 3. INSTRUÇÕES DE EXECUÇÃO: passos para implementar cada entrega (se aplicável)
 
 MÓDULOS CONTRATADOS: ${modulosLista}
-${contextoCliente ? `CONTEXTO DO CLIENTE: ${contextoCliente}` : ""}
+${contexto_cliente ? `CONTEXTO DO CLIENTE: ${contexto_cliente}` : ""}
 
 DOCUMENTO A ANALISAR:
 ${texto}
