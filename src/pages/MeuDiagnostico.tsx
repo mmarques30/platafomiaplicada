@@ -9,7 +9,7 @@ export default function MeuDiagnostico() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
-  const { effectivePlan, isVisitante, isBusiness, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
+  const { effectivePlan, isVisitante, isBusiness, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
   
   // Ref para garantir que o redirect aconteça apenas UMA vez
   const hasRedirected = useRef(false);
@@ -38,9 +38,10 @@ export default function MeuDiagnostico() {
       return;
     }
 
-    // Academy: admin ou completado -> painel, senão -> formulário
+    // Academy: admin real (não simulando) ou completado -> painel, senão -> formulário
     hasRedirected.current = true;
-    if (isAdmin || formulario?.completado) {
+    const isRealAdmin = isAdmin && !isSimulating;
+    if (isRealAdmin || formulario?.completado) {
       navigate('/diagnostico/painel', { replace: true });
     } else {
       navigate('/diagnostico/formulario', { replace: true });
