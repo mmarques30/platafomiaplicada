@@ -3,28 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "@/hooks/admin/useUsers";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
-import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, CheckSquare, Calendar, FolderKanban, Route, Plus, RefreshCw, Target, Pencil, Trash2, ClipboardList, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck } from "lucide-react";
 import TasksBusinessManager from "@/components/admin/business/TasksBusinessManager";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
-import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
+import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { EtapasManager } from "@/components/admin/business/EtapasManager";
 import { ContratoBusinessManager } from "@/components/admin/business/ContratoBusinessManager";
 import { ReportsBusinessManager } from "@/components/admin/business/ReportsBusinessManager";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
-import ProjetoModal from "@/components/admin/mentoria/ProjetoModal";
 import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
-import { ProjetoMentoria } from "@/hooks/useMentoriaProjetos";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { toast } from "@/hooks/use-toast";
-import { formatProjetoTitulo } from "@/lib/utils";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { EntregasBusinessManager } from "@/components/admin/business/EntregasBusinessManager";
 
 export default function MentoriaBusinessPage() {
   const navigate = useNavigate();
@@ -36,29 +31,24 @@ export default function MentoriaBusinessPage() {
   const users = allUsers.filter(u => u.plano_mentoria === "business");
   const selectedUser = users.find(u => u.id === selectedUserId);
 
+  // Buscar contrato do usuário selecionado
+  const { contrato } = useContratosBusiness(selectedUserId);
+
   const { sessoes, createSessao, updateSessao } = useMentoriaSessoes(selectedUserId);
-  const { projetos, createProjeto, updateProjeto, deleteProjeto } = useMentoriaProjetos(selectedUserId);
 
   const [sessaoModalOpen, setSessaoModalOpen] = useState(false);
-  const [projetoModalOpen, setProjetoModalOpen] = useState(false);
-
   const [editingSessao, setEditingSessao] = useState<SessaoMentoria | undefined>();
-  const [editingProjeto, setEditingProjeto] = useState<ProjetoMentoria | undefined>();
 
   useEffect(() => {
     if (selectedUserId) {
-      queryClient.invalidateQueries({ queryKey: ["projetos-mentoria", selectedUserId] });
+      queryClient.invalidateQueries({ queryKey: ["contrato-business", selectedUserId] });
+      queryClient.invalidateQueries({ queryKey: ["entregas-business"] });
     }
   }, [selectedUserId, queryClient]);
 
   const handleEditSessao = (sessao: SessaoMentoria) => {
     setEditingSessao(sessao);
     setSessaoModalOpen(true);
-  };
-
-  const handleEditProjeto = (projeto: ProjetoMentoria) => {
-    setEditingProjeto(projeto);
-    setProjetoModalOpen(true);
   };
 
   return (
@@ -120,7 +110,7 @@ export default function MentoriaBusinessPage() {
 
       {selectedUserId && (
         <Tabs defaultValue="contrato" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="contrato">
               <ClipboardList className="h-4 w-4 mr-2" />
               Contrato
@@ -145,13 +135,9 @@ export default function MentoriaBusinessPage() {
               <ClipboardCheck className="h-4 w-4 mr-2" />
               Tasks
             </TabsTrigger>
-            <TabsTrigger value="tarefas">
-              <CheckSquare className="h-4 w-4 mr-2" />
-              Tarefas
-            </TabsTrigger>
           </TabsList>
 
-          {/* Aba Contrato - NOVA */}
+          {/* Aba Contrato */}
           <TabsContent value="contrato" className="space-y-4">
             <ContratoBusinessManager 
               userId={selectedUserId} 
@@ -159,12 +145,12 @@ export default function MentoriaBusinessPage() {
             />
           </TabsContent>
 
-          {/* Aba Etapas - EXISTENTE */}
+          {/* Aba Etapas */}
           <TabsContent value="etapas" className="space-y-4">
             <EtapasManager userId={selectedUserId} userName={selectedUser?.nome_completo} />
           </TabsContent>
 
-          {/* Aba Reports - NOVA */}
+          {/* Aba Reports */}
           <TabsContent value="reports" className="space-y-4">
             <ReportsBusinessManager 
               userId={selectedUserId} 
@@ -172,7 +158,7 @@ export default function MentoriaBusinessPage() {
             />
           </TabsContent>
 
-          {/* Aba Sessões - EXISTENTE */}
+          {/* Aba Sessões */}
           <TabsContent value="sessoes" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Sessões de {selectedUser?.nome_completo}</h2>
@@ -207,107 +193,46 @@ export default function MentoriaBusinessPage() {
             </div>
           </TabsContent>
 
-          {/* Aba Projetos - EXISTENTE */}
-          <TabsContent value="projetos" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Projetos de {selectedUser?.nome_completo}</h2>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    queryClient.invalidateQueries({ queryKey: ["projetos-mentoria"] });
-                    queryClient.invalidateQueries({ queryKey: ["projetos-mentoria", selectedUserId] });
-                    queryClient.refetchQueries({ queryKey: ["projetos-mentoria", selectedUserId] });
-                    toast({ title: "Cache limpo!", description: "Dados recarregados do servidor" });
-                  }}
-                >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Atualizar
-                </Button>
-                <Button onClick={() => { setEditingProjeto(undefined); setProjetoModalOpen(true); }}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Projeto
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid gap-4">
-              {projetos.map((projeto) => (
-                <Card key={projeto.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <CardTitle className="text-lg">{formatProjetoTitulo(projeto.titulo)}</CardTitle>
-                          {projeto.tipo === "estrategico" && (
-                            <Badge variant="default" className="bg-primary flex items-center gap-1.5">
-                              <Target className="h-3.5 w-3.5" />
-                              Estratégico
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={
-                          projeto.status === "concluido" ? "default" : 
-                          projeto.status === "em_andamento" ? "secondary" : 
-                          projeto.status === "planejamento" ? "outline" : 
-                          "destructive"
-                        }>
-                          {projeto.status === "planejamento" ? "Planejamento" : 
-                           projeto.status === "em_andamento" ? "Em Andamento" : 
-                           projeto.status === "concluido" ? "Concluído" : "Cancelado"}
-                        </Badge>
-                        <Button variant="ghost" size="icon" onClick={() => handleEditProjeto(projeto)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Excluir Projeto</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tem certeza que deseja excluir o projeto "{formatProjetoTitulo(projeto.titulo)}"? Esta ação não pode ser desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteProjeto(projeto.id)}>
-                                Excluir
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                    <CardDescription>{projeto.descricao}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      {projeto.data_entrega && <p><strong>Entrega:</strong> {format(new Date(projeto.data_entrega), "dd/MM/yyyy", { locale: ptBR })}</p>}
-                      {projeto.avaliacao_mentor && <p><strong>Avaliação Mentor:</strong> {projeto.avaliacao_mentor}/5</p>}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {projetos.length === 0 && (
-                <p className="text-center text-muted-foreground py-8">Nenhum projeto cadastrado</p>
-              )}
-            </div>
+          {/* Aba Entregas */}
+          <TabsContent value="entregas" className="space-y-4">
+            {contrato?.id ? (
+              <EntregasBusinessManager 
+                contratoId={contrato.id}
+                userId={selectedUserId}
+                userName={selectedUser?.nome_completo}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  <FolderKanban className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg font-medium">Crie um contrato primeiro</p>
+                  <p className="text-sm">Para gerenciar entregas, é necessário criar o contrato na aba "Contrato"</p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
-          {/* Aba Tarefas - EXISTENTE */}
-          <TabsContent value="tarefas" className="space-y-4">
-            <TarefasAdmin userId={selectedUserId} />
+          {/* Aba Tasks */}
+          <TabsContent value="tasks" className="space-y-4">
+            {contrato?.id ? (
+              <TasksBusinessManager 
+                contratoId={contrato.id} 
+                userId={selectedUserId} 
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  <ClipboardCheck className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg font-medium">Crie um contrato primeiro</p>
+                  <p className="text-sm">Para gerenciar tasks de validação, é necessário criar o contrato na aba "Contrato"</p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       )}
 
-      {/* Modais */}
+      {/* Modal Sessão */}
       <SessaoModal
         open={sessaoModalOpen}
         onOpenChange={setSessaoModalOpen}
@@ -320,21 +245,6 @@ export default function MentoriaBusinessPage() {
             createSessao(data);
           }
           setSessaoModalOpen(false);
-        }}
-      />
-
-      <ProjetoModal
-        open={projetoModalOpen}
-        onOpenChange={setProjetoModalOpen}
-        projeto={editingProjeto}
-        userId={selectedUserId}
-        onSubmit={(data) => {
-          if (editingProjeto) {
-            updateProjeto({ ...editingProjeto, ...data });
-          } else {
-            createProjeto(data);
-          }
-          setProjetoModalOpen(false);
         }}
       />
     </div>
