@@ -3,26 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "@/hooks/admin/useUsers";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
-import { useMentoriaRecursos } from "@/hooks/useMentoriaRecursos";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
-import { useMentoriaBonus, BonusMentoria, getArquivoUrls } from "@/hooks/useMentoriaBonus";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, CheckSquare, Calendar, BookOpen, FolderKanban, Route, Gift, Plus, RefreshCw, Target, Pencil, Trash2, Lock, CheckCircle, ExternalLink, FileDown } from "lucide-react";
-import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
+import { ArrowLeft, Users, FileText, CheckSquare, Calendar, FolderKanban, Route, Plus, RefreshCw, Target, Pencil, Trash2, ClipboardList } from "lucide-react";
 import { TarefasAdmin } from "@/components/admin/mentoria/TarefasAdmin";
-import { ProcessoRoadmap } from "@/components/admin/mentoria/ProcessoRoadmap";
 import { EtapasManager } from "@/components/admin/business/EtapasManager";
-import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { ContratoBusinessManager } from "@/components/admin/business/ContratoBusinessManager";
+import { ReportsBusinessManager } from "@/components/admin/business/ReportsBusinessManager";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
-import RecursoModal from "@/components/admin/mentoria/RecursoModal";
 import ProjetoModal from "@/components/admin/mentoria/ProjetoModal";
-import BonusModal from "@/components/admin/mentoria/BonusModal";
 import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
-import { RecursoMentoria } from "@/hooks/useMentoriaRecursos";
 import { ProjetoMentoria } from "@/hooks/useMentoriaProjetos";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -41,19 +35,13 @@ export default function MentoriaBusinessPage() {
   const selectedUser = users.find(u => u.id === selectedUserId);
 
   const { sessoes, createSessao, updateSessao } = useMentoriaSessoes(selectedUserId);
-  const { recursos, createRecurso, updateRecurso, deleteRecurso } = useMentoriaRecursos(selectedUserId);
   const { projetos, createProjeto, updateProjeto, deleteProjeto } = useMentoriaProjetos(selectedUserId);
-  const { bonus, createBonus, updateBonus, deleteBonus } = useMentoriaBonus(selectedUserId);
 
   const [sessaoModalOpen, setSessaoModalOpen] = useState(false);
-  const [recursoModalOpen, setRecursoModalOpen] = useState(false);
   const [projetoModalOpen, setProjetoModalOpen] = useState(false);
-  const [bonusModalOpen, setBonusModalOpen] = useState(false);
 
   const [editingSessao, setEditingSessao] = useState<SessaoMentoria | undefined>();
-  const [editingRecurso, setEditingRecurso] = useState<RecursoMentoria | undefined>();
   const [editingProjeto, setEditingProjeto] = useState<ProjetoMentoria | undefined>();
-  const [editingBonus, setEditingBonus] = useState<BonusMentoria | undefined>();
 
   useEffect(() => {
     if (selectedUserId) {
@@ -66,19 +54,9 @@ export default function MentoriaBusinessPage() {
     setSessaoModalOpen(true);
   };
 
-  const handleEditRecurso = (recurso: RecursoMentoria) => {
-    setEditingRecurso(recurso);
-    setRecursoModalOpen(true);
-  };
-
   const handleEditProjeto = (projeto: ProjetoMentoria) => {
     setEditingProjeto(projeto);
     setProjetoModalOpen(true);
-  };
-
-  const handleEditBonus = (bonusItem: BonusMentoria) => {
-    setEditingBonus(bonusItem);
-    setBonusModalOpen(true);
   };
 
   return (
@@ -90,7 +68,7 @@ export default function MentoriaBusinessPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">Mentoria Business</h1>
-            <Badge variant="secondary" className="bg-purple-500/10 text-purple-500">
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
               {users.length} mentorados
             </Badge>
           </div>
@@ -139,19 +117,23 @@ export default function MentoriaBusinessPage() {
       )}
 
       {selectedUserId && (
-        <Tabs defaultValue="diagnostico" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="diagnostico">
-              <FileText className="h-4 w-4 mr-2" />
-              Diagnóstico
-            </TabsTrigger>
-            <TabsTrigger value="roadmap">
-              <Route className="h-4 w-4 mr-2" />
-              Roadmap
+        <Tabs defaultValue="contrato" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="contrato">
+              <ClipboardList className="h-4 w-4 mr-2" />
+              Contrato
             </TabsTrigger>
             <TabsTrigger value="etapas">
               <Route className="h-4 w-4 mr-2" />
               Etapas
+            </TabsTrigger>
+            <TabsTrigger value="reports">
+              <FileText className="h-4 w-4 mr-2" />
+              Reports
+            </TabsTrigger>
+            <TabsTrigger value="sessoes">
+              <Calendar className="h-4 w-4 mr-2" />
+              Sessões
             </TabsTrigger>
             <TabsTrigger value="projetos">
               <FolderKanban className="h-4 w-4 mr-2" />
@@ -161,32 +143,65 @@ export default function MentoriaBusinessPage() {
               <CheckSquare className="h-4 w-4 mr-2" />
               Tarefas
             </TabsTrigger>
-            <TabsTrigger value="sessoes">
-              <Calendar className="h-4 w-4 mr-2" />
-              Sessões
-            </TabsTrigger>
-            <TabsTrigger value="recursos">
-              <BookOpen className="h-4 w-4 mr-2" />
-              Recursos
-            </TabsTrigger>
-            <TabsTrigger value="bonus">
-              <Gift className="h-4 w-4 mr-2" />
-              Bônus
-            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="diagnostico" className="space-y-4">
-            <DiagnosticoAdmin userId={selectedUserId} />
+          {/* Aba Contrato - NOVA */}
+          <TabsContent value="contrato" className="space-y-4">
+            <ContratoBusinessManager 
+              userId={selectedUserId} 
+              userName={selectedUser?.nome_completo} 
+            />
           </TabsContent>
 
-          <TabsContent value="roadmap" className="space-y-4">
-            <ProcessoRoadmap userId={selectedUserId} isAdmin={true} />
-          </TabsContent>
-
+          {/* Aba Etapas - EXISTENTE */}
           <TabsContent value="etapas" className="space-y-4">
             <EtapasManager userId={selectedUserId} userName={selectedUser?.nome_completo} />
           </TabsContent>
 
+          {/* Aba Reports - NOVA */}
+          <TabsContent value="reports" className="space-y-4">
+            <ReportsBusinessManager 
+              userId={selectedUserId} 
+              userName={selectedUser?.nome_completo} 
+            />
+          </TabsContent>
+
+          {/* Aba Sessões - EXISTENTE */}
+          <TabsContent value="sessoes" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Sessões de {selectedUser?.nome_completo}</h2>
+              <Button onClick={() => { setEditingSessao(undefined); setSessaoModalOpen(true); }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Sessão
+              </Button>
+            </div>
+
+            <div className="grid gap-4">
+              {sessoes.map((sessao) => (
+                <Card key={sessao.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditSessao(sessao)}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-lg">{sessao.titulo}</CardTitle>
+                      <Badge variant={sessao.status === "realizada" ? "default" : sessao.status === "agendada" ? "secondary" : "destructive"}>
+                        {sessao.status === "agendada" ? "Agendada" : sessao.status === "realizada" ? "Realizada" : "Cancelada"}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1 text-sm">
+                      <p><strong>Data:</strong> {format(new Date(sessao.data_sessao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
+                      {sessao.duracao && <p><strong>Duração:</strong> {sessao.duracao} minutos</p>}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {sessoes.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">Nenhuma sessão cadastrada</p>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Aba Projetos - EXISTENTE */}
           <TabsContent value="projetos" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Projetos de {selectedUser?.nome_completo}</h2>
@@ -279,180 +294,9 @@ export default function MentoriaBusinessPage() {
             </div>
           </TabsContent>
 
+          {/* Aba Tarefas - EXISTENTE */}
           <TabsContent value="tarefas" className="space-y-4">
             <TarefasAdmin userId={selectedUserId} />
-          </TabsContent>
-
-          <TabsContent value="sessoes" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Sessões de {selectedUser?.nome_completo}</h2>
-              <Button onClick={() => { setEditingSessao(undefined); setSessaoModalOpen(true); }}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nova Sessão
-              </Button>
-            </div>
-
-            <div className="grid gap-4">
-              {sessoes.map((sessao) => (
-                <Card key={sessao.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditSessao(sessao)}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{sessao.titulo}</CardTitle>
-                      <Badge variant={sessao.status === "realizada" ? "default" : sessao.status === "agendada" ? "secondary" : "destructive"}>
-                        {sessao.status === "agendada" ? "Agendada" : sessao.status === "realizada" ? "Realizada" : "Cancelada"}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-1 text-sm">
-                      <p><strong>Data:</strong> {format(new Date(sessao.data_sessao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
-                      {sessao.duracao && <p><strong>Duração:</strong> {sessao.duracao} minutos</p>}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {sessoes.length === 0 && (
-                <p className="text-center text-muted-foreground py-8">Nenhuma sessão cadastrada</p>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="recursos" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Recursos de {selectedUser?.nome_completo}</h2>
-              <Button onClick={() => { setEditingRecurso(undefined); setRecursoModalOpen(true); }}>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Recurso
-              </Button>
-            </div>
-
-            <div className="grid gap-4">
-              {recursos.map((recurso) => (
-                <Card key={recurso.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditRecurso(recurso)}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{recurso.nome}</CardTitle>
-                      <Badge>{recurso.categoria}</Badge>
-                    </div>
-                    <CardDescription>{recurso.descricao}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{recurso.para_que_serve}</p>
-                  </CardContent>
-                </Card>
-              ))}
-              {recursos.length === 0 && (
-                <p className="text-center text-muted-foreground py-8">Nenhum recurso cadastrado</p>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="bonus" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Bônus de {selectedUser?.nome_completo}</h2>
-              <Button onClick={() => { setEditingBonus(undefined); setBonusModalOpen(true); }}>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Bônus
-              </Button>
-            </div>
-
-            <div className="grid gap-4">
-              {bonus.filter(b => b.user_id === selectedUserId).map((bonusItem) => {
-                const arquivos = getArquivoUrls(bonusItem.arquivo_url);
-                return (
-                  <Card key={bonusItem.id}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-2">
-                          {bonusItem.liberado ? (
-                            <CheckCircle className="h-5 w-5 text-green-500" />
-                          ) : (
-                            <Lock className="h-5 w-5 text-muted-foreground" />
-                          )}
-                          <CardTitle className="text-lg">{bonusItem.nome}</CardTitle>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEditBonus(bonusItem)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Excluir Bônus</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Tem certeza que deseja excluir o bônus "{bonusItem.nome}"? Esta ação não pode ser desfeita.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteBonus(bonusItem.id)}>
-                                  Excluir
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </div>
-                      <CardDescription>{bonusItem.descricao}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">Condição</p>
-                          <p className="font-medium">{bonusItem.condicao_tipo}</p>
-                          {bonusItem.condicao_descricao && (
-                            <p className="text-xs text-muted-foreground">{bonusItem.condicao_descricao}</p>
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Status</p>
-                          <Badge variant={bonusItem.liberado ? "default" : "secondary"}>
-                            {bonusItem.liberado ? "Liberado" : "Bloqueado"}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {bonusItem.link && (
-                        <div className="flex items-center gap-2">
-                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                          <a href={bonusItem.link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                            Acessar link
-                          </a>
-                        </div>
-                      )}
-
-                      {arquivos.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-sm text-muted-foreground">Arquivos:</p>
-                          <div className="flex flex-wrap gap-2">
-                            {arquivos.map((url, idx) => (
-                              <a
-                                key={idx}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-xs bg-muted px-2 py-1 rounded hover:bg-muted/80"
-                              >
-                                <FileDown className="h-3 w-3" />
-                                Arquivo {idx + 1}
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-              {bonus.filter(b => b.user_id === selectedUserId).length === 0 && (
-                <p className="text-center text-muted-foreground py-8">Nenhum bônus cadastrado para este mentorado</p>
-              )}
-            </div>
           </TabsContent>
         </Tabs>
       )}
@@ -473,21 +317,6 @@ export default function MentoriaBusinessPage() {
         }}
       />
 
-      <RecursoModal
-        open={recursoModalOpen}
-        onOpenChange={setRecursoModalOpen}
-        recurso={editingRecurso}
-        userId={selectedUserId}
-        onSubmit={(data) => {
-          if (editingRecurso) {
-            updateRecurso({ ...editingRecurso, ...data });
-          } else {
-            createRecurso(data);
-          }
-          setRecursoModalOpen(false);
-        }}
-      />
-
       <ProjetoModal
         open={projetoModalOpen}
         onOpenChange={setProjetoModalOpen}
@@ -500,21 +329,6 @@ export default function MentoriaBusinessPage() {
             createProjeto(data);
           }
           setProjetoModalOpen(false);
-        }}
-      />
-
-      <BonusModal
-        open={bonusModalOpen}
-        onOpenChange={setBonusModalOpen}
-        bonus={editingBonus}
-        userId={selectedUserId}
-        onSubmit={(data) => {
-          if (editingBonus) {
-            updateBonus({ ...editingBonus, ...data });
-          } else {
-            createBonus(data);
-          }
-          setBonusModalOpen(false);
         }}
       />
     </div>
