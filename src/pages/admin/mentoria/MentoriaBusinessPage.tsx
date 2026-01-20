@@ -7,7 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks } from "lucide-react";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import TasksBusinessManager from "@/components/admin/business/TasksBusinessManager";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { EtapasManager } from "@/components/admin/business/EtapasManager";
@@ -34,7 +36,35 @@ export default function MentoriaBusinessPage() {
   // Buscar contrato do usuário selecionado
   const { contrato } = useContratosBusiness(selectedUserId);
 
-  const { sessoes, createSessao, updateSessao } = useMentoriaSessoes(selectedUserId);
+  const { sessoes, createSessao, updateSessao, deleteSessao, bulkCreateSessoes } = useMentoriaSessoes(selectedUserId);
+  const { data: etapas = [] } = useEtapasBusiness(contrato?.id);
+
+  // Etapas que não têm sessão vinculada
+  const etapasSemSessao = etapas.filter(
+    etapa => !sessoes.some(s => s.etapa_id === etapa.id)
+  );
+
+  const handleSincronizarSessoes = async () => {
+    if (etapasSemSessao.length === 0 || !selectedUserId) return;
+    
+    const sessoesParaCriar = etapasSemSessao.map(etapa => ({
+      user_id: selectedUserId,
+      titulo: `Encontro ${etapa.numero_etapa}: ${etapa.titulo}`,
+      data_sessao: etapa.data_prevista 
+        ? new Date(etapa.data_prevista + 'T10:00:00').toISOString() 
+        : new Date().toISOString(),
+      status: 'agendada' as const,
+      notas: etapa.objetivo || '',
+      etapa_id: etapa.id,
+    }));
+
+    try {
+      await bulkCreateSessoes(sessoesParaCriar);
+      toast.success(`${sessoesParaCriar.length} sessões criadas com sucesso!`);
+    } catch (error: any) {
+      toast.error("Erro ao criar sessões: " + error.message);
+    }
+  };
 
   const [sessaoModalOpen, setSessaoModalOpen] = useState(false);
   const [editingSessao, setEditingSessao] = useState<SessaoMentoria | undefined>();
@@ -158,10 +188,22 @@ export default function MentoriaBusinessPage() {
                 <h2 className="text-lg font-semibold">Sessões</h2>
                 <Badge variant="secondary" className="text-xs">{sessoes.length}</Badge>
               </div>
-              <Button size="sm" onClick={() => { setEditingSessao(undefined); setSessaoModalOpen(true); }}>
-                <Plus className="h-4 w-4 mr-1" />
-                Nova Sessão
-              </Button>
+              <div className="flex items-center gap-2">
+                {etapasSemSessao.length > 0 && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleSincronizarSessoes}
+                  >
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    Gerar {etapasSemSessao.length} Sessões
+                  </Button>
+                )}
+                <Button size="sm" onClick={() => { setEditingSessao(undefined); setSessaoModalOpen(true); }}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Nova Sessão
+                </Button>
+              </div>
             </div>
 
             <div className="grid gap-3">
@@ -272,6 +314,10 @@ export default function MentoriaBusinessPage() {
           } else {
             createSessao(data);
           }
+          setSessaoModalOpen(false);
+        }}
+        onDelete={(id) => {
+          deleteSessao(id);
           setSessaoModalOpen(false);
         }}
       />
