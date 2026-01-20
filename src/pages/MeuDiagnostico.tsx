@@ -46,7 +46,7 @@ export default function MeuDiagnostico() {
     } else {
       navigate('/diagnostico/formulario', { replace: true });
     }
-  }, [isLoading, planLoading, isVisitante, isBusiness, isAdmin, formulario, navigate]);
+  }, [isLoading, planLoading, isVisitante, isBusiness, isAdmin, isSimulating, formulario, navigate]);
 
   // Tela de loading enquanto redireciona
   return (

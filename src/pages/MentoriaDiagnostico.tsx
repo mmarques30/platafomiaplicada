@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
 import { InsightIA } from "@/components/mentoria/InsightIA";
@@ -16,8 +16,8 @@ export default function MentoriaDiagnostico() {
   const navigate = useNavigate();
   const location = useLocation();
   const { formulario, isLoading, refetch } = useMentoriaForm();
-  const { plan } = useUserPlan();
-  const { isAdmin, isVisitante, isLoading: roleLoading } = useUserRole();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { effectivePlan, isVisitante, isBusiness, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
 
   // Check if accessed via /diagnostico route (Academy-specific)
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');
@@ -28,19 +28,23 @@ export default function MentoriaDiagnostico() {
 
   // Redirecionar visitantes - não devem acessar esta página
   useEffect(() => {
-    if (!roleLoading && isVisitante) {
+    // Aguardar loading completo antes de decidir redirect
+    if (planLoading) return;
+    
+    if (isVisitante) {
       toast.info("Esta funcionalidade requer um plano ativo");
       navigate("/trilhas", { replace: true });
     }
-  }, [isVisitante, roleLoading, navigate]);
+  }, [isVisitante, planLoading, navigate]);
 
-  // GUARD DEFINITIVO: Admin em /diagnostico/formulario SEM ?edit=1 => vai para painel
+  // GUARD DEFINITIVO: Admin REAL (não simulando) em /diagnostico/formulario SEM ?edit=1 => vai para painel
   useEffect(() => {
-    if (roleLoading) return;
-    if (isAdmin && isFormularioRoute && !canEdit) {
+    if (planLoading) return;
+    const isRealAdmin = isAdmin && !isSimulating;
+    if (isRealAdmin && isFormularioRoute && !canEdit) {
       navigate("/diagnostico/painel", { replace: true });
     }
-  }, [isAdmin, isFormularioRoute, canEdit, roleLoading, navigate]);
+  }, [isAdmin, isSimulating, isFormularioRoute, canEdit, planLoading, navigate]);
 
   // Admin pode acessar esta rota sem redirecionamento automático.
   // (Evita loop de replaceState entre /diagnostico/formulario e /diagnostico/painel)
@@ -48,20 +52,21 @@ export default function MentoriaDiagnostico() {
 
   const naoPreencheu = !formulario?.completado;
   const preenchido = formulario?.completado;
+  const isRealAdmin = isAdmin && !isSimulating;
   
-  const voltarUrl = isAdmin 
+  const voltarUrl = isRealAdmin 
     ? '/mentoria' 
-    : !plan 
+    : !effectivePlan 
       ? '/comunidade' 
-      : (plan === 'academy' || isAcademyRoute)
+      : (effectivePlan === 'academy' || isAcademyRoute)
         ? '/meu-diagnostico' 
         : '/mentoria';
   
-  const voltarLabel = isAdmin 
+  const voltarLabel = isRealAdmin 
     ? 'Voltar para Mentoria' 
-    : !plan 
+    : !effectivePlan 
       ? 'Voltar para Comunidade' 
-      : (plan === 'academy' || isAcademyRoute)
+      : (effectivePlan === 'academy' || isAcademyRoute)
         ? 'Voltar para Meu Diagnóstico' 
         : 'Voltar para Mentoria';
 
@@ -70,7 +75,7 @@ export default function MentoriaDiagnostico() {
   };
 
   // Não renderizar enquanto carrega ou se for visitante
-  if (isLoading || roleLoading || isVisitante) {
+  if (isLoading || planLoading || isVisitante) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -98,12 +103,12 @@ export default function MentoriaDiagnostico() {
       )}
 
       {/* Business Dashboard - quando já preencheu e é Business */}
-      {preenchido && plan === 'business' && (
+      {preenchido && isBusiness && (
         <BusinessDashboard diagnostico={formulario} />
       )}
 
       {/* Resumo + Insight - quando já preencheu e é Academy */}
-      {preenchido && plan !== 'business' && (
+      {preenchido && !isBusiness && (
         <div className="w-full space-y-6">
           {formulario.preenchido_por === 'admin' && (
             <Alert>
