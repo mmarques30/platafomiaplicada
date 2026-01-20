@@ -14,10 +14,10 @@ interface StepProps {
 export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
   return (
     <div className="space-y-6">
-      {/* Premium Header */}
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-purple-500/30">
-          <Wrench className="h-5 w-5 text-purple-400" />
+        <div className="p-2 rounded-lg bg-primary/10">
+          <Wrench className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-foreground">O Que Vamos Construir</h3>
@@ -25,9 +25,9 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
         </div>
       </div>
 
-      <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20 mb-6">
+      <div className="p-4 rounded-lg bg-muted/50 border border-border mb-6">
         <p className="text-sm text-foreground/80">
-          <strong className="text-purple-400">Importante:</strong> Quanto mais detalhes você fornecer, 
+          <strong className="text-primary">Importante:</strong> Quanto mais detalhes você fornecer, 
           mais precisa será a solução que vamos construir para você.
         </p>
       </div>
@@ -41,7 +41,7 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
             <FormControl>
               <Textarea
                 placeholder="Ex: Gastamos muito tempo respondendo e-mails de clientes com dúvidas repetitivas..."
-                className="min-h-[100px] bg-card border-border"
+                className="min-h-[100px]"
                 {...field}
               />
             </FormControl>
@@ -59,7 +59,7 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
             <FormControl>
               <Textarea
                 placeholder="Ex: Hoje recebemos cerca de 50 e-mails por dia. Cada um precisa ser lido, categorizado e respondido manualmente..."
-                className="min-h-[100px] bg-card border-border"
+                className="min-h-[100px]"
                 {...field}
               />
             </FormControl>
@@ -77,7 +77,7 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
             <FormControl>
               <Textarea
                 placeholder="Ex: Quero que a IA responda automaticamente 80% dos e-mails e me notifique apenas os urgentes..."
-                className="min-h-[100px] bg-card border-border"
+                className="min-h-[100px]"
                 {...field}
               />
             </FormControl>
@@ -95,7 +95,7 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
             <FormControl>
               <Textarea
                 placeholder="Conte se já tentou alguma solução e o que não funcionou..."
-                className="min-h-[80px] bg-card border-border"
+                className="min-h-[80px]"
                 {...field}
               />
             </FormControl>
@@ -109,10 +109,7 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
           <ArrowLeft className="h-4 w-4" />
           Anterior
         </Button>
-        <Button 
-          onClick={onNext} 
-          className="gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
-        >
+        <Button onClick={onNext} className="gap-2">
           Próximo
           <ArrowRight className="h-4 w-4" />
         </Button>
