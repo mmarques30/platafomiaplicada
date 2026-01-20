@@ -5,6 +5,7 @@ import { toast } from "sonner";
 export interface EntregaBusiness {
   id: string;
   contrato_id: string;
+  etapa_id?: string;
   titulo: string;
   descricao?: string;
   modulo_relacionado?: string;
@@ -21,6 +22,7 @@ export interface EntregaBusiness {
 
 export interface EntregaInput {
   contrato_id: string;
+  etapa_id?: string;
   titulo: string;
   descricao?: string;
   modulo_relacionado?: string;
