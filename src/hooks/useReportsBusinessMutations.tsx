@@ -17,6 +17,9 @@ export interface ReportBusinessInput {
   resumo_executivo?: string | null;
 }
 
+// Type helper para compatibilidade com Supabase Json
+type JsonCompatible = string | number | boolean | null | { [key: string]: JsonCompatible } | JsonCompatible[];
+
 export interface ReportGeradoIA {
   titulo: string;
   resumo_executivo: string;
@@ -64,12 +67,23 @@ export function useReportsBusinessMutations(contratoId?: string) {
 
   const createReport = useMutation({
     mutationFn: async (data: ReportBusinessInput) => {
+      const insertData = {
+        contrato_id: data.contrato_id,
+        titulo: data.titulo,
+        descricao: data.descricao,
+        arquivo_url: data.arquivo_url,
+        periodo_referencia: data.periodo_referencia,
+        data_envio: data.data_envio || new Date().toISOString(),
+        tipo: data.tipo,
+        conteudo_html: data.conteudo_html,
+        metricas: data.metricas as JsonCompatible,
+        gerado_por_ia: data.gerado_por_ia,
+        resumo_executivo: data.resumo_executivo,
+      };
+
       const { data: result, error } = await supabase
         .from("reports_business")
-        .insert({
-          ...data,
-          data_envio: data.data_envio || new Date().toISOString(),
-        })
+        .insert(insertData)
         .select()
         .single();
 
@@ -95,9 +109,14 @@ export function useReportsBusinessMutations(contratoId?: string) {
 
   const updateReport = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<ReportBusinessInput> }) => {
+      const updateData: Record<string, unknown> = { ...data };
+      if (data.metricas) {
+        updateData.metricas = data.metricas as JsonCompatible;
+      }
+
       const { data: result, error } = await supabase
         .from("reports_business")
-        .update(data)
+        .update(updateData)
         .eq("id", id)
         .select()
         .single();

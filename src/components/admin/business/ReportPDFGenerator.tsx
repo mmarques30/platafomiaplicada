@@ -68,7 +68,7 @@ export function generateReportPDF({ report, nomeEmpresa, nomeMentorado }: Report
   yPos += 15;
 
   // Métricas (se disponíveis)
-  const metricas = report.metricas as Record<string, any> | null;
+  const metricas = (report as any).metricas as Record<string, any> | null;
   if (metricas) {
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
@@ -105,7 +105,7 @@ export function generateReportPDF({ report, nomeEmpresa, nomeMentorado }: Report
   }
 
   // Resumo Executivo
-  const resumo = report.resumo_executivo || report.descricao;
+  const resumo = (report as any).resumo_executivo || report.descricao;
   if (resumo) {
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");

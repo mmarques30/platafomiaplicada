@@ -26,6 +26,37 @@ export interface ContratoBusiness {
   observacoes: string | null;
   created_at: string;
   updated_at: string;
+  // Campos adicionais do banco
+  modulos_selecionados?: Array<{ nome: string; descricao?: string }> | null;
+  fases_projeto?: Array<{ nome: string; descricao?: string }> | null;
+  contexto_transformacao?: string | null;
+  dores_mapeadas?: string[] | null;
+  nome_empresa?: string | null;
+  razao_social?: string | null;
+  cnpj?: string | null;
+  representante_nome?: string | null;
+  representante_email?: string | null;
+  representante_cpf?: string | null;
+  representante_rg?: string | null;
+  endereco?: string | null;
+  setor_atuacao?: string | null;
+  desafios_estrategicos?: string[] | null;
+  desafios_operacionais?: string[] | null;
+  solucao_proposta?: Record<string, unknown> | null;
+  metricas_performance?: Record<string, unknown> | null;
+  garantias?: string[] | null;
+  proximos_passos?: string[] | null;
+  cases_referencia?: string | null;
+  creditos_iniciais?: number | null;
+  valor_credito_adicional?: number | null;
+  valor_hora_tecnica?: number | null;
+  duracao_academy_meses?: number | null;
+  valor_entrada?: number | null;
+  numero_parcelas?: number | null;
+  valor_parcela?: number | null;
+  multa_rescisao_percentual?: number | null;
+  data_assinatura?: string | null;
+  tabela_manutencao?: Record<string, unknown> | null;
 }
 
 export interface ReportBusiness {
@@ -37,6 +68,12 @@ export interface ReportBusiness {
   periodo_referencia: string | null;
   data_envio: string;
   created_at: string;
+  // Campos novos para reports IA
+  tipo?: string | null;
+  conteudo_html?: string | null;
+  metricas?: Record<string, unknown> | null;
+  gerado_por_ia?: boolean | null;
+  resumo_executivo?: string | null;
 }
 
 export function useContratosBusiness(userId?: string) {
