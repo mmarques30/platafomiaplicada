@@ -4,7 +4,7 @@ import {
   Calendar, 
   Map, 
   FolderKanban, 
-  ListTodo, 
+  AlertCircle, 
   FileText 
 } from "lucide-react";
 
@@ -18,10 +18,10 @@ interface QuickNavItem {
 const navItems: QuickNavItem[] = [
   { title: "Diagnóstico", path: "/mentoria/diagnostico", icon: ClipboardCheck },
   { title: "Sessões", path: "/mentoria/sessoes", icon: Calendar },
+  { title: "Etapas", path: "/mentoria?tab=roadmap", icon: FolderKanban },
+  { title: "Pendências", path: "/mentoria/validacoes", icon: AlertCircle },
+  { title: "Reports", path: "/mentoria/reports", icon: FileText },
   { title: "MAPA", path: "https://mapa.iaplicada.com.br", icon: Map, external: true },
-  { title: "Projetos", path: "/mentoria/projetos", icon: FolderKanban },
-  { title: "Tarefas", path: "/mentoria/tarefas", icon: ListTodo },
-  { title: "Instruções", path: "/mentoria?tab=roadmap", icon: FileText },
 ];
 
 export function BusinessAcessoRapido() {
