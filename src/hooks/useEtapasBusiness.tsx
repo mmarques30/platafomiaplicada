@@ -151,6 +151,7 @@ export function useUpdateEtapa() {
 }
 
 // Nova função para criar etapas em lote (geradas via IA)
+// Retorna as etapas criadas com seus IDs para uso posterior
 export function useBulkCreateEtapas() {
   const queryClient = useQueryClient();
 
@@ -158,7 +159,7 @@ export function useBulkCreateEtapas() {
     mutationFn: async ({ contratoId, etapas }: { 
       contratoId: string; 
       etapas: EtapaGeradaIA[] 
-    }) => {
+    }): Promise<{ data: EtapaBusiness[]; contratoId: string }> => {
       const etapasFormatadas = etapas.map(e => ({
         contrato_id: contratoId,
         numero_etapa: e.numero_etapa,
@@ -175,11 +176,10 @@ export function useBulkCreateEtapas() {
         .select();
 
       if (error) throw error;
-      return { data, contratoId };
+      return { data: data as EtapaBusiness[], contratoId };
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['etapas-business', result.contratoId] });
-      toast.success(`${result.data.length} etapas criadas com sucesso!`);
     },
     onError: (error) => {
       console.error('Erro ao criar etapas em lote:', error);

@@ -8,7 +8,9 @@ import { Loader2, Sparkles, Calendar, Target, CheckCircle2, AlertCircle } from "
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useGerarEtapasIA, useBulkCreateEtapas, type EtapaGeradaIA } from "@/hooks/useEtapasBusiness";
+import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { ContratoBusiness } from "@/hooks/useContratosBusiness";
+import { toast } from "sonner";
 
 interface GerarEtapasIAModalProps {
   open: boolean;
@@ -20,9 +22,11 @@ interface GerarEtapasIAModalProps {
 export function GerarEtapasIAModal({ open, onOpenChange, contrato, onSuccess }: GerarEtapasIAModalProps) {
   const [etapasGeradas, setEtapasGeradas] = useState<EtapaGeradaIA[] | null>(null);
   const [meta, setMeta] = useState<{ total_etapas: number; dias_por_etapa: number } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   const gerarEtapas = useGerarEtapasIA();
   const bulkCreate = useBulkCreateEtapas();
+  const { bulkCreateSessoes } = useMentoriaSessoes(contrato.user_id);
 
   const handleGerar = async () => {
     // Usa os campos do contrato, com fallback para valores vazios
@@ -50,16 +54,40 @@ export function GerarEtapasIAModal({ open, onOpenChange, contrato, onSuccess }: 
 
   const handleConfirmar = async () => {
     if (!etapasGeradas) return;
+    setIsSaving(true);
 
-    await bulkCreate.mutateAsync({
-      contratoId: contrato.id,
-      etapas: etapasGeradas,
-    });
+    try {
+      // 1. Criar etapas e obter os IDs
+      const { data: etapasCriadas } = await bulkCreate.mutateAsync({
+        contratoId: contrato.id,
+        etapas: etapasGeradas,
+      });
 
-    onSuccess();
-    onOpenChange(false);
-    setEtapasGeradas(null);
-    setMeta(null);
+      // 2. Criar sessões correspondentes para cada etapa
+      const sessoesParaCriar = etapasCriadas.map(etapa => ({
+        user_id: contrato.user_id,
+        titulo: `Encontro ${etapa.numero_etapa}: ${etapa.titulo}`,
+        data_sessao: etapa.data_prevista 
+          ? new Date(etapa.data_prevista + 'T10:00:00').toISOString() 
+          : new Date().toISOString(),
+        status: 'agendada' as const,
+        notas: etapa.objetivo || '',
+        etapa_id: etapa.id,
+      }));
+
+      await bulkCreateSessoes(sessoesParaCriar);
+      
+      toast.success(`${etapasCriadas.length} etapas e sessões criadas com sucesso!`);
+      onSuccess();
+      onOpenChange(false);
+      setEtapasGeradas(null);
+      setMeta(null);
+    } catch (error) {
+      console.error('Erro ao salvar etapas e sessões:', error);
+      toast.error('Erro ao salvar. Tente novamente.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleClose = () => {
@@ -200,11 +228,11 @@ export function GerarEtapasIAModal({ open, onOpenChange, contrato, onSuccess }: 
               )}
             </Button>
           ) : (
-            <Button onClick={handleConfirmar} disabled={bulkCreate.isPending}>
-              {bulkCreate.isPending ? (
+            <Button onClick={handleConfirmar} disabled={isSaving}>
+              {isSaving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Salvando...
+                  Salvando etapas e sessões...
                 </>
               ) : (
                 <>

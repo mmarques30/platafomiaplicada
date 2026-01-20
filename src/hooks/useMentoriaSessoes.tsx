@@ -15,6 +15,7 @@ export type SessaoMentoria = {
   notas?: string;
   feedback_entregas?: string;
   status: "agendada" | "realizada" | "cancelada";
+  etapa_id?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -157,11 +158,38 @@ export const useMentoriaSessoes = (userId?: string) => {
     }
   });
 
+  // Bulk create para criar múltiplas sessões de uma vez
+  const bulkCreateSessoes = async (sessoesData: Array<Partial<SessaoMentoria>>) => {
+    const token = await getAccessTokenOrThrow();
+
+    const res = await fetch(`${supabaseUrl}/rest/v1/sessoes_mentoria`, {
+      method: "POST",
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify(sessoesData),
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const message = json?.message || json?.error_description || json?.error || `Erro (${res.status})`;
+      throw new Error(message);
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["sessoes-mentoria"] });
+    return json as SessaoMentoria[];
+  };
+
   return {
     sessoes: sessoes || [],
     isLoading,
     createSessao: createSessao.mutate,
     updateSessao: updateSessao.mutate,
+    bulkCreateSessoes,
     isCreating: createSessao.isPending,
     isUpdating: updateSessao.isPending
   };

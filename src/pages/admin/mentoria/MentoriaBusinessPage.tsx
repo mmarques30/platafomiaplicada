@@ -111,13 +111,17 @@ export default function MentoriaBusinessPage() {
               <ClipboardList className="h-3.5 w-3.5" />
               Contrato
             </TabsTrigger>
+            <TabsTrigger value="etapas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Route className="h-3.5 w-3.5" />
+              Etapas
+            </TabsTrigger>
             <TabsTrigger value="sessoes" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <Calendar className="h-3.5 w-3.5" />
               Sessões
             </TabsTrigger>
-            <TabsTrigger value="etapas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              <Route className="h-3.5 w-3.5" />
-              Etapas
+            <TabsTrigger value="entregas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <FolderKanban className="h-3.5 w-3.5" />
+              Entregas
             </TabsTrigger>
             <TabsTrigger value="instrucoes" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <ListChecks className="h-3.5 w-3.5" />
@@ -126,10 +130,6 @@ export default function MentoriaBusinessPage() {
             <TabsTrigger value="tasks" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <ClipboardCheck className="h-3.5 w-3.5" />
               Tasks
-            </TabsTrigger>
-            <TabsTrigger value="entregas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              <FolderKanban className="h-3.5 w-3.5" />
-              Entregas
             </TabsTrigger>
             <TabsTrigger value="reports" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <FileText className="h-3.5 w-3.5" />
@@ -148,14 +148,6 @@ export default function MentoriaBusinessPage() {
           {/* Aba Etapas */}
           <TabsContent value="etapas" className="space-y-4 mt-4">
             <EtapasManager userId={selectedUserId} userName={selectedUser?.nome_completo} />
-          </TabsContent>
-
-          {/* Aba Reports */}
-          <TabsContent value="reports" className="space-y-4 mt-4">
-            <ReportsBusinessManager 
-              userId={selectedUserId} 
-              userName={selectedUser?.nome_completo} 
-            />
           </TabsContent>
 
           {/* Aba Sessões */}
@@ -256,6 +248,14 @@ export default function MentoriaBusinessPage() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* Aba Reports */}
+          <TabsContent value="reports" className="space-y-4 mt-4">
+            <ReportsBusinessManager 
+              userId={selectedUserId} 
+              userName={selectedUser?.nome_completo} 
+            />
           </TabsContent>
         </Tabs>
       )}
