@@ -90,9 +90,6 @@ export function InstrucaoFormModal({
     },
   });
 
-  // Watch responsável para exibir/ocultar seção de IA
-  const responsavelAtual = form.watch('responsavel');
-  const mostrarOrientacaoIA = responsavelAtual !== 'mentor';
 
   useEffect(() => {
     if (open) {
@@ -236,7 +233,6 @@ export function InstrucaoFormModal({
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="voce">Cliente</SelectItem>
-                        <SelectItem value="mentor">Consultoria</SelectItem>
                         <SelectItem value="conjunto">Conjunto</SelectItem>
                       </SelectContent>
                     </Select>
@@ -279,65 +275,61 @@ export function InstrucaoFormModal({
               etapaId={etapaId}
             />
 
-            {/* Seção de IA - apenas para Cliente e Conjunto */}
-            {mostrarOrientacaoIA && (
-              <>
-                <Separator />
+            {/* Seção de IA */}
+            <Separator />
 
-                <div className="space-y-4">
-                  <h4 className="font-medium text-sm text-muted-foreground">
-                    ORIENTAÇÃO PARA IA (opcional)
-                  </h4>
-                  
-                  <Textarea
-                    placeholder="Cole aqui o texto orientativo. A IA irá usar este conteúdo para personalizar a descrição da instrução considerando o contexto do projeto e os recursos anexados..."
-                    value={textoOrientativo}
-                    onChange={(e) => setTextoOrientativo(e.target.value)}
-                    rows={4}
-                    className="resize-none"
-                  />
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground">
+                ORIENTAÇÃO PARA IA (opcional)
+              </h4>
+              
+              <Textarea
+                placeholder="Cole aqui o texto orientativo. A IA irá usar este conteúdo para personalizar a descrição da instrução considerando o contexto do projeto e os recursos anexados..."
+                value={textoOrientativo}
+                onChange={(e) => setTextoOrientativo(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handlePersonalizar}
-                    disabled={isPersonalizing || !textoOrientativo.trim()}
-                    className="w-full"
-                  >
-                    {isPersonalizing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Personalizando...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Personalizar via IA
-                      </>
-                    )}
-                  </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePersonalizar}
+                disabled={isPersonalizing || !textoOrientativo.trim()}
+                className="w-full"
+              >
+                {isPersonalizing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Personalizando...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Personalizar via IA
+                  </>
+                )}
+              </Button>
 
-                  <FormField
-                    control={form.control}
-                    name="descricao"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Descrição (editável)</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Descrição da instrução para o cliente..."
-                            className="resize-none"
-                            rows={4}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </>
-            )}
+              <FormField
+                control={form.control}
+                name="descricao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição (editável)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Descrição da instrução para o cliente..."
+                        className="resize-none"
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Separator />
 
