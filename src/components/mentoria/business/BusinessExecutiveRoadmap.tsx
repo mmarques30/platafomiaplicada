@@ -2,44 +2,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { 
   CheckCircle2, 
   Clock, 
-  FileText, 
-  BookOpen,
-  Download,
-  ChevronRight
+  FileText,
+  ChevronRight,
+  AlertTriangle
 } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
-import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
+import { useTasksByUser } from "@/hooks/useTasksBusiness";
+import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { format, parseISO, isPast } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
 export function BusinessExecutiveRoadmap() {
-  const { contrato, reports, progresso, isLoading } = useContratosBusiness();
-  const { sessoes } = useMentoriaSessoes();
+  const { contrato, reports, isLoading } = useContratosBusiness();
   const { data: etapas } = useEtapasBusiness(contrato?.id);
+  const { user } = useAuth();
+  const { data: tasks } = useTasksByUser(user?.id);
   const navigate = useNavigate();
 
-  // Usar todas as sessões como reuniões recorrentes
-  const reunioesRecorrentes = sessoes || [];
+  const tasksPendentes = tasks?.filter(t => 
+    t.status === 'pendente' || t.status === 'revisao_solicitada'
+  ).length || 0;
 
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-12 bg-muted rounded-xl" />
         <div className="h-48 bg-muted rounded-xl" />
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="h-40 bg-muted rounded-xl" />
+        <div className="grid md:grid-cols-2 gap-4">
           <div className="h-40 bg-muted rounded-xl" />
           <div className="h-40 bg-muted rounded-xl" />
         </div>
@@ -52,22 +47,24 @@ export function BusinessExecutiveRoadmap() {
 
   // Dados de exemplo para o modo preview
   const entregasExemplo = [
-    { titulo: "Diagnóstico Inicial", tipo: "Análise", status: "pendente", prazo: null },
-    { titulo: "Desenvolvimento de Solução", tipo: "Implementação", status: "pendente", prazo: null },
-    { titulo: "Treinamento da Equipe", tipo: "Capacitação", status: "pendente", prazo: null },
-    { titulo: "Go-Live e Acompanhamento", tipo: "Entrega", status: "pendente", prazo: null },
+    { id: null, titulo: "Diagnóstico Inicial", tipo: "Análise", status: "pendente", prazo: null },
+    { id: null, titulo: "Desenvolvimento de Solução", tipo: "Implementação", status: "pendente", prazo: null },
+    { id: null, titulo: "Treinamento da Equipe", tipo: "Capacitação", status: "pendente", prazo: null },
+    { id: null, titulo: "Go-Live e Acompanhamento", tipo: "Entrega", status: "pendente", prazo: null },
   ];
 
-  const entregas = isPreview ? entregasExemplo : (contrato?.entregas_esperadas || []);
+  // Mapear etapas reais para o formato do timeline
+  const entregasFromEtapas = etapas?.map(etapa => ({
+    id: etapa.id,
+    titulo: etapa.titulo,
+    tipo: `Etapa ${etapa.numero_etapa}`,
+    prazo: etapa.data_prevista,
+    status: etapa.status || 'pendente',
+  })) || [];
+
+  const entregas = isPreview ? entregasExemplo : entregasFromEtapas;
   const entregasConcluidas = isPreview ? 0 : entregas.filter(e => e.status === "concluida").length;
-  const progressoAtual = isPreview ? 0 : progresso.percentual;
-
-  // Dados de exemplo para guias de uso
-  const guiasExemplo = [
-    { titulo: "Como usar a plataforma", descricao: "Guia completo de navegação" },
-    { titulo: "Boas práticas de IA", descricao: "Dicas para maximizar resultados" },
-    { titulo: "FAQ - Perguntas frequentes", descricao: "Respostas às dúvidas comuns" },
-  ];
+  const progressoAtual = isPreview ? 0 : (entregas.length > 0 ? Math.round((entregasConcluidas / entregas.length) * 100) : 0);
 
   return (
     <div className="space-y-6">
@@ -88,13 +85,13 @@ export function BusinessExecutiveRoadmap() {
         <div className="flex justify-between text-sm">
           <span className="font-medium">Progresso do Roadmap</span>
           <span className="text-muted-foreground">
-            {entregasConcluidas}/{entregas.length} entregas ({progressoAtual}%)
+            {entregasConcluidas}/{entregas.length} etapas ({progressoAtual}%)
           </span>
         </div>
         <Progress value={progressoAtual} className="h-2" />
       </div>
 
-      {/* Timeline de Entregas */}
+      {/* Timeline de Entregas (Etapas) */}
       <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Entregas Esperadas</CardTitle>
@@ -111,11 +108,11 @@ export function BusinessExecutiveRoadmap() {
                 
                 return (
                   <div 
-                    key={index} 
-                    className={`relative pl-8 ${!isPreview && etapas?.[index] ? 'cursor-pointer group' : ''}`}
+                    key={entrega.id || index} 
+                    className={`relative pl-8 ${!isPreview && entrega.id ? 'cursor-pointer group' : ''}`}
                     onClick={() => {
-                      if (!isPreview && etapas?.[index]) {
-                        navigate(`/mentoria/etapa/${etapas[index].id}`);
+                      if (!isPreview && entrega.id) {
+                        navigate(`/mentoria/etapa/${entrega.id}`);
                       }
                     }}
                   >
@@ -154,7 +151,7 @@ export function BusinessExecutiveRoadmap() {
                               {format(parseISO(entrega.prazo), "dd MMM", { locale: ptBR })}
                             </span>
                           )}
-                          {!isPreview && etapas?.[index] && (
+                          {!isPreview && entrega.id && (
                             <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                           )}
                         </div>
@@ -168,143 +165,110 @@ export function BusinessExecutiveRoadmap() {
         </CardContent>
       </Card>
 
-      {/* Grid: Reuniões, Documentos, Guias */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {/* Reuniões Recorrentes - Formato Tabela */}
+      {/* Grid: Reports e Pendências (Tasks) */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Card Reports */}
         <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Reuniões Recorrentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[180px]">
-              {isPreview ? (
-                <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-60">
-                  <p className="text-muted-foreground text-sm">
-                    As reuniões aparecerão aqui após o início do contrato
-                  </p>
-                </div>
-              ) : reunioesRecorrentes.length === 0 ? (
-                <p className="text-muted-foreground text-sm text-center py-4">
-                  Nenhuma reunião agendada
-                </p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-xs">Data</TableHead>
-                      <TableHead className="text-xs text-right">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {reunioesRecorrentes.map((reuniao) => {
-                      const data = parseISO(reuniao.data_sessao);
-                      const passada = isPast(data);
-                      
-                      return (
-                        <TableRow key={reuniao.id}>
-                          <TableCell className="text-sm py-2">
-                            {format(data, "dd MMM yyyy", { locale: ptBR })}
-                          </TableCell>
-                          <TableCell className="text-right py-2">
-                            {passada ? (
-                              <span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                                <CheckCircle2 className="h-3 w-3" />
-                                Realizada
-                              </span>
-                            ) : (
-                              <Badge variant="secondary" className="text-xs">
-                                Agendada
-                              </Badge>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
-        {/* Documentos Suporte */}
-        <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="h-4 w-4 text-primary" />
-              Documentos Suporte
+              Reports
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[180px]">
+            <ScrollArea className="h-[120px]">
               {isPreview ? (
-                <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-60">
-                  <FileText className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                <div className="flex flex-col items-center justify-center h-full py-4 text-center opacity-60">
+                  <FileText className="h-6 w-6 text-muted-foreground/50 mb-2" />
                   <p className="text-muted-foreground text-sm">
-                    Os documentos de suporte aparecerão aqui
+                    Reports disponíveis após início do contrato
                   </p>
                 </div>
               ) : reports.length === 0 ? (
                 <p className="text-muted-foreground text-sm text-center py-4">
-                  Nenhum documento disponível
+                  Nenhum report disponível
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {reports.map((report) => (
+                  {reports.slice(0, 3).map((report) => (
                     <div 
                       key={report.id}
-                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                      onClick={() => report.arquivo_url && window.open(report.arquivo_url, '_blank')}
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{report.titulo}</p>
                         <p className="text-xs text-muted-foreground">
-                          {format(parseISO(report.data_envio), "dd MMM yyyy", { locale: ptBR })}
+                          {format(parseISO(report.data_envio), "dd MMM", { locale: ptBR })}
                         </p>
                       </div>
-                      {report.arquivo_url && (
-                        <button 
-                          className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-md hover:bg-muted"
-                          onClick={() => window.open(report.arquivo_url!, '_blank')}
-                        >
-                          <Download className="h-4 w-4" />
-                        </button>
-                      )}
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
                     </div>
                   ))}
+                  {reports.length > 3 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full text-xs"
+                      onClick={() => navigate('/mentoria/reports')}
+                    >
+                      Ver todos ({reports.length})
+                    </Button>
+                  )}
                 </div>
               )}
             </ScrollArea>
           </CardContent>
         </Card>
 
-        {/* Guias de Uso */}
+        {/* Card Pendências (Tasks) */}
         <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-primary" />
-              Guias de Uso
+              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              Pendências
+              {!isPreview && tasksPendentes > 0 && (
+                <Badge variant="destructive" className="text-xs">{tasksPendentes}</Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[180px]">
+            <ScrollArea className="h-[120px]">
               {isPreview ? (
-                <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-60">
-                  <BookOpen className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                <div className="flex flex-col items-center justify-center h-full py-4 text-center opacity-60">
+                  <CheckCircle2 className="h-6 w-6 text-muted-foreground/50 mb-2" />
                   <p className="text-muted-foreground text-sm">
-                    Os guias de uso aparecerão aqui
+                    Suas pendências aparecerão aqui
                   </p>
+                </div>
+              ) : tasksPendentes === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full py-4 text-center">
+                  <CheckCircle2 className="h-6 w-6 text-green-500 mb-2" />
+                  <p className="text-sm text-muted-foreground">Nenhuma pendência!</p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {guiasExemplo.map((guia, index) => (
+                  {tasks?.filter(t => t.status === 'pendente').slice(0, 2).map((task) => (
                     <div 
-                      key={index}
-                      className="p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                      key={task.id}
+                      className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20"
                     >
-                      <p className="text-sm font-medium">{guia.titulo}</p>
-                      <p className="text-xs text-muted-foreground">{guia.descricao}</p>
+                      <p className="text-sm font-medium truncate">{task.titulo}</p>
+                      {task.prazo && (
+                        <p className="text-xs text-muted-foreground">
+                          Prazo: {format(new Date(task.prazo), "dd/MM", { locale: ptBR })}
+                        </p>
+                      )}
                     </div>
                   ))}
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="w-full text-xs"
+                    onClick={() => navigate('/mentoria/validacoes')}
+                  >
+                    Ver todas pendências
+                  </Button>
                 </div>
               )}
             </ScrollArea>

@@ -5,7 +5,7 @@ import { InstrucaoCard } from "@/components/mentoria/business/InstrucaoCard";
 import { MarcosEtapa } from "@/components/mentoria/business/MarcosEtapa";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, UserCog, Users } from "lucide-react";
+import { User, Users, Target } from "lucide-react";
 
 export default function MentoriaEtapa() {
   const { etapaId } = useParams<{ etapaId: string }>();
@@ -37,7 +37,6 @@ export default function MentoriaEtapa() {
   }
 
   const instrucoesVoce = instrucoes?.filter(i => i.responsavel === 'voce') || [];
-  const instrucoesMentor = instrucoes?.filter(i => i.responsavel === 'mentor') || [];
   const instrucoesConjunto = instrucoes?.filter(i => i.responsavel === 'conjunto') || [];
 
   const calcularProgresso = (lista: typeof instrucoes) => {
@@ -50,13 +49,28 @@ export default function MentoriaEtapa() {
     <div className="container max-w-4xl py-8 space-y-8">
       <EtapaHeader etapa={etapa} />
 
+      {/* Objetivo da Etapa */}
+      {etapa.objetivo && (
+        <Card className="bg-muted/30 border-dashed">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <Target className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium">Objetivo desta Etapa</p>
+                <p className="text-sm text-muted-foreground mt-1">{etapa.objetivo}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {instrucoesVoce.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-medium flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-blue-500" />
-                Suas Tarefas
+                Instruções
               </div>
               <span className="text-sm font-normal text-muted-foreground">
                 {calcularProgresso(instrucoesVoce)}% concluído
@@ -65,32 +79,6 @@ export default function MentoriaEtapa() {
           </CardHeader>
           <CardContent className="space-y-3">
             {instrucoesVoce.map(instrucao => (
-              <InstrucaoCard
-                key={instrucao.id}
-                instrucao={instrucao}
-                onToggleStatus={handleToggleStatus}
-                isUpdating={updateInstrucao.isPending}
-              />
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {instrucoesMentor.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <UserCog className="h-4 w-4 text-zinc-500" />
-                Tarefas do Mentor
-              </div>
-              <span className="text-sm font-normal text-muted-foreground">
-                {calcularProgresso(instrucoesMentor)}% concluído
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {instrucoesMentor.map(instrucao => (
               <InstrucaoCard
                 key={instrucao.id}
                 instrucao={instrucao}
