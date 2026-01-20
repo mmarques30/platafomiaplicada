@@ -99,10 +99,9 @@ const NovaTaskModal: React.FC<NovaTaskModalProps> = ({
 
   const onSubmit = async (data: FormData) => {
     try {
-      // Tratar "none" como valor nulo
-      const entregaId = data.entrega_id === 'none' ? null : (data.entrega_id || null);
-      const etapaId = data.etapa_id === 'none' ? null : (data.etapa_id || null);
-
+      // Tratar "none" e string vazia como valores nulos
+      const isValidUuid = (val: string | undefined) => val && val !== 'none' && val.length > 0;
+      
       if (editingTask) {
         await updateTask.mutateAsync({
           id: editingTask.id,
@@ -111,8 +110,8 @@ const NovaTaskModal: React.FC<NovaTaskModalProps> = ({
           tipo: data.tipo as TaskBusiness['tipo'],
           prioridade: data.prioridade as TaskBusiness['prioridade'],
           prazo: data.prazo || undefined,
-          entrega_id: entregaId,
-          etapa_id: etapaId,
+          entrega_id: isValidUuid(data.entrega_id) ? data.entrega_id : null,
+          etapa_id: isValidUuid(data.etapa_id) ? data.etapa_id : null,
           link_referencia: data.link_referencia || undefined,
           instrucoes_validacao: data.instrucoes_validacao || undefined,
         });
@@ -125,8 +124,8 @@ const NovaTaskModal: React.FC<NovaTaskModalProps> = ({
           tipo: data.tipo as TaskBusiness['tipo'],
           prioridade: data.prioridade as TaskBusiness['prioridade'],
           prazo: data.prazo || undefined,
-          entrega_id: entregaId || undefined,
-          etapa_id: etapaId || undefined,
+          entrega_id: isValidUuid(data.entrega_id) ? data.entrega_id : undefined,
+          etapa_id: isValidUuid(data.etapa_id) ? data.etapa_id : undefined,
           link_referencia: data.link_referencia || undefined,
           instrucoes_validacao: data.instrucoes_validacao || undefined,
           created_by: user?.id,
