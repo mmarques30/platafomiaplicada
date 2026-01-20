@@ -70,6 +70,8 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
 
   // Módulos selecionados
   const [modulosSelecionados, setModulosSelecionados] = useState<string[]>([]);
+  const [modulosCustom, setModulosCustom] = useState<string[]>([]);
+  const [novoModulo, setNovoModulo] = useState("");
 
   // Valores
   const [valores, setValores] = useState({
@@ -112,7 +114,12 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
         observacoes: contrato.observacoes || "",
       });
 
-      setModulosSelecionados((contrato as any).modulos_selecionados || []);
+      const modulosSalvos = (contrato as any).modulos_selecionados || [];
+      setModulosSelecionados(modulosSalvos);
+      
+      // Identificar módulos customizados (os que não estão na lista padrão)
+      const customModulos = modulosSalvos.filter((m: string) => !MODULOS_DISPONIVEIS.includes(m));
+      setModulosCustom(customModulos);
 
       setValores({
         valor_contrato: contrato.valor_contrato?.toString() || "",
@@ -238,6 +245,25 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
         ? prev.filter(m => m !== modulo)
         : [...prev, modulo]
     );
+  };
+
+  const handleAddModulo = () => {
+    const moduloTrimmed = novoModulo.trim();
+    if (!moduloTrimmed) return;
+    
+    // Verificar se já existe
+    if (MODULOS_DISPONIVEIS.includes(moduloTrimmed) || modulosCustom.includes(moduloTrimmed)) {
+      return;
+    }
+    
+    setModulosCustom(prev => [...prev, moduloTrimmed]);
+    setModulosSelecionados(prev => [...prev, moduloTrimmed]);
+    setNovoModulo("");
+  };
+
+  const handleRemoveModuloCustom = (modulo: string) => {
+    setModulosCustom(prev => prev.filter(m => m !== modulo));
+    setModulosSelecionados(prev => prev.filter(m => m !== modulo));
   };
 
   const addEntrega = () => {
@@ -492,8 +518,8 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
 
           <Separator />
 
-          <div className="space-y-3">
-            <Label>Módulos Selecionados</Label>
+          <div className="space-y-4">
+            <Label>Módulos Disponíveis</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {MODULOS_DISPONIVEIS.map((modulo) => (
                 <div key={modulo} className="flex items-center space-x-2">
@@ -508,6 +534,53 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
                 </div>
               ))}
             </div>
+
+            {/* Módulos Customizados */}
+            {modulosCustom.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Módulos Personalizados</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {modulosCustom.map((modulo) => (
+                    <div key={modulo} className="flex items-center space-x-2 bg-muted/50 px-2 py-1 rounded">
+                      <Checkbox
+                        id={`modulo-custom-${modulo}`}
+                        checked={modulosSelecionados.includes(modulo)}
+                        onCheckedChange={() => toggleModulo(modulo)}
+                      />
+                      <Label htmlFor={`modulo-custom-${modulo}`} className="text-sm font-normal cursor-pointer flex-1">
+                        {modulo}
+                      </Label>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 text-destructive hover:text-destructive"
+                        onClick={() => handleRemoveModuloCustom(modulo)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Adicionar Novo Módulo */}
+            <div className="flex gap-2 items-end">
+              <div className="flex-1 space-y-1">
+                <Label className="text-xs">Adicionar Módulo Personalizado</Label>
+                <Input
+                  value={novoModulo}
+                  onChange={(e) => setNovoModulo(e.target.value)}
+                  placeholder="Nome do novo módulo"
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddModulo()}
+                />
+              </div>
+              <Button variant="outline" onClick={handleAddModulo} disabled={!novoModulo.trim()}>
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar
+              </Button>
+            </div>
+
             {modulosSelecionados.length > 0 && (
               <p className="text-xs text-muted-foreground">
                 {modulosSelecionados.length} módulo(s) selecionado(s): {modulosSelecionados.join(", ")}
