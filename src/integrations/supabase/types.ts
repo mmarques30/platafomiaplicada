@@ -1156,6 +1156,50 @@ export type Database = {
         }
         Relationships: []
       }
+      documentos_business: {
+        Row: {
+          arquivo_url: string | null
+          conteudo_texto: string | null
+          contrato_id: string | null
+          created_at: string | null
+          id: string
+          processado: boolean | null
+          resultado_ia: Json | null
+          tipo: string | null
+          titulo: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          conteudo_texto?: string | null
+          contrato_id?: string | null
+          created_at?: string | null
+          id?: string
+          processado?: boolean | null
+          resultado_ia?: Json | null
+          tipo?: string | null
+          titulo: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          conteudo_texto?: string | null
+          contrato_id?: string | null
+          created_at?: string | null
+          id?: string
+          processado?: boolean | null
+          resultado_ia?: Json | null
+          tipo?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos_legais: {
         Row: {
           apenas_mentorados: boolean | null
@@ -1294,6 +1338,65 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      entregas_business: {
+        Row: {
+          contrato_id: string | null
+          created_at: string | null
+          descricao: string | null
+          id: string
+          justificativa_backlog: string | null
+          modulo_relacionado: string | null
+          ordem: number | null
+          prazo_previsto: string | null
+          prioridade: string | null
+          status: string | null
+          tem_instrucoes: boolean | null
+          tipo: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          contrato_id?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          justificativa_backlog?: string | null
+          modulo_relacionado?: string | null
+          ordem?: number | null
+          prazo_previsto?: string | null
+          prioridade?: string | null
+          status?: string | null
+          tem_instrucoes?: boolean | null
+          tipo?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          contrato_id?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          justificativa_backlog?: string | null
+          modulo_relacionado?: string | null
+          ordem?: number | null
+          prazo_previsto?: string | null
+          prioridade?: string | null
+          status?: string | null
+          tem_instrucoes?: boolean | null
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entregas_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1918,12 +2021,14 @@ export type Database = {
           created_at: string | null
           descricao: string | null
           dicas: string | null
+          entrega_id: string | null
           etapa_id: string | null
           ferramenta: string | null
           gerado_por_ia: boolean | null
           id: string
           ordem: number | null
           prompt_sugerido: string | null
+          recursos: Json | null
           recursos_url: string | null
           responsavel: string
           status: string | null
@@ -1933,12 +2038,14 @@ export type Database = {
           created_at?: string | null
           descricao?: string | null
           dicas?: string | null
+          entrega_id?: string | null
           etapa_id?: string | null
           ferramenta?: string | null
           gerado_por_ia?: boolean | null
           id?: string
           ordem?: number | null
           prompt_sugerido?: string | null
+          recursos?: Json | null
           recursos_url?: string | null
           responsavel: string
           status?: string | null
@@ -1948,18 +2055,27 @@ export type Database = {
           created_at?: string | null
           descricao?: string | null
           dicas?: string | null
+          entrega_id?: string | null
           etapa_id?: string | null
           ferramenta?: string | null
           gerado_por_ia?: boolean | null
           id?: string
           ordem?: number | null
           prompt_sugerido?: string | null
+          recursos?: Json | null
           recursos_url?: string | null
           responsavel?: string
           status?: string | null
           titulo?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "instrucoes_etapa_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "entregas_business"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "instrucoes_etapa_etapa_id_fkey"
             columns: ["etapa_id"]
@@ -3194,9 +3310,11 @@ export type Database = {
           data_acordo: string
           data_conclusao: string | null
           descricao: string
+          entrega_id: string | null
           etapa_id: string | null
           feedback_mentor: string | null
           id: string
+          instrucao_id: string | null
           link_externo: string | null
           prazo_entrega: string
           prioridade: string
@@ -3215,9 +3333,11 @@ export type Database = {
           data_acordo?: string
           data_conclusao?: string | null
           descricao: string
+          entrega_id?: string | null
           etapa_id?: string | null
           feedback_mentor?: string | null
           id?: string
+          instrucao_id?: string | null
           link_externo?: string | null
           prazo_entrega: string
           prioridade?: string
@@ -3236,9 +3356,11 @@ export type Database = {
           data_acordo?: string
           data_conclusao?: string | null
           descricao?: string
+          entrega_id?: string | null
           etapa_id?: string | null
           feedback_mentor?: string | null
           id?: string
+          instrucao_id?: string | null
           link_externo?: string | null
           prazo_entrega?: string
           prioridade?: string
@@ -3252,10 +3374,24 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "tarefas_mentoria_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "entregas_business"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tarefas_mentoria_etapa_id_fkey"
             columns: ["etapa_id"]
             isOneToOne: false
             referencedRelation: "etapas_business"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tarefas_mentoria_instrucao_id_fkey"
+            columns: ["instrucao_id"]
+            isOneToOne: false
+            referencedRelation: "instrucoes_etapa"
             referencedColumns: ["id"]
           },
           {
