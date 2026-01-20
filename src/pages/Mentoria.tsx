@@ -12,7 +12,7 @@ import { FaseAtualCard } from "@/components/mentoria/FaseAtualCard";
 
 import { BusinessAcessoRapido } from "@/components/mentoria/business/BusinessAcessoRapido";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
-import PendenciasValidacao from "@/components/mentoria/business/PendenciasValidacao";
+import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
 import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -61,7 +61,7 @@ export default function Mentoria() {
             <>
               {/* Business: ROI → Pendências */}
               <BusinessROIChart />
-              <PendenciasValidacao />
+              <BusinessReportsCard />
             </>
           ) : (
             <>
