@@ -32,6 +32,15 @@ export interface InstrucaoEtapa {
   created_at: string;
 }
 
+export interface EtapaGeradaIA {
+  numero_etapa: number;
+  titulo: string;
+  objetivo: string;
+  data_prevista: string;
+  marcos_proxima_etapa: string[];
+  status: string;
+}
+
 export function useEtapasBusiness(contratoId?: string) {
   return useQuery({
     queryKey: ['etapas-business', contratoId],
@@ -135,6 +144,72 @@ export function useUpdateEtapa() {
     onError: (error) => {
       console.error('Erro ao atualizar etapa:', error);
       toast.error('Erro ao atualizar etapa');
+    },
+  });
+}
+
+// Nova função para criar etapas em lote (geradas via IA)
+export function useBulkCreateEtapas() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ contratoId, etapas }: { 
+      contratoId: string; 
+      etapas: EtapaGeradaIA[] 
+    }) => {
+      const etapasFormatadas = etapas.map(e => ({
+        contrato_id: contratoId,
+        numero_etapa: e.numero_etapa,
+        titulo: e.titulo,
+        objetivo: e.objetivo,
+        data_prevista: e.data_prevista,
+        marcos_proxima_etapa: e.marcos_proxima_etapa,
+        status: 'pendente' as const,
+      }));
+
+      const { data, error } = await supabase
+        .from('etapas_business')
+        .insert(etapasFormatadas)
+        .select();
+
+      if (error) throw error;
+      return { data, contratoId };
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['etapas-business', result.contratoId] });
+      toast.success(`${result.data.length} etapas criadas com sucesso!`);
+    },
+    onError: (error) => {
+      console.error('Erro ao criar etapas em lote:', error);
+      toast.error('Erro ao criar etapas');
+    },
+  });
+}
+
+// Hook para chamar a edge function de geração de etapas
+export function useGerarEtapasIA() {
+  return useMutation({
+    mutationFn: async (contrato: Record<string, unknown>) => {
+      const { data, error } = await supabase.functions.invoke('gerar-etapas-projeto', {
+        body: { contrato },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      
+      return data as {
+        success: boolean;
+        etapas: EtapaGeradaIA[];
+        meta: {
+          total_etapas: number;
+          dias_por_etapa: number;
+          duracao_meses: number;
+        };
+      };
+    },
+    onError: (error) => {
+      console.error('Erro ao gerar etapas via IA:', error);
+      toast.error('Erro ao gerar etapas. Tente novamente.');
     },
   });
 }
