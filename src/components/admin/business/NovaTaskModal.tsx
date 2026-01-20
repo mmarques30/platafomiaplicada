@@ -99,6 +99,10 @@ const NovaTaskModal: React.FC<NovaTaskModalProps> = ({
 
   const onSubmit = async (data: FormData) => {
     try {
+      // Tratar "none" como valor nulo
+      const entregaId = data.entrega_id === 'none' ? null : (data.entrega_id || null);
+      const etapaId = data.etapa_id === 'none' ? null : (data.etapa_id || null);
+
       if (editingTask) {
         await updateTask.mutateAsync({
           id: editingTask.id,
@@ -107,8 +111,8 @@ const NovaTaskModal: React.FC<NovaTaskModalProps> = ({
           tipo: data.tipo as TaskBusiness['tipo'],
           prioridade: data.prioridade as TaskBusiness['prioridade'],
           prazo: data.prazo || undefined,
-          entrega_id: data.entrega_id || null,
-          etapa_id: data.etapa_id || null,
+          entrega_id: entregaId,
+          etapa_id: etapaId,
           link_referencia: data.link_referencia || undefined,
           instrucoes_validacao: data.instrucoes_validacao || undefined,
         });
@@ -121,8 +125,8 @@ const NovaTaskModal: React.FC<NovaTaskModalProps> = ({
           tipo: data.tipo as TaskBusiness['tipo'],
           prioridade: data.prioridade as TaskBusiness['prioridade'],
           prazo: data.prazo || undefined,
-          entrega_id: data.entrega_id || undefined,
-          etapa_id: data.etapa_id || undefined,
+          entrega_id: entregaId || undefined,
+          etapa_id: etapaId || undefined,
           link_referencia: data.link_referencia || undefined,
           instrucoes_validacao: data.instrucoes_validacao || undefined,
           created_by: user?.id,
@@ -220,7 +224,7 @@ const NovaTaskModal: React.FC<NovaTaskModalProps> = ({
                   <SelectValue placeholder="Selecione (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
+                  <SelectItem value="none">Nenhuma</SelectItem>
                   {entregas.map((entrega) => (
                     <SelectItem key={entrega.id} value={entrega.id}>
                       {entrega.titulo}
@@ -240,7 +244,7 @@ const NovaTaskModal: React.FC<NovaTaskModalProps> = ({
                   <SelectValue placeholder="Selecione (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
+                  <SelectItem value="none">Nenhuma</SelectItem>
                   {etapas.map((etapa) => (
                     <SelectItem key={etapa.id} value={etapa.id}>
                       Etapa {etapa.numero_etapa}: {etapa.titulo}
