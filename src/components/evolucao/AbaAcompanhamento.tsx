@@ -16,8 +16,8 @@ import { useUserRole } from "@/hooks/useUserRole";
 export function AbaAcompanhamento() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
-  const { isAdmin } = useUserRole();
-  const { isBusiness } = useEffectivePlan(isAdmin);
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isBusiness } = useEffectivePlan(isAdmin, roleLoading);
 
   const completo = formulario?.completado || false;
   const preenchidoPorAdmin = formulario?.preenchido_por === "admin";
