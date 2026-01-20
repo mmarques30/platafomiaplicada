@@ -25,15 +25,22 @@ export function GerarEtapasIAModal({ open, onOpenChange, contrato, onSuccess }: 
   const bulkCreate = useBulkCreateEtapas();
 
   const handleGerar = async () => {
+    // Usa os campos do contrato, com fallback para valores vazios
+    const modulosSelecionados = (contrato as any).modulos_selecionados || [];
+    const fasesProjetoData = (contrato as any).fases_projeto || [];
+    const contexto = (contrato as any).contexto_transformacao || '';
+    const dores = (contrato as any).dores_mapeadas || [];
+    const empresa = (contrato as any).nome_empresa || 'Cliente';
+
     const result = await gerarEtapas.mutateAsync({
-      modulos_selecionados: contrato.modulos_selecionados || [],
+      modulos_selecionados: modulosSelecionados,
       tempo_consultoria_meses: contrato.tempo_consultoria_meses,
       reunioes_mensais: contrato.reunioes_mensais,
-      fases_projeto: contrato.fases_projeto || [],
+      fases_projeto: fasesProjetoData,
       entregas_esperadas: contrato.entregas_esperadas || [],
-      contexto_transformacao: contrato.contexto_transformacao || '',
-      dores_mapeadas: contrato.dores_mapeadas || [],
-      nome_empresa: contrato.nome_empresa || 'Cliente',
+      contexto_transformacao: contexto,
+      dores_mapeadas: dores,
+      nome_empresa: empresa,
       data_inicio: contrato.data_inicio || new Date().toISOString(),
     });
 
@@ -99,11 +106,11 @@ export function GerarEtapasIAModal({ open, onOpenChange, contrato, onSuccess }: 
               </Card>
             </div>
 
-            {contrato.modulos_selecionados && contrato.modulos_selecionados.length > 0 && (
+            {((contrato as any).modulos_selecionados?.length > 0) && (
               <div>
                 <p className="text-sm font-medium mb-2">Módulos contratados:</p>
                 <div className="flex flex-wrap gap-1">
-                  {contrato.modulos_selecionados.map((modulo: any, index: number) => (
+                  {((contrato as any).modulos_selecionados as any[]).map((modulo: any, index: number) => (
                     <Badge key={index} variant="secondary" className="text-xs">
                       {modulo.nome || modulo}
                     </Badge>
