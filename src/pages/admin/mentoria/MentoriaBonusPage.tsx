@@ -1,26 +1,23 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Gift } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BonusGlobaisTab from "@/components/admin/mentoria/BonusGlobaisTab";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function MentoriaBonusPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/admin/mentoria")}>
-          <ArrowLeft className="h-5 w-5" />
+    <div className={adminTheme.page}>
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" className={adminTheme.buttonIcon} onClick={() => navigate("/admin/mentoria")}>
+          <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Bônus Globais</h1>
-          <p className="text-muted-foreground">
-            Gerencie bônus disponíveis para todos os mentorados
-          </p>
-        </div>
+        <Gift className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Bônus Globais</h1>
       </div>
 
-      <BonusGlobaisTab />
+      <BonusGlobaisTab showHeader={false} />
     </div>
   );
 }

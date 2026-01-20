@@ -11,8 +11,13 @@ import { ptBR } from "date-fns/locale";
 import BonusModal from "./BonusModal";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { adminTheme } from "@/components/admin/adminTheme";
 
-export default function BonusGlobaisTab() {
+interface BonusGlobaisTabProps {
+  showHeader?: boolean;
+}
+
+export default function BonusGlobaisTab({ showHeader = true }: BonusGlobaisTabProps) {
   const { bonusGlobais, createBonus, updateBonus, deleteBonus, toggleUserEligibility, isCreating, isUpdating, isDeleting, isTogglingEligibility } = useBonusGlobais();
   const { data: users } = useUsers();
   const [modalOpen, setModalOpen] = useState(false);
@@ -55,31 +60,37 @@ export default function BonusGlobaisTab() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Gift className="h-6 w-6 text-primary" />
-            Bônus Globais
-          </h2>
-          <p className="text-muted-foreground">
-            Gerencie bônus para todos ou grupos específicos de mentorados
-          </p>
+    <div className="space-y-4">
+      {showHeader && (
+        <div className={adminTheme.pageHeader}>
+          <div className={adminTheme.pageTitleWrapper}>
+            <Gift className={adminTheme.pageIcon} />
+            <h1 className={adminTheme.pageTitle}>Bônus Globais</h1>
+          </div>
+          <Button size="sm" className={adminTheme.buttonSm} onClick={() => { setEditingBonus(undefined); setModalOpen(true); }}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" />
+            Novo Bônus
+          </Button>
         </div>
-        <Button onClick={() => { setEditingBonus(undefined); setModalOpen(true); }}>
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Bônus
-        </Button>
-      </div>
+      )}
 
-      <div className="grid gap-4">
+      {!showHeader && (
+        <div className="flex justify-end">
+          <Button size="sm" className={adminTheme.buttonSm} onClick={() => { setEditingBonus(undefined); setModalOpen(true); }}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" />
+            Novo Bônus
+          </Button>
+        </div>
+      )}
+
+      <div className="grid gap-3">
         {bonusGlobais.map((bonus) => {
           const stats = getEligibilityStats(bonus);
           const isExpanded = expandedBonus === bonus.id;
 
           return (
-            <Card key={bonus.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
+            <Card key={bonus.id} className={adminTheme.card}>
+              <CardHeader className={adminTheme.cardHeader}>
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${
@@ -88,18 +99,17 @@ export default function BonusGlobaisTab() {
                         : (bonus.liberado ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted')
                     }`}>
                       {bonus.publico_alvo === 'usuarios_especificos' ? (
-                        <Users className="h-5 w-5 text-blue-600" />
+                        <Users className="h-4 w-4 text-blue-600" />
                       ) : bonus.liberado ? (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <CheckCircle className="h-4 w-4 text-green-600" />
                       ) : (
-                        <Lock className="h-5 w-5 text-muted-foreground" />
+                        <Lock className="h-4 w-4 text-muted-foreground" />
                       )}
                     </div>
                     <div>
-                      <CardTitle className="text-lg">{bonus.nome}</CardTitle>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        {/* Público-alvo badge */}
-                        <Badge variant="outline" className="flex items-center gap-1">
+                      <CardTitle className={adminTheme.cardTitle}>{bonus.nome}</CardTitle>
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                        <Badge variant="outline" className="text-xs flex items-center gap-1">
                           {bonus.publico_alvo === 'usuario_especifico' ? (
                             <User className="h-3 w-3" />
                           ) : (
@@ -110,33 +120,32 @@ export default function BonusGlobaisTab() {
                             : getPublicoAlvoLabel(bonus.publico_alvo)}
                         </Badge>
                         
-                        {/* Stats para usuarios_especificos */}
                         {stats && (
-                          <Badge variant="secondary" className="flex items-center gap-1">
+                          <Badge variant="secondary" className="text-xs">
                             {stats.liberados}/{stats.total} liberado(s)
                           </Badge>
                         )}
                         
-                        <Badge variant={bonus.condicao_tipo === 'sorteio' ? 'secondary' : 'outline'}>
+                        <Badge variant={bonus.condicao_tipo === 'sorteio' ? 'secondary' : 'outline'} className="text-xs">
                           {bonus.condicao_tipo === 'sorteio' ? 'Sorteio' : 'Preenchimento'}
                         </Badge>
                         
                         {bonus.publico_alvo !== 'usuarios_especificos' && (
-                          <Badge variant={bonus.liberado ? 'default' : 'destructive'}>
+                          <Badge variant={bonus.liberado ? 'default' : 'destructive'} className="text-xs">
                             {bonus.liberado ? 'Liberado' : 'Bloqueado'}
                           </Badge>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(bonus)}>
-                      <Pencil className="h-4 w-4" />
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" className={adminTheme.buttonIcon} onClick={() => handleEdit(bonus)}>
+                      <Pencil className="h-3.5 w-3.5" />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                        <Button variant="ghost" size="icon" className={adminTheme.buttonIcon}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -156,35 +165,34 @@ export default function BonusGlobaisTab() {
                     </AlertDialog>
                   </div>
                 </div>
-                <CardDescription>{bonus.descricao}</CardDescription>
+                <CardDescription className="text-xs mt-2">{bonus.descricao}</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="space-y-3 text-sm">
                   {bonus.condicao_descricao && (
-                    <p><strong>Condição:</strong> {bonus.condicao_descricao}</p>
+                    <p className="text-xs"><strong>Condição:</strong> {bonus.condicao_descricao}</p>
                   )}
                   
-                  {/* Lista expandível de usuários elegíveis */}
                   {bonus.publico_alvo === 'usuarios_especificos' && bonus.usuarios_elegiveis && bonus.usuarios_elegiveis.length > 0 && (
                     <Collapsible open={isExpanded} onOpenChange={() => setExpandedBonus(isExpanded ? null : bonus.id)}>
                       <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm" className="w-full justify-between">
+                        <Button variant="ghost" size="sm" className="w-full justify-between h-8 text-xs">
                           <span>Ver usuários elegíveis ({bonus.usuarios_elegiveis.length})</span>
-                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                          {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                         </Button>
                       </CollapsibleTrigger>
                       <CollapsibleContent className="mt-2">
-                        <div className="space-y-2 p-3 bg-muted/50 rounded-lg">
+                        <div className="space-y-1.5 p-2 bg-muted/50 rounded-lg">
                           {bonus.usuarios_elegiveis.map(u => (
                             <div 
                               key={u.user_id} 
-                              className={`flex items-center justify-between p-2 rounded-lg ${
+                              className={`flex items-center justify-between p-2 rounded-lg text-xs ${
                                 u.liberado ? 'bg-green-50 dark:bg-green-950/20' : 'bg-background'
                               }`}
                             >
-                              <span className="text-sm">{u.user?.nome_completo || 'Usuário'}</span>
+                              <span>{u.user?.nome_completo || 'Usuário'}</span>
                               <div className="flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-muted-foreground">
                                   {u.liberado ? 'Liberado' : 'Bloqueado'}
                                 </span>
                                 <Switch
@@ -206,9 +214,9 @@ export default function BonusGlobaisTab() {
                     </Collapsible>
                   )}
                   
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {bonus.link && (
-                      <Button variant="outline" size="sm" asChild>
+                      <Button variant="outline" size="sm" className="h-7 text-xs" asChild>
                         <a href={bonus.link} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3 w-3 mr-1" />
                           Link
@@ -216,7 +224,7 @@ export default function BonusGlobaisTab() {
                       </Button>
                     )}
                     {getArquivoUrls(bonus.arquivo_url).map((url, idx) => (
-                      <Button key={idx} variant="outline" size="sm" asChild>
+                      <Button key={idx} variant="outline" size="sm" className="h-7 text-xs" asChild>
                         <a href={url} target="_blank" rel="noopener noreferrer">
                           <FileDown className="h-3 w-3 mr-1" />
                           {getArquivoUrls(bonus.arquivo_url).length > 1 ? `Doc ${idx + 1}` : 'Documento'}
@@ -226,9 +234,9 @@ export default function BonusGlobaisTab() {
                   </div>
 
                   {bonus.comando_uso && (
-                    <div className="p-3 bg-muted rounded-lg">
+                    <div className="p-2 bg-muted rounded-lg">
                       <p className="text-xs font-medium text-muted-foreground mb-1">Comando de uso:</p>
-                      <p className="text-sm whitespace-pre-wrap line-clamp-3">{bonus.comando_uso}</p>
+                      <p className="text-xs whitespace-pre-wrap line-clamp-3">{bonus.comando_uso}</p>
                     </div>
                   )}
 
@@ -244,15 +252,13 @@ export default function BonusGlobaisTab() {
         })}
 
         {bonusGlobais.length === 0 && (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <Gift className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Nenhum bônus cadastrado</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Crie bônus globais que podem ser liberados para todos ou grupos de mentorados
-              </p>
-            </CardContent>
-          </Card>
+          <div className={adminTheme.emptyState}>
+            <Gift className={adminTheme.emptyIcon} />
+            <p className={adminTheme.emptyTitle}>Nenhum bônus cadastrado</p>
+            <p className={adminTheme.emptyDescription}>
+              Crie bônus globais que podem ser liberados para todos ou grupos de mentorados
+            </p>
+          </div>
         )}
       </div>
 

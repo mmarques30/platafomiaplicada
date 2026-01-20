@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFormularios } from "@/hooks/admin/useFormularios";
-import { useAuth } from "@/hooks/useAuth";
-import { useUserRole } from "@/hooks/useUserRole";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +11,10 @@ import { DiagnosticosTable } from "@/components/admin/mentoria/DiagnosticosTable
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Search, FileText, User, Calendar, Target, RefreshCw, Eye, LayoutGrid, Table as TableIcon } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function VisualizarFormularios() {
   const { data: formularios, isLoading, refetch } = useFormularios();
-  const { user } = useAuth();
-  const { isAdmin, isLoading: roleLoading } = useUserRole();
   const [selectedFormulario, setSelectedFormulario] = useState<any>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -64,6 +60,7 @@ export default function VisualizarFormularios() {
   const totalAcademy = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "academy").length || 0;
   const totalSkills = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "skills").length || 0;
   const totalBusiness = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "business").length || 0;
+  const totalCompletos = formularios?.filter((f: any) => f.completado).length || 0;
 
   const getPlanoBadgeColor = (plano: string) => {
     switch (plano) {
@@ -79,79 +76,44 @@ export default function VisualizarFormularios() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Formulários de Diagnóstico</h1>
-          <p className="text-muted-foreground mt-1">
-            Visualize e gerencie os formulários preenchidos pelos mentorados
-          </p>
+    <div className={adminTheme.page}>
+      {/* Header compacto com stats inline */}
+      <div className={adminTheme.pageHeader}>
+        <div className={adminTheme.pageTitleWrapper}>
+          <FileText className={adminTheme.pageIcon} />
+          <h1 className={adminTheme.pageTitle}>Formulários de Diagnóstico</h1>
+          <Badge variant="secondary" className="text-xs">{formularios?.length || 0}</Badge>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
+          {/* Stats inline compactos */}
+          <div className="hidden md:flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="text-blue-500">Academy: <strong>{totalAcademy}</strong></span>
+            <span className="text-orange-500">Skills: <strong>{totalSkills}</strong></span>
+            <span className="text-purple-500">Business: <strong>{totalBusiness}</strong></span>
+            <span className="text-green-600">Completos: <strong>{totalCompletos}</strong></span>
+          </div>
           <div className="flex border rounded-lg">
             <Button 
               variant={viewMode === "cards" ? "secondary" : "ghost"} 
               size="sm"
+              className="h-8 w-8 p-0"
               onClick={() => setViewMode("cards")}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="h-3.5 w-3.5" />
             </Button>
             <Button 
               variant={viewMode === "table" ? "secondary" : "ghost"} 
               size="sm"
+              className="h-8 w-8 p-0"
               onClick={() => setViewMode("table")}
             >
-              <TableIcon className="h-4 w-4" />
+              <TableIcon className="h-3.5 w-3.5" />
             </Button>
           </div>
-          <Button variant="outline" size="icon" onClick={() => refetch()} disabled={isLoading}>
-            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => refetch()} disabled={isLoading}>
+            <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
           </Button>
         </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-5">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formularios?.length || 0}</div>
-          </CardContent>
-        </Card>
-        <Card className="border-blue-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-blue-500">Academy</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalAcademy}</div>
-          </CardContent>
-        </Card>
-        <Card className="border-orange-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-orange-500">Skills</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalSkills}</div>
-          </CardContent>
-        </Card>
-        <Card className="border-purple-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-purple-500">Business</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalBusiness}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-500">Completos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formularios?.filter((f: any) => f.completado).length || 0}</div>
-          </CardContent>
-        </Card>
       </div>
 
       {viewMode === "table" ? (
@@ -159,19 +121,19 @@ export default function VisualizarFormularios() {
       ) : (
         <>
           {/* Filtros e Busca */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className={adminTheme.filterBar}>
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nome do mentorado..."
+                placeholder="Buscar por nome..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className={`pl-9 ${adminTheme.input}`}
               />
             </div>
             
             <Select value={planoFilter} onValueChange={setPlanoFilter}>
-              <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectTrigger className={adminTheme.filterSelect}>
                 <SelectValue placeholder="Plano" />
               </SelectTrigger>
               <SelectContent>
@@ -183,7 +145,7 @@ export default function VisualizarFormularios() {
             </Select>
 
             <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-              <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectTrigger className={adminTheme.filterSelect}>
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -194,8 +156,8 @@ export default function VisualizarFormularios() {
             </Select>
 
             <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Ordenar por" />
+              <SelectTrigger className={adminTheme.filterSelect}>
+                <SelectValue placeholder="Ordenar" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="date-desc">Mais recentes</SelectItem>
@@ -209,14 +171,12 @@ export default function VisualizarFormularios() {
           {isLoading && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Card key={i}>
-                  <CardHeader>
-                    <Skeleton className="h-6 w-3/4 mb-2" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="h-20 w-full" />
-                  </CardContent>
+                <Card key={i} className={adminTheme.card}>
+                  <div className="p-4">
+                    <Skeleton className="h-5 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-1/2 mb-4" />
+                    <Skeleton className="h-16 w-full" />
+                  </div>
                 </Card>
               ))}
             </div>
@@ -224,73 +184,63 @@ export default function VisualizarFormularios() {
 
           {/* Empty State */}
           {!isLoading && filteredFormularios?.length === 0 && (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium">Nenhum formulário encontrado</p>
-                <p className="text-sm text-muted-foreground">
-                  {searchTerm || statusFilter !== "all" || planoFilter !== "all"
-                    ? "Tente ajustar os filtros de busca"
-                    : "Os formulários preenchidos aparecerão aqui"}
-                </p>
-              </CardContent>
-            </Card>
+            <div className={adminTheme.emptyState}>
+              <FileText className={adminTheme.emptyIcon} />
+              <p className={adminTheme.emptyTitle}>Nenhum formulário encontrado</p>
+              <p className={adminTheme.emptyDescription}>
+                {searchTerm || statusFilter !== "all" || planoFilter !== "all"
+                  ? "Tente ajustar os filtros de busca"
+                  : "Os formulários preenchidos aparecerão aqui"}
+              </p>
+            </div>
           )}
 
           {/* Formulários Grid */}
           {!isLoading && filteredFormularios && filteredFormularios.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {filteredFormularios.map((form: any) => (
-                <Card key={form.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <CardTitle className="text-lg">
+                <Card key={form.id} className={`${adminTheme.card} ${adminTheme.tableRow}`}>
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="font-medium text-sm truncate">
                           {form.profiles?.nome_completo || form.nome_completo || "Nome não disponível"}
-                        </CardTitle>
+                        </span>
                       </div>
-                      <div className="flex flex-col gap-1 items-end">
-                        <Badge variant={!!form.completado ? "default" : "secondary"}>
+                      <div className="flex flex-col gap-1 items-end shrink-0">
+                        <Badge variant={!!form.completado ? "default" : "secondary"} className="text-xs">
                           {!!form.completado ? "Completo" : "Incompleto"}
                         </Badge>
                         {form.profiles?.plano_mentoria && (
-                          <Badge variant="outline" className={getPlanoBadgeColor(form.profiles.plano_mentoria)}>
+                          <Badge variant="outline" className={`text-xs ${getPlanoBadgeColor(form.profiles.plano_mentoria)}`}>
                             {form.profiles.plano_mentoria}
                           </Badge>
                         )}
                       </div>
                     </div>
-                    <CardDescription className="flex items-center gap-1">
+                    
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Calendar className="h-3 w-3" />
-                      {format(new Date(form.created_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {/* Preview de informações */}
-                    <div className="space-y-2 text-sm">
-                      {form.objetivo_principal && (
-                        <div className="flex items-start gap-2">
-                          <Target className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                          <p className="text-muted-foreground line-clamp-2">{form.objetivo_principal}</p>
-                        </div>
-                      )}
-                      {form.nivel_ia && (
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{form.nivel_ia}</Badge>
-                        </div>
-                      )}
+                      {format(new Date(form.created_at), "dd 'de' MMM 'de' yyyy", { locale: ptBR })}
                     </div>
+
+                    {form.objetivo_principal && (
+                      <div className="flex items-start gap-2">
+                        <Target className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                        <p className="text-xs text-muted-foreground line-clamp-2">{form.objetivo_principal}</p>
+                      </div>
+                    )}
 
                     <Button 
                       onClick={() => handleViewDetails(form)} 
-                      className="w-full"
+                      className="w-full h-8 text-xs"
                       variant="outline"
                     >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Ver Detalhes Completos
+                      <Eye className="h-3.5 w-3.5 mr-2" />
+                      Ver Detalhes
                     </Button>
-                  </CardContent>
+                  </div>
                 </Card>
               ))}
             </div>

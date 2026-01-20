@@ -23,10 +23,10 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import { PageTitle } from "@/components/shared/PageTitle";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function GerenciarUsuários() {
   const navigate = useNavigate();
@@ -84,14 +84,14 @@ export default function GerenciarUsuários() {
     const expiracao = user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : null;
     
     if (!user.conta_ativa) {
-      return <Badge variant="destructive">Inativo</Badge>;
+      return <Badge variant="destructive" className="text-xs">Inativo</Badge>;
     }
     
     if (expiracao && expiracao < now) {
-      return <Badge variant="destructive">Expirado</Badge>;
+      return <Badge variant="destructive" className="text-xs">Expirado</Badge>;
     }
     
-    return <Badge variant="default" className="bg-green-600">Ativo</Badge>;
+    return <Badge variant="default" className="bg-green-600 text-xs">Ativo</Badge>;
   };
 
   const handleDeleteUser = () => {
@@ -109,46 +109,55 @@ export default function GerenciarUsuários() {
 
   if (isLoading) {
     return (
-      <div>
-        <PageTitle primary="Gerenciar" secondary="Usuários" />
-        <div className="mt-8">
-          <Skeleton className="h-64" />
+      <div className={adminTheme.page}>
+        <div className={adminTheme.pageHeader}>
+          <div className={adminTheme.pageTitleWrapper}>
+            <Users className={adminTheme.pageIcon} />
+            <h1 className={adminTheme.pageTitle}>Gerenciar Usuários</h1>
+          </div>
         </div>
+        <Skeleton className="h-64" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <PageTitle primary="Gerenciar" secondary="Usuários" />
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageHeader}>
+        <div className={adminTheme.pageTitleWrapper}>
+          <Users className={adminTheme.pageIcon} />
+          <h1 className={adminTheme.pageTitle}>Gerenciar Usuários</h1>
+          <Badge variant="secondary" className="text-xs">{filteredUsers?.length || 0}</Badge>
+        </div>
         <div className="flex gap-2">
           <Button 
             onClick={() => navigate('/admin/importar-usuarios')}
             variant="outline"
+            size="sm"
+            className={adminTheme.buttonSm}
           >
-            <Upload className="h-4 w-4 mr-2" />
-            Importar Usuários
+            <Upload className="h-3.5 w-3.5 mr-1.5" />
+            Importar
           </Button>
-          <Button onClick={() => setNovoUsuarioOpen(true)}>
-            <UserPlus className="h-4 w-4 mr-2" />
+          <Button onClick={() => setNovoUsuarioOpen(true)} size="sm" className={adminTheme.buttonSm}>
+            <UserPlus className="h-3.5 w-3.5 mr-1.5" />
             Novo Usuário
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className={adminTheme.filterBar}>
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome, email ou ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className={`pl-9 ${adminTheme.input}`}
           />
         </div>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className={adminTheme.filterSelect}>
             <SelectValue placeholder="Filtrar por role" />
           </SelectTrigger>
           <SelectContent>
@@ -161,92 +170,90 @@ export default function GerenciarUsuários() {
         </Select>
       </div>
 
-      <div className="border rounded-lg">
+      <div className={adminTheme.tableContainer}>
         <Table>
-          <TableHeader>
+          <TableHeader className={adminTheme.tableHeader}>
             <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Roles</TableHead>
-              <TableHead>Plano</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Expira em</TableHead>
-              <TableHead>Cadastro</TableHead>
-              <TableHead className="text-center">Email Enviado</TableHead>
-              <TableHead className="text-center">Grupo WhatsApp</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+              <TableHead className={adminTheme.tableHeaderCell}>Nome</TableHead>
+              <TableHead className={adminTheme.tableHeaderCell}>Email</TableHead>
+              <TableHead className={adminTheme.tableHeaderCell}>Roles</TableHead>
+              <TableHead className={adminTheme.tableHeaderCell}>Plano</TableHead>
+              <TableHead className={adminTheme.tableHeaderCell}>Status</TableHead>
+              <TableHead className={adminTheme.tableHeaderCell}>Expira em</TableHead>
+              <TableHead className={adminTheme.tableHeaderCell}>Cadastro</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} text-center`}>Email</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} text-center`}>WhatsApp</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} text-right`}>Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredUsers?.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.nome_completo}</TableCell>
-                <TableCell className="text-sm">
+              <TableRow key={user.id} className={adminTheme.tableRow}>
+                <TableCell className={`${adminTheme.tableCell} font-medium`}>{user.nome_completo}</TableCell>
+                <TableCell className={adminTheme.tableCell}>
                   {(user as any).email || <span className="text-muted-foreground">-</span>}
                 </TableCell>
-                <TableCell>
+                <TableCell className={adminTheme.tableCell}>
                   <div className="flex gap-1 flex-wrap">
                     {user.roles.length === 0 ? (
-                      <Badge variant="outline">Sem role</Badge>
+                      <Badge variant="outline" className="text-xs">Sem role</Badge>
                     ) : (
                       user.roles.map((role) => (
-                        <Badge key={role} variant={getRoleBadgeVariant(role)}>
+                        <Badge key={role} variant={getRoleBadgeVariant(role)} className="text-xs">
                           {getRoleLabel(role)}
                         </Badge>
                       ))
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {(user as any).plano_mentoria ? (
-                      <Badge 
-                        variant="outline"
-                        className={
-                          (user as any).plano_mentoria === "academy"
-                            ? "border-blue-500 text-blue-700"
-                            : (user as any).plano_mentoria === "skills"
-                            ? "border-orange-500 text-orange-700"
-                            : (user as any).plano_mentoria === "business"
-                            ? "border-purple-500 text-purple-700"
-                            : "border-gray-500 text-gray-700"
-                        }
-                      >
-                        {(user as any).plano_mentoria === "academy" && "Academy"}
-                        {(user as any).plano_mentoria === "skills" && "Skills"}
-                        {(user as any).plano_mentoria === "business" && "Business"}
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="border-gray-400 text-gray-600">
-                        Sem Plano
-                      </Badge>
-                    )}
-                  </div>
+                <TableCell className={adminTheme.tableCell}>
+                  {(user as any).plano_mentoria ? (
+                    <Badge 
+                      variant="outline"
+                      className={`text-xs ${
+                        (user as any).plano_mentoria === "academy"
+                          ? "border-blue-500 text-blue-700"
+                          : (user as any).plano_mentoria === "skills"
+                          ? "border-orange-500 text-orange-700"
+                          : (user as any).plano_mentoria === "business"
+                          ? "border-purple-500 text-purple-700"
+                          : "border-gray-500 text-gray-700"
+                      }`}
+                    >
+                      {(user as any).plano_mentoria === "academy" && "Academy"}
+                      {(user as any).plano_mentoria === "skills" && "Skills"}
+                      {(user as any).plano_mentoria === "business" && "Business"}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="border-gray-400 text-gray-600 text-xs">
+                      Sem Plano
+                    </Badge>
+                  )}
                 </TableCell>
-                <TableCell>
+                <TableCell className={adminTheme.tableCell}>
                   {getStatusBadge(user)}
                 </TableCell>
-                <TableCell>
+                <TableCell className={adminTheme.tableCell}>
                   {(user as any).data_expiracao_acesso ? (
                     <div className="flex items-center gap-1">
                       {new Date((user as any).data_expiracao_acesso) < new Date() && (
                         <AlertCircle className="h-3 w-3 text-destructive" />
                       )}
-                      <span className="text-sm">
+                      <span className="text-xs">
                         {format(new Date((user as any).data_expiracao_acesso), "dd/MM/yyyy")}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-muted-foreground text-sm">Sem limite</span>
+                    <span className="text-muted-foreground text-xs">Sem limite</span>
                   )}
                 </TableCell>
-                <TableCell>
-                  {user.created_at
-                    ? format(new Date(user.created_at), "dd/MM/yyyy")
-                    : "-"}
+                <TableCell className={adminTheme.tableCell}>
+                  <span className="text-xs">
+                    {user.created_at ? format(new Date(user.created_at), "dd/MM/yyyy") : "-"}
+                  </span>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-center gap-2">
+                <TableCell className={adminTheme.tableCell}>
+                  <div className="flex items-center justify-center gap-1">
                     <Switch
                       checked={(user as any).email_acesso_enviado || false}
                       onCheckedChange={(checked) => {
@@ -263,8 +270,8 @@ export default function GerenciarUsuários() {
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-center gap-2">
+                <TableCell className={adminTheme.tableCell}>
+                  <div className="flex items-center justify-center gap-1">
                     <Switch
                       checked={(user as any).adicionado_grupo_whatsapp || false}
                       onCheckedChange={(checked) => {
@@ -281,36 +288,35 @@ export default function GerenciarUsuários() {
                     )}
                   </div>
                 </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex gap-2 justify-end">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingUser({
-                          ...user,
-                          email: (user as any).email,
-                          profissao: (user as any).profissao,
-                          idade: (user as any).idade,
-                          linkedin: (user as any).linkedin,
-                          plano_mentoria: (user as any).plano_mentoria,
-                          data_expiracao_acesso: (user as any).data_expiracao_acesso,
-                          conta_ativa: (user as any).conta_ativa,
-                        })}
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Editar
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeletingUser({ id: user.id, nome: user.nome_completo })}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Excluir
-                      </Button>
-                    </div>
-                  </TableCell>
+                <TableCell className={`${adminTheme.tableCell} text-right`}>
+                  <div className="flex gap-1 justify-end">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={adminTheme.buttonIcon}
+                      onClick={() => setEditingUser({
+                        ...user,
+                        email: (user as any).email,
+                        profissao: (user as any).profissao,
+                        idade: (user as any).idade,
+                        linkedin: (user as any).linkedin,
+                        plano_mentoria: (user as any).plano_mentoria,
+                        data_expiracao_acesso: (user as any).data_expiracao_acesso,
+                        conta_ativa: (user as any).conta_ativa,
+                      })}
+                    >
+                      <Edit className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`${adminTheme.buttonIcon} text-destructive hover:text-destructive hover:bg-destructive/10`}
+                      onClick={() => setDeletingUser({ id: user.id, nome: user.nome_completo })}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

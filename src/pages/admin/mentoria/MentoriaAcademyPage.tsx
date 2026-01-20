@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "@/hooks/admin/useUsers";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,6 +11,7 @@ import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { ProjetosIAAdmin } from "@/components/admin/mentoria/ProjetosIAAdmin";
 import { FeedbackMentoraAdmin } from "@/components/admin/mentoria/FeedbackMentoraAdmin";
 import { Badge } from "@/components/ui/badge";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function MentoriaAcademyPage() {
   const navigate = useNavigate();
@@ -29,88 +30,80 @@ export default function MentoriaAcademyPage() {
   }, [selectedUserId, queryClient]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/admin/mentoria")}>
-          <ArrowLeft className="h-5 w-5" />
+    <div className={adminTheme.page}>
+      {/* Header compacto igual ao Business */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" className={adminTheme.buttonIcon} onClick={() => navigate("/admin/mentoria")}>
+          <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold">Mentoria Academy</h1>
-            <Badge variant="secondary" className="bg-blue-500/10 text-blue-500">
-              {users.length} mentorados
-            </Badge>
-          </div>
-          <p className="text-muted-foreground">
-            Gerenciar mentorados do plano Academy - acesso a trilhas e conteúdos
-          </p>
+        <div className="flex-1">
+          <h1 className={adminTheme.pageTitle}>Mentoria Academy</h1>
+          <p className={adminTheme.pageSubtitle}>Gerenciar mentorados do plano Academy</p>
         </div>
+        <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 text-xs">
+          {users.length} mentorados
+        </Badge>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Selecionar Mentorado Academy
-          </CardTitle>
-          <CardDescription>
-            Escolha um mentorado para visualizar e gerenciar suas informações
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-            <SelectTrigger className="w-full max-w-md">
-              <SelectValue placeholder="Selecione um mentorado Academy" />
-            </SelectTrigger>
-            <SelectContent>
-              {users.map((user) => (
-                <SelectItem key={user.id} value={user.id}>
-                  {user.nome_completo}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {/* Card de seleção compacto */}
+      <Card className={adminTheme.card}>
+        <CardContent className="py-3 px-4">
+          <div className="flex items-center gap-4">
+            <Users className="h-4 w-4 text-muted-foreground shrink-0" />
+            <div className="flex-1">
+              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                <SelectTrigger className={adminTheme.select}>
+                  <SelectValue placeholder="Selecione um mentorado Academy" />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.nome_completo}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
       {users.length === 0 && (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Users className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Nenhum mentorado Academy</p>
-            <p className="text-sm text-muted-foreground">
-              Não há mentorados com plano Academy cadastrados
-            </p>
-          </CardContent>
-        </Card>
+        <div className={adminTheme.emptyState}>
+          <Users className={adminTheme.emptyIcon} />
+          <p className={adminTheme.emptyTitle}>Nenhum mentorado Academy</p>
+          <p className={adminTheme.emptyDescription}>
+            Não há mentorados com plano Academy cadastrados
+          </p>
+        </div>
       )}
 
       {selectedUserId && (
         <Tabs defaultValue="diagnostico-ia" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="diagnostico-ia">
-              <FileText className="h-4 w-4 mr-2" />
+          <TabsList className={adminTheme.tabsList}>
+            <TabsTrigger value="diagnostico-ia" className={adminTheme.tabsTrigger}>
+              <FileText className={adminTheme.tabsIcon} />
               Diagnóstico IA
             </TabsTrigger>
-            <TabsTrigger value="feedback-mentora">
-              <Video className="h-4 w-4 mr-2" />
+            <TabsTrigger value="feedback-mentora" className={adminTheme.tabsTrigger}>
+              <Video className={adminTheme.tabsIcon} />
               Feedback Mentora
             </TabsTrigger>
-            <TabsTrigger value="projetos-ia">
-              <Lightbulb className="h-4 w-4 mr-2" />
+            <TabsTrigger value="projetos-ia" className={adminTheme.tabsTrigger}>
+              <Lightbulb className={adminTheme.tabsIcon} />
               Projetos IA
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="diagnostico-ia" className="space-y-4">
+          <TabsContent value="diagnostico-ia" className={adminTheme.tabsContent}>
             <DiagnosticoAdmin userId={selectedUserId} allowManualInput={false} />
           </TabsContent>
 
-          <TabsContent value="feedback-mentora" className="space-y-4">
+          <TabsContent value="feedback-mentora" className={adminTheme.tabsContent}>
             <FeedbackMentoraAdmin userId={selectedUserId} />
           </TabsContent>
 
-          <TabsContent value="projetos-ia" className="space-y-4">
+          <TabsContent value="projetos-ia" className={adminTheme.tabsContent}>
             <ProjetosIAAdmin userId={selectedUserId} />
           </TabsContent>
         </Tabs>
