@@ -228,7 +228,7 @@ const PendenciasValidacao: React.FC = () => {
         <CardContent className="py-8 text-center text-muted-foreground">
           <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-500" />
           <p className="font-medium">Nenhuma pendência de validação</p>
-          <p className="text-sm">Você está em dia! 🎉</p>
+          <p className="text-sm">Você está em dia!</p>
         </CardContent>
       </Card>
     );
