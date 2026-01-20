@@ -22,24 +22,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileText, Users, Download, Eye, ExternalLink, Trash2 } from "lucide-react";
+import { FileText, Users, Download, Eye, ExternalLink, Trash2, ClipboardCheck } from "lucide-react";
 import { usePesquisasAdmin, useRespostasPesquisa, useEstatisticasPesquisa, useDeleteResposta } from "@/hooks/usePesquisas";
 import type { Pesquisa } from "@/types/pesquisas";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function GerenciarPesquisas() {
   const { data: pesquisas, isLoading } = usePesquisasAdmin();
   const [selectedPesquisa, setSelectedPesquisa] = useState<Pesquisa | null>(null);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Pesquisas</h1>
-          <p className="text-muted-foreground">Gerencie pesquisas e visualize respostas</p>
-        </div>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <ClipboardCheck className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Pesquisas</h1>
+        <Badge variant="secondary" className="text-xs">{pesquisas?.length || 0}</Badge>
       </div>
 
       {isLoading ? (
@@ -80,23 +80,23 @@ function PesquisaCard({
   const totalPerguntas = pesquisa.perguntas.reduce((acc, s) => acc + s.perguntas.length, 0);
 
   return (
-    <Card className="bg-card border-border">
-      <CardContent className="p-6">
+    <Card className={adminTheme.card}>
+      <CardContent className="p-4">
         <div className="flex items-start justify-between">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-              <FileText className="h-6 w-6 text-primary" />
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <FileText className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">{pesquisa.titulo}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{pesquisa.descricao}</p>
-              <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+              <h3 className="font-semibold text-sm">{pesquisa.titulo}</h3>
+              <p className="text-xs text-muted-foreground mt-1">{pesquisa.descricao}</p>
+              <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
+                  <Users className="h-3.5 w-3.5" />
                   {stats?.total || 0} respostas
                 </span>
                 <span>/{pesquisa.slug}</span>
-                <Badge variant={pesquisa.ativo ? "default" : "secondary"}>
+                <Badge variant={pesquisa.ativo ? "default" : "secondary"} className="text-xs">
                   {pesquisa.ativo ? "Ativo" : "Inativo"}
                 </Badge>
               </div>
@@ -107,38 +107,38 @@ function PesquisaCard({
               variant="outline"
               size="sm"
               onClick={() => window.open(`/${pesquisa.slug}`, "_blank")}
-              className="gap-2"
+              className="gap-1.5 h-8 text-xs"
             >
-              <ExternalLink className="h-4 w-4" />
+              <ExternalLink className="h-3.5 w-3.5" />
               Abrir
             </Button>
             <Button
               variant="default"
               size="sm"
               onClick={onViewRespostas}
-              className="gap-2"
+              className="gap-1.5 h-8 text-xs"
             >
-              <Eye className="h-4 w-4" />
+              <Eye className="h-3.5 w-3.5" />
               Ver Respostas
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mt-6 pt-4 border-t border-border">
+        <div className="grid grid-cols-4 gap-4 mt-4 pt-3 border-t border-border/50">
           <div className="text-center">
-            <p className="text-2xl font-bold text-foreground">{pesquisa.perguntas.length}</p>
+            <p className="text-xl font-bold">{pesquisa.perguntas.length}</p>
             <p className="text-xs text-muted-foreground">Seções</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-foreground">{totalPerguntas}</p>
+            <p className="text-xl font-bold">{totalPerguntas}</p>
             <p className="text-xs text-muted-foreground">Perguntas</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-primary">{stats?.completas || 0}</p>
+            <p className="text-xl font-bold text-primary">{stats?.completas || 0}</p>
             <p className="text-xs text-muted-foreground">Completas</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-yellow-500">{stats?.parciais || 0}</p>
+            <p className="text-xl font-bold text-yellow-500">{stats?.parciais || 0}</p>
             <p className="text-xs text-muted-foreground">Parciais</p>
           </div>
         </div>
@@ -233,10 +233,10 @@ function RespostasDrawer({
     <>
       <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
         <DrawerContent className="max-h-[90vh]">
-          <DrawerHeader className="border-b border-border">
+          <DrawerHeader className="border-b border-border/50">
             <div className="flex items-center justify-between">
               <div>
-                <DrawerTitle>Respostas: {pesquisa.titulo}</DrawerTitle>
+                <DrawerTitle className="text-base">Respostas: {pesquisa.titulo}</DrawerTitle>
                 <p className="text-sm text-muted-foreground mt-1">
                   {statusFilter !== "todos" 
                     ? `${respostasFiltradas.length} de ${respostas?.length || 0} respostas`
@@ -246,7 +246,7 @@ function RespostasDrawer({
               </div>
               <div className="flex items-center gap-3">
                 <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-                  <SelectTrigger className="w-[140px]">
+                  <SelectTrigger className="w-[140px] h-9">
                     <SelectValue placeholder="Filtrar" />
                   </SelectTrigger>
                   <SelectContent>
@@ -255,8 +255,8 @@ function RespostasDrawer({
                     <SelectItem value="parciais">Parciais</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="outline" size="sm" onClick={exportCSV} className="gap-2">
-                  <Download className="h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={exportCSV} className="gap-1.5 h-8">
+                  <Download className="h-3.5 w-3.5" />
                   Exportar CSV
                 </Button>
               </div>
@@ -276,14 +276,14 @@ function RespostasDrawer({
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Lista de respostas */}
                 <ScrollArea className="h-[70vh]">
-                  <div className="border border-border rounded-lg overflow-hidden">
+                  <div className={adminTheme.tableContainer}>
                     <Table>
-                      <TableHeader>
+                      <TableHeader className={adminTheme.tableHeader}>
                         <TableRow>
-                          <TableHead>Nome</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Data</TableHead>
-                          <TableHead>Ações</TableHead>
+                          <TableHead className={adminTheme.tableHeaderCell}>Nome</TableHead>
+                          <TableHead className={adminTheme.tableHeaderCell}>Status</TableHead>
+                          <TableHead className={adminTheme.tableHeaderCell}>Data</TableHead>
+                          <TableHead className={adminTheme.tableHeaderCell}>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -294,42 +294,39 @@ function RespostasDrawer({
                           return (
                             <TableRow 
                               key={resposta.id}
-                              className={selectedResposta?.id === resposta.id ? "bg-muted" : ""}
+                              className={`${adminTheme.tableRow} ${selectedResposta?.id === resposta.id ? "bg-muted" : ""}`}
                             >
                               <TableCell>
                                 <div>
-                                  <p className="font-medium text-foreground">
-                                    {displayName}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {displayEmail}
-                                  </p>
+                                  <p className="font-medium text-sm">{displayName}</p>
+                                  <p className="text-xs text-muted-foreground">{displayEmail}</p>
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <Badge variant={resposta.completado ? "default" : "secondary"}>
+                                <Badge variant={resposta.completado ? "default" : "secondary"} className="text-xs">
                                   {resposta.completado ? "Completa" : "Parcial"}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-sm text-muted-foreground">
+                              <TableCell className="text-xs text-muted-foreground">
                                 {format(new Date(resposta.created_at), "dd/MM/yy", { locale: ptBR })}
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-1">
                                   <Button
                                     variant="ghost"
-                                    size="sm"
+                                    size="icon"
+                                    className="h-8 w-8"
                                     onClick={() => setSelectedResposta(resposta)}
                                   >
-                                    <Eye className="h-4 w-4" />
+                                    <Eye className="h-3.5 w-3.5" />
                                   </Button>
                                   <Button
                                     variant="ghost"
-                                    size="sm"
-                                    className="text-destructive hover:text-destructive"
+                                    size="icon"
+                                    className="h-8 w-8 text-destructive hover:text-destructive"
                                     onClick={() => setRespostaToDelete(resposta)}
                                   >
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
                                 </div>
                               </TableCell>
@@ -342,16 +339,16 @@ function RespostasDrawer({
                 </ScrollArea>
 
                 {/* Detalhes da resposta selecionada */}
-                <div className="border border-border rounded-lg p-4">
+                <div className="border border-border/50 rounded-xl p-4">
                   {selectedResposta ? (
                     <ScrollArea className="h-[70vh]">
-                      <h3 className="font-semibold text-foreground mb-4">
+                      <h3 className="font-semibold text-sm mb-4">
                         Respostas de {selectedResposta.email_respondente?.split("@")[0] || "Anônimo"}
                       </h3>
                       <div className="space-y-6">
                         {pesquisa.perguntas.map((secao) => (
                           <div key={secao.secao}>
-                            <h4 className="text-sm font-medium text-primary mb-3">
+                            <h4 className="text-xs font-medium text-primary mb-3">
                               {secao.titulo}
                             </h4>
                             <div className="space-y-4">
@@ -359,10 +356,10 @@ function RespostasDrawer({
                                 const resposta = (selectedResposta.respostas as Record<string, string>)[pergunta.id];
                                 return (
                                   <div key={pergunta.id}>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-xs text-muted-foreground">
                                       {pergunta.texto}
                                     </p>
-                                    <p className="text-foreground mt-1">
+                                    <p className="text-sm mt-1">
                                       {resposta || <span className="text-muted-foreground italic">Não respondida</span>}
                                     </p>
                                   </div>
@@ -374,7 +371,7 @@ function RespostasDrawer({
                       </div>
                     </ScrollArea>
                   ) : (
-                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                    <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
                       Selecione uma resposta para ver os detalhes
                     </div>
                   )}

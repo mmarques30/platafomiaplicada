@@ -7,8 +7,9 @@ import { useMenuConfig, MenuConfig } from "@/hooks/useMenuConfig";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Menu } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function GerenciarMenus() {
   const { menuConfig, isLoading, refetch } = useMenuConfig();
@@ -92,48 +93,51 @@ export default function GerenciarMenus() {
     return (
       <div
         key={menu.id}
-        className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+        className="flex items-center gap-4 p-3 border border-border/50 rounded-lg hover:bg-muted/30 transition-colors"
       >
         <div className="flex-1 space-y-2">
           {isEditing ? (
             <>
               <div className="grid gap-2">
-                <Label>Nome do Menu</Label>
+                <Label className="text-xs">Nome do Menu</Label>
                 <Input
                   value={formData.label || ""}
                   onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                   placeholder="Nome do menu"
+                  className="h-9"
                 />
               </div>
               {menu.url && (
                 <div className="grid gap-2">
-                  <Label>URL</Label>
+                  <Label className="text-xs">URL</Label>
                   <Input
                     value={formData.url || ""}
                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                     placeholder="/caminho"
+                    className="h-9"
                   />
                 </div>
               )}
               <div className="grid gap-2">
-                <Label>Ordem</Label>
+                <Label className="text-xs">Ordem</Label>
                 <Input
                   type="number"
                   value={formData.ordem || 0}
                   onChange={(e) => setFormData({ ...formData, ordem: parseInt(e.target.value) })}
+                  className="h-9"
                 />
               </div>
             </>
           ) : (
             <>
               <div className="flex items-center gap-2">
-                <h4 className="font-semibold">{menu.label}</h4>
+                <h4 className="font-medium text-sm">{menu.label}</h4>
                 <Badge variant="outline" className="text-xs">
                   {menu.menu_key}
                 </Badge>
               </div>
               {menu.url && (
-                <p className="text-sm text-muted-foreground">{menu.url}</p>
+                <p className="text-xs text-muted-foreground">{menu.url}</p>
               )}
               <p className="text-xs text-muted-foreground">Ordem: {menu.ordem}</p>
             </>
@@ -163,14 +167,16 @@ export default function GerenciarMenus() {
             <div className="flex gap-2">
               <Button
                 size="sm"
+                className="h-8"
                 onClick={() => handleSave(menu.id)}
                 disabled={saving}
               >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
               </Button>
               <Button
                 size="sm"
                 variant="outline"
+                className="h-8"
                 onClick={handleCancel}
                 disabled={saving}
               >
@@ -181,6 +187,7 @@ export default function GerenciarMenus() {
             <Button
               size="sm"
               variant="outline"
+              className="h-8"
               onClick={() => handleEdit(menu)}
             >
               Editar
@@ -200,18 +207,16 @@ export default function GerenciarMenus() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Gerenciar Menus e Páginas</h1>
-        <p className="text-muted-foreground mt-2">
-          Controle a visibilidade e edição de menus e páginas do sistema
-        </p>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <Menu className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Gerenciar Menus e Páginas</h1>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Menus da Sidebar</CardTitle>
-          <CardDescription>
+      <Card className={adminTheme.card}>
+        <CardHeader className={adminTheme.cardHeader}>
+          <CardTitle className={adminTheme.cardTitle}>Menus da Sidebar</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
             Gerencie os itens que aparecem na barra lateral de navegação
           </CardDescription>
         </CardHeader>
@@ -220,10 +225,10 @@ export default function GerenciarMenus() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Menus do Header</CardTitle>
-          <CardDescription>
+      <Card className={adminTheme.card}>
+        <CardHeader className={adminTheme.cardHeader}>
+          <CardTitle className={adminTheme.cardTitle}>Menus do Header</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
             Gerencie os itens que aparecem no cabeçalho superior
           </CardDescription>
         </CardHeader>

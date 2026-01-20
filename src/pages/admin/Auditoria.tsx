@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Download, RefreshCw } from "lucide-react";
+import { Download, RefreshCw, History } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function Auditoria() {
   const [tabelaFiltro, setTabelaFiltro] = useState<string>("todas");
@@ -19,20 +21,12 @@ export default function Auditoria() {
     queryFn: async () => {
       let query = supabase
         .from("auditoria_conteudo")
-        .select(`
-          *,
-          profiles:user_id(nome_completo)
-        `)
+        .select(`*, profiles:user_id(nome_completo)`)
         .order("created_at", { ascending: false })
         .limit(100);
 
-      if (tabelaFiltro !== "todas") {
-        query = query.eq("tabela", tabelaFiltro);
-      }
-
-      if (operacaoFiltro !== "todas") {
-        query = query.eq("operacao", operacaoFiltro);
-      }
+      if (tabelaFiltro !== "todas") query = query.eq("tabela", tabelaFiltro);
+      if (operacaoFiltro !== "todas") query = query.eq("operacao", operacaoFiltro);
 
       const { data, error } = await query;
       if (error) throw error;
@@ -66,20 +60,20 @@ export default function Auditoria() {
   };
 
   return (
-    <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Auditoria do Sistema</h1>
-          <p className="text-muted-foreground mt-2">
-            Histórico completo de alterações no sistema
-          </p>
-        </div>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <History className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Auditoria do Sistema</h1>
+        <Badge variant="secondary" className="text-xs">{historico?.length || 0} registros</Badge>
+      </div>
 
-        <Card className="p-6">
-          <div className="flex flex-wrap gap-4 mb-6">
+      <Card className={adminTheme.card}>
+        <div className="p-4">
+          <div className="flex flex-wrap gap-4 mb-4">
             <div className="flex-1 min-w-[200px]">
-              <label className="text-sm font-medium mb-2 block">Tabela</label>
+              <label className="text-xs font-medium mb-2 block text-muted-foreground">Tabela</label>
               <Select value={tabelaFiltro} onValueChange={setTabelaFiltro}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -94,9 +88,9 @@ export default function Auditoria() {
             </div>
 
             <div className="flex-1 min-w-[200px]">
-              <label className="text-sm font-medium mb-2 block">Operação</label>
+              <label className="text-xs font-medium mb-2 block text-muted-foreground">Operação</label>
               <Select value={operacaoFiltro} onValueChange={setOperacaoFiltro}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -109,95 +103,73 @@ export default function Auditoria() {
             </div>
 
             <div className="flex items-end gap-2">
-              <Button variant="outline" onClick={() => refetch()}>
-                <RefreshCw className="h-4 w-4 mr-2" />
+              <Button variant="outline" size="sm" className="h-9" onClick={() => refetch()}>
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
                 Atualizar
               </Button>
-              <Button variant="outline" onClick={exportarCSV}>
-                <Download className="h-4 w-4 mr-2" />
-                Exportar CSV
+              <Button variant="outline" size="sm" className="h-9" onClick={exportarCSV}>
+                <Download className="h-3.5 w-3.5 mr-1.5" />
+                CSV
               </Button>
             </div>
           </div>
 
-          <div className="border rounded-lg">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Data/Hora</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Usuário</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Tabela</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Operação</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Detalhes</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                        Carregando...
-                      </td>
-                    </tr>
-                  ) : historico && historico.length > 0 ? (
-                    historico.map((item) => (
-                      <tr key={item.id} className="hover:bg-muted/50">
-                        <td className="px-4 py-3 text-sm">
-                          {format(new Date(item.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          {(item.profiles as any)?.nome_completo || "Sistema"}
-                        </td>
-                        <td className="px-4 py-3 text-sm font-medium">{item.tabela}</td>
-                        <td className="px-4 py-3">
-                          <OperacaoBadge operacao={item.operacao} />
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground max-w-md truncate">
-                          {item.campos_alterados && item.campos_alterados.length > 0 ? (
-                            <span>Campos: {item.campos_alterados.join(", ")}</span>
-                          ) : (
-                            <span>-</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                        Nenhum registro encontrado
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div className={adminTheme.tableContainer}>
+            <Table>
+              <TableHeader className={adminTheme.tableHeader}>
+                <TableRow>
+                  <TableHead className={adminTheme.tableHeaderCell}>Data/Hora</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Usuário</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Tabela</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Operação</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Detalhes</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                  </TableRow>
+                ) : historico && historico.length > 0 ? (
+                  historico.map((item) => (
+                    <TableRow key={item.id} className={adminTheme.tableRow}>
+                      <TableCell className="text-xs">
+                        {format(new Date(item.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {(item.profiles as any)?.nome_completo || "Sistema"}
+                      </TableCell>
+                      <TableCell className="text-sm font-medium">{item.tabela}</TableCell>
+                      <TableCell><OperacaoBadge operacao={item.operacao} /></TableCell>
+                      <TableCell className="text-xs text-muted-foreground max-w-md truncate">
+                        {item.campos_alterados?.length ? `Campos: ${item.campos_alterados.join(", ")}` : "-"}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Nenhum registro encontrado</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
+    </div>
   );
 }
 
-interface OperacaoBadgeProps {
-  operacao: string;
-}
-
-function OperacaoBadge({ operacao }: OperacaoBadgeProps) {
+function OperacaoBadge({ operacao }: { operacao: string }) {
   const styles: Record<string, string> = {
-    INSERT: "bg-success/10 text-success",
-    UPDATE: "bg-primary/10 text-primary",
-    DELETE: "bg-destructive/10 text-destructive",
-    PASSWORD_CHANGE: "bg-warning/10 text-warning",
+    INSERT: "bg-green-100 text-green-700",
+    UPDATE: "bg-blue-100 text-blue-700",
+    DELETE: "bg-red-100 text-red-700",
   };
-
-  const labels: Record<string, string> = {
-    INSERT: "Criação",
-    UPDATE: "Atualização",
-    DELETE: "Exclusão",
-    PASSWORD_CHANGE: "Senha",
-  };
+  const labels: Record<string, string> = { INSERT: "Criação", UPDATE: "Atualização", DELETE: "Exclusão" };
 
   return (
-    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${styles[operacao] || "bg-muted text-muted-foreground"}`}>
+    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${styles[operacao] || "bg-muted text-muted-foreground"}`}>
       {labels[operacao] || operacao}
     </span>
   );

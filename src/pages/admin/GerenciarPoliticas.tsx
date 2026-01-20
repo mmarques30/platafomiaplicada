@@ -9,9 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { FileText, Edit, Clock } from "lucide-react";
+import { FileText, Edit, Clock, Scale } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function GerenciarPoliticas() {
   const { data: documentos, isLoading } = useDocumentosLegais();
@@ -55,35 +56,36 @@ export default function GerenciarPoliticas() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Gerenciar Políticas e Termos</h1>
+      <div className={adminTheme.page}>
+        <div className={adminTheme.pageTitleWrapper}>
+          <Scale className={adminTheme.pageIcon} />
+          <h1 className={adminTheme.pageTitle}>Gerenciar Políticas e Termos</h1>
+        </div>
         <div className="grid gap-4">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Gerenciar Políticas e Termos</h1>
-        <p className="text-muted-foreground">
-          Edite os documentos legais da plataforma
-        </p>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <Scale className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Gerenciar Políticas e Termos</h1>
       </div>
 
       <div className="grid gap-4">
         {documentos?.map((doc) => (
-          <Card key={doc.id}>
-            <CardHeader>
+          <Card key={doc.id} className={adminTheme.card}>
+            <CardHeader className="py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <FileText className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <CardTitle className="text-lg">{doc.titulo}</CardTitle>
-                    <CardDescription className="flex items-center gap-1 mt-1">
+                    <CardTitle className="text-sm font-semibold">{doc.titulo}</CardTitle>
+                    <CardDescription className="flex items-center gap-1 mt-1 text-xs">
                       <Clock className="h-3 w-3" />
                       Atualizado em {format(new Date(doc.ultima_atualizacao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                     </CardDescription>
@@ -95,8 +97,8 @@ export default function GerenciarPoliticas() {
                       Apenas Mentorados
                     </span>
                   )}
-                  <Button variant="outline" size="sm" onClick={() => handleEditar(doc)}>
-                    <Edit className="h-4 w-4 mr-2" />
+                  <Button variant="outline" size="sm" className="h-8" onClick={() => handleEditar(doc)}>
+                    <Edit className="h-3.5 w-3.5 mr-1.5" />
                     Editar
                   </Button>
                 </div>
@@ -110,15 +112,15 @@ export default function GerenciarPoliticas() {
       <Dialog open={!!editando} onOpenChange={(open) => !open && handleCancelar()}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Editar: {editando?.titulo}</DialogTitle>
+            <DialogTitle className="text-base">Editar: {editando?.titulo}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6 py-4">
             {/* Toggle Apenas Mentorados */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center justify-between p-4 border border-border/50 rounded-lg">
               <div className="space-y-0.5">
-                <Label>Apenas para Mentorados</Label>
-                <p className="text-sm text-muted-foreground">
+                <Label className="text-sm">Apenas para Mentorados</Label>
+                <p className="text-xs text-muted-foreground">
                   Se ativado, visitantes não terão acesso a este documento
                 </p>
               </div>
@@ -129,17 +131,19 @@ export default function GerenciarPoliticas() {
             </div>
 
             {/* Tabs de Conteúdo */}
-            <Tabs defaultValue="mentorados" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="mentorados">Versão Mentorados</TabsTrigger>
-                <TabsTrigger value="visitantes" disabled={apenasMentorados}>
+            <Tabs defaultValue="mentorados" className="w-full space-y-4">
+              <TabsList className={adminTheme.tabsList}>
+                <TabsTrigger value="mentorados" className={adminTheme.tabsTrigger}>
+                  Versão Mentorados
+                </TabsTrigger>
+                <TabsTrigger value="visitantes" className={adminTheme.tabsTrigger} disabled={apenasMentorados}>
                   Versão Visitantes
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="mentorados" className="mt-4">
+              <TabsContent value="mentorados" className={adminTheme.tabsContent}>
                 <div className="space-y-2">
-                  <Label>Conteúdo para Mentorados (Markdown)</Label>
+                  <Label className="text-sm">Conteúdo para Mentorados (Markdown)</Label>
                   <Textarea
                     value={conteudoMentorados}
                     onChange={(e) => setConteudoMentorados(e.target.value)}
@@ -149,9 +153,9 @@ export default function GerenciarPoliticas() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="visitantes" className="mt-4">
+              <TabsContent value="visitantes" className={adminTheme.tabsContent}>
                 <div className="space-y-2">
-                  <Label>Conteúdo para Visitantes (Markdown)</Label>
+                  <Label className="text-sm">Conteúdo para Visitantes (Markdown)</Label>
                   <Textarea
                     value={conteudoVisitantes}
                     onChange={(e) => setConteudoVisitantes(e.target.value)}
@@ -160,7 +164,7 @@ export default function GerenciarPoliticas() {
                     disabled={apenasMentorados}
                   />
                   {apenasMentorados && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       Desative "Apenas para Mentorados" para editar a versão de visitantes.
                     </p>
                   )}

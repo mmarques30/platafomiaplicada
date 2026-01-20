@@ -6,67 +6,65 @@ import { JornadasTab } from "@/components/admin/produtos/JornadasTab";
 import { EstatisticasProdutos } from "@/components/admin/produtos/EstatisticasProdutos";
 import { DescontosTab } from "@/components/admin/produtos/DescontosTab";
 import { Package, TrendingUp, RefreshCw, Map, BarChart3, Percent } from "lucide-react";
-import { PageTitle } from "@/components/shared/PageTitle";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 export default function GerenciarProdutos() {
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
-        <PageTitle primary="Gestão" secondary="de Produtos" />
-        <p className="text-muted-foreground mt-2">
-          Gerencie produtos, upsells, jornadas e acompanhe estatísticas
-        </p>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <Package className={adminTheme.pageIcon} />
+        <h1 className={adminTheme.pageTitle}>Gestão de Produtos</h1>
       </div>
 
-      <Tabs defaultValue="produtos" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-8">
-          <TabsTrigger value="produtos" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
+      <Tabs defaultValue="produtos" className="w-full space-y-4">
+        <TabsList className={adminTheme.tabsList}>
+          <TabsTrigger value="produtos" className={adminTheme.tabsTrigger}>
+            <Package className={adminTheme.tabsIcon} />
             Produtos
           </TabsTrigger>
-          <TabsTrigger value="upsells" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
+          <TabsTrigger value="upsells" className={adminTheme.tabsTrigger}>
+            <TrendingUp className={adminTheme.tabsIcon} />
             Upsells
           </TabsTrigger>
-          <TabsTrigger value="renovacoes" className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4" />
+          <TabsTrigger value="renovacoes" className={adminTheme.tabsTrigger}>
+            <RefreshCw className={adminTheme.tabsIcon} />
             Renovações
           </TabsTrigger>
-          <TabsTrigger value="jornadas" className="flex items-center gap-2">
-            <Map className="h-4 w-4" />
+          <TabsTrigger value="jornadas" className={adminTheme.tabsTrigger}>
+            <Map className={adminTheme.tabsIcon} />
             Jornadas
           </TabsTrigger>
-          <TabsTrigger value="descontos" className="flex items-center gap-2">
-            <Percent className="h-4 w-4" />
+          <TabsTrigger value="descontos" className={adminTheme.tabsTrigger}>
+            <Percent className={adminTheme.tabsIcon} />
             Descontos
           </TabsTrigger>
-          <TabsTrigger value="estatisticas" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
+          <TabsTrigger value="estatisticas" className={adminTheme.tabsTrigger}>
+            <BarChart3 className={adminTheme.tabsIcon} />
             Estatísticas
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="produtos">
+        <TabsContent value="produtos" className={adminTheme.tabsContent}>
           <ProdutosTab />
         </TabsContent>
 
-        <TabsContent value="upsells">
+        <TabsContent value="upsells" className={adminTheme.tabsContent}>
           <UpsellsTab />
         </TabsContent>
 
-        <TabsContent value="renovacoes">
+        <TabsContent value="renovacoes" className={adminTheme.tabsContent}>
           <RenovacoesTab />
         </TabsContent>
 
-        <TabsContent value="jornadas">
+        <TabsContent value="jornadas" className={adminTheme.tabsContent}>
           <JornadasTab />
         </TabsContent>
 
-        <TabsContent value="descontos">
+        <TabsContent value="descontos" className={adminTheme.tabsContent}>
           <DescontosTab />
         </TabsContent>
 
-        <TabsContent value="estatisticas">
+        <TabsContent value="estatisticas" className={adminTheme.tabsContent}>
           <EstatisticasProdutos />
         </TabsContent>
       </Tabs>

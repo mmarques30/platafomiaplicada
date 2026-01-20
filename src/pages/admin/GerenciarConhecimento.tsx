@@ -6,6 +6,7 @@ import { UploadDocumentoModal } from "@/components/admin/knowledge/UploadDocumen
 import { DocumentoCard } from "@/components/admin/knowledge/DocumentoCard";
 import { StatsCard } from "@/components/admin/StatsCard";
 import { KnowledgeBaseDocument } from "@/types/knowledge-base";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -13,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 const GerenciarConhecimento = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -62,16 +64,15 @@ const GerenciarConhecimento = () => {
   const documentosInativos = totalDocumentos - documentosAtivos;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Base de Conhecimento</h1>
-          <p className="text-muted-foreground mt-1">
-            Gerencie os documentos que alimentam o conhecimento da MarIAna
-          </p>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageHeader}>
+        <div className={adminTheme.pageTitleWrapper}>
+          <Database className={adminTheme.pageIcon} />
+          <h1 className={adminTheme.pageTitle}>Base de Conhecimento</h1>
+          <Badge variant="secondary" className="text-xs">{totalDocumentos}</Badge>
         </div>
-        <Button onClick={() => setUploadModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button size="sm" onClick={() => setUploadModalOpen(true)}>
+          <Plus className="mr-1.5 h-3.5 w-3.5" />
           Novo Documento
         </Button>
       </div>
@@ -96,7 +97,7 @@ const GerenciarConhecimento = () => {
 
       <div className="flex items-center gap-4">
         <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[200px] h-9">
             <SelectValue placeholder="Filtrar por categoria" />
           </SelectTrigger>
           <SelectContent>
@@ -129,7 +130,7 @@ const GerenciarConhecimento = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 border-2 border-dashed rounded-lg">
+        <div className="text-center py-12 border-2 border-dashed rounded-xl border-border/50">
           <Database className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <p className="text-muted-foreground">
             Nenhum documento encontrado. Comece adicionando um novo documento!
