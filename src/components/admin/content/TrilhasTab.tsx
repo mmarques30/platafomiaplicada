@@ -138,10 +138,10 @@ export function TrilhasTab() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[60px] text-center">#</TableHead>
               <TableHead>Título</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Nível</TableHead>
-              <TableHead>Ordem</TableHead>
               <TableHead>Módulos</TableHead>
               <TableHead>Vídeos</TableHead>
               <TableHead>Materiais</TableHead>
@@ -155,6 +155,11 @@ export function TrilhasTab() {
               const trilhaStat = stats?.find((s: any) => s.trilha_id === trilha.id);
               return (
                 <TableRow key={trilha.id}>
+                  <TableCell className="text-center">
+                    <Badge variant="outline" className="font-mono">
+                      {trilha.ordem ?? '-'}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="font-medium">{trilha.titulo}</TableCell>
                   <TableCell>
                     {trilha.categoria === 'aulas semanais' && (
@@ -181,7 +186,7 @@ export function TrilhasTab() {
                   <TableCell>
                     <Badge variant="outline">{trilha.nivel}</Badge>
                   </TableCell>
-                  <TableCell>{trilha.ordem}</TableCell>
+                  
                   <TableCell>
                     <Badge variant="secondary">{trilhaStat?.total_modulos || 0}</Badge>
                   </TableCell>

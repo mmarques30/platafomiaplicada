@@ -122,11 +122,11 @@ export function ModulosTab() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[60px] text-center">#</TableHead>
               <TableHead>Título</TableHead>
               <TableHead>Trilha</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Data Início</TableHead>
-              <TableHead>Ordem</TableHead>
               <TableHead>Vídeos</TableHead>
               <TableHead>Materiais</TableHead>
               <TableHead>Exercícios</TableHead>
@@ -139,6 +139,11 @@ export function ModulosTab() {
               const moduloStat = stats?.find((s: any) => s.modulo_id === modulo.id);
               return (
               <TableRow key={modulo.id}>
+                <TableCell className="text-center">
+                  <Badge variant="outline" className="font-mono">
+                    {modulo.ordem ?? '-'}
+                  </Badge>
+                </TableCell>
                 <TableCell className="font-medium">{modulo.titulo}</TableCell>
                 <TableCell>{modulo.trilha?.titulo}</TableCell>
                 <TableCell>
@@ -170,7 +175,7 @@ export function ModulosTab() {
                     <span className="text-muted-foreground text-xs">-</span>
                   )}
                 </TableCell>
-                <TableCell>{modulo.ordem}</TableCell>
+                
                   <TableCell>
                     <Badge variant="secondary">{moduloStat?.total_videos || 0}</Badge>
                   </TableCell>
