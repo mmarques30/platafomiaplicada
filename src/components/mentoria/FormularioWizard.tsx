@@ -235,19 +235,18 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
 
   return (
     <Card className="w-full max-w-4xl mx-auto relative overflow-hidden">
-      {/* Business Premium Badge */}
-      {isBusiness && (
-        <div className="absolute top-4 right-4 z-10">
-          <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full flex items-center gap-1.5">
-            <Crown className="h-3.5 w-3.5" />
-            Business
-          </span>
-        </div>
-      )}
-
       <CardContent className="pt-6">
-        {onCancelar && (
-          <div className="flex justify-end mb-4">
+        <div className="flex justify-between items-center mb-4">
+          {/* Business Premium Badge */}
+          {isBusiness && (
+            <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full flex items-center gap-1.5">
+              <Crown className="h-3.5 w-3.5" />
+              Business
+            </span>
+          )}
+          {!isBusiness && <div />}
+          
+          {onCancelar && (
             <Button 
               variant="ghost" 
               size="sm" 
@@ -257,8 +256,8 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
               <X className="h-4 w-4" />
               Cancelar
             </Button>
-          </div>
-        )}
+          )}
+        </div>
         
         <div className="flex items-center justify-between mb-2">
           <ProgressBar 
