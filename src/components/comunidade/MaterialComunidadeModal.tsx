@@ -10,10 +10,20 @@ import { useMateriaisComunidade, MaterialComunidade } from "@/hooks/useMateriais
 import { useAvaliacoesMateriais } from "@/hooks/useAvaliacoesMateriais";
 import { RatingStars } from "./RatingStars";
 import { useAuth } from "@/hooks/useAuth";
-import { Copy, Download, Check, FileText, Image, FileSpreadsheet, Layout, File, Send } from "lucide-react";
+import { Copy, Download, Check, FileText, Image as ImageIcon, FileSpreadsheet, Layout, File, Send } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+const getFileName = (url: string): string => {
+  try {
+    const decodedUrl = decodeURIComponent(url);
+    const parts = decodedUrl.split("/");
+    return parts[parts.length - 1];
+  } catch {
+    return url.split("/").pop() || "arquivo";
+  }
+};
 
 interface MaterialComunidadeModalProps {
   materialId: string | null;
@@ -23,7 +33,7 @@ interface MaterialComunidadeModalProps {
 
 const TIPO_ICONS: Record<string, React.ReactNode> = {
   prompt: <FileText className="w-5 h-5" />,
-  imagem: <Image className="w-5 h-5" />,
+  imagem: <ImageIcon className="w-5 h-5" />,
   documento: <FileSpreadsheet className="w-5 h-5" />,
   template: <Layout className="w-5 h-5" />,
   outro: <File className="w-5 h-5" />,
@@ -79,10 +89,8 @@ export function MaterialComunidadeModal({ materialId, open, onOpenChange }: Mate
     }
   };
 
-  const handleDownload = () => {
-    if (material.arquivo_url) {
-      window.open(material.arquivo_url, "_blank");
-    }
+  const handleDownload = (url: string) => {
+    window.open(url, "_blank");
   };
 
   const handleSubmitAvaliacao = () => {
@@ -155,28 +163,32 @@ export function MaterialComunidadeModal({ materialId, open, onOpenChange }: Mate
               </div>
             )}
 
-            {/* Arquivo para download */}
-            {material.arquivo_url && (
+            {/* Arquivos para download */}
+            {material.arquivos_url && material.arquivos_url.length > 0 && (
               <div className="space-y-2">
-                <span className="text-sm font-medium">Arquivo</span>
-                {material.tipo === "imagem" ? (
-                  <div className="space-y-2">
-                    <img
-                      src={material.arquivo_url}
-                      alt={material.titulo}
-                      className="max-h-[300px] rounded-lg object-contain bg-muted"
-                    />
-                    <Button variant="outline" size="sm" onClick={handleDownload}>
-                      <Download className="w-4 h-4 mr-2" />
-                      Baixar imagem
-                    </Button>
-                  </div>
-                ) : (
-                  <Button variant="outline" onClick={handleDownload}>
-                    <Download className="w-4 h-4 mr-2" />
-                    Baixar arquivo
-                  </Button>
-                )}
+                <span className="text-sm font-medium">
+                  {material.arquivos_url.length === 1 ? "Arquivo" : `Arquivos (${material.arquivos_url.length})`}
+                </span>
+                <div className="space-y-2">
+                  {material.arquivos_url.map((url, index) => {
+                    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+                    return (
+                      <div key={index} className="space-y-2">
+                        {isImage && (
+                          <img
+                            src={url}
+                            alt={`${material.titulo} - ${index + 1}`}
+                            className="max-h-[200px] rounded-lg object-contain bg-muted"
+                          />
+                        )}
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(url)}>
+                          <Download className="w-4 h-4 mr-2" />
+                          {getFileName(url)}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
