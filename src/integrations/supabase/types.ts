@@ -128,6 +128,58 @@ export type Database = {
         }
         Relationships: []
       }
+      avaliacoes_materiais_comunidade: {
+        Row: {
+          comentario: string | null
+          created_at: string | null
+          id: string
+          material_id: string
+          nota: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          comentario?: string | null
+          created_at?: string | null
+          id?: string
+          material_id: string
+          nota: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          comentario?: string | null
+          created_at?: string | null
+          id?: string
+          material_id?: string
+          nota?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_materiais_comunidade_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materiais_comunidade"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_materiais_comunidade_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_materiais_comunidade_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       avisos: {
         Row: {
           ativo: boolean | null
@@ -2169,6 +2221,92 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      materiais_comunidade: {
+        Row: {
+          adicionado_por: string | null
+          arquivo_url: string | null
+          ativo: boolean | null
+          categoria: string
+          conteudo_texto: string | null
+          created_at: string | null
+          criador_id: string | null
+          descricao: string | null
+          id: string
+          media_avaliacoes: number | null
+          ordem: number | null
+          tipo: string
+          titulo: string
+          total_avaliacoes: number | null
+          total_comentarios: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          adicionado_por?: string | null
+          arquivo_url?: string | null
+          ativo?: boolean | null
+          categoria: string
+          conteudo_texto?: string | null
+          created_at?: string | null
+          criador_id?: string | null
+          descricao?: string | null
+          id?: string
+          media_avaliacoes?: number | null
+          ordem?: number | null
+          tipo: string
+          titulo: string
+          total_avaliacoes?: number | null
+          total_comentarios?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          adicionado_por?: string | null
+          arquivo_url?: string | null
+          ativo?: boolean | null
+          categoria?: string
+          conteudo_texto?: string | null
+          created_at?: string | null
+          criador_id?: string | null
+          descricao?: string | null
+          id?: string
+          media_avaliacoes?: number | null
+          ordem?: number | null
+          tipo?: string
+          titulo?: string
+          total_avaliacoes?: number | null
+          total_comentarios?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "materiais_comunidade_adicionado_por_fkey"
+            columns: ["adicionado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materiais_comunidade_adicionado_por_fkey"
+            columns: ["adicionado_por"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "materiais_comunidade_criador_id_fkey"
+            columns: ["criador_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materiais_comunidade_criador_id_fkey"
+            columns: ["criador_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       materiais_gratuitos: {
         Row: {
