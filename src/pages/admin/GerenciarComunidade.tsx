@@ -5,11 +5,12 @@ import { ModeracaoTab } from "@/components/admin/comunidade/ModeracaoTab";
 import { ConversasIATab } from "@/components/admin/comunidade/ConversasIATab";
 import { EstatisticasComunidadeTab } from "@/components/admin/comunidade/EstatisticasComunidadeTab";
 import { FerramentasCompartilhadasTab } from "@/components/admin/comunidade/FerramentasCompartilhadasTab";
+import { CriadoresTab } from "@/components/admin/comunidade/CriadoresTab";
 import { Users, Crown, Tags, MessagesSquare } from "lucide-react";
 import { adminTheme } from "@/components/admin/adminTheme";
 
 type MainTab = "categorias" | "gratuita" | "pagantes";
-type GratuitaSubTab = "moderacao" | "estatisticas";
+type GratuitaSubTab = "moderacao" | "estatisticas" | "criadores";
 type PagantesSubTab = "conversas" | "ferramentas";
 
 export default function GerenciarComunidade() {
@@ -58,10 +59,13 @@ export default function GerenciarComunidade() {
           >
             <TabsList className={adminTheme.tabsList}>
               <TabsTrigger value="moderacao" className={adminTheme.tabsTrigger}>
-                Moderação
+                Moderacao
               </TabsTrigger>
               <TabsTrigger value="estatisticas" className={adminTheme.tabsTrigger}>
-                Estatísticas
+                Estatisticas
+              </TabsTrigger>
+              <TabsTrigger value="criadores" className={adminTheme.tabsTrigger}>
+                Criadores
               </TabsTrigger>
             </TabsList>
 
@@ -71,6 +75,10 @@ export default function GerenciarComunidade() {
 
             <TabsContent value="estatisticas" className={adminTheme.tabsContent}>
               <EstatisticasComunidadeTab />
+            </TabsContent>
+
+            <TabsContent value="criadores" className={adminTheme.tabsContent}>
+              <CriadoresTab />
             </TabsContent>
           </Tabs>
         </TabsContent>
