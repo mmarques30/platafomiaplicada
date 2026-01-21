@@ -144,17 +144,61 @@ export function MaterialCriadoresModal({ open, onOpenChange, materialId }: Mater
     return uploadedUrls;
   };
 
-  const handleGerarComIA = async () => {
-    // Determinar o conteudo a analisar
-    let conteudo = conteudoTexto.trim();
-    
-    // Se nao tem texto mas tem arquivos, usar nomes dos arquivos como contexto
-    if (!conteudo && selectedFiles.length > 0) {
-      conteudo = `Arquivos: ${selectedFiles.map(f => f.name).join(", ")}`;
+  // Funcao para extrair conteudo real de arquivos
+  const extractFileContent = async (file: File): Promise<string> => {
+    // Para arquivos de texto simples
+    if (file.type === "text/plain" || file.name.endsWith(".txt") || file.name.endsWith(".md")) {
+      return await file.text();
     }
     
+    // Para imagens, retornar descricao basica
+    if (file.type.startsWith("image/")) {
+      return `[Imagem: ${file.name}]`;
+    }
+    
+    // Para PDFs e documentos, tentar ler como texto
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        // Tentar extrair texto legivel
+        const cleanText = text?.replace(/[^\x20-\x7E\n\r\tÀ-ÿ]/g, " ").replace(/\s+/g, " ").trim();
+        if (cleanText && cleanText.length > 50) {
+          resolve(cleanText.substring(0, 10000)); // Limitar a 10k caracteres
+        } else {
+          resolve(`[Documento: ${file.name}]`);
+        }
+      };
+      reader.onerror = () => resolve(`[Documento: ${file.name}]`);
+      reader.readAsText(file);
+    });
+  };
+
+  const handleGerarComIA = async () => {
+    let conteudo = conteudoTexto.trim();
+    
+    // Se nao tem texto, extrair conteudo real dos arquivos selecionados
+    if (!conteudo && selectedFiles.length > 0) {
+      setGerando(true);
+      try {
+        const contents = await Promise.all(
+          selectedFiles.map(async (file) => {
+            const content = await extractFileContent(file);
+            return `--- ${file.name} ---\n${content}`;
+          })
+        );
+        conteudo = contents.join("\n\n");
+      } catch (error) {
+        console.error("Erro ao extrair conteudo:", error);
+        toast.error("Erro ao ler conteudo dos arquivos");
+        setGerando(false);
+        return;
+      }
+    }
+    
+    // Se ainda nao tem conteudo, usar URLs existentes como fallback
     if (!conteudo && arquivoUrls.length > 0) {
-      conteudo = `Arquivos: ${arquivoUrls.map(url => getFileName(url)).join(", ")}`;
+      conteudo = `Arquivos ja enviados: ${arquivoUrls.map(url => getFileName(url)).join(", ")}`;
     }
     
     if (!conteudo) {
