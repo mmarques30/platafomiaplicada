@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { FileText, BookOpen, Lightbulb, Wrench, CheckSquare, Book, Mail, ExternalLink, Calendar, Download } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useNavigate } from "react-router-dom";
 import { MaterialGratuito } from "@/hooks/useMateriaisGratuitos";
 import { Json } from "@/integrations/supabase/types";
 
@@ -46,18 +47,16 @@ const getArquivoUrls = (arquivos_url: Json | null): string[] => {
 };
 
 export function MaterialCard({ material }: MaterialCardProps) {
+  const navigate = useNavigate();
   const Icon = categoriaIconMap[material.categoria] || FileText;
   const iconBgClass = categoriaBgMap[material.categoria] || "bg-primary";
   
-  const links = getLinksUrls(material.links_url);
   const arquivos = getArquivoUrls(material.arquivos_url);
-  const primaryUrl = material.url || links[0];
   const hasFiles = arquivos.length > 0;
 
   const handleClick = () => {
-    if (primaryUrl) {
-      window.open(primaryUrl, "_blank");
-    }
+    // Navega para a Sala de Aula com a aba Materiais selecionada
+    navigate('/videos-bonus?tab=materiais');
   };
 
   return (
@@ -103,9 +102,7 @@ export function MaterialCard({ material }: MaterialCardProps) {
           {hasFiles && (
             <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary/70" />
           )}
-          {primaryUrl && (
-            <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-          )}
+          <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
         </div>
       </div>
     </motion.div>
