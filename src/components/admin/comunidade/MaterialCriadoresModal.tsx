@@ -11,7 +11,7 @@ import { useMateriaisComunidadeAdmin, MaterialComunidade } from "@/hooks/useMate
 import { useCommunityMembers } from "@/hooks/useCommunityMembers";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, X, FileText } from "lucide-react";
+import { Upload, X, FileText, Sparkles, Loader2 } from "lucide-react";
 
 interface MaterialCriadoresModalProps {
   open: boolean;
@@ -65,6 +65,7 @@ export function MaterialCriadoresModal({ open, onOpenChange, materialId }: Mater
   const [ativo, setAtivo] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [gerando, setGerando] = useState(false);
 
   const isEditing = !!materialId;
   const existingMaterial = materiais.find((m) => m.id === materialId);
@@ -143,6 +144,44 @@ export function MaterialCriadoresModal({ open, onOpenChange, materialId }: Mater
     return uploadedUrls;
   };
 
+  const handleGerarComIA = async () => {
+    // Determinar o conteudo a analisar
+    let conteudo = conteudoTexto.trim();
+    
+    // Se nao tem texto mas tem arquivos, usar nomes dos arquivos como contexto
+    if (!conteudo && selectedFiles.length > 0) {
+      conteudo = `Arquivos: ${selectedFiles.map(f => f.name).join(", ")}`;
+    }
+    
+    if (!conteudo && arquivoUrls.length > 0) {
+      conteudo = `Arquivos: ${arquivoUrls.map(url => getFileName(url)).join(", ")}`;
+    }
+    
+    if (!conteudo) {
+      toast.error("Adicione conteudo texto ou arquivos primeiro");
+      return;
+    }
+
+    setGerando(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("gerar-metadados-material", {
+        body: { conteudo, tipo, categoria },
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Erro desconhecido");
+
+      setTitulo(data.data.titulo);
+      setDescricao(data.data.descricao);
+      toast.success("Titulo e descricao gerados com sucesso!");
+    } catch (error) {
+      console.error("Erro ao gerar com IA:", error);
+      toast.error("Erro ao gerar com IA. Tente novamente.");
+    } finally {
+      setGerando(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!titulo.trim()) {
       toast.error("Titulo e obrigatorio");
@@ -198,9 +237,24 @@ export function MaterialCriadoresModal({ open, onOpenChange, materialId }: Mater
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Editar Material" : "Adicionar Material"}
-          </DialogTitle>
+          <div className="flex items-center justify-between gap-4">
+            <DialogTitle>
+              {isEditing ? "Editar Material" : "Adicionar Material"}
+            </DialogTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGerarComIA}
+              disabled={gerando || (!conteudoTexto.trim() && selectedFiles.length === 0 && arquivoUrls.length === 0)}
+            >
+              {gerando ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4 mr-2" />
+              )}
+              Gerar com IA
+            </Button>
+          </div>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
