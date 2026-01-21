@@ -38,14 +38,10 @@ export default function MeuDiagnostico() {
       return;
     }
 
-    // Academy: admin real (não simulando) ou completado -> painel, senão -> formulário
+    // Academy: SEMPRE vai para o painel com as duas abas (Diagnóstico + Feedback)
+    // O painel já mostra o botão "Preencher diagnóstico" se ainda não preencheu
     hasRedirected.current = true;
-    const isRealAdmin = isAdmin && !isSimulating;
-    if (isRealAdmin || formulario?.completado) {
-      navigate('/diagnostico/painel', { replace: true });
-    } else {
-      navigate('/diagnostico/formulario', { replace: true });
-    }
+    navigate('/diagnostico/painel', { replace: true });
   }, [isLoading, planLoading, isVisitante, isBusiness, isAdmin, isSimulating, formulario, navigate]);
 
   // Tela de loading enquanto redireciona
