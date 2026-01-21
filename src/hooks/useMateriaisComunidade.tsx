@@ -9,7 +9,7 @@ export interface MaterialComunidade {
   tipo: string;
   categoria: string;
   conteudo_texto: string | null;
-  arquivo_url: string | null;
+  arquivos_url: string[] | null;
   criador_id: string | null;
   adicionado_por: string | null;
   ativo: boolean;
@@ -111,7 +111,7 @@ export function useMateriaisComunidadeAdmin() {
           categoria: material.categoria!,
           descricao: material.descricao,
           conteudo_texto: material.conteudo_texto,
-          arquivo_url: material.arquivo_url,
+          arquivos_url: material.arquivos_url || [],
           criador_id: material.criador_id,
           ordem: material.ordem,
           ativo: material.ativo,

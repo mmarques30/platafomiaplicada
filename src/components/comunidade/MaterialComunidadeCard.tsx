@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RatingStars } from "./RatingStars";
-import { FileText, Image, FileSpreadsheet, Layout, File } from "lucide-react";
+import { FileText, Image as ImageIcon, FileSpreadsheet, Layout, File, Paperclip } from "lucide-react";
 
 interface MaterialComunidadeCardProps {
   material: MaterialComunidade;
@@ -12,7 +12,7 @@ interface MaterialComunidadeCardProps {
 
 const TIPO_ICONS: Record<string, React.ReactNode> = {
   prompt: <FileText className="w-5 h-5" />,
-  imagem: <Image className="w-5 h-5" />,
+  imagem: <ImageIcon className="w-5 h-5" />,
   documento: <FileSpreadsheet className="w-5 h-5" />,
   template: <Layout className="w-5 h-5" />,
   outro: <File className="w-5 h-5" />,
@@ -66,6 +66,12 @@ export function MaterialComunidadeCard({ material, onClick }: MaterialComunidade
           <Badge variant="outline" className="text-xs">
             {CATEGORIA_LABELS[material.categoria] || material.categoria}
           </Badge>
+          {material.arquivos_url && material.arquivos_url.length > 0 && (
+            <Badge variant="outline" className="text-xs">
+              <Paperclip className="w-3 h-3 mr-1" />
+              {material.arquivos_url.length}
+            </Badge>
+          )}
         </div>
 
         {/* Footer: Criador + Avaliacao */}

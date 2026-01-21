@@ -2225,7 +2225,7 @@ export type Database = {
       materiais_comunidade: {
         Row: {
           adicionado_por: string | null
-          arquivo_url: string | null
+          arquivos_url: Json | null
           ativo: boolean | null
           categoria: string
           conteudo_texto: string | null
@@ -2243,7 +2243,7 @@ export type Database = {
         }
         Insert: {
           adicionado_por?: string | null
-          arquivo_url?: string | null
+          arquivos_url?: Json | null
           ativo?: boolean | null
           categoria: string
           conteudo_texto?: string | null
@@ -2261,7 +2261,7 @@ export type Database = {
         }
         Update: {
           adicionado_por?: string | null
-          arquivo_url?: string | null
+          arquivos_url?: Json | null
           ativo?: boolean | null
           categoria?: string
           conteudo_texto?: string | null
