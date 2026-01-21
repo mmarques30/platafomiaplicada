@@ -142,6 +142,7 @@ export function VideosTab() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[60px] text-center">#</TableHead>
               <TableHead className="w-[100px]">Thumb</TableHead>
               <TableHead>Título</TableHead>
               <TableHead>Módulo</TableHead>
@@ -163,6 +164,11 @@ export function VideosTab() {
               }
               return (
                 <TableRow key={video.id}>
+                  <TableCell className="text-center">
+                    <Badge variant="outline" className="font-mono">
+                      {video.ordem ?? '-'}
+                    </Badge>
+                  </TableCell>
                   <TableCell>
                     <img 
                       src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)} 
