@@ -144,34 +144,76 @@ export function MaterialCriadoresModal({ open, onOpenChange, materialId }: Mater
     return uploadedUrls;
   };
 
-  // Funcao para extrair conteudo real de arquivos
+  // Funcao para extrair conteudo real de arquivos usando IA
   const extractFileContent = async (file: File): Promise<string> => {
-    // Para arquivos de texto simples
+    // Para arquivos de texto simples - leitura direta
     if (file.type === "text/plain" || file.name.endsWith(".txt") || file.name.endsWith(".md")) {
       return await file.text();
     }
     
-    // Para imagens, retornar descricao basica
+    // Para imagens, retornar descricao basica (fallback)
     if (file.type.startsWith("image/")) {
       return `[Imagem: ${file.name}]`;
     }
     
-    // Para PDFs e documentos, tentar ler como texto
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target?.result as string;
-        // Tentar extrair texto legivel
-        const cleanText = text?.replace(/[^\x20-\x7E\n\r\tÀ-ÿ]/g, " ").replace(/\s+/g, " ").trim();
-        if (cleanText && cleanText.length > 50) {
-          resolve(cleanText.substring(0, 10000)); // Limitar a 10k caracteres
-        } else {
-          resolve(`[Documento: ${file.name}]`);
+    // Para PDF, PPTX, DOCX - usar edge function com Gemini
+    const binaryFormats = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-powerpoint",
+      "application/msword",
+    ];
+    
+    const isBinaryDoc = binaryFormats.includes(file.type) || 
+      file.name.endsWith(".pdf") || 
+      file.name.endsWith(".pptx") || 
+      file.name.endsWith(".ppt") ||
+      file.name.endsWith(".docx") ||
+      file.name.endsWith(".doc");
+    
+    if (isBinaryDoc) {
+      try {
+        // Converter arquivo para base64
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        let binary = "";
+        for (let i = 0; i < uint8Array.byteLength; i++) {
+          binary += String.fromCharCode(uint8Array[i]);
         }
-      };
-      reader.onerror = () => resolve(`[Documento: ${file.name}]`);
-      reader.readAsText(file);
-    });
+        const base64 = btoa(binary);
+        
+        console.log(`Extraindo texto de ${file.name} via IA...`);
+        
+        // Chamar edge function para extrair texto
+        const { data, error } = await supabase.functions.invoke("extrair-texto-documento", {
+          body: { 
+            fileBase64: base64, 
+            fileName: file.name, 
+            fileType: file.type 
+          },
+        });
+        
+        if (error) {
+          console.warn("Erro na edge function:", error);
+          return `[Documento: ${file.name}]`;
+        }
+        
+        if (data?.fallback || !data?.texto) {
+          console.warn("Fallback: não foi possível extrair texto de", file.name);
+          return `[Documento: ${file.name}]`;
+        }
+        
+        console.log(`Texto extraído de ${file.name}: ${data.texto.length} caracteres`);
+        return data.texto.substring(0, 15000); // Limitar tamanho
+      } catch (e) {
+        console.error("Erro ao extrair texto:", e);
+        return `[Documento: ${file.name}]`;
+      }
+    }
+    
+    // Fallback para outros formatos
+    return `[Documento: ${file.name}]`;
   };
 
   const handleGerarComIA = async () => {
@@ -180,6 +222,8 @@ export function MaterialCriadoresModal({ open, onOpenChange, materialId }: Mater
     // Se nao tem texto, extrair conteudo real dos arquivos selecionados
     if (!conteudo && selectedFiles.length > 0) {
       setGerando(true);
+      toast.info("Extraindo conteúdo dos documentos... isso pode levar alguns segundos.");
+      
       try {
         const contents = await Promise.all(
           selectedFiles.map(async (file) => {
@@ -188,9 +232,15 @@ export function MaterialCriadoresModal({ open, onOpenChange, materialId }: Mater
           })
         );
         conteudo = contents.join("\n\n");
+        
+        // Verificar se extração foi bem sucedida
+        const hasRealContent = contents.some(c => !c.includes("[Documento:") && !c.includes("[Imagem:"));
+        if (!hasRealContent) {
+          toast.warning("Não foi possível extrair texto. Usando informações básicas.");
+        }
       } catch (error) {
         console.error("Erro ao extrair conteudo:", error);
-        toast.error("Erro ao ler conteudo dos arquivos");
+        toast.error("Erro ao ler conteúdo dos arquivos");
         setGerando(false);
         return;
       }

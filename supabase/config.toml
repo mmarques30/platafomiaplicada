@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.gerar-metadados-material]
 verify_jwt = false
+
+[functions.extrair-texto-documento]
+verify_jwt = false
