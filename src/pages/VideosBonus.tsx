@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { VideosVisitante } from "@/components/dashboard/VideosVisitante";
 import { MateriaisGratuitosTab } from "@/components/comunidade/MateriaisGratuitosTab";
 import { PageTitle } from "@/components/shared/PageTitle";
@@ -5,6 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GraduationCap } from "lucide-react";
 
 export default function VideosBonus() {
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'aula';
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-6 space-y-6">
@@ -14,7 +18,7 @@ export default function VideosBonus() {
         </section>
 
         {/* Tabs */}
-        <Tabs defaultValue="aula" className="w-full">
+        <Tabs defaultValue={initialTab} className="w-full">
           <TabsList className="w-full md:w-auto grid grid-cols-2 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6">
             <TabsTrigger 
               value="aula"
