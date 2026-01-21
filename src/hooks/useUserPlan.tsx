@@ -72,23 +72,21 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
   const isLoading = planLoading || isAdminLoading;
   
   // Obter o viewAs do context (safe access)
-  let viewAs: AdminViewMode = null;
-  let isViewingAs = false;
-  
-  try {
-    const context = useAdminViewContext();
-    viewAs = context.viewAs;
-    isViewingAs = context.isViewingAs;
-  } catch {
-    // Context not available, use defaults
-  }
+  const context = useAdminViewContext();
+  const viewAs = context.viewAs;
+  const isViewingAs = context.isViewingAs;
+
+  // CRÍTICO: Se temos uma simulação ativa (viewAs no context), aplicar MESMO durante loading
+  // Isso evita que o redirect para /trilhas aconteça antes do isAdmin carregar
+  const hasActiveSimulation = isViewingAs && viewAs !== null;
 
   // Função centralizada para verificar acesso efetivo (hierarquia paralela)
   const hasEffectiveAccessTo = (product: "trilhas" | "skills" | "business") => {
     // Determinar o plano atual considerando simulação
     let currentPlan: UserPlan | null = null;
     
-    if (isAdmin && isViewingAs && viewAs) {
+    // Se há simulação ativa, usar o plano simulado
+    if (hasActiveSimulation) {
       currentPlan = viewAs === "visitante" ? null : viewAs as UserPlan;
     } else if (isAdmin) {
       currentPlan = "business"; // Admin sem viewAs vê como business
@@ -114,8 +112,9 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
     }
   };
 
-  // Se admin está usando "ver como", usar essa visão
-  if (isAdmin && isViewingAs && viewAs) {
+  // Se há simulação ativa (viewAs no localStorage/context), aplicar independente de isAdmin
+  // Isso é seguro porque o AdminViewSelector só aparece para admins
+  if (hasActiveSimulation) {
     const isSimulatingVisitante = viewAs === "visitante";
     const simulatedPlan = isSimulatingVisitante ? null : viewAs as UserPlan;
     
@@ -140,13 +139,14 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
     };
   }
 
-  // Admin sem viewAs vê como business (padrão)
+  // Sem simulação: admin vê como business (padrão)
   const effectiveIsBusiness = isAdmin || isBusiness;
   const effectiveIsSkills = !effectiveIsBusiness && isSkills;
   const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills;
   
   // Visitante real: flag do profile OU não tem plano (sem ser admin)
-  const effectiveIsVisitante = isRealVisitante || (!isAdmin && !plan);
+  // IMPORTANTE: Durante loading, não marcar como visitante para evitar redirect prematuro
+  const effectiveIsVisitante = isLoading ? false : (isRealVisitante || (!isAdmin && !plan));
 
   return {
     plan,
