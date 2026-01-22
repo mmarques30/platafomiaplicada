@@ -50,7 +50,7 @@ export function MaterialComunidadeCard({ material, onClick }: MaterialComunidade
         </div>
 
         {/* Descricao */}
-        <p className="text-sm text-muted-foreground line-clamp-3 mb-auto">
+        <p className="text-sm text-muted-foreground line-clamp-3">
           {material.descricao || "Sem descricao"}
         </p>
 
@@ -70,9 +70,9 @@ export function MaterialComunidadeCard({ material, onClick }: MaterialComunidade
           )}
         </div>
 
-        {/* Footer: Rating */}
-        {material.total_avaliacoes > 0 && (
-          <div className="flex items-center justify-end mt-3 pt-3 border-t">
+        {/* Footer: Rating ou spacer */}
+        {material.total_avaliacoes > 0 ? (
+          <div className="flex items-center justify-end mt-auto pt-3 border-t">
             <div className="flex items-center gap-1.5">
               <RatingStars rating={Number(material.media_avaliacoes)} size="sm" />
               <span className="text-xs text-muted-foreground">
@@ -80,6 +80,8 @@ export function MaterialComunidadeCard({ material, onClick }: MaterialComunidade
               </span>
             </div>
           </div>
+        ) : (
+          <div className="mt-auto" />
         )}
       </CardContent>
     </Card>
