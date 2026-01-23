@@ -1441,6 +1441,7 @@ export type Database = {
           id: string
           justificativa_backlog: string | null
           modulo_relacionado: string | null
+          numero_entrega: number | null
           ordem: number | null
           prazo_previsto: string | null
           prioridade: string | null
@@ -1458,6 +1459,7 @@ export type Database = {
           id?: string
           justificativa_backlog?: string | null
           modulo_relacionado?: string | null
+          numero_entrega?: number | null
           ordem?: number | null
           prazo_previsto?: string | null
           prioridade?: string | null
@@ -1475,6 +1477,7 @@ export type Database = {
           id?: string
           justificativa_backlog?: string | null
           modulo_relacionado?: string | null
+          numero_entrega?: number | null
           ordem?: number | null
           prazo_previsto?: string | null
           prioridade?: string | null

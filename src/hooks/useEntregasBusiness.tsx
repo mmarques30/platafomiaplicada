@@ -13,6 +13,7 @@ export interface EntregaBusiness {
   status: 'pendente' | 'em_andamento' | 'concluida' | 'cancelada';
   prioridade: 'baixa' | 'media' | 'alta' | 'critica';
   ordem: number;
+  numero_entrega?: number;
   prazo_previsto?: string;
   tem_instrucoes: boolean;
   justificativa_backlog?: string;
@@ -30,6 +31,7 @@ export interface EntregaInput {
   status?: 'pendente' | 'em_andamento' | 'concluida' | 'cancelada';
   prioridade?: 'baixa' | 'media' | 'alta' | 'critica';
   ordem?: number;
+  numero_entrega?: number;
   prazo_previsto?: string;
   tem_instrucoes?: boolean;
   justificativa_backlog?: string;

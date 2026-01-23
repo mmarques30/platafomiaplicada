@@ -14,7 +14,8 @@ import {
   Filter,
   Loader2,
   ExternalLink,
-  Trash2
+  Trash2,
+  Package
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +28,7 @@ interface InstrucoesBusinessManagerProps {
   userName?: string;
 }
 
-interface InstrucaoComEtapa {
+interface InstrucaoComRelacionamentos {
   id: string;
   titulo: string;
   descricao: string | null;
@@ -38,10 +39,18 @@ interface InstrucaoComEtapa {
   dicas: string | null;
   recursos_url: string | null;
   status: string;
+  entrega_id: string | null;
+  etapa_id: string | null;
   etapas_business: {
     id: string;
     numero_etapa: number;
     titulo: string;
+  } | null;
+  entregas_business: {
+    id: string;
+    titulo: string;
+    numero_entrega: number | null;
+    etapa_id: string | null;
   } | null;
 }
 
@@ -70,7 +79,7 @@ function useInstrucoesByContrato(contratoId?: string) {
       
       const etapaIds = etapas.map(e => e.id);
       
-      // Depois busca todas instruções dessas etapas
+      // Busca todas instruções dessas etapas com entregas relacionadas
       const { data, error } = await supabase
         .from('instrucoes_etapa')
         .select(`
@@ -79,16 +88,34 @@ function useInstrucoesByContrato(contratoId?: string) {
             id,
             numero_etapa,
             titulo
+          ),
+          entregas_business (
+            id,
+            titulo,
+            numero_entrega,
+            etapa_id
           )
         `)
         .in('etapa_id', etapaIds)
         .order('ordem', { ascending: true });
 
       if (error) throw error;
-      return data as InstrucaoComEtapa[];
+      return data as InstrucaoComRelacionamentos[];
     },
     enabled: !!contratoId,
   });
+}
+
+// Tipo para estrutura hierárquica
+interface EntregaAgrupada {
+  entrega: InstrucaoComRelacionamentos['entregas_business'];
+  instrucoes: InstrucaoComRelacionamentos[];
+}
+
+interface FaseAgrupada {
+  etapa: InstrucaoComRelacionamentos['etapas_business'];
+  entregas: Record<string, EntregaAgrupada>;
+  instrucoesAvulsas: InstrucaoComRelacionamentos[];
 }
 
 export function InstrucoesBusinessManager({ contratoId, userId, userName }: InstrucoesBusinessManagerProps) {
@@ -96,13 +123,13 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
   const { data: instrucoes, isLoading, refetch } = useInstrucoesByContrato(contratoId);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [responsavelFilter, setResponsavelFilter] = useState<string>("all");
-  const [expandedEtapas, setExpandedEtapas] = useState<Set<number>>(new Set([1, 2, 3]));
+  const [expandedFases, setExpandedFases] = useState<Set<number>>(new Set([1, 2, 3]));
+  const [expandedEntregas, setExpandedEntregas] = useState<Set<string>>(new Set());
   const [isClearing, setIsClearing] = useState(false);
 
   const handleClearAll = async () => {
     setIsClearing(true);
     try {
-      // Primeiro busca todas as etapas do contrato
       const { data: etapas } = await supabase
         .from('etapas_business')
         .select('id')
@@ -140,46 +167,106 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
     );
   }
 
-  // Agrupar instruções por etapa
-  const instrucoesPorEtapa = (instrucoes || []).reduce((acc, instrucao) => {
-    const etapaNum = instrucao.etapas_business?.numero_etapa || 0;
-    if (!acc[etapaNum]) {
-      acc[etapaNum] = {
+  // Aplicar filtros primeiro
+  const instrucoesFiltradas = (instrucoes || []).filter(i => {
+    if (statusFilter !== "all" && i.status !== statusFilter) return false;
+    if (responsavelFilter !== "all" && i.responsavel !== responsavelFilter) return false;
+    return true;
+  });
+
+  // Agrupar instruções por FASE > ENTREGA
+  const instrucoesPorFaseEEntrega = instrucoesFiltradas.reduce((acc, instrucao) => {
+    const faseNum = instrucao.etapas_business?.numero_etapa || 0;
+    const entregaId = instrucao.entrega_id || 'sem-entrega';
+    
+    if (!acc[faseNum]) {
+      acc[faseNum] = {
         etapa: instrucao.etapas_business,
-        instrucoes: [],
+        entregas: {},
+        instrucoesAvulsas: [],
       };
     }
-    acc[etapaNum].instrucoes.push(instrucao);
-    return acc;
-  }, {} as Record<number, { etapa: InstrucaoComEtapa['etapas_business']; instrucoes: InstrucaoComEtapa[] }>);
-
-  // Aplicar filtros
-  const filteredInstrucoesPorEtapa = Object.entries(instrucoesPorEtapa).reduce((acc, [etapaNum, { etapa, instrucoes }]) => {
-    const filtered = instrucoes.filter(i => {
-      if (statusFilter !== "all" && i.status !== statusFilter) return false;
-      if (responsavelFilter !== "all" && i.responsavel !== responsavelFilter) return false;
-      return true;
-    });
-    if (filtered.length > 0) {
-      acc[Number(etapaNum)] = { etapa, instrucoes: filtered };
-    }
-    return acc;
-  }, {} as typeof instrucoesPorEtapa);
-
-  const toggleEtapa = (etapaNum: number) => {
-    const newSet = new Set(expandedEtapas);
-    if (newSet.has(etapaNum)) {
-      newSet.delete(etapaNum);
+    
+    if (instrucao.entrega_id && instrucao.entregas_business) {
+      if (!acc[faseNum].entregas[entregaId]) {
+        acc[faseNum].entregas[entregaId] = {
+          entrega: instrucao.entregas_business,
+          instrucoes: [],
+        };
+      }
+      acc[faseNum].entregas[entregaId].instrucoes.push(instrucao);
     } else {
-      newSet.add(etapaNum);
+      acc[faseNum].instrucoesAvulsas.push(instrucao);
     }
-    setExpandedEtapas(newSet);
+    
+    return acc;
+  }, {} as Record<number, FaseAgrupada>);
+
+  const toggleFase = (faseNum: number) => {
+    const newSet = new Set(expandedFases);
+    if (newSet.has(faseNum)) {
+      newSet.delete(faseNum);
+    } else {
+      newSet.add(faseNum);
+    }
+    setExpandedFases(newSet);
+  };
+
+  const toggleEntrega = (entregaId: string) => {
+    const newSet = new Set(expandedEntregas);
+    if (newSet.has(entregaId)) {
+      newSet.delete(entregaId);
+    } else {
+      newSet.add(entregaId);
+    }
+    setExpandedEntregas(newSet);
   };
 
   // Estatísticas
   const totalInstrucoes = instrucoes?.length || 0;
   const concluidas = instrucoes?.filter(i => i.status === 'concluida').length || 0;
   const emAndamento = instrucoes?.filter(i => i.status === 'em_andamento').length || 0;
+
+  const renderInstrucao = (instrucao: InstrucaoComRelacionamentos) => {
+    const status = statusConfig[instrucao.status as keyof typeof statusConfig] || statusConfig.pendente;
+    const responsavel = responsavelConfig[instrucao.responsavel as keyof typeof responsavelConfig] || responsavelConfig.voce;
+    const StatusIcon = status.icon;
+
+    return (
+      <div key={instrucao.id} className="px-4 py-3 flex items-start gap-3 bg-muted/20 rounded-lg">
+        <StatusIcon className={cn("h-4 w-4 mt-0.5 shrink-0", status.className)} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-sm">{instrucao.titulo}</span>
+            <Badge variant="outline" className={cn("text-xs", responsavel.className)}>
+              {responsavel.label}
+            </Badge>
+            {instrucao.ferramenta && (
+              <Badge variant="secondary" className="text-xs">
+                {instrucao.ferramenta}
+              </Badge>
+            )}
+          </div>
+          {instrucao.descricao && (
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+              {instrucao.descricao}
+            </p>
+          )}
+          {instrucao.recursos_url && (
+            <a 
+              href={instrucao.recursos_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Ver recurso
+            </a>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -264,8 +351,8 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
         </CardContent>
       </Card>
 
-      {/* Lista agrupada por etapa */}
-      {Object.keys(filteredInstrucoesPorEtapa).length === 0 ? (
+      {/* Lista hierárquica: FASE > ENTREGA > INSTRUÇÃO */}
+      {Object.keys(instrucoesPorFaseEEntrega).length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="py-10 text-center">
             <ListChecks className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
@@ -279,17 +366,21 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
         </Card>
       ) : (
         <div className="space-y-3">
-          {Object.entries(filteredInstrucoesPorEtapa)
+          {Object.entries(instrucoesPorFaseEEntrega)
             .sort(([a], [b]) => Number(a) - Number(b))
-            .map(([etapaNum, { etapa, instrucoes }]) => {
-              const isExpanded = expandedEtapas.has(Number(etapaNum));
-              const concluidas = instrucoes.filter(i => i.status === 'concluida').length;
+            .map(([faseNum, { etapa, entregas, instrucoesAvulsas }]) => {
+              const isFaseExpanded = expandedFases.has(Number(faseNum));
+              const totalEntregas = Object.keys(entregas).length;
+              const totalInstrucoesFase = Object.values(entregas).reduce((sum, e) => sum + e.instrucoes.length, 0) + instrucoesAvulsas.length;
+              const concluidasFase = Object.values(entregas).reduce((sum, e) => 
+                sum + e.instrucoes.filter(i => i.status === 'concluida').length, 0
+              ) + instrucoesAvulsas.filter(i => i.status === 'concluida').length;
 
               return (
                 <Collapsible 
-                  key={etapaNum} 
-                  open={isExpanded} 
-                  onOpenChange={() => toggleEtapa(Number(etapaNum))}
+                  key={faseNum} 
+                  open={isFaseExpanded} 
+                  onOpenChange={() => toggleFase(Number(faseNum))}
                 >
                   <Card className="border-border/50">
                     <CollapsibleTrigger asChild>
@@ -297,64 +388,85 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
                         <div className="flex items-center gap-3">
                           <ChevronDown className={cn(
                             "h-4 w-4 text-muted-foreground transition-transform",
-                            !isExpanded && "-rotate-90"
+                            !isFaseExpanded && "-rotate-90"
                           )} />
                           <div>
                             <h4 className="font-medium text-sm">
-                              Fase {etapaNum} - {etapa?.titulo || "Sem título"}
+                              📁 Fase {faseNum}: {etapa?.titulo || "Sem título"}
                             </h4>
                             <p className="text-xs text-muted-foreground">
-                              {concluidas}/{instrucoes.length} instruções concluídas
+                              {totalEntregas} entrega(s) • {concluidasFase}/{totalInstrucoesFase} instruções concluídas
                             </p>
                           </div>
                         </div>
                         <Badge variant="outline" className="text-xs">
-                          {instrucoes.length} instrução(ões)
+                          {totalInstrucoesFase} instrução(ões)
                         </Badge>
                       </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <div className="border-t border-border/50 divide-y divide-border/30">
-                        {instrucoes.map((instrucao) => {
-                          const status = statusConfig[instrucao.status as keyof typeof statusConfig] || statusConfig.pendente;
-                          const responsavel = responsavelConfig[instrucao.responsavel as keyof typeof responsavelConfig] || responsavelConfig.voce;
-                          const StatusIcon = status.icon;
+                      <div className="border-t border-border/50 p-3 space-y-3">
+                        {/* Entregas com suas instruções */}
+                        {Object.entries(entregas)
+                          .sort(([, a], [, b]) => 
+                            (a.entrega?.numero_entrega || 0) - (b.entrega?.numero_entrega || 0)
+                          )
+                          .map(([entregaId, { entrega, instrucoes }]) => {
+                            const isEntregaExpanded = expandedEntregas.has(entregaId);
+                            const concluidasEntrega = instrucoes.filter(i => i.status === 'concluida').length;
+                            const numeroEntrega = entrega?.numero_entrega;
 
-                          return (
-                            <div key={instrucao.id} className="px-4 py-3 flex items-start gap-3">
-                              <StatusIcon className={cn("h-4 w-4 mt-0.5 shrink-0", status.className)} />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-medium text-sm">{instrucao.titulo}</span>
-                                  <Badge variant="outline" className={cn("text-xs", responsavel.className)}>
-                                    {responsavel.label}
-                                  </Badge>
-                                  {instrucao.ferramenta && (
-                                    <Badge variant="secondary" className="text-xs">
-                                      {instrucao.ferramenta}
-                                    </Badge>
-                                  )}
+                            return (
+                              <Collapsible
+                                key={entregaId}
+                                open={isEntregaExpanded}
+                                onOpenChange={() => toggleEntrega(entregaId)}
+                              >
+                                <div className="border border-border/40 rounded-lg bg-card/50">
+                                  <CollapsibleTrigger asChild>
+                                    <div className="flex items-center justify-between p-2 cursor-pointer hover:bg-muted/20 transition-colors rounded-t-lg">
+                                      <div className="flex items-center gap-2">
+                                        <ChevronDown className={cn(
+                                          "h-3.5 w-3.5 text-muted-foreground transition-transform",
+                                          !isEntregaExpanded && "-rotate-90"
+                                        )} />
+                                        <Package className="h-4 w-4 text-primary" />
+                                        <span className="font-medium text-sm">
+                                          {numeroEntrega ? `${numeroEntrega}. ` : ""}{entrega?.titulo || "Entrega sem título"}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs text-muted-foreground">
+                                          {concluidasEntrega}/{instrucoes.length}
+                                        </span>
+                                        <Badge variant="secondary" className="text-xs">
+                                          {instrucoes.length} instrução(ões)
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  </CollapsibleTrigger>
+                                  <CollapsibleContent>
+                                    <div className="p-2 pt-0 space-y-2">
+                                      {instrucoes.map(instrucao => renderInstrucao(instrucao))}
+                                    </div>
+                                  </CollapsibleContent>
                                 </div>
-                                {instrucao.descricao && (
-                                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                    {instrucao.descricao}
-                                  </p>
-                                )}
-                                {instrucao.recursos_url && (
-                                  <a 
-                                    href={instrucao.recursos_url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                    Ver recurso
-                                  </a>
-                                )}
-                              </div>
+                              </Collapsible>
+                            );
+                          })}
+
+                        {/* Instruções avulsas (sem entrega vinculada) */}
+                        {instrucoesAvulsas.length > 0 && (
+                          <div className="border border-dashed border-border/40 rounded-lg p-3">
+                            <h5 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
+                              <Circle className="h-3 w-3" />
+                              Instruções sem entrega vinculada
+                            </h5>
+                            <div className="space-y-2">
+                              {instrucoesAvulsas.map(instrucao => renderInstrucao(instrucao))}
                             </div>
-                          );
-                        })}
+                          </div>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </Card>
