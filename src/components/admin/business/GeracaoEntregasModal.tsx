@@ -86,6 +86,10 @@ interface EntregaSelecionada {
   responsavel?: string;
   status?: string;
   selecionada: boolean;
+  is_conjuntas?: boolean; // Flag para entregas em conjunto
+  is_grouped?: boolean;
+  subitens_count?: number;
+  subitens_concluidos?: number;
 }
 
 interface InstrucaoSelecionada {
@@ -223,14 +227,15 @@ export function GeracaoEntregasModal({
       setInstrucoes(resultado.instrucoes.map(i => ({ ...i, selecionada: true })));
       setTasks(resultado.tasks.map(t => ({ ...t, selecionada: true })));
       
-      // Backlog: converter para formato do editor
+      // Backlog: converter para formato do editor com origem
       const backlogItems: BacklogItemEditable[] = resultado.backlog.map(b => ({
         titulo: b.titulo,
         descricao: b.descricao || '',
         categoria: (b.justificativa?.includes('Melhorias') ? 'Melhorias Futuras' : 
                    b.justificativa?.includes('Débito') ? 'Débito Técnico' : 'Pós-MVP') as BacklogItemEditable['categoria'],
         prioridade: 'media' as const,
-        selecionado: true
+        selecionado: true,
+        origem: 'auto' as const
       }));
       setBacklog(backlogItems);
       
@@ -252,13 +257,14 @@ export function GeracaoEntregasModal({
         selecionada: e.tipo === 'ativa',
       })));
       
-      // Formato antigo: converter backlog para formato do editor
+      // Formato antigo: converter backlog para formato do editor com origem
       const backlogItems: BacklogItemEditable[] = (resultado.backlog_sugerido || []).map(b => ({
         titulo: b.titulo,
         descricao: b.descricao || '',
         categoria: 'Pós-MVP' as const,
         prioridade: 'media' as const,
-        selecionado: false
+        selecionado: false,
+        origem: 'auto' as const
       }));
       setBacklog(backlogItems);
     }
@@ -668,10 +674,10 @@ export function GeracaoEntregasModal({
   const totalTasks = tasks.filter(t => t.selecionada).length;
   const totalBacklog = backlog.filter(b => b.selecionado).length;
 
-  // Separar entregas por tipo
+  // Separar entregas por tipo - Conjuntas agora vão dentro das fases
   const entregasMVP = entregas.filter(e => e.numero_entrega < 0);
-  const entregasConjuntas = entregas.filter(e => e.responsavel === 'conjunto');
-  const entregasPrincipais = entregas.filter(e => e.numero_entrega > 0 && e.responsavel !== 'conjunto');
+  // Entregas principais incluem todas as entregas com numero > 0 (incluindo conjuntas)
+  const entregasPrincipais = entregas.filter(e => e.numero_entrega > 0);
 
   // Cores por FASE
   const getCoresFase = (numero: number) => {
@@ -799,69 +805,8 @@ export function GeracaoEntregasModal({
         </div>
       )}
 
-      {/* Entregas em Conjunto - AGRUPADA */}
-      {entregasConjuntas.length > 0 && (
-        <div className="border rounded-lg overflow-hidden border-blue-500/30">
-          <div 
-            className="flex items-center gap-3 p-3 bg-blue-500/10 cursor-pointer hover:bg-blue-500/15"
-            onClick={() => setExpandedConjuntas(!expandedConjuntas)}
-          >
-            {expandedConjuntas ? (
-              <ChevronDown className="h-4 w-4 text-blue-600" />
-            ) : (
-              <ChevronRight className="h-4 w-4 text-blue-600" />
-            )}
-            <Users className="h-4 w-4 text-blue-600" />
-            <div className="flex-1">
-              <p className="font-medium text-blue-700">Entregas em Conjunto (Mariana + Paula)</p>
-              <p className="text-xs text-muted-foreground">
-                {entregasConjuntas.filter(e => e.status === 'concluida').length} concluídas de {entregasConjuntas.length} itens
-              </p>
-            </div>
-            <Badge variant="secondary" className="text-xs">
-              {entregasConjuntas.filter(e => e.selecionada).length}/{entregasConjuntas.length}
-            </Badge>
-            {getResponsavelBadge('conjunto')}
-          </div>
-          
-          {expandedConjuntas && (
-            <div className="p-3 space-y-2 max-h-[250px] overflow-y-auto">
-              {entregasConjuntas.map((entrega, idx) => (
-                <div 
-                  key={entrega.numero_entrega}
-                  className={`flex items-center gap-3 p-2 border rounded transition-colors ${
-                    entrega.status === 'concluida' 
-                      ? 'bg-emerald-50/50 border-emerald-200' 
-                      : 'bg-background'
-                  }`}
-                >
-                  <Checkbox
-                    checked={entrega.selecionada}
-                    onCheckedChange={() => toggleEntregaSelecionada(entrega.numero_entrega)}
-                  />
-                  <span className="text-xs text-muted-foreground w-6">{idx + 1}.</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${entrega.status === 'concluida' ? 'line-through text-muted-foreground' : ''}`}>
-                      {entrega.titulo}
-                    </p>
-                  </div>
-                  {entrega.status === 'concluida' ? (
-                    <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
-                      ✓ Feito
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">
-                      Pendente
-                    </Badge>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
       {/* FASES - Agrupadas por Fase do Documento com Drag-and-Drop */}
+      {/* Entregas em Conjunto agora aparecem dentro das fases como items especiais */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

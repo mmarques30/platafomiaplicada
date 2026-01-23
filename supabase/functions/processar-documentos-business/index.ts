@@ -651,10 +651,11 @@ function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial
 // PROCESSAR MVP E CONJUNTAS SEPARADAMENTE
 // ═══════════════════════════════════════════════════════════════════
 
-function processarMVPeConjuntas(ancoras: AncorasLiterais): { 
+function processarMVPeConjuntas(ancoras: AncorasLiterais, texto: string): { 
   mvpEntregas: any[], 
   conjuntasEntregaAgrupada: any | null,
-  conjuntasInstrucoes: any[]
+  conjuntasInstrucoes: any[],
+  faseConjuntas: number
 } {
   console.log("=== PROCESSANDO MVP E CONJUNTAS ===");
   
@@ -671,16 +672,32 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais): {
   }));
   console.log(`  MVP: ${mvpEntregas.length} entregas`);
   
-  // Entregas em conjunto -> AGRUPAR em 1 entrega + N instruções
+  // Detectar em qual FASE as "Entregas em Conjunto" aparecem no documento
+  let faseConjuntas = 1; // default - primeira fase
+  const posConjuntas = texto.toUpperCase().indexOf('ENTREGAS EM CONJUNTO');
+  
+  if (posConjuntas !== -1 && ancoras.fases.length > 0) {
+    // Encontrar qual fase contém essa seção (última fase antes da posição)
+    for (const fase of ancoras.fases.slice().reverse()) {
+      const posicaoFase = texto.toUpperCase().indexOf(`FASE ${fase.numero}`);
+      if (posicaoFase !== -1 && posConjuntas > posicaoFase) {
+        faseConjuntas = fase.numero;
+        console.log(`  Entregas em Conjunto detectadas na FASE ${faseConjuntas}`);
+        break;
+      }
+    }
+  }
+  
+  // Entregas em conjunto -> AGRUPAR em 1 entrega + N instruções DENTRO DA FASE
   let conjuntasEntregaAgrupada: any = null;
   const conjuntasInstrucoes: any[] = [];
   
   if (ancoras.conjuntas.length > 0) {
-    // Criar UMA entrega agrupadora
+    // Criar UMA entrega agrupadora associada à fase correta
     const NUMERO_ENTREGA_CONJUNTAS = 9000; // Número especial para identificar
     
     conjuntasEntregaAgrupada = {
-      etapa_numero: 0,
+      etapa_numero: faseConjuntas, // Agora pertence à fase correta!
       numero_entrega: NUMERO_ENTREGA_CONJUNTAS,
       titulo: 'Entregas em Conjunto (Mariana + Paula)',
       descricao: `${ancoras.conjuntas.length} itens de trabalho colaborativo ao longo da mentoria`,
@@ -688,7 +705,8 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais): {
       prioridade: 'media',
       modulo_relacionado: null,
       responsavel: 'conjunto',
-      is_grouped: true, // Flag para identificar no frontend
+      is_conjuntas: true, // Flag para estilização especial no frontend
+      is_grouped: true,
       subitens_count: ancoras.conjuntas.length,
       subitens_concluidos: ancoras.conjuntas.filter(c => c.status === 'concluida').length
     };
@@ -707,10 +725,10 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais): {
       });
     });
     
-    console.log(`  Conjuntas: 1 entrega agrupada com ${conjuntasInstrucoes.length} instruções`);
+    console.log(`  Conjuntas: 1 entrega agrupada com ${conjuntasInstrucoes.length} instruções (FASE ${faseConjuntas})`);
   }
   
-  return { mvpEntregas, conjuntasEntregaAgrupada, conjuntasInstrucoes };
+  return { mvpEntregas, conjuntasEntregaAgrupada, conjuntasInstrucoes, faseConjuntas };
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -819,9 +837,9 @@ serve(async (req) => {
     console.log(`\nÂncoras encontradas: ${temFases ? ancoras.fases.length : 0} fases, ${temEntregas ? ancoras.entregas.length : 0} entregas`);
     
     // ═══════════════════════════════════════════════════════════════
-    // PASSO 2: Processar MVP e Conjuntas (AGRUPADAS)
+    // PASSO 2: Processar MVP e Conjuntas (AGRUPADAS - associadas à fase correta)
     // ═══════════════════════════════════════════════════════════════
-    const { mvpEntregas, conjuntasEntregaAgrupada, conjuntasInstrucoes } = processarMVPeConjuntas(ancoras);
+    const { mvpEntregas, conjuntasEntregaAgrupada, conjuntasInstrucoes, faseConjuntas } = processarMVPeConjuntas(ancoras, texto);
     
     // ═══════════════════════════════════════════════════════════════
     // PASSO 3: Processar com IA ou apenas com âncoras

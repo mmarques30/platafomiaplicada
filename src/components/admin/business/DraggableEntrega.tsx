@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Package, ChevronDown, ChevronRight, FileText, CheckSquare } from "lucide-react";
+import { GripVertical, Package, ChevronDown, ChevronRight, FileText, CheckSquare, Users } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 
@@ -15,6 +15,10 @@ interface EntregaSelecionada {
   responsavel?: string;
   status?: string;
   selecionada: boolean;
+  is_conjuntas?: boolean;
+  is_grouped?: boolean;
+  subitens_count?: number;
+  subitens_concluidos?: number;
 }
 
 interface InstrucaoSelecionada {
@@ -82,6 +86,7 @@ export function DraggableEntrega({
     zIndex: isDragging ? 1000 : 'auto',
   };
 
+  const isConjuntas = entrega.is_conjuntas || entrega.responsavel === 'conjunto';
   const instrucoesDaEntrega = instrucoes.filter(i => i.entrega_numero === entrega.numero_entrega);
   const tasksDaEntrega = tasks.filter(t => t.entrega_numero === entrega.numero_entrega);
 
@@ -89,10 +94,14 @@ export function DraggableEntrega({
     <div 
       ref={setNodeRef}
       style={style}
-      className={`border rounded-lg bg-background transition-shadow ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''}`}
+      className={`border rounded-lg bg-background transition-shadow ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''} ${
+        isConjuntas ? 'border-blue-500/40 bg-blue-500/5' : ''
+      }`}
     >
       {/* Header da Entrega */}
-      <div className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/30">
+      <div className={`flex items-center gap-2 p-3 cursor-pointer ${
+        isConjuntas ? 'hover:bg-blue-500/10' : 'hover:bg-muted/30'
+      }`}>
         {/* Handle de Drag */}
         <button
           {...attributes}
@@ -114,20 +123,34 @@ export function DraggableEntrega({
           ) : (
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           )}
-          <Package className="h-4 w-4 text-emerald-600" />
+          {isConjuntas ? (
+            <Users className="h-4 w-4 text-blue-600" />
+          ) : (
+            <Package className="h-4 w-4 text-emerald-600" />
+          )}
           <div className="flex-1">
-            <p className="text-sm font-medium">
-              Entrega {entrega.numero_entrega}: {entrega.titulo}
+            <p className={`text-sm font-medium ${isConjuntas ? 'text-blue-700' : ''}`}>
+              {isConjuntas ? entrega.titulo : `Entrega ${entrega.numero_entrega}: ${entrega.titulo}`}
             </p>
-            {instrucoesDaEntrega.length > 0 && (
+            {isConjuntas && entrega.subitens_count ? (
+              <p className="text-xs text-muted-foreground">
+                {entrega.subitens_concluidos || 0}/{entrega.subitens_count} concluídas • {instrucoesDaEntrega.length} itens
+              </p>
+            ) : instrucoesDaEntrega.length > 0 ? (
               <p className="text-xs text-muted-foreground">
                 {instrucoesDaEntrega.length} instruções
               </p>
-            )}
+            ) : null}
           </div>
         </div>
+        {isConjuntas && (
+          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-700 border-blue-500/30">
+            <Users className="h-3 w-3 mr-1" />
+            Conjunta
+          </Badge>
+        )}
         {getAcaoBadge(getAcaoItem('entrega', entrega.titulo))}
-        {getPrioridadeBadge(entrega.prioridade)}
+        {!isConjuntas && getPrioridadeBadge(entrega.prioridade)}
       </div>
 
       {/* Conteúdo da Entrega */}

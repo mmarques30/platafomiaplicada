@@ -24,6 +24,10 @@ interface EntregaSelecionada {
   responsavel?: string;
   status?: string;
   selecionada: boolean;
+  is_conjuntas?: boolean;
+  is_grouped?: boolean;
+  subitens_count?: number;
+  subitens_concluidos?: number;
 }
 
 interface InstrucaoSelecionada {
