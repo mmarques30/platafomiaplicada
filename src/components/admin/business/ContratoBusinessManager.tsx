@@ -944,7 +944,7 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
 
       {/* Botões de Ação */}
       <div className="flex justify-between items-center">
-        <ContratoPreviewPDF contratoData={contratoDataForPDF} nomeCliente={userName} />
+        <ContratoPreviewPDF contratoData={contratoDataForPDF} nomeCliente={userName} contratoId={contrato?.id} />
         
         <Button
           onClick={handleSave}

@@ -1,26 +1,26 @@
 import { useNavigate } from "react-router-dom";
 import { 
-  ClipboardCheck, 
   Calendar, 
-  FolderKanban, 
-  CheckSquare, 
-  FileText,
-  Package
+  FileCheck, 
+  ClipboardList, 
+  MessageCircleQuestion, 
+  FileBarChart,
+  FolderOpen
 } from "lucide-react";
 
 interface QuickNavItem {
   title: string;
   path: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 const navItems: QuickNavItem[] = [
-  { title: "Diagnóstico", path: "/mentoria/diagnostico", icon: ClipboardCheck },
   { title: "Sessões", path: "/mentoria/sessoes", icon: Calendar },
-  { title: "Etapas", path: "/mentoria?tab=roadmap", icon: FolderKanban },
-  { title: "Instruções", path: "/mentoria?tab=roadmap", icon: FileText },
-  { title: "Entregas", path: "/mentoria/entregas", icon: Package },
-  { title: "Tasks", path: "/mentoria/validacoes", icon: CheckSquare },
+  { title: "Entregas", path: "/mentoria/entregas", icon: FileCheck },
+  { title: "Tasks", path: "/mentoria/tarefas", icon: ClipboardList },
+  { title: "Dúvidas", path: "/mentoria/duvidas", icon: MessageCircleQuestion },
+  { title: "Reports", path: "/mentoria/reports", icon: FileBarChart },
+  { title: "Documentos", path: "/mentoria/documentos", icon: FolderOpen },
 ];
 
 export function BusinessAcessoRapido() {
