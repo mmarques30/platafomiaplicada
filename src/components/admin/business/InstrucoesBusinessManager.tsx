@@ -621,14 +621,16 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
             etapa_id: editingInstrucao.etapa_id!,
             titulo: editingInstrucao.titulo,
             descricao: editingInstrucao.descricao,
-            responsavel: editingInstrucao.responsavel as 'voce' | 'conjunto',
+            responsavel: editingInstrucao.responsavel as 'voce' | 'mentor' | 'conjunto',
             ferramenta: editingInstrucao.ferramenta as 'claude' | 'lovable' | 'reuniao' | 'outro' | null,
             ordem: editingInstrucao.ordem,
             prompt_sugerido: editingInstrucao.prompt_sugerido,
             dicas: editingInstrucao.dicas,
             recursos_url: editingInstrucao.recursos_url,
+            recursos: null,
             status: editingInstrucao.status as 'pendente' | 'em_andamento' | 'concluida',
-            entrega_id: editingInstrucao.entrega_id,
+            gerado_por_ia: false,
+            created_at: new Date().toISOString(),
           }}
           defaultResponsavel={editingInstrucao.responsavel as 'voce' | 'conjunto'}
         />
