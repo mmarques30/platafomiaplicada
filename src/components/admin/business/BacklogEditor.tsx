@@ -25,6 +25,7 @@ export interface BacklogItemEditable {
   categoria: 'Pós-MVP' | 'Melhorias Futuras' | 'Débito Técnico';
   prioridade: 'baixa' | 'media' | 'alta';
   selecionado: boolean;
+  origem?: 'auto' | 'manual'; // Rastrear se foi extraído ou adicionado manualmente
 }
 
 interface BacklogEditorProps {
@@ -63,7 +64,8 @@ export function BacklogEditor({ initialItems = [], onItemsChange }: BacklogEdito
         descricao: item.descricao || '',
         categoria: item.categoria || 'Pós-MVP',
         prioridade: item.prioridade || 'media',
-        selecionado: true
+        selecionado: true,
+        origem: 'auto' as const
       }));
 
       setItems(organizedItems);
@@ -136,7 +138,8 @@ export function BacklogEditor({ initialItems = [], onItemsChange }: BacklogEdito
       descricao: "",
       categoria: 'Pós-MVP',
       prioridade: 'media',
-      selecionado: true
+      selecionado: true,
+      origem: 'manual'
     };
     const updated = [...items, newItem];
     setItems(updated);
@@ -238,14 +241,26 @@ Exemplos:
     );
   }
 
+  // Contadores por origem
+  const countAuto = items.filter(i => i.origem === 'auto').length;
+  const countManual = items.filter(i => i.origem === 'manual' || !i.origem).length;
+
   // Review state - show organized items
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium flex items-center gap-2">
-          <ListTodo className="h-4 w-4" />
-          Backlog ({items.filter(i => i.selecionado).length}/{items.length})
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm font-medium flex items-center gap-2">
+            <ListTodo className="h-4 w-4" />
+            Backlog ({items.filter(i => i.selecionado).length}/{items.length})
+          </p>
+          {countAuto > 0 && (
+            <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
+              <Sparkles className="h-3 w-3 mr-1" />
+              {countAuto} extraídos
+            </Badge>
+          )}
+        </div>
         <div className="flex gap-2">
           <Button
             variant="ghost"
@@ -348,6 +363,13 @@ Exemplos:
                       <SelectItem value="baixa">Baixa</SelectItem>
                     </SelectContent>
                   </Select>
+
+                  {item.origem === 'auto' && (
+                    <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Extraído
+                    </Badge>
+                  )}
                 </div>
               </div>
 
