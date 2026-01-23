@@ -55,7 +55,10 @@ const getRecursoIcon = (tipo: RecursoItem['tipo']) => {
 
 export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: InstrucaoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const config = ferramentaConfig[instrucao.ferramenta || 'outro'];
+  const ferramentaKey = instrucao.ferramenta && instrucao.ferramenta in ferramentaConfig 
+    ? instrucao.ferramenta 
+    : 'outro';
+  const config = ferramentaConfig[ferramentaKey as keyof typeof ferramentaConfig];
   const Icon = config.icon;
   const isConcluida = instrucao.status === 'concluida';
 
