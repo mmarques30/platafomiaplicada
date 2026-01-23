@@ -27,12 +27,14 @@ serve(async (req) => {
       ? modulos_contratados.join(", ") 
       : "Não especificados";
 
-    const prompt = `Você é um assistente especializado em analisar propostas comerciais e transcrições de calls de vendas para projetos de consultoria de IA.
+    const prompt = `Você é um assistente especializado em analisar documentos de mentoria business, como propostas comerciais, transcrições de calls e guias de entregas.
 
-Analise o seguinte documento e extraia as entregas do projeto, separando em:
-1. ENTREGAS ATIVAS: o que será implementado agora (prioridade alta/média)
-2. BACKLOG: entregas futuras ou de menor prioridade
-3. INSTRUÇÕES DE EXECUÇÃO: passos para implementar cada entrega (se aplicável)
+Analise o documento e extraia a estrutura COMPLETA do projeto, organizando em:
+1. FASES/ETAPAS: Grandes blocos do projeto (ex: "Fase 1: Documentação", "Fase 2: Financeiro")
+2. ENTREGAS: Cada entrega dentro das fases (ex: "Entrega 1: Upload de Documentação")
+3. INSTRUÇÕES: Passos detalhados de como executar cada entrega
+4. TASKS: Checklists de validação para o mentorado completar
+5. BACKLOG: Entregas futuras ou de baixa prioridade
 
 MÓDULOS CONTRATADOS: ${modulosLista}
 ${contexto_cliente ? `CONTEXTO DO CLIENTE: ${contexto_cliente}` : ""}
@@ -42,80 +44,110 @@ ${texto}
 
 Responda APENAS com um JSON válido neste formato exato:
 {
-  "entregas_sugeridas": [
+  "etapas": [
     {
-      "titulo": "Nome da entrega",
-      "descricao": "Descrição detalhada",
-      "modulo_relacionado": "CRM",
+      "numero": 1,
+      "titulo": "Documentação e Processos",
+      "objetivo": "Organizar base documental da empresa"
+    }
+  ],
+  "entregas": [
+    {
+      "etapa_numero": 1,
+      "numero_entrega": 1,
+      "titulo": "Upload de Documentação Completa",
+      "descricao": "Subir toda documentação na pasta FLI do Drive",
       "tipo": "ativa",
       "prioridade": "alta",
-      "tarefas": [
-        { "titulo": "Tarefa para validação", "descricao": "O que validar", "prioridade": "alta" }
-      ]
+      "modulo_relacionado": "Processos"
     }
   ],
-  "instrucoes_sugeridas": [
+  "instrucoes": [
     {
-      "entrega_titulo": "Nome da entrega",
-      "instrucoes": [
-        {
-          "titulo": "Passo de execução",
-          "descricao": "Como executar",
-          "responsavel": "voce",
-          "ferramenta": "claude",
-          "prompt_sugerido": "Prompt para usar na ferramenta",
-          "tarefas": [
-            { "titulo": "Subtarefa", "prioridade": "media" }
-          ]
-        }
-      ]
+      "entrega_numero": 1,
+      "titulo": "Acessar pasta FLI no Drive",
+      "descricao": "Pasta já compartilhada com acesso de edição",
+      "responsavel": "voce",
+      "ferramenta": "drive",
+      "dicas": "A pasta está na raiz do Drive compartilhado",
+      "ordem": 1
     }
   ],
-  "backlog_sugerido": [
+  "tasks": [
     {
-      "titulo": "Entrega futura",
-      "descricao": "Descrição",
-      "justificativa": "Por que está no backlog"
+      "entrega_numero": 1,
+      "titulo": "Verificar se todos documentos foram carregados",
+      "tipo": "validacao",
+      "prioridade": "alta",
+      "instrucoes_validacao": "Conferir se todas as subpastas estão preenchidas"
+    }
+  ],
+  "backlog": [
+    {
+      "titulo": "Tradução para francês",
+      "descricao": "Traduzir interface após conclusão em português",
+      "justificativa": "Depende da conclusão do MVP"
     }
   ]
 }
 
 REGRAS:
-- "tipo" deve ser "ativa" ou "backlog"
-- "prioridade" deve ser "baixa", "media" ou "alta"
+- "etapas" são as fases do projeto (numere sequencialmente começando em 1)
+- "entregas" são as entregas dentro de cada fase (etapa_numero indica a qual fase pertence)
+- "instrucoes" são os passos para executar cada entrega (entrega_numero indica a qual entrega pertence)
+- "tasks" são os itens de validação/checklist para cada entrega
+- "tipo" de entrega deve ser "ativa" ou "backlog"
+- "prioridade" deve ser "baixa", "media", "alta" ou "urgente"
 - "responsavel" deve ser "voce" (mentorado), "mentor" ou "conjunto"
-- "ferramenta" pode ser "claude", "lovable", "chatgpt", "notion", "outro"
-- Seja específico nas tarefas de validação
-- Instruções só são necessárias para entregas que o mentorado vai co-criar
-- Backlog é para entregas futuras ou de baixa prioridade`;
+- "ferramenta" pode ser "claude", "lovable", "drive", "mapa", "reuniao", "outro"
+- "tipo" de task deve ser "validacao", "aprovacao", "revisao", "homologacao", "assinatura" ou "feedback"
+- Extraia TODOS os passos e checklists do documento
+- Se o documento tiver checklists (☐), converta em tasks
+- Se houver instruções numeradas, converta em instrucoes
+- Mantenha a ordem original do documento`;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 4096,
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "user",
             content: prompt,
           },
         ],
+        max_tokens: 8192,
       }),
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Limite de requisições excedido, tente novamente em alguns minutos." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Créditos insuficientes. Adicione créditos na sua conta." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       const errorText = await response.text();
       console.error("Erro na API:", errorText);
       throw new Error(`Erro na API: ${response.status}`);
     }
 
     const result = await response.json();
-    const content = result.content[0].text;
+    const content = result.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error("Resposta vazia da IA");
+    }
 
     // Extrair JSON da resposta
     const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -125,7 +157,20 @@ REGRAS:
 
     const parsedResult = JSON.parse(jsonMatch[0]);
 
-    return new Response(JSON.stringify(parsedResult), {
+    // Garantir estrutura mínima
+    const finalResult = {
+      etapas: parsedResult.etapas || [],
+      entregas: parsedResult.entregas || [],
+      instrucoes: parsedResult.instrucoes || [],
+      tasks: parsedResult.tasks || [],
+      backlog: parsedResult.backlog || [],
+      // Manter compatibilidade com formato antigo
+      entregas_sugeridas: parsedResult.entregas_sugeridas || [],
+      instrucoes_sugeridas: parsedResult.instrucoes_sugeridas || [],
+      backlog_sugerido: parsedResult.backlog_sugerido || parsedResult.backlog || [],
+    };
+
+    return new Response(JSON.stringify(finalResult), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
