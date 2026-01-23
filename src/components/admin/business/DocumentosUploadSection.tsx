@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { 
   Sparkles, 
   Trash2, 
@@ -14,11 +16,15 @@ import {
   FileUp,
   ChevronDown,
   ChevronRight,
-  FileText
+  FileText,
+  RefreshCw,
+  Plus
 } from "lucide-react";
 import { useDocumentosBusiness, DocumentoBusiness } from "@/hooks/useDocumentosBusiness";
 import { useProcessarDocumentos, ResultadoProcessamento } from "@/hooks/useProcessarDocumentos";
 import { GeracaoEntregasModal } from "./GeracaoEntregasModal";
+
+export type ModoImportacao = 'nova' | 'atualizar';
 
 interface DocumentosUploadSectionProps {
   contratoId: string;
@@ -39,6 +45,7 @@ export function DocumentosUploadSection({
   const [resultadoIA, setResultadoIA] = useState<ResultadoProcessamento | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
+  const [modoImportacao, setModoImportacao] = useState<ModoImportacao>('nova');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -207,6 +214,31 @@ export function DocumentosUploadSection({
                 className="min-h-[80px] text-sm bg-background"
               />
 
+              {/* Seletor de Modo de Importação */}
+              <div className="flex items-center gap-4 p-3 rounded-lg border border-border/50 bg-muted/30">
+                <span className="text-xs font-medium text-muted-foreground">Modo:</span>
+                <RadioGroup 
+                  value={modoImportacao} 
+                  onValueChange={(v) => setModoImportacao(v as ModoImportacao)}
+                  className="flex gap-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="nova" id="modo-nova" />
+                    <Label htmlFor="modo-nova" className="text-xs flex items-center gap-1.5 cursor-pointer">
+                      <Plus className="h-3.5 w-3.5 text-emerald-600" />
+                      Nova Importação
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="atualizar" id="modo-atualizar" />
+                    <Label htmlFor="modo-atualizar" className="text-xs flex items-center gap-1.5 cursor-pointer">
+                      <RefreshCw className="h-3.5 w-3.5 text-blue-600" />
+                      Atualizar Existentes
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <div className="flex justify-between items-center">
                 <Button
                   variant="outline"
@@ -274,6 +306,7 @@ export function DocumentosUploadSection({
         onOpenChange={setModalOpen}
         resultado={resultadoIA}
         contratoId={contratoId}
+        modoImportacao={modoImportacao}
         onSuccess={() => {
           setResultadoIA(null);
           setTexto("");
