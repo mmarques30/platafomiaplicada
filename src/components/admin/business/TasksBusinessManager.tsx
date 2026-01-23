@@ -16,7 +16,8 @@ import {
   Trash2,
   Edit,
   Eye,
-  ClipboardCheck
+  ClipboardCheck,
+  Loader2
 } from 'lucide-react';
 import { useTasksBusiness, useUpdateTask, useDeleteTask, TaskBusiness } from '@/hooks/useTasksBusiness';
 import { useEntregasBusiness } from '@/hooks/useEntregasBusiness';
@@ -33,7 +34,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface TasksBusinessManagerProps {
   contratoId: string;
@@ -65,7 +70,8 @@ const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; colo
 };
 
 const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId, userId }) => {
-  const { data: tasks, isLoading } = useTasksBusiness(contratoId);
+  const queryClient = useQueryClient();
+  const { data: tasks, isLoading, refetch } = useTasksBusiness(contratoId);
   const { entregas } = useEntregasBusiness(contratoId);
   const { data: etapas } = useEtapasBusiness(contratoId);
   const updateTask = useUpdateTask();
@@ -74,11 +80,33 @@ const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId,
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskBusiness | null>(null);
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     pendentes: true,
     em_analise: true,
     concluidas: false,
   });
+
+  const handleClearAll = async () => {
+    setIsClearing(true);
+    try {
+      const { error } = await supabase
+        .from("tasks_business")
+        .delete()
+        .eq("contrato_id", contratoId);
+      
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["tasks-business", contratoId] });
+      toast.success("Todas as tasks foram removidas");
+      refetch();
+    } catch (error) {
+      console.error("Erro ao limpar:", error);
+      toast.error("Erro ao limpar tasks");
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   const pendentes = tasks?.filter(t => t.status === 'pendente') || [];
   const emAnalise = tasks?.filter(t => t.status === 'em_analise' || t.status === 'revisao_solicitada') || [];
@@ -279,10 +307,38 @@ const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId,
             <h2 className="text-lg font-semibold">Tasks de Validação</h2>
             <Badge variant="secondary" className="text-xs">{tasks?.length || 0}</Badge>
           </div>
-          <Button size="sm" onClick={() => { setEditingTask(null); setIsModalOpen(true); }}>
-            <Plus className="h-4 w-4 mr-1" />
-            Nova Task
-          </Button>
+          <div className="flex items-center gap-2">
+            {(tasks?.length || 0) > 0 && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Limpar Tudo
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Limpar todas as tasks?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta ação irá remover permanentemente todas as tasks de validação. 
+                      Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClearAll} disabled={isClearing} className="bg-destructive text-destructive-foreground">
+                      {isClearing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                      Sim, limpar tudo
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            <Button size="sm" onClick={() => { setEditingTask(null); setIsModalOpen(true); }}>
+              <Plus className="h-4 w-4 mr-1" />
+              Nova Task
+            </Button>
+          </div>
         </div>
 
         {/* Seções de Tasks */}

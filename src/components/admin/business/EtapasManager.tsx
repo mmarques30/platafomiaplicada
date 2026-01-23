@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { 
   Plus, 
@@ -13,7 +14,8 @@ import {
   ChevronRight, 
   Calendar,
   Edit,
-  Loader2
+  Loader2,
+  Trash2
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -29,6 +31,9 @@ import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { UploadTranscricaoModal } from "./UploadTranscricaoModal";
 import { GerarEtapasIAModal } from "./GerarEtapasIAModal";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface EtapasManagerProps {
   contratoId?: string;
@@ -271,6 +276,7 @@ function EditEtapaDialog({
 }
 
 export function EtapasManager({ contratoId: propContratoId, userId, userName }: EtapasManagerProps) {
+  const queryClient = useQueryClient();
   // Buscar contrato se userId fornecido mas contratoId não
   const { contrato } = useContratosBusiness(userId);
   const contratoId = propContratoId || contrato?.id;
@@ -279,9 +285,33 @@ export function EtapasManager({ contratoId: propContratoId, userId, userName }: 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [gerarIAModalOpen, setGerarIAModalOpen] = useState(false);
   const [editingEtapa, setEditingEtapa] = useState<EtapaBusiness | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
 
   const proximoNumero = (etapas?.length || 0) + 1;
   const hasEtapas = etapas && etapas.length > 0;
+
+  const handleClearAll = async () => {
+    if (!contratoId) return;
+    setIsClearing(true);
+    try {
+      const { error } = await supabase
+        .from("etapas_business")
+        .delete()
+        .eq("contrato_id", contratoId);
+      
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["etapas-business", contratoId] });
+      queryClient.invalidateQueries({ queryKey: ["instrucoes-etapa"] });
+      toast.success("Todas as etapas foram removidas");
+      refetch();
+    } catch (error) {
+      console.error("Erro ao limpar:", error);
+      toast.error("Erro ao limpar etapas");
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   if (!contratoId) {
     return (
@@ -313,6 +343,32 @@ export function EtapasManager({ contratoId: propContratoId, userId, userName }: 
           )}
         </div>
         <div className="flex items-center gap-2">
+          {hasEtapas && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Limpar Tudo
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Limpar todas as etapas?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação irá remover permanentemente todas as etapas e suas instruções associadas. 
+                    Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearAll} disabled={isClearing} className="bg-destructive text-destructive-foreground">
+                    {isClearing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                    Sim, limpar tudo
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
           {contrato && (
             <Button 
               variant="outline" 

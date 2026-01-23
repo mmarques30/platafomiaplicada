@@ -111,7 +111,7 @@ export function GeracaoEntregasModal({
       setEntregas(resultado.entregas.map(e => ({ ...e, selecionada: true })));
       setInstrucoes(resultado.instrucoes.map(i => ({ ...i, selecionada: true })));
       setTasks(resultado.tasks.map(t => ({ ...t, selecionada: true })));
-      setBacklog(resultado.backlog.map(b => ({ ...b, selecionado: false })));
+      setBacklog(resultado.backlog.map(b => ({ ...b, selecionado: true })));
       
       // Expandir primeira etapa
       if (resultado.etapas.length > 0) {

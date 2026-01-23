@@ -91,7 +91,19 @@ Responda APENAS com um JSON válido neste formato exato:
   ]
 }
 
-REGRAS:
+REGRAS IMPORTANTES PARA INSTRUÇÕES:
+- Cada entrega pode ter MÚLTIPLAS instruções (passos/steps)
+- Se o documento tiver "Instruções:", "Passo X:", "1.", "2." etc., extraia CADA passo como uma instrução SEPARADA
+- Para instruções longas (ex: "13 passos para criar no Lovable"), extraia TODOS os passos individualmente
+- Mantenha a ordem original (ordem: 1, 2, 3...)
+- entrega_numero deve corresponder exatamente à entrega que a instrução pertence
+
+REGRAS IMPORTANTES PARA BACKLOG:
+- Extraia TODAS as seções de "Pós-MVP", "Melhorias Futuras", "Backlog", "Próximas Fases" como itens de backlog
+- Cada funcionalidade futura deve ser um item separado
+- Inclua uma justificativa clara do porquê está no backlog
+
+REGRAS GERAIS:
 - "etapas" são as fases do projeto (numere sequencialmente começando em 1)
 - "entregas" são as entregas dentro de cada fase (etapa_numero indica a qual fase pertence)
 - "instrucoes" são os passos para executar cada entrega (entrega_numero indica a qual entrega pertence)
@@ -99,7 +111,7 @@ REGRAS:
 - "tipo" de entrega deve ser "ativa" ou "backlog"
 - "prioridade" deve ser "baixa", "media", "alta" ou "urgente"
 - "responsavel" deve ser "voce" (mentorado), "mentor" ou "conjunto"
-- "ferramenta" pode ser "claude", "lovable", "drive", "mapa", "reuniao", "outro"
+- "ferramenta" deve ser EXATAMENTE um destes valores: "claude", "lovable", "drive", "notion", "supabase", "make", "n8n", "zapier", "mapa", "reuniao", "outro"
 - "tipo" de task deve ser "validacao", "aprovacao", "revisao", "homologacao", "assinatura" ou "feedback"
 - Extraia TODOS os passos e checklists do documento
 - Se o documento tiver checklists (☐), converta em tasks
