@@ -21,18 +21,29 @@ import {
   Route,
   FileText,
   CheckSquare,
-  Loader2
+  Loader2,
+  RefreshCw,
+  Plus
 } from "lucide-react";
 import { ResultadoProcessamento } from "@/hooks/useProcessarDocumentos";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { ModoImportacao } from "./DocumentosUploadSection";
+
+interface DadosExistentes {
+  etapas: { id: string; numero: number; titulo: string }[];
+  entregas: { id: string; titulo: string; status: string }[];
+  instrucoes: { id: string; titulo: string; entrega_id: string; status: string }[];
+  tasks: { id: string; titulo: string; status: string }[];
+}
 
 interface GeracaoEntregasModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   resultado: ResultadoProcessamento | null;
   contratoId: string;
+  modoImportacao: ModoImportacao;
   onSuccess?: () => void;
 }
 
@@ -86,6 +97,7 @@ export function GeracaoEntregasModal({
   onOpenChange,
   resultado,
   contratoId,
+  modoImportacao,
   onSuccess,
 }: GeracaoEntregasModalProps) {
   const queryClient = useQueryClient();
@@ -98,9 +110,38 @@ export function GeracaoEntregasModal({
   const [expandedEtapas, setExpandedEtapas] = useState<number[]>([]);
   const [expandedEntregas, setExpandedEntregas] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [dadosExistentes, setDadosExistentes] = useState<DadosExistentes>({
+    etapas: [],
+    entregas: [],
+    instrucoes: [],
+    tasks: [],
+  });
 
   // Detectar se é formato novo ou antigo
   const isNewFormat = resultado && resultado.etapas && resultado.etapas.length > 0;
+
+  // Buscar dados existentes quando abrir o modal em modo atualizar
+  useEffect(() => {
+    if (!open || !contratoId) return;
+
+    const fetchDadosExistentes = async () => {
+      const [etapasRes, entregasRes, instrucoesRes, tasksRes] = await Promise.all([
+        supabase.from("etapas_business").select("id, numero_etapa, titulo").eq("contrato_id", contratoId),
+        supabase.from("entregas_business").select("id, titulo, status").eq("contrato_id", contratoId),
+        supabase.from("instrucoes_etapa").select("id, titulo, entrega_id, status"),
+        supabase.from("tasks_business").select("id, titulo, status").eq("contrato_id", contratoId),
+      ]);
+
+      setDadosExistentes({
+        etapas: etapasRes.data?.map(e => ({ id: e.id, numero: e.numero_etapa, titulo: e.titulo })) || [],
+        entregas: entregasRes.data || [],
+        instrucoes: instrucoesRes.data || [],
+        tasks: tasksRes.data || [],
+      });
+    };
+
+    fetchDadosExistentes();
+  }, [open, contratoId]);
 
   useEffect(() => {
     if (!resultado) return;
@@ -137,6 +178,41 @@ export function GeracaoEntregasModal({
       })));
     }
   }, [resultado, isNewFormat]);
+
+  // Helpers para verificar status de itens
+  const getAcaoItem = (tipo: 'etapa' | 'entrega' | 'instrucao' | 'task', titulo: string) => {
+    const existente = tipo === 'etapa' 
+      ? dadosExistentes.etapas.find(e => e.titulo === titulo)
+      : tipo === 'entrega'
+        ? dadosExistentes.entregas.find(e => e.titulo === titulo)
+        : tipo === 'task'
+          ? dadosExistentes.tasks.find(t => t.titulo === titulo)
+          : null;
+
+    if (!existente) return 'nova';
+    
+    if (tipo === 'etapa') return 'existente'; // Etapas nunca são atualizadas
+    
+    const status = (existente as any).status;
+    if (status === 'concluida' || status === 'concluido') return 'concluida';
+    
+    return modoImportacao === 'atualizar' ? 'atualizar' : 'existente';
+  };
+
+  const getAcaoBadge = (acao: string) => {
+    switch (acao) {
+      case 'nova':
+        return <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">+ Nova</Badge>;
+      case 'atualizar':
+        return <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-700 border-blue-500/30">↺ Atualizar</Badge>;
+      case 'concluida':
+        return <Badge variant="outline" className="text-xs bg-gray-500/10 text-gray-500 border-gray-500/30">✓ Concluída</Badge>;
+      case 'existente':
+        return <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">Existente</Badge>;
+      default:
+        return null;
+    }
+  };
 
   const toggleEtapa = (numero: number) => {
     setExpandedEtapas(prev =>
@@ -239,7 +315,11 @@ export function GeracaoEntregasModal({
       const tasksSelecionadas = tasks.filter(t => t.selecionada);
       const backlogSelecionado = backlog.filter(b => b.selecionado);
 
-      // 1. Criar Etapas (com verificação de duplicatas)
+      let totalCriados = 0;
+      let totalAtualizados = 0;
+      let novasEtapasBacklog = 0;
+
+      // 1. Processar Etapas (NUNCA atualizar, preservar acordo)
       const etapasMap: Record<number, string> = {};
       
       if (etapasSelecionadas.length > 0) {
@@ -253,8 +333,10 @@ export function GeracaoEntregasModal({
             .maybeSingle();
 
           if (existente) {
+            // Etapa já existe - apenas mapear, NUNCA atualizar
             etapasMap[etapa.numero] = existente.id;
-          } else {
+          } else if (modoImportacao === 'nova') {
+            // Modo nova: criar etapa
             const { data: novaEtapa, error } = await supabase
               .from("etapas_business")
               .insert({
@@ -269,30 +351,59 @@ export function GeracaoEntregasModal({
 
             if (error) throw error;
             etapasMap[etapa.numero] = novaEtapa.id;
+            totalCriados++;
+          } else {
+            // Modo atualizar: nova etapa detectada -> adicionar como backlog
+            await supabase.from("entregas_business").insert({
+              contrato_id: contratoId,
+              titulo: `Nova Fase Sugerida: ${etapa.titulo}`,
+              descricao: `Fase ${etapa.numero} detectada na atualização. Objetivo: ${etapa.objetivo || 'A definir'}`,
+              tipo: 'backlog',
+              prioridade: 'baixa',
+              justificativa_backlog: 'Nova fase detectada após acordo inicial - avaliar com mentor',
+              ordem: 999,
+            });
+            novasEtapasBacklog++;
           }
         }
       }
 
-      // 2. Criar Entregas (com verificação de duplicatas)
+      // 2. Processar Entregas (atualizar se não concluída)
       const entregasMap: Record<number, string> = {};
       
       for (const entrega of entregasSelecionadas) {
         const etapaId = etapasMap[entrega.etapa_numero] || null;
         
-        // Verificar se já existe entrega com mesmo título na mesma etapa
+        // Verificar se já existe
         const { data: entregaExistente } = await supabase
           .from("entregas_business")
-          .select("id")
+          .select("id, status")
           .eq("contrato_id", contratoId)
           .eq("titulo", entrega.titulo)
           .maybeSingle();
 
         if (entregaExistente) {
-          // Já existe, apenas mapear
           entregasMap[entrega.numero_entrega] = entregaExistente.id;
+          
+          // Modo atualizar: atualizar campos se NÃO estiver concluída
+          if (modoImportacao === 'atualizar' && entregaExistente.status !== 'concluida') {
+            const { error } = await supabase
+              .from("entregas_business")
+              .update({
+                descricao: entrega.descricao,
+                prioridade: entrega.prioridade === 'urgente' ? 'critica' : entrega.prioridade,
+                modulo_relacionado: entrega.modulo_relacionado,
+                // NÃO atualizar: status, etapa_id (mantém o acordado)
+              })
+              .eq("id", entregaExistente.id);
+
+            if (error) throw error;
+            totalAtualizados++;
+          }
           continue;
         }
         
+        // Criar nova entrega
         const { data: novaEntrega, error } = await supabase
           .from("entregas_business")
           .insert({
@@ -311,24 +422,43 @@ export function GeracaoEntregasModal({
 
         if (error) throw error;
         entregasMap[entrega.numero_entrega] = novaEntrega.id;
+        totalCriados++;
       }
 
-      // 3. Criar Instruções (com verificação de duplicatas e normalização de ferramenta)
+      // 3. Processar Instruções (atualizar se não concluída)
       for (const instrucao of instrucoesSelecionadas) {
         const entregaId = entregasMap[instrucao.entrega_numero] || null;
         const entrega = entregasSelecionadas.find(e => e.numero_entrega === instrucao.entrega_numero);
         const etapaId = entrega ? etapasMap[entrega.etapa_numero] : null;
 
-        // Verificar se já existe instrução com mesmo título na mesma entrega
+        // Verificar se já existe
         const { data: instrucaoExistente } = await supabase
           .from("instrucoes_etapa")
-          .select("id")
+          .select("id, status")
           .eq("entrega_id", entregaId)
           .eq("titulo", instrucao.titulo)
           .maybeSingle();
 
-        if (instrucaoExistente) continue; // Já existe, pular
+        if (instrucaoExistente) {
+          // Modo atualizar: atualizar campos se NÃO estiver concluída
+          if (modoImportacao === 'atualizar' && instrucaoExistente.status !== 'concluida') {
+            const { error } = await supabase
+              .from("instrucoes_etapa")
+              .update({
+                descricao: instrucao.descricao,
+                dicas: instrucao.dicas,
+                ferramenta: normalizarFerramenta(instrucao.ferramenta),
+                // Manter: status, ordem original, responsavel
+              })
+              .eq("id", instrucaoExistente.id);
 
+            if (error) throw error;
+            totalAtualizados++;
+          }
+          continue;
+        }
+
+        // Criar nova instrução
         const { error } = await supabase
           .from("instrucoes_etapa")
           .insert({
@@ -345,24 +475,41 @@ export function GeracaoEntregasModal({
           });
 
         if (error) throw error;
+        totalCriados++;
       }
 
-      // 4. Criar Tasks (com verificação de duplicatas)
+      // 4. Processar Tasks (atualizar se não concluída)
       for (const task of tasksSelecionadas) {
         const entregaId = entregasMap[task.entrega_numero] || null;
         const entrega = entregasSelecionadas.find(e => e.numero_entrega === task.entrega_numero);
         const etapaId = entrega ? etapasMap[entrega.etapa_numero] : null;
 
-        // Verificar se já existe task com mesmo título na mesma entrega
+        // Verificar se já existe
         const { data: taskExistente } = await supabase
           .from("tasks_business")
-          .select("id")
+          .select("id, status")
           .eq("contrato_id", contratoId)
           .eq("titulo", task.titulo)
           .maybeSingle();
 
-        if (taskExistente) continue; // Já existe, pular
+        if (taskExistente) {
+          // Modo atualizar: atualizar campos se NÃO estiver concluída
+          if (modoImportacao === 'atualizar' && taskExistente.status !== 'concluida' && taskExistente.status !== 'concluido') {
+            const { error } = await supabase
+              .from("tasks_business")
+              .update({
+                prioridade: task.prioridade,
+                instrucoes_validacao: task.instrucoes_validacao,
+              })
+              .eq("id", taskExistente.id);
 
+            if (error) throw error;
+            totalAtualizados++;
+          }
+          continue;
+        }
+
+        // Criar nova task
         const { error } = await supabase
           .from("tasks_business")
           .insert({
@@ -378,9 +525,10 @@ export function GeracaoEntregasModal({
           });
 
         if (error) throw error;
+        totalCriados++;
       }
 
-      // 5. Criar Backlog como entregas futuras (com verificação de duplicatas)
+      // 5. Processar Backlog (sempre adicionar novos)
       for (const item of backlogSelecionado) {
         // Verificar se já existe
         const { data: backlogExistente } = await supabase
@@ -406,6 +554,7 @@ export function GeracaoEntregasModal({
           });
 
         if (error) throw error;
+        totalCriados++;
       }
 
       // Invalidar queries
@@ -414,11 +563,13 @@ export function GeracaoEntregasModal({
       queryClient.invalidateQueries({ queryKey: ["instrucoes-etapa"] });
       queryClient.invalidateQueries({ queryKey: ["tasks-business", contratoId] });
       
-      const totalCriado = etapasSelecionadas.length + entregasSelecionadas.length + 
-                         instrucoesSelecionadas.length + tasksSelecionadas.length + 
-                         backlogSelecionado.length;
+      // Mensagem de sucesso
+      const mensagens: string[] = [];
+      if (totalCriados > 0) mensagens.push(`${totalCriados} criados`);
+      if (totalAtualizados > 0) mensagens.push(`${totalAtualizados} atualizados`);
+      if (novasEtapasBacklog > 0) mensagens.push(`${novasEtapasBacklog} novas fases em backlog`);
       
-      toast.success(`${totalCriado} itens criados com sucesso!`);
+      toast.success(`Itens processados: ${mensagens.join(', ')}`);
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -467,6 +618,7 @@ export function GeracaoEntregasModal({
                   <p className="text-xs text-muted-foreground">{etapa.objetivo}</p>
                 )}
               </div>
+              {getAcaoBadge(getAcaoItem('etapa', etapa.titulo))}
               <Badge variant="secondary" className="text-xs">
                 {entregasDaEtapa.length} entregas
               </Badge>
@@ -503,6 +655,7 @@ export function GeracaoEntregasModal({
                             Entrega {entrega.numero_entrega}: {entrega.titulo}
                           </p>
                         </div>
+                        {getAcaoBadge(getAcaoItem('entrega', entrega.titulo))}
                         {getPrioridadeBadge(entrega.prioridade)}
                       </div>
 
@@ -618,7 +771,23 @@ export function GeracaoEntregasModal({
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             Estrutura Gerada pela IA
+            {modoImportacao === 'atualizar' ? (
+              <Badge variant="secondary" className="ml-2 text-xs bg-blue-500/10 text-blue-700 border-blue-500/30">
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Modo Atualização
+              </Badge>
+            ) : (
+              <Badge variant="secondary" className="ml-2 text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
+                <Plus className="h-3 w-3 mr-1" />
+                Nova Importação
+              </Badge>
+            )}
           </DialogTitle>
+          {modoImportacao === 'atualizar' && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Itens concluídos não serão modificados. Novas etapas serão adicionadas ao backlog.
+            </p>
+          )}
         </DialogHeader>
 
         <ScrollArea className="max-h-[55vh] pr-4">
