@@ -301,7 +301,7 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
                           )} />
                           <div>
                             <h4 className="font-medium text-sm">
-                              Encontro {etapaNum} - {etapa?.titulo || "Sem título"}
+                              Fase {etapaNum} - {etapa?.titulo || "Sem título"}
                             </h4>
                             <p className="text-xs text-muted-foreground">
                               {concluidas}/{instrucoes.length} instruções concluídas

@@ -90,7 +90,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
   const getEtapaNome = (etapaId?: string) => {
     if (!etapaId) return null;
     const etapa = etapas.find(e => e.id === etapaId);
-    return etapa ? `Encontro ${etapa.numero_etapa}: ${etapa.titulo}` : null;
+    return etapa ? `Fase ${etapa.numero_etapa}: ${etapa.titulo}` : null;
   };
 
   const handleOpenModal = (entrega?: EntregaBusiness) => {
@@ -435,7 +435,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
             </div>
 
             <div>
-              <label className="text-sm font-medium">Etapa (Encontro) Relacionada</label>
+              <label className="text-sm font-medium">Fase Relacionada</label>
               <Select
                 value={formData.etapa_id || "none"}
                 onValueChange={(v) => setFormData({ ...formData, etapa_id: v === "none" ? "" : v })}
