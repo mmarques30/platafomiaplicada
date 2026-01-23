@@ -2222,6 +2222,53 @@ export type Database = {
         }
         Relationships: []
       }
+      links_business: {
+        Row: {
+          ativo: boolean | null
+          contrato_id: string
+          created_at: string | null
+          descricao: string | null
+          icone: string | null
+          id: string
+          ordem: number | null
+          titulo: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          contrato_id: string
+          created_at?: string | null
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          ordem?: number | null
+          titulo: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          ativo?: boolean | null
+          contrato_id?: string
+          created_at?: string | null
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          ordem?: number | null
+          titulo?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "links_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       materiais_comunidade: {
         Row: {
           adicionado_por: string | null

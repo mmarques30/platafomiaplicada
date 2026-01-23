@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles } from "lucide-react";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen } from "lucide-react";
 import { toast } from "sonner";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import TasksBusinessManager from "@/components/admin/business/TasksBusinessManager";
@@ -16,6 +16,7 @@ import { EtapasManager } from "@/components/admin/business/EtapasManager";
 import { ContratoBusinessManager } from "@/components/admin/business/ContratoBusinessManager";
 import { ReportsBusinessManager } from "@/components/admin/business/ReportsBusinessManager";
 import { InstrucoesBusinessManager } from "@/components/admin/business/InstrucoesBusinessManager";
+import { DocumentosBusinessManager } from "@/components/admin/business/DocumentosBusinessManager";
 import { Badge } from "@/components/ui/badge";
 import SessaoModal from "@/components/admin/mentoria/SessaoModal";
 import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
@@ -161,6 +162,10 @@ export default function MentoriaBusinessPage() {
               <ClipboardCheck className="h-3.5 w-3.5" />
               Tasks
             </TabsTrigger>
+            <TabsTrigger value="documentos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <FolderOpen className="h-3.5 w-3.5" />
+              Documentos
+            </TabsTrigger>
             <TabsTrigger value="reports" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <FileText className="h-3.5 w-3.5" />
               Reports
@@ -287,6 +292,25 @@ export default function MentoriaBusinessPage() {
                   <ClipboardCheck className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
                   <p className="font-medium">Crie um contrato primeiro</p>
                   <p className="text-sm text-muted-foreground">Para gerenciar tasks, crie o contrato na aba "Contrato"</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Aba Documentos */}
+          <TabsContent value="documentos" className="space-y-4 mt-4">
+            {contrato?.id ? (
+              <DocumentosBusinessManager 
+                contratoId={contrato.id}
+                userId={selectedUserId}
+                userName={selectedUser?.nome_completo}
+              />
+            ) : (
+              <Card className="border-border/50">
+                <CardContent className="py-10 text-center">
+                  <FolderOpen className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+                  <p className="font-medium">Crie um contrato primeiro</p>
+                  <p className="text-sm text-muted-foreground">Para gerenciar documentos, crie o contrato na aba "Contrato"</p>
                 </CardContent>
               </Card>
             )}
