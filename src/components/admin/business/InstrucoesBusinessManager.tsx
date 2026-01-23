@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { 
   ChevronDown, 
   CheckCircle2, 
@@ -12,11 +13,13 @@ import {
   ListChecks,
   Filter,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  Trash2
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface InstrucoesBusinessManagerProps {
   contratoId: string;
@@ -89,10 +92,43 @@ function useInstrucoesByContrato(contratoId?: string) {
 }
 
 export function InstrucoesBusinessManager({ contratoId, userId, userName }: InstrucoesBusinessManagerProps) {
-  const { data: instrucoes, isLoading } = useInstrucoesByContrato(contratoId);
+  const queryClient = useQueryClient();
+  const { data: instrucoes, isLoading, refetch } = useInstrucoesByContrato(contratoId);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [responsavelFilter, setResponsavelFilter] = useState<string>("all");
   const [expandedEtapas, setExpandedEtapas] = useState<Set<number>>(new Set([1, 2, 3]));
+  const [isClearing, setIsClearing] = useState(false);
+
+  const handleClearAll = async () => {
+    setIsClearing(true);
+    try {
+      // Primeiro busca todas as etapas do contrato
+      const { data: etapas } = await supabase
+        .from('etapas_business')
+        .select('id')
+        .eq('contrato_id', contratoId);
+      
+      if (etapas && etapas.length > 0) {
+        const etapaIds = etapas.map(e => e.id);
+        
+        const { error } = await supabase
+          .from("instrucoes_etapa")
+          .delete()
+          .in("etapa_id", etapaIds);
+        
+        if (error) throw error;
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["instrucoes-contrato", contratoId] });
+      toast.success("Todas as instruções foram removidas");
+      refetch();
+    } catch (error) {
+      console.error("Erro ao limpar:", error);
+      toast.error("Erro ao limpar instruções");
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -159,6 +195,32 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
           )}
         </div>
         <div className="flex items-center gap-2">
+          {totalInstrucoes > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Limpar Tudo
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Limpar todas as instruções?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação irá remover permanentemente todas as instruções. 
+                    Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearAll} disabled={isClearing} className="bg-destructive text-destructive-foreground">
+                    {isClearing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                    Sim, limpar tudo
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
           <Badge variant="outline" className="text-xs">
             {concluidas}/{totalInstrucoes} concluídas
           </Badge>

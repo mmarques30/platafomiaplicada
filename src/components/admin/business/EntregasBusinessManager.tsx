@@ -8,12 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Clock, AlertCircle, CheckCircle2, FolderKanban, CalendarDays } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Clock, AlertCircle, CheckCircle2, FolderKanban, CalendarDays, Loader2 } from "lucide-react";
 import { useEntregasBusiness, EntregaBusiness, EntregaInput } from "@/hooks/useEntregasBusiness";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useQueryClient } from "@tanstack/react-query";
 import { DocumentosUploadSection } from "./DocumentosUploadSection";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface EntregasBusinessManagerProps {
   contratoId: string;
@@ -45,6 +47,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
   const [editingEntrega, setEditingEntrega] = useState<EntregaBusiness | null>(null);
   const [ativasOpen, setAtivasOpen] = useState(true);
   const [backlogOpen, setBacklogOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const [formData, setFormData] = useState<Partial<EntregaInput>>({
     titulo: "",
@@ -58,6 +61,27 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
     tem_instrucoes: false,
     justificativa_backlog: "",
   });
+
+  const handleClearAll = async () => {
+    setIsClearing(true);
+    try {
+      const { error } = await supabase
+        .from("entregas_business")
+        .delete()
+        .eq("contrato_id", contratoId);
+      
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["entregas-business", contratoId] });
+      queryClient.invalidateQueries({ queryKey: ["instrucoes-etapa"] });
+      toast.success("Todas as entregas foram removidas");
+    } catch (error) {
+      console.error("Erro ao limpar:", error);
+      toast.error("Erro ao limpar entregas");
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   // Get modulos from contract
   const modulosSelecionados = (contrato as any)?.modulos_selecionados || [];
@@ -234,10 +258,38 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
             {entregas.length} total
           </Badge>
         </div>
-        <Button size="sm" onClick={() => handleOpenModal()}>
-          <Plus className="h-4 w-4 mr-1" />
-          Nova Entrega
-        </Button>
+        <div className="flex items-center gap-2">
+          {entregas.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Limpar Tudo
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Limpar todas as entregas?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação irá remover permanentemente todas as entregas e suas instruções associadas. 
+                    Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearAll} disabled={isClearing} className="bg-destructive text-destructive-foreground">
+                    {isClearing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                    Sim, limpar tudo
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          <Button size="sm" onClick={() => handleOpenModal()}>
+            <Plus className="h-4 w-4 mr-1" />
+            Nova Entrega
+          </Button>
+        </div>
       </div>
 
       {/* Upload de Documentos com IA */}
