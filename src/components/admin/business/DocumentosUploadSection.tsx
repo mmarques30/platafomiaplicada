@@ -37,7 +37,8 @@ export function DocumentosUploadSection({
   modulosContratados,
   onEntregasGeradas 
 }: DocumentosUploadSectionProps) {
-  const { documentos, createDocumento, deleteDocumento, uploadDocumento, isLoading } = useDocumentosBusiness(contratoId);
+  // Buscar apenas documentos para processamento IA
+  const { documentos, createDocumento, deleteDocumento, uploadDocumento, isLoading } = useDocumentosBusiness(contratoId, true);
   const { processarDocumento, isProcessing } = useProcessarDocumentos();
   
   const [texto, setTexto] = useState("");
@@ -74,6 +75,7 @@ export function DocumentosUploadSection({
         tipo,
         arquivo_url: url,
         conteudo_texto: conteudoTexto || undefined,
+        para_processamento_ia: true, // Marcar como documento para IA
       });
 
       if (fileInputRef.current) {
@@ -92,6 +94,7 @@ export function DocumentosUploadSection({
       titulo: `Texto - ${tipo} - ${new Date().toLocaleDateString()}`,
       tipo,
       conteudo_texto: texto,
+      para_processamento_ia: true, // Marcar como documento para IA
     });
 
     setTexto("");

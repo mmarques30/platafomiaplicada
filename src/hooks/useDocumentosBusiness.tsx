@@ -12,6 +12,7 @@ export interface DocumentoBusiness {
   processado: boolean;
   resultado_ia?: any;
   created_at: string;
+  para_processamento_ia: boolean;
 }
 
 export interface DocumentoInput {
@@ -20,21 +21,28 @@ export interface DocumentoInput {
   tipo: 'proposta' | 'transcricao' | 'anexo' | 'solucao' | 'outro';
   arquivo_url?: string;
   conteudo_texto?: string;
+  para_processamento_ia?: boolean;
 }
 
-export function useDocumentosBusiness(contratoId?: string) {
+export function useDocumentosBusiness(contratoId?: string, paraProcessamentoIA?: boolean) {
   const queryClient = useQueryClient();
 
   const { data: documentos = [], isLoading } = useQuery({
-    queryKey: ["documentos-business", contratoId],
+    queryKey: ["documentos-business", contratoId, paraProcessamentoIA],
     queryFn: async () => {
       if (!contratoId) return [];
       
-      const { data, error } = await supabase
+      let query = supabase
         .from("documentos_business")
         .select("*")
-        .eq("contrato_id", contratoId)
-        .order("created_at", { ascending: false });
+        .eq("contrato_id", contratoId);
+      
+      // Filtrar por propósito se especificado
+      if (paraProcessamentoIA !== undefined) {
+        query = query.eq("para_processamento_ia", paraProcessamentoIA);
+      }
+      
+      const { data, error } = await query.order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as DocumentoBusiness[];
