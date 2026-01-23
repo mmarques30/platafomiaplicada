@@ -17,6 +17,8 @@ export interface EntregaSugeridaV2 {
   tipo: 'ativa' | 'backlog';
   prioridade: 'baixa' | 'media' | 'alta' | 'urgente';
   modulo_relacionado?: string;
+  responsavel?: 'voce' | 'mentor' | 'conjunto';
+  status?: 'pendente' | 'concluida';
 }
 
 export interface InstrucaoSugeridaV2 {

@@ -6,12 +6,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Interfaces para tipagem
-interface FaseIdentificada {
-  numero: number;
-  titulo: string;
-  inicio_texto: string;
-  fim_texto: string;
+// ═══════════════════════════════════════════════════════════════════
+// INTERFACES
+// ═══════════════════════════════════════════════════════════════════
+
+interface AncorasLiterais {
+  fases: { numero: number; titulo: string; conteudo: string }[];
+  entregas: { numero: number; titulo: string; faseNumero: number }[];
+  passos: { numero: number; titulo: string; entregaNumero: number }[];
+  checklists: { titulo: string; entregaNumero: number }[];
+  mvp: { titulo: string }[];
+  conjuntas: { titulo: string; status: string }[];
+  backlog: { titulo: string; secao: string }[];
 }
 
 interface ResultadoParcial {
@@ -22,7 +28,10 @@ interface ResultadoParcial {
   backlog: any[];
 }
 
-// Mapeamento de ferramentas para valores válidos do banco
+// ═══════════════════════════════════════════════════════════════════
+// NORMALIZAÇÃO
+// ═══════════════════════════════════════════════════════════════════
+
 const FERRAMENTAS_VALIDAS = ["claude", "lovable", "drive", "notion", "supabase", "make", "n8n", "zapier", "mapa", "reuniao", "outro"];
 
 function normalizarFerramenta(ferramenta: string | undefined): string {
@@ -47,21 +56,17 @@ function normalizarFerramenta(ferramenta: string | undefined): string {
     "grupo": "reuniao",
     "meet": "reuniao",
     "zoom": "reuniao",
-    "21st.dev": "outro",
-    "21st": "outro",
   };
   
   return mapeamento[ferramentaLower] || 
          (FERRAMENTAS_VALIDAS.includes(ferramentaLower) ? ferramentaLower : "outro");
 }
 
-// Normalizar responsável baseado no texto
 function normalizarResponsavel(texto: string | undefined): "voce" | "mentor" | "conjunto" {
   if (!texto) return "voce";
   
   const textoLower = texto.toLowerCase().trim();
   
-  // Conjunto
   if (textoLower.includes("conjunto") || 
       textoLower.includes("juntos") || 
       textoLower.includes("mariana + paula") ||
@@ -70,7 +75,6 @@ function normalizarResponsavel(texto: string | undefined): "voce" | "mentor" | "
     return "conjunto";
   }
   
-  // Mentor
   if (textoLower.includes("mariana") || 
       textoLower.includes("mari") || 
       textoLower.includes("mentora") ||
@@ -78,11 +82,13 @@ function normalizarResponsavel(texto: string | undefined): "voce" | "mentor" | "
     return "mentor";
   }
   
-  // Mentorada (padrão)
   return "voce";
 }
 
-// Função para extrair JSON da resposta da IA
+// ═══════════════════════════════════════════════════════════════════
+// EXTRAÇÃO DE JSON
+// ═══════════════════════════════════════════════════════════════════
+
 function extractJsonFromResponse(response: string): any {
   let cleaned = response
     .replace(/```json\s*/gi, "")
@@ -136,7 +142,220 @@ function extractJsonFromResponse(response: string): any {
   }
 }
 
-// Função para chamar a IA
+// ═══════════════════════════════════════════════════════════════════
+// PRE-PARSER COM REGEX - EXTRAI ÂNCORAS LITERAIS ANTES DA IA
+// ═══════════════════════════════════════════════════════════════════
+
+function extrairAncorasLiterais(texto: string): AncorasLiterais {
+  console.log("=== PRE-PARSER: Extraindo âncoras literais ===");
+  
+  const ancoras: AncorasLiterais = {
+    fases: [],
+    entregas: [],
+    passos: [],
+    checklists: [],
+    mvp: [],
+    conjuntas: [],
+    backlog: [],
+  };
+  
+  // 1. FASES - Padrões: "FASE 1:", "FASE 1 -", "FASE 1.", "# FASE 1"
+  const regexFase = /(?:^|\n)[\s#]*(?:FASE|ETAPA)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
+  let matchFase;
+  while ((matchFase = regexFase.exec(texto)) !== null) {
+    const numero = parseInt(matchFase[1]);
+    const titulo = matchFase[2].trim()
+      .replace(/\*+/g, '')
+      .replace(/\(.*?\)/, '')
+      .trim();
+    
+    if (titulo.length > 2 && !ancoras.fases.some(f => f.numero === numero)) {
+      // Encontrar conteúdo até próxima fase
+      const startPos = matchFase.index;
+      const nextFaseMatch = texto.substring(startPos + matchFase[0].length).match(/(?:^|\n)[\s#]*(?:FASE|ETAPA)\s*\d+\s*[:\-–.]/i);
+      const endPos = nextFaseMatch 
+        ? startPos + matchFase[0].length + (nextFaseMatch.index || 0)
+        : texto.length;
+      
+      ancoras.fases.push({
+        numero,
+        titulo,
+        conteudo: texto.substring(startPos, endPos)
+      });
+      console.log(`  FASE ${numero}: ${titulo}`);
+    }
+  }
+  
+  // 2. ENTREGAS - Padrões: "ENTREGA 1:", "Entrega 3 -"
+  const regexEntrega = /(?:^|\n)\s*(?:ENTREGA)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
+  let matchEntrega;
+  let ultimaFase = 1;
+  
+  while ((matchEntrega = regexEntrega.exec(texto)) !== null) {
+    const numero = parseInt(matchEntrega[1]);
+    const titulo = matchEntrega[2].trim()
+      .replace(/\*+/g, '')
+      .trim();
+    
+    // Determinar a qual fase pertence
+    const posicaoEntrega = matchEntrega.index;
+    for (const fase of ancoras.fases) {
+      const faseStart = texto.indexOf(fase.conteudo);
+      const faseEnd = faseStart + fase.conteudo.length;
+      if (posicaoEntrega >= faseStart && posicaoEntrega < faseEnd) {
+        ultimaFase = fase.numero;
+        break;
+      }
+    }
+    
+    if (titulo.length > 2 && !ancoras.entregas.some(e => e.numero === numero)) {
+      ancoras.entregas.push({
+        numero,
+        titulo,
+        faseNumero: ultimaFase
+      });
+      console.log(`  ENTREGA ${numero}: ${titulo} (Fase ${ultimaFase})`);
+    }
+  }
+  
+  // 3. PASSOS - Padrões: "PASSO 1 -", "PASSO 1:", "1.", "1 -"
+  const regexPasso = /(?:^|\n)\s*(?:PASSO\s*)?(\d{1,2})\s*[:\-–.]\s*([^☐□\[\]]+?)(?=(?:\n\s*(?:PASSO\s*)?\d{1,2}\s*[:\-–.])|(?:\n\s*[☐□\[\]])|(?:\n\n)|$)/gi;
+  let matchPasso;
+  let ultimaEntrega = 1;
+  
+  // Encontrar passos dentro de cada entrega
+  for (const entrega of ancoras.entregas) {
+    const entregaMatch = texto.match(new RegExp(`ENTREGA\\s*${entrega.numero}[\\s\\S]*?(?=ENTREGA\\s*${entrega.numero + 1}|$)`, 'i'));
+    if (entregaMatch) {
+      const textoEntrega = entregaMatch[0];
+      
+      // Procurar padrão "PASSO X -"
+      const regexPassoEntrega = /(?:^|\n)\s*PASSO\s*(\d{1,2})\s*[:\-–]\s*(.+?)(?=(?:\n\s*PASSO)|(?:\n\s*[☐□\[\]])|(?:\n\n)|$)/gi;
+      let mp;
+      while ((mp = regexPassoEntrega.exec(textoEntrega)) !== null) {
+        const numPasso = parseInt(mp[1]);
+        let tituloPasso = mp[2].trim()
+          .replace(/\*+/g, '')
+          .replace(/[\r\n].*/s, '')
+          .trim();
+        
+        if (tituloPasso.length > 3 && tituloPasso.length < 200) {
+          ancoras.passos.push({
+            numero: numPasso,
+            titulo: tituloPasso,
+            entregaNumero: entrega.numero
+          });
+          console.log(`    PASSO ${numPasso} (Entrega ${entrega.numero}): ${tituloPasso.substring(0, 50)}...`);
+        }
+      }
+    }
+  }
+  
+  // 4. CHECKLISTS - Padrões: "☐", "□", "[ ]", "✓"
+  const regexChecklist = /[☐□✓✔]\s*(.+?)(?=\n|$)/gi;
+  let matchCheck;
+  ultimaEntrega = 1;
+  
+  while ((matchCheck = regexChecklist.exec(texto)) !== null) {
+    const titulo = matchCheck[1].trim()
+      .replace(/\?$/, '?')
+      .replace(/\*+/g, '')
+      .trim();
+    
+    // Determinar entrega do checklist
+    const posicao = matchCheck.index;
+    for (const entrega of ancoras.entregas.slice().reverse()) {
+      const entregaMatch = texto.indexOf(`ENTREGA ${entrega.numero}`);
+      if (entregaMatch !== -1 && posicao > entregaMatch) {
+        ultimaEntrega = entrega.numero;
+        break;
+      }
+    }
+    
+    if (titulo.length > 3 && titulo.length < 300) {
+      ancoras.checklists.push({
+        titulo,
+        entregaNumero: ultimaEntrega
+      });
+    }
+  }
+  console.log(`  Checklists encontrados: ${ancoras.checklists.length}`);
+  
+  // 5. MVP - Seção "MVP" ou "Primeira Entrega"
+  const mvpMatch = texto.match(/(?:MVP|Primeira Entrega|Escopo Acordado)[\s\S]*?(?=Pós-MVP|FASE|ENTREGAS EM CONJUNTO|$)/i);
+  if (mvpMatch) {
+    const mvpText = mvpMatch[0];
+    const regexItem = /[-•]\s*([^-•\n]+)/g;
+    let itemMatch;
+    while ((itemMatch = regexItem.exec(mvpText)) !== null) {
+      const titulo = itemMatch[1].trim()
+        .replace(/\*+/g, '')
+        .trim();
+      if (titulo.length > 5 && titulo.length < 200 && !titulo.toLowerCase().includes('pós-mvp')) {
+        ancoras.mvp.push({ titulo });
+      }
+    }
+    console.log(`  MVP items: ${ancoras.mvp.length}`);
+  }
+  
+  // 6. ENTREGAS EM CONJUNTO
+  const conjuntaMatch = texto.match(/ENTREGAS EM CONJUNTO[\s\S]*?(?=\d+\.\s*(?:ENTREGAS|FASES)|MVP|$)/i);
+  if (conjuntaMatch) {
+    const conjuntaText = conjuntaMatch[0];
+    
+    // Procurar linhas de tabela ou lista
+    const linhas = conjuntaText.split('\n');
+    for (const linha of linhas) {
+      const linhaLimpa = linha.replace(/\|/g, ' ').trim();
+      if (linhaLimpa.length > 10 && !linhaLimpa.includes('---') && !linhaLimpa.toLowerCase().includes('entrega')) {
+        // Extrair título (primeira parte significativa)
+        const partes = linhaLimpa.split(/\s{2,}|\t/);
+        const titulo = partes[0]?.trim();
+        
+        // Determinar status
+        const status = (linha.includes('✅') || linha.toLowerCase().includes('feito') || linha.toLowerCase().includes('concluíd')) 
+          ? 'concluida' 
+          : 'pendente';
+        
+        if (titulo && titulo.length > 3 && titulo.length < 200 && !titulo.match(/^\d+$/)) {
+          ancoras.conjuntas.push({ titulo, status });
+        }
+      }
+    }
+    console.log(`  Entregas conjuntas: ${ancoras.conjuntas.length}`);
+  }
+  
+  // 7. BACKLOG - Seções "Pós-MVP", "Melhorias Futuras"
+  const backlogSections = [
+    { regex: /Pós[-\s]?MVP[\s\S]*?(?=Melhorias Futuras|FASE|$)/i, secao: 'Pós-MVP' },
+    { regex: /Melhorias Futuras[\s\S]*?(?=FASE|ENTREGAS|$)/i, secao: 'Melhorias Futuras' },
+    { regex: /Próximos Passos[\s\S]*?(?=FASE|$)/i, secao: 'Próximos Passos' }
+  ];
+  
+  for (const { regex, secao } of backlogSections) {
+    const match = texto.match(regex);
+    if (match) {
+      const regexItem = /[-•]\s*([^-•\n]+)/g;
+      let itemMatch;
+      while ((itemMatch = regexItem.exec(match[0])) !== null) {
+        const titulo = itemMatch[1].trim()
+          .replace(/\*+/g, '')
+          .trim();
+        if (titulo.length > 5 && titulo.length < 200) {
+          ancoras.backlog.push({ titulo, secao });
+        }
+      }
+    }
+  }
+  console.log(`  Backlog items: ${ancoras.backlog.length}`);
+  
+  return ancoras;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CHAMAR IA COM PROMPT ULTRA-RESTRITIVO
+// ═══════════════════════════════════════════════════════════════════
+
 async function callAI(apiKey: string, prompt: string, maxTokens: number = 4096): Promise<string> {
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -148,6 +367,7 @@ async function callAI(apiKey: string, prompt: string, maxTokens: number = 4096):
       model: "google/gemini-2.5-flash",
       messages: [{ role: "user", content: prompt }],
       max_tokens: maxTokens,
+      temperature: 0, // DETERMINÍSTICO - não inventar
     }),
   });
 
@@ -161,372 +381,377 @@ async function callAI(apiKey: string, prompt: string, maxTokens: number = 4096):
   return result.choices?.[0]?.message?.content || "";
 }
 
-// PASSO 1: Identificar fases do documento - COM EXTRAÇÃO LITERAL
-async function identificarFases(apiKey: string, texto: string): Promise<FaseIdentificada[]> {
-  console.log("=== PASSO 1: Identificando fases do documento ===");
-  
-  const prompt = `Analise este documento e identifique TODAS as seções marcadas como FASE, ETAPA, ou blocos principais de entregas.
+// ═══════════════════════════════════════════════════════════════════
+// PROCESSAR COM IA RESTRITA (FALLBACK/COMPLEMENTO)
+// ═══════════════════════════════════════════════════════════════════
 
-DOCUMENTO:
-${texto.substring(0, 30000)} ${texto.length > 30000 ? '...[documento continua]' : ''}
-
-REGRAS CRÍTICAS - EXTRAIA LITERALMENTE:
-1. Copie os TÍTULOS EXATOS como estão escritos no documento
-2. NÃO INVENTE títulos genéricos
-3. Se está escrito "FASE 1: DOCUMENTAÇÃO E PROCESSOS", retorne EXATAMENTE assim
-4. Se está escrito "FASE 2: FINANCEIRO E EXPANSÃO", retorne EXATAMENTE assim
-5. Inclua seções de "Pós-MVP", "Backlog", "Melhorias Futuras" como fases separadas
-
-❌ EXEMPLOS NEGATIVOS (NÃO FAÇA):
-- "Fase 1: Planejamento e Preparação" (título inventado)
-- "Fase 2: Implementação e Lançamento" (título genérico)
-- "Etapa de Organização" (resumo, não literal)
-
-✅ EXEMPLOS POSITIVOS (FAÇA):
-- "FASE 1: DOCUMENTAÇÃO E PROCESSOS" (copiado do documento)
-- "FASE 2: FINANCEIRO E EXPANSÃO" (copiado do documento)
-- "Pós-MVP" (seção real do documento)
-
-Responda APENAS com JSON válido:
-{
-  "fases_encontradas": [
-    {
-      "numero": 1,
-      "titulo": "TÍTULO EXATO DO DOCUMENTO - COPIE LITERALMENTE",
-      "inicio_texto": "copie as primeiras 50 palavras exatas desta seção",
-      "fim_texto": "copie as últimas 30 palavras exatas desta seção"
-    }
-  ],
-  "total_fases": 3
-}`;
-
-  try {
-    const content = await callAI(apiKey, prompt, 2048);
-    const parsed = extractJsonFromResponse(content);
-    
-    const fases = parsed.fases_encontradas || [];
-    console.log(`Fases identificadas: ${fases.length}`);
-    fases.forEach((f: FaseIdentificada, i: number) => {
-      console.log(`  ${i + 1}. ${f.titulo}`);
-    });
-    
-    if (fases.length === 0) {
-      console.log("Nenhuma fase identificada, processando documento como fase única");
-      return [{
-        numero: 1,
-        titulo: "Documento Completo",
-        inicio_texto: texto.substring(0, 100),
-        fim_texto: texto.substring(texto.length - 100)
-      }];
-    }
-    
-    return fases;
-  } catch (error) {
-    console.error("Erro ao identificar fases:", error);
-    return [{
-      numero: 1,
-      titulo: "Documento Completo",
-      inicio_texto: texto.substring(0, 100),
-      fim_texto: texto.substring(texto.length - 100)
-    }];
-  }
-}
-
-// Função para dividir documento baseado nas fases identificadas
-function splitDocumentByPhases(texto: string, fases: FaseIdentificada[]): string[] {
-  console.log("=== Dividindo documento em seções ===");
-  
-  if (fases.length === 1) {
-    return [texto];
-  }
-  
-  const sections: string[] = [];
-  
-  for (let i = 0; i < fases.length; i++) {
-    const fase = fases[i];
-    const nextFase = fases[i + 1];
-    
-    const searchStart = fase.inicio_texto.substring(0, Math.min(50, fase.inicio_texto.length));
-    let startIndex = texto.indexOf(searchStart);
-    
-    if (startIndex === -1) {
-      startIndex = texto.toLowerCase().indexOf(fase.titulo.toLowerCase());
-    }
-    
-    if (startIndex === -1) {
-      startIndex = Math.floor((i / fases.length) * texto.length);
-    }
-    
-    let endIndex = texto.length;
-    if (nextFase) {
-      const searchEnd = nextFase.inicio_texto.substring(0, Math.min(50, nextFase.inicio_texto.length));
-      const nextStart = texto.indexOf(searchEnd, startIndex + 100);
-      
-      if (nextStart > startIndex) {
-        endIndex = nextStart;
-      } else {
-        const nextByTitle = texto.toLowerCase().indexOf(nextFase.titulo.toLowerCase(), startIndex + 100);
-        if (nextByTitle > startIndex) {
-          endIndex = nextByTitle;
-        }
-      }
-    }
-    
-    const section = texto.substring(startIndex, endIndex).trim();
-    if (section.length > 50) {
-      sections.push(section);
-      console.log(`  Seção ${i + 1}: ${section.length} caracteres`);
-    }
-  }
-  
-  if (sections.length === 0) {
-    console.log("Não foi possível dividir, usando documento completo");
-    return [texto];
-  }
-  
-  return sections;
-}
-
-// Detectar se seção é de entregas em conjunto
-function isSecaoConjunta(section: string): boolean {
-  const textoLower = section.toLowerCase();
-  return textoLower.includes("em conjunto") ||
-         textoLower.includes("mariana + paula") ||
-         textoLower.includes("paula + mariana") ||
-         textoLower.includes("entregas conjuntas");
-}
-
-// Detectar se é seção de backlog
-function isSecaoBacklog(section: string, titulo: string): boolean {
-  const textoLower = (section + " " + titulo).toLowerCase();
-  return textoLower.includes("pós-mvp") ||
-         textoLower.includes("pos-mvp") ||
-         textoLower.includes("backlog") ||
-         textoLower.includes("melhorias futuras") ||
-         textoLower.includes("próximos passos") ||
-         textoLower.includes("proximos passos");
-}
-
-// PASSO 2: Processar cada fase individualmente - COM EXTRAÇÃO LITERAL
-async function processarFase(
-  apiKey: string, 
-  section: string, 
-  faseNumero: number, 
-  totalFases: number,
-  entregaOffset: number,
-  modulosLista: string,
-  contextoCliente?: string
+async function processarComIARestrita(
+  apiKey: string,
+  texto: string,
+  ancoras: AncorasLiterais,
+  modulosLista: string
 ): Promise<ResultadoParcial> {
-  console.log(`=== Processando fase ${faseNumero}/${totalFases} ===`);
+  console.log("=== PROCESSANDO COM IA RESTRITA ===");
   
-  const isConjunta = isSecaoConjunta(section);
-  const isBacklog = isSecaoBacklog(section, "");
+  // Criar lista de âncoras para validação
+  const fasesLista = ancoras.fases.map(f => `FASE ${f.numero}: ${f.titulo}`).join('\n');
+  const entregasLista = ancoras.entregas.map(e => `ENTREGA ${e.numero}: ${e.titulo} (Fase ${e.faseNumero})`).join('\n');
+  const passosLista = ancoras.passos.map(p => `PASSO ${p.numero} (Entrega ${p.entregaNumero}): ${p.titulo}`).join('\n');
   
-  console.log(`  - Seção conjunta: ${isConjunta}`);
-  console.log(`  - Seção backlog: ${isBacklog}`);
-  
-  const prompt = `Você é um extrator de dados. Extraia EXATAMENTE o conteúdo desta seção do documento de mentoria.
-
-CONTEXTO: Esta é a FASE ${faseNumero} de ${totalFases}.
-${isConjunta ? "⚠️ ATENÇÃO: Esta é uma seção de ENTREGAS EM CONJUNTO - todas devem ter responsavel='conjunto'" : ""}
-${isBacklog ? "⚠️ ATENÇÃO: Esta é uma seção de BACKLOG/PÓS-MVP - todos os itens devem ir para backlog" : ""}
-
-MÓDULOS CONTRATADOS: ${modulosLista}
-${contextoCliente ? `CONTEXTO: ${contextoCliente}` : ""}
-
-SEÇÃO DO DOCUMENTO A PROCESSAR:
-${section}
+  const prompt = `VOCÊ É UM ORGANIZADOR DE DADOS - NÃO UM CRIADOR.
 
 ═══════════════════════════════════════════════════════════════
-REGRAS DE EXTRAÇÃO LITERAL - SIGA RIGOROSAMENTE:
+ÂNCORAS LITERAIS JÁ ENCONTRADAS NO DOCUMENTO:
 ═══════════════════════════════════════════════════════════════
 
-1. ENTREGAS = Títulos marcados como "ENTREGA X:", "Entrega:", ou blocos de atividades principais
-   - Copie o TÍTULO EXATO como está escrito
-   - Ex: "ENTREGA 3: Módulo de Gestão Financeira" → titulo: "Módulo de Gestão Financeira"
-   - ❌ NÃO TRANSFORME em "Plano de Gestão" ou títulos genéricos
-   - ❌ NÃO INVENTE entregas que não existem no texto
+FASES:
+${fasesLista || 'Nenhuma fase detectada'}
 
-2. INSTRUÇÕES = Passos numerados (PASSO 1, 1., 2., 3., etc.) ou bullets detalhados
-   - CADA passo numerado é UMA instrução SEPARADA
-   - Mantenha o texto original de cada passo
-   - Ex: "PASSO 1 - Preparar o prompt para o Claude" → titulo: "Preparar o prompt para o Claude"
-   - Ex: "2. Enviar para o Claude" → titulo: "Enviar para o Claude"
-   - Identifique a ferramenta mencionada (Claude, Lovable, MAPA, Drive, etc.)
+ENTREGAS:
+${entregasLista || 'Nenhuma entrega detectada'}
 
-3. TASKS = Itens de checklist (☐, □, [ ], ✓) ou perguntas de validação
-   - CADA checkbox/pergunta é UMA task de validação SEPARADA
-   - Ex: "☐ Consigo acessar a tela de receitas?" → titulo: "Consigo acessar a tela de receitas?"
-   - Ex: "[ ] Verificar se o módulo está funcionando" → task
-
-4. RESPONSÁVEL - Identifique no texto:
-   - Se menciona "Paula", "mentorada", "você faz" → "voce"
-   - Se menciona "Mariana", "mentora", "Mari" → "mentor"
-   - Se menciona "Em Conjunto", "juntos", "Mariana + Paula" → "conjunto"
-   ${isConjunta ? "- NESTA SEÇÃO: Forçar 'conjunto' para todas" : ""}
-
-5. FERRAMENTA - Extraia a ferramenta mencionada:
-   - "Claude", "Lovable", "MAPA", "Drive", "Notion", "Supabase", "Make", "N8N", "Zapier"
-   - Se não mencionar ferramenta específica → "outro"
-   - Se for reunião, call, meet → "reuniao"
-
-6. BACKLOG - Itens para depois do MVP:
-   ${isBacklog ? "- NESTA SEÇÃO: Todos os itens são backlog" : "- Seções 'Pós-MVP', 'Melhorias Futuras', 'Próximos Passos'"}
-   - Items marcados como "A fazer", "Futuro", "Conforme demanda"
+PASSOS:
+${passosLista || 'Nenhum passo detectado'}
 
 ═══════════════════════════════════════════════════════════════
+SUA TAREFA - APENAS ORGANIZAR E PREENCHER DETALHES:
+═══════════════════════════════════════════════════════════════
 
-Responda APENAS com JSON válido:
+Para cada ENTREGA listada acima, extraia do texto abaixo:
+1. Descrição/objetivo (copie literalmente)
+2. Módulo relacionado (se mencionado)
+3. Ferramenta de cada passo (Claude, Lovable, MAPA, Drive, etc.)
+4. Responsável de cada passo (Paula/mentorada="voce", Mariana/mentora="mentor", Em Conjunto="conjunto")
+
+═══════════════════════════════════════════════════════════════
+PROIBIÇÕES ABSOLUTAS:
+═══════════════════════════════════════════════════════════════
+
+❌ PROIBIDO inventar títulos que NÃO estão na lista acima
+❌ PROIBIDO usar termos genéricos: "Planejamento", "Canvas", "Proposta de Valor", "Estruturação"
+❌ PROIBIDO resumir ou parafrasear títulos
+❌ PROIBIDO adicionar fases/entregas que não existem no documento
+❌ PROIBIDO criar conteúdo da metodologia "IAplicada" genérica
+
+DOCUMENTO A ANALISAR:
+${texto.substring(0, 25000)}
+
+Responda APENAS com JSON válido seguindo EXATAMENTE as âncoras acima:
 {
   "etapas": [
     {
-      "numero": ${faseNumero},
-      "titulo": "TÍTULO EXATO DA FASE - COPIE DO DOCUMENTO",
-      "objetivo": "Objetivo mencionado no documento"
+      "numero": 1,
+      "titulo": "USAR TÍTULO EXATO DA LISTA ACIMA",
+      "objetivo": "Copiar objetivo do documento"
     }
   ],
   "entregas": [
     {
-      "etapa_numero": ${faseNumero},
-      "numero_entrega": ${entregaOffset + 1},
-      "titulo": "TÍTULO EXATO DA ENTREGA - COPIE DO DOCUMENTO",
-      "descricao": "Descrição/objetivo da entrega como está no documento",
-      "tipo": "${isBacklog ? "backlog" : "ativa"}",
+      "etapa_numero": 1,
+      "numero_entrega": 1,
+      "titulo": "USAR TÍTULO EXATO DA LISTA ACIMA",
+      "descricao": "Copiar descrição do documento",
+      "tipo": "ativa",
       "prioridade": "alta",
-      "modulo_relacionado": "Módulo mencionado"
+      "modulo_relacionado": "Módulo mencionado ou null"
     }
   ],
   "instrucoes": [
     {
-      "entrega_numero": ${entregaOffset + 1},
-      "titulo": "TEXTO EXATO DO PASSO - COPIE DO DOCUMENTO",
-      "descricao": "Detalhes adicionais se houver",
-      "responsavel": "${isConjunta ? "conjunto" : "voce"}",
-      "ferramenta": "claude",
-      "dicas": "Dicas ou observações mencionadas",
+      "entrega_numero": 1,
+      "titulo": "USAR TÍTULO EXATO DO PASSO",
+      "descricao": "Detalhes adicionais",
+      "responsavel": "voce",
+      "ferramenta": "lovable",
+      "dicas": "Dicas do documento",
       "ordem": 1
     }
   ],
-  "tasks": [
-    {
-      "entrega_numero": ${entregaOffset + 1},
-      "titulo": "TEXTO EXATO DO CHECKLIST - COPIE DO DOCUMENTO",
-      "tipo": "validacao",
-      "prioridade": "alta",
-      "instrucoes_validacao": "Como validar este item"
-    }
-  ],
-  "backlog": [
-    {
-      "titulo": "Item futuro mencionado",
-      "descricao": "Descrição do item",
-      "justificativa": "Porque está no backlog (Pós-MVP, Melhoria Futura, etc.)"
-    }
-  ]
-}
-
-LEMBRE-SE:
-- Extraia TUDO que está no documento - não omita itens
-- Use texto LITERAL do documento - não resuma
-- Se não encontrar determinado tipo de item, retorne array vazio []
-- NÃO INVENTE conteúdo que não existe no texto`;
+  "tasks": [],
+  "backlog": []
+}`;
 
   try {
     const content = await callAI(apiKey, prompt, 8192);
     const parsed = extractJsonFromResponse(content);
     
-    // Pós-processamento para normalizar valores
-    const entregas = (parsed.entregas || []).map((e: any) => ({
-      ...e,
-      tipo: isBacklog ? "backlog" : (e.tipo || "ativa"),
-      prioridade: e.prioridade || "alta"
-    }));
+    // Validar que títulos correspondem às âncoras
+    const resultado = validarContraAncoras(parsed, ancoras);
     
-    const instrucoes = (parsed.instrucoes || []).map((inst: any) => ({
-      ...inst,
-      responsavel: isConjunta ? "conjunto" : normalizarResponsavel(inst.responsavel),
-      ferramenta: normalizarFerramenta(inst.ferramenta)
-    }));
-    
-    const tasks = (parsed.tasks || []).map((t: any) => ({
-      ...t,
-      tipo: t.tipo || "validacao",
-      prioridade: t.prioridade || "alta"
-    }));
-    
-    console.log(`  Resultado fase ${faseNumero}:`);
-    console.log(`    - Etapas: ${parsed.etapas?.length || 0}`);
-    console.log(`    - Entregas: ${entregas.length}`);
-    console.log(`    - Instruções: ${instrucoes.length}`);
-    console.log(`    - Tasks: ${tasks.length}`);
-    console.log(`    - Backlog: ${parsed.backlog?.length || 0}`);
-    
-    return {
-      etapas: parsed.etapas || [],
-      entregas,
-      instrucoes,
-      tasks,
-      backlog: parsed.backlog || []
-    };
+    return resultado;
   } catch (error) {
-    console.error(`Erro ao processar fase ${faseNumero}:`, error);
-    return {
-      etapas: [{
-        numero: faseNumero,
-        titulo: `Fase ${faseNumero}`,
-        objetivo: "Erro ao processar - revisar manualmente"
-      }],
-      entregas: [],
-      instrucoes: [],
-      tasks: [],
-      backlog: []
-    };
+    console.error("Erro ao processar com IA:", error);
+    // Retornar estrutura baseada APENAS nas âncoras
+    return construirResultadoDeAncoras(ancoras);
   }
 }
 
-// Função para renumerar e garantir continuidade
-function renumberResults(
-  partial: ResultadoParcial, 
-  etapaNumero: number, 
-  entregaOffset: number
-): ResultadoParcial {
-  const entregaMap: Record<number, number> = {};
+// ═══════════════════════════════════════════════════════════════════
+// VALIDAR RESULTADO CONTRA ÂNCORAS LITERAIS
+// ═══════════════════════════════════════════════════════════════════
+
+function validarContraAncoras(resultado: any, ancoras: AncorasLiterais): ResultadoParcial {
+  console.log("=== VALIDANDO CONTRA ÂNCORAS ===");
   
-  const entregas = (partial.entregas || []).map((e: any, i: number) => {
-    const novoNumero = entregaOffset + i + 1;
-    entregaMap[e.numero_entrega] = novoNumero;
-    return {
-      ...e,
-      numero_entrega: novoNumero,
-      etapa_numero: etapaNumero
-    };
-  });
+  const etapasValidas: any[] = [];
+  const entregasValidas: any[] = [];
+  const instrucoesValidas: any[] = [];
+  const tasksValidas: any[] = [];
   
-  const instrucoes = (partial.instrucoes || []).map((inst: any) => ({
-    ...inst,
-    entrega_numero: entregaMap[inst.entrega_numero] || inst.entrega_numero
-  }));
+  // Termos proibidos (genéricos)
+  const termosProibidos = [
+    'planejamento', 'estruturação', 'canvas', 'proposta de valor',
+    'definição do problema', 'preparação inicial', 'organização do projeto',
+    'mapeamento de necessidades', 'análise de mercado', 'validação de hipóteses'
+  ];
   
-  const tasks = (partial.tasks || []).map((t: any) => ({
-    ...t,
-    entrega_numero: entregaMap[t.entrega_numero] || t.entrega_numero
-  }));
+  // Validar etapas
+  for (const etapa of (resultado.etapas || [])) {
+    const tituloLower = (etapa.titulo || '').toLowerCase();
+    
+    // Verificar se é termo proibido
+    const isProibido = termosProibidos.some(t => tituloLower.includes(t));
+    if (isProibido) {
+      console.warn(`  ❌ Etapa "${etapa.titulo}" REJEITADA - termo genérico`);
+      continue;
+    }
+    
+    // Verificar se corresponde a alguma âncora
+    const ancoraCorrespondente = ancoras.fases.find(f => 
+      tituloLower.includes(f.titulo.toLowerCase()) || 
+      f.titulo.toLowerCase().includes(tituloLower) ||
+      f.numero === etapa.numero
+    );
+    
+    if (ancoraCorrespondente || ancoras.fases.length === 0) {
+      etapasValidas.push({
+        ...etapa,
+        titulo: ancoraCorrespondente?.titulo || etapa.titulo
+      });
+      console.log(`  ✓ Etapa ${etapa.numero}: ${etapa.titulo}`);
+    } else {
+      console.warn(`  ❌ Etapa "${etapa.titulo}" REJEITADA - não encontrada no documento`);
+    }
+  }
   
-  const etapas = (partial.etapas || []).map((e: any) => ({
-    ...e,
-    numero: etapaNumero
-  }));
+  // Validar entregas
+  for (const entrega of (resultado.entregas || [])) {
+    const tituloLower = (entrega.titulo || '').toLowerCase();
+    
+    const isProibido = termosProibidos.some(t => tituloLower.includes(t));
+    if (isProibido) {
+      console.warn(`  ❌ Entrega "${entrega.titulo}" REJEITADA - termo genérico`);
+      continue;
+    }
+    
+    const ancoraCorrespondente = ancoras.entregas.find(e => 
+      tituloLower.includes(e.titulo.toLowerCase()) || 
+      e.titulo.toLowerCase().includes(tituloLower) ||
+      e.numero === entrega.numero_entrega
+    );
+    
+    if (ancoraCorrespondente || ancoras.entregas.length === 0) {
+      entregasValidas.push({
+        ...entrega,
+        titulo: ancoraCorrespondente?.titulo || entrega.titulo,
+        etapa_numero: ancoraCorrespondente?.faseNumero || entrega.etapa_numero
+      });
+      console.log(`  ✓ Entrega ${entrega.numero_entrega}: ${entrega.titulo}`);
+    } else {
+      console.warn(`  ❌ Entrega "${entrega.titulo}" REJEITADA - não encontrada no documento`);
+    }
+  }
+  
+  // Validar instruções
+  for (const instrucao of (resultado.instrucoes || [])) {
+    const ancoraCorrespondente = ancoras.passos.find(p => 
+      p.entregaNumero === instrucao.entrega_numero &&
+      (p.numero === instrucao.ordem || p.titulo.toLowerCase().includes(instrucao.titulo?.toLowerCase() || ''))
+    );
+    
+    instrucoesValidas.push({
+      ...instrucao,
+      titulo: ancoraCorrespondente?.titulo || instrucao.titulo,
+      responsavel: normalizarResponsavel(instrucao.responsavel),
+      ferramenta: normalizarFerramenta(instrucao.ferramenta)
+    });
+  }
+  
+  // Tasks dos checklists
+  for (const check of ancoras.checklists) {
+    tasksValidas.push({
+      entrega_numero: check.entregaNumero,
+      titulo: check.titulo,
+      tipo: 'validacao',
+      prioridade: 'alta',
+      instrucoes_validacao: 'Verificar se o item está funcionando corretamente'
+    });
+  }
   
   return {
-    etapas,
-    entregas,
-    instrucoes,
-    tasks,
-    backlog: partial.backlog || []
+    etapas: etapasValidas,
+    entregas: entregasValidas,
+    instrucoes: instrucoesValidas,
+    tasks: tasksValidas,
+    backlog: resultado.backlog || []
   };
 }
 
-// Handler principal
+// ═══════════════════════════════════════════════════════════════════
+// CONSTRUIR RESULTADO APENAS COM ÂNCORAS (SEM IA)
+// ═══════════════════════════════════════════════════════════════════
+
+function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial {
+  console.log("=== CONSTRUINDO RESULTADO DIRETO DAS ÂNCORAS ===");
+  
+  const etapas = ancoras.fases.map(f => ({
+    numero: f.numero,
+    titulo: f.titulo,
+    objetivo: ''
+  }));
+  
+  const entregas = ancoras.entregas.map(e => ({
+    etapa_numero: e.faseNumero,
+    numero_entrega: e.numero,
+    titulo: e.titulo,
+    descricao: '',
+    tipo: 'ativa' as const,
+    prioridade: 'alta',
+    modulo_relacionado: null
+  }));
+  
+  const instrucoes = ancoras.passos.map((p, idx) => ({
+    entrega_numero: p.entregaNumero,
+    titulo: p.titulo,
+    descricao: '',
+    responsavel: 'voce' as const,
+    ferramenta: 'outro',
+    dicas: '',
+    ordem: p.numero || idx + 1
+  }));
+  
+  const tasks = ancoras.checklists.map(c => ({
+    entrega_numero: c.entregaNumero,
+    titulo: c.titulo,
+    tipo: 'validacao',
+    prioridade: 'alta',
+    instrucoes_validacao: ''
+  }));
+  
+  const backlog = ancoras.backlog.map(b => ({
+    titulo: b.titulo,
+    descricao: '',
+    justificativa: b.secao
+  }));
+  
+  return { etapas, entregas, instrucoes, tasks, backlog };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROCESSAR MVP E CONJUNTAS SEPARADAMENTE
+// ═══════════════════════════════════════════════════════════════════
+
+function processarMVPeConjuntas(ancoras: AncorasLiterais): { mvpEntregas: any[], conjuntasEntregas: any[] } {
+  console.log("=== PROCESSANDO MVP E CONJUNTAS ===");
+  
+  // MVP como entregas sem etapa (ordem negativa para aparecer primeiro)
+  const mvpEntregas = ancoras.mvp.map((item, idx) => ({
+    etapa_numero: 0,
+    numero_entrega: -(ancoras.mvp.length - idx),
+    titulo: item.titulo,
+    descricao: 'Item do MVP - escopo acordado',
+    tipo: 'ativa' as const,
+    prioridade: 'alta',
+    modulo_relacionado: null,
+    responsavel: 'voce'
+  }));
+  console.log(`  MVP: ${mvpEntregas.length} entregas`);
+  
+  // Entregas em conjunto (sem etapa específica)
+  const conjuntasEntregas = ancoras.conjuntas.map((item, idx) => ({
+    etapa_numero: 0,
+    numero_entrega: 1000 + idx,
+    titulo: item.titulo,
+    descricao: 'Entrega em conjunto Mariana + Paula',
+    tipo: 'ativa' as const,
+    prioridade: 'media',
+    modulo_relacionado: null,
+    responsavel: 'conjunto',
+    status: item.status
+  }));
+  console.log(`  Conjuntas: ${conjuntasEntregas.length} entregas`);
+  
+  return { mvpEntregas, conjuntasEntregas };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CLONAR PASSOS PARA ENTREGAS QUE USAM MESMO FLUXO
+// ═══════════════════════════════════════════════════════════════════
+
+function clonarPassosParaEntregas(
+  instrucoes: any[], 
+  entregas: any[],
+  texto: string
+): any[] {
+  console.log("=== CLONANDO PASSOS PARA ENTREGAS ===");
+  
+  // Encontrar entrega com mais passos (modelo)
+  const passosCount: Record<number, number> = {};
+  for (const inst of instrucoes) {
+    passosCount[inst.entrega_numero] = (passosCount[inst.entrega_numero] || 0) + 1;
+  }
+  
+  let entregaModelo = 0;
+  let maxPassos = 0;
+  for (const [entrega, count] of Object.entries(passosCount)) {
+    if (count > maxPassos) {
+      maxPassos = count;
+      entregaModelo = parseInt(entrega);
+    }
+  }
+  
+  if (maxPassos < 5) {
+    console.log("  Não há entrega modelo com passos suficientes");
+    return instrucoes;
+  }
+  
+  console.log(`  Entrega modelo: ${entregaModelo} com ${maxPassos} passos`);
+  
+  // Passos da entrega modelo
+  const passosModelo = instrucoes.filter(i => i.entrega_numero === entregaModelo);
+  
+  // Verificar no texto quais entregas devem usar o mesmo fluxo
+  const regexFluxo = /(?:segui[r]?\s*(?:o\s*)?mesmo\s*fluxo|mesmos?\s*passos?|mesma\s*lógica)/gi;
+  const mencoesFluxo = texto.match(regexFluxo);
+  
+  // Entregas que NÃO têm passos próprios
+  const entregasSemPassos = entregas
+    .filter(e => !passosCount[e.numero_entrega] || passosCount[e.numero_entrega] < 3)
+    .filter(e => e.numero_entrega > entregaModelo);
+  
+  const novasInstrucoes = [...instrucoes];
+  
+  if (mencoesFluxo && mencoesFluxo.length > 0) {
+    console.log(`  Detectado: "${mencoesFluxo[0]}" - clonando para ${entregasSemPassos.length} entregas`);
+    
+    for (const entrega of entregasSemPassos) {
+      for (const passo of passosModelo) {
+        novasInstrucoes.push({
+          ...passo,
+          entrega_numero: entrega.numero_entrega
+        });
+      }
+      console.log(`    Clonado ${passosModelo.length} passos para Entrega ${entrega.numero_entrega}`);
+    }
+  }
+  
+  return novasInstrucoes;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HANDLER PRINCIPAL
+// ═══════════════════════════════════════════════════════════════════
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -548,63 +773,101 @@ serve(async (req) => {
       ? modulos_contratados.join(", ") 
       : "Não especificados";
 
-    console.log("=== INÍCIO DO PROCESSAMENTO ===");
+    console.log("═══════════════════════════════════════════════════════════════");
+    console.log("INÍCIO DO PROCESSAMENTO - MODO EXTRAÇÃO LITERAL");
+    console.log("═══════════════════════════════════════════════════════════════");
     console.log(`Tamanho do documento: ${texto.length} caracteres`);
     console.log(`Módulos contratados: ${modulosLista}`);
 
-    // PASSO 1: Identificar fases do documento
-    const fases = await identificarFases(apiKey, texto);
+    // ═══════════════════════════════════════════════════════════════
+    // PASSO 1: PRE-PARSER - Extrair âncoras ANTES de chamar a IA
+    // ═══════════════════════════════════════════════════════════════
+    const ancoras = extrairAncorasLiterais(texto);
     
-    // Dividir documento baseado nas fases
-    const sections = splitDocumentByPhases(texto, fases);
+    const temFases = ancoras.fases.length > 0;
+    const temEntregas = ancoras.entregas.length > 0;
     
-    console.log(`\n=== PROCESSANDO ${sections.length} SEÇÕES ===`);
-
-    // PASSO 2: Processar cada fase
-    const allResults: ResultadoParcial = {
-      etapas: [],
-      entregas: [],
-      instrucoes: [],
-      tasks: [],
-      backlog: []
-    };
-
-    for (let i = 0; i < sections.length; i++) {
-      const faseNumero = i + 1;
-      const entregaOffset = allResults.entregas.length;
+    console.log(`\nÂncoras encontradas: ${temFases ? ancoras.fases.length : 0} fases, ${temEntregas ? ancoras.entregas.length : 0} entregas`);
+    
+    // ═══════════════════════════════════════════════════════════════
+    // PASSO 2: Processar MVP e Conjuntas
+    // ═══════════════════════════════════════════════════════════════
+    const { mvpEntregas, conjuntasEntregas } = processarMVPeConjuntas(ancoras);
+    
+    // ═══════════════════════════════════════════════════════════════
+    // PASSO 3: Processar com IA ou apenas com âncoras
+    // ═══════════════════════════════════════════════════════════════
+    let resultado: ResultadoParcial;
+    
+    if (temFases && temEntregas) {
+      // Documento estruturado - usar IA para preencher detalhes
+      resultado = await processarComIARestrita(apiKey, texto, ancoras, modulosLista);
+    } else {
+      // Fallback: usar IA com prompt genérico restritivo
+      console.log("Documento sem estrutura clara - usando fallback IA");
+      resultado = construirResultadoDeAncoras(ancoras);
       
-      const faseResult = await processarFase(
-        apiKey,
-        sections[i],
-        faseNumero,
-        sections.length,
-        entregaOffset,
-        modulosLista,
-        contexto_cliente
-      );
-      
-      const renumbered = renumberResults(faseResult, faseNumero, entregaOffset);
-      
-      allResults.etapas.push(...renumbered.etapas);
-      allResults.entregas.push(...renumbered.entregas);
-      allResults.instrucoes.push(...renumbered.instrucoes);
-      allResults.tasks.push(...renumbered.tasks);
-      allResults.backlog.push(...renumbered.backlog);
+      // Se não encontrou nada, tentar IA
+      if (resultado.etapas.length === 0 && resultado.entregas.length === 0) {
+        resultado = await processarComIARestrita(apiKey, texto, ancoras, modulosLista);
+      }
     }
-
+    
+    // ═══════════════════════════════════════════════════════════════
+    // PASSO 4: Clonar passos se documento indicar
+    // ═══════════════════════════════════════════════════════════════
+    resultado.instrucoes = clonarPassosParaEntregas(
+      resultado.instrucoes, 
+      resultado.entregas,
+      texto
+    );
+    
+    // ═══════════════════════════════════════════════════════════════
+    // PASSO 5: Combinar tudo
+    // ═══════════════════════════════════════════════════════════════
+    
+    // Adicionar MVP e Conjuntas às entregas
+    const todasEntregas = [
+      ...mvpEntregas,
+      ...resultado.entregas,
+      ...conjuntasEntregas
+    ];
+    
+    // Adicionar backlog das âncoras
+    const todoBacklog = [
+      ...resultado.backlog,
+      ...ancoras.backlog.map(b => ({
+        titulo: b.titulo,
+        descricao: '',
+        justificativa: b.secao
+      }))
+    ];
+    
+    // Remover duplicatas de backlog
+    const backlogUnico = todoBacklog.filter((b, idx, arr) => 
+      arr.findIndex(x => x.titulo === b.titulo) === idx
+    );
+    
     // Resultado final
-    console.log("\n=== RESULTADO FINAL ===");
-    console.log(`Total de etapas: ${allResults.etapas.length}`);
-    console.log(`Total de entregas: ${allResults.entregas.length}`);
-    console.log(`Total de instruções: ${allResults.instrucoes.length}`);
-    console.log(`Total de tasks: ${allResults.tasks.length}`);
-    console.log(`Total de backlog: ${allResults.backlog.length}`);
+    console.log("\n═══════════════════════════════════════════════════════════════");
+    console.log("RESULTADO FINAL");
+    console.log("═══════════════════════════════════════════════════════════════");
+    console.log(`Total de etapas: ${resultado.etapas.length}`);
+    console.log(`Total de entregas: ${todasEntregas.length} (MVP: ${mvpEntregas.length}, Principais: ${resultado.entregas.length}, Conjuntas: ${conjuntasEntregas.length})`);
+    console.log(`Total de instruções: ${resultado.instrucoes.length}`);
+    console.log(`Total de tasks: ${resultado.tasks.length}`);
+    console.log(`Total de backlog: ${backlogUnico.length}`);
 
     const finalResult = {
-      ...allResults,
+      etapas: resultado.etapas,
+      entregas: todasEntregas,
+      instrucoes: resultado.instrucoes,
+      tasks: resultado.tasks,
+      backlog: backlogUnico,
+      // Compatibilidade com formato antigo
       entregas_sugeridas: [],
       instrucoes_sugeridas: [],
-      backlog_sugerido: allResults.backlog,
+      backlog_sugerido: backlogUnico,
     };
 
     return new Response(JSON.stringify(finalResult), {
