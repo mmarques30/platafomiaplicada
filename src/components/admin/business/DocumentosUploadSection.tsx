@@ -18,11 +18,14 @@ import {
   ChevronRight,
   FileText,
   RefreshCw,
-  Plus
+  Plus,
+  Loader2
 } from "lucide-react";
 import { useDocumentosBusiness, DocumentoBusiness } from "@/hooks/useDocumentosBusiness";
 import { useProcessarDocumentos, ResultadoProcessamento } from "@/hooks/useProcessarDocumentos";
 import { GeracaoEntregasModal } from "./GeracaoEntregasModal";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export type ModoImportacao = 'nova' | 'atualizar';
 
@@ -47,26 +50,81 @@ export function DocumentosUploadSection({
   const [modalOpen, setModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [modoImportacao, setModoImportacao] = useState<ModoImportacao>('nova');
+  const [isExtracting, setIsExtracting] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Função para extrair texto de arquivos binários (DOCX, PDF, PPTX)
+  const extrairTextoDocumento = async (file: File): Promise<string | null> => {
+    try {
+      // Converter arquivo para base64
+      const arrayBuffer = await file.arrayBuffer();
+      const base64 = btoa(
+        new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+      );
+
+      console.log(`Extraindo texto de ${file.name}, tamanho: ${file.size} bytes`);
+
+      const { data, error } = await supabase.functions.invoke('extrair-texto-documento', {
+        body: {
+          fileBase64: base64,
+          fileName: file.name,
+          fileType: file.type,
+        },
+      });
+
+      if (error) {
+        console.error('Erro na extração:', error);
+        throw error;
+      }
+
+      if (data.fallback) {
+        console.warn('Extração retornou fallback - documento não legível');
+        return null;
+      }
+
+      console.log(`Texto extraído: ${data.texto?.length || 0} caracteres`);
+      return data.texto || null;
+    } catch (error) {
+      console.error('Erro ao extrair texto:', error);
+      return null;
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
+      setIsExtracting(true);
       const url = await uploadDocumento(file, contratoId, tipo);
       
       let conteudoTexto = "";
+      
       // Para arquivos de texto, extrair conteúdo diretamente
       if (file.type === "text/plain" || file.name.endsWith(".md") || file.name.endsWith(".txt")) {
         conteudoTexto = await file.text();
+        console.log(`Texto direto extraído: ${conteudoTexto.length} caracteres`);
       }
-      // Para DOCX, tentar extrair texto (simplificado - lê como texto raw)
-      else if (file.name.endsWith(".docx") || file.name.endsWith(".doc")) {
-        // O conteúdo será processado pela IA mesmo sem texto extraído
-        // O arquivo está salvo e disponível para download
-        conteudoTexto = `[Documento: ${file.name}] - Conteúdo será processado pela IA`;
+      // Para DOCX, PDF, PPTX - usar Edge Function com Gemini
+      else if (
+        file.name.endsWith(".docx") || 
+        file.name.endsWith(".doc") ||
+        file.name.endsWith(".pdf") ||
+        file.name.endsWith(".pptx") ||
+        file.name.endsWith(".ppt")
+      ) {
+        toast.info("Extraindo texto do documento...");
+        const textoExtraido = await extrairTextoDocumento(file);
+        
+        if (textoExtraido && textoExtraido.length > 50) {
+          conteudoTexto = textoExtraido;
+          toast.success(`Texto extraído: ${textoExtraido.length} caracteres`);
+        } else {
+          // Fallback: salvar sem texto extraído
+          toast.warning("Não foi possível extrair texto automaticamente. O arquivo foi salvo.");
+          conteudoTexto = "";
+        }
       }
 
       await createDocumento.mutateAsync({
@@ -75,7 +133,7 @@ export function DocumentosUploadSection({
         tipo,
         arquivo_url: url,
         conteudo_texto: conteudoTexto || undefined,
-        para_processamento_ia: true, // Marcar como documento para IA
+        para_processamento_ia: true,
       });
 
       if (fileInputRef.current) {
@@ -83,6 +141,9 @@ export function DocumentosUploadSection({
       }
     } catch (error) {
       console.error("Erro no upload:", error);
+      toast.error("Erro ao processar arquivo");
+    } finally {
+      setIsExtracting(false);
     }
   };
 
@@ -184,7 +245,7 @@ export function DocumentosUploadSection({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".pdf,.doc,.docx,.txt,.md"
+                  accept=".pdf,.doc,.docx,.txt,.md,.pptx,.ppt"
                   onChange={handleFileUpload}
                   className="hidden"
                   id="file-upload"
@@ -193,11 +254,20 @@ export function DocumentosUploadSection({
                   variant="outline"
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={createDocumento.isPending}
+                  disabled={createDocumento.isPending || isExtracting}
                   className="h-8"
                 >
-                  <FileUp className="h-3.5 w-3.5 mr-1.5" />
-                  Upload
+                  {isExtracting ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                      Extraindo...
+                    </>
+                  ) : (
+                    <>
+                      <FileUp className="h-3.5 w-3.5 mr-1.5" />
+                      Upload
+                    </>
+                  )}
                 </Button>
               </div>
 
