@@ -416,9 +416,28 @@ export function GeracaoEntregasModal({
         .order("numero_etapa", { ascending: true });
 
       if (secoesExistentes && secoesExistentes.length > 0) {
-        // Mapear seções existentes por numero_etapa
+        // Mapear seções existentes por numero_etapa E atualizar com dados do documento
         for (const secao of secoesExistentes) {
           etapasMap[secao.numero_etapa] = secao.id;
+          
+          // Encontrar a fase correspondente do documento importado
+          const faseDocumento = etapas.find(e => e.numero === secao.numero_etapa);
+          
+          if (faseDocumento && faseDocumento.selecionada) {
+            // Atualizar a seção existente com informações ricas do documento
+            const { error } = await supabase
+              .from("etapas_business")
+              .update({
+                titulo: faseDocumento.titulo,
+                objetivo: faseDocumento.objetivo || null,
+              })
+              .eq("id", secao.id);
+
+            if (!error) {
+              console.log(`Seção ${secao.numero_etapa} atualizada: ${faseDocumento.titulo}`);
+              totalAtualizados++;
+            }
+          }
         }
         console.log(`${secoesExistentes.length} seções existentes mapeadas`);
       } else {
