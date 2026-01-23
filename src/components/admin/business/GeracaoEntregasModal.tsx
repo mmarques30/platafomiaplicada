@@ -406,25 +406,27 @@ export function GeracaoEntregasModal({
       let totalAtualizados = 0;
       let novasEtapasBacklog = 0;
 
-      // 1. Processar Etapas (NUNCA atualizar, preservar acordo)
+      // 1. Carregar seções EXISTENTES do contrato (já criadas automaticamente)
       const etapasMap: Record<number, string> = {};
       
-      const etapasSelecionadas = etapas.filter(e => e.selecionada);
-      if (etapasSelecionadas.length > 0) {
-        for (const etapa of etapasSelecionadas) {
-          // Verificar se já existe
-          const { data: existente } = await supabase
-            .from("etapas_business")
-            .select("id")
-            .eq("contrato_id", contratoId)
-            .eq("numero_etapa", etapa.numero)
-            .maybeSingle();
+      const { data: secoesExistentes } = await supabase
+        .from("etapas_business")
+        .select("id, numero_etapa")
+        .eq("contrato_id", contratoId)
+        .order("numero_etapa", { ascending: true });
 
-          if (existente) {
-            // Etapa já existe - apenas mapear, NUNCA atualizar
-            etapasMap[etapa.numero] = existente.id;
-          } else if (modoImportacao === 'nova') {
-            // Modo nova: criar etapa
+      if (secoesExistentes && secoesExistentes.length > 0) {
+        // Mapear seções existentes por numero_etapa
+        for (const secao of secoesExistentes) {
+          etapasMap[secao.numero_etapa] = secao.id;
+        }
+        console.log(`${secoesExistentes.length} seções existentes mapeadas`);
+      } else {
+        // Fallback: Se não houver seções, criar baseado nas etapas do documento (modo legado)
+        console.warn("Nenhuma seção existente encontrada, criando baseado no documento");
+        const etapasSelecionadas = etapas.filter(e => e.selecionada);
+        for (const etapa of etapasSelecionadas) {
+          if (modoImportacao === 'nova') {
             const { data: novaEtapa, error } = await supabase
               .from("etapas_business")
               .insert({
@@ -440,18 +442,6 @@ export function GeracaoEntregasModal({
             if (error) throw error;
             etapasMap[etapa.numero] = novaEtapa.id;
             totalCriados++;
-          } else {
-            // Modo atualizar: nova etapa detectada -> adicionar como backlog
-            await supabase.from("entregas_business").insert({
-              contrato_id: contratoId,
-              titulo: `Nova Fase Sugerida: ${etapa.titulo}`,
-              descricao: `Fase ${etapa.numero} detectada na atualização. Objetivo: ${etapa.objetivo || 'A definir'}`,
-              tipo: 'backlog',
-              prioridade: 'baixa',
-              justificativa_backlog: 'Nova fase detectada após acordo inicial - avaliar com mentor',
-              ordem: 999,
-            });
-            novasEtapasBacklog++;
           }
         }
       }
