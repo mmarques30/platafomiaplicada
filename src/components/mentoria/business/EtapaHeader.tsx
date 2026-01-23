@@ -44,7 +44,7 @@ export function EtapaHeader({ etapa }: EtapaHeaderProps) {
       <div className="space-y-3">
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-2xl font-semibold text-foreground">
-            Encontro {etapa.numero_etapa}: {etapa.titulo}
+            Fase {etapa.numero_etapa}: {etapa.titulo}
           </h1>
           <Badge variant="outline" className={status.className}>
             {status.label}

@@ -17,8 +17,11 @@ import {
   Trash2,
   Package,
   Lightbulb,
-  Bot
+  Bot,
+  Pencil
 } from "lucide-react";
+import { useDeleteInstrucao, type InstrucaoEtapa } from "@/hooks/useEtapasBusiness";
+import { InstrucaoFormModal } from "@/components/admin/business/InstrucaoFormModal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -121,7 +124,15 @@ interface FaseAgrupada {
 }
 
 // Componente para instrução com expansão - Extraído para evitar violação de regras de Hooks
-function InstrucaoItemAdmin({ instrucao }: { instrucao: InstrucaoComRelacionamentos }) {
+function InstrucaoItemAdmin({ 
+  instrucao, 
+  onEdit, 
+  onDelete 
+}: { 
+  instrucao: InstrucaoComRelacionamentos; 
+  onEdit: (instrucao: InstrucaoComRelacionamentos) => void;
+  onDelete: (instrucao: InstrucaoComRelacionamentos) => void;
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
   const status = statusConfig[instrucao.status as keyof typeof statusConfig] || statusConfig.pendente;
   const responsavel = responsavelConfig[instrucao.responsavel as keyof typeof responsavelConfig] || responsavelConfig.voce;
@@ -130,7 +141,7 @@ function InstrucaoItemAdmin({ instrucao }: { instrucao: InstrucaoComRelacionamen
   const temDetalhes = instrucao.prompt_sugerido || instrucao.dicas;
 
   return (
-    <div className="px-4 py-3 bg-muted/20 rounded-lg">
+    <div className="px-4 py-3 bg-muted/20 rounded-lg group relative">
       <div className="flex items-start gap-3">
         <StatusIcon className={cn("h-4 w-4 mt-0.5 shrink-0", status.className)} />
         <div className="flex-1 min-w-0">
@@ -206,6 +217,26 @@ function InstrucaoItemAdmin({ instrucao }: { instrucao: InstrucaoComRelacionamen
             </a>
           )}
         </div>
+
+        {/* Botões de ação */}
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={() => onEdit(instrucao)}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-destructive hover:text-destructive"
+            onClick={() => onDelete(instrucao)}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -214,11 +245,42 @@ function InstrucaoItemAdmin({ instrucao }: { instrucao: InstrucaoComRelacionamen
 export function InstrucoesBusinessManager({ contratoId, userId, userName }: InstrucoesBusinessManagerProps) {
   const queryClient = useQueryClient();
   const { data: instrucoes, isLoading, refetch } = useInstrucoesByContrato(contratoId);
+  const deleteInstrucao = useDeleteInstrucao();
+  
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [responsavelFilter, setResponsavelFilter] = useState<string>("all");
   const [expandedFases, setExpandedFases] = useState<Set<number>>(new Set([1, 2, 3]));
   const [expandedEntregas, setExpandedEntregas] = useState<Set<string>>(new Set());
   const [isClearing, setIsClearing] = useState(false);
+  
+  // Estados para edição e exclusão
+  const [editingInstrucao, setEditingInstrucao] = useState<InstrucaoComRelacionamentos | null>(null);
+  const [instrucaoModalOpen, setInstrucaoModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [instrucaoToDelete, setInstrucaoToDelete] = useState<InstrucaoComRelacionamentos | null>(null);
+
+  const handleEditInstrucao = (instrucao: InstrucaoComRelacionamentos) => {
+    setEditingInstrucao(instrucao);
+    setInstrucaoModalOpen(true);
+  };
+
+  const handleDeleteClick = (instrucao: InstrucaoComRelacionamentos) => {
+    setInstrucaoToDelete(instrucao);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (instrucaoToDelete && instrucaoToDelete.etapa_id) {
+      deleteInstrucao.mutate({ id: instrucaoToDelete.id, etapaId: instrucaoToDelete.etapa_id }, {
+        onSuccess: () => {
+          toast.success("Instrução excluída com sucesso");
+          setDeleteDialogOpen(false);
+          setInstrucaoToDelete(null);
+          queryClient.invalidateQueries({ queryKey: ["instrucoes-contrato", contratoId] });
+        },
+      });
+    }
+  };
 
   const handleClearAll = async () => {
     setIsClearing(true);
@@ -500,7 +562,12 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
                                   <CollapsibleContent>
                                     <div className="p-2 pt-0 space-y-2">
                                       {instrucoes.map(instrucao => (
-                                        <InstrucaoItemAdmin key={instrucao.id} instrucao={instrucao} />
+                                        <InstrucaoItemAdmin 
+                                          key={instrucao.id} 
+                                          instrucao={instrucao} 
+                                          onEdit={handleEditInstrucao}
+                                          onDelete={handleDeleteClick}
+                                        />
                                       ))}
                                     </div>
                                   </CollapsibleContent>
@@ -518,7 +585,12 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
                             </h5>
                             <div className="space-y-2">
                               {instrucoesAvulsas.map(instrucao => (
-                                <InstrucaoItemAdmin key={instrucao.id} instrucao={instrucao} />
+                                <InstrucaoItemAdmin 
+                                  key={instrucao.id} 
+                                  instrucao={instrucao} 
+                                  onEdit={handleEditInstrucao}
+                                  onDelete={handleDeleteClick}
+                                />
                               ))}
                             </div>
                           </div>
@@ -531,6 +603,57 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
             })}
         </div>
       )}
+
+      {/* Modal de edição */}
+      {editingInstrucao && (
+        <InstrucaoFormModal
+          open={instrucaoModalOpen}
+          onOpenChange={(open) => {
+            setInstrucaoModalOpen(open);
+            if (!open) {
+              setEditingInstrucao(null);
+              queryClient.invalidateQueries({ queryKey: ["instrucoes-contrato", contratoId] });
+            }
+          }}
+          etapaId={editingInstrucao.etapa_id!}
+          instrucao={{
+            id: editingInstrucao.id,
+            etapa_id: editingInstrucao.etapa_id!,
+            titulo: editingInstrucao.titulo,
+            descricao: editingInstrucao.descricao,
+            responsavel: editingInstrucao.responsavel as 'voce' | 'conjunto',
+            ferramenta: editingInstrucao.ferramenta as 'claude' | 'lovable' | 'reuniao' | 'outro' | null,
+            ordem: editingInstrucao.ordem,
+            prompt_sugerido: editingInstrucao.prompt_sugerido,
+            dicas: editingInstrucao.dicas,
+            recursos_url: editingInstrucao.recursos_url,
+            status: editingInstrucao.status as 'pendente' | 'em_andamento' | 'concluida',
+            entrega_id: editingInstrucao.entrega_id,
+          }}
+          defaultResponsavel={editingInstrucao.responsavel as 'voce' | 'conjunto'}
+        />
+      )}
+
+      {/* Dialog de confirmação de exclusão */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir instrução</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir "{instrucaoToDelete?.titulo}"? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
