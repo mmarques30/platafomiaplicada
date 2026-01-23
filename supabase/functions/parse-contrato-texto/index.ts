@@ -25,6 +25,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
+    // Prompt atualizado - NÃO extrai mais entregas_esperadas
     const systemPrompt = `Você é um assistente especializado em analisar contratos de prestação de serviços de consultoria empresarial e IA.
     
 Extraia do texto fornecido as seguintes informações e retorne APENAS um JSON válido (sem markdown, sem \`\`\`):
@@ -61,23 +62,15 @@ Extraia do texto fornecido as seguintes informações e retorne APENAS um JSON v
     "roi_projetado": 200,
     "multa_rescisao_percentual": 30,
     "valor_hora_tecnica": 250
-  },
-  "entregas_esperadas": [
-    {
-      "titulo": "Diagnóstico inicial",
-      "tipo": "documento",
-      "prazo": "Semana 1",
-      "status": "pendente"
-    }
-  ]
+  }
 }
 
-REGRAS:
+REGRAS IMPORTANTES:
 - Se algum campo não for encontrado, use null
 - Valores monetários devem ser apenas números (sem R$, sem pontos de milhar)
 - Datas no formato YYYY-MM-DD
-- modulos_selecionados deve ser um array de strings
-- entregas_esperadas deve ser um array de objetos
+- modulos_selecionados deve ser um array de strings com os módulos mencionados no contrato
+- NÃO extraia entregas ou etapas - apenas dados contratuais
 - Retorne APENAS o JSON, sem nenhum texto adicional`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -87,7 +80,7 @@ REGRAS:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Analise o seguinte texto de contrato e extraia as informações:\n\n${texto}` }

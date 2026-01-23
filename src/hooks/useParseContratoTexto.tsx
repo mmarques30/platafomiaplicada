@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// Interface atualizada - SEM entregas_esperadas (etapas são padrão, não extraídas do contrato)
 export interface ContratoParseResult {
   contratante?: {
     razao_social?: string;
@@ -35,12 +36,6 @@ export interface ContratoParseResult {
     multa_rescisao_percentual?: number;
     valor_hora_tecnica?: number;
   };
-  entregas_esperadas?: Array<{
-    titulo: string;
-    tipo?: string;
-    prazo?: string;
-    status?: string;
-  }>;
   observacoes?: string;
 }
 
