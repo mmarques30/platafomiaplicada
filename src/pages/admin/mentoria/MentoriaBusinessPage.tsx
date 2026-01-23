@@ -40,24 +40,49 @@ export default function MentoriaBusinessPage() {
   const { sessoes, createSessao, updateSessao, deleteSessao, bulkCreateSessoes } = useMentoriaSessoes(selectedUserId);
   const { data: etapas = [] } = useEtapasBusiness(contrato?.id);
 
-  // Etapas que não têm sessão vinculada
-  const etapasSemSessao = etapas.filter(
-    etapa => !sessoes.some(s => s.etapa_id === etapa.id)
-  );
+  // Calcular número de reuniões baseado no contrato
+  const totalReunioes = contrato 
+    ? (contrato.tempo_consultoria_meses || 0) * (contrato.reunioes_mensais || 1) 
+    : 0;
+  const sessoesFaltantes = Math.max(0, totalReunioes - sessoes.length);
 
   const handleSincronizarSessoes = async () => {
-    if (etapasSemSessao.length === 0 || !selectedUserId) return;
+    if (sessoesFaltantes <= 0 || !selectedUserId || !contrato) return;
     
-    const sessoesParaCriar = etapasSemSessao.map(etapa => ({
-      user_id: selectedUserId,
-      titulo: `Encontro ${etapa.numero_etapa}: ${etapa.titulo}`,
-      data_sessao: etapa.data_prevista 
-        ? new Date(etapa.data_prevista + 'T10:00:00').toISOString() 
-        : new Date().toISOString(),
-      status: 'agendada' as const,
-      notas: etapa.objetivo || '',
-      etapa_id: etapa.id,
-    }));
+    const dataInicio = contrato.data_inicio 
+      ? new Date(contrato.data_inicio) 
+      : new Date();
+    
+    const sessoesParaCriar = [];
+    const reunioesPorMes = contrato.reunioes_mensais || 1;
+    const totalMeses = contrato.tempo_consultoria_meses || 0;
+    
+    let sessaoNumero = sessoes.length + 1;
+    
+    for (let mes = 0; mes < totalMeses; mes++) {
+      for (let reuniao = 0; reuniao < reunioesPorMes; reuniao++) {
+        if (sessaoNumero > totalReunioes) break;
+        
+        // Calcular data da sessão (distribuir reuniões no mês)
+        const dataSessao = new Date(dataInicio);
+        dataSessao.setMonth(dataSessao.getMonth() + mes);
+        if (reunioesPorMes > 1) {
+          dataSessao.setDate(dataSessao.getDate() + (reuniao * Math.floor(30 / reunioesPorMes)));
+        }
+        dataSessao.setHours(10, 0, 0, 0);
+        
+        sessoesParaCriar.push({
+          user_id: selectedUserId,
+          titulo: `Reunião ${sessaoNumero}`,
+          data_sessao: dataSessao.toISOString(),
+          status: 'agendada' as const,
+          notas: `Mês ${mes + 1} - Encontro ${reuniao + 1}`,
+          etapa_id: null,
+        });
+        
+        sessaoNumero++;
+      }
+    }
 
     try {
       await bulkCreateSessoes(sessoesParaCriar);
@@ -191,17 +216,22 @@ export default function MentoriaBusinessPage() {
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <h2 className="text-lg font-semibold">Sessões</h2>
-                <Badge variant="secondary" className="text-xs">{sessoes.length}</Badge>
+                <Badge variant="secondary" className="text-xs">{sessoes.length}/{totalReunioes}</Badge>
+                {contrato && (
+                  <span className="text-xs text-muted-foreground">
+                    ({contrato.tempo_consultoria_meses}m × {contrato.reunioes_mensais} reunião/mês)
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2">
-                {etapasSemSessao.length > 0 && (
+                {sessoesFaltantes > 0 && contrato && (
                   <Button 
                     variant="outline" 
                     size="sm" 
                     onClick={handleSincronizarSessoes}
                   >
                     <Sparkles className="h-4 w-4 mr-1" />
-                    Gerar {etapasSemSessao.length} Sessões
+                    Gerar {sessoesFaltantes} Sessões
                   </Button>
                 )}
                 <Button size="sm" onClick={() => { setEditingSessao(undefined); setSessaoModalOpen(true); }}>
