@@ -210,14 +210,8 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
       }));
     }
 
-    if (parsed.entregas_esperadas?.length) {
-      setEntregas(parsed.entregas_esperadas.map(e => ({
-        titulo: e.titulo,
-        tipo: e.tipo || "implementacao",
-        prazo: e.prazo,
-        status: (e.status as EntregaEsperada["status"]) || "pendente",
-      })));
-    }
+    // NOTA: Etapas/entregas NÃO são mais extraídas do contrato
+    // Elas são geradas como padrão a partir da quantidade de módulos
   };
 
   const handleSave = () => {
