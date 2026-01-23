@@ -33,12 +33,15 @@ serve(async (req) => {
       data_inicio = new Date().toISOString(),
     } = contrato;
 
-    // Calcular total de etapas baseado em reuniões
-    const totalEtapas = reunioes_mensais * tempo_consultoria_meses;
+    // Calcular total de FASES baseado na estrutura do projeto (não em reuniões)
+    // Fases são etapas do projeto, não encontros/sessões
+    const totalFases = fases_projeto.length > 0 
+      ? fases_projeto.length 
+      : Math.min(6, Math.max(3, tempo_consultoria_meses)); // 3-6 fases
     
-    // Calcular duração de cada etapa em dias
+    // Calcular duração de cada fase em dias
     const duracaoProjeto = tempo_consultoria_meses * 30; // em dias
-    const diasPorEtapa = Math.floor(duracaoProjeto / totalEtapas);
+    const diasPorFase = Math.floor(duracaoProjeto / totalFases);
 
     // Preparar contexto para IA
     const modulosTexto = modulos_selecionados.length > 0 
@@ -53,31 +56,33 @@ serve(async (req) => {
       ? entregas_esperadas.map((e: any) => e.titulo || e).join(', ')
       : 'Entregas definidas durante o projeto';
 
-    const prompt = `Você é um especialista em consultoria de IA para empresas. Crie um roadmap detalhado de ${totalEtapas} etapas para um projeto de consultoria.
+    const prompt = `Você é um especialista em consultoria de IA para empresas. Crie um roadmap de ${totalFases} FASES para um projeto de consultoria.
+
+IMPORTANTE: FASES são etapas do projeto (ex: Diagnóstico, Implementação, Validação), NÃO são encontros/reuniões.
 
 CONTEXTO DO PROJETO:
 - Empresa: ${nome_empresa}
 - Duração: ${tempo_consultoria_meses} meses
-- Reuniões: ${reunioes_mensais} por mês (total: ${totalEtapas} encontros)
 - Módulos contratados: ${modulosTexto}
 - Contexto da transformação: ${contexto_transformacao || 'Implementação de IA nos processos'}
 - Principais dores: ${doresTexto}
 - Entregas esperadas: ${entregasTexto}
 
 REGRAS:
-1. A primeira etapa SEMPRE deve ser "Kickoff e Alinhamento Estratégico"
-2. A última etapa SEMPRE deve ser "Encerramento e Handoff"
-3. Distribua os módulos ao longo das etapas de forma lógica
-4. Cada etapa deve ter 2-3 marcos para a próxima etapa
+1. A primeira fase SEMPRE deve ser "Diagnóstico e Alinhamento Estratégico"
+2. A última fase SEMPRE deve ser "Validação e Handoff"
+3. Distribua os módulos ao longo das fases de forma lógica
+4. Cada fase deve ter 2-3 marcos para a próxima fase
 5. Os objetivos devem ser específicos e mensuráveis
+6. Fases típicas: Diagnóstico, Planejamento, Implementação, Testes, Validação, Handoff
 
 Responda APENAS com um JSON válido no seguinte formato (sem markdown, sem explicações):
 {
   "etapas": [
     {
       "numero_etapa": 1,
-      "titulo": "Título da Etapa",
-      "objetivo": "Objetivo específico desta etapa",
+      "titulo": "Título da Fase",
+      "objetivo": "Objetivo específico desta fase",
       "marcos_proxima_etapa": ["Marco 1", "Marco 2"]
     }
   ]
@@ -148,11 +153,11 @@ Responda APENAS com um JSON válido no seguinte formato (sem markdown, sem expli
     // Parse do JSON
     const parsed = JSON.parse(cleanContent);
 
-    // Adicionar datas calculadas a cada etapa
+    // Adicionar datas calculadas a cada fase
     const dataInicio = new Date(data_inicio);
-    const etapasComDatas = parsed.etapas.map((etapa: any, index: number) => {
+    const fasesComDatas = parsed.etapas.map((etapa: any, index: number) => {
       const dataPrevista = new Date(dataInicio);
-      dataPrevista.setDate(dataPrevista.getDate() + (index * diasPorEtapa));
+      dataPrevista.setDate(dataPrevista.getDate() + (index * diasPorFase));
       
       return {
         ...etapa,
@@ -161,13 +166,15 @@ Responda APENAS com um JSON válido no seguinte formato (sem markdown, sem expli
       };
     });
 
+    console.log(`Geradas ${fasesComDatas.length} fases para projeto de ${tempo_consultoria_meses} meses`);
+
     return new Response(
       JSON.stringify({ 
         success: true, 
-        etapas: etapasComDatas,
+        etapas: fasesComDatas,
         meta: {
-          total_etapas: totalEtapas,
-          dias_por_etapa: diasPorEtapa,
+          total_fases: totalFases,
+          dias_por_fase: diasPorFase,
           duracao_meses: tempo_consultoria_meses
         }
       }),

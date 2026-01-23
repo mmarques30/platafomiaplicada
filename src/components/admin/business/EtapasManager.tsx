@@ -62,7 +62,7 @@ function EtapaCard({ etapa, onEdit }: { etapa: EtapaBusiness; onEdit: () => void
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-sm font-medium text-muted-foreground">
-                Encontro {etapa.numero_etapa}
+                Fase {etapa.numero_etapa}
               </span>
               <Badge variant="outline" className={cn("text-xs", status.className)}>
                 {status.label}
@@ -148,7 +148,7 @@ function NovaEtapaDialog({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nova Etapa - Encontro {proximoNumero}</DialogTitle>
+          <DialogTitle>Nova Fase {proximoNumero}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
@@ -223,7 +223,7 @@ function EditEtapaDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Editar Encontro {etapa.numero_etapa}</DialogTitle>
+          <DialogTitle>Editar Fase {etapa.numero_etapa}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
@@ -337,7 +337,7 @@ export function EtapasManager({ contratoId: propContratoId, userId, userName }: 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-medium">Etapas do Contrato</h3>
+          <h3 className="font-medium">Fases do Projeto</h3>
           {userName && (
             <p className="text-sm text-muted-foreground">{userName}</p>
           )}

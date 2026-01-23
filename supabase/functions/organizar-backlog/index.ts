@@ -12,9 +12,25 @@ serve(async (req) => {
   }
 
   try {
-    const { texto } = await req.json();
+    console.log("=== ORGANIZAR-BACKLOG EDGE FUNCTION INICIADA ===");
+    console.log("Request method:", req.method);
+    
+    let body;
+    try {
+      body = await req.json();
+      console.log("Body recebido:", JSON.stringify(body).substring(0, 200));
+    } catch (parseError) {
+      console.error("Erro ao parsear body:", parseError);
+      return new Response(
+        JSON.stringify({ error: "Body inválido", items: [] }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { texto } = body;
 
     if (!texto || !texto.trim()) {
+      console.log("Texto vazio recebido, retornando array vazio");
       return new Response(
         JSON.stringify({ items: [] }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -23,11 +39,12 @@ serve(async (req) => {
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
+      console.error("LOVABLE_API_KEY não encontrada nas variáveis de ambiente");
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
-    console.log("=== ORGANIZANDO BACKLOG ===");
     console.log(`Texto recebido: ${texto.length} caracteres`);
+    console.log(`Preview: ${texto.substring(0, 100)}...`);
 
     // Prompt ultra-restritivo para APENAS organizar, não inventar
     const prompt = `VOCÊ É UM ORGANIZADOR DE LISTA - NÃO UM CRIADOR.
