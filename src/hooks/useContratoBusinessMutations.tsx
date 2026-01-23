@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { EntregaEsperada } from "./useContratosBusiness";
 import { Json } from "@/integrations/supabase/types";
+import { addMonths, format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export interface ContratoBusinessInput {
   user_id: string;
@@ -30,6 +32,51 @@ const entregasToJson = (entregas: EntregaEsperada[]): Json => {
   })) as unknown as Json;
 };
 
+// Função para gerar seções mensais automaticamente
+async function gerarSecoesAutomaticas(
+  contratoId: string, 
+  dataInicio: string | null | undefined, 
+  totalMeses: number
+): Promise<void> {
+  // Verificar se já existem seções para este contrato
+  const { data: existentes } = await supabase
+    .from("etapas_business")
+    .select("id")
+    .eq("contrato_id", contratoId);
+
+  if (existentes && existentes.length > 0) {
+    console.log("Seções já existem para este contrato, pulando geração automática");
+    return;
+  }
+
+  const dataBase = dataInicio ? new Date(dataInicio) : new Date();
+  const secoesParaCriar = [];
+
+  for (let mes = 1; mes <= totalMeses; mes++) {
+    const dataPrevista = addMonths(dataBase, mes - 1);
+    const mesFormatado = format(dataPrevista, "MMM/yyyy", { locale: ptBR });
+    
+    secoesParaCriar.push({
+      contrato_id: contratoId,
+      numero_etapa: mes,
+      titulo: `Mês ${mes} - ${mesFormatado}`,
+      objetivo: `Atividades e entregas do mês ${mes} da consultoria`,
+      status: 'pendente',
+      data_prevista: format(dataPrevista, 'yyyy-MM-dd'),
+    });
+  }
+
+  const { error } = await supabase
+    .from("etapas_business")
+    .insert(secoesParaCriar);
+
+  if (error) {
+    console.error("Erro ao gerar seções automáticas:", error);
+  } else {
+    console.log(`${totalMeses} seções mensais criadas automaticamente`);
+  }
+}
+
 export function useContratoBusinessMutations() {
   const queryClient = useQueryClient();
 
@@ -48,6 +95,16 @@ export function useContratoBusinessMutations() {
         .single();
 
       if (error) throw error;
+      
+      // Gerar seções mensais automaticamente após criar contrato
+      if (result && data.tempo_consultoria_meses > 0) {
+        await gerarSecoesAutomaticas(
+          result.id,
+          data.data_inicio,
+          data.tempo_consultoria_meses
+        );
+      }
+      
       return result;
     },
     onSuccess: (_, variables) => {
@@ -55,7 +112,7 @@ export function useContratoBusinessMutations() {
       queryClient.invalidateQueries({ queryKey: ["etapas-business"] });
       toast({
         title: "Contrato criado!",
-        description: "O contrato foi criado com sucesso.",
+        description: "Contrato e seções mensais criados com sucesso.",
       });
     },
     onError: (error) => {
