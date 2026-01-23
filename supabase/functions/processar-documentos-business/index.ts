@@ -179,69 +179,127 @@ REGRAS GERAIS:
 
       cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
 
-      // Step 3: Attempt parse with error handling
+      // Step 3: Sanitize problematic characters before parsing
+      cleaned = cleaned
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // Remove control chars except \n, \r, \t
+        .replace(/\r\n/g, "\\n") // Normalize line endings
+        .replace(/\r/g, "\\n")
+        .replace(/\n/g, "\\n") // Escape actual newlines in JSON
+        .replace(/\t/g, "\\t"); // Escape tabs
+
+      // Step 4: Attempt parse with error handling
       try {
         return JSON.parse(cleaned);
       } catch (e) {
-        // Step 4: Try to fix common issues
+        console.log("First parse failed, attempting recovery...");
+        
+        // Step 5: More aggressive cleanup
         cleaned = cleaned
           .replace(/,\s*}/g, "}") // Remove trailing commas before }
           .replace(/,\s*]/g, "]") // Remove trailing commas before ]
-          .replace(/[\x00-\x1F\x7F]/g, "") // Remove control characters
-          .replace(/\n/g, " ") // Replace newlines with spaces
-          .replace(/\r/g, "") // Remove carriage returns
-          .replace(/\t/g, " "); // Replace tabs with spaces
+          .replace(/\\n/g, " ") // Replace escaped newlines with spaces for safer parsing
+          .replace(/\\t/g, " ") // Replace escaped tabs
+          .replace(/\\"/g, "'") // Convert escaped quotes to single quotes (lossy but safer)
+          .replace(/[\u2018\u2019]/g, "'") // Smart single quotes
+          .replace(/[\u201C\u201D]/g, '"') // Smart double quotes
+          .replace(/\u2026/g, "...") // Ellipsis
+          .replace(/[\u2013\u2014]/g, "-"); // Em/en dashes
 
         try {
           return JSON.parse(cleaned);
         } catch (e2) {
-          // Step 5: Try to extract partial valid JSON by truncating at last complete element
-          // Find the last valid closing bracket/brace sequence
-          let lastValidPos = -1;
-          let braceCount = 0;
-          let bracketCount = 0;
-          let inString = false;
-          let escapeNext = false;
+          console.log("Second parse failed, attempting structural recovery...");
+          
+          // Step 6: Try to rebuild a valid JSON structure from partial data
+          // Find all complete array elements for each section
+          const result: any = {
+            etapas: [],
+            entregas: [],
+            instrucoes: [],
+            tasks: [],
+            backlog: []
+          };
 
-          for (let i = 0; i < cleaned.length; i++) {
-            const char = cleaned[i];
+          // Extract each section separately
+          const sections = ['etapas', 'entregas', 'instrucoes', 'tasks', 'backlog'];
+          
+          for (const section of sections) {
+            const sectionRegex = new RegExp(`"${section}"\\s*:\\s*\\[`, 'i');
+            const match = cleaned.match(sectionRegex);
             
-            if (escapeNext) {
-              escapeNext = false;
-              continue;
-            }
-            
-            if (char === '\\' && inString) {
-              escapeNext = true;
-              continue;
-            }
-            
-            if (char === '"' && !escapeNext) {
-              inString = !inString;
-              continue;
-            }
-            
-            if (!inString) {
-              if (char === '{') braceCount++;
-              else if (char === '}') {
-                braceCount--;
-                if (braceCount === 0) lastValidPos = i;
+            if (match && match.index !== undefined) {
+              const startIdx = match.index + match[0].length;
+              let depth = 1;
+              let endIdx = startIdx;
+              let inString = false;
+              let escapeNext = false;
+
+              for (let i = startIdx; i < cleaned.length && depth > 0; i++) {
+                const char = cleaned[i];
+                
+                if (escapeNext) {
+                  escapeNext = false;
+                  continue;
+                }
+                
+                if (char === '\\') {
+                  escapeNext = true;
+                  continue;
+                }
+                
+                if (char === '"') {
+                  inString = !inString;
+                  continue;
+                }
+                
+                if (!inString) {
+                  if (char === '[') depth++;
+                  else if (char === ']') {
+                    depth--;
+                    if (depth === 0) endIdx = i;
+                  }
+                }
               }
-              else if (char === '[') bracketCount++;
-              else if (char === ']') bracketCount--;
+
+              if (endIdx > startIdx) {
+                const arrayContent = cleaned.substring(startIdx, endIdx);
+                // Try to parse individual objects from the array
+                const objectRegex = /\{[^{}]*\}/g;
+                let objMatch;
+                
+                while ((objMatch = objectRegex.exec(arrayContent)) !== null) {
+                  try {
+                    // Clean the individual object
+                    let objStr = objMatch[0]
+                      .replace(/'/g, "\\'") // Escape single quotes
+                      .replace(/\\'/g, "'"); // But not double-escaped
+                    
+                    const obj = JSON.parse(objStr);
+                    result[section].push(obj);
+                  } catch (objErr) {
+                    // Skip malformed objects
+                    console.log(`Skipping malformed ${section} object`);
+                  }
+                }
+              }
             }
           }
 
-          if (lastValidPos > 0) {
-            const truncated = cleaned.substring(0, lastValidPos + 1);
-            try {
-              return JSON.parse(truncated);
-            } catch (e3) {
-              console.error("Failed to parse truncated JSON:", e3);
-            }
+          // Check if we recovered any data
+          const hasData = Object.values(result).some((arr: any) => arr.length > 0);
+          
+          if (hasData) {
+            console.log("Recovered partial data:", {
+              etapas: result.etapas.length,
+              entregas: result.entregas.length,
+              instrucoes: result.instrucoes.length,
+              tasks: result.tasks.length,
+              backlog: result.backlog.length
+            });
+            return result;
           }
 
-          throw new Error(`JSON parsing failed: ${e2}`);
+          throw new Error(`JSON parsing failed after all recovery attempts: ${e2}`);
         }
       }
     }
