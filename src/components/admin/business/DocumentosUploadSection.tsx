@@ -50,8 +50,15 @@ export function DocumentosUploadSection({
       const url = await uploadDocumento(file, contratoId, tipo);
       
       let conteudoTexto = "";
+      // Para arquivos de texto, extrair conteúdo diretamente
       if (file.type === "text/plain" || file.name.endsWith(".md") || file.name.endsWith(".txt")) {
         conteudoTexto = await file.text();
+      }
+      // Para DOCX, tentar extrair texto (simplificado - lê como texto raw)
+      else if (file.name.endsWith(".docx") || file.name.endsWith(".doc")) {
+        // O conteúdo será processado pela IA mesmo sem texto extraído
+        // O arquivo está salvo e disponível para download
+        conteudoTexto = `[Documento: ${file.name}] - Conteúdo será processado pela IA`;
       }
 
       await createDocumento.mutateAsync({

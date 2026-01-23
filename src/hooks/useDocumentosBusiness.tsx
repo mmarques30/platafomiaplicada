@@ -105,10 +105,11 @@ export function useDocumentosBusiness(contratoId?: string) {
 
   const uploadDocumento = async (file: File, contratoId: string, tipo: DocumentoInput['tipo']) => {
     const fileExt = file.name.split('.').pop();
-    const fileName = `${contratoId}/${Date.now()}.${fileExt}`;
+    const fileName = `${contratoId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     
-    const { error: uploadError, data: uploadData } = await supabase.storage
-      .from("diagnosticos-mentoria")
+    // Usar o bucket correto para documentos business
+    const { error: uploadError } = await supabase.storage
+      .from("contratos-business")
       .upload(fileName, file);
 
     if (uploadError) {
@@ -116,11 +117,8 @@ export function useDocumentosBusiness(contratoId?: string) {
       throw uploadError;
     }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from("diagnosticos-mentoria")
-      .getPublicUrl(fileName);
-
-    return publicUrl;
+    // Retornar o path relativo (não a URL pública) para uso com signed URLs
+    return fileName;
   };
 
   return {

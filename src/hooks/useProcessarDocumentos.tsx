@@ -2,6 +2,57 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Nova estrutura hierárquica
+export interface EtapaSugerida {
+  numero: number;
+  titulo: string;
+  objetivo?: string;
+}
+
+export interface EntregaSugeridaV2 {
+  etapa_numero: number;
+  numero_entrega: number;
+  titulo: string;
+  descricao: string;
+  tipo: 'ativa' | 'backlog';
+  prioridade: 'baixa' | 'media' | 'alta' | 'urgente';
+  modulo_relacionado?: string;
+}
+
+export interface InstrucaoSugeridaV2 {
+  entrega_numero: number;
+  titulo: string;
+  descricao?: string;
+  responsavel: 'voce' | 'mentor' | 'conjunto';
+  ferramenta?: string;
+  dicas?: string;
+  ordem: number;
+}
+
+export interface TaskSugerida {
+  entrega_numero: number;
+  titulo: string;
+  tipo: 'validacao' | 'aprovacao' | 'revisao' | 'homologacao' | 'assinatura' | 'feedback';
+  prioridade: 'baixa' | 'media' | 'alta' | 'urgente';
+  instrucoes_validacao?: string;
+}
+
+export interface BacklogItem {
+  titulo: string;
+  descricao: string;
+  justificativa: string;
+}
+
+// Interface principal do resultado
+export interface ResultadoProcessamentoV2 {
+  etapas: EtapaSugerida[];
+  entregas: EntregaSugeridaV2[];
+  instrucoes: InstrucaoSugeridaV2[];
+  tasks: TaskSugerida[];
+  backlog: BacklogItem[];
+}
+
+// Manter compatibilidade com formato antigo
 export interface EntregaSugerida {
   titulo: string;
   descricao: string;
@@ -30,14 +81,11 @@ export interface InstrucaoSugerida {
   }[];
 }
 
-export interface ResultadoProcessamento {
+export interface ResultadoProcessamento extends ResultadoProcessamentoV2 {
+  // Campos antigos para compatibilidade
   entregas_sugeridas: EntregaSugerida[];
   instrucoes_sugeridas: InstrucaoSugerida[];
-  backlog_sugerido: {
-    titulo: string;
-    descricao: string;
-    justificativa: string;
-  }[];
+  backlog_sugerido: BacklogItem[];
 }
 
 export function useProcessarDocumentos() {
