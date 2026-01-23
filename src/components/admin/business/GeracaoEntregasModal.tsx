@@ -96,6 +96,7 @@ interface InstrucaoSelecionada {
   entrega_numero: number;
   titulo: string;
   descricao?: string;
+  prompt_sugerido?: string;
   responsavel: string;
   ferramenta?: string;
   dicas?: string;
@@ -534,6 +535,7 @@ export function GeracaoEntregasModal({
               .from("instrucoes_etapa")
               .update({
                 descricao: instrucao.descricao,
+                prompt_sugerido: instrucao.prompt_sugerido || null,
                 dicas: instrucao.dicas,
                 ferramenta: normalizarFerramenta(instrucao.ferramenta),
                 // Manter: status, ordem original, responsavel
@@ -554,6 +556,7 @@ export function GeracaoEntregasModal({
             entrega_id: entregaId,
             titulo: instrucao.titulo,
             descricao: instrucao.descricao,
+            prompt_sugerido: instrucao.prompt_sugerido || null,
             responsavel: instrucao.responsavel,
             ferramenta: normalizarFerramenta(instrucao.ferramenta),
             dicas: instrucao.dicas,
