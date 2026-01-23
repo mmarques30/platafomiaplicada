@@ -6,9 +6,10 @@ import { useAdminViewContext, AdminViewMode } from "@/contexts/AdminViewContext"
 export type UserPlan = "academy" | "skills" | "business" | null;
 
 export function useUserPlan() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
-  const { data, isLoading } = useQuery({
+  // Usar isPending em vez de isLoading - isPending é true quando query está disabled
+  const { data, isPending } = useQuery({
     queryKey: ["user-plan", user?.id],
     queryFn: async () => {
       if (!user) return { plan: null, isVisitante: false };
@@ -32,6 +33,10 @@ export function useUserPlan() {
 
   const plan = data?.plan ?? null;
   const isProfileVisitante = data?.isVisitante ?? false;
+
+  // Loading inclui auth + query pending
+  const isLoading = authLoading || isPending;
+
 
   // Hierarquia de acesso PARALELA:
   // Academy = base para todos
