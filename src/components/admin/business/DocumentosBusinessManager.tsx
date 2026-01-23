@@ -55,7 +55,8 @@ const getIconComponent = (icone: string) => {
 };
 
 export function DocumentosBusinessManager({ contratoId, userId, userName }: DocumentosBusinessManagerProps) {
-  const { documentos, isLoading: isLoadingDocs, createDocumento, deleteDocumento, uploadDocumento } = useDocumentosBusiness(contratoId);
+  // Buscar apenas documentos para download do mentorado (não para IA)
+  const { documentos, isLoading: isLoadingDocs, createDocumento, deleteDocumento, uploadDocumento } = useDocumentosBusiness(contratoId, false);
   const { links, isLoading: isLoadingLinks, createLink, updateLink, deleteLink } = useLinksBusiness(contratoId);
 
   const [uploadingFile, setUploadingFile] = useState(false);

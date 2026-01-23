@@ -1251,6 +1251,7 @@ export type Database = {
           contrato_id: string | null
           created_at: string | null
           id: string
+          para_processamento_ia: boolean | null
           processado: boolean | null
           resultado_ia: Json | null
           tipo: string | null
@@ -1262,6 +1263,7 @@ export type Database = {
           contrato_id?: string | null
           created_at?: string | null
           id?: string
+          para_processamento_ia?: boolean | null
           processado?: boolean | null
           resultado_ia?: Json | null
           tipo?: string | null
@@ -1273,6 +1275,7 @@ export type Database = {
           contrato_id?: string | null
           created_at?: string | null
           id?: string
+          para_processamento_ia?: boolean | null
           processado?: boolean | null
           resultado_ia?: Json | null
           tipo?: string | null
