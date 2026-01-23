@@ -15,7 +15,9 @@ import {
   Loader2,
   ExternalLink,
   Trash2,
-  Package
+  Package,
+  Lightbulb,
+  Bot
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,6 +118,97 @@ interface FaseAgrupada {
   etapa: InstrucaoComRelacionamentos['etapas_business'];
   entregas: Record<string, EntregaAgrupada>;
   instrucoesAvulsas: InstrucaoComRelacionamentos[];
+}
+
+// Componente para instrução com expansão - Extraído para evitar violação de regras de Hooks
+function InstrucaoItemAdmin({ instrucao }: { instrucao: InstrucaoComRelacionamentos }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const status = statusConfig[instrucao.status as keyof typeof statusConfig] || statusConfig.pendente;
+  const responsavel = responsavelConfig[instrucao.responsavel as keyof typeof responsavelConfig] || responsavelConfig.voce;
+  const StatusIcon = status.icon;
+  
+  const temDetalhes = instrucao.prompt_sugerido || instrucao.dicas;
+
+  return (
+    <div className="px-4 py-3 bg-muted/20 rounded-lg">
+      <div className="flex items-start gap-3">
+        <StatusIcon className={cn("h-4 w-4 mt-0.5 shrink-0", status.className)} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-sm">{instrucao.titulo}</span>
+            <Badge variant="outline" className={cn("text-xs", responsavel.className)}>
+              {responsavel.label}
+            </Badge>
+            {instrucao.ferramenta && (
+              <Badge variant="secondary" className="text-xs">
+                {instrucao.ferramenta}
+              </Badge>
+            )}
+          </div>
+          {instrucao.descricao && (
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+              {instrucao.descricao}
+            </p>
+          )}
+
+          {/* Botão de expansão para detalhes */}
+          {temDetalhes && (
+            <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="mt-2 h-7 px-2 text-xs">
+                  <ChevronDown className={cn(
+                    "h-3 w-3 mr-1 transition-transform",
+                    isExpanded && "rotate-180"
+                  )} />
+                  {isExpanded ? "Menos detalhes" : "Mais detalhes"}
+                </Button>
+              </CollapsibleTrigger>
+              
+              <CollapsibleContent className="mt-3 space-y-3">
+                {instrucao.prompt_sugerido && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Bot className="h-4 w-4 text-primary" />
+                      <span className="text-xs font-medium text-primary uppercase">
+                        Prompt Sugerido
+                      </span>
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap text-foreground/80">
+                      {instrucao.prompt_sugerido}
+                    </p>
+                  </div>
+                )}
+                
+                {instrucao.dicas && (
+                  <div className="flex items-start gap-2 text-sm bg-accent/10 border border-accent/30 rounded-lg p-3">
+                    <Lightbulb className="h-4 w-4 text-accent-foreground mt-0.5 shrink-0" />
+                    <div>
+                      <span className="text-xs font-medium text-accent-foreground uppercase block mb-1">
+                        Dicas
+                      </span>
+                      <span className="text-foreground/80">{instrucao.dicas}</span>
+                    </div>
+                  </div>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+          
+          {instrucao.recursos_url && (
+            <a 
+              href={instrucao.recursos_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-primary hover:underline flex items-center gap-1 mt-2"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Ver recurso
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function InstrucoesBusinessManager({ contratoId, userId, userName }: InstrucoesBusinessManagerProps) {
@@ -226,47 +319,6 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
   const totalInstrucoes = instrucoes?.length || 0;
   const concluidas = instrucoes?.filter(i => i.status === 'concluida').length || 0;
   const emAndamento = instrucoes?.filter(i => i.status === 'em_andamento').length || 0;
-
-  const renderInstrucao = (instrucao: InstrucaoComRelacionamentos) => {
-    const status = statusConfig[instrucao.status as keyof typeof statusConfig] || statusConfig.pendente;
-    const responsavel = responsavelConfig[instrucao.responsavel as keyof typeof responsavelConfig] || responsavelConfig.voce;
-    const StatusIcon = status.icon;
-
-    return (
-      <div key={instrucao.id} className="px-4 py-3 flex items-start gap-3 bg-muted/20 rounded-lg">
-        <StatusIcon className={cn("h-4 w-4 mt-0.5 shrink-0", status.className)} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-medium text-sm">{instrucao.titulo}</span>
-            <Badge variant="outline" className={cn("text-xs", responsavel.className)}>
-              {responsavel.label}
-            </Badge>
-            {instrucao.ferramenta && (
-              <Badge variant="secondary" className="text-xs">
-                {instrucao.ferramenta}
-              </Badge>
-            )}
-          </div>
-          {instrucao.descricao && (
-            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-              {instrucao.descricao}
-            </p>
-          )}
-          {instrucao.recursos_url && (
-            <a 
-              href={instrucao.recursos_url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
-            >
-              <ExternalLink className="h-3 w-3" />
-              Ver recurso
-            </a>
-          )}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="space-y-4">
@@ -447,7 +499,9 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
                                   </CollapsibleTrigger>
                                   <CollapsibleContent>
                                     <div className="p-2 pt-0 space-y-2">
-                                      {instrucoes.map(instrucao => renderInstrucao(instrucao))}
+                                      {instrucoes.map(instrucao => (
+                                        <InstrucaoItemAdmin key={instrucao.id} instrucao={instrucao} />
+                                      ))}
                                     </div>
                                   </CollapsibleContent>
                                 </div>
@@ -463,7 +517,9 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
                               Instruções sem entrega vinculada
                             </h5>
                             <div className="space-y-2">
-                              {instrucoesAvulsas.map(instrucao => renderInstrucao(instrucao))}
+                              {instrucoesAvulsas.map(instrucao => (
+                                <InstrucaoItemAdmin key={instrucao.id} instrucao={instrucao} />
+                              ))}
                             </div>
                           </div>
                         )}
