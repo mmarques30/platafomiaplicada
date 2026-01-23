@@ -27,6 +27,7 @@ import {
   Users,
   Zap
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { ResultadoProcessamento } from "@/hooks/useProcessarDocumentos";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -637,7 +638,7 @@ export function GeracaoEntregasModal({
     return cores[numero] || cores[1];
   };
 
-  // Calcular totais por fase
+  // Calcular totais por fase com progresso
   const getTotaisFase = (faseNumero: number) => {
     const entregasFase = entregasPrincipais.filter(e => e.etapa_numero === faseNumero);
     const instrucoesFase = instrucoes.filter(i => 
@@ -646,11 +647,49 @@ export function GeracaoEntregasModal({
     const tasksFase = tasks.filter(t =>
       entregasFase.some(e => e.numero_entrega === t.entrega_numero)
     );
+    
+    // Contar itens concluídos usando dados existentes do banco
+    const entregasConcluidas = entregasFase.filter(e => {
+      const existente = dadosExistentes.entregas.find(ex => ex.titulo === e.titulo);
+      return existente?.status === 'concluida';
+    }).length;
+    
+    const instrucoesConcluidas = instrucoesFase.filter(i => {
+      const entrega = entregasFase.find(e => e.numero_entrega === i.entrega_numero);
+      const entregaExistente = entrega 
+        ? dadosExistentes.entregas.find(ex => ex.titulo === entrega.titulo)
+        : null;
+      if (!entregaExistente) return false;
+      const instrucaoExistente = dadosExistentes.instrucoes.find(
+        ix => ix.entrega_id === entregaExistente.id && ix.titulo === i.titulo
+      );
+      return instrucaoExistente?.status === 'concluida';
+    }).length;
+    
+    // Calcular porcentagem geral
+    const totalItens = entregasFase.length + instrucoesFase.length;
+    const totalConcluidos = entregasConcluidas + instrucoesConcluidas;
+    const porcentagem = totalItens > 0 ? Math.round((totalConcluidos / totalItens) * 100) : 0;
+    
     return {
       entregas: entregasFase.length,
+      entregasConcluidas,
       instrucoes: instrucoesFase.length,
-      tasks: tasksFase.length
+      instrucoesConcluidas,
+      tasks: tasksFase.length,
+      porcentagem
     };
+  };
+  
+  // Cor da barra de progresso por fase
+  const getProgressColor = (faseNumero: number, porcentagem: number) => {
+    if (porcentagem === 100) return 'bg-emerald-500';
+    const coresFase: Record<number, string> = {
+      1: 'bg-purple-500',
+      2: 'bg-amber-500',
+      3: 'bg-blue-500'
+    };
+    return coresFase[faseNumero] || 'bg-muted-foreground/50';
   };
 
   // Detectar se fase é prioritária (baseado no título)
@@ -771,37 +810,51 @@ export function GeracaoEntregasModal({
           <div key={etapa.numero} className={`border rounded-lg overflow-hidden ${cores.border}`}>
             {/* Header da FASE */}
             <div 
-              className={`flex items-center gap-3 p-3 cursor-pointer ${cores.headerBg}`}
+              className={`flex flex-col gap-2 p-3 cursor-pointer ${cores.headerBg}`}
               onClick={() => toggleEtapa(etapa.numero)}
             >
-              <Checkbox
-                checked={etapa.selecionada}
-                onCheckedChange={() => toggleEtapaSelecionada(etapa.numero)}
-                onClick={(e) => e.stopPropagation()}
-              />
-              {isExpanded ? (
-                <ChevronDown className={`h-4 w-4 ${cores.icon}`} />
-              ) : (
-                <ChevronRight className={`h-4 w-4 ${cores.icon}`} />
-              )}
-              <FolderOpen className={`h-4 w-4 ${cores.icon}`} />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <p className={`font-semibold ${cores.text}`}>
-                    FASE {etapa.numero}: {etapa.titulo.toUpperCase()}
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  checked={etapa.selecionada}
+                  onCheckedChange={() => toggleEtapaSelecionada(etapa.numero)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                {isExpanded ? (
+                  <ChevronDown className={`h-4 w-4 ${cores.icon}`} />
+                ) : (
+                  <ChevronRight className={`h-4 w-4 ${cores.icon}`} />
+                )}
+                <FolderOpen className={`h-4 w-4 ${cores.icon}`} />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className={`font-semibold ${cores.text}`}>
+                      FASE {etapa.numero}: {etapa.titulo.toUpperCase()}
+                    </p>
+                    {isPrioritaria && (
+                      <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-700 border-amber-500/40">
+                        <Zap className="h-3 w-3 mr-1" />
+                        Prioridade
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {totais.entregasConcluidas}/{totais.entregas} entregas • {totais.instrucoesConcluidas}/{totais.instrucoes} instruções • {totais.tasks} tasks
                   </p>
-                  {isPrioritaria && (
-                    <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-700 border-amber-500/40">
-                      <Zap className="h-3 w-3 mr-1" />
-                      Prioridade
-                    </Badge>
-                  )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {totais.entregas} entregas • {totais.instrucoes} instruções • {totais.tasks} tasks
-                </p>
+                <span className={`text-sm font-semibold ${totais.porcentagem === 100 ? 'text-emerald-600' : cores.text}`}>
+                  {totais.porcentagem}%
+                </span>
+                {getAcaoBadge(getAcaoItem('etapa', etapa.titulo))}
               </div>
-              {getAcaoBadge(getAcaoItem('etapa', etapa.titulo))}
+              
+              {/* Barra de Progresso */}
+              <div className="ml-10 mr-4">
+                <Progress 
+                  value={totais.porcentagem} 
+                  className="h-1.5 bg-background/50"
+                  indicatorClassName={getProgressColor(etapa.numero, totais.porcentagem)}
+                />
+              </div>
             </div>
 
             {/* Entregas da FASE */}
