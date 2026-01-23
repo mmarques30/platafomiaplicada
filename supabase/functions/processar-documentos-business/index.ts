@@ -681,6 +681,19 @@ function validarContraAncoras(resultado: any, ancoras: AncorasLiterais): Resulta
     }
   }
   
+  // ⚠️ FALLBACK: Se nenhuma etapa foi validada mas existem âncoras, usar âncoras diretamente
+  if (etapasValidas.length === 0 && ancoras.fases.length > 0) {
+    console.log("  ⚠️ Nenhuma etapa validada pela IA - usando âncoras diretamente como fallback");
+    for (const fase of ancoras.fases) {
+      etapasValidas.push({
+        numero: fase.numero,
+        titulo: fase.titulo,
+        objetivo: ''
+      });
+      console.log(`  ✓ Etapa ${fase.numero}: ${fase.titulo} (fallback âncora)`);
+    }
+  }
+  
   // Validar entregas
   for (const entrega of (resultado.entregas || [])) {
     const tituloLower = (entrega.titulo || '').toLowerCase();
@@ -709,6 +722,23 @@ function validarContraAncoras(resultado: any, ancoras: AncorasLiterais): Resulta
     }
   }
   
+  // ⚠️ FALLBACK: Se nenhuma entrega foi validada mas existem âncoras, usar âncoras diretamente
+  if (entregasValidas.length === 0 && ancoras.entregas.length > 0) {
+    console.log("  ⚠️ Nenhuma entrega validada pela IA - usando âncoras diretamente como fallback");
+    for (const entrega of ancoras.entregas) {
+      entregasValidas.push({
+        etapa_numero: entrega.faseNumero,
+        numero_entrega: entrega.numero,
+        titulo: entrega.titulo,
+        descricao: '',
+        tipo: 'ativa' as const,
+        prioridade: 'alta',
+        modulo_relacionado: null
+      });
+      console.log(`  ✓ Entrega ${entrega.numero}: ${entrega.titulo} (fallback âncora)`);
+    }
+  }
+  
   // Validar instruções - PRIORIZAR dados das âncoras (que têm prompt/dicas)
   for (const instrucao of (resultado.instrucoes || [])) {
     const ancoraCorrespondente = ancoras.passos.find(p => 
@@ -725,6 +755,24 @@ function validarContraAncoras(resultado: any, ancoras: AncorasLiterais): Resulta
       responsavel: ancoraCorrespondente?.responsavel || normalizarResponsavel(instrucao.responsavel),
       ferramenta: ancoraCorrespondente?.ferramenta || normalizarFerramenta(instrucao.ferramenta)
     });
+  }
+  
+  // ⚠️ FALLBACK: Se nenhuma instrução foi validada mas existem passos nas âncoras, usar âncoras diretamente
+  if (instrucoesValidas.length === 0 && ancoras.passos.length > 0) {
+    console.log("  ⚠️ Nenhuma instrução validada pela IA - usando âncoras diretamente como fallback");
+    for (const passo of ancoras.passos) {
+      instrucoesValidas.push({
+        entrega_numero: passo.entregaNumero,
+        titulo: passo.titulo,
+        descricao: passo.descricao || '',
+        prompt_sugerido: passo.prompt_sugerido || '',
+        dicas: passo.dicas || '',
+        responsavel: passo.responsavel || 'voce',
+        ferramenta: passo.ferramenta || 'outro',
+        ordem: passo.numero
+      });
+    }
+    console.log(`  ✓ ${instrucoesValidas.length} instruções adicionadas via fallback âncoras`);
   }
   
   // Tasks dos checklists
