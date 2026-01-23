@@ -225,7 +225,7 @@ export default function AdminEtapaBusinessPage() {
         <div className="space-y-3">
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-semibold text-foreground">
-              Encontro {etapa.numero_etapa}: {etapa.titulo}
+              Fase {etapa.numero_etapa}: {etapa.titulo}
             </h1>
             <Badge variant="outline" className={status.className}>
               {status.label}
@@ -275,7 +275,7 @@ export default function AdminEtapaBusinessPage() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-medium flex items-center gap-2">
               <Flag className="h-4 w-4 text-primary" />
-              Marcos para o Próximo Encontro
+              Marcos para a Próxima Fase
             </CardTitle>
             <Button variant="outline" size="sm" onClick={() => setMarcosModalOpen(true)}>
               <Pencil className="h-4 w-4 mr-1" />
