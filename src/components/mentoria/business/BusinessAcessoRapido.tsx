@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { 
   Calendar, 
-  FileCheck, 
-  ClipboardList, 
-  MessageCircleQuestion, 
-  FileBarChart,
+  ClipboardCheck,
+  Route,
+  FileText,
+  Package,
+  CheckSquare,
   FolderOpen
 } from "lucide-react";
 
@@ -15,11 +16,12 @@ interface QuickNavItem {
 }
 
 const navItems: QuickNavItem[] = [
+  { title: "Diagnóstico", path: "/mentoria/diagnostico", icon: ClipboardCheck },
   { title: "Sessões", path: "/mentoria/sessoes", icon: Calendar },
-  { title: "Entregas", path: "/mentoria/entregas", icon: FileCheck },
-  { title: "Tasks", path: "/mentoria/tarefas", icon: ClipboardList },
-  { title: "Dúvidas", path: "/mentoria/duvidas", icon: MessageCircleQuestion },
-  { title: "Reports", path: "/mentoria/reports", icon: FileBarChart },
+  { title: "Etapas", path: "/mentoria/processo", icon: Route },
+  { title: "Instruções", path: "/mentoria/recursos", icon: FileText },
+  { title: "Entregas", path: "/mentoria/entregas", icon: Package },
+  { title: "Tasks", path: "/mentoria/tarefas", icon: CheckSquare },
   { title: "Documentos", path: "/mentoria/documentos", icon: FolderOpen },
 ];
 
