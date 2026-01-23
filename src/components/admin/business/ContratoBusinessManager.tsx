@@ -15,7 +15,8 @@ import { ContratoImportSection } from "./ContratoImportSection";
 import { ContratoPreviewPDF } from "./ContratoPreviewPDF";
 import { ContratoParseResult } from "@/hooks/useParseContratoTexto";
 import { MODULOS_DISPONIVEIS, ContratoData, gerarEntregasContratoPadrao, EntregaContratoPadrao } from "@/lib/contratoBusinessTemplate";
-import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2, Building2, DollarSign, ChevronDown, ChevronUp, RefreshCw, Sparkles } from "lucide-react";
+import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2, Building2, DollarSign, ChevronDown, ChevronUp, RefreshCw, Sparkles, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 import { format } from "date-fns";
 
 interface ContratoBusinessManagerProps {
@@ -112,6 +113,52 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
       valores: novoValor,
       entregas: novoValor,
     });
+  };
+
+  // Função para limpar todos os dados do formulário
+  const handleLimparTudo = () => {
+    setDadosContratante({
+      razao_social: "",
+      cnpj: "",
+      endereco: "",
+      representante_nome: "",
+      representante_cpf: "",
+      representante_rg: "",
+      representante_email: "",
+    });
+    
+    setFormData({
+      modulos_contratados: 6,
+      tempo_consultoria_meses: 6,
+      reunioes_mensais: 2,
+      reports_frequencia: "quinzenal",
+      suporte_tipo: "chat",
+      data_inicio: "",
+      data_fim: "",
+      data_assinatura: "",
+      observacoes: "",
+    });
+    
+    setModulosSelecionados([]);
+    setModulosCustom([]);
+    setNovoModulo("");
+    
+    setValores({
+      valor_contrato: "",
+      valor_entrada: "",
+      numero_parcelas: "6",
+      valor_parcela: "",
+      creditos_iniciais: "300",
+      valor_credito_adicional: "1",
+      duracao_academy_meses: "12",
+      roi_projetado: "",
+      multa_rescisao_percentual: "30",
+      valor_hora_tecnica: "250",
+    });
+    
+    setEntregas([]);
+    
+    toast.success("Formulário limpo. Você pode importar um novo contrato.");
   };
 
   // Carregar dados existentes
@@ -367,8 +414,18 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
       {/* Seção de Importação com IA */}
       <ContratoImportSection onDataParsed={handleDataParsed} />
 
-      {/* Botão para expandir/recolher tudo */}
-      <div className="flex justify-end">
+      {/* Botões de ação */}
+      <div className="flex justify-between items-center">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleLimparTudo}
+          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+        >
+          <RotateCcw className="h-4 w-4 mr-2" />
+          Limpar Tudo
+        </Button>
+        
         <Button variant="ghost" size="sm" onClick={toggleTodasSecoes}>
           {todasAbertas ? (
             <>
