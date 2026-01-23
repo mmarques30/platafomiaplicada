@@ -18,13 +18,14 @@ import {
   ChevronDown,
   ChevronRight,
   Layers,
-  Route,
+  FolderOpen,
   FileText,
   CheckSquare,
   Loader2,
   RefreshCw,
   Plus,
-  Users
+  Users,
+  Zap
 } from "lucide-react";
 import { ResultadoProcessamento } from "@/hooks/useProcessarDocumentos";
 import { useQueryClient } from "@tanstack/react-query";
@@ -608,6 +609,57 @@ export function GeracaoEntregasModal({
   const entregasConjuntas = entregas.filter(e => e.responsavel === 'conjunto');
   const entregasPrincipais = entregas.filter(e => e.numero_entrega > 0 && e.responsavel !== 'conjunto');
 
+  // Cores por FASE
+  const getCoresFase = (numero: number) => {
+    const cores: Record<number, { bg: string; border: string; text: string; icon: string; headerBg: string }> = {
+      1: { 
+        bg: 'bg-purple-500/5', 
+        border: 'border-purple-500/30', 
+        text: 'text-purple-700', 
+        icon: 'text-purple-600',
+        headerBg: 'bg-purple-500/10 hover:bg-purple-500/15'
+      },
+      2: { 
+        bg: 'bg-amber-500/5', 
+        border: 'border-amber-500/30', 
+        text: 'text-amber-700', 
+        icon: 'text-amber-600',
+        headerBg: 'bg-amber-500/10 hover:bg-amber-500/15'
+      },
+      3: { 
+        bg: 'bg-blue-500/5', 
+        border: 'border-blue-500/30', 
+        text: 'text-blue-700', 
+        icon: 'text-blue-600',
+        headerBg: 'bg-blue-500/10 hover:bg-blue-500/15'
+      },
+    };
+    return cores[numero] || cores[1];
+  };
+
+  // Calcular totais por fase
+  const getTotaisFase = (faseNumero: number) => {
+    const entregasFase = entregasPrincipais.filter(e => e.etapa_numero === faseNumero);
+    const instrucoesFase = instrucoes.filter(i => 
+      entregasFase.some(e => e.numero_entrega === i.entrega_numero)
+    );
+    const tasksFase = tasks.filter(t =>
+      entregasFase.some(e => e.numero_entrega === t.entrega_numero)
+    );
+    return {
+      entregas: entregasFase.length,
+      instrucoes: instrucoesFase.length,
+      tasks: tasksFase.length
+    };
+  };
+
+  // Detectar se fase é prioritária (baseado no título)
+  const isFasePrioritaria = (titulo: string) => {
+    return titulo.toLowerCase().includes('prioridade') || 
+           titulo.toLowerCase().includes('financeiro') ||
+           titulo.toLowerCase().includes('atual');
+  };
+
   // Renderizar formato novo (hierárquico)
   const renderNewFormat = () => (
     <div className="space-y-4">
@@ -707,16 +759,19 @@ export function GeracaoEntregasModal({
         </div>
       )}
 
-      {/* Etapas e Entregas Principais */}
+      {/* FASES - Agrupadas por Fase do Documento */}
       {etapas.map((etapa) => {
         const isExpanded = expandedEtapas.includes(etapa.numero);
         const entregasDaEtapa = entregasPrincipais.filter(e => e.etapa_numero === etapa.numero);
+        const cores = getCoresFase(etapa.numero);
+        const totais = getTotaisFase(etapa.numero);
+        const isPrioritaria = isFasePrioritaria(etapa.titulo);
         
         return (
-          <div key={etapa.numero} className="border rounded-lg overflow-hidden">
-            {/* Header da Etapa */}
+          <div key={etapa.numero} className={`border rounded-lg overflow-hidden ${cores.border}`}>
+            {/* Header da FASE */}
             <div 
-              className="flex items-center gap-3 p-3 bg-muted/50 cursor-pointer hover:bg-muted/70"
+              className={`flex items-center gap-3 p-3 cursor-pointer ${cores.headerBg}`}
               onClick={() => toggleEtapa(etapa.numero)}
             >
               <Checkbox
@@ -725,26 +780,33 @@ export function GeracaoEntregasModal({
                 onClick={(e) => e.stopPropagation()}
               />
               {isExpanded ? (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className={`h-4 w-4 ${cores.icon}`} />
               ) : (
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <ChevronRight className={`h-4 w-4 ${cores.icon}`} />
               )}
-              <Route className="h-4 w-4 text-primary" />
+              <FolderOpen className={`h-4 w-4 ${cores.icon}`} />
               <div className="flex-1">
-                <p className="font-medium">Fase {etapa.numero}: {etapa.titulo}</p>
-                {etapa.objetivo && (
-                  <p className="text-xs text-muted-foreground">{etapa.objetivo}</p>
-                )}
+                <div className="flex items-center gap-2">
+                  <p className={`font-semibold ${cores.text}`}>
+                    FASE {etapa.numero}: {etapa.titulo.toUpperCase()}
+                  </p>
+                  {isPrioritaria && (
+                    <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-700 border-amber-500/40">
+                      <Zap className="h-3 w-3 mr-1" />
+                      Prioridade
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {totais.entregas} entregas • {totais.instrucoes} instruções • {totais.tasks} tasks
+                </p>
               </div>
               {getAcaoBadge(getAcaoItem('etapa', etapa.titulo))}
-              <Badge variant="secondary" className="text-xs">
-                {entregasDaEtapa.length} entregas
-              </Badge>
             </div>
 
-            {/* Conteúdo da Etapa */}
+            {/* Entregas da FASE */}
             {isExpanded && (
-              <div className="p-3 space-y-3">
+              <div className={`p-3 space-y-3 ${cores.bg}`}>
                 {entregasDaEtapa.map((entrega) => {
                   const isEntregaExpanded = expandedEntregas.includes(entrega.numero_entrega);
                   const instrucoesDaEntrega = instrucoes.filter(i => i.entrega_numero === entrega.numero_entrega);
