@@ -149,13 +149,92 @@ REGRAS:
       throw new Error("Resposta vazia da IA");
     }
 
-    // Extrair JSON da resposta
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("Não foi possível extrair JSON da resposta");
+    // Função robusta para extrair e limpar JSON
+    function extractJsonFromResponse(response: string): any {
+      // Step 1: Remove markdown code blocks
+      let cleaned = response
+        .replace(/```json\s*/gi, "")
+        .replace(/```\s*/g, "")
+        .trim();
+
+      // Step 2: Find JSON boundaries
+      const jsonStart = cleaned.indexOf("{");
+      const jsonEnd = cleaned.lastIndexOf("}");
+
+      if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error("No JSON object found in response");
+      }
+
+      cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
+
+      // Step 3: Attempt parse with error handling
+      try {
+        return JSON.parse(cleaned);
+      } catch (e) {
+        // Step 4: Try to fix common issues
+        cleaned = cleaned
+          .replace(/,\s*}/g, "}") // Remove trailing commas before }
+          .replace(/,\s*]/g, "]") // Remove trailing commas before ]
+          .replace(/[\x00-\x1F\x7F]/g, "") // Remove control characters
+          .replace(/\n/g, " ") // Replace newlines with spaces
+          .replace(/\r/g, "") // Remove carriage returns
+          .replace(/\t/g, " "); // Replace tabs with spaces
+
+        try {
+          return JSON.parse(cleaned);
+        } catch (e2) {
+          // Step 5: Try to extract partial valid JSON by truncating at last complete element
+          // Find the last valid closing bracket/brace sequence
+          let lastValidPos = -1;
+          let braceCount = 0;
+          let bracketCount = 0;
+          let inString = false;
+          let escapeNext = false;
+
+          for (let i = 0; i < cleaned.length; i++) {
+            const char = cleaned[i];
+            
+            if (escapeNext) {
+              escapeNext = false;
+              continue;
+            }
+            
+            if (char === '\\' && inString) {
+              escapeNext = true;
+              continue;
+            }
+            
+            if (char === '"' && !escapeNext) {
+              inString = !inString;
+              continue;
+            }
+            
+            if (!inString) {
+              if (char === '{') braceCount++;
+              else if (char === '}') {
+                braceCount--;
+                if (braceCount === 0) lastValidPos = i;
+              }
+              else if (char === '[') bracketCount++;
+              else if (char === ']') bracketCount--;
+            }
+          }
+
+          if (lastValidPos > 0) {
+            const truncated = cleaned.substring(0, lastValidPos + 1);
+            try {
+              return JSON.parse(truncated);
+            } catch (e3) {
+              console.error("Failed to parse truncated JSON:", e3);
+            }
+          }
+
+          throw new Error(`JSON parsing failed: ${e2}`);
+        }
+      }
     }
 
-    const parsedResult = JSON.parse(jsonMatch[0]);
+    const parsedResult = extractJsonFromResponse(content);
 
     // Garantir estrutura mínima
     const finalResult = {
