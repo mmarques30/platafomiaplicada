@@ -119,6 +119,61 @@ export const ContratoPreviewPDF = ({ contratoData, nomeCliente, contratoId }: Co
     return y + 5;
   };
 
+  // Função para adicionar tabela de entregas esperadas ao PDF
+  const addEntregasTable = (doc: jsPDF, startY: number, margin: number, contentWidth: number): number => {
+    const entregas = contratoData.entregas_esperadas || [];
+    if (!entregas.length) return startY;
+    
+    let y = startY;
+    const rowHeight = 8;
+    const colWidths = [25, contentWidth - 85, 30, 30];
+    
+    // Header
+    doc.setFillColor(240, 240, 240);
+    doc.rect(margin, y, contentWidth, rowHeight, 'F');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    
+    let xPos = margin;
+    const headers = ['Prazo', 'Entrega', 'Tipo', 'Status'];
+    headers.forEach((header, i) => {
+      doc.text(header, xPos + 2, y + 5.5);
+      xPos += colWidths[i];
+    });
+    y += rowHeight;
+    
+    // Rows
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    
+    entregas.forEach((entrega) => {
+      doc.setDrawColor(200, 200, 200);
+      xPos = margin;
+      colWidths.forEach((w) => {
+        doc.rect(xPos, y, w, rowHeight);
+        xPos += w;
+      });
+      
+      xPos = margin;
+      const prazoFormatted = entrega.prazo ? new Date(entrega.prazo).toLocaleDateString('pt-BR') : '-';
+      doc.text(prazoFormatted, xPos + 2, y + 5.5);
+      xPos += colWidths[0];
+      
+      const titulo = doc.splitTextToSize(entrega.titulo, colWidths[1] - 4)[0] || '';
+      doc.text(titulo, xPos + 2, y + 5.5);
+      xPos += colWidths[1];
+      
+      doc.text(entrega.tipo || '-', xPos + 2, y + 5.5);
+      xPos += colWidths[2];
+      
+      doc.text(entrega.status || 'pendente', xPos + 2, y + 5.5);
+      
+      y += rowHeight;
+    });
+    
+    return y + 5;
+  };
+
   const gerarPDF = async () => {
     setIsGenerating(true);
     try {
@@ -587,6 +642,35 @@ export const ContratoPreviewPDF = ({ contratoData, nomeCliente, contratoId }: Co
                   <>, sugerindo-se iniciar com: {contratoData.modulos_selecionados.slice(0, 3).join(", ")}</>
                 )}.
               </p>
+
+              {/* Tabela de Entregas Esperadas */}
+              {contratoData.entregas_esperadas && contratoData.entregas_esperadas.length > 0 && (
+                <>
+                  <p className="font-semibold mt-4">Cronograma Previsto de Entregas:</p>
+                  <div className="border rounded-lg overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-muted/50">
+                          <TableHead className="font-bold text-black">Prazo</TableHead>
+                          <TableHead className="font-bold text-black">Entrega</TableHead>
+                          <TableHead className="font-bold text-black">Tipo</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {contratoData.entregas_esperadas.map((entrega, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell className="font-medium">
+                              {entrega.prazo ? new Date(entrega.prazo).toLocaleDateString('pt-BR') : '-'}
+                            </TableCell>
+                            <TableCell>{entrega.titulo}</TableCell>
+                            <TableCell className="capitalize">{entrega.tipo}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Tabela de Manutenção (na cláusula 9) */}

@@ -14,8 +14,8 @@ import { useContratoBusinessMutations } from "@/hooks/useContratoBusinessMutatio
 import { ContratoImportSection } from "./ContratoImportSection";
 import { ContratoPreviewPDF } from "./ContratoPreviewPDF";
 import { ContratoParseResult } from "@/hooks/useParseContratoTexto";
-import { MODULOS_DISPONIVEIS, ContratoData } from "@/lib/contratoBusinessTemplate";
-import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2, Building2, DollarSign, ChevronDown, ChevronUp } from "lucide-react";
+import { MODULOS_DISPONIVEIS, ContratoData, gerarEntregasContratoPadrao, EntregaContratoPadrao } from "@/lib/contratoBusinessTemplate";
+import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2, Building2, DollarSign, ChevronDown, ChevronUp, RefreshCw, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 
 interface ContratoBusinessManagerProps {
@@ -283,6 +283,33 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
   const handleRemoveModuloCustom = (modulo: string) => {
     setModulosCustom(prev => prev.filter(m => m !== modulo));
     setModulosSelecionados(prev => prev.filter(m => m !== modulo));
+  };
+
+  // Gerar entregas padrão do contrato baseadas nos módulos e duração
+  const gerarEntregasPadrao = () => {
+    const entregasGeradas = gerarEntregasContratoPadrao(
+      formData.modulos_contratados,
+      formData.tempo_consultoria_meses,
+      formData.data_inicio
+    );
+    
+    // Converter para o formato de EntregaEsperada com prazos calculados
+    const dataBase = formData.data_inicio ? new Date(formData.data_inicio) : new Date();
+    
+    const novasEntregas: EntregaEsperada[] = entregasGeradas.map((eg) => {
+      const prazoDate = new Date(dataBase);
+      prazoDate.setMonth(prazoDate.getMonth() + eg.mes - 1);
+      prazoDate.setDate(Math.min(prazoDate.getDate(), 28)); // Evitar problemas com meses curtos
+      
+      return {
+        titulo: eg.titulo,
+        prazo: format(prazoDate, "yyyy-MM-dd"),
+        tipo: eg.tipo,
+        status: "pendente" as const,
+      };
+    });
+    
+    setEntregas(novasEntregas);
   };
 
   const addEntrega = () => {
@@ -817,7 +844,7 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
         </Card>
       </Collapsible>
 
-      {/* Entregas Esperadas */}
+      {/* Entregas Esperadas do Contrato */}
       <Collapsible open={secoesAbertas.entregas} onOpenChange={() => toggleSecao('entregas')}>
         <Card>
           <CollapsibleTrigger asChild>
@@ -826,13 +853,27 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     <Target className="h-5 w-5" />
-                    Entregas Esperadas
+                    Entregas Esperadas (Contrato)
+                    {entregas.length > 0 && (
+                      <Badge variant="secondary" className="ml-2">
+                        {entregas.length} entregas
+                      </Badge>
+                    )}
                   </CardTitle>
                   <CardDescription>
-                    Defina as entregas que aparecerão na timeline do mentorado
+                    Cronograma de entregas que aparecerá no contrato PDF
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button 
+                    onClick={(e) => { e.stopPropagation(); gerarEntregasPadrao(); }} 
+                    variant="outline" 
+                    size="sm"
+                    className="gap-1"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Gerar Padrão
+                  </Button>
                   <Button 
                     onClick={(e) => { e.stopPropagation(); addEntrega(); }} 
                     variant="outline" 
@@ -852,11 +893,19 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
+              {/* Info sobre geração automática */}
               {entregas.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>Nenhuma entrega definida</p>
-                  <p className="text-sm">Clique em "Adicionar" para criar entregas</p>
+                  <p className="text-sm mb-4">
+                    Clique em "Gerar Padrão" para criar entregas baseadas em {formData.modulos_contratados} módulos 
+                    em {formData.tempo_consultoria_meses} meses
+                  </p>
+                  <Button onClick={gerarEntregasPadrao} variant="default" size="sm">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Gerar Entregas Padrão
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-4">

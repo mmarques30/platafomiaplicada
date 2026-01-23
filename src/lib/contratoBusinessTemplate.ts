@@ -47,6 +47,90 @@ export const TABELA_MANUTENCAO = [
 // Manter compatibilidade com código antigo
 export const TABELA_MANUTENCAO_PADRAO = TABELA_MANUTENCAO;
 
+// Interface para entregas esperadas do contrato (genéricas, para o PDF)
+export interface EntregaContratoPadrao {
+  mes: number;
+  titulo: string;
+  descricao: string;
+  tipo: string;
+}
+
+// Gera entregas padrão do contrato baseadas na quantidade de módulos e duração
+export const gerarEntregasContratoPadrao = (
+  modulosContratados: number,
+  mesesConsultoria: number,
+  dataInicio?: string | null
+): EntregaContratoPadrao[] => {
+  const entregas: EntregaContratoPadrao[] = [];
+  
+  if (!modulosContratados || !mesesConsultoria) return entregas;
+  
+  // Mês 1 - Sempre: Diagnóstico e Roadmap
+  entregas.push({
+    mes: 1,
+    titulo: "Diagnóstico Completo",
+    descricao: "Mapeamento de processos e identificação de oportunidades de automação",
+    tipo: "diagnostico"
+  });
+  entregas.push({
+    mes: 1,
+    titulo: "Roadmap de Implementação",
+    descricao: "Cronograma detalhado com marcos e entregas do projeto",
+    tipo: "documento"
+  });
+  
+  // Distribuir módulos ao longo dos meses restantes (mês 2 até penúltimo)
+  const mesesDesenvolvimento = Math.max(1, mesesConsultoria - 2); // Reservar mês 1 (diag) e último (validação)
+  const modulosPorMes = Math.ceil(modulosContratados / mesesDesenvolvimento);
+  
+  let moduloAtual = 1;
+  for (let mes = 2; mes < mesesConsultoria && moduloAtual <= modulosContratados; mes++) {
+    const modulosNesteMes = Math.min(modulosPorMes, modulosContratados - moduloAtual + 1);
+    
+    if (modulosNesteMes === 1) {
+      entregas.push({
+        mes,
+        titulo: `Módulo ${moduloAtual} - Implementação`,
+        descricao: `Desenvolvimento e configuração do módulo ${moduloAtual}`,
+        tipo: "implementacao"
+      });
+    } else {
+      entregas.push({
+        mes,
+        titulo: `Módulos ${moduloAtual}-${moduloAtual + modulosNesteMes - 1} - Implementação`,
+        descricao: `Desenvolvimento e configuração dos módulos ${moduloAtual} a ${moduloAtual + modulosNesteMes - 1}`,
+        tipo: "implementacao"
+      });
+    }
+    
+    moduloAtual += modulosNesteMes;
+  }
+  
+  // Último mês - Sempre: Validação Final e Go-Live
+  if (mesesConsultoria >= 2) {
+    entregas.push({
+      mes: mesesConsultoria,
+      titulo: "Validação Final e Go-Live",
+      descricao: "Testes finais, ajustes e entrega oficial da plataforma",
+      tipo: "treinamento"
+    });
+  }
+  
+  // Treinamento (meio do projeto)
+  const mesTreinamento = Math.ceil(mesesConsultoria / 2);
+  if (mesTreinamento > 1 && mesTreinamento < mesesConsultoria) {
+    entregas.push({
+      mes: mesTreinamento,
+      titulo: "Treinamento da Equipe",
+      descricao: "Capacitação dos usuários nos módulos implementados",
+      tipo: "treinamento"
+    });
+  }
+  
+  // Ordenar por mês
+  return entregas.sort((a, b) => a.mes - b.mes);
+};
+
 export const formatCurrency = (value: number | null | undefined): string => {
   if (value == null) return "R$ 0,00";
   return new Intl.NumberFormat('pt-BR', { 
