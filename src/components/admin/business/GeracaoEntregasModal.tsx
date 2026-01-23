@@ -211,6 +211,15 @@ export function GeracaoEntregasModal({
     return <Badge variant="outline" className={`text-xs ${c.className}`}>{c.label}</Badge>;
   };
 
+  // Lista de ferramentas válidas (deve corresponder ao constraint do banco)
+  const FERRAMENTAS_VALIDAS = ['claude', 'lovable', 'reuniao', 'outro', 'drive', 'notion', 'supabase', 'make', 'n8n', 'zapier', 'mapa'];
+
+  const normalizarFerramenta = (ferramenta?: string): string => {
+    if (!ferramenta) return 'outro';
+    const lower = ferramenta.toLowerCase().trim();
+    return FERRAMENTAS_VALIDAS.includes(lower) ? lower : 'outro';
+  };
+
   const handleSalvar = async () => {
     setIsSaving(true);
 
@@ -230,7 +239,7 @@ export function GeracaoEntregasModal({
       const tasksSelecionadas = tasks.filter(t => t.selecionada);
       const backlogSelecionado = backlog.filter(b => b.selecionado);
 
-      // 1. Criar Etapas
+      // 1. Criar Etapas (com verificação de duplicatas)
       const etapasMap: Record<number, string> = {};
       
       if (etapasSelecionadas.length > 0) {
@@ -241,7 +250,7 @@ export function GeracaoEntregasModal({
             .select("id")
             .eq("contrato_id", contratoId)
             .eq("numero_etapa", etapa.numero)
-            .single();
+            .maybeSingle();
 
           if (existente) {
             etapasMap[etapa.numero] = existente.id;
@@ -264,11 +273,25 @@ export function GeracaoEntregasModal({
         }
       }
 
-      // 2. Criar Entregas
+      // 2. Criar Entregas (com verificação de duplicatas)
       const entregasMap: Record<number, string> = {};
       
       for (const entrega of entregasSelecionadas) {
         const etapaId = etapasMap[entrega.etapa_numero] || null;
+        
+        // Verificar se já existe entrega com mesmo título na mesma etapa
+        const { data: entregaExistente } = await supabase
+          .from("entregas_business")
+          .select("id")
+          .eq("contrato_id", contratoId)
+          .eq("titulo", entrega.titulo)
+          .maybeSingle();
+
+        if (entregaExistente) {
+          // Já existe, apenas mapear
+          entregasMap[entrega.numero_entrega] = entregaExistente.id;
+          continue;
+        }
         
         const { data: novaEntrega, error } = await supabase
           .from("entregas_business")
@@ -290,11 +313,21 @@ export function GeracaoEntregasModal({
         entregasMap[entrega.numero_entrega] = novaEntrega.id;
       }
 
-      // 3. Criar Instruções
+      // 3. Criar Instruções (com verificação de duplicatas e normalização de ferramenta)
       for (const instrucao of instrucoesSelecionadas) {
         const entregaId = entregasMap[instrucao.entrega_numero] || null;
         const entrega = entregasSelecionadas.find(e => e.numero_entrega === instrucao.entrega_numero);
         const etapaId = entrega ? etapasMap[entrega.etapa_numero] : null;
+
+        // Verificar se já existe instrução com mesmo título na mesma entrega
+        const { data: instrucaoExistente } = await supabase
+          .from("instrucoes_etapa")
+          .select("id")
+          .eq("entrega_id", entregaId)
+          .eq("titulo", instrucao.titulo)
+          .maybeSingle();
+
+        if (instrucaoExistente) continue; // Já existe, pular
 
         const { error } = await supabase
           .from("instrucoes_etapa")
@@ -304,7 +337,7 @@ export function GeracaoEntregasModal({
             titulo: instrucao.titulo,
             descricao: instrucao.descricao,
             responsavel: instrucao.responsavel,
-            ferramenta: instrucao.ferramenta || 'outro',
+            ferramenta: normalizarFerramenta(instrucao.ferramenta),
             dicas: instrucao.dicas,
             ordem: instrucao.ordem,
             status: 'pendente',
@@ -314,11 +347,21 @@ export function GeracaoEntregasModal({
         if (error) throw error;
       }
 
-      // 4. Criar Tasks
+      // 4. Criar Tasks (com verificação de duplicatas)
       for (const task of tasksSelecionadas) {
         const entregaId = entregasMap[task.entrega_numero] || null;
         const entrega = entregasSelecionadas.find(e => e.numero_entrega === task.entrega_numero);
         const etapaId = entrega ? etapasMap[entrega.etapa_numero] : null;
+
+        // Verificar se já existe task com mesmo título na mesma entrega
+        const { data: taskExistente } = await supabase
+          .from("tasks_business")
+          .select("id")
+          .eq("contrato_id", contratoId)
+          .eq("titulo", task.titulo)
+          .maybeSingle();
+
+        if (taskExistente) continue; // Já existe, pular
 
         const { error } = await supabase
           .from("tasks_business")
@@ -337,8 +380,18 @@ export function GeracaoEntregasModal({
         if (error) throw error;
       }
 
-      // 5. Criar Backlog como entregas futuras
+      // 5. Criar Backlog como entregas futuras (com verificação de duplicatas)
       for (const item of backlogSelecionado) {
+        // Verificar se já existe
+        const { data: backlogExistente } = await supabase
+          .from("entregas_business")
+          .select("id")
+          .eq("contrato_id", contratoId)
+          .eq("titulo", item.titulo)
+          .maybeSingle();
+
+        if (backlogExistente) continue; // Já existe, pular
+
         const { error } = await supabase
           .from("entregas_business")
           .insert({
