@@ -502,6 +502,7 @@ export function GeracaoEntregasModal({
             tipo: entrega.tipo,
             prioridade: entrega.prioridade === 'urgente' ? 'critica' : entrega.prioridade,
             ordem: entrega.numero_entrega,
+            numero_entrega: entrega.numero_entrega,
             tem_instrucoes: instrucoesSelecionadas.some(i => i.entrega_numero === entrega.numero_entrega),
           })
           .select()
