@@ -1,5 +1,20 @@
 import { useState, useEffect } from "react";
 import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -25,9 +40,11 @@ import {
   RefreshCw,
   Plus,
   Users,
-  Zap
+  Zap,
+  GripVertical
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { DroppableFase } from "./DroppableFase";
 import { ResultadoProcessamento } from "@/hooks/useProcessarDocumentos";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -117,12 +134,58 @@ export function GeracaoEntregasModal({
   const [expandedEntregas, setExpandedEntregas] = useState<number[]>([]);
   const [expandedConjuntas, setExpandedConjuntas] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeEntrega, setActiveEntrega] = useState<EntregaSelecionada | null>(null);
   const [dadosExistentes, setDadosExistentes] = useState<DadosExistentes>({
     etapas: [],
     entregas: [],
     instrucoes: [],
     tasks: [],
   });
+
+  // DnD Sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag start
+  const handleDragStart = (event: DragStartEvent) => {
+    const entregaId = event.active.id as number;
+    const entrega = entregas.find(e => e.numero_entrega === entregaId);
+    setActiveEntrega(entrega || null);
+  };
+
+  // Handle drag end
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveEntrega(null);
+    
+    if (!over) return;
+    
+    const entregaId = active.id as number;
+    const overId = over.id.toString();
+    
+    // Check if dropped on a phase
+    if (overId.startsWith('fase-')) {
+      const novaFaseId = parseInt(overId.replace('fase-', ''));
+      const entrega = entregas.find(e => e.numero_entrega === entregaId);
+      
+      if (entrega && entrega.etapa_numero !== novaFaseId) {
+        setEntregas(prev => prev.map(e => 
+          e.numero_entrega === entregaId 
+            ? { ...e, etapa_numero: novaFaseId }
+            : e
+        ));
+        toast.success(`Entrega movida para Fase ${novaFaseId}`);
+      }
+    }
+  };
 
   // Detectar se é formato novo ou antigo
   const isNewFormat = resultado && resultado.etapas && resultado.etapas.length > 0;
@@ -798,179 +861,63 @@ export function GeracaoEntregasModal({
         </div>
       )}
 
-      {/* FASES - Agrupadas por Fase do Documento */}
-      {etapas.map((etapa) => {
-        const isExpanded = expandedEtapas.includes(etapa.numero);
-        const entregasDaEtapa = entregasPrincipais.filter(e => e.etapa_numero === etapa.numero);
-        const cores = getCoresFase(etapa.numero);
-        const totais = getTotaisFase(etapa.numero);
-        const isPrioritaria = isFasePrioritaria(etapa.titulo);
-        
-        return (
-          <div key={etapa.numero} className={`border rounded-lg overflow-hidden ${cores.border}`}>
-            {/* Header da FASE */}
-            <div 
-              className={`flex flex-col gap-2 p-3 cursor-pointer ${cores.headerBg}`}
-              onClick={() => toggleEtapa(etapa.numero)}
-            >
-              <div className="flex items-center gap-3">
-                <Checkbox
-                  checked={etapa.selecionada}
-                  onCheckedChange={() => toggleEtapaSelecionada(etapa.numero)}
-                  onClick={(e) => e.stopPropagation()}
-                />
-                {isExpanded ? (
-                  <ChevronDown className={`h-4 w-4 ${cores.icon}`} />
-                ) : (
-                  <ChevronRight className={`h-4 w-4 ${cores.icon}`} />
-                )}
-                <FolderOpen className={`h-4 w-4 ${cores.icon}`} />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className={`font-semibold ${cores.text}`}>
-                      FASE {etapa.numero}: {etapa.titulo.toUpperCase()}
-                    </p>
-                    {isPrioritaria && (
-                      <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-700 border-amber-500/40">
-                        <Zap className="h-3 w-3 mr-1" />
-                        Prioridade
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {totais.entregasConcluidas}/{totais.entregas} entregas • {totais.instrucoesConcluidas}/{totais.instrucoes} instruções • {totais.tasks} tasks
-                  </p>
-                </div>
-                <span className={`text-sm font-semibold ${totais.porcentagem === 100 ? 'text-emerald-600' : cores.text}`}>
-                  {totais.porcentagem}%
+      {/* FASES - Agrupadas por Fase do Documento com Drag-and-Drop */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="space-y-4">
+          {etapas.map((etapa) => {
+            const entregasDaEtapa = entregasPrincipais.filter(e => e.etapa_numero === etapa.numero);
+            const cores = getCoresFase(etapa.numero);
+            const totais = getTotaisFase(etapa.numero);
+            const isPrioritaria = isFasePrioritaria(etapa.titulo);
+            
+            return (
+              <DroppableFase
+                key={etapa.numero}
+                etapa={etapa}
+                entregas={entregasDaEtapa}
+                instrucoes={instrucoes}
+                tasks={tasks}
+                cores={cores}
+                totais={totais}
+                isExpanded={expandedEtapas.includes(etapa.numero)}
+                expandedEntregas={expandedEntregas}
+                isPrioritaria={isPrioritaria}
+                onToggleExpand={() => toggleEtapa(etapa.numero)}
+                onToggleSelect={() => toggleEtapaSelecionada(etapa.numero)}
+                onToggleEntrega={toggleEntrega}
+                onToggleEntregaSelect={toggleEntregaSelecionada}
+                onToggleInstrucao={toggleInstrucaoSelecionada}
+                onToggleTask={toggleTaskSelecionada}
+                getAcaoBadge={getAcaoBadge}
+                getAcaoItem={getAcaoItem}
+                getPrioridadeBadge={getPrioridadeBadge}
+                getResponsavelBadge={getResponsavelBadge}
+                getProgressColor={getProgressColor}
+              />
+            );
+          })}
+        </div>
+
+        {/* Drag Overlay */}
+        <DragOverlay>
+          {activeEntrega && (
+            <div className="border rounded-lg bg-background shadow-xl p-3 opacity-90">
+              <div className="flex items-center gap-2">
+                <GripVertical className="h-4 w-4 text-muted-foreground" />
+                <Package className="h-4 w-4 text-emerald-600" />
+                <span className="text-sm font-medium">
+                  Entrega {activeEntrega.numero_entrega}: {activeEntrega.titulo}
                 </span>
-                {getAcaoBadge(getAcaoItem('etapa', etapa.titulo))}
-              </div>
-              
-              {/* Barra de Progresso */}
-              <div className="ml-10 mr-4">
-                <Progress 
-                  value={totais.porcentagem} 
-                  className="h-1.5 bg-background/50"
-                  indicatorClassName={getProgressColor(etapa.numero, totais.porcentagem)}
-                />
               </div>
             </div>
-
-            {/* Entregas da FASE */}
-            {isExpanded && (
-              <div className={`p-3 space-y-3 ${cores.bg}`}>
-                {entregasDaEtapa.map((entrega) => {
-                  const isEntregaExpanded = expandedEntregas.includes(entrega.numero_entrega);
-                  const instrucoesDaEntrega = instrucoes.filter(i => i.entrega_numero === entrega.numero_entrega);
-                  const tasksDaEntrega = tasks.filter(t => t.entrega_numero === entrega.numero_entrega);
-                  
-                  return (
-                    <div key={entrega.numero_entrega} className="border rounded-lg bg-background">
-                      {/* Header da Entrega */}
-                      <div 
-                        className="flex items-center gap-3 p-3 cursor-pointer hover:bg-muted/30"
-                        onClick={() => toggleEntrega(entrega.numero_entrega)}
-                      >
-                        <Checkbox
-                          checked={entrega.selecionada}
-                          onCheckedChange={() => toggleEntregaSelecionada(entrega.numero_entrega)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        {isEntregaExpanded ? (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        )}
-                        <Package className="h-4 w-4 text-emerald-600" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">
-                            Entrega {entrega.numero_entrega}: {entrega.titulo}
-                          </p>
-                          {instrucoesDaEntrega.length > 0 && (
-                            <p className="text-xs text-muted-foreground">
-                              {instrucoesDaEntrega.length} instruções
-                            </p>
-                          )}
-                        </div>
-                        {getAcaoBadge(getAcaoItem('entrega', entrega.titulo))}
-                        {getPrioridadeBadge(entrega.prioridade)}
-                      </div>
-
-                      {/* Conteúdo da Entrega */}
-                      {isEntregaExpanded && (
-                        <div className="px-3 pb-3 space-y-3">
-                          <p className="text-xs text-muted-foreground pl-10">
-                            {entrega.descricao}
-                          </p>
-
-                          {/* Instruções */}
-                          {instrucoesDaEntrega.length > 0 && (
-                            <div className="pl-10 space-y-2">
-                              <p className="text-xs font-medium flex items-center gap-1.5 text-muted-foreground">
-                                <FileText className="h-3.5 w-3.5" />
-                                Instruções ({instrucoesDaEntrega.filter(i => i.selecionada).length}/{instrucoesDaEntrega.length})
-                              </p>
-                              {instrucoesDaEntrega.map((instrucao) => (
-                                <div 
-                                  key={`${instrucao.entrega_numero}-${instrucao.ordem}`}
-                                  className="flex items-start gap-2 p-2 rounded bg-muted/30"
-                                >
-                                  <Checkbox
-                                    checked={instrucao.selecionada}
-                                    onCheckedChange={() => toggleInstrucaoSelecionada(instrucao.entrega_numero, instrucao.ordem)}
-                                    disabled={!entrega.selecionada}
-                                  />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-medium">{instrucao.ordem}. {instrucao.titulo}</p>
-                                    {instrucao.descricao && (
-                                      <p className="text-xs text-muted-foreground truncate">{instrucao.descricao}</p>
-                                    )}
-                                  </div>
-                                  {getResponsavelBadge(instrucao.responsavel)}
-                                  {instrucao.ferramenta && instrucao.ferramenta !== 'outro' && (
-                                    <Badge variant="outline" className="text-xs">
-                                      {instrucao.ferramenta}
-                                    </Badge>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Tasks */}
-                          {tasksDaEntrega.length > 0 && (
-                            <div className="pl-10 space-y-2">
-                              <p className="text-xs font-medium flex items-center gap-1.5 text-muted-foreground">
-                                <CheckSquare className="h-3.5 w-3.5" />
-                                Checklist ({tasksDaEntrega.filter(t => t.selecionada).length}/{tasksDaEntrega.length})
-                              </p>
-                              {tasksDaEntrega.map((task, idx) => (
-                                <div 
-                                  key={`${task.entrega_numero}-${idx}`}
-                                  className="flex items-center gap-2 p-2 rounded bg-muted/30"
-                                >
-                                  <Checkbox
-                                    checked={task.selecionada}
-                                    onCheckedChange={() => toggleTaskSelecionada(task.entrega_numero, task.titulo)}
-                                    disabled={!entrega.selecionada}
-                                  />
-                                  <span className="text-xs flex-1">{task.titulo}</span>
-                                  {getPrioridadeBadge(task.prioridade)}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
+          )}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 
