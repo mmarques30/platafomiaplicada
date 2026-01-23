@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.extrair-texto-documento]
 verify_jwt = false
+
+[functions.organizar-backlog]
+verify_jwt = false

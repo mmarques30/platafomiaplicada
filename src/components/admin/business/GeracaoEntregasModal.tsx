@@ -23,13 +23,15 @@ import {
   CheckSquare,
   Loader2,
   RefreshCw,
-  Plus
+  Plus,
+  Users
 } from "lucide-react";
 import { ResultadoProcessamento } from "@/hooks/useProcessarDocumentos";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { ModoImportacao } from "./DocumentosUploadSection";
+import { BacklogEditor, type BacklogItemEditable } from "./BacklogEditor";
 
 interface DadosExistentes {
   etapas: { id: string; numero: number; titulo: string }[];
@@ -108,9 +110,10 @@ export function GeracaoEntregasModal({
   const [entregas, setEntregas] = useState<EntregaSelecionada[]>([]);
   const [instrucoes, setInstrucoes] = useState<InstrucaoSelecionada[]>([]);
   const [tasks, setTasks] = useState<TaskSelecionada[]>([]);
-  const [backlog, setBacklog] = useState<BacklogSelecionado[]>([]);
+  const [backlog, setBacklog] = useState<BacklogItemEditable[]>([]);
   const [expandedEtapas, setExpandedEtapas] = useState<number[]>([]);
   const [expandedEntregas, setExpandedEntregas] = useState<number[]>([]);
+  const [expandedConjuntas, setExpandedConjuntas] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [dadosExistentes, setDadosExistentes] = useState<DadosExistentes>({
     etapas: [],
@@ -154,7 +157,17 @@ export function GeracaoEntregasModal({
       setEntregas(resultado.entregas.map(e => ({ ...e, selecionada: true })));
       setInstrucoes(resultado.instrucoes.map(i => ({ ...i, selecionada: true })));
       setTasks(resultado.tasks.map(t => ({ ...t, selecionada: true })));
-      setBacklog(resultado.backlog.map(b => ({ ...b, selecionado: true })));
+      
+      // Backlog: converter para formato do editor
+      const backlogItems: BacklogItemEditable[] = resultado.backlog.map(b => ({
+        titulo: b.titulo,
+        descricao: b.descricao || '',
+        categoria: (b.justificativa?.includes('Melhorias') ? 'Melhorias Futuras' : 
+                   b.justificativa?.includes('Débito') ? 'Débito Técnico' : 'Pós-MVP') as BacklogItemEditable['categoria'],
+        prioridade: 'media' as const,
+        selecionado: true
+      }));
+      setBacklog(backlogItems);
       
       // Expandir primeira etapa
       if (resultado.etapas.length > 0) {
@@ -174,10 +187,15 @@ export function GeracaoEntregasModal({
         selecionada: e.tipo === 'ativa',
       })));
       
-      setBacklog((resultado.backlog_sugerido || []).map(b => ({
-        ...b,
-        selecionado: false,
-      })));
+      // Formato antigo: converter backlog para formato do editor
+      const backlogItems: BacklogItemEditable[] = (resultado.backlog_sugerido || []).map(b => ({
+        titulo: b.titulo,
+        descricao: b.descricao || '',
+        categoria: 'Pós-MVP' as const,
+        prioridade: 'media' as const,
+        selecionado: false
+      }));
+      setBacklog(backlogItems);
     }
   }, [resultado, isNewFormat]);
 
@@ -260,12 +278,8 @@ export function GeracaoEntregasModal({
     ));
   };
 
-  const toggleBacklog = (index: number) => {
-    setBacklog(prev => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], selecionado: !updated[index].selecionado };
-      return updated;
-    });
+  const handleBacklogChange = (items: BacklogItemEditable[]) => {
+    setBacklog(items);
   };
 
   const getPrioridadeBadge = (prioridade: string) => {
@@ -311,7 +325,6 @@ export function GeracaoEntregasModal({
 
       if (!contrato) throw new Error("Contrato não encontrado");
 
-      const etapasSelecionadas = etapas.filter(e => e.selecionada);
       const entregasSelecionadas = entregas.filter(e => e.selecionada);
       const instrucoesSelecionadas = instrucoes.filter(i => i.selecionada);
       const tasksSelecionadas = tasks.filter(t => t.selecionada);
@@ -324,6 +337,7 @@ export function GeracaoEntregasModal({
       // 1. Processar Etapas (NUNCA atualizar, preservar acordo)
       const etapasMap: Record<number, string> = {};
       
+      const etapasSelecionadas = etapas.filter(e => e.selecionada);
       if (etapasSelecionadas.length > 0) {
         for (const etapa of etapasSelecionadas) {
           // Verificar se já existe
@@ -549,8 +563,8 @@ export function GeracaoEntregasModal({
             titulo: item.titulo,
             descricao: item.descricao,
             tipo: 'backlog',
-            prioridade: 'baixa',
-            justificativa_backlog: item.justificativa,
+            prioridade: item.prioridade || 'baixa',
+            justificativa_backlog: item.categoria || 'Pós-MVP',
             ordem: 999,
             tem_instrucoes: false,
           });
@@ -631,46 +645,65 @@ export function GeracaoEntregasModal({
         </div>
       )}
 
-      {/* Entregas em Conjunto */}
+      {/* Entregas em Conjunto - AGRUPADA */}
       {entregasConjuntas.length > 0 && (
         <div className="border rounded-lg overflow-hidden border-blue-500/30">
-          <div className="flex items-center gap-3 p-3 bg-blue-500/10">
-            <ListTodo className="h-4 w-4 text-blue-600" />
+          <div 
+            className="flex items-center gap-3 p-3 bg-blue-500/10 cursor-pointer hover:bg-blue-500/15"
+            onClick={() => setExpandedConjuntas(!expandedConjuntas)}
+          >
+            {expandedConjuntas ? (
+              <ChevronDown className="h-4 w-4 text-blue-600" />
+            ) : (
+              <ChevronRight className="h-4 w-4 text-blue-600" />
+            )}
+            <Users className="h-4 w-4 text-blue-600" />
             <div className="flex-1">
-              <p className="font-medium text-blue-700">Entregas em Conjunto</p>
-              <p className="text-xs text-muted-foreground">Mariana + Paula - acontecem durante todas as etapas</p>
+              <p className="font-medium text-blue-700">Entregas em Conjunto (Mariana + Paula)</p>
+              <p className="text-xs text-muted-foreground">
+                {entregasConjuntas.filter(e => e.status === 'concluida').length} concluídas de {entregasConjuntas.length} itens
+              </p>
             </div>
             <Badge variant="secondary" className="text-xs">
               {entregasConjuntas.filter(e => e.selecionada).length}/{entregasConjuntas.length}
             </Badge>
+            {getResponsavelBadge('conjunto')}
           </div>
-          <div className="p-3 space-y-2">
-            {entregasConjuntas.map((entrega) => (
-              <div 
-                key={entrega.numero_entrega}
-                className="flex items-center gap-3 p-2 border rounded bg-background"
-              >
-                <Checkbox
-                  checked={entrega.selecionada}
-                  onCheckedChange={() => toggleEntregaSelecionada(entrega.numero_entrega)}
-                />
-                <Package className="h-4 w-4 text-blue-600" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{entrega.titulo}</p>
+          
+          {expandedConjuntas && (
+            <div className="p-3 space-y-2 max-h-[250px] overflow-y-auto">
+              {entregasConjuntas.map((entrega, idx) => (
+                <div 
+                  key={entrega.numero_entrega}
+                  className={`flex items-center gap-3 p-2 border rounded transition-colors ${
+                    entrega.status === 'concluida' 
+                      ? 'bg-emerald-50/50 border-emerald-200' 
+                      : 'bg-background'
+                  }`}
+                >
+                  <Checkbox
+                    checked={entrega.selecionada}
+                    onCheckedChange={() => toggleEntregaSelecionada(entrega.numero_entrega)}
+                  />
+                  <span className="text-xs text-muted-foreground w-6">{idx + 1}.</span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${entrega.status === 'concluida' ? 'line-through text-muted-foreground' : ''}`}>
+                      {entrega.titulo}
+                    </p>
+                  </div>
+                  {entrega.status === 'concluida' ? (
+                    <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
+                      ✓ Feito
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">
+                      Pendente
+                    </Badge>
+                  )}
                 </div>
-                {entrega.status === 'concluida' ? (
-                  <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
-                    ✓ Concluída
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">
-                    Pendente
-                  </Badge>
-                )}
-                {getResponsavelBadge('conjunto')}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -888,40 +921,12 @@ export function GeracaoEntregasModal({
         <ScrollArea className="max-h-[55vh] pr-4">
           {isNewFormat ? renderNewFormat() : renderOldFormat()}
 
-          {/* Backlog */}
-          {backlog.length > 0 && (
-            <>
-              <Separator className="my-4" />
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                  <Layers className="h-4 w-4" />
-                  Backlog / Futuras ({backlog.filter(b => b.selecionado).length}/{backlog.length})
-                </h3>
-                
-                <div className="space-y-2">
-                  {backlog.map((item, index) => (
-                    <div 
-                      key={item.titulo}
-                      className="flex items-center gap-3 p-3 border rounded-lg border-dashed"
-                    >
-                      <Checkbox
-                        checked={item.selecionado}
-                        onCheckedChange={() => toggleBacklog(index)}
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{item.titulo}</p>
-                        {item.justificativa && (
-                          <p className="text-xs text-muted-foreground">
-                            "{item.justificativa}"
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
+          {/* Backlog - Usar BacklogEditor */}
+          <Separator className="my-4" />
+          <BacklogEditor
+            initialItems={backlog}
+            onItemsChange={handleBacklogChange}
+          />
         </ScrollArea>
 
         <DialogFooter className="flex justify-between items-center">
