@@ -22,6 +22,66 @@ interface ResultadoParcial {
   backlog: any[];
 }
 
+// Mapeamento de ferramentas para valores válidos do banco
+const FERRAMENTAS_VALIDAS = ["claude", "lovable", "drive", "notion", "supabase", "make", "n8n", "zapier", "mapa", "reuniao", "outro"];
+
+function normalizarFerramenta(ferramenta: string | undefined): string {
+  if (!ferramenta) return "outro";
+  
+  const ferramentaLower = ferramenta.toLowerCase().trim();
+  
+  const mapeamento: Record<string, string> = {
+    "claude": "claude",
+    "lovable": "lovable",
+    "mapa": "mapa",
+    "drive": "drive",
+    "google drive": "drive",
+    "notion": "notion",
+    "supabase": "supabase",
+    "make": "make",
+    "n8n": "n8n",
+    "zapier": "zapier",
+    "reunião": "reuniao",
+    "reuniao": "reuniao",
+    "call": "reuniao",
+    "grupo": "reuniao",
+    "meet": "reuniao",
+    "zoom": "reuniao",
+    "21st.dev": "outro",
+    "21st": "outro",
+  };
+  
+  return mapeamento[ferramentaLower] || 
+         (FERRAMENTAS_VALIDAS.includes(ferramentaLower) ? ferramentaLower : "outro");
+}
+
+// Normalizar responsável baseado no texto
+function normalizarResponsavel(texto: string | undefined): "voce" | "mentor" | "conjunto" {
+  if (!texto) return "voce";
+  
+  const textoLower = texto.toLowerCase().trim();
+  
+  // Conjunto
+  if (textoLower.includes("conjunto") || 
+      textoLower.includes("juntos") || 
+      textoLower.includes("mariana + paula") ||
+      textoLower.includes("paula + mariana") ||
+      textoLower.includes("em conjunto")) {
+    return "conjunto";
+  }
+  
+  // Mentor
+  if (textoLower.includes("mariana") || 
+      textoLower.includes("mari") || 
+      textoLower.includes("mentora") ||
+      textoLower === "mentor") {
+    return "mentor";
+  }
+  
+  // Mentorada (padrão)
+  return "voce";
+}
+
 // Função para extrair JSON da resposta da IA
 function extractJsonFromResponse(response: string): any {
   let cleaned = response
@@ -101,35 +161,44 @@ async function callAI(apiKey: string, prompt: string, maxTokens: number = 4096):
   return result.choices?.[0]?.message?.content || "";
 }
 
-// PASSO 1: Identificar fases do documento
+// PASSO 1: Identificar fases do documento - COM EXTRAÇÃO LITERAL
 async function identificarFases(apiKey: string, texto: string): Promise<FaseIdentificada[]> {
   console.log("=== PASSO 1: Identificando fases do documento ===");
   
-  const prompt = `Analise este documento e identifique TODAS as fases/etapas/seções principais.
+  const prompt = `Analise este documento e identifique TODAS as seções marcadas como FASE, ETAPA, ou blocos principais de entregas.
 
 DOCUMENTO:
 ${texto.substring(0, 30000)} ${texto.length > 30000 ? '...[documento continua]' : ''}
+
+REGRAS CRÍTICAS - EXTRAIA LITERALMENTE:
+1. Copie os TÍTULOS EXATOS como estão escritos no documento
+2. NÃO INVENTE títulos genéricos
+3. Se está escrito "FASE 1: DOCUMENTAÇÃO E PROCESSOS", retorne EXATAMENTE assim
+4. Se está escrito "FASE 2: FINANCEIRO E EXPANSÃO", retorne EXATAMENTE assim
+5. Inclua seções de "Pós-MVP", "Backlog", "Melhorias Futuras" como fases separadas
+
+❌ EXEMPLOS NEGATIVOS (NÃO FAÇA):
+- "Fase 1: Planejamento e Preparação" (título inventado)
+- "Fase 2: Implementação e Lançamento" (título genérico)
+- "Etapa de Organização" (resumo, não literal)
+
+✅ EXEMPLOS POSITIVOS (FAÇA):
+- "FASE 1: DOCUMENTAÇÃO E PROCESSOS" (copiado do documento)
+- "FASE 2: FINANCEIRO E EXPANSÃO" (copiado do documento)
+- "Pós-MVP" (seção real do documento)
 
 Responda APENAS com JSON válido:
 {
   "fases_encontradas": [
     {
       "numero": 1,
-      "titulo": "Nome da Fase/Etapa",
-      "inicio_texto": "copie as primeiras 30-50 palavras exatas desta fase",
-      "fim_texto": "copie as últimas 30-50 palavras exatas desta fase"
+      "titulo": "TÍTULO EXATO DO DOCUMENTO - COPIE LITERALMENTE",
+      "inicio_texto": "copie as primeiras 50 palavras exatas desta seção",
+      "fim_texto": "copie as últimas 30 palavras exatas desta seção"
     }
   ],
   "total_fases": 3
-}
-
-REGRAS CRÍTICAS:
-- Identifique TODAS as fases, não importa quantas sejam (2, 5, 10, 15...)
-- Fases podem ser marcadas como: "Fase X", "Etapa X", "Módulo X", "Bloco X", headers markdown (# ##), numerações, etc.
-- Inclua seções de "Backlog", "Pós-MVP", "Melhorias Futuras", "Próximos Passos" como fases separadas
-- Os campos inicio_texto e fim_texto devem ser texto EXATO do documento para localização
-- Se não encontrar divisões claras, retorne uma única fase com o documento todo
-- NÃO INVENTE conteúdo, use apenas texto que existe no documento`;
+}`;
 
   try {
     const content = await callAI(apiKey, prompt, 2048);
@@ -141,7 +210,6 @@ REGRAS CRÍTICAS:
       console.log(`  ${i + 1}. ${f.titulo}`);
     });
     
-    // Se não encontrou fases, retornar documento como fase única
     if (fases.length === 0) {
       console.log("Nenhuma fase identificada, processando documento como fase única");
       return [{
@@ -155,7 +223,6 @@ REGRAS CRÍTICAS:
     return fases;
   } catch (error) {
     console.error("Erro ao identificar fases:", error);
-    // Fallback: tratar documento inteiro como uma fase
     return [{
       numero: 1,
       titulo: "Documento Completo",
@@ -179,21 +246,17 @@ function splitDocumentByPhases(texto: string, fases: FaseIdentificada[]): string
     const fase = fases[i];
     const nextFase = fases[i + 1];
     
-    // Encontrar início desta fase usando parte do texto inicial
     const searchStart = fase.inicio_texto.substring(0, Math.min(50, fase.inicio_texto.length));
     let startIndex = texto.indexOf(searchStart);
     
-    // Fallback: buscar por título
     if (startIndex === -1) {
       startIndex = texto.toLowerCase().indexOf(fase.titulo.toLowerCase());
     }
     
-    // Se ainda não encontrou, usar posição proporcional
     if (startIndex === -1) {
       startIndex = Math.floor((i / fases.length) * texto.length);
     }
     
-    // Encontrar fim (início da próxima fase ou fim do documento)
     let endIndex = texto.length;
     if (nextFase) {
       const searchEnd = nextFase.inicio_texto.substring(0, Math.min(50, nextFase.inicio_texto.length));
@@ -202,7 +265,6 @@ function splitDocumentByPhases(texto: string, fases: FaseIdentificada[]): string
       if (nextStart > startIndex) {
         endIndex = nextStart;
       } else {
-        // Fallback: buscar por título da próxima
         const nextByTitle = texto.toLowerCase().indexOf(nextFase.titulo.toLowerCase(), startIndex + 100);
         if (nextByTitle > startIndex) {
           endIndex = nextByTitle;
@@ -217,7 +279,6 @@ function splitDocumentByPhases(texto: string, fases: FaseIdentificada[]): string
     }
   }
   
-  // Se não conseguiu dividir, retornar documento inteiro
   if (sections.length === 0) {
     console.log("Não foi possível dividir, usando documento completo");
     return [texto];
@@ -226,7 +287,27 @@ function splitDocumentByPhases(texto: string, fases: FaseIdentificada[]): string
   return sections;
 }
 
-// PASSO 2: Processar cada fase individualmente
+// Detectar se seção é de entregas em conjunto
+function isSecaoConjunta(section: string): boolean {
+  const textoLower = section.toLowerCase();
+  return textoLower.includes("em conjunto") ||
+         textoLower.includes("mariana + paula") ||
+         textoLower.includes("paula + mariana") ||
+         textoLower.includes("entregas conjuntas");
+}
+
+// Detectar se é seção de backlog
+function isSecaoBacklog(section: string, titulo: string): boolean {
+  const textoLower = (section + " " + titulo).toLowerCase();
+  return textoLower.includes("pós-mvp") ||
+         textoLower.includes("pos-mvp") ||
+         textoLower.includes("backlog") ||
+         textoLower.includes("melhorias futuras") ||
+         textoLower.includes("próximos passos") ||
+         textoLower.includes("proximos passos");
+}
+
+// PASSO 2: Processar cada fase individualmente - COM EXTRAÇÃO LITERAL
 async function processarFase(
   apiKey: string, 
   section: string, 
@@ -238,102 +319,153 @@ async function processarFase(
 ): Promise<ResultadoParcial> {
   console.log(`=== Processando fase ${faseNumero}/${totalFases} ===`);
   
-  const prompt = `Você é um assistente especializado em analisar documentos de mentoria business.
+  const isConjunta = isSecaoConjunta(section);
+  const isBacklog = isSecaoBacklog(section, "");
+  
+  console.log(`  - Seção conjunta: ${isConjunta}`);
+  console.log(`  - Seção backlog: ${isBacklog}`);
+  
+  const prompt = `Você é um extrator de dados. Extraia EXATAMENTE o conteúdo desta seção do documento de mentoria.
 
-CONTEXTO: Esta é a FASE ${faseNumero} de ${totalFases} de um documento de mentoria.
-
-IMPORTANTE - EXTRAIA ABSOLUTAMENTE TUDO:
-- NÃO resuma ou omita informações
-- Cada item listado deve virar uma entrega, instrução ou task
-- Se houver listas numeradas (1., 2., 3...), cada item é uma instrução SEPARADA
-- Se houver checklists (☐ ou □ ou [ ]), cada item é uma task SEPARADA
-- Capture TODOS os detalhes, dicas, observações e notas
-
-NUMERAÇÃO PARA ESTA FASE:
-- numero da etapa: ${faseNumero}
-- entregas começam em: ${entregaOffset + 1}
+CONTEXTO: Esta é a FASE ${faseNumero} de ${totalFases}.
+${isConjunta ? "⚠️ ATENÇÃO: Esta é uma seção de ENTREGAS EM CONJUNTO - todas devem ter responsavel='conjunto'" : ""}
+${isBacklog ? "⚠️ ATENÇÃO: Esta é uma seção de BACKLOG/PÓS-MVP - todos os itens devem ir para backlog" : ""}
 
 MÓDULOS CONTRATADOS: ${modulosLista}
-${contextoCliente ? `CONTEXTO DO CLIENTE: ${contextoCliente}` : ""}
+${contextoCliente ? `CONTEXTO: ${contextoCliente}` : ""}
 
-SEÇÃO A ANALISAR:
+SEÇÃO DO DOCUMENTO A PROCESSAR:
 ${section}
+
+═══════════════════════════════════════════════════════════════
+REGRAS DE EXTRAÇÃO LITERAL - SIGA RIGOROSAMENTE:
+═══════════════════════════════════════════════════════════════
+
+1. ENTREGAS = Títulos marcados como "ENTREGA X:", "Entrega:", ou blocos de atividades principais
+   - Copie o TÍTULO EXATO como está escrito
+   - Ex: "ENTREGA 3: Módulo de Gestão Financeira" → titulo: "Módulo de Gestão Financeira"
+   - ❌ NÃO TRANSFORME em "Plano de Gestão" ou títulos genéricos
+   - ❌ NÃO INVENTE entregas que não existem no texto
+
+2. INSTRUÇÕES = Passos numerados (PASSO 1, 1., 2., 3., etc.) ou bullets detalhados
+   - CADA passo numerado é UMA instrução SEPARADA
+   - Mantenha o texto original de cada passo
+   - Ex: "PASSO 1 - Preparar o prompt para o Claude" → titulo: "Preparar o prompt para o Claude"
+   - Ex: "2. Enviar para o Claude" → titulo: "Enviar para o Claude"
+   - Identifique a ferramenta mencionada (Claude, Lovable, MAPA, Drive, etc.)
+
+3. TASKS = Itens de checklist (☐, □, [ ], ✓) ou perguntas de validação
+   - CADA checkbox/pergunta é UMA task de validação SEPARADA
+   - Ex: "☐ Consigo acessar a tela de receitas?" → titulo: "Consigo acessar a tela de receitas?"
+   - Ex: "[ ] Verificar se o módulo está funcionando" → task
+
+4. RESPONSÁVEL - Identifique no texto:
+   - Se menciona "Paula", "mentorada", "você faz" → "voce"
+   - Se menciona "Mariana", "mentora", "Mari" → "mentor"
+   - Se menciona "Em Conjunto", "juntos", "Mariana + Paula" → "conjunto"
+   ${isConjunta ? "- NESTA SEÇÃO: Forçar 'conjunto' para todas" : ""}
+
+5. FERRAMENTA - Extraia a ferramenta mencionada:
+   - "Claude", "Lovable", "MAPA", "Drive", "Notion", "Supabase", "Make", "N8N", "Zapier"
+   - Se não mencionar ferramenta específica → "outro"
+   - Se for reunião, call, meet → "reuniao"
+
+6. BACKLOG - Itens para depois do MVP:
+   ${isBacklog ? "- NESTA SEÇÃO: Todos os itens são backlog" : "- Seções 'Pós-MVP', 'Melhorias Futuras', 'Próximos Passos'"}
+   - Items marcados como "A fazer", "Futuro", "Conforme demanda"
+
+═══════════════════════════════════════════════════════════════
 
 Responda APENAS com JSON válido:
 {
   "etapas": [
     {
       "numero": ${faseNumero},
-      "titulo": "Título da Fase",
-      "objetivo": "Objetivo principal desta fase"
+      "titulo": "TÍTULO EXATO DA FASE - COPIE DO DOCUMENTO",
+      "objetivo": "Objetivo mencionado no documento"
     }
   ],
   "entregas": [
     {
       "etapa_numero": ${faseNumero},
       "numero_entrega": ${entregaOffset + 1},
-      "titulo": "Título da Entrega",
-      "descricao": "Descrição detalhada",
-      "tipo": "ativa",
+      "titulo": "TÍTULO EXATO DA ENTREGA - COPIE DO DOCUMENTO",
+      "descricao": "Descrição/objetivo da entrega como está no documento",
+      "tipo": "${isBacklog ? "backlog" : "ativa"}",
       "prioridade": "alta",
-      "modulo_relacionado": "Módulo"
+      "modulo_relacionado": "Módulo mencionado"
     }
   ],
   "instrucoes": [
     {
       "entrega_numero": ${entregaOffset + 1},
-      "titulo": "Passo específico",
-      "descricao": "Detalhes do passo",
-      "responsavel": "voce",
-      "ferramenta": "outro",
-      "dicas": "Dicas adicionais",
+      "titulo": "TEXTO EXATO DO PASSO - COPIE DO DOCUMENTO",
+      "descricao": "Detalhes adicionais se houver",
+      "responsavel": "${isConjunta ? "conjunto" : "voce"}",
+      "ferramenta": "claude",
+      "dicas": "Dicas ou observações mencionadas",
       "ordem": 1
     }
   ],
   "tasks": [
     {
       "entrega_numero": ${entregaOffset + 1},
-      "titulo": "Item de validação",
+      "titulo": "TEXTO EXATO DO CHECKLIST - COPIE DO DOCUMENTO",
       "tipo": "validacao",
       "prioridade": "alta",
-      "instrucoes_validacao": "Como validar"
+      "instrucoes_validacao": "Como validar este item"
     }
   ],
   "backlog": [
     {
-      "titulo": "Item futuro",
-      "descricao": "Descrição",
-      "justificativa": "Porque está no backlog"
+      "titulo": "Item futuro mencionado",
+      "descricao": "Descrição do item",
+      "justificativa": "Porque está no backlog (Pós-MVP, Melhoria Futura, etc.)"
     }
   ]
 }
 
-REGRAS CRÍTICAS:
-- "tipo" de entrega: "ativa" ou "backlog"
-- "prioridade": "baixa", "media", "alta" ou "urgente"
-- "responsavel": "voce" (mentorado), "mentor" ou "conjunto"
-- "ferramenta": "claude", "lovable", "drive", "notion", "supabase", "make", "n8n", "zapier", "mapa", "reuniao", "outro"
-- "tipo" de task: "validacao", "aprovacao", "revisao", "homologacao", "assinatura", "feedback"
-- NÃO PULE nenhum item do documento
-- Se a seção tiver passos numerados, CADA passo é uma instrução separada
-- Se a seção tiver checklists, CADA checkbox é uma task separada`;
+LEMBRE-SE:
+- Extraia TUDO que está no documento - não omita itens
+- Use texto LITERAL do documento - não resuma
+- Se não encontrar determinado tipo de item, retorne array vazio []
+- NÃO INVENTE conteúdo que não existe no texto`;
 
   try {
-    const content = await callAI(apiKey, prompt, 6144);
+    const content = await callAI(apiKey, prompt, 8192);
     const parsed = extractJsonFromResponse(content);
+    
+    // Pós-processamento para normalizar valores
+    const entregas = (parsed.entregas || []).map((e: any) => ({
+      ...e,
+      tipo: isBacklog ? "backlog" : (e.tipo || "ativa"),
+      prioridade: e.prioridade || "alta"
+    }));
+    
+    const instrucoes = (parsed.instrucoes || []).map((inst: any) => ({
+      ...inst,
+      responsavel: isConjunta ? "conjunto" : normalizarResponsavel(inst.responsavel),
+      ferramenta: normalizarFerramenta(inst.ferramenta)
+    }));
+    
+    const tasks = (parsed.tasks || []).map((t: any) => ({
+      ...t,
+      tipo: t.tipo || "validacao",
+      prioridade: t.prioridade || "alta"
+    }));
     
     console.log(`  Resultado fase ${faseNumero}:`);
     console.log(`    - Etapas: ${parsed.etapas?.length || 0}`);
-    console.log(`    - Entregas: ${parsed.entregas?.length || 0}`);
-    console.log(`    - Instruções: ${parsed.instrucoes?.length || 0}`);
-    console.log(`    - Tasks: ${parsed.tasks?.length || 0}`);
+    console.log(`    - Entregas: ${entregas.length}`);
+    console.log(`    - Instruções: ${instrucoes.length}`);
+    console.log(`    - Tasks: ${tasks.length}`);
     console.log(`    - Backlog: ${parsed.backlog?.length || 0}`);
     
     return {
       etapas: parsed.etapas || [],
-      entregas: parsed.entregas || [],
-      instrucoes: parsed.instrucoes || [],
-      tasks: parsed.tasks || [],
+      entregas,
+      instrucoes,
+      tasks,
       backlog: parsed.backlog || []
     };
   } catch (error) {
@@ -360,7 +492,6 @@ function renumberResults(
 ): ResultadoParcial {
   const entregaMap: Record<number, number> = {};
   
-  // Renumerar entregas
   const entregas = (partial.entregas || []).map((e: any, i: number) => {
     const novoNumero = entregaOffset + i + 1;
     entregaMap[e.numero_entrega] = novoNumero;
@@ -371,19 +502,16 @@ function renumberResults(
     };
   });
   
-  // Atualizar referências em instruções
   const instrucoes = (partial.instrucoes || []).map((inst: any) => ({
     ...inst,
     entrega_numero: entregaMap[inst.entrega_numero] || inst.entrega_numero
   }));
   
-  // Atualizar referências em tasks
   const tasks = (partial.tasks || []).map((t: any) => ({
     ...t,
     entrega_numero: entregaMap[t.entrega_numero] || t.entrega_numero
   }));
   
-  // Garantir numeração correta da etapa
   const etapas = (partial.etapas || []).map((e: any) => ({
     ...e,
     numero: etapaNumero
@@ -455,10 +583,8 @@ serve(async (req) => {
         contexto_cliente
       );
       
-      // Renumerar para garantir continuidade
       const renumbered = renumberResults(faseResult, faseNumero, entregaOffset);
       
-      // Agregar resultados
       allResults.etapas.push(...renumbered.etapas);
       allResults.entregas.push(...renumbered.entregas);
       allResults.instrucoes.push(...renumbered.instrucoes);
@@ -476,7 +602,6 @@ serve(async (req) => {
 
     const finalResult = {
       ...allResults,
-      // Manter compatibilidade com formato antigo
       entregas_sugeridas: [],
       instrucoes_sugeridas: [],
       backlog_sugerido: allResults.backlog,
@@ -488,7 +613,6 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Erro:", error);
     
-    // Tratar erros específicos de rate limit
     if (error.message?.includes("429")) {
       return new Response(
         JSON.stringify({ error: "Limite de requisições excedido, tente novamente em alguns minutos." }),
