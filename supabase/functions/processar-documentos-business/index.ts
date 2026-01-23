@@ -651,7 +651,11 @@ function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial
 // PROCESSAR MVP E CONJUNTAS SEPARADAMENTE
 // ═══════════════════════════════════════════════════════════════════
 
-function processarMVPeConjuntas(ancoras: AncorasLiterais): { mvpEntregas: any[], conjuntasEntregas: any[] } {
+function processarMVPeConjuntas(ancoras: AncorasLiterais): { 
+  mvpEntregas: any[], 
+  conjuntasEntregaAgrupada: any | null,
+  conjuntasInstrucoes: any[]
+} {
   console.log("=== PROCESSANDO MVP E CONJUNTAS ===");
   
   // MVP como entregas sem etapa (ordem negativa para aparecer primeiro)
@@ -667,21 +671,46 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais): { mvpEntregas: any[],
   }));
   console.log(`  MVP: ${mvpEntregas.length} entregas`);
   
-  // Entregas em conjunto (sem etapa específica)
-  const conjuntasEntregas = ancoras.conjuntas.map((item, idx) => ({
-    etapa_numero: 0,
-    numero_entrega: 1000 + idx,
-    titulo: item.titulo,
-    descricao: 'Entrega em conjunto Mariana + Paula',
-    tipo: 'ativa' as const,
-    prioridade: 'media',
-    modulo_relacionado: null,
-    responsavel: 'conjunto',
-    status: item.status
-  }));
-  console.log(`  Conjuntas: ${conjuntasEntregas.length} entregas`);
+  // Entregas em conjunto -> AGRUPAR em 1 entrega + N instruções
+  let conjuntasEntregaAgrupada: any = null;
+  const conjuntasInstrucoes: any[] = [];
   
-  return { mvpEntregas, conjuntasEntregas };
+  if (ancoras.conjuntas.length > 0) {
+    // Criar UMA entrega agrupadora
+    const NUMERO_ENTREGA_CONJUNTAS = 9000; // Número especial para identificar
+    
+    conjuntasEntregaAgrupada = {
+      etapa_numero: 0,
+      numero_entrega: NUMERO_ENTREGA_CONJUNTAS,
+      titulo: 'Entregas em Conjunto (Mariana + Paula)',
+      descricao: `${ancoras.conjuntas.length} itens de trabalho colaborativo ao longo da mentoria`,
+      tipo: 'ativa' as const,
+      prioridade: 'media',
+      modulo_relacionado: null,
+      responsavel: 'conjunto',
+      is_grouped: true, // Flag para identificar no frontend
+      subitens_count: ancoras.conjuntas.length,
+      subitens_concluidos: ancoras.conjuntas.filter(c => c.status === 'concluida').length
+    };
+    
+    // Cada item vira uma instrução
+    ancoras.conjuntas.forEach((item, idx) => {
+      conjuntasInstrucoes.push({
+        entrega_numero: NUMERO_ENTREGA_CONJUNTAS,
+        titulo: item.titulo,
+        descricao: 'Entrega em conjunto Mariana + Paula',
+        responsavel: 'conjunto',
+        ferramenta: 'reuniao',
+        dicas: '',
+        ordem: idx + 1,
+        status: item.status // 'concluida' ou 'pendente'
+      });
+    });
+    
+    console.log(`  Conjuntas: 1 entrega agrupada com ${conjuntasInstrucoes.length} instruções`);
+  }
+  
+  return { mvpEntregas, conjuntasEntregaAgrupada, conjuntasInstrucoes };
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -790,9 +819,9 @@ serve(async (req) => {
     console.log(`\nÂncoras encontradas: ${temFases ? ancoras.fases.length : 0} fases, ${temEntregas ? ancoras.entregas.length : 0} entregas`);
     
     // ═══════════════════════════════════════════════════════════════
-    // PASSO 2: Processar MVP e Conjuntas
+    // PASSO 2: Processar MVP e Conjuntas (AGRUPADAS)
     // ═══════════════════════════════════════════════════════════════
-    const { mvpEntregas, conjuntasEntregas } = processarMVPeConjuntas(ancoras);
+    const { mvpEntregas, conjuntasEntregaAgrupada, conjuntasInstrucoes } = processarMVPeConjuntas(ancoras);
     
     // ═══════════════════════════════════════════════════════════════
     // PASSO 3: Processar com IA ou apenas com âncoras
@@ -826,48 +855,47 @@ serve(async (req) => {
     // PASSO 5: Combinar tudo
     // ═══════════════════════════════════════════════════════════════
     
-    // Adicionar MVP e Conjuntas às entregas
+    // Adicionar MVP e Conjuntas às entregas (agrupada, não fragmentada)
     const todasEntregas = [
       ...mvpEntregas,
       ...resultado.entregas,
-      ...conjuntasEntregas
+      ...(conjuntasEntregaAgrupada ? [conjuntasEntregaAgrupada] : [])
     ];
     
-    // Adicionar backlog das âncoras
-    const todoBacklog = [
-      ...resultado.backlog,
-      ...ancoras.backlog.map(b => ({
-        titulo: b.titulo,
-        descricao: '',
-        justificativa: b.secao
-      }))
+    // Adicionar instruções das conjuntas
+    const todasInstrucoes = [
+      ...resultado.instrucoes,
+      ...conjuntasInstrucoes
     ];
     
-    // Remover duplicatas de backlog
-    const backlogUnico = todoBacklog.filter((b, idx, arr) => 
-      arr.findIndex(x => x.titulo === b.titulo) === idx
-    );
+    // NÃO gerar backlog automaticamente - será manual via BacklogEditor
+    // Apenas manter backlog que veio de âncoras literais do documento
+    const backlogLiteral = ancoras.backlog.map(b => ({
+      titulo: b.titulo,
+      descricao: '',
+      justificativa: b.secao
+    }));
     
     // Resultado final
     console.log("\n═══════════════════════════════════════════════════════════════");
     console.log("RESULTADO FINAL");
     console.log("═══════════════════════════════════════════════════════════════");
     console.log(`Total de etapas: ${resultado.etapas.length}`);
-    console.log(`Total de entregas: ${todasEntregas.length} (MVP: ${mvpEntregas.length}, Principais: ${resultado.entregas.length}, Conjuntas: ${conjuntasEntregas.length})`);
-    console.log(`Total de instruções: ${resultado.instrucoes.length}`);
+    console.log(`Total de entregas: ${todasEntregas.length} (MVP: ${mvpEntregas.length}, Principais: ${resultado.entregas.length}, Conjuntas: ${conjuntasEntregaAgrupada ? 1 : 0})`);
+    console.log(`Total de instruções: ${todasInstrucoes.length}`);
     console.log(`Total de tasks: ${resultado.tasks.length}`);
-    console.log(`Total de backlog: ${backlogUnico.length}`);
+    console.log(`Total de backlog literal: ${backlogLiteral.length}`);
 
     const finalResult = {
       etapas: resultado.etapas,
       entregas: todasEntregas,
-      instrucoes: resultado.instrucoes,
+      instrucoes: todasInstrucoes,
       tasks: resultado.tasks,
-      backlog: backlogUnico,
+      backlog: backlogLiteral, // Apenas literais, o resto é manual
       // Compatibilidade com formato antigo
       entregas_sugeridas: [],
       instrucoes_sugeridas: [],
-      backlog_sugerido: backlogUnico,
+      backlog_sugerido: backlogLiteral,
     };
 
     return new Response(JSON.stringify(finalResult), {
