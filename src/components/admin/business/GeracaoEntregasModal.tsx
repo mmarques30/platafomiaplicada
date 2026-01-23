@@ -62,6 +62,8 @@ interface EntregaSelecionada {
   tipo: 'ativa' | 'backlog';
   prioridade: string;
   modulo_relacionado?: string;
+  responsavel?: string;
+  status?: string;
   selecionada: boolean;
 }
 
@@ -587,12 +589,95 @@ export function GeracaoEntregasModal({
   const totalTasks = tasks.filter(t => t.selecionada).length;
   const totalBacklog = backlog.filter(b => b.selecionado).length;
 
+  // Separar entregas por tipo
+  const entregasMVP = entregas.filter(e => e.numero_entrega < 0);
+  const entregasConjuntas = entregas.filter(e => e.responsavel === 'conjunto');
+  const entregasPrincipais = entregas.filter(e => e.numero_entrega > 0 && e.responsavel !== 'conjunto');
+
   // Renderizar formato novo (hierárquico)
   const renderNewFormat = () => (
     <div className="space-y-4">
+      {/* MVP - Entregas sem etapa */}
+      {entregasMVP.length > 0 && (
+        <div className="border rounded-lg overflow-hidden border-emerald-500/30">
+          <div className="flex items-center gap-3 p-3 bg-emerald-500/10">
+            <Sparkles className="h-4 w-4 text-emerald-600" />
+            <div className="flex-1">
+              <p className="font-medium text-emerald-700">MVP - Escopo Acordado</p>
+              <p className="text-xs text-muted-foreground">Entregas prioritárias do primeiro release</p>
+            </div>
+            <Badge variant="secondary" className="text-xs">
+              {entregasMVP.filter(e => e.selecionada).length}/{entregasMVP.length}
+            </Badge>
+          </div>
+          <div className="p-3 space-y-2">
+            {entregasMVP.map((entrega) => (
+              <div 
+                key={entrega.numero_entrega}
+                className="flex items-center gap-3 p-2 border rounded bg-background"
+              >
+                <Checkbox
+                  checked={entrega.selecionada}
+                  onCheckedChange={() => toggleEntregaSelecionada(entrega.numero_entrega)}
+                />
+                <Package className="h-4 w-4 text-emerald-600" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{entrega.titulo}</p>
+                </div>
+                {getAcaoBadge(getAcaoItem('entrega', entrega.titulo))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Entregas em Conjunto */}
+      {entregasConjuntas.length > 0 && (
+        <div className="border rounded-lg overflow-hidden border-blue-500/30">
+          <div className="flex items-center gap-3 p-3 bg-blue-500/10">
+            <ListTodo className="h-4 w-4 text-blue-600" />
+            <div className="flex-1">
+              <p className="font-medium text-blue-700">Entregas em Conjunto</p>
+              <p className="text-xs text-muted-foreground">Mariana + Paula - acontecem durante todas as etapas</p>
+            </div>
+            <Badge variant="secondary" className="text-xs">
+              {entregasConjuntas.filter(e => e.selecionada).length}/{entregasConjuntas.length}
+            </Badge>
+          </div>
+          <div className="p-3 space-y-2">
+            {entregasConjuntas.map((entrega) => (
+              <div 
+                key={entrega.numero_entrega}
+                className="flex items-center gap-3 p-2 border rounded bg-background"
+              >
+                <Checkbox
+                  checked={entrega.selecionada}
+                  onCheckedChange={() => toggleEntregaSelecionada(entrega.numero_entrega)}
+                />
+                <Package className="h-4 w-4 text-blue-600" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{entrega.titulo}</p>
+                </div>
+                {entrega.status === 'concluida' ? (
+                  <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
+                    ✓ Concluída
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">
+                    Pendente
+                  </Badge>
+                )}
+                {getResponsavelBadge('conjunto')}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Etapas e Entregas Principais */}
       {etapas.map((etapa) => {
         const isExpanded = expandedEtapas.includes(etapa.numero);
-        const entregasDaEtapa = entregas.filter(e => e.etapa_numero === etapa.numero);
+        const entregasDaEtapa = entregasPrincipais.filter(e => e.etapa_numero === etapa.numero);
         
         return (
           <div key={etapa.numero} className="border rounded-lg overflow-hidden">
@@ -654,6 +739,11 @@ export function GeracaoEntregasModal({
                           <p className="text-sm font-medium">
                             Entrega {entrega.numero_entrega}: {entrega.titulo}
                           </p>
+                          {instrucoesDaEntrega.length > 0 && (
+                            <p className="text-xs text-muted-foreground">
+                              {instrucoesDaEntrega.length} instruções
+                            </p>
+                          )}
                         </div>
                         {getAcaoBadge(getAcaoItem('entrega', entrega.titulo))}
                         {getPrioridadeBadge(entrega.prioridade)}
@@ -690,6 +780,11 @@ export function GeracaoEntregasModal({
                                     )}
                                   </div>
                                   {getResponsavelBadge(instrucao.responsavel)}
+                                  {instrucao.ferramenta && instrucao.ferramenta !== 'outro' && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {instrucao.ferramenta}
+                                    </Badge>
+                                  )}
                                 </div>
                               ))}
                             </div>
