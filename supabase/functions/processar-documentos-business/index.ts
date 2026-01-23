@@ -10,10 +10,22 @@ const corsHeaders = {
 // INTERFACES
 // ═══════════════════════════════════════════════════════════════════
 
+interface PassoExtraido {
+  numero: number;
+  titulo: string;
+  entregaNumero: number;
+  conteudo_completo: string;
+  descricao: string;
+  prompt_sugerido?: string;
+  dicas?: string;
+  ferramenta: string;
+  responsavel: string;
+}
+
 interface AncorasLiterais {
   fases: { numero: number; titulo: string; conteudo: string }[];
   entregas: { numero: number; titulo: string; faseNumero: number }[];
-  passos: { numero: number; titulo: string; entregaNumero: number }[];
+  passos: PassoExtraido[];
   checklists: { titulo: string; entregaNumero: number }[];
   mvp: { titulo: string }[];
   conjuntas: { titulo: string; status: string }[];
@@ -83,6 +95,116 @@ function normalizarResponsavel(texto: string | undefined): "voce" | "mentor" | "
   }
   
   return "voce";
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DETECÇÃO AUTOMÁTICA DE FERRAMENTA E RESPONSÁVEL
+// ═══════════════════════════════════════════════════════════════════
+
+function detectarFerramenta(texto: string): string {
+  const textoLower = texto.toLowerCase();
+  
+  // Ordem de prioridade: mais específico primeiro
+  if (textoLower.includes('lovable')) return 'lovable';
+  if (textoLower.includes('claude') || textoLower.includes('prompt') || textoLower.includes(' ia ') || textoLower.includes('copie e cole')) return 'claude';
+  if (textoLower.includes('mapa') || textoLower.includes('fluxo') || textoLower.includes('proceso')) return 'mapa';
+  if (textoLower.includes('drive') || textoLower.includes('google')) return 'drive';
+  if (textoLower.includes('notion')) return 'notion';
+  if (textoLower.includes('supabase')) return 'supabase';
+  if (textoLower.includes('make')) return 'make';
+  if (textoLower.includes('n8n')) return 'n8n';
+  if (textoLower.includes('zapier')) return 'zapier';
+  if (textoLower.includes('reunião') || textoLower.includes('call') || textoLower.includes('meet') || textoLower.includes('grupo')) return 'reuniao';
+  
+  return 'outro';
+}
+
+function detectarResponsavel(texto: string): "voce" | "mentor" | "conjunto" {
+  const textoLower = texto.toLowerCase();
+  
+  if (textoLower.includes('em conjunto') || textoLower.includes('juntos') || textoLower.includes('mariana + paula')) {
+    return 'conjunto';
+  }
+  if (textoLower.includes('mariana') || textoLower.includes('mentora') || textoLower.includes('mari ')) {
+    return 'mentor';
+  }
+  
+  return 'voce';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EXTRAÇÃO DE PROMPTS E DICAS DO CONTEÚDO
+// ═══════════════════════════════════════════════════════════════════
+
+function extrairPrompt(conteudo: string): string | undefined {
+  // Padrão 1: Texto entre aspas após "prompt" ou "cole"
+  const regexAspas = /(?:prompt|cole\s+o\s+prompt|copie\s+e\s+cole|mensagem)[:\s]*["'"]([\s\S]+?)["'"]/i;
+  const matchAspas = conteudo.match(regexAspas);
+  if (matchAspas && matchAspas[1].length > 30) {
+    return matchAspas[1].trim();
+  }
+  
+  // Padrão 2: Bloco de texto grande após "Prompt:" ou similar
+  const regexBloco = /(?:prompt|cole\s+no\s+claude|envie\s+para\s+o\s+claude)[:\s]*([\s\S]{50,}?)(?=\n\n|\nDICA|\nOBS|\nATENÇÃO|\nIMPORTANTE|\nPASSO|$)/i;
+  const matchBloco = conteudo.match(regexBloco);
+  if (matchBloco && matchBloco[1].length > 50) {
+    return matchBloco[1].trim();
+  }
+  
+  // Padrão 3: Texto entre aspas curvas ou retas
+  const regexAspasLongas = /["'"]([\s\S]{80,}?)["'"]/;
+  const matchAspaslongas = conteudo.match(regexAspasLongas);
+  if (matchAspaslongas) {
+    return matchAspaslongas[1].trim();
+  }
+  
+  return undefined;
+}
+
+function extrairDicas(conteudo: string): string | undefined {
+  // Padrão: "DICA:", "DICAS:", "Obs:", "ATENÇÃO:", "IMPORTANTE:"
+  const regexDicas = /(?:DICAS?|OBS|ATENÇÃO|IMPORTANTE|OBSERVAÇÃO)[:\s]*([^\n]+(?:\n(?!\s*PASSO|\s*\d+\s*[-–:])[^\n]+)*)/i;
+  const match = conteudo.match(regexDicas);
+  if (match && match[1].length > 5) {
+    return match[1].trim();
+  }
+  
+  return undefined;
+}
+
+function extrairDescricao(conteudo: string, titulo: string): string {
+  // Remover título e extrair descrição (linhas após título, antes de prompt/dicas)
+  const linhas = conteudo.split('\n');
+  const descricaoLinhas: string[] = [];
+  let iniciou = false;
+  
+  for (const linha of linhas) {
+    const linhaTrimmed = linha.trim();
+    
+    // Pular linha do título
+    if (!iniciou && linhaTrimmed.toLowerCase().includes(titulo.toLowerCase().substring(0, 20))) {
+      iniciou = true;
+      continue;
+    }
+    
+    if (!iniciou) continue;
+    
+    // Parar em marcadores de prompt/dicas
+    if (linhaTrimmed.match(/^(prompt|dica|obs|atenção|importante|copie|cole)/i)) {
+      break;
+    }
+    
+    // Parar em aspas (início de prompt)
+    if (linhaTrimmed.startsWith('"') || linhaTrimmed.startsWith("'") || linhaTrimmed.startsWith('"')) {
+      break;
+    }
+    
+    if (linhaTrimmed.length > 2) {
+      descricaoLinhas.push(linhaTrimmed);
+    }
+  }
+  
+  return descricaoLinhas.slice(0, 5).join(' ').trim(); // Limitar a 5 linhas
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -218,43 +340,67 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
     }
   }
   
-  // 3. PASSOS - Padrões: "PASSO 1 -", "PASSO 1:", "1.", "1 -"
-  const regexPasso = /(?:^|\n)\s*(?:PASSO\s*)?(\d{1,2})\s*[:\-–.]\s*([^☐□\[\]]+?)(?=(?:\n\s*(?:PASSO\s*)?\d{1,2}\s*[:\-–.])|(?:\n\s*[☐□\[\]])|(?:\n\n)|$)/gi;
-  let matchPasso;
-  let ultimaEntrega = 1;
+  // 3. PASSOS - EXTRAÇÃO COMPLETA com prompt, dicas, ferramenta, responsável
+  console.log("  Extraindo PASSOS com conteúdo completo...");
   
-  // Encontrar passos dentro de cada entrega
   for (const entrega of ancoras.entregas) {
-    const entregaMatch = texto.match(new RegExp(`ENTREGA\\s*${entrega.numero}[\\s\\S]*?(?=ENTREGA\\s*${entrega.numero + 1}|$)`, 'i'));
+    // Encontrar todo o texto da entrega até a próxima entrega
+    const regexEntregaConteudo = new RegExp(
+      `ENTREGA\\s*${entrega.numero}[\\s\\S]*?(?=ENTREGA\\s*${entrega.numero + 1}|ENTREGAS\\s+EM\\s+CONJUNTO|$)`, 
+      'i'
+    );
+    const entregaMatch = texto.match(regexEntregaConteudo);
+    
     if (entregaMatch) {
       const textoEntrega = entregaMatch[0];
       
-      // Procurar padrão "PASSO X -"
-      const regexPassoEntrega = /(?:^|\n)\s*PASSO\s*(\d{1,2})\s*[:\-–]\s*(.+?)(?=(?:\n\s*PASSO)|(?:\n\s*[☐□\[\]])|(?:\n\n)|$)/gi;
+      // Regex que captura PASSO + TODO conteúdo até próximo PASSO ou fim
+      const regexPassoCompleto = /PASSO\s*(\d{1,2})\s*[:\-–]\s*([\s\S]*?)(?=\nPASSO\s*\d{1,2}\s*[:\-–]|\nENTREGA\s*\d|☐|$)/gi;
+      
       let mp;
-      while ((mp = regexPassoEntrega.exec(textoEntrega)) !== null) {
+      while ((mp = regexPassoCompleto.exec(textoEntrega)) !== null) {
         const numPasso = parseInt(mp[1]);
-        let tituloPasso = mp[2].trim()
+        const conteudoCompleto = mp[2].trim();
+        
+        // Extrair título (primeira linha significativa, sem asteriscos)
+        const primeiraLinha = conteudoCompleto.split('\n')[0];
+        const titulo = primeiraLinha
           .replace(/\*+/g, '')
-          .replace(/[\r\n].*/s, '')
+          .replace(/^[-–:\s]+/, '')
           .trim();
         
-        if (tituloPasso.length > 3 && tituloPasso.length < 200) {
-          ancoras.passos.push({
-            numero: numPasso,
-            titulo: tituloPasso,
-            entregaNumero: entrega.numero
-          });
-          console.log(`    PASSO ${numPasso} (Entrega ${entrega.numero}): ${tituloPasso.substring(0, 50)}...`);
-        }
+        if (titulo.length < 3 || titulo.length > 200) continue;
+        
+        // Extrair detalhes do conteúdo
+        const prompt = extrairPrompt(conteudoCompleto);
+        const dicas = extrairDicas(conteudoCompleto);
+        const descricao = extrairDescricao(conteudoCompleto, titulo);
+        const ferramenta = detectarFerramenta(conteudoCompleto);
+        const responsavel = detectarResponsavel(conteudoCompleto);
+        
+        ancoras.passos.push({
+          numero: numPasso,
+          titulo,
+          entregaNumero: entrega.numero,
+          conteudo_completo: conteudoCompleto,
+          descricao: descricao || '',
+          prompt_sugerido: prompt,
+          dicas: dicas,
+          ferramenta,
+          responsavel
+        });
+        
+        console.log(`    PASSO ${numPasso} (Entrega ${entrega.numero}): ${titulo.substring(0, 40)}... [${ferramenta}] ${prompt ? '📋 PROMPT' : ''} ${dicas ? '💡 DICAS' : ''}`);
       }
     }
   }
   
+  console.log(`  Total de passos extraídos com detalhes: ${ancoras.passos.length}`);
+  
   // 4. CHECKLISTS - Padrões: "☐", "□", "[ ]", "✓"
   const regexChecklist = /[☐□✓✔]\s*(.+?)(?=\n|$)/gi;
   let matchCheck;
-  ultimaEntrega = 1;
+  let ultimaEntrega = 1;
   
   while ((matchCheck = regexChecklist.exec(texto)) !== null) {
     const titulo = matchCheck[1].trim()
@@ -460,10 +606,11 @@ Responda APENAS com JSON válido seguindo EXATAMENTE as âncoras acima:
     {
       "entrega_numero": 1,
       "titulo": "USAR TÍTULO EXATO DO PASSO",
-      "descricao": "Detalhes adicionais",
+      "descricao": "Detalhes completos do passo - COPIE DO DOCUMENTO",
+      "prompt_sugerido": "Prompt completo se existir - COPIE EXATAMENTE COMO ESTÁ",
+      "dicas": "Dicas, observações, atenções - COPIE DO DOCUMENTO",
       "responsavel": "voce",
       "ferramenta": "lovable",
-      "dicas": "Dicas do documento",
       "ordem": 1
     }
   ],
@@ -562,18 +709,21 @@ function validarContraAncoras(resultado: any, ancoras: AncorasLiterais): Resulta
     }
   }
   
-  // Validar instruções
+  // Validar instruções - PRIORIZAR dados das âncoras (que têm prompt/dicas)
   for (const instrucao of (resultado.instrucoes || [])) {
     const ancoraCorrespondente = ancoras.passos.find(p => 
       p.entregaNumero === instrucao.entrega_numero &&
-      (p.numero === instrucao.ordem || p.titulo.toLowerCase().includes(instrucao.titulo?.toLowerCase() || ''))
+      (p.numero === instrucao.ordem || p.titulo.toLowerCase().includes((instrucao.titulo || '').toLowerCase().substring(0, 20)))
     );
     
     instrucoesValidas.push({
       ...instrucao,
       titulo: ancoraCorrespondente?.titulo || instrucao.titulo,
-      responsavel: normalizarResponsavel(instrucao.responsavel),
-      ferramenta: normalizarFerramenta(instrucao.ferramenta)
+      descricao: ancoraCorrespondente?.descricao || instrucao.descricao || '',
+      prompt_sugerido: ancoraCorrespondente?.prompt_sugerido || instrucao.prompt_sugerido || '',
+      dicas: ancoraCorrespondente?.dicas || instrucao.dicas || '',
+      responsavel: ancoraCorrespondente?.responsavel || normalizarResponsavel(instrucao.responsavel),
+      ferramenta: ancoraCorrespondente?.ferramenta || normalizarFerramenta(instrucao.ferramenta)
     });
   }
   
@@ -620,13 +770,15 @@ function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial
     modulo_relacionado: null
   }));
   
+  // USAR DADOS COMPLETOS DOS PASSOS - com prompt, dicas, ferramenta, responsável
   const instrucoes = ancoras.passos.map((p, idx) => ({
     entrega_numero: p.entregaNumero,
     titulo: p.titulo,
-    descricao: '',
-    responsavel: 'voce' as const,
-    ferramenta: 'outro',
-    dicas: '',
+    descricao: p.descricao || '',
+    prompt_sugerido: p.prompt_sugerido || '',
+    dicas: p.dicas || '',
+    responsavel: p.responsavel || 'voce',
+    ferramenta: p.ferramenta || 'outro',
     ordem: p.numero || idx + 1
   }));
   
@@ -717,9 +869,10 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais, texto: string): {
         entrega_numero: NUMERO_ENTREGA_CONJUNTAS,
         titulo: item.titulo,
         descricao: 'Entrega em conjunto Mariana + Paula',
+        prompt_sugerido: '',
+        dicas: '',
         responsavel: 'conjunto',
         ferramenta: 'reuniao',
-        dicas: '',
         ordem: idx + 1,
         status: item.status // 'concluida' ou 'pendente'
       });
@@ -821,7 +974,7 @@ serve(async (req) => {
       : "Não especificados";
 
     console.log("═══════════════════════════════════════════════════════════════");
-    console.log("INÍCIO DO PROCESSAMENTO - MODO EXTRAÇÃO LITERAL");
+    console.log("INÍCIO DO PROCESSAMENTO - MODO EXTRAÇÃO LITERAL COMPLETA");
     console.log("═══════════════════════════════════════════════════════════════");
     console.log(`Tamanho do documento: ${texto.length} caracteres`);
     console.log(`Módulos contratados: ${modulosLista}`);
@@ -835,6 +988,9 @@ serve(async (req) => {
     const temEntregas = ancoras.entregas.length > 0;
     
     console.log(`\nÂncoras encontradas: ${temFases ? ancoras.fases.length : 0} fases, ${temEntregas ? ancoras.entregas.length : 0} entregas`);
+    console.log(`Passos com detalhes: ${ancoras.passos.length}`);
+    console.log(`  - Com prompt: ${ancoras.passos.filter(p => p.prompt_sugerido).length}`);
+    console.log(`  - Com dicas: ${ancoras.passos.filter(p => p.dicas).length}`);
     
     // ═══════════════════════════════════════════════════════════════
     // PASSO 2: Processar MVP e Conjuntas (AGRUPADAS - associadas à fase correta)
@@ -901,6 +1057,8 @@ serve(async (req) => {
     console.log(`Total de etapas: ${resultado.etapas.length}`);
     console.log(`Total de entregas: ${todasEntregas.length} (MVP: ${mvpEntregas.length}, Principais: ${resultado.entregas.length}, Conjuntas: ${conjuntasEntregaAgrupada ? 1 : 0})`);
     console.log(`Total de instruções: ${todasInstrucoes.length}`);
+    console.log(`  - Com prompt: ${todasInstrucoes.filter(i => i.prompt_sugerido).length}`);
+    console.log(`  - Com dicas: ${todasInstrucoes.filter(i => i.dicas).length}`);
     console.log(`Total de tasks: ${resultado.tasks.length}`);
     console.log(`Total de backlog literal: ${backlogLiteral.length}`);
 
@@ -935,7 +1093,7 @@ serve(async (req) => {
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     return new Response(
       JSON.stringify({ error: error?.message || "Erro desconhecido" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

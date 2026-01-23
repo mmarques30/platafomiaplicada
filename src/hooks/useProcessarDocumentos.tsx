@@ -25,6 +25,7 @@ export interface InstrucaoSugeridaV2 {
   entrega_numero: number;
   titulo: string;
   descricao?: string;
+  prompt_sugerido?: string;
   responsavel: 'voce' | 'mentor' | 'conjunto';
   ferramenta?: string;
   dicas?: string;
