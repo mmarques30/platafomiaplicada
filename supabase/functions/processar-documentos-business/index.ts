@@ -853,9 +853,8 @@ function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial
 
 function processarMVPeConjuntas(ancoras: AncorasLiterais, texto: string): { 
   mvpEntregas: any[], 
-  conjuntasEntregaAgrupada: any | null,
-  conjuntasInstrucoes: any[],
-  faseConjuntas: number
+  conjuntasEntregasPorFase: any[],
+  conjuntasInstrucoes: any[]
 } {
   console.log("=== PROCESSANDO MVP E CONJUNTAS ===");
   
@@ -872,64 +871,101 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais, texto: string): {
   }));
   console.log(`  MVP: ${mvpEntregas.length} entregas`);
   
-  // Detectar em qual FASE as "Entregas em Conjunto" aparecem no documento
-  let faseConjuntas = 1; // default - primeira fase
-  const posConjuntas = texto.toUpperCase().indexOf('ENTREGAS EM CONJUNTO');
+  // Keywords para detectar fase de cada instrução
+  const keywordsPorFase: Record<number, string[]> = {
+    1: ['configuração', 'ambiente', 'stack', 'base de dados', 'autenticação', 'cores', 'logo', 'documentos', 'storage', 'bucket', 'deploy', 'domínio'],
+    2: ['financeiro', 'contabilidade', 'scanner', 'ocr', 'integração', 'backend', 'expansão', 'módulos complexos', 'demanda'],
+    3: ['alunos', 'inscrição', 'turmas', 'professor', 'segurança', 'rls', 'tradução', 'personagem', 'marketing', 'francês', 'cadastro']
+  };
   
-  if (posConjuntas !== -1 && ancoras.fases.length > 0) {
-    // Encontrar qual fase contém essa seção (última fase antes da posição)
-    for (const fase of ancoras.fases.slice().reverse()) {
-      const posicaoFase = texto.toUpperCase().indexOf(`FASE ${fase.numero}`);
-      if (posicaoFase !== -1 && posConjuntas > posicaoFase) {
-        faseConjuntas = fase.numero;
-        console.log(`  Entregas em Conjunto detectadas na FASE ${faseConjuntas}`);
-        break;
+  // Detectar fase por conteúdo do título
+  function detectarFasePorConteudo(titulo: string): number {
+    const tituloLower = titulo.toLowerCase();
+    for (const [fase, keywords] of Object.entries(keywordsPorFase)) {
+      if (keywords.some(kw => tituloLower.includes(kw))) {
+        return parseInt(fase);
       }
     }
+    return 1; // default fase 1
   }
   
-  // Entregas em conjunto -> AGRUPAR em 1 entrega + N instruções DENTRO DA FASE
-  let conjuntasEntregaAgrupada: any = null;
+  // Entregas em conjunto -> CRIAR UMA ENTREGA POR FASE
+  const conjuntasEntregasPorFase: any[] = [];
   const conjuntasInstrucoes: any[] = [];
   
   if (ancoras.conjuntas.length > 0) {
-    // Criar UMA entrega agrupadora associada à fase correta
-    const NUMERO_ENTREGA_CONJUNTAS = 9000; // Número especial para identificar
+    const totalFases = Math.max(ancoras.fases.length, 1);
+    const NUMERO_CONJUNTAS_BASE = 9000;
     
-    conjuntasEntregaAgrupada = {
-      etapa_numero: faseConjuntas, // Agora pertence à fase correta!
-      numero_entrega: NUMERO_ENTREGA_CONJUNTAS,
-      titulo: 'Entregas em Conjunto (Mariana + Paula)',
-      descricao: `${ancoras.conjuntas.length} itens de trabalho colaborativo ao longo da mentoria`,
-      tipo: 'ativa' as const,
-      prioridade: 'media',
-      modulo_relacionado: null,
-      responsavel: 'conjunto',
-      is_conjuntas: true, // Flag para estilização especial no frontend
-      is_grouped: true,
-      subitens_count: ancoras.conjuntas.length,
-      subitens_concluidos: ancoras.conjuntas.filter(c => c.status === 'concluida').length
-    };
+    // Criar uma entrega "Conjuntas" para CADA fase detectada
+    const fasesComConjuntas = new Set<number>();
     
-    // Cada item vira uma instrução
-    ancoras.conjuntas.forEach((item, idx) => {
+    // Primeiro, detectar quais fases têm itens
+    ancoras.conjuntas.forEach(item => {
+      const faseDestino = detectarFasePorConteudo(item.titulo);
+      fasesComConjuntas.add(faseDestino);
+    });
+    
+    // Se não detectou nenhuma fase específica, usar todas as fases existentes
+    if (fasesComConjuntas.size === 0) {
+      for (let i = 1; i <= totalFases; i++) {
+        fasesComConjuntas.add(i);
+      }
+    }
+    
+    // Criar entregas para cada fase que tem itens
+    const fasesArray = Array.from(fasesComConjuntas).sort((a, b) => a - b);
+    for (const faseNum of fasesArray) {
+      const faseTitulo = ancoras.fases.find(f => f.numero === faseNum)?.titulo || `Fase ${faseNum}`;
+      // Extrair parte relevante do título da fase (ex: "FINANCEIRO E EXPANSÃO")
+      const tituloResumido = faseTitulo.replace(/^FASE\s*\d+\s*[-–:]\s*/i, '').trim() || `Fase ${faseNum}`;
+      
+      conjuntasEntregasPorFase.push({
+        etapa_numero: faseNum,
+        numero_entrega: NUMERO_CONJUNTAS_BASE + faseNum - 1,
+        titulo: `Entregas em Conjunto - ${tituloResumido}`,
+        descricao: `Trabalho colaborativo da Fase ${faseNum}`,
+        tipo: 'ativa' as const,
+        prioridade: 'media',
+        modulo_relacionado: null,
+        responsavel: 'conjunto',
+        is_conjuntas: true
+      });
+    }
+    
+    // Distribuir instruções para a entrega da fase correta
+    const ordemPorFase: Record<number, number> = {};
+    
+    ancoras.conjuntas.forEach((item) => {
+      const faseDestino = detectarFasePorConteudo(item.titulo);
+      const numeroEntrega = NUMERO_CONJUNTAS_BASE + faseDestino - 1;
+      
+      // Incrementar ordem para esta fase
+      ordemPorFase[faseDestino] = (ordemPorFase[faseDestino] || 0) + 1;
+      
       conjuntasInstrucoes.push({
-        entrega_numero: NUMERO_ENTREGA_CONJUNTAS,
+        entrega_numero: numeroEntrega,
         titulo: item.titulo,
-        descricao: 'Entrega em conjunto Mariana + Paula',
+        descricao: 'Entrega em conjunto',
         prompt_sugerido: '',
         dicas: '',
         responsavel: 'conjunto',
         ferramenta: 'reuniao',
-        ordem: idx + 1,
-        status: item.status // 'concluida' ou 'pendente'
+        ordem: ordemPorFase[faseDestino],
+        status: item.status
       });
     });
     
-    console.log(`  Conjuntas: 1 entrega agrupada com ${conjuntasInstrucoes.length} instruções (FASE ${faseConjuntas})`);
+    console.log(`  Conjuntas: ${conjuntasEntregasPorFase.length} entregas (1 por fase) com ${conjuntasInstrucoes.length} instruções distribuídas`);
+    
+    // Log detalhado
+    for (const entrega of conjuntasEntregasPorFase) {
+      const qtdInstrucoes = conjuntasInstrucoes.filter(i => i.entrega_numero === entrega.numero_entrega).length;
+      console.log(`    Fase ${entrega.etapa_numero}: ${qtdInstrucoes} instruções`);
+    }
   }
   
-  return { mvpEntregas, conjuntasEntregaAgrupada, conjuntasInstrucoes, faseConjuntas };
+  return { mvpEntregas, conjuntasEntregasPorFase, conjuntasInstrucoes };
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1041,9 +1077,9 @@ serve(async (req) => {
     console.log(`  - Com dicas: ${ancoras.passos.filter(p => p.dicas).length}`);
     
     // ═══════════════════════════════════════════════════════════════
-    // PASSO 2: Processar MVP e Conjuntas (AGRUPADAS - associadas à fase correta)
+    // PASSO 2: Processar MVP e Conjuntas (1 ENTREGA POR FASE)
     // ═══════════════════════════════════════════════════════════════
-    const { mvpEntregas, conjuntasEntregaAgrupada, conjuntasInstrucoes, faseConjuntas } = processarMVPeConjuntas(ancoras, texto);
+    const { mvpEntregas, conjuntasEntregasPorFase, conjuntasInstrucoes } = processarMVPeConjuntas(ancoras, texto);
     
     // ═══════════════════════════════════════════════════════════════
     // PASSO 3: Processar com IA ou apenas com âncoras
@@ -1077,11 +1113,11 @@ serve(async (req) => {
     // PASSO 5: Combinar tudo
     // ═══════════════════════════════════════════════════════════════
     
-    // Adicionar MVP e Conjuntas às entregas (agrupada, não fragmentada)
+    // Adicionar MVP e Conjuntas às entregas (1 por fase)
     const todasEntregas = [
       ...mvpEntregas,
       ...resultado.entregas,
-      ...(conjuntasEntregaAgrupada ? [conjuntasEntregaAgrupada] : [])
+      ...conjuntasEntregasPorFase
     ];
     
     // Adicionar instruções das conjuntas
@@ -1103,7 +1139,7 @@ serve(async (req) => {
     console.log("RESULTADO FINAL");
     console.log("═══════════════════════════════════════════════════════════════");
     console.log(`Total de etapas: ${resultado.etapas.length}`);
-    console.log(`Total de entregas: ${todasEntregas.length} (MVP: ${mvpEntregas.length}, Principais: ${resultado.entregas.length}, Conjuntas: ${conjuntasEntregaAgrupada ? 1 : 0})`);
+    console.log(`Total de entregas: ${todasEntregas.length} (MVP: ${mvpEntregas.length}, Principais: ${resultado.entregas.length}, Conjuntas: ${conjuntasEntregasPorFase.length})`);
     console.log(`Total de instruções: ${todasInstrucoes.length}`);
     console.log(`  - Com prompt: ${todasInstrucoes.filter(i => i.prompt_sugerido).length}`);
     console.log(`  - Com dicas: ${todasInstrucoes.filter(i => i.dicas).length}`);
