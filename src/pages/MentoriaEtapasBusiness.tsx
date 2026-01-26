@@ -11,6 +11,7 @@ import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 const statusConfig = {
   pendente: { label: "Pendente", className: "bg-muted text-muted-foreground" },
@@ -52,29 +53,30 @@ export default function MentoriaEtapasBusiness() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-4xl py-8 flex items-center justify-center min-h-[400px]">
+      <div className="container mx-auto py-8 px-4 flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="container max-w-4xl py-8 space-y-6">
+    <div className="container mx-auto py-8 px-4 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/mentoria")}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">Minhas Fases</h1>
-          <p className="text-muted-foreground text-sm">
-            Acompanhe o progresso das fases do seu projeto
-          </p>
-        </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate("/mentoria")}
+        className="text-muted-foreground hover:text-foreground mb-4"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar
+      </Button>
+
+      <div className="mb-8">
+        <PageTitle primary="Minhas" secondary="Fases" />
+        <p className="text-muted-foreground text-lg mt-2">
+          Acompanhe o progresso das fases do seu projeto
+        </p>
       </div>
 
       {/* Progresso Geral */}
