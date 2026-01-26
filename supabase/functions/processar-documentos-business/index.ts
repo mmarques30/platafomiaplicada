@@ -1225,18 +1225,20 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais, texto: string): {
 } {
   console.log("=== PROCESSANDO MVP E CONJUNTAS ===");
   
-  // MVP como entregas sem etapa (ordem negativa para aparecer primeiro)
+  // MVP como entregas vinculadas à FASE 1 (ordem negativa para aparecer primeiro na fase)
+  // MVPs são entregas prioritárias que devem ser feitas em conjunto na primeira fase
   const mvpEntregas = ancoras.mvp.map((item, idx) => ({
-    etapa_numero: 0,
-    numero_entrega: -(ancoras.mvp.length - idx),
+    etapa_numero: 1, // Associar à Fase 1 - MVPs são feitos em conjunto nesta fase
+    numero_entrega: -(ancoras.mvp.length - idx), // Ordem negativa para aparecer antes das entregas principais
     titulo: item.titulo,
-    descricao: 'Item do MVP - escopo acordado',
+    descricao: 'Item do MVP - escopo acordado para a primeira fase',
     tipo: 'ativa' as const,
-    prioridade: 'alta',
+    prioridade: 'critica', // MVPs são prioridade crítica
     modulo_relacionado: null,
-    responsavel: 'voce'
+    responsavel: 'conjunto', // MVPs são feitos em conjunto mentor+mentorado
+    is_mvp: true // Flag para identificar como MVP
   }));
-  console.log(`  MVP: ${mvpEntregas.length} entregas`);
+  console.log(`  MVP: ${mvpEntregas.length} entregas (vinculadas à Fase 1)`);
   
   // ENTREGAS EM CONJUNTO - UMA ÚNICA ENTREGA GLOBAL
   let conjuntaEntrega: any | null = null;
