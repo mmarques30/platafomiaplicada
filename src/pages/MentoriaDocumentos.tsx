@@ -49,7 +49,8 @@ export default function MentoriaDocumentos() {
   const navigate = useNavigate();
   const businessUserId = useBusinessUserId();
   const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(businessUserId);
-  const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id);
+  // Buscar apenas documentos que NÃO são para processamento IA (importados na aba Documentos)
+  const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id, false);
   const { links, isLoading: isLoadingLinks } = useLinksBusiness(contrato?.id);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
@@ -84,7 +85,7 @@ export default function MentoriaDocumentos() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -94,7 +95,7 @@ export default function MentoriaDocumentos() {
 
   if (!contrato) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="container mx-auto py-8 px-4">
         <Card>
           <CardContent className="py-12 text-center">
             <FolderOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -111,7 +112,7 @@ export default function MentoriaDocumentos() {
   const documentosDisponiveis = documentos.filter((d) => d.arquivo_url);
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="container mx-auto py-8 px-4">
       <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar para Mentoria
