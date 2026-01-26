@@ -26,6 +26,38 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+// Componentes de markdown personalizados para renderização consistente
+const markdownComponents = {
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <p className="mb-2 last:mb-0">{children}</p>
+  ),
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="font-semibold text-foreground">{children}</strong>
+  ),
+  em: ({ children }: { children?: React.ReactNode }) => (
+    <em className="italic">{children}</em>
+  ),
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul className="list-disc list-inside space-y-1 my-2">{children}</ul>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <ol className="list-decimal list-inside space-y-1 my-2">{children}</ol>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <li className="ml-2">{children}</li>
+  ),
+  code: ({ children }: { children?: React.ReactNode }) => (
+    <code className="bg-muted px-1 py-0.5 rounded text-sm">{children}</code>
+  ),
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+      {children}
+    </a>
+  ),
+};
 
 interface InstrucoesBusinessManagerProps {
   contratoId: string;
@@ -157,9 +189,11 @@ function InstrucaoItemAdmin({
             )}
           </div>
           {instrucao.descricao && (
-            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-              {instrucao.descricao}
-            </p>
+            <div className="text-xs text-muted-foreground mt-1 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                {instrucao.descricao}
+              </ReactMarkdown>
+            </div>
           )}
 
           {/* Botão de expansão para detalhes */}
@@ -184,20 +218,26 @@ function InstrucaoItemAdmin({
                         Prompt Sugerido
                       </span>
                     </div>
-                    <p className="text-sm whitespace-pre-wrap text-foreground/80">
-                      {instrucao.prompt_sugerido}
-                    </p>
+                    <div className="text-sm text-foreground/80 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                        {instrucao.prompt_sugerido}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 )}
                 
                 {instrucao.dicas && (
-                  <div className="flex items-start gap-2 text-sm bg-accent/10 border border-accent/30 rounded-lg p-3">
-                    <Lightbulb className="h-4 w-4 text-accent-foreground mt-0.5 shrink-0" />
-                    <div>
-                      <span className="text-xs font-medium text-accent-foreground uppercase block mb-1">
+                  <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb className="h-4 w-4 text-accent-foreground shrink-0" />
+                      <span className="text-xs font-medium text-accent-foreground uppercase">
                         Dicas
                       </span>
-                      <span className="text-foreground/80">{instrucao.dicas}</span>
+                    </div>
+                    <div className="text-sm text-foreground/80 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                        {instrucao.dicas}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 )}

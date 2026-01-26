@@ -298,8 +298,90 @@ function extrairDescricao(conteudo: string, titulo: string): string {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FORMATAÇÃO E ORGANIZAÇÃO DE TEXTOS
+// FORMATAÇÃO E ORGANIZAÇÃO DE TEXTOS COM MARKDOWN
 // ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Converte texto plano para Markdown formatado
+ * - Detecta e formata checklists e labels em negrito
+ * - Converte sequências de perguntas em listas
+ * - Cria parágrafos apropriados
+ * - Formata bullets e listas numeradas
+ */
+function converterParaMarkdown(texto: string): string {
+  if (!texto || texto.trim().length === 0) return '';
+  
+  let markdown = texto
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+  
+  // Limpar caracteres problemáticos
+  markdown = markdown
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\u2026/g, '...')
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  
+  // 1. Detectar e formatar CHECKLIST patterns
+  // "CHECKLIST DE TESTES - RECEITAS:" -> quebra de linha + negrito
+  markdown = markdown.replace(
+    /(CHECKLIST\s+DE\s+[A-ZÁÉÍÓÚÀÂÃÊÔ\s]+-\s*[A-ZÁÉÍÓÚÀÂÃÊÔ]+):/gi,
+    '\n\n**$1:**'
+  );
+  
+  // 2. Formatar outros labels importantes em negrito
+  markdown = markdown.replace(
+    /\b(IMPORTANTE|ATENÇÃO|OBS|OBSERVAÇÃO|NOTA|DICA|VERIFICAR|TESTAR):/gi,
+    '\n\n**$1:**'
+  );
+  
+  // 3. Converter sequências de perguntas em lista de bullets
+  // Detectar padrões como "Pergunta1? Pergunta2? Pergunta3?"
+  const linhas = markdown.split('\n');
+  const linhasFormatadas: string[] = [];
+  
+  for (const linha of linhas) {
+    const trimmed = linha.trim();
+    
+    // Se a linha contém múltiplas perguntas seguidas
+    if ((trimmed.match(/\?/g) || []).length >= 2 && !trimmed.startsWith('-') && !trimmed.startsWith('*')) {
+      // Dividir por "? " e criar bullets
+      const perguntas = trimmed.split(/\?\s+/).filter(p => p.trim().length > 0);
+      if (perguntas.length >= 2) {
+        const bullets = perguntas.map(p => {
+          const pergunta = p.trim();
+          return `- ${pergunta}${pergunta.endsWith('?') ? '' : '?'}`;
+        });
+        linhasFormatadas.push(bullets.join('\n'));
+        continue;
+      }
+    }
+    
+    // Se já é um item de lista, preservar
+    if (trimmed.match(/^[\d]+[.)]\s/) || trimmed.match(/^[-•◦▪▸►]\s/)) {
+      // Normalizar para markdown bullet
+      const textoItem = trimmed.replace(/^[\d]+[.)]\s*/, '').replace(/^[-•◦▪▸►]\s*/, '');
+      linhasFormatadas.push(`- ${textoItem}`);
+      continue;
+    }
+    
+    linhasFormatadas.push(linha);
+  }
+  
+  markdown = linhasFormatadas.join('\n');
+  
+  // 4. Limpar quebras de linha excessivas
+  markdown = markdown
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/^\n+/, '')
+    .trim();
+  
+  // 5. Garantir espaçamento após labels em negrito
+  markdown = markdown.replace(/(\*\*[^*]+:\*\*)([^\n])/g, '$1 $2');
+  
+  return markdown;
+}
 
 /**
  * Formata o texto em parágrafos bem organizados
@@ -311,68 +393,8 @@ function extrairDescricao(conteudo: string, titulo: string): string {
 function formatarTextoEmParagrafos(texto: string): string {
   if (!texto || texto.trim().length === 0) return '';
   
-  // 1. Normalizar quebras de linha
-  let formatado = texto
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n');
-  
-  // 2. Remover múltiplas quebras de linha (mais de 2)
-  formatado = formatado.replace(/\n{3,}/g, '\n\n');
-  
-  // 3. Remover espaços em branco no início/fim de linhas
-  formatado = formatado
-    .split('\n')
-    .map(linha => linha.trim())
-    .join('\n');
-  
-  // 4. Remover linhas que são apenas caracteres especiais
-  formatado = formatado
-    .split('\n')
-    .filter(linha => !linha.match(/^[-─═_*•◦▪▸►]+$/))
-    .join('\n');
-  
-  // 5. Limpar caracteres problemáticos
-  formatado = formatado
-    .replace(/[\u2018\u2019]/g, "'")  // Aspas simples curvas
-    .replace(/[\u201C\u201D]/g, '"')   // Aspas duplas curvas
-    .replace(/\u2026/g, '...')          // Reticências
-    .replace(/[\u2013\u2014]/g, '-')   // Travessões
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Caracteres de controle
-  
-  // 6. Identificar e preservar listas
-  const linhas = formatado.split('\n');
-  const linhasFormatadas: string[] = [];
-  
-  for (let i = 0; i < linhas.length; i++) {
-    const linha = linhas[i];
-    const proximaLinha = linhas[i + 1] || '';
-    
-    // Se a linha é um item de lista, preservar
-    if (linha.match(/^[\d]+[.)]\s/) || linha.match(/^[-•◦▪▸►]\s/)) {
-      linhasFormatadas.push(linha);
-      continue;
-    }
-    
-    // Se a linha termina sem pontuação e a próxima começa com minúscula, juntar
-    if (linha.length > 0 && !linha.match(/[.!?:,;]$/) && 
-        proximaLinha.length > 0 && proximaLinha[0] === proximaLinha[0].toLowerCase() &&
-        proximaLinha[0].match(/[a-záéíóúâêôãõç]/i)) {
-      linhasFormatadas.push(linha + ' ');
-    } else {
-      linhasFormatadas.push(linha);
-    }
-  }
-  
-  // 7. Juntar linhas e criar parágrafos
-  formatado = linhasFormatadas
-    .join('\n')
-    .replace(/\n +/g, '\n')           // Espaços após quebra
-    .replace(/ +\n/g, '\n')           // Espaços antes de quebra
-    .replace(/ +/g, ' ')              // Múltiplos espaços
-    .replace(/\n{3,}/g, '\n\n')       // Normalizar parágrafos
-    .trim();
-  
-  return formatado;
+  // Usar a função de conversão para markdown
+  return converterParaMarkdown(texto);
 }
 
 /**
@@ -457,26 +479,32 @@ function formatarPromptSugerido(prompt: string): string {
 }
 
 /**
- * Formata dicas/observações
+ * Formata dicas/observações com suporte a Markdown
  * - Organiza em lista se houver múltiplas dicas
  * - Limpa prefixos repetitivos
+ * - Detecta checklists e formata como bullets
  */
 function formatarDicas(dicas: string): string {
   if (!dicas || dicas.trim().length === 0) return '';
   
-  let formatado = formatarTextoEmParagrafos(dicas);
+  // Primeiro converter para markdown
+  let formatado = converterParaMarkdown(dicas);
   
-  // Remover prefixo "DICA:", "OBS:", etc. do início
-  formatado = formatado.replace(/^(DICAS?|OBS|ATENÇÃO|IMPORTANTE|OBSERVAÇÃO)[:\s]*/i, '');
+  // Remover prefixo "DICA:", "OBS:", etc. do início (já em negrito ou não)
+  formatado = formatado.replace(/^\**(DICAS?|OBS|ATENÇÃO|IMPORTANTE|OBSERVAÇÃO)\**[:\s]*/i, '');
   
-  // Se tiver múltiplas dicas separadas por vírgula ou ponto, transformar em lista
-  if (formatado.includes('. ') && formatado.length > 100) {
-    const partes = formatado.split(/\.\s+/);
-    if (partes.length > 2) {
-      formatado = partes
-        .filter(p => p.trim().length > 5)
-        .map((p, i) => `${i + 1}. ${p.trim()}${p.endsWith('.') ? '' : '.'}`)
-        .join('\n');
+  // Se não tem bullets mas tem múltiplos pontos, tentar criar lista
+  if (!formatado.includes('- ') && formatado.includes('. ') && formatado.length > 100) {
+    // Verificar se não é um texto normal com frases
+    const partes = formatado.split(/\.\s+/).filter(p => p.trim().length > 5);
+    
+    // Só converter em lista se parecer ser itens separados (frases curtas)
+    const mediaLength = partes.reduce((acc, p) => acc + p.length, 0) / partes.length;
+    if (partes.length >= 3 && mediaLength < 80) {
+      formatado = partes.map(p => {
+        const texto = p.trim();
+        return `- ${texto}${texto.endsWith('.') ? '' : '.'}`;
+      }).join('\n');
     }
   }
   
