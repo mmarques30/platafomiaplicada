@@ -37,6 +37,24 @@ export interface EntregaInput {
   justificativa_backlog?: string;
 }
 
+// Hook para buscar uma entrega específica por ID
+export function useEntregaById(entregaId?: string) {
+  return useQuery({
+    queryKey: ['entrega-business', entregaId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('entregas_business')
+        .select('*')
+        .eq('id', entregaId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as EntregaBusiness | null;
+    },
+    enabled: !!entregaId,
+  });
+}
+
 export function useEntregasBusiness(contratoId?: string) {
   const queryClient = useQueryClient();
 
