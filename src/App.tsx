@@ -40,6 +40,7 @@ import MentoriaProcesso from "./pages/MentoriaProcesso";
 import MentoriaEtapa from "./pages/MentoriaEtapa";
 import MentoriaEtapasBusiness from "./pages/MentoriaEtapasBusiness";
 import MentoriaInstrucoesBusiness from "./pages/MentoriaInstrucoesBusiness";
+import MentoriaTasksBusiness from "./pages/MentoriaTasksBusiness";
 import MentoriaValidacoes from "./pages/MentoriaValidacoes";
 import MentoriaReports from "./pages/MentoriaReports";
 import MentoriaDocumentos from "./pages/MentoriaDocumentos";
@@ -154,6 +155,7 @@ function AppContent() {
             <Route path="/mentoria/etapa/:etapaId" element={<MentoriaEtapa />} />
             <Route path="/mentoria/etapas-business" element={<MentoriaEtapasBusiness />} />
             <Route path="/mentoria/instrucoes-business" element={<MentoriaInstrucoesBusiness />} />
+            <Route path="/mentoria/tasks-business" element={<MentoriaTasksBusiness />} />
             <Route path="/mentoria/validacoes" element={<MentoriaValidacoes />} />
             <Route path="/mentoria/reports" element={<MentoriaReports />} />
             <Route path="/mentoria/entregas" element={<MentoriaEntregas />} />
