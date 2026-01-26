@@ -66,7 +66,7 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
   const recursos = instrucao.recursos as unknown as RecursosInstrucao | null;
   const passos = recursos?.passos || [];
   const temPassos = passos.length > 0;
-  const temDetalhes = temPassos || instrucao.dicas;
+  const temDetalhes = temPassos || instrucao.dicas || instrucao.prompt_sugerido;
 
   return (
     <Card className={cn(
@@ -124,6 +124,21 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                 </CollapsibleTrigger>
                 
                 <CollapsibleContent className="mt-3 space-y-4">
+                  {/* Prompt Sugerido - igual ao admin */}
+                  {instrucao.prompt_sugerido && (
+                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Bot className="h-4 w-4 text-primary" />
+                        <span className="text-xs font-medium text-primary uppercase">
+                          Prompt Sugerido
+                        </span>
+                      </div>
+                      <p className="text-sm whitespace-pre-wrap text-foreground/80">
+                        {instrucao.prompt_sugerido}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Passos com recursos */}
                   {temPassos && (
                     <div className="space-y-3">
@@ -172,9 +187,16 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                   )}
                   
                   {instrucao.dicas && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <Lightbulb className="h-4 w-4 text-accent-foreground mt-0.5 shrink-0" />
-                      <span className="text-muted-foreground">{instrucao.dicas}</span>
+                    <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <Lightbulb className="h-4 w-4 text-accent-foreground mt-0.5 shrink-0" />
+                        <div>
+                          <span className="text-xs font-medium text-accent-foreground uppercase block mb-1">
+                            Dicas
+                          </span>
+                          <span className="text-sm text-foreground/80">{instrucao.dicas}</span>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </CollapsibleContent>
