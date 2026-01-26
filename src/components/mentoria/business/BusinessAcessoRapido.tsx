@@ -21,7 +21,7 @@ const navItems: QuickNavItem[] = [
   { title: "Etapas", path: "/mentoria/etapas-business", icon: Route },
   { title: "Instruções", path: "/mentoria/instrucoes-business", icon: FileText },
   { title: "Entregas", path: "/mentoria/entregas", icon: Package },
-  { title: "Tasks", path: "/mentoria/tarefas", icon: CheckSquare },
+  { title: "Tasks", path: "/mentoria/tasks-business", icon: CheckSquare },
   { title: "Documentos", path: "/mentoria/documentos", icon: FolderOpen },
 ];
 
