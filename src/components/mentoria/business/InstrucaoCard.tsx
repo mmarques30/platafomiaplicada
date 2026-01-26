@@ -124,16 +124,16 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                 </CollapsibleTrigger>
                 
                 <CollapsibleContent className="mt-3 space-y-4">
-                  {/* Prompt Sugerido - igual ao admin */}
+                  {/* Prompt Sugerido - com cor de destaque visível */}
                   {instrucao.prompt_sugerido && (
-                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                    <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Bot className="h-4 w-4 text-primary" />
-                        <span className="text-xs font-medium text-primary uppercase">
+                        <Bot className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">
                           Prompt Sugerido
                         </span>
                       </div>
-                      <p className="text-sm whitespace-pre-wrap text-foreground/80">
+                      <p className="text-sm whitespace-pre-wrap text-blue-900 dark:text-blue-100">
                         {instrucao.prompt_sugerido}
                       </p>
                     </div>
@@ -187,14 +187,14 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                   )}
                   
                   {instrucao.dicas && (
-                    <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
+                    <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
                       <div className="flex items-start gap-2">
-                        <Lightbulb className="h-4 w-4 text-accent-foreground mt-0.5 shrink-0" />
+                        <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                         <div>
-                          <span className="text-xs font-medium text-accent-foreground uppercase block mb-1">
+                          <span className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wide block mb-1">
                             Dicas
                           </span>
-                          <span className="text-sm text-foreground/80">{instrucao.dicas}</span>
+                          <span className="text-sm text-amber-900 dark:text-amber-100">{instrucao.dicas}</span>
                         </div>
                       </div>
                     </div>
