@@ -211,14 +211,14 @@ function InstrucaoItemAdmin({
               
               <CollapsibleContent className="mt-3 space-y-3">
                 {instrucao.prompt_sugerido && (
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                  <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-2">
-                      <Bot className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-medium text-primary uppercase">
+                      <Bot className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <span className="text-xs font-medium text-blue-700 dark:text-blue-300 uppercase">
                         Prompt Sugerido
                       </span>
                     </div>
-                    <div className="text-sm text-foreground/80 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+                    <div className="text-sm text-blue-900 dark:text-blue-100 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
                       <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                         {instrucao.prompt_sugerido}
                       </ReactMarkdown>
@@ -227,14 +227,14 @@ function InstrucaoItemAdmin({
                 )}
                 
                 {instrucao.dicas && (
-                  <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
+                  <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-2">
-                      <Lightbulb className="h-4 w-4 text-accent-foreground shrink-0" />
-                      <span className="text-xs font-medium text-accent-foreground uppercase">
+                      <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                      <span className="text-xs font-medium text-amber-700 dark:text-amber-300 uppercase">
                         Dicas
                       </span>
                     </div>
-                    <div className="text-sm text-foreground/80 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+                    <div className="text-sm text-amber-900 dark:text-amber-100 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
                       <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                         {instrucao.dicas}
                       </ReactMarkdown>
