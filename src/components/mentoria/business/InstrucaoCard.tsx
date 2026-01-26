@@ -6,8 +6,26 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Bot, Code, Users, CheckSquare, ChevronDown, Lightbulb, ExternalLink, FileText, Image, Video, File, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { InstrucaoEtapa } from "@/hooks/useEtapasBusiness";
 import type { RecursosInstrucao, RecursoItem } from "@/hooks/useInstrucaoRecursos";
+
+// Componentes personalizados para renderização de markdown
+const markdownComponents = {
+  p: ({ children }: { children?: React.ReactNode }) => <p className="mb-2 last:mb-0">{children}</p>,
+  strong: ({ children }: { children?: React.ReactNode }) => <strong className="font-semibold">{children}</strong>,
+  em: ({ children }: { children?: React.ReactNode }) => <em className="italic">{children}</em>,
+  ul: ({ children }: { children?: React.ReactNode }) => <ul className="list-disc list-inside space-y-1 my-2">{children}</ul>,
+  ol: ({ children }: { children?: React.ReactNode }) => <ol className="list-decimal list-inside space-y-1 my-2">{children}</ol>,
+  li: ({ children }: { children?: React.ReactNode }) => <li className="ml-2">{children}</li>,
+  code: ({ children }: { children?: React.ReactNode }) => <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">
+      {children}
+    </a>
+  ),
+};
 
 interface InstrucaoCardProps {
   instrucao: InstrucaoEtapa;
@@ -106,9 +124,11 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
             </h4>
             
             {instrucao.descricao && (
-              <p className="text-sm text-muted-foreground mt-1">
-                {instrucao.descricao}
-              </p>
+              <div className="text-sm text-muted-foreground mt-1 prose prose-sm dark:prose-invert max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                  {instrucao.descricao}
+                </ReactMarkdown>
+              </div>
             )}
 
             {temDetalhes && (
@@ -124,18 +144,20 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                 </CollapsibleTrigger>
                 
                 <CollapsibleContent className="mt-3 space-y-4">
-                  {/* Prompt Sugerido - com cor de destaque visível */}
+                  {/* Prompt Sugerido */}
                   {instrucao.prompt_sugerido && (
-                    <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Bot className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">
+                        <Bot className="h-4 w-4 text-primary" />
+                        <span className="text-xs font-semibold text-primary uppercase tracking-wide">
                           Prompt Sugerido
                         </span>
                       </div>
-                      <p className="text-sm whitespace-pre-wrap text-blue-900 dark:text-blue-100">
-                        {instrucao.prompt_sugerido}
-                      </p>
+                      <div className="text-sm text-foreground prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                          {instrucao.prompt_sugerido}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   )}
 
@@ -155,9 +177,11 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-sm">{passo.titulo}</p>
                                 {passo.descricao && (
-                                  <p className="text-xs text-muted-foreground mt-0.5">
-                                    {passo.descricao}
-                                  </p>
+                                  <div className="text-xs text-muted-foreground mt-0.5 prose prose-sm dark:prose-invert max-w-none">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                                      {passo.descricao}
+                                    </ReactMarkdown>
+                                  </div>
                                 )}
                                 
                                 {/* Recursos do passo */}
@@ -186,15 +210,20 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                     </div>
                   )}
                   
+                  {/* Dicas */}
                   {instrucao.dicas && (
-                    <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                    <div className="bg-accent/10 border border-accent/30 rounded-lg p-4">
                       <div className="flex items-start gap-2">
-                        <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                        <div>
-                          <span className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wide block mb-1">
+                        <Lightbulb className="h-4 w-4 text-accent-foreground mt-0.5 shrink-0" />
+                        <div className="flex-1">
+                          <span className="text-xs font-semibold text-accent-foreground uppercase tracking-wide block mb-1">
                             Dicas
                           </span>
-                          <span className="text-sm text-amber-900 dark:text-amber-100">{instrucao.dicas}</span>
+                          <div className="text-sm text-foreground prose prose-sm dark:prose-invert max-w-none">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                              {instrucao.dicas}
+                            </ReactMarkdown>
+                          </div>
                         </div>
                       </div>
                     </div>
