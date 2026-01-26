@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { 
   Collapsible,
   CollapsibleContent,
@@ -11,19 +10,24 @@ import {
   Clock, 
   ChevronRight,
   ChevronDown,
-  FileText
+  FileText,
+  CheckCircle2,
+  Circle
 } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
-import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+interface FaseProjeto {
+  nome: string;
+  descricao?: string;
+}
+
 export function BusinessExecutiveRoadmap() {
   const businessUserId = useBusinessUserId();
   const { contrato, reports, isLoading } = useContratosBusiness(businessUserId);
-  const { data: etapas } = useEtapasBusiness(contrato?.id);
   const navigate = useNavigate();
   const [reportsExpanded, setReportsExpanded] = useState(false);
 
@@ -43,26 +47,18 @@ export function BusinessExecutiveRoadmap() {
   // Flag para modo preview (sem contrato ativo)
   const isPreview = !contrato;
 
+  // Fases padrão definidas no contrato (fases_projeto)
+  const fasesContrato: FaseProjeto[] = contrato?.fases_projeto || [];
+
   // Dados de exemplo para o modo preview
-  const entregasExemplo = [
-    { id: null, titulo: "Diagnóstico Inicial", tipo: "Análise", status: "pendente", prazo: null },
-    { id: null, titulo: "Desenvolvimento de Solução", tipo: "Implementação", status: "pendente", prazo: null },
-    { id: null, titulo: "Treinamento da Equipe", tipo: "Capacitação", status: "pendente", prazo: null },
-    { id: null, titulo: "Go-Live e Acompanhamento", tipo: "Entrega", status: "pendente", prazo: null },
+  const fasesExemplo: FaseProjeto[] = [
+    { nome: "Diagnóstico Inicial", descricao: "Análise e mapeamento de necessidades" },
+    { nome: "Desenvolvimento de Solução", descricao: "Implementação das automações" },
+    { nome: "Treinamento da Equipe", descricao: "Capacitação e transferência de conhecimento" },
+    { nome: "Go-Live e Acompanhamento", descricao: "Entrega final e suporte" },
   ];
 
-  // Mapear etapas reais para o formato do timeline
-  const entregasFromEtapas = etapas?.map(etapa => ({
-    id: etapa.id,
-    titulo: etapa.titulo,
-    tipo: `Etapa ${etapa.numero_etapa}`,
-    prazo: etapa.data_prevista,
-    status: etapa.status || 'pendente',
-  })) || [];
-
-  const entregas = isPreview ? entregasExemplo : entregasFromEtapas;
-  const entregasConcluidas = isPreview ? 0 : entregas.filter(e => e.status === "concluida").length;
-  const progressoAtual = isPreview ? 0 : (entregas.length > 0 ? Math.round((entregasConcluidas / entregas.length) * 100) : 0);
+  const fases = isPreview || fasesContrato.length === 0 ? fasesExemplo : fasesContrato;
 
   return (
     <div className="space-y-6">
@@ -78,86 +74,58 @@ export function BusinessExecutiveRoadmap() {
         </Card>
       )}
 
-      {/* Progresso Geral do Roadmap */}
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="font-medium">Progresso do Roadmap</span>
-          <span className="text-muted-foreground">
-            {entregasConcluidas}/{entregas.length} etapas ({progressoAtual}%)
-          </span>
-        </div>
-        <Progress value={progressoAtual} className="h-2" />
-      </div>
-
-      {/* Timeline de Entregas (Etapas) */}
+      {/* Timeline de Fases do Contrato - Visual e Não-Clicável */}
       <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Etapas do Projeto</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Fases do Projeto</CardTitle>
+            <Badge variant="outline" className="text-xs">
+              {fases.length} {fases.length === 1 ? 'fase' : 'fases'}
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Entregas esperadas conforme contrato
+          </p>
         </CardHeader>
         <CardContent>
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-border" />
+            <div className="absolute left-[11px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-primary/50 via-primary/30 to-muted" />
             
-            <div className={`space-y-4 ${isPreview ? 'opacity-60' : ''}`}>
-              {entregas.map((entrega, index) => {
-                const isConcluida = entrega.status === "concluida";
-                const isEmAndamento = entrega.status === "em_andamento";
-                
-                return (
-                  <div 
-                    key={entrega.id || index} 
-                    className={`relative pl-8 ${!isPreview && entrega.id ? 'cursor-pointer group' : ''}`}
-                    onClick={() => {
-                      if (!isPreview && entrega.id) {
-                        navigate(`/mentoria/etapa/${entrega.id}`);
-                      }
-                    }}
-                  >
-                    {/* Status dot - bullet simples */}
-                    <div className="absolute left-0 top-3">
-                      <div className={`h-4 w-4 rounded-full border-2 border-background ${
-                        isConcluida 
-                          ? 'bg-emerald-500' 
-                          : isEmAndamento 
-                            ? 'bg-amber-500' 
-                            : 'bg-muted-foreground'
-                      }`} />
+            <div className={`space-y-3 ${isPreview ? 'opacity-60' : ''}`}>
+              {fases.map((fase, index) => (
+                <div 
+                  key={index} 
+                  className="relative pl-10"
+                >
+                  {/* Status dot - visual indicator */}
+                  <div className="absolute left-0 top-3">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center border border-primary/30">
+                      <Circle className="h-3 w-3 text-primary" />
                     </div>
-                    
-                    <div className={`p-3 rounded-lg transition-colors ${
-                      isConcluida 
-                        ? 'bg-emerald-500/10 border border-emerald-500/20' 
-                        : isEmAndamento 
-                          ? 'bg-amber-500/10 border border-amber-500/20'
-                          : isPreview
-                            ? 'bg-muted/30 border border-dashed border-border'
-                            : 'bg-muted/50 group-hover:bg-muted/70'
-                    }`}>
-                      <div className="flex items-center justify-between">
-                        <span className={`font-medium ${isConcluida ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>
-                          {entrega.titulo}
-                        </span>
+                  </div>
+                  
+                  <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          {entrega.tipo && (
-                            <Badge variant="outline" className="text-xs">
-                              {entrega.tipo}
-                            </Badge>
-                          )}
-                          {entrega.prazo && (
-                            <span className="text-xs text-muted-foreground">
-                              {format(parseISO(entrega.prazo), "dd MMM", { locale: ptBR })}
-                            </span>
-                          )}
-                          {!isPreview && entrega.id && (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                          )}
+                          <Badge variant="secondary" className="text-xs shrink-0">
+                            Fase {index + 1}
+                          </Badge>
+                          <span className="font-medium truncate">
+                            {fase.nome}
+                          </span>
                         </div>
+                        {fase.descricao && (
+                          <p className="text-sm text-muted-foreground mt-1.5 line-clamp-2">
+                            {fase.descricao}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </CardContent>
