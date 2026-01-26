@@ -16,11 +16,28 @@ import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsC
 import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSearchParams } from "react-router-dom";
 
 export default function Mentoria() {
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
   const { isBusiness } = useEffectivePlan(isAdmin);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Ler tab da URL ou usar padrão
+  const tabFromUrl = searchParams.get("tab");
+  const validTabs = ["visao-geral", "roadmap", "evolucao-aprendizado"];
+  const activeTab = validTabs.includes(tabFromUrl || "") ? tabFromUrl! : "visao-geral";
+
+  const handleTabChange = (value: string) => {
+    if (value === "visao-geral") {
+      // Remover parâmetro tab quando for visão geral (URL limpa)
+      searchParams.delete("tab");
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ tab: value });
+    }
+  };
 
   return (
     <div className="container mx-auto py-4 md:py-8 px-4 max-w-7xl">
@@ -31,7 +48,7 @@ export default function Mentoria() {
       {isBusiness && <BusinessAcessoRapido />}
 
       {/* Tabs - Diferente para Business vs Academy */}
-      <Tabs defaultValue="visao-geral" className="w-full mt-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
         <TabsList className={`w-full md:w-auto grid ${isBusiness ? 'grid-cols-3' : 'grid-cols-2'} md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6`}>
           <TabsTrigger
             value="visao-geral"
