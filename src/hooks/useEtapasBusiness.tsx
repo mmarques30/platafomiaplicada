@@ -170,6 +170,62 @@ export function useUpdateEtapa() {
 
 // Nova função para criar etapas em lote (geradas via IA)
 // Retorna as etapas criadas com seus IDs para uso posterior
+// Hook para deletar todas as etapas de um contrato (usado antes de regerar)
+export function useDeleteEtapasByContrato() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (contratoId: string) => {
+      // Primeiro, buscar todas as etapas do contrato
+      const { data: etapas } = await supabase
+        .from('etapas_business')
+        .select('id')
+        .eq('contrato_id', contratoId);
+
+      if (etapas && etapas.length > 0) {
+        const etapaIds = etapas.map(e => e.id);
+        
+        // Deletar instruções vinculadas a essas etapas
+        await supabase
+          .from('instrucoes_etapa')
+          .delete()
+          .in('etapa_id', etapaIds);
+
+        // Deletar entregas vinculadas a essas etapas
+        await supabase
+          .from('entregas_business')
+          .delete()
+          .in('etapa_id', etapaIds);
+
+        // Deletar sessões vinculadas a essas etapas
+        await supabase
+          .from('sessoes_mentoria')
+          .delete()
+          .in('etapa_id', etapaIds);
+
+        // Deletar as etapas
+        const { error } = await supabase
+          .from('etapas_business')
+          .delete()
+          .eq('contrato_id', contratoId);
+
+        if (error) throw error;
+      }
+
+      return contratoId;
+    },
+    onSuccess: (contratoId) => {
+      queryClient.invalidateQueries({ queryKey: ['etapas-business', contratoId] });
+      queryClient.invalidateQueries({ queryKey: ['instrucoes-etapa'] });
+      queryClient.invalidateQueries({ queryKey: ['entregas-business'] });
+      queryClient.invalidateQueries({ queryKey: ['sessoes-mentoria'] });
+    },
+    onError: (error) => {
+      console.error('Erro ao deletar etapas existentes:', error);
+    },
+  });
+}
+
 export function useBulkCreateEtapas() {
   const queryClient = useQueryClient();
 

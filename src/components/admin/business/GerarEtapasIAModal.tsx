@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Sparkles, Calendar, Target, CheckCircle2, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useGerarEtapasIA, useBulkCreateEtapas, type EtapaGeradaIA } from "@/hooks/useEtapasBusiness";
+import { useGerarEtapasIA, useBulkCreateEtapas, useDeleteEtapasByContrato, type EtapaGeradaIA } from "@/hooks/useEtapasBusiness";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { ContratoBusiness } from "@/hooks/useContratosBusiness";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ export function GerarEtapasIAModal({ open, onOpenChange, contrato, onSuccess }: 
   
   const gerarEtapas = useGerarEtapasIA();
   const bulkCreate = useBulkCreateEtapas();
+  const deleteEtapas = useDeleteEtapasByContrato();
   const { bulkCreateSessoes } = useMentoriaSessoes(contrato.user_id);
 
   const handleGerar = async () => {
@@ -57,6 +58,9 @@ export function GerarEtapasIAModal({ open, onOpenChange, contrato, onSuccess }: 
     setIsSaving(true);
 
     try {
+      // 0. Deletar etapas existentes (e seus dados relacionados) antes de recriar
+      await deleteEtapas.mutateAsync(contrato.id);
+
       // 1. Criar etapas e obter os IDs
       const { data: etapasCriadas } = await bulkCreate.mutateAsync({
         contratoId: contrato.id,
