@@ -146,14 +146,14 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                 <CollapsibleContent className="mt-3 space-y-4">
                   {/* Prompt Sugerido */}
                   {instrucao.prompt_sugerido && (
-                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                    <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Bot className="h-4 w-4 text-primary" />
-                        <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                        <Bot className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">
                           Prompt Sugerido
                         </span>
                       </div>
-                      <div className="text-sm text-foreground prose prose-sm dark:prose-invert max-w-none">
+                      <div className="text-sm text-blue-900 dark:text-blue-100 prose prose-sm dark:prose-invert max-w-none">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                           {instrucao.prompt_sugerido}
                         </ReactMarkdown>
@@ -212,14 +212,14 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                   
                   {/* Dicas */}
                   {instrucao.dicas && (
-                    <div className="bg-accent/10 border border-accent/30 rounded-lg p-4">
+                    <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
                       <div className="flex items-start gap-2">
-                        <Lightbulb className="h-4 w-4 text-accent-foreground mt-0.5 shrink-0" />
+                        <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                         <div className="flex-1">
-                          <span className="text-xs font-semibold text-accent-foreground uppercase tracking-wide block mb-1">
+                          <span className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wide block mb-1">
                             Dicas
                           </span>
-                          <div className="text-sm text-foreground prose prose-sm dark:prose-invert max-w-none">
+                          <div className="text-sm text-amber-900 dark:text-amber-100 prose prose-sm dark:prose-invert max-w-none">
                             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                               {instrucao.dicas}
                             </ReactMarkdown>
