@@ -5,12 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function MentoriaReports() {
   const navigate = useNavigate();
-  const { reports, isLoading } = useContratosBusiness();
+  const businessUserId = useBusinessUserId();
+  const { reports, isLoading } = useContratosBusiness(businessUserId);
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">

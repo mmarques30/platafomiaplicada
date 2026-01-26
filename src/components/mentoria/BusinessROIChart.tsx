@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Target, CheckCircle2 } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { 
   ChartContainer, 
   ChartTooltip, 
@@ -19,7 +20,8 @@ import { format, parseISO, addMonths, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export function BusinessROIChart() {
-  const { contrato, progresso } = useContratosBusiness();
+  const businessUserId = useBusinessUserId();
+  const { contrato, progresso } = useContratosBusiness(businessUserId);
   const { projetos } = useMentoriaProjetos();
 
   // Gerar dados do gráfico baseado no contrato

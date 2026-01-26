@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { useContratosBusiness } from '@/hooks/useContratosBusiness';
+import { useBusinessUserId } from '@/hooks/useBusinessUserId';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -9,7 +10,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 const BusinessReportsCard: React.FC = () => {
   const navigate = useNavigate();
-  const { reports, isLoading } = useContratosBusiness();
+  const businessUserId = useBusinessUserId();
+  const { reports, isLoading } = useContratosBusiness(businessUserId);
   const [expanded, setExpanded] = useState(false);
 
   if (isLoading) {

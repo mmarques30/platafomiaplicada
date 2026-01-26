@@ -15,12 +15,14 @@ import {
 } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export function BusinessExecutiveRoadmap() {
-  const { contrato, reports, isLoading } = useContratosBusiness();
+  const businessUserId = useBusinessUserId();
+  const { contrato, reports, isLoading } = useContratosBusiness(businessUserId);
   const { data: etapas } = useEtapasBusiness(contrato?.id);
   const navigate = useNavigate();
   const [reportsExpanded, setReportsExpanded] = useState(false);

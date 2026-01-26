@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Download, Loader2, FolderOpen, ExternalLink, Link2, HardDrive, Wrench, Video, Table } from "lucide-react";
+import { FileText, Download, Loader2, FolderOpen, ExternalLink, Link2, HardDrive, Wrench, Video, Table, ArrowLeft } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useDocumentosBusiness, DocumentoBusiness } from "@/hooks/useDocumentosBusiness";
 import { useLinksBusiness } from "@/hooks/useLinksBusiness";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const tipoLabels: Record<string, string> = {
@@ -44,7 +46,9 @@ const getIconComponent = (icone: string) => {
 };
 
 export default function MentoriaDocumentos() {
-  const { contrato, isLoading: isLoadingContrato } = useContratosBusiness();
+  const navigate = useNavigate();
+  const businessUserId = useBusinessUserId();
+  const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(businessUserId);
   const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id);
   const { links, isLoading: isLoadingLinks } = useLinksBusiness(contrato?.id);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -108,6 +112,11 @@ export default function MentoriaDocumentos() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar para Mentoria
+      </Button>
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">Meus Documentos</h1>
         <p className="text-muted-foreground">
