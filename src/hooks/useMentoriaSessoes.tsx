@@ -74,7 +74,7 @@ export const useMentoriaSessoes = (userId?: string) => {
         .from("sessoes_mentoria")
         .select("*")
         .eq("user_id", targetUserId)
-        .order("data_sessao", { ascending: false });
+        .order("data_sessao", { ascending: true });
 
       if (error) throw error;
       return data as SessaoMentoria[];
