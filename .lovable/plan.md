@@ -1,147 +1,210 @@
 
-## Plano: Visualizar Como Business com Seleção de Mentorado
+## Plano: Corrigir Visão do Mentorado Business
 
-### Objetivo
-Permitir que o admin selecione um mentorado específico do plano Business ao ativar "Ver como Business", para visualizar exatamente o que esse mentorado vê em todas as páginas de mentoria.
+### Problemas Identificados
 
----
-
-### Arquitetura da Solução
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     AdminViewContext                             │
-│  viewAs: AdminViewMode                                          │
-│  impersonatedUserId: string | null  ← NOVO                      │
-│  impersonatedUserName: string | null ← NOVO                     │
-│  setViewAs(mode, userId?, userName?) ← ATUALIZADO               │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   AdminViewSelector                              │
-│  Quando Business selecionado:                                    │
-│    → Abre modal de seleção de mentorado                         │
-│    → Lista apenas usuários com plano_mentoria = 'business'      │
-│    → Admin escolhe mentorado específico                         │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Páginas de Mentoria Business                        │
-│  MentoriaEntregas, MentoriaDocumentos, MentoriaSessoes...       │
-│    → Hooks recebem userId do context quando em modo simulação   │
-│    → useContratosBusiness(impersonatedUserId)                   │
-└─────────────────────────────────────────────────────────────────┘
-```
+| # | Problema | Causa Raiz |
+|---|----------|------------|
+| 1 | Instruções da Etapa desconfiguradas e ocupando parte da página | `MentoriaEtapa.tsx` usa `useInstrucoesEtapa(etapaId)` que busca instruções apenas pela etapa, não organiza por Entrega como no admin |
+| 2 | Botão "Etapas" leva para `/mentoria/processo` (roadmap genérico) | `BusinessAcessoRapido.tsx` rota incorreta - deveria ir para página específica de etapas Business |
+| 3 | Botão "Instruções" leva para "Recursos e Ferramentas" | `BusinessAcessoRapido.tsx` aponta para `/mentoria/recursos` que mostra biblioteca de ferramentas, não instruções de execução |
+| 4 | Página "Meus Documentos" sem botão de voltar | `MentoriaDocumentos.tsx` falta o componente `ArrowLeft` padrão |
 
 ---
 
-### PARTE 1: Atualizar Context e Hook
+### PARTE 1: Corrigir Página MentoriaDocumentos (Botão Voltar)
 
-**Arquivo: `src/contexts/AdminViewContext.tsx`**
+**Arquivo:** `src/pages/MentoriaDocumentos.tsx`
 
-Adicionar ao estado:
-- `impersonatedUserId: string | null` - ID do mentorado sendo visualizado
-- `impersonatedUserName: string | null` - Nome para exibição no botão
-
-Atualizar métodos:
-- `setViewAs(mode, userId?, userName?)` - Agora aceita userId opcional
-- `resetView()` - Limpa também o impersonatedUserId
-- Persistir no localStorage: `admin_view_user_id` e `admin_view_user_name`
-
-**Arquivo: `src/hooks/useAdminView.tsx`**
-
-Adicionar ao retorno:
-- `impersonatedUserId` 
-- `impersonatedUserName`
-
----
-
-### PARTE 2: Criar Modal de Seleção de Mentorado
-
-**Novo arquivo: `src/components/admin/BusinessUserSelectorModal.tsx`**
-
-Componente modal com:
-- Lista de usuários Business (filtrado por `plano_mentoria = 'business'`)
-- Campo de busca por nome/email
-- Exibir: Avatar, nome, email, empresa (se disponível)
-- Botão "Selecionar" que fecha modal e seta o `impersonatedUserId`
-
-```typescript
-interface BusinessUserSelectorModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSelect: (userId: string, userName: string) => void;
-}
-```
-
----
-
-### PARTE 3: Atualizar AdminViewSelector
-
-**Arquivo: `src/components/admin/AdminViewSelector.tsx`**
-
-Modificações:
-1. Quando `mode = 'business'` for selecionado, abrir o modal ao invés de setar direto
-2. Após seleção no modal, chamar `setViewAs('business', userId, userName)`
-3. No botão, exibir o nome do mentorado: "Business: Paula" ao invés de só "Business"
-4. Adicionar indicador visual diferenciado quando impersonando
-
----
-
-### PARTE 4: Atualizar Páginas de Mentoria Business
-
-Todas as páginas que chamam hooks de dados Business precisam usar o `impersonatedUserId` quando disponível.
-
-**Hook utilitário novo: `src/hooks/useBusinessUserId.tsx`**
-
-```typescript
-export function useBusinessUserId(): string | undefined {
-  const { user } = useAuth();
-  const { viewAs, impersonatedUserId } = useAdminViewContext();
-  
-  // Se admin está visualizando como Business com user específico
-  if (viewAs === 'business' && impersonatedUserId) {
-    return impersonatedUserId;
-  }
-  
-  // Caso contrário, usa o próprio usuário
-  return user?.id;
-}
-```
-
-**Páginas a atualizar:**
-
-| Arquivo | Mudança |
-|---------|---------|
-| `src/pages/MentoriaEntregas.tsx` | `useContratosBusiness(businessUserId)` |
-| `src/pages/MentoriaDocumentos.tsx` | `useContratosBusiness(businessUserId)` |
-| `src/pages/MentoriaSessoes.tsx` | `useContratosBusiness(businessUserId)` |
-| `src/pages/MentoriaReports.tsx` | `useContratosBusiness(businessUserId)` |
-| `src/pages/MentoriaEtapa.tsx` | Verificar se precisa |
-| `src/pages/MentoriaEntregaDetalhe.tsx` | Verificar se usa contexto |
-| `src/components/mentoria/business/BusinessExecutiveRoadmap.tsx` | `useContratosBusiness(businessUserId)` |
-| `src/components/mentoria/business/BusinessReportsCard.tsx` | `useContratosBusiness(businessUserId)` |
-| `src/components/mentoria/BusinessROIChart.tsx` | `useContratosBusiness(businessUserId)` |
-
----
-
-### PARTE 5: Banner de Simulação
-
-Adicionar banner fixo quando em modo impersonação, mostrando quem está sendo visualizado:
-
-**Arquivo: `src/components/layout/TopHeader.tsx` ou `MainLayout.tsx`**
+Adicionar botão de voltar padrão antes do título, igual às outras páginas:
 
 ```tsx
-{viewAs === 'business' && impersonatedUserName && (
-  <div className="fixed top-14 left-0 right-0 bg-amber-500 text-black text-center py-2 z-40 text-sm font-medium">
-    👁️ Visualizando como: {impersonatedUserName} (Business)
-    <Button size="sm" variant="ghost" onClick={resetView} className="ml-4">
-      Sair da simulação
-    </Button>
-  </div>
-)}
+<Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
+  <ArrowLeft className="h-4 w-4 mr-2" />
+  Voltar para Mentoria
+</Button>
+```
+
+---
+
+### PARTE 2: Corrigir Rotas do BusinessAcessoRapido
+
+**Arquivo:** `src/components/mentoria/business/BusinessAcessoRapido.tsx`
+
+**Mudanças nas rotas:**
+
+| Botão | Rota Atual | Rota Correta | Motivo |
+|-------|------------|--------------|--------|
+| Etapas | `/mentoria/processo` | `/mentoria/etapas-business` | Nova página específica para roadmap Business |
+| Instruções | `/mentoria/recursos` | `/mentoria/instrucoes-business` | Nova página com instruções agrupadas por Fase/Entrega |
+
+```tsx
+const navItems: QuickNavItem[] = [
+  { title: "Diagnóstico", path: "/mentoria/diagnostico", icon: ClipboardCheck },
+  { title: "Sessões", path: "/mentoria/sessoes", icon: Calendar },
+  { title: "Etapas", path: "/mentoria/etapas-business", icon: Route },  // ALTERADO
+  { title: "Instruções", path: "/mentoria/instrucoes-business", icon: FileText },  // ALTERADO
+  { title: "Entregas", path: "/mentoria/entregas", icon: Package },
+  { title: "Tasks", path: "/mentoria/tarefas", icon: CheckSquare },
+  { title: "Documentos", path: "/mentoria/documentos", icon: FolderOpen },
+];
+```
+
+---
+
+### PARTE 3: Criar Página de Etapas Business para Mentorado
+
+**Novo arquivo:** `src/pages/MentoriaEtapasBusiness.tsx`
+
+Página que mostra as etapas/fases do contrato Business com estrutura similar ao `BusinessExecutiveRoadmap`, mas em página dedicada com mais detalhes:
+
+**Estrutura:**
+- Header com título e botão voltar
+- Progresso geral do projeto (barra de progresso)
+- Lista de Fases (cada fase clicável leva a `/mentoria/etapa/:etapaId`)
+- Cada fase mostra: número, título, status, data prevista, e número de entregas associadas
+
+**Fluxo de dados:**
+```tsx
+const businessUserId = useBusinessUserId();
+const { contrato } = useContratosBusiness(businessUserId);
+const { data: etapas } = useEtapasBusiness(contrato?.id);
+const { entregas } = useEntregasBusiness(contrato?.id);
+```
+
+---
+
+### PARTE 4: Criar Página de Instruções Business para Mentorado
+
+**Novo arquivo:** `src/pages/MentoriaInstrucoesBusiness.tsx`
+
+Página que exibe TODAS as instruções do mentorado, organizadas hierarquicamente por **Fase > Entrega**, similar ao `InstrucoesBusinessManager` do admin, mas em modo somente leitura com progresso:
+
+**Estrutura:**
+- Header com título, botão voltar e progresso geral
+- Seções colapsáveis por Fase
+- Dentro de cada Fase, subseções por Entrega (com link para `/mentoria/entrega/:id`)
+- Cada instrução usa o `InstrucaoCard` existente com checkbox funcional
+
+**Layout:**
+```
+Fase 1: Documentação e Processos
+  └─ Entrega: Entregas em Conjunto (16 instruções) - [Ver Detalhes]
+  └─ Entrega: Upload de Documentação (3 instruções) - [Ver Detalhes]
+
+Fase 2: Financeiro e Expansão  
+  └─ Entrega: Módulo de Gestão Financeira (13 instruções) - [Ver Detalhes]
+  └─ Entrega: Módulo de Gestão de Canais (13 instruções) - [Ver Detalhes]
+
+Fase 3: Gestão de Alunos
+  └─ ...
+```
+
+**Fluxo de dados (hook existente reutilizado):**
+```tsx
+// Criar novo hook useInstrucoesByContrato exportado
+const businessUserId = useBusinessUserId();
+const { contrato } = useContratosBusiness(businessUserId);
+// Buscar todas instruções do contrato agrupadas por etapa/entrega
+```
+
+---
+
+### PARTE 5: Melhorar Página MentoriaEtapa (Detalhe da Fase)
+
+**Arquivo:** `src/pages/MentoriaEtapa.tsx`
+
+A página atual mostra instruções flat, sem contexto de entregas. Melhorar para:
+
+1. Adicionar seção de **Entregas da Fase** com links para `/mentoria/entrega/:id`
+2. Agrupar instruções por entrega (quando tiver `entrega_id`)
+3. Manter layout full-width (remover `max-w-4xl` restritivo se necessário)
+4. Adicionar estatísticas: X entregas, Y instruções, Z% concluído
+
+**Nova estrutura:**
+```tsx
+<div className="container mx-auto py-8 px-4 max-w-6xl">  {/* Largura maior */}
+  <EtapaHeader etapa={etapa} />
+  
+  {/* Entregas desta Fase */}
+  <Card>
+    <CardHeader>
+      <CardTitle>Entregas desta Fase ({entregasDaFase.length})</CardTitle>
+    </CardHeader>
+    <CardContent>
+      {entregasDaFase.map(entrega => (
+        <div 
+          key={entrega.id}
+          onClick={() => navigate(`/mentoria/entrega/${entrega.id}`)}
+          className="cursor-pointer hover:bg-muted/50 p-3 rounded-lg"
+        >
+          <span>{entrega.titulo}</span>
+          <Badge>{entrega.status}</Badge>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+
+  {/* Instruções agrupadas */}
+  ...
+</div>
+```
+
+---
+
+### PARTE 6: Registrar Novas Rotas
+
+**Arquivo:** `src/App.tsx`
+
+Adicionar as novas rotas:
+
+```tsx
+import MentoriaEtapasBusiness from "./pages/MentoriaEtapasBusiness";
+import MentoriaInstrucoesBusiness from "./pages/MentoriaInstrucoesBusiness";
+
+// Dentro das rotas protegidas:
+<Route path="/mentoria/etapas-business" element={<MentoriaEtapasBusiness />} />
+<Route path="/mentoria/instrucoes-business" element={<MentoriaInstrucoesBusiness />} />
+```
+
+---
+
+### PARTE 7: Criar Hook para Instruções por Contrato (Mentorado)
+
+**Arquivo:** `src/hooks/useEtapasBusiness.tsx`
+
+Exportar um hook para buscar todas instruções do contrato do mentorado:
+
+```tsx
+export function useInstrucoesByContrato(contratoId?: string) {
+  return useQuery({
+    queryKey: ['instrucoes-contrato-mentorado', contratoId],
+    queryFn: async () => {
+      const { data: etapas } = await supabase
+        .from('etapas_business')
+        .select('id')
+        .eq('contrato_id', contratoId);
+      
+      if (!etapas?.length) return [];
+      
+      const etapaIds = etapas.map(e => e.id);
+      
+      const { data, error } = await supabase
+        .from('instrucoes_etapa')
+        .select(`
+          *,
+          etapas_business (id, numero_etapa, titulo),
+          entregas_business (id, titulo, numero_entrega, etapa_id)
+        `)
+        .in('etapa_id', etapaIds)
+        .order('ordem', { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!contratoId,
+  });
+}
 ```
 
 ---
@@ -150,38 +213,36 @@ Adicionar banner fixo quando em modo impersonação, mostrando quem está sendo 
 
 | Arquivo | Ação |
 |---------|------|
-| `src/contexts/AdminViewContext.tsx` | **MODIFICAR** - Adicionar impersonatedUserId/Name |
-| `src/hooks/useAdminView.tsx` | **MODIFICAR** - Expor novos campos |
-| `src/hooks/useBusinessUserId.tsx` | **CRIAR** - Hook utilitário |
-| `src/components/admin/BusinessUserSelectorModal.tsx` | **CRIAR** - Modal de seleção |
-| `src/components/admin/AdminViewSelector.tsx` | **MODIFICAR** - Integrar modal |
-| `src/pages/MentoriaEntregas.tsx` | **MODIFICAR** - Usar businessUserId |
-| `src/pages/MentoriaDocumentos.tsx` | **MODIFICAR** - Usar businessUserId |
-| `src/pages/MentoriaSessoes.tsx` | **MODIFICAR** - Usar businessUserId |
-| `src/pages/MentoriaReports.tsx` | **MODIFICAR** - Usar businessUserId |
-| `src/components/mentoria/business/BusinessExecutiveRoadmap.tsx` | **MODIFICAR** - Usar businessUserId |
-| `src/components/mentoria/business/BusinessReportsCard.tsx` | **MODIFICAR** - Usar businessUserId |
-| `src/components/mentoria/BusinessROIChart.tsx` | **MODIFICAR** - Usar businessUserId |
-| `src/components/layout/TopHeader.tsx` | **MODIFICAR** - Adicionar banner de simulação |
+| `src/pages/MentoriaDocumentos.tsx` | **MODIFICAR** - Adicionar botão voltar |
+| `src/components/mentoria/business/BusinessAcessoRapido.tsx` | **MODIFICAR** - Corrigir rotas Etapas/Instruções |
+| `src/pages/MentoriaEtapasBusiness.tsx` | **CRIAR** - Nova página de etapas Business |
+| `src/pages/MentoriaInstrucoesBusiness.tsx` | **CRIAR** - Nova página de instruções Business |
+| `src/pages/MentoriaEtapa.tsx` | **MODIFICAR** - Melhorar layout e adicionar entregas |
+| `src/hooks/useEtapasBusiness.tsx` | **MODIFICAR** - Adicionar hook useInstrucoesByContrato |
+| `src/App.tsx` | **MODIFICAR** - Registrar novas rotas |
 
 ---
 
-### Fluxo de Uso
+### Resultado Esperado
 
-1. Admin clica em "Ver como..." no header
-2. Seleciona "Business" no dropdown
-3. Modal abre com lista de mentorados Business
-4. Admin busca/seleciona "Paula"
-5. Modal fecha, botão mostra "Business: Paula" em amarelo
-6. Banner aparece: "Visualizando como: Paula (Business)"
-7. Todas as páginas de mentoria mostram dados da Paula
-8. Admin clica em "Sair da simulação" para voltar ao modo normal
+**Fluxo do Mentorado Business:**
 
----
+```
+Dashboard Business
+  ├── [Etapas] → /mentoria/etapas-business → Lista todas as fases com progresso
+  │     └── Clique em Fase → /mentoria/etapa/:id → Detalhes da fase + entregas
+  │           └── Clique em Entrega → /mentoria/entrega/:id → Instruções da entrega
+  │
+  ├── [Instruções] → /mentoria/instrucoes-business → Todas instruções por Fase > Entrega
+  │
+  ├── [Entregas] → /mentoria/entregas → Lista todas entregas
+  │     └── Clique → /mentoria/entrega/:id
+  │
+  └── [Documentos] → /mentoria/documentos → Downloads + Links (COM botão voltar)
+```
 
-### Benefícios
-
-- Admin pode verificar exatamente o que cada mentorado Business vê
-- Facilita debug de problemas reportados por mentorados
-- Garante que importações de documentos estão corretas
-- Validação rápida da experiência do usuário
+**Consistência com Admin:**
+- Mentorado vê mesma estrutura hierárquica (Fase > Entrega > Instrução)
+- Instruções agrupadas corretamente por entrega
+- Navegação intuitiva entre níveis
+- Botão voltar padrão em todas as páginas
