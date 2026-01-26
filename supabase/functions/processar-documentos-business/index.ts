@@ -1219,26 +1219,48 @@ function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial
 // ═══════════════════════════════════════════════════════════════════
 
 function processarMVPeConjuntas(ancoras: AncorasLiterais, texto: string): { 
-  mvpEntregas: any[], 
+  mvpEntrega: any | null,
+  mvpInstrucoes: any[],
   conjuntaEntrega: any | null,
   conjuntasInstrucoes: any[]
 } {
   console.log("=== PROCESSANDO MVP E CONJUNTAS ===");
   
-  // MVP como entregas vinculadas à FASE 1 (ordem negativa para aparecer primeiro na fase)
-  // MVPs são entregas prioritárias que devem ser feitas em conjunto na primeira fase
-  const mvpEntregas = ancoras.mvp.map((item, idx) => ({
-    etapa_numero: 1, // Associar à Fase 1 - MVPs são feitos em conjunto nesta fase
-    numero_entrega: -(ancoras.mvp.length - idx), // Ordem negativa para aparecer antes das entregas principais
-    titulo: item.titulo,
-    descricao: 'Item do MVP - escopo acordado para a primeira fase',
-    tipo: 'ativa' as const,
-    prioridade: 'critica', // MVPs são prioridade crítica
-    modulo_relacionado: null,
-    responsavel: 'conjunto', // MVPs são feitos em conjunto mentor+mentorado
-    is_mvp: true // Flag para identificar como MVP
-  }));
-  console.log(`  MVP: ${mvpEntregas.length} entregas (vinculadas à Fase 1)`);
+  // MVP como UMA ÚNICA ENTREGA com items como instruções (igual às Conjuntas)
+  let mvpEntrega: any | null = null;
+  const mvpInstrucoes: any[] = [];
+  
+  if (ancoras.mvp.length > 0) {
+    // Criar UMA única entrega MVP na Fase 1
+    mvpEntrega = {
+      etapa_numero: 1,
+      numero_entrega: -1, // Número negativo para aparecer antes das entregas principais
+      titulo: 'MVP - Escopo Acordado',
+      descricao: 'Entregas prioritárias do primeiro release',
+      tipo: 'ativa' as const,
+      prioridade: 'critica',
+      modulo_relacionado: null,
+      responsavel: 'conjunto',
+      is_mvp: true,
+      ordem: -1 // Ordem negativa para aparecer primeiro
+    };
+    
+    // Cada item do MVP vira uma instrução
+    ancoras.mvp.forEach((item, idx) => {
+      mvpInstrucoes.push({
+        entrega_numero: -1, // Vinculada à entrega MVP (numero_entrega = -1)
+        titulo: item.titulo,
+        descricao: '',
+        prompt_sugerido: '',
+        dicas: '',
+        responsavel: 'conjunto',
+        ferramenta: 'reuniao',
+        ordem: idx + 1
+      });
+    });
+    
+    console.log(`  MVP: 1 entrega global com ${mvpInstrucoes.length} instruções`);
+  }
   
   // ENTREGAS EM CONJUNTO - UMA ÚNICA ENTREGA GLOBAL
   let conjuntaEntrega: any | null = null;
@@ -1282,7 +1304,7 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais, texto: string): {
     console.log(`  Conjuntas: 1 entrega global com ${conjuntasInstrucoes.length} instruções`);
   }
   
-  return { mvpEntregas, conjuntaEntrega, conjuntasInstrucoes };
+  return { mvpEntrega, mvpInstrucoes, conjuntaEntrega, conjuntasInstrucoes };
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1394,9 +1416,9 @@ serve(async (req) => {
     console.log(`  - Com dicas: ${ancoras.passos.filter(p => p.dicas).length}`);
     
     // ═══════════════════════════════════════════════════════════════
-    // PASSO 2: Processar MVP e Conjuntas (1 ENTREGA GLOBAL)
+    // PASSO 2: Processar MVP e Conjuntas (1 ENTREGA GLOBAL cada)
     // ═══════════════════════════════════════════════════════════════
-    const { mvpEntregas, conjuntaEntrega, conjuntasInstrucoes } = processarMVPeConjuntas(ancoras, texto);
+    const { mvpEntrega, mvpInstrucoes, conjuntaEntrega, conjuntasInstrucoes } = processarMVPeConjuntas(ancoras, texto);
     
     // ═══════════════════════════════════════════════════════════════
     // PASSO 3: Processar com IA ou apenas com âncoras
@@ -1430,15 +1452,16 @@ serve(async (req) => {
     // PASSO 5: Combinar tudo
     // ═══════════════════════════════════════════════════════════════
     
-    // Adicionar MVP e Conjunta às entregas (1 entrega global)
+    // Adicionar MVP e Conjunta às entregas (1 entrega global cada)
     const todasEntregas = [
-      ...mvpEntregas,
+      ...(mvpEntrega ? [mvpEntrega] : []),
       ...resultado.entregas,
       ...(conjuntaEntrega ? [conjuntaEntrega] : [])
     ];
     
-    // Adicionar instruções das conjuntas
+    // Adicionar instruções de MVP e Conjuntas
     const todasInstrucoes = [
+      ...mvpInstrucoes,
       ...resultado.instrucoes,
       ...conjuntasInstrucoes
     ];
@@ -1456,7 +1479,7 @@ serve(async (req) => {
     console.log("RESULTADO FINAL");
     console.log("═══════════════════════════════════════════════════════════════");
     console.log(`Total de etapas: ${resultado.etapas.length}`);
-    console.log(`Total de entregas: ${todasEntregas.length} (MVP: ${mvpEntregas.length}, Principais: ${resultado.entregas.length}, Conjunta: ${conjuntaEntrega ? 1 : 0})`);
+    console.log(`Total de entregas: ${todasEntregas.length} (MVP: ${mvpEntrega ? 1 : 0}, Principais: ${resultado.entregas.length}, Conjunta: ${conjuntaEntrega ? 1 : 0})`);
     console.log(`Total de instruções: ${todasInstrucoes.length}`);
     console.log(`  - Com prompt: ${todasInstrucoes.filter(i => i.prompt_sugerido).length}`);
     console.log(`  - Com dicas: ${todasInstrucoes.filter(i => i.dicas).length}`);
