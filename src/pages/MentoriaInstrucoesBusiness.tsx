@@ -11,6 +11,7 @@ import { useEtapasBusiness, useInstrucoesByContrato, useUpdateInstrucao } from "
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { InstrucaoCard } from "@/components/mentoria/business/InstrucaoCard";
+import { PageTitle } from "@/components/shared/PageTitle";
 import { cn } from "@/lib/utils";
 
 interface FaseAgrupada {
@@ -180,22 +181,21 @@ export default function MentoriaInstrucoesBusiness() {
   return (
     <div className="container mx-auto py-8 px-4 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/mentoria")}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Minhas Instruções</h1>
-            <p className="text-muted-foreground text-sm">
-              Instruções organizadas por fase e entrega
-            </p>
-          </div>
-        </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate("/mentoria")}
+        className="mb-4"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar
+      </Button>
+
+      <div className="mb-8">
+        <PageTitle primary="Minhas" secondary="Instruções" />
+        <p className="text-muted-foreground text-lg mt-2">
+          Instruções organizadas por fase e entrega
+        </p>
       </div>
 
       {/* Filtros */}
