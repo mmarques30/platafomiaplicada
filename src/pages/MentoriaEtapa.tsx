@@ -1,86 +1,75 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEtapaById, useInstrucoesEtapa, useUpdateInstrucao } from "@/hooks/useEtapasBusiness";
-import { useEntregasByEtapa } from "@/hooks/useEntregasBusiness";
+import { useEtapaById } from "@/hooks/useEtapasBusiness";
+import { useEntregasByEtapa, EntregaBusiness } from "@/hooks/useEntregasBusiness";
 import { EtapaHeader } from "@/components/mentoria/business/EtapaHeader";
-import { InstrucaoCard } from "@/components/mentoria/business/InstrucaoCard";
 import { MarcosEtapa } from "@/components/mentoria/business/MarcosEtapa";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User, Users, Target, Package, ChevronRight } from "lucide-react";
-import { useMemo } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, Target, Package, Clock, PlayCircle, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { supabase } from "@/integrations/supabase/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+const STATUS_CONFIG = {
+  pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const, color: "text-muted-foreground" },
+  em_andamento: { label: "Em Andamento", icon: PlayCircle, variant: "default" as const, color: "text-amber-600" },
+  concluida: { label: "Concluída", icon: CheckCircle2, variant: "outline" as const, color: "text-green-600" },
+  cancelada: { label: "Cancelada", icon: AlertCircle, variant: "destructive" as const, color: "text-destructive" },
+};
+
+const PRIORIDADE_CONFIG = {
+  baixa: { label: "Baixa", variant: "secondary" as const },
+  media: { label: "Média", variant: "default" as const },
+  alta: { label: "Alta", variant: "destructive" as const },
+  critica: { label: "Crítica", variant: "destructive" as const },
+};
 
 export default function MentoriaEtapa() {
   const { etapaId } = useParams<{ etapaId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: etapa, isLoading: loadingEtapa } = useEtapaById(etapaId);
-  const { data: instrucoes, isLoading: loadingInstrucoes } = useInstrucoesEtapa(etapaId);
   const { data: entregas, isLoading: loadingEntregas } = useEntregasByEtapa(etapaId);
-  const updateInstrucao = useUpdateInstrucao();
 
-  const handleToggleStatus = (id: string, novoStatus: 'pendente' | 'concluida') => {
-    if (!etapaId) return;
-    updateInstrucao.mutate({ id, etapaId, status: novoStatus });
+  // Mutation para atualizar status da entrega
+  const updateEntrega = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: EntregaBusiness['status'] }) => {
+      const { error } = await supabase
+        .from("entregas_business")
+        .update({ status })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["entregas-by-etapa", etapaId] });
+      toast.success("Entrega atualizada");
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar entrega");
+    },
+  });
+
+  const handleStatusChange = (entregaId: string, newStatus: EntregaBusiness['status']) => {
+    updateEntrega.mutate({ id: entregaId, status: newStatus });
   };
 
-  // Agrupar instruções por entrega
-  const instrucoesAgrupadas = useMemo(() => {
-    if (!instrucoes || !entregas) return { porEntrega: [], avulsas: [] };
-
-    const entregaMap = new Map(entregas.map(e => [e.id, e]));
-    const porEntrega: {
-      entrega: typeof entregas[0];
-      instrucoesVoce: typeof instrucoes;
-      instrucoesConjunto: typeof instrucoes;
-      progresso: number;
-    }[] = [];
-    const instrucoesAvulsas: typeof instrucoes = [];
-
-    // Agrupar por entrega_id
-    const grupos = new Map<string | null, typeof instrucoes>();
-    instrucoes.forEach(instr => {
-      const entregaId = (instr as any).entrega_id || null;
-      if (!grupos.has(entregaId)) {
-        grupos.set(entregaId, []);
-      }
-      grupos.get(entregaId)!.push(instr);
-    });
-
-    // Processar grupos
-    grupos.forEach((instrs, entregaId) => {
-      if (entregaId && entregaMap.has(entregaId)) {
-        const entrega = entregaMap.get(entregaId)!;
-        const instrucoesVoce = instrs.filter(i => i.responsavel === 'voce');
-        const instrucoesConjunto = instrs.filter(i => i.responsavel === 'conjunto');
-        const concluidas = instrs.filter(i => i.status === 'concluida').length;
-        const progresso = instrs.length > 0 ? Math.round((concluidas / instrs.length) * 100) : 0;
-        
-        porEntrega.push({ entrega, instrucoesVoce, instrucoesConjunto, progresso });
-      } else {
-        instrucoesAvulsas.push(...instrs);
-      }
-    });
-
-    // Ordenar por numero_entrega
-    porEntrega.sort((a, b) => (a.entrega.numero_entrega || 0) - (b.entrega.numero_entrega || 0));
-
-    return { porEntrega, avulsas: instrucoesAvulsas };
-  }, [instrucoes, entregas]);
-
-  const instrucoesVoceAvulsas = instrucoesAgrupadas.avulsas.filter(i => i.responsavel === 'voce');
-  const instrucoesConjuntoAvulsas = instrucoesAgrupadas.avulsas.filter(i => i.responsavel === 'conjunto');
-
-  const calcularProgresso = (lista: typeof instrucoes) => {
-    if (!lista || lista.length === 0) return 0;
-    const concluidas = lista.filter(i => i.status === 'concluida').length;
-    return Math.round((concluidas / lista.length) * 100);
+  // Calcular progresso
+  const calcularProgresso = () => {
+    if (!entregas || entregas.length === 0) return 0;
+    const concluidas = entregas.filter(e => e.status === 'concluida').length;
+    return Math.round((concluidas / entregas.length) * 100);
   };
 
-  const progressoGeral = calcularProgresso(instrucoes);
+  const progressoGeral = calcularProgresso();
 
-  if (loadingEtapa || loadingInstrucoes || loadingEntregas) {
+  if (loadingEtapa || loadingEntregas) {
     return (
       <div className="container mx-auto py-8 px-4 space-y-6">
         <Skeleton className="h-8 w-64" />
@@ -97,6 +86,94 @@ export default function MentoriaEtapa() {
       </div>
     );
   }
+
+  const renderEntregaCard = (entrega: EntregaBusiness) => {
+    const statusConfig = STATUS_CONFIG[entrega.status];
+    const prioridadeConfig = PRIORIDADE_CONFIG[entrega.prioridade];
+    const StatusIcon = statusConfig.icon;
+
+    return (
+      <Card 
+        key={entrega.id} 
+        className={cn(
+          "border-l-4 transition-all",
+          entrega.status === 'concluida' && "border-l-green-500 bg-green-50/30 dark:bg-green-950/10",
+          entrega.status === 'em_andamento' && "border-l-amber-500 bg-amber-50/30 dark:bg-amber-950/10",
+          entrega.status === 'pendente' && "border-l-muted-foreground/30",
+          entrega.status === 'cancelada' && "border-l-destructive opacity-60"
+        )}
+      >
+        <CardContent className="py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <StatusIcon className={cn("h-5 w-5", statusConfig.color)} />
+                <h3 className={cn(
+                  "font-semibold text-lg",
+                  entrega.status === 'concluida' && "line-through text-muted-foreground"
+                )}>
+                  {entrega.numero_entrega ? `Entrega ${entrega.numero_entrega}: ` : ''}
+                  {entrega.titulo}
+                </h3>
+                <Badge variant={prioridadeConfig.variant} className="text-xs">
+                  {prioridadeConfig.label}
+                </Badge>
+              </div>
+              
+              {entrega.descricao && (
+                <p className="text-sm text-muted-foreground mb-3">
+                  {entrega.descricao}
+                </p>
+              )}
+              
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                {entrega.modulo_relacionado && (
+                  <span className="bg-muted px-2 py-1 rounded-md">
+                    {entrega.modulo_relacionado}
+                  </span>
+                )}
+                {entrega.prazo_previsto && (
+                  <span className="bg-muted px-2 py-1 rounded-md">
+                    Prazo: {format(parseISO(entrega.prazo_previsto), "dd/MM/yyyy", { locale: ptBR })}
+                  </span>
+                )}
+              </div>
+            </div>
+            
+            {/* Status Selector */}
+            <div className="flex items-center gap-2 lg:min-w-[180px]">
+              <Select
+                value={entrega.status}
+                onValueChange={(value) => handleStatusChange(entrega.id, value as EntregaBusiness['status'])}
+                disabled={updateEntrega.isPending}
+              >
+                <SelectTrigger className={cn(
+                  "w-full",
+                  entrega.status === 'concluida' && "border-green-500 text-green-600",
+                  entrega.status === 'em_andamento' && "border-amber-500 text-amber-600"
+                )}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background border shadow-lg z-50">
+                  {Object.entries(STATUS_CONFIG).map(([key, config]) => {
+                    const Icon = config.icon;
+                    return (
+                      <SelectItem key={key} value={key}>
+                        <div className="flex items-center gap-2">
+                          <Icon className={cn("h-4 w-4", config.color)} />
+                          {config.label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="container mx-auto py-8 px-4 space-y-8">
@@ -129,161 +206,44 @@ export default function MentoriaEtapa() {
         </Card>
       )}
 
-      {/* Progresso Geral */}
-      {instrucoes && instrucoes.length > 0 && (
+      {/* Progresso Geral das Entregas */}
+      {entregas && entregas.length > 0 && (
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium flex items-center justify-between">
-              <span>Progresso da Fase</span>
-              <span className="text-sm font-normal text-muted-foreground">
-                {instrucoes.filter(i => i.status === 'concluida').length}/{instrucoes.length} instruções
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">Progresso das Entregas</span>
+              <span className="text-sm text-muted-foreground">
+                {entregas.filter(e => e.status === 'concluida').length}/{entregas.length} entregas
               </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </div>
             <Progress value={progressoGeral} className="h-2" />
           </CardContent>
         </Card>
       )}
 
-      {/* Instruções agrupadas por Entrega */}
-      {instrucoesAgrupadas.porEntrega.map(({ entrega, instrucoesVoce, instrucoesConjunto, progresso }) => (
-        <Card key={entrega.id}>
-          <CardHeader className="pb-3">
-            <div 
-              className="flex items-center justify-between cursor-pointer group"
-              onClick={() => navigate(`/mentoria/entrega/${entrega.id}`)}
-            >
-              <div className="flex items-center gap-3">
-                <Package className="h-5 w-5 text-primary" />
-                <div>
-                  <CardTitle className="text-base font-semibold group-hover:text-primary transition-colors">
-                    {entrega.numero_entrega ? `Entrega ${entrega.numero_entrega}: ` : ''}
-                    {entrega.titulo}
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {instrucoesVoce.length + instrucoesConjunto.length} instruções • {progresso}% concluído
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-20">
-                  <Progress value={progresso} className="h-1.5" />
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Suas Instruções */}
-            {instrucoesVoce.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <User className="h-4 w-4 text-blue-500" />
-                  <span className="font-medium">Suas Instruções</span>
-                  <span className="text-muted-foreground">
-                    ({calcularProgresso(instrucoesVoce)}%)
-                  </span>
-                </div>
-                <div className="pl-6 space-y-2">
-                  {instrucoesVoce.map(instrucao => (
-                    <InstrucaoCard
-                      key={instrucao.id}
-                      instrucao={instrucao}
-                      onToggleStatus={handleToggleStatus}
-                      isUpdating={updateInstrucao.isPending}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Na Próxima Reunião */}
-            {instrucoesConjunto.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <Users className="h-4 w-4 text-amber-500" />
-                  <span className="font-medium">Na Próxima Reunião</span>
-                  <span className="text-muted-foreground">
-                    ({calcularProgresso(instrucoesConjunto)}%)
-                  </span>
-                </div>
-                <div className="pl-6 space-y-2">
-                  {instrucoesConjunto.map(instrucao => (
-                    <InstrucaoCard
-                      key={instrucao.id}
-                      instrucao={instrucao}
-                      onToggleStatus={handleToggleStatus}
-                      isUpdating={updateInstrucao.isPending}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
-
-      {/* Instruções avulsas (sem entrega vinculada) */}
-      {instrucoesVoceAvulsas.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-blue-500" />
-                Instruções Gerais
-              </div>
-              <span className="text-sm font-normal text-muted-foreground">
-                {calcularProgresso(instrucoesVoceAvulsas)}% concluído
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {instrucoesVoceAvulsas.map(instrucao => (
-              <InstrucaoCard
-                key={instrucao.id}
-                instrucao={instrucao}
-                onToggleStatus={handleToggleStatus}
-                isUpdating={updateInstrucao.isPending}
-              />
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {instrucoesConjuntoAvulsas.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-amber-500" />
-                Na Próxima Reunião
-              </div>
-              <span className="text-sm font-normal text-muted-foreground">
-                {calcularProgresso(instrucoesConjuntoAvulsas)}% concluído
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {instrucoesConjuntoAvulsas.map(instrucao => (
-              <InstrucaoCard
-                key={instrucao.id}
-                instrucao={instrucao}
-                onToggleStatus={handleToggleStatus}
-                isUpdating={updateInstrucao.isPending}
-              />
-            ))}
-          </CardContent>
-        </Card>
+      {/* Lista de Entregas */}
+      {entregas && entregas.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Package className="h-5 w-5 text-primary" />
+            Entregas desta Fase ({entregas.length})
+          </h2>
+          <div className="space-y-3">
+            {entregas
+              .sort((a, b) => (a.numero_entrega || 0) - (b.numero_entrega || 0))
+              .map(renderEntregaCard)}
+          </div>
+        </div>
       )}
 
       <MarcosEtapa marcos={etapa.marcos_proxima_etapa} />
 
-      {(!instrucoes || instrucoes.length === 0) && (
+      {(!entregas || entregas.length === 0) && (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
+            <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
             <p className="text-muted-foreground">
-              Nenhuma instrução cadastrada para esta fase.
+              Nenhuma entrega cadastrada para esta fase.
             </p>
           </CardContent>
         </Card>
