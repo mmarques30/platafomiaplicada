@@ -81,13 +81,13 @@ export function TopHeader() {
     <>
       {/* Banner de simulação Business */}
       {isAdmin && viewAs === 'business' && impersonatedUserName && (
-        <div className="fixed top-0 left-0 right-0 bg-amber-500 text-amber-950 text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
+        <div className="fixed top-0 left-0 right-0 bg-aplicada-green-700 text-white text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
           <span>👁️ Visualizando como: <strong>{impersonatedUserName}</strong> (Business)</span>
           <Button 
             size="sm" 
             variant="ghost" 
             onClick={resetView} 
-            className="h-7 px-3 text-amber-950 hover:text-amber-950 hover:bg-amber-400"
+            className="h-7 px-3 text-white hover:text-white hover:bg-aplicada-green-800"
           >
             Sair da simulação
           </Button>
