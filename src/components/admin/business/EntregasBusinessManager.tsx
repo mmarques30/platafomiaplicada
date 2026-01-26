@@ -156,7 +156,12 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5">
               <h4 className="font-medium text-sm truncate">
-                {entrega.numero_entrega ? `${entrega.numero_entrega}. ` : ""}{entrega.titulo}
+                {entrega.numero_entrega === -1 
+                  ? "MVP. " 
+                  : entrega.numero_entrega && entrega.numero_entrega > 0 
+                    ? `${entrega.numero_entrega}. ` 
+                    : ""
+                }{entrega.titulo}
               </h4>
               <Badge variant={prioridade.variant} className="text-xs shrink-0">
                 {prioridade.label}

@@ -568,7 +568,7 @@ export function InstrucoesBusinessManager({ contratoId, userId, userName }: Inst
                           .map(([entregaId, { entrega, instrucoes }]) => {
                             const isEntregaExpanded = expandedEntregas.has(entregaId);
                             const concluidasEntrega = instrucoes.filter(i => i.status === 'concluida').length;
-                            const numeroEntrega = entrega?.numero_entrega;
+                            const numeroEntrega = entrega?.numero_entrega === -1 ? "MVP" : entrega?.numero_entrega;
 
                             return (
                               <Collapsible
