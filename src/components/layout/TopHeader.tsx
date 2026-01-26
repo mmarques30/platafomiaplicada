@@ -21,6 +21,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
 import { useProdutosAtivos } from "@/hooks/admin/useProdutos";
+import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { cn } from "@/lib/utils";
 import { forceFullAppReload } from "@/lib/pwaUpdate";
 import { AdminViewSelector } from "@/components/admin/AdminViewSelector";
@@ -33,6 +34,7 @@ export function TopHeader() {
   const { effectivePlan, isBusiness, isSkills, isAcademy, isVisitante, hasEffectiveAccessTo } = useEffectivePlan(isAdmin);
   const { profile } = useUserProfile();
   const { data: produtosAtivos } = useProdutosAtivos();
+  const { viewAs, impersonatedUserName, resetView } = useAdminViewContext();
   
   // Verifica se um produto está ativo pelo slug
   const isProdutoAtivo = (slug: string) => {
@@ -76,15 +78,32 @@ export function TopHeader() {
   const firstName = profile?.nome_completo?.split(" ")[0] || "Usuário";
 
   return (
-    <header 
-      className={cn(
-        "fixed top-0 z-50 w-full border-b border-white/10 bg-[#0D0D0D] transition-transform duration-300 ease-in-out",
-        isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0"
+    <>
+      {/* Banner de simulação Business */}
+      {isAdmin && viewAs === 'business' && impersonatedUserName && (
+        <div className="fixed top-0 left-0 right-0 bg-amber-500 text-amber-950 text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
+          <span>👁️ Visualizando como: <strong>{impersonatedUserName}</strong> (Business)</span>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={resetView} 
+            className="h-7 px-3 text-amber-950 hover:text-amber-950 hover:bg-amber-400"
+          >
+            Sair da simulação
+          </Button>
+        </div>
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="relative h-14 w-full">
+      
+      <header 
+        className={cn(
+          "fixed z-50 w-full border-b border-white/10 bg-[#0D0D0D] transition-transform duration-300 ease-in-out",
+          isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0",
+          isAdmin && viewAs === 'business' && impersonatedUserName ? "top-10" : "top-0"
+        )}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="relative h-14 w-full">
         {/* LEFT: SidebarTrigger + Logo + Mobile Menu */}
         <div className="absolute left-0 top-0 h-full flex items-center gap-2 ml-1 md:ml-2">
           <SidebarTrigger className="h-10 w-10 md:h-8 md:w-8 text-white hover:text-white hover:bg-white/20 bg-white/10 rounded-md transition-colors" />
@@ -268,7 +287,8 @@ export function TopHeader() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
-    </header>
+        </div>
+      </header>
+    </>
   );
 }

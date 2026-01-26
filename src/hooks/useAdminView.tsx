@@ -2,10 +2,12 @@ import { useAdminViewContext, AdminViewMode } from "@/contexts/AdminViewContext"
 
 interface UseAdminViewReturn {
   viewAs: AdminViewMode;
-  setViewAs: (mode: AdminViewMode) => void;
+  setViewAs: (mode: AdminViewMode, userId?: string, userName?: string) => void;
   isViewingAs: boolean;
   resetView: () => void;
   canUseViewAs: boolean;
+  impersonatedUserId: string | null;
+  impersonatedUserName: string | null;
 }
 
 export function useAdminView(isAdmin: boolean): UseAdminViewReturn {
@@ -19,6 +21,8 @@ export function useAdminView(isAdmin: boolean): UseAdminViewReturn {
       isViewingAs: false,
       resetView: () => {},
       canUseViewAs: false,
+      impersonatedUserId: null,
+      impersonatedUserName: null,
     };
   }
 

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -25,7 +26,8 @@ const PRIORIDADE_CONFIG = {
 
 export default function MentoriaEntregas() {
   const navigate = useNavigate();
-  const { contrato, isLoading: isLoadingContrato } = useContratosBusiness();
+  const businessUserId = useBusinessUserId();
+  const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(businessUserId);
   const { entregas, entregasAtivas, entregasBacklog, isLoading: isLoadingEntregas } = useEntregasBusiness(contrato?.id);
   const { data: etapas } = useEtapasBusiness(contrato?.id);
 

@@ -8,6 +8,7 @@ import { Calendar, Clock, Video, FileText, Loader2, ArrowLeft } from "lucide-rea
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -29,8 +30,9 @@ import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function MentoriaSessoes() {
   const navigate = useNavigate();
-  const { sessoes, isLoading } = useMentoriaSessoes();
-  const { contrato } = useContratosBusiness();
+  const businessUserId = useBusinessUserId();
+  const { sessoes, isLoading } = useMentoriaSessoes(businessUserId);
+  const { contrato } = useContratosBusiness(businessUserId);
   const { data: etapas } = useEtapasBusiness(contrato?.id);
   const [selectedSessao, setSelectedSessao] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("todas");
