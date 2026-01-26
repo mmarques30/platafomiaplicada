@@ -137,28 +137,118 @@ function detectarResponsavel(texto: string): "voce" | "mentor" | "conjunto" {
 // ═══════════════════════════════════════════════════════════════════
 
 function extrairPrompt(conteudo: string): string | undefined {
-  // Padrão 1: Texto entre aspas após "prompt" ou "cole"
-  const regexAspas = /(?:prompt|cole\s+o\s+prompt|copie\s+e\s+cole|mensagem)[:\s]*["'"]([\s\S]+?)["'"]/i;
-  const matchAspas = conteudo.match(regexAspas);
-  if (matchAspas && matchAspas[1].length > 30) {
-    return matchAspas[1].trim();
+  // IMPORTANTE: Só extrair prompts REAIS - blocos de texto que o usuário deve copiar e colar
+  // NÃO extrair: descrições, passos, instruções genéricas
+  
+  // Verificar se o conteúdo parece ter um prompt real
+  const conteudoLower = conteudo.toLowerCase();
+  const temIndicadorPrompt = 
+    conteudoLower.includes('use este modelo:') ||
+    conteudoLower.includes('copie e cole:') ||
+    conteudoLower.includes('cole no claude:') ||
+    conteudoLower.includes('envie para o claude:') ||
+    conteudoLower.includes('prompt:') ||
+    conteudoLower.includes('cole este prompt') ||
+    conteudoLower.includes('escreva isso no');
+  
+  if (!temIndicadorPrompt) {
+    return undefined;
   }
   
-  // Padrão 2: Bloco de texto grande após "Prompt:" ou similar
-  const regexBloco = /(?:prompt|cole\s+no\s+claude|envie\s+para\s+o\s+claude)[:\s]*([\s\S]{50,}?)(?=\n\n|\nDICA|\nOBS|\nATENÇÃO|\nIMPORTANTE|\nPASSO|$)/i;
-  const matchBloco = conteudo.match(regexBloco);
-  if (matchBloco && matchBloco[1].length > 50) {
-    return matchBloco[1].trim();
+  // Padrão 1: Texto entre aspas curvas "..." após indicador de prompt
+  const regexAspasCurvas = /(?:use\s+este\s+modelo|cole\s+(?:no\s+claude|e\s+cole)|envie\s+para\s+o\s+claude|prompt)[:\s]*[""]([^""]+)[""]|[""]([^""]{100,}?)[""]/i;
+  const matchAspasCurvas = conteudo.match(regexAspasCurvas);
+  if (matchAspasCurvas) {
+    const promptText = (matchAspasCurvas[1] || matchAspasCurvas[2] || '').trim();
+    // Verificar se parece um prompt real (tem estrutura de comando para IA)
+    if (promptText.length > 100 && isPromptReal(promptText)) {
+      return promptText;
+    }
   }
   
-  // Padrão 3: Texto entre aspas curvas ou retas
-  const regexAspasLongas = /["'"]([\s\S]{80,}?)["'"]/;
-  const matchAspaslongas = conteudo.match(regexAspasLongas);
-  if (matchAspaslongas) {
-    return matchAspaslongas[1].trim();
+  // Padrão 2: Texto entre aspas retas "..." após indicador
+  const regexAspasRetas = /(?:use\s+este\s+modelo|cole\s+(?:no\s+claude|e\s+cole)|envie\s+para\s+o\s+claude|prompt)[:\s]*"([^"]+)"/i;
+  const matchAspasRetas = conteudo.match(regexAspasRetas);
+  if (matchAspasRetas && matchAspasRetas[1].length > 100) {
+    const promptText = matchAspasRetas[1].trim();
+    if (isPromptReal(promptText)) {
+      return promptText;
+    }
+  }
+  
+  // Padrão 3: Bloco de texto após "Use este modelo:" ou "Prompt:" que termina em aspas
+  const regexBlocoModelo = /(?:use\s+este\s+modelo|prompt)[:\s]*\n?([\s\S]*?)(?=\nDICA|\nOBS|\n\n\n|\nATENÇÃO|$)/i;
+  const matchBloco = conteudo.match(regexBlocoModelo);
+  if (matchBloco && matchBloco[1].length > 100) {
+    const blocoText = matchBloco[1].trim();
+    // Limpar prefixos de introdução
+    const limpo = limparIntroducaoPrompt(blocoText);
+    if (limpo.length > 80 && isPromptReal(limpo)) {
+      return limpo;
+    }
   }
   
   return undefined;
+}
+
+// Verifica se o texto parece um prompt real para IA
+function isPromptReal(texto: string): boolean {
+  const textoLower = texto.toLowerCase();
+  
+  // Um prompt real geralmente tem comandos/instruções para IA
+  const indicadoresPrompt = [
+    'preciso', 'crie', 'gere', 'faça', 'desenvolva', 'implemente',
+    'contexto:', 'funcionalidade', 'módulo', 'aplicativo', 'sistema',
+    'design:', 'campos:', 'botão', 'formulário', 'menu', 'dashboard'
+  ];
+  
+  // Indicadores de que NÃO é um prompt (é descrição/passos)
+  const indicadoresNaoPrompt = [
+    'abrir o claude', 'colar o prompt', 'aguardar', 'ler a resposta',
+    'verificar se', 'se faltar', 'enviar', 'passo 1', 'passo 2'
+  ];
+  
+  let scorePrompt = 0;
+  let scoreNaoPrompt = 0;
+  
+  for (const ind of indicadoresPrompt) {
+    if (textoLower.includes(ind)) scorePrompt++;
+  }
+  
+  for (const ind of indicadoresNaoPrompt) {
+    if (textoLower.includes(ind)) scoreNaoPrompt++;
+  }
+  
+  // Precisa ter mais indicadores de prompt do que de não-prompt
+  return scorePrompt >= 2 && scorePrompt > scoreNaoPrompt;
+}
+
+// Remove texto de introdução antes do prompt real
+function limparIntroducaoPrompt(texto: string): string {
+  const linhas = texto.split('\n');
+  const linhasLimpas: string[] = [];
+  let inicioPrompt = false;
+  
+  for (const linha of linhas) {
+    const linhaLower = linha.toLowerCase().trim();
+    
+    // Pular linhas de introdução
+    if (!inicioPrompt) {
+      if (linhaLower.startsWith('para o claude') ||
+          linhaLower.startsWith('abrir') ||
+          linhaLower.startsWith('cole') ||
+          linhaLower.startsWith('enviar') ||
+          linhaLower.length < 10) {
+        continue;
+      }
+      // Encontrou início do prompt real
+      inicioPrompt = true;
+    }
+    
+    linhasLimpas.push(linha);
+  }
+  
+  return linhasLimpas.join('\n').trim();
 }
 
 function extrairDicas(conteudo: string): string | undefined {
