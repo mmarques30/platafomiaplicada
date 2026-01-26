@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, Loader2, Package, FolderOpen, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ChevronDown, Loader2, Package, FolderOpen, CheckCircle2, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness, useInstrucoesByContrato, useUpdateInstrucao } from "@/hooks/useEtapasBusiness";
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
@@ -44,6 +45,8 @@ export default function MentoriaInstrucoesBusiness() {
   const updateInstrucao = useUpdateInstrucao();
 
   const [expandedFases, setExpandedFases] = useState<Set<string>>(new Set());
+  const [filtroFase, setFiltroFase] = useState<string>("todas");
+  const [filtroEntrega, setFiltroEntrega] = useState<string>("todas");
 
   const isLoading = loadingContrato || loadingEtapas || loadingInstrucoes;
 
@@ -102,6 +105,44 @@ export default function MentoriaInstrucoesBusiness() {
     }).filter(f => f.entregas.length > 0 || f.instrucoesAvulsas.length > 0);
   }, [etapas, entregas, instrucoes]);
 
+  // Lista de entregas para o filtro
+  const entregasDisponiveis = useMemo(() => {
+    const todasEntregas: { id: string; titulo: string; faseId: string }[] = [];
+    fasesAgrupadas.forEach(fase => {
+      fase.entregas.forEach(e => {
+        todasEntregas.push({
+          id: e.entrega.id,
+          titulo: e.entrega.numero_entrega 
+            ? `Entrega ${e.entrega.numero_entrega}: ${e.entrega.titulo}`
+            : e.entrega.titulo,
+          faseId: fase.etapa.id
+        });
+      });
+    });
+    return todasEntregas;
+  }, [fasesAgrupadas]);
+
+  // Filtrar fases e entregas
+  const fasesFiltradas = useMemo(() => {
+    let resultado = fasesAgrupadas;
+    
+    // Filtrar por fase
+    if (filtroFase !== "todas") {
+      resultado = resultado.filter(f => f.etapa.id === filtroFase);
+    }
+    
+    // Filtrar por entrega
+    if (filtroEntrega !== "todas") {
+      resultado = resultado.map(fase => ({
+        ...fase,
+        entregas: fase.entregas.filter(e => e.entrega.id === filtroEntrega),
+        instrucoesAvulsas: [] // Esconder avulsas quando filtrar por entrega específica
+      })).filter(f => f.entregas.length > 0);
+    }
+    
+    return resultado;
+  }, [fasesAgrupadas, filtroFase, filtroEntrega]);
+
   // Progresso geral
   const totalInstrucoes = instrucoes?.length || 0;
   const instrucoesConcluidas = instrucoes?.filter(i => i.status === 'concluida').length || 0;
@@ -130,30 +171,95 @@ export default function MentoriaInstrucoesBusiness() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-5xl py-8 flex items-center justify-center min-h-[400px]">
+      <div className="container py-8 flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="container max-w-5xl py-8 space-y-6">
+    <div className="container py-8 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/mentoria")}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">Minhas Instruções</h1>
-          <p className="text-muted-foreground text-sm">
-            Instruções organizadas por fase e entrega
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/mentoria")}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">Minhas Instruções</h1>
+            <p className="text-muted-foreground text-sm">
+              Instruções organizadas por fase e entrega
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Filtros */}
+      <Card>
+        <CardContent className="pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Filter className="h-4 w-4" />
+              <span className="font-medium">Filtros:</span>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground whitespace-nowrap">Fase:</span>
+                <Select value={filtroFase} onValueChange={setFiltroFase}>
+                  <SelectTrigger className="w-[200px] bg-background">
+                    <SelectValue placeholder="Todas as fases" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectItem value="todas">Todas as fases</SelectItem>
+                    {fasesAgrupadas.map(fase => (
+                      <SelectItem key={fase.etapa.id} value={fase.etapa.id}>
+                        Fase {fase.etapa.numero_etapa}: {fase.etapa.titulo}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground whitespace-nowrap">Entrega:</span>
+                <Select value={filtroEntrega} onValueChange={setFiltroEntrega}>
+                  <SelectTrigger className="w-[280px] bg-background">
+                    <SelectValue placeholder="Todas as entregas" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-lg z-50">
+                    <SelectItem value="todas">Todas as entregas</SelectItem>
+                    {entregasDisponiveis
+                      .filter(e => filtroFase === "todas" || e.faseId === filtroFase)
+                      .map(entrega => (
+                        <SelectItem key={entrega.id} value={entrega.id}>
+                          {entrega.titulo}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {(filtroFase !== "todas" || filtroEntrega !== "todas") && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  setFiltroFase("todas");
+                  setFiltroEntrega("todas");
+                }}
+              >
+                Limpar
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Progresso Geral */}
       <Card>
@@ -175,7 +281,7 @@ export default function MentoriaInstrucoesBusiness() {
 
       {/* Lista de Fases */}
       <div className="space-y-4">
-        {fasesAgrupadas.map((fase) => (
+        {fasesFiltradas.map((fase) => (
           <Collapsible
             key={fase.etapa.id}
             open={expandedFases.has(fase.etapa.id)}
@@ -290,12 +396,14 @@ export default function MentoriaInstrucoesBusiness() {
         ))}
       </div>
 
-      {fasesAgrupadas.length === 0 && (
+      {fasesFiltradas.length === 0 && (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <FolderOpen className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
             <p className="text-muted-foreground">
-              Nenhuma instrução cadastrada ainda.
+              {filtroFase !== "todas" || filtroEntrega !== "todas" 
+                ? "Nenhuma instrução encontrada com os filtros selecionados."
+                : "Nenhuma instrução cadastrada ainda."}
             </p>
           </CardContent>
         </Card>
