@@ -98,6 +98,24 @@ export function useInstrucoesEtapa(etapaId?: string) {
   });
 }
 
+// Hook para buscar instruções por entrega_id
+export function useInstrucoesByEntrega(entregaId?: string) {
+  return useQuery({
+    queryKey: ['instrucoes-entrega', entregaId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('instrucoes_etapa')
+        .select('*')
+        .eq('entrega_id', entregaId)
+        .order('ordem', { ascending: true });
+
+      if (error) throw error;
+      return data as InstrucaoEtapa[];
+    },
+    enabled: !!entregaId,
+  });
+}
+
 export function useCreateEtapa() {
   const queryClient = useQueryClient();
 

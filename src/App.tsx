@@ -42,6 +42,7 @@ import MentoriaValidacoes from "./pages/MentoriaValidacoes";
 import MentoriaReports from "./pages/MentoriaReports";
 import MentoriaDocumentos from "./pages/MentoriaDocumentos";
 import MentoriaEntregas from "./pages/MentoriaEntregas";
+import MentoriaEntregaDetalhe from "./pages/MentoriaEntregaDetalhe";
 import FormulariosDisponiveis from "./pages/FormulariosDisponiveis";
 import ResponderFormulario from "./pages/ResponderFormulario";
 import IACopieUse from "./pages/IACopieUse";
@@ -152,6 +153,7 @@ function AppContent() {
             <Route path="/mentoria/validacoes" element={<MentoriaValidacoes />} />
             <Route path="/mentoria/reports" element={<MentoriaReports />} />
             <Route path="/mentoria/entregas" element={<MentoriaEntregas />} />
+            <Route path="/mentoria/entrega/:entregaId" element={<MentoriaEntregaDetalhe />} />
             <Route path="/mentoria/documentos" element={<MentoriaDocumentos />} />
             <Route path="/ia-copie-use" element={<IACopieUse />} />
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
