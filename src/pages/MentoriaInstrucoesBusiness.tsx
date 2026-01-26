@@ -171,14 +171,14 @@ export default function MentoriaInstrucoesBusiness() {
 
   if (isLoading) {
     return (
-      <div className="container py-8 flex items-center justify-center min-h-[400px]">
+      <div className="container mx-auto py-8 px-4 flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="container py-8 space-y-6">
+    <div className="container mx-auto py-8 px-4 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">

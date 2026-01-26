@@ -1,20 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Package, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Package, Clock, CheckCircle2, AlertCircle, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
-import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
+import { useEntregasBusiness, EntregaBusiness } from "@/hooks/useEntregasBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG = {
-  pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const },
-  em_andamento: { label: "Em Andamento", icon: AlertCircle, variant: "default" as const },
-  concluida: { label: "Concluída", icon: CheckCircle2, variant: "outline" as const },
-  cancelada: { label: "Cancelada", icon: AlertCircle, variant: "destructive" as const },
+  pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const, color: "text-muted-foreground" },
+  em_andamento: { label: "Em Andamento", icon: PlayCircle, variant: "default" as const, color: "text-amber-600" },
+  concluida: { label: "Concluída", icon: CheckCircle2, variant: "outline" as const, color: "text-green-600" },
+  cancelada: { label: "Cancelada", icon: AlertCircle, variant: "destructive" as const, color: "text-destructive" },
 };
 
 const PRIORIDADE_CONFIG = {
@@ -28,7 +30,7 @@ export default function MentoriaEntregas() {
   const navigate = useNavigate();
   const businessUserId = useBusinessUserId();
   const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(businessUserId);
-  const { entregas, entregasAtivas, entregasBacklog, isLoading: isLoadingEntregas } = useEntregasBusiness(contrato?.id);
+  const { entregas, entregasAtivas, entregasBacklog, isLoading: isLoadingEntregas, updateEntrega } = useEntregasBusiness(contrato?.id);
   const { data: etapas } = useEtapasBusiness(contrato?.id);
 
   const isLoading = isLoadingContrato || isLoadingEntregas;
@@ -36,12 +38,16 @@ export default function MentoriaEntregas() {
   const getEtapaNome = (etapaId?: string) => {
     if (!etapaId || !etapas) return null;
     const etapa = etapas.find(e => e.id === etapaId);
-    return etapa ? `Etapa ${etapa.numero_etapa}: ${etapa.titulo}` : null;
+    return etapa ? `Fase ${etapa.numero_etapa}: ${etapa.titulo}` : null;
+  };
+
+  const handleStatusChange = (entregaId: string, newStatus: EntregaBusiness['status']) => {
+    updateEntrega.mutate({ id: entregaId, status: newStatus });
   };
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-5xl">
+      <div className="container mx-auto py-8 px-4">
         <div className="space-y-4 animate-pulse">
           <div className="h-10 bg-muted rounded-lg w-48" />
           <div className="h-64 bg-muted rounded-xl" />
@@ -52,7 +58,7 @@ export default function MentoriaEntregas() {
 
   if (!contrato) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-5xl">
+      <div className="container mx-auto py-8 px-4">
         <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
@@ -70,7 +76,7 @@ export default function MentoriaEntregas() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-5xl">
+    <div className="container mx-auto py-8 px-4">
       <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar para Mentoria
@@ -103,7 +109,7 @@ export default function MentoriaEntregas() {
           {entregasAtivas.length > 0 && (
             <div>
               <h2 className="text-lg font-semibold mb-4">Entregas Ativas ({entregasAtivas.length})</h2>
-              <div className="space-y-3">
+              <div className="grid gap-4">
                 {entregasAtivas.map((entrega) => {
                   const statusConfig = STATUS_CONFIG[entrega.status];
                   const prioridadeConfig = PRIORIDADE_CONFIG[entrega.prioridade];
@@ -111,43 +117,86 @@ export default function MentoriaEntregas() {
                   const etapaNome = getEtapaNome(entrega.etapa_id);
 
                   return (
-                    <Card key={entrega.id} className="border-border/50">
+                    <Card 
+                      key={entrega.id} 
+                      className={cn(
+                        "border-l-4 transition-all",
+                        entrega.status === 'concluida' && "border-l-green-500 bg-green-50/30 dark:bg-green-950/10",
+                        entrega.status === 'em_andamento' && "border-l-amber-500 bg-amber-50/30 dark:bg-amber-950/10",
+                        entrega.status === 'pendente' && "border-l-muted-foreground/30",
+                        entrega.status === 'cancelada' && "border-l-destructive opacity-60"
+                      )}
+                    >
                       <CardContent className="py-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-medium">{entrega.titulo}</h3>
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <StatusIcon className={cn("h-5 w-5", statusConfig.color)} />
+                              <h3 className={cn(
+                                "font-semibold text-lg",
+                                entrega.status === 'concluida' && "line-through text-muted-foreground"
+                              )}>
+                                {entrega.titulo}
+                              </h3>
                               <Badge variant={prioridadeConfig.variant} className="text-xs">
                                 {prioridadeConfig.label}
                               </Badge>
                             </div>
+                            
                             {entrega.descricao && (
-                              <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                              <p className="text-sm text-muted-foreground mb-3">
                                 {entrega.descricao}
                               </p>
                             )}
+                            
                             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                               {etapaNome && (
-                                <span className="bg-muted/50 px-2 py-0.5 rounded">
+                                <span className="bg-muted px-2 py-1 rounded-md">
                                   {etapaNome}
                                 </span>
                               )}
                               {entrega.modulo_relacionado && (
-                                <span className="bg-muted/50 px-2 py-0.5 rounded">
+                                <span className="bg-muted px-2 py-1 rounded-md">
                                   {entrega.modulo_relacionado}
                                 </span>
                               )}
                               {entrega.prazo_previsto && (
-                                <span>
+                                <span className="bg-muted px-2 py-1 rounded-md">
                                   Prazo: {format(parseISO(entrega.prazo_previsto), "dd/MM/yyyy", { locale: ptBR })}
                                 </span>
                               )}
                             </div>
                           </div>
-                          <Badge variant={statusConfig.variant} className="flex items-center gap-1 self-start">
-                            <StatusIcon className="h-3 w-3" />
-                            {statusConfig.label}
-                          </Badge>
+                          
+                          {/* Status Selector */}
+                          <div className="flex items-center gap-2 lg:min-w-[180px]">
+                            <Select
+                              value={entrega.status}
+                              onValueChange={(value) => handleStatusChange(entrega.id, value as EntregaBusiness['status'])}
+                              disabled={updateEntrega.isPending}
+                            >
+                              <SelectTrigger className={cn(
+                                "w-full",
+                                entrega.status === 'concluida' && "border-green-500 text-green-600",
+                                entrega.status === 'em_andamento' && "border-amber-500 text-amber-600"
+                              )}>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-background border shadow-lg z-50">
+                                {Object.entries(STATUS_CONFIG).map(([key, config]) => {
+                                  const Icon = config.icon;
+                                  return (
+                                    <SelectItem key={key} value={key}>
+                                      <div className="flex items-center gap-2">
+                                        <Icon className={cn("h-4 w-4", config.color)} />
+                                        {config.label}
+                                      </div>
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -163,20 +212,25 @@ export default function MentoriaEntregas() {
               <h2 className="text-lg font-semibold mb-4 text-muted-foreground">
                 Backlog / Futuras ({entregasBacklog.length})
               </h2>
-              <div className="space-y-2">
+              <div className="grid gap-3">
                 {entregasBacklog.map((entrega) => (
                   <Card key={entrega.id} className="border-border/30 bg-muted/20">
-                    <CardContent className="py-3">
-                      <div className="flex items-center justify-between">
-                        <div>
+                    <CardContent className="py-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex-1">
                           <h3 className="font-medium text-muted-foreground">{entrega.titulo}</h3>
+                          {entrega.descricao && (
+                            <p className="text-sm text-muted-foreground/70 mt-1">
+                              {entrega.descricao}
+                            </p>
+                          )}
                           {entrega.justificativa_backlog && (
-                            <p className="text-xs text-muted-foreground/70 mt-1">
+                            <p className="text-xs text-muted-foreground/60 mt-2 italic">
                               {entrega.justificativa_backlog}
                             </p>
                           )}
                         </div>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs self-start">
                           {entrega.tipo === 'backlog' ? 'Backlog' : 'Futura'}
                         </Badge>
                       </div>

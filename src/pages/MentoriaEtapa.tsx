@@ -82,7 +82,7 @@ export default function MentoriaEtapa() {
 
   if (loadingEtapa || loadingInstrucoes || loadingEntregas) {
     return (
-      <div className="container max-w-5xl py-8 space-y-6">
+      <div className="container mx-auto py-8 px-4 space-y-6">
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-24 w-full" />
         <Skeleton className="h-48 w-full" />
@@ -92,14 +92,14 @@ export default function MentoriaEtapa() {
 
   if (!etapa) {
     return (
-      <div className="container max-w-5xl py-8">
+      <div className="container mx-auto py-8 px-4">
         <p className="text-muted-foreground">Etapa não encontrada</p>
       </div>
     );
   }
 
   return (
-    <div className="container max-w-5xl py-8 space-y-8">
+    <div className="container mx-auto py-8 px-4 space-y-8">
       {/* Header com botão voltar */}
       <div className="flex items-center gap-4">
         <Button
