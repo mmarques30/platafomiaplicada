@@ -298,6 +298,221 @@ function extrairDescricao(conteudo: string, titulo: string): string {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// FORMATAÇÃO E ORGANIZAÇÃO DE TEXTOS
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Formata o texto em parágrafos bem organizados
+ * - Remove espaços excessivos
+ * - Organiza em parágrafos lógicos
+ * - Limpa caracteres especiais problemáticos
+ * - Mantém a estrutura semântica
+ */
+function formatarTextoEmParagrafos(texto: string): string {
+  if (!texto || texto.trim().length === 0) return '';
+  
+  // 1. Normalizar quebras de linha
+  let formatado = texto
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+  
+  // 2. Remover múltiplas quebras de linha (mais de 2)
+  formatado = formatado.replace(/\n{3,}/g, '\n\n');
+  
+  // 3. Remover espaços em branco no início/fim de linhas
+  formatado = formatado
+    .split('\n')
+    .map(linha => linha.trim())
+    .join('\n');
+  
+  // 4. Remover linhas que são apenas caracteres especiais
+  formatado = formatado
+    .split('\n')
+    .filter(linha => !linha.match(/^[-─═_*•◦▪▸►]+$/))
+    .join('\n');
+  
+  // 5. Limpar caracteres problemáticos
+  formatado = formatado
+    .replace(/[\u2018\u2019]/g, "'")  // Aspas simples curvas
+    .replace(/[\u201C\u201D]/g, '"')   // Aspas duplas curvas
+    .replace(/\u2026/g, '...')          // Reticências
+    .replace(/[\u2013\u2014]/g, '-')   // Travessões
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Caracteres de controle
+  
+  // 6. Identificar e preservar listas
+  const linhas = formatado.split('\n');
+  const linhasFormatadas: string[] = [];
+  
+  for (let i = 0; i < linhas.length; i++) {
+    const linha = linhas[i];
+    const proximaLinha = linhas[i + 1] || '';
+    
+    // Se a linha é um item de lista, preservar
+    if (linha.match(/^[\d]+[.)]\s/) || linha.match(/^[-•◦▪▸►]\s/)) {
+      linhasFormatadas.push(linha);
+      continue;
+    }
+    
+    // Se a linha termina sem pontuação e a próxima começa com minúscula, juntar
+    if (linha.length > 0 && !linha.match(/[.!?:,;]$/) && 
+        proximaLinha.length > 0 && proximaLinha[0] === proximaLinha[0].toLowerCase() &&
+        proximaLinha[0].match(/[a-záéíóúâêôãõç]/i)) {
+      linhasFormatadas.push(linha + ' ');
+    } else {
+      linhasFormatadas.push(linha);
+    }
+  }
+  
+  // 7. Juntar linhas e criar parágrafos
+  formatado = linhasFormatadas
+    .join('\n')
+    .replace(/\n +/g, '\n')           // Espaços após quebra
+    .replace(/ +\n/g, '\n')           // Espaços antes de quebra
+    .replace(/ +/g, ' ')              // Múltiplos espaços
+    .replace(/\n{3,}/g, '\n\n')       // Normalizar parágrafos
+    .trim();
+  
+  return formatado;
+}
+
+/**
+ * Formata descrição de instrução/passo
+ * - Remove texto de introdução
+ * - Organiza em passos claros
+ * - Preserva formatação de lista se houver
+ */
+function formatarDescricaoInstrucao(descricao: string): string {
+  if (!descricao || descricao.trim().length === 0) return '';
+  
+  let formatado = formatarTextoEmParagrafos(descricao);
+  
+  // Remover prefixos comuns de introdução
+  const prefixosRemover = [
+    /^(nesta etapa|neste passo|objetivo[:\s]*|descrição[:\s]*)/i,
+    /^(você (deve|vai|precisa)[:\s]*)/i,
+    /^(este passo|esta instrução)[:\s]*/i,
+  ];
+  
+  for (const regex of prefixosRemover) {
+    formatado = formatado.replace(regex, '');
+  }
+  
+  // Capitalizar primeira letra
+  if (formatado.length > 0) {
+    formatado = formatado.charAt(0).toUpperCase() + formatado.slice(1);
+  }
+  
+  return formatado.trim();
+}
+
+/**
+ * Formata prompt sugerido
+ * - Remove instruções sobre como usar o prompt
+ * - Limpa texto de introdução
+ * - Mantém apenas o conteúdo do prompt em si
+ */
+function formatarPromptSugerido(prompt: string): string {
+  if (!prompt || prompt.trim().length === 0) return '';
+  
+  let formatado = formatarTextoEmParagrafos(prompt);
+  
+  // Remover linhas de introdução/instrução
+  const linhas = formatado.split('\n');
+  const linhasLimpas: string[] = [];
+  let dentroDoPrompt = false;
+  
+  for (const linha of linhas) {
+    const linhaLower = linha.toLowerCase().trim();
+    
+    // Linhas que indicam introdução (pular)
+    if (!dentroDoPrompt) {
+      if (linhaLower.startsWith('para o claude') ||
+          linhaLower.startsWith('abra o claude') ||
+          linhaLower.startsWith('abrir o claude') ||
+          linhaLower.startsWith('cole este') ||
+          linhaLower.startsWith('copie e cole') ||
+          linhaLower.startsWith('envie para') ||
+          linhaLower.startsWith('use este modelo') ||
+          linhaLower.startsWith('prompt:') ||
+          linhaLower.match(/^passo \d/i) ||
+          linhaLower.length < 5) {
+        continue;
+      }
+      dentroDoPrompt = true;
+    }
+    
+    // Parar se encontrar indicadores de fim
+    if (linhaLower.startsWith('dica:') ||
+        linhaLower.startsWith('obs:') ||
+        linhaLower.startsWith('atenção:') ||
+        linhaLower.startsWith('importante:') ||
+        linhaLower.match(/^passo \d/i)) {
+      break;
+    }
+    
+    linhasLimpas.push(linha);
+  }
+  
+  return linhasLimpas.join('\n').trim();
+}
+
+/**
+ * Formata dicas/observações
+ * - Organiza em lista se houver múltiplas dicas
+ * - Limpa prefixos repetitivos
+ */
+function formatarDicas(dicas: string): string {
+  if (!dicas || dicas.trim().length === 0) return '';
+  
+  let formatado = formatarTextoEmParagrafos(dicas);
+  
+  // Remover prefixo "DICA:", "OBS:", etc. do início
+  formatado = formatado.replace(/^(DICAS?|OBS|ATENÇÃO|IMPORTANTE|OBSERVAÇÃO)[:\s]*/i, '');
+  
+  // Se tiver múltiplas dicas separadas por vírgula ou ponto, transformar em lista
+  if (formatado.includes('. ') && formatado.length > 100) {
+    const partes = formatado.split(/\.\s+/);
+    if (partes.length > 2) {
+      formatado = partes
+        .filter(p => p.trim().length > 5)
+        .map((p, i) => `${i + 1}. ${p.trim()}${p.endsWith('.') ? '' : '.'}`)
+        .join('\n');
+    }
+  }
+  
+  return formatado.trim();
+}
+
+/**
+ * Formata título removendo caracteres desnecessários
+ */
+function formatarTitulo(titulo: string): string {
+  if (!titulo || titulo.trim().length === 0) return '';
+  
+  let formatado = titulo
+    .replace(/^\*+\s*/, '')           // Asteriscos no início
+    .replace(/\s*\*+$/, '')           // Asteriscos no fim
+    .replace(/^[-–:]\s*/, '')         // Travessões/dois-pontos no início
+    .replace(/\s*[-–:]$/, '')         // Travessões/dois-pontos no fim
+    .replace(/^#+\s*/, '')            // Hashtags de markdown
+    .replace(/\*\*/g, '')             // Bold markdown
+    .trim();
+  
+  // Capitalizar primeira letra de cada palavra importante
+  formatado = formatado.replace(/\b\w/g, (char, index) => {
+    // Manter minúsculas para palavras pequenas (exceto início)
+    const palavra = formatado.substring(index).match(/^\w+/)?.[0] || '';
+    const palavrasPequenas = ['de', 'da', 'do', 'das', 'dos', 'e', 'em', 'no', 'na', 'com', 'para', 'por', 'a', 'o', 'um', 'uma'];
+    if (index > 0 && palavrasPequenas.includes(palavra.toLowerCase())) {
+      return char.toLowerCase();
+    }
+    return char.toUpperCase();
+  });
+  
+  return formatado;
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // EXTRAÇÃO DE JSON
 // ═══════════════════════════════════════════════════════════════════
 
@@ -454,25 +669,31 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
         
         // Extrair título (primeira linha significativa, sem asteriscos)
         const primeiraLinha = conteudoCompleto.split('\n')[0];
-        const titulo = primeiraLinha
+        const tituloRaw = primeiraLinha
           .replace(/\*+/g, '')
           .replace(/^[-–:\s]+/, '')
           .trim();
         
-        if (titulo.length < 3 || titulo.length > 200) continue;
+        if (tituloRaw.length < 3 || tituloRaw.length > 200) continue;
         
         // Extrair detalhes do conteúdo
-        const prompt = extrairPrompt(conteudoCompleto);
-        const dicas = extrairDicas(conteudoCompleto);
-        const descricao = extrairDescricao(conteudoCompleto, titulo);
+        const promptRaw = extrairPrompt(conteudoCompleto);
+        const dicasRaw = extrairDicas(conteudoCompleto);
+        const descricaoRaw = extrairDescricao(conteudoCompleto, tituloRaw);
         const ferramenta = detectarFerramenta(conteudoCompleto);
         const responsavel = detectarResponsavel(conteudoCompleto);
+        
+        // APLICAR FORMATAÇÃO para organizar textos em parágrafos
+        const titulo = formatarTitulo(tituloRaw);
+        const descricao = formatarDescricaoInstrucao(descricaoRaw);
+        const prompt = promptRaw ? formatarPromptSugerido(promptRaw) : undefined;
+        const dicas = dicasRaw ? formatarDicas(dicasRaw) : undefined;
         
         ancoras.passos.push({
           numero: numPasso,
           titulo,
           entregaNumero: entrega.numero,
-          conteudo_completo: conteudoCompleto,
+          conteudo_completo: formatarTextoEmParagrafos(conteudoCompleto),
           descricao: descricao || '',
           prompt_sugerido: prompt,
           dicas: dicas,
@@ -830,18 +1051,25 @@ function validarContraAncoras(resultado: any, ancoras: AncorasLiterais): Resulta
   }
   
   // Validar instruções - PRIORIZAR dados das âncoras (que têm prompt/dicas)
+  // APLICAR FORMATAÇÃO EM TODOS OS TEXTOS
   for (const instrucao of (resultado.instrucoes || [])) {
     const ancoraCorrespondente = ancoras.passos.find(p => 
       p.entregaNumero === instrucao.entrega_numero &&
       (p.numero === instrucao.ordem || p.titulo.toLowerCase().includes((instrucao.titulo || '').toLowerCase().substring(0, 20)))
     );
     
+    // Pegar o texto da âncora ou da instrução e aplicar formatação
+    const tituloRaw = ancoraCorrespondente?.titulo || instrucao.titulo || '';
+    const descricaoRaw = ancoraCorrespondente?.descricao || instrucao.descricao || '';
+    const promptRaw = ancoraCorrespondente?.prompt_sugerido || instrucao.prompt_sugerido || '';
+    const dicasRaw = ancoraCorrespondente?.dicas || instrucao.dicas || '';
+    
     instrucoesValidas.push({
       ...instrucao,
-      titulo: ancoraCorrespondente?.titulo || instrucao.titulo,
-      descricao: ancoraCorrespondente?.descricao || instrucao.descricao || '',
-      prompt_sugerido: ancoraCorrespondente?.prompt_sugerido || instrucao.prompt_sugerido || '',
-      dicas: ancoraCorrespondente?.dicas || instrucao.dicas || '',
+      titulo: formatarTitulo(tituloRaw),
+      descricao: formatarDescricaoInstrucao(descricaoRaw),
+      prompt_sugerido: promptRaw ? formatarPromptSugerido(promptRaw) : '',
+      dicas: dicasRaw ? formatarDicas(dicasRaw) : '',
       responsavel: ancoraCorrespondente?.responsavel || normalizarResponsavel(instrucao.responsavel),
       ferramenta: ancoraCorrespondente?.ferramenta || normalizarFerramenta(instrucao.ferramenta)
     });
@@ -853,10 +1081,10 @@ function validarContraAncoras(resultado: any, ancoras: AncorasLiterais): Resulta
     for (const passo of ancoras.passos) {
       instrucoesValidas.push({
         entrega_numero: passo.entregaNumero,
-        titulo: passo.titulo,
-        descricao: passo.descricao || '',
-        prompt_sugerido: passo.prompt_sugerido || '',
-        dicas: passo.dicas || '',
+        titulo: formatarTitulo(passo.titulo),
+        descricao: formatarDescricaoInstrucao(passo.descricao || ''),
+        prompt_sugerido: passo.prompt_sugerido ? formatarPromptSugerido(passo.prompt_sugerido) : '',
+        dicas: passo.dicas ? formatarDicas(passo.dicas) : '',
         responsavel: passo.responsavel || 'voce',
         ferramenta: passo.ferramenta || 'outro',
         ordem: passo.numero
@@ -892,16 +1120,18 @@ function validarContraAncoras(resultado: any, ancoras: AncorasLiterais): Resulta
 function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial {
   console.log("=== CONSTRUINDO RESULTADO DIRETO DAS ÂNCORAS ===");
   
+  // Formatar títulos das etapas
   const etapas = ancoras.fases.map(f => ({
     numero: f.numero,
-    titulo: f.titulo,
+    titulo: formatarTitulo(f.titulo),
     objetivo: ''
   }));
   
+  // Formatar títulos das entregas
   const entregas = ancoras.entregas.map(e => ({
     etapa_numero: e.faseNumero,
     numero_entrega: e.numero,
-    titulo: e.titulo,
+    titulo: formatarTitulo(e.titulo),
     descricao: '',
     tipo: 'ativa' as const,
     prioridade: 'alta',
@@ -909,12 +1139,13 @@ function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial
   }));
   
   // USAR DADOS COMPLETOS DOS PASSOS - com prompt, dicas, ferramenta, responsável
+  // APLICAR FORMATAÇÃO EM TODOS OS CAMPOS
   const instrucoes = ancoras.passos.map((p, idx) => ({
     entrega_numero: p.entregaNumero,
-    titulo: p.titulo,
-    descricao: p.descricao || '',
-    prompt_sugerido: p.prompt_sugerido || '',
-    dicas: p.dicas || '',
+    titulo: formatarTitulo(p.titulo),
+    descricao: formatarDescricaoInstrucao(p.descricao || ''),
+    prompt_sugerido: p.prompt_sugerido ? formatarPromptSugerido(p.prompt_sugerido) : '',
+    dicas: p.dicas ? formatarDicas(p.dicas) : '',
     responsavel: p.responsavel || 'voce',
     ferramenta: p.ferramenta || 'outro',
     ordem: p.numero || idx + 1
@@ -922,14 +1153,14 @@ function construirResultadoDeAncoras(ancoras: AncorasLiterais): ResultadoParcial
   
   const tasks = ancoras.checklists.map(c => ({
     entrega_numero: c.entregaNumero,
-    titulo: c.titulo,
+    titulo: formatarTitulo(c.titulo),
     tipo: 'validacao',
     prioridade: 'alta',
     instrucoes_validacao: ''
   }));
   
   const backlog = ancoras.backlog.map(b => ({
-    titulo: b.titulo,
+    titulo: formatarTitulo(b.titulo),
     descricao: '',
     justificativa: b.secao
   }));
