@@ -18,8 +18,8 @@ interface QuickNavItem {
 const navItems: QuickNavItem[] = [
   { title: "Diagnóstico", path: "/mentoria/diagnostico", icon: ClipboardCheck },
   { title: "Sessões", path: "/mentoria/sessoes", icon: Calendar },
-  { title: "Etapas", path: "/mentoria/processo", icon: Route },
-  { title: "Instruções", path: "/mentoria/recursos", icon: FileText },
+  { title: "Etapas", path: "/mentoria/etapas-business", icon: Route },
+  { title: "Instruções", path: "/mentoria/instrucoes-business", icon: FileText },
   { title: "Entregas", path: "/mentoria/entregas", icon: Package },
   { title: "Tasks", path: "/mentoria/tarefas", icon: CheckSquare },
   { title: "Documentos", path: "/mentoria/documentos", icon: FolderOpen },

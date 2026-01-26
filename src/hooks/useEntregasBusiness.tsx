@@ -55,6 +55,24 @@ export function useEntregaById(entregaId?: string) {
   });
 }
 
+// Hook para buscar entregas por etapa
+export function useEntregasByEtapa(etapaId?: string) {
+  return useQuery({
+    queryKey: ['entregas-by-etapa', etapaId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('entregas_business')
+        .select('*')
+        .eq('etapa_id', etapaId)
+        .order('numero_entrega', { ascending: true });
+
+      if (error) throw error;
+      return data as EntregaBusiness[];
+    },
+    enabled: !!etapaId,
+  });
+}
+
 export function useEntregasBusiness(contratoId?: string) {
   const queryClient = useQueryClient();
 

@@ -366,3 +366,33 @@ export function useUpdateEtapaMarcos() {
     },
   });
 }
+
+// Hook para buscar todas instruções de um contrato com relacionamentos
+export function useInstrucoesByContrato(contratoId?: string) {
+  return useQuery({
+    queryKey: ['instrucoes-contrato', contratoId],
+    queryFn: async () => {
+      // 1. Buscar etapas do contrato
+      const { data: etapas, error: etapasError } = await supabase
+        .from('etapas_business')
+        .select('id')
+        .eq('contrato_id', contratoId!);
+      
+      if (etapasError) throw etapasError;
+      if (!etapas?.length) return [];
+      
+      const etapaIds = etapas.map(e => e.id);
+      
+      // 2. Buscar instruções das etapas
+      const { data, error } = await supabase
+        .from('instrucoes_etapa')
+        .select('*')
+        .in('etapa_id', etapaIds)
+        .order('ordem', { ascending: true });
+
+      if (error) throw error;
+      return data as InstrucaoEtapa[];
+    },
+    enabled: !!contratoId,
+  });
+}
