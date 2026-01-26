@@ -252,11 +252,29 @@ function limparIntroducaoPrompt(texto: string): string {
 }
 
 function extrairDicas(conteudo: string): string | undefined {
-  // Padrão: "DICA:", "DICAS:", "Obs:", "ATENÇÃO:", "IMPORTANTE:"
-  const regexDicas = /(?:DICAS?|OBS|ATENÇÃO|IMPORTANTE|OBSERVAÇÃO)[:\s]*([^\n]+(?:\n(?!\s*PASSO|\s*\d+\s*[-–:])[^\n]+)*)/i;
+  // Padrão principal: "DICA:", "DICAS:", "Obs:", "ATENÇÃO:", "IMPORTANTE:", "NOTA:", "Lembre-se:"
+  const regexDicas = /(?:DICAS?|OBS|ATENÇÃO|IMPORTANTE|OBSERVAÇÃO|NOTA|LEMBRE-SE|CUIDADO|SUGESTÃO)[:\s]*([^\n]+(?:\n(?!\s*PASSO|\s*\d+\s*[-–:]|\s*ENTREGA)[^\n]+)*)/i;
   const match = conteudo.match(regexDicas);
   if (match && match[1].length > 5) {
     return match[1].trim();
+  }
+  
+  // Padrão alternativo: texto entre parênteses após prompt ou instrução principal
+  const regexParenteses = /\((?:obs|nota|atenção|dica|importante)[:\s]*([^)]+)\)/i;
+  const matchParenteses = conteudo.match(regexParenteses);
+  if (matchParenteses && matchParenteses[1].length > 5) {
+    return matchParenteses[1].trim();
+  }
+  
+  // Padrão 3: Frases que começam com "Certifique-se", "Verifique", "Não esqueça", etc.
+  const regexFrasesAlerta = /(?:certifique-se|verifique|não esqueça|lembre-se|garanta que|é importante)[^.!?]*[.!?]/gi;
+  const matchesAlerta = conteudo.match(regexFrasesAlerta);
+  if (matchesAlerta && matchesAlerta.length > 0) {
+    // Juntar todas as frases de alerta encontradas
+    const alertas = matchesAlerta.slice(0, 3).join(' ').trim();
+    if (alertas.length > 10) {
+      return alertas;
+    }
   }
   
   return undefined;
