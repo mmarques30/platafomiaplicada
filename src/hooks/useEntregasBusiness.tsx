@@ -180,10 +180,30 @@ export function useEntregasBusiness(contratoId?: string) {
   const entregasAtivas = entregas.filter(e => e.tipo === 'ativa');
   const entregasBacklog = entregas.filter(e => e.tipo === 'backlog' || e.tipo === 'futura');
 
+  // Agrupar entregas por etapa_id
+  const entregasPorEtapa = entregas.reduce((acc, entrega) => {
+    const etapaId = entrega.etapa_id || 'sem_etapa';
+    if (!acc[etapaId]) {
+      acc[etapaId] = [];
+    }
+    acc[etapaId].push(entrega);
+    return acc;
+  }, {} as Record<string, EntregaBusiness[]>);
+
+  // Calcular progresso por etapa
+  const calcularProgressoEtapa = (etapaId: string): number => {
+    const entregasEtapa = entregasPorEtapa[etapaId] || [];
+    if (entregasEtapa.length === 0) return 0;
+    const concluidas = entregasEtapa.filter(e => e.status === 'concluida').length;
+    return Math.round((concluidas / entregasEtapa.length) * 100);
+  };
+
   return {
     entregas,
     entregasAtivas,
     entregasBacklog,
+    entregasPorEtapa,
+    calcularProgressoEtapa,
     isLoading,
     createEntrega,
     updateEntrega,
