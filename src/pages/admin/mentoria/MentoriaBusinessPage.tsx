@@ -7,7 +7,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen } from "lucide-react";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import TasksBusinessManager from "@/components/admin/business/TasksBusinessManager";
@@ -37,7 +48,7 @@ export default function MentoriaBusinessPage() {
   // Buscar contrato do usuário selecionado
   const { contrato } = useContratosBusiness(selectedUserId);
 
-  const { sessoes, createSessao, updateSessao, deleteSessao, bulkCreateSessoes } = useMentoriaSessoes(selectedUserId);
+  const { sessoes, createSessao, updateSessao, deleteSessao, bulkCreateSessoes, bulkDeleteSessoes } = useMentoriaSessoes(selectedUserId);
   const { data: etapas = [] } = useEtapasBusiness(contrato?.id);
 
   // Calcular número de reuniões baseado no contrato
@@ -224,6 +235,39 @@ export default function MentoriaBusinessPage() {
                 )}
               </div>
               <div className="flex items-center gap-2">
+                {sessoes.length > 0 && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/10">
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Limpar Tudo
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Limpar todas as sessões?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Esta ação irá excluir permanentemente todas as {sessoes.length} sessões. Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            try {
+                              await bulkDeleteSessoes();
+                            } catch (error: any) {
+                              toast.error("Erro ao limpar sessões: " + error.message);
+                            }
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Excluir Tudo
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
                 {sessoesFaltantes > 0 && contrato && (
                   <Button 
                     variant="outline" 
@@ -245,23 +289,38 @@ export default function MentoriaBusinessPage() {
               {sessoes.map((sessao) => (
                 <div 
                   key={sessao.id} 
-                  className="p-3 rounded-xl border border-border/50 bg-card hover:shadow-sm cursor-pointer transition-all"
-                  onClick={() => handleEditSessao(sessao)}
+                  className="p-3 rounded-xl border border-border/50 bg-card hover:shadow-sm transition-all group"
                 >
                   <div className="flex justify-between items-start gap-3">
-                    <div className="flex-1 min-w-0">
+                    <div 
+                      className="flex-1 min-w-0 cursor-pointer"
+                      onClick={() => handleEditSessao(sessao)}
+                    >
                       <h4 className="font-medium text-sm truncate">{sessao.titulo}</h4>
                       <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                         <span>{format(new Date(sessao.data_sessao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
                         {sessao.duracao && <span>{sessao.duracao} min</span>}
                       </div>
                     </div>
-                    <Badge 
-                      variant={sessao.status === "realizada" ? "default" : sessao.status === "agendada" ? "secondary" : "destructive"}
-                      className="text-xs shrink-0"
-                    >
-                      {sessao.status === "agendada" ? "Agendada" : sessao.status === "realizada" ? "Realizada" : "Cancelada"}
-                    </Badge>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge 
+                        variant={sessao.status === "realizada" ? "default" : sessao.status === "agendada" ? "secondary" : "destructive"}
+                        className="text-xs"
+                      >
+                        {sessao.status === "agendada" ? "Agendada" : sessao.status === "realizada" ? "Realizada" : "Cancelada"}
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteSessao(sessao.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}

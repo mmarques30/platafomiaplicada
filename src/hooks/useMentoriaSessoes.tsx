@@ -217,6 +217,32 @@ export const useMentoriaSessoes = (userId?: string) => {
     }
   });
 
+  // Bulk delete para limpar todas as sessões de um usuário
+  const bulkDeleteSessoes = async () => {
+    if (!targetUserId) throw new Error("Usuário não selecionado");
+    
+    const token = await getAccessTokenOrThrow();
+
+    const res = await fetch(`${supabaseUrl}/rest/v1/sessoes_mentoria?user_id=eq.${targetUserId}`, {
+      method: "DELETE",
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const json = await res.json().catch(() => null);
+      const message = json?.message || json?.error_description || json?.error || `Erro (${res.status})`;
+      throw new Error(message);
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["sessoes-mentoria"] });
+    toast({
+      title: "Todas as sessões foram excluídas!",
+    });
+  };
+
   return {
     sessoes: sessoes || [],
     isLoading,
@@ -224,6 +250,7 @@ export const useMentoriaSessoes = (userId?: string) => {
     updateSessao: updateSessao.mutate,
     deleteSessao: deleteSessao.mutate,
     bulkCreateSessoes,
+    bulkDeleteSessoes,
     isCreating: createSessao.isPending,
     isUpdating: updateSessao.isPending,
     isDeleting: deleteSessao.isPending
