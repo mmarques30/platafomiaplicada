@@ -7,15 +7,51 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verificar autenticação
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Não autorizado' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       { auth: { autoRefreshToken: false, persistSession: false } }
     )
 
-    const { email, password, nomeCompleto, roles, planoMentoria, origemConsultoria, empresaConsultoria } = await req.json()
+    // Verificar usuário autenticado
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+    
+    if (authError || !user) {
+      console.error('Auth error:', authError)
+      return new Response(
+        JSON.stringify({ error: 'Usuário não autenticado' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-    console.log('Creating user:', { email, nomeCompleto, roles, planoMentoria, origemConsultoria, empresaConsultoria })
+    // Verificar se é admin
+    const { data: roles, error: rolesError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+
+    if (rolesError || !roles || roles.length === 0) {
+      console.error('Acesso negado - usuário não é admin:', user.id)
+      return new Response(
+        JSON.stringify({ error: 'Apenas administradores podem criar usuários' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const { email, password, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria } = await req.json()
+
+    console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria })
 
     // Validar planoMentoria
     const planosValidos = ['academy', 'skills', 'business'];
@@ -61,7 +97,7 @@ Deno.serve(async (req) => {
     console.log('Profile confirmed')
 
     // 3. Atualizar profile com dados adicionais
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       senha_temporaria: true,
       primeiro_acesso: true,
       email: email,
@@ -88,13 +124,13 @@ Deno.serve(async (req) => {
     console.log('Profile updated')
 
     // 4. Inserir roles (pelo menos aluno_trilha se nenhuma for passada)
-    const rolesToInsert = roles && roles.length > 0 ? roles : ['aluno_trilha']
+    const rolesToInsert = userRoles && userRoles.length > 0 ? userRoles : ['aluno_trilha']
     
-    const { error: rolesError } = await supabaseAdmin
+    const { error: insertRolesError } = await supabaseAdmin
       .from('user_roles')
       .insert(rolesToInsert.map((role: string) => ({ user_id: userId, role })))
 
-    if (rolesError) throw rolesError
+    if (insertRolesError) throw insertRolesError
     console.log('Roles inserted:', rolesToInsert)
 
     // 5. Verificar que as roles foram inseridas (retry até 3x)
@@ -117,7 +153,7 @@ Deno.serve(async (req) => {
       throw new Error('Roles não foram confirmadas no banco')
     }
 
-    console.log('Roles confirmed')
+    console.log('Roles confirmed - User created by admin:', user.id)
 
     return new Response(
       JSON.stringify({ 
