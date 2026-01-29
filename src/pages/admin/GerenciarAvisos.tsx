@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Search, ArrowUp, ArrowDown, Repeat, Bell, Calendar } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ArrowUp, ArrowDown, Repeat, Bell, Calendar, ClipboardList } from "lucide-react";
 import { AvisoModal } from "@/components/admin/AvisoModal";
 import { AulaSemanalModal } from "@/components/admin/AulaSemanalModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -13,6 +13,7 @@ import { FilterBar } from "@/components/admin/content/FilterBar";
 import { Input } from "@/components/ui/input";
 import { format, addDays, subDays, isAfter, isBefore, startOfDay } from "date-fns";
 import { adminTheme } from "@/components/admin/adminTheme";
+import { GerenciarPendencias } from "@/components/admin/dashboard/GerenciarPendencias";
 
 export default function GerenciarAvisos() {
   const { data: avisos, isLoading } = useAvisos();
@@ -260,6 +261,10 @@ export default function GerenciarAvisos() {
             <Calendar className={adminTheme.tabsIcon} />
             Encontros IAplicada
           </TabsTrigger>
+          <TabsTrigger value="pendencias" className={adminTheme.tabsTrigger}>
+            <ClipboardList className={adminTheme.tabsIcon} />
+            Pendências
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="avisos" className="space-y-4">
@@ -442,6 +447,10 @@ export default function GerenciarAvisos() {
               </TableBody>
             </Table>
           </div>
+        </TabsContent>
+
+        <TabsContent value="pendencias" className="space-y-4">
+          <GerenciarPendencias />
         </TabsContent>
       </Tabs>
 
