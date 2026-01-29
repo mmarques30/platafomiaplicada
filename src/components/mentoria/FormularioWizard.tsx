@@ -46,9 +46,9 @@ const academyStepLabels = [
 const businessStepLabels = [
   { id: 1, titulo: "Perfil" },
   { id: 2, titulo: "Solução" },
-  { id: 3, titulo: "Contexto" },
-  { id: 4, titulo: "Projeto" },
-  { id: 5, titulo: "Aprender" },
+  { id: 3, titulo: "Impacto" },
+  { id: 4, titulo: "Decisão" },
+  { id: 5, titulo: "Expansão" },
   { id: 6, titulo: "Sucesso" },
 ];
 
@@ -183,7 +183,7 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   const getStepFields = (step: number): (keyof FormData)[] => {
     if (isBusiness) {
       switch (step) {
-        case 0: return ["tamanho_empresa"] as (keyof FormData)[]; // nome_completo removido - preenchido automaticamente
+        case 0: return ["tamanho_empresa"] as (keyof FormData)[]; // nome_completo preenchido automaticamente
         case 1: return [] as (keyof FormData)[];
         case 2: return [] as (keyof FormData)[];
         case 3: return [] as (keyof FormData)[];

@@ -1,10 +1,9 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Layers } from "lucide-react";
+import { ArrowLeft, ArrowRight, TrendingUp } from "lucide-react";
 import type { BusinessFormData } from "../../schema";
 
 interface StepProps {
@@ -13,29 +12,20 @@ interface StepProps {
   onPrev: () => void;
 }
 
-const urgenciaOptions = [
-  { value: "imediato", label: "Imediato (preciso ontem)" },
-  { value: "30dias", label: "Próximos 30 dias" },
-  { value: "90dias", label: "Próximos 90 dias" },
-  { value: "sempressa", label: "Sem pressa definida" },
+const impactoFinanceiroOptions = [
+  { value: "ate_10k", label: "Até R$ 10.000/mês" },
+  { value: "10k_50k", label: "R$ 10.000 - R$ 50.000/mês" },
+  { value: "50k_100k", label: "R$ 50.000 - R$ 100.000/mês" },
+  { value: "acima_100k", label: "Acima de R$ 100.000/mês" },
+  { value: "nao_sei", label: "Ainda não tenho essa estimativa" },
 ];
 
-const sistemasOptions = [
-  { id: "crm", label: "CRM (Salesforce, Pipedrive, etc.)" },
-  { id: "erp", label: "ERP (SAP, TOTVS, etc.)" },
-  { id: "planilhas", label: "Planilhas (Excel, Google Sheets)" },
-  { id: "email", label: "E-mail (Gmail, Outlook)" },
-  { id: "whatsapp", label: "WhatsApp / Mensageiros" },
-  { id: "site", label: "Site / Landing Pages" },
-  { id: "ecommerce", label: "E-commerce" },
-  { id: "notion", label: "Notion / Ferramentas de gestão" },
-];
-
-const volumeOptions = [
-  { value: "baixo", label: "Baixo (algumas vezes por semana)" },
-  { value: "medio", label: "Médio (algumas vezes por dia)" },
-  { value: "alto", label: "Alto (dezenas de vezes por dia)" },
-  { value: "intenso", label: "Intenso (centenas de vezes por dia)" },
+const orcamentoExpansaoOptions = [
+  { value: "ate_5k", label: "Até R$ 5.000/mês" },
+  { value: "5k_15k", label: "R$ 5.000 - R$ 15.000/mês" },
+  { value: "15k_30k", label: "R$ 15.000 - R$ 30.000/mês" },
+  { value: "acima_30k", label: "Acima de R$ 30.000/mês" },
+  { value: "a_definir", label: "A definir conforme resultados" },
 ];
 
 export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
@@ -44,30 +34,40 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 rounded-lg bg-primary/10">
-          <Layers className="h-5 w-5 text-primary" />
+          <TrendingUp className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Contexto da Entrega</h3>
-          <p className="text-sm text-muted-foreground">Detalhes técnicos e de uso</p>
+          <h3 className="text-lg font-semibold text-foreground">Visão de Impacto</h3>
+          <p className="text-sm text-muted-foreground">Quanto essa solução pode gerar de valor</p>
         </div>
+      </div>
+
+      <div className="p-4 rounded-lg bg-muted/50 border border-border mb-6">
+        <p className="text-sm text-foreground/80">
+          <strong className="text-primary">Por que perguntamos?</strong> Essas informações nos ajudam 
+          a priorizar as entregas que geram mais impacto para você.
+        </p>
       </div>
 
       <FormField
         control={form.control}
-        name="urgencia_solucao"
+        name="impacto_financeiro_estimado"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual a urgência dessa solução? *</FormLabel>
+            <FormLabel>Qual o impacto financeiro estimado dessa solução?</FormLabel>
+            <p className="text-xs text-muted-foreground mb-2">
+              Quanto você estima economizar ou gerar com essa automação por mês?
+            </p>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
                 value={field.value}
-                className="grid grid-cols-2 gap-2"
+                className="space-y-2"
               >
-                {urgenciaOptions.map((opt) => (
+                {impactoFinanceiroOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={opt.value} id={`urg-${opt.value}`} />
-                    <label htmlFor={`urg-${opt.value}`} className="text-sm cursor-pointer">
+                    <RadioGroupItem value={opt.value} id={`impacto-${opt.value}`} />
+                    <label htmlFor={`impacto-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
@@ -81,66 +81,15 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
 
       <FormField
         control={form.control}
-        name="sistemas_integrar"
-        render={() => (
-          <FormItem>
-            <FormLabel>Existem sistemas que precisam integrar?</FormLabel>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {sistemasOptions.map((sistema) => (
-                <FormField
-                  key={sistema.id}
-                  control={form.control}
-                  name="sistemas_integrar"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value?.includes(sistema.id)}
-                          onCheckedChange={(checked) => {
-                            const current = field.value || [];
-                            if (checked) {
-                              field.onChange([...current, sistema.id]);
-                            } else {
-                              field.onChange(current.filter((v) => v !== sistema.id));
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <label className="text-sm cursor-pointer">{sistema.label}</label>
-                    </FormItem>
-                  )}
-                />
-              ))}
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="outros_sistemas"
+        name="kpi_principal"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Outros sistemas</FormLabel>
+            <FormLabel>Qual é o principal indicador (KPI) que você quer melhorar?</FormLabel>
             <FormControl>
-              <Input placeholder="Liste outros sistemas que usa" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="quem_vai_usar"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Quem vai usar a solução no dia a dia? *</FormLabel>
-            <FormControl>
-              <Input 
-                placeholder="Ex: Equipe de atendimento (5 pessoas), eu mesmo, etc." 
-                {...field} 
+              <Textarea
+                placeholder="Ex: Tempo de resposta ao cliente, taxa de conversão, custo por lead, NPS..."
+                className="min-h-[80px]"
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -150,20 +99,38 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
 
       <FormField
         control={form.control}
-        name="volume_uso"
+        name="outras_areas_potencial"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual o volume de uso esperado? *</FormLabel>
+            <FormLabel>Além dessa solução, quais outras áreas da empresa poderiam usar IA?</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Ex: RH, Financeiro, Marketing, Vendas, Operações..."
+                className="min-h-[80px]"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="orcamento_expansao"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Qual orçamento você tem em mente para expandir o uso de IA?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
                 value={field.value}
-                className="grid grid-cols-2 gap-2"
+                className="space-y-2"
               >
-                {volumeOptions.map((opt) => (
+                {orcamentoExpansaoOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={opt.value} id={`vol-${opt.value}`} />
-                    <label htmlFor={`vol-${opt.value}`} className="text-sm cursor-pointer">
+                    <RadioGroupItem value={opt.value} id={`orc-${opt.value}`} />
+                    <label htmlFor={`orc-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>

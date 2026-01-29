@@ -1818,27 +1818,46 @@ export type Database = {
       }
       formulario_diagnostico: {
         Row: {
+          agendar_call_alinhamento: string | null
           area_aplicacao_ia: string | null
           area_atuacao: string | null
           area_atuacao_outro: string | null
+          areas_futuro_ia: Json | null
           arquivo_diagnostico_url: string | null
+          cargo_atual: string | null
+          como_conheceu_iaplicada: string | null
+          como_medir_sucesso: string | null
           completado: boolean | null
           created_at: string | null
+          decisor_especifico: string | null
+          decisores_tecnologia: string | null
+          definicao_sucesso: string | null
           desafio_1: string | null
           desafio_2: string | null
           desafio_3: string | null
+          desafio_principal_negocio: string | null
           direcional_entregas: string | null
+          disponibilidade_treinamento: string | null
           duvidas_preocupacoes: string | null
+          empresa_nome: string | null
+          equipe_precisa_aprender: string | null
           estilo_aprendizagem: string | null
+          experiencia_consultorias: string | null
           experiencia_ia: string | null
           feedback_mentora_em: string | null
           ferramentas_ia: Json | null
           frequencia_feedback: string | null
           frequencia_uso_ia: string | null
+          gatilho_renovacao: string | null
           id: string
           idade: number | null
+          impacto_financeiro_estimado: string | null
+          importancia_projeto: number | null
           insight_gerado_em: string | null
           insight_ia: Json | null
+          interesse_alem_entrega: Json | null
+          ja_tentou_antes: string | null
+          kpi_principal: string | null
           lidera_equipe: boolean | null
           limitacoes_tecnicas: string | null
           link_plano_execucao: string | null
@@ -1846,64 +1865,106 @@ export type Database = {
           maior_dificuldade_ia: string | null
           maior_ladrao_tempo: string | null
           maior_medo_ia: string | null
+          maior_preocupacao: string | null
           melhor_horario: string | null
           meta_12_meses: string | null
           meta_3_meses: string | null
           metricas_sucesso: string | null
           motivacao_mentoria: string | null
+          motivo_escolha_iaplicada: string | null
           nao_negociaveis: string | null
+          nao_pode_acontecer: string | null
           nivel_autonomia: string | null
           nivel_comprometimento: number | null
+          nivel_envolvimento: string | null
           nivel_ia: string | null
           nome_completo: string | null
+          o_que_aprender: string | null
           objetivo_especifico: string | null
           objetivo_principal: string | null
           observacoes_admin: string | null
+          orcamento_expansao: string | null
+          outras_areas_potencial: string | null
           outras_ferramentas: string | null
+          outros_decisores: string | null
+          outros_sistemas: string | null
+          pessoas_para_capacitar_skills: string | null
           plano_gerado: boolean | null
           plano_gerado_em: string | null
           plano_gerado_por: string | null
           preenchido_por: string | null
+          preferencia_acompanhamento: string | null
           preferencia_aprendizado: string | null
+          preferencia_comunicacao: string | null
           preferencia_sessoes: string | null
+          problema_principal: string | null
+          processo_automatizar: string | null
           processo_otimizar: string | null
           profissao: string | null
+          proximo_projeto_ia: string | null
+          quantos_capacitar: number | null
+          quem_vai_usar: string | null
+          quer_aprender: string | null
           quick_wins: Json | null
+          resultado_esperado: string | null
+          sistemas_integrar: Json | null
           tamanho_empresa: string | null
           tamanho_equipe: number | null
+          tem_equipe: boolean | null
           tempo_disponivel: string | null
           tempo_experiencia: string | null
           tipo_feedback: string | null
           tipo_suporte: string | null
           transcricao_call_url: string | null
           updated_at: string | null
+          urgencia_solucao: string | null
           user_id: string
           video_call_url: string | null
           vitoria_30_dias: string | null
+          volume_uso: string | null
           zona_conforto: string | null
         }
         Insert: {
+          agendar_call_alinhamento?: string | null
           area_aplicacao_ia?: string | null
           area_atuacao?: string | null
           area_atuacao_outro?: string | null
+          areas_futuro_ia?: Json | null
           arquivo_diagnostico_url?: string | null
+          cargo_atual?: string | null
+          como_conheceu_iaplicada?: string | null
+          como_medir_sucesso?: string | null
           completado?: boolean | null
           created_at?: string | null
+          decisor_especifico?: string | null
+          decisores_tecnologia?: string | null
+          definicao_sucesso?: string | null
           desafio_1?: string | null
           desafio_2?: string | null
           desafio_3?: string | null
+          desafio_principal_negocio?: string | null
           direcional_entregas?: string | null
+          disponibilidade_treinamento?: string | null
           duvidas_preocupacoes?: string | null
+          empresa_nome?: string | null
+          equipe_precisa_aprender?: string | null
           estilo_aprendizagem?: string | null
+          experiencia_consultorias?: string | null
           experiencia_ia?: string | null
           feedback_mentora_em?: string | null
           ferramentas_ia?: Json | null
           frequencia_feedback?: string | null
           frequencia_uso_ia?: string | null
+          gatilho_renovacao?: string | null
           id?: string
           idade?: number | null
+          impacto_financeiro_estimado?: string | null
+          importancia_projeto?: number | null
           insight_gerado_em?: string | null
           insight_ia?: Json | null
+          interesse_alem_entrega?: Json | null
+          ja_tentou_antes?: string | null
+          kpi_principal?: string | null
           lidera_equipe?: boolean | null
           limitacoes_tecnicas?: string | null
           link_plano_execucao?: string | null
@@ -1911,64 +1972,106 @@ export type Database = {
           maior_dificuldade_ia?: string | null
           maior_ladrao_tempo?: string | null
           maior_medo_ia?: string | null
+          maior_preocupacao?: string | null
           melhor_horario?: string | null
           meta_12_meses?: string | null
           meta_3_meses?: string | null
           metricas_sucesso?: string | null
           motivacao_mentoria?: string | null
+          motivo_escolha_iaplicada?: string | null
           nao_negociaveis?: string | null
+          nao_pode_acontecer?: string | null
           nivel_autonomia?: string | null
           nivel_comprometimento?: number | null
+          nivel_envolvimento?: string | null
           nivel_ia?: string | null
           nome_completo?: string | null
+          o_que_aprender?: string | null
           objetivo_especifico?: string | null
           objetivo_principal?: string | null
           observacoes_admin?: string | null
+          orcamento_expansao?: string | null
+          outras_areas_potencial?: string | null
           outras_ferramentas?: string | null
+          outros_decisores?: string | null
+          outros_sistemas?: string | null
+          pessoas_para_capacitar_skills?: string | null
           plano_gerado?: boolean | null
           plano_gerado_em?: string | null
           plano_gerado_por?: string | null
           preenchido_por?: string | null
+          preferencia_acompanhamento?: string | null
           preferencia_aprendizado?: string | null
+          preferencia_comunicacao?: string | null
           preferencia_sessoes?: string | null
+          problema_principal?: string | null
+          processo_automatizar?: string | null
           processo_otimizar?: string | null
           profissao?: string | null
+          proximo_projeto_ia?: string | null
+          quantos_capacitar?: number | null
+          quem_vai_usar?: string | null
+          quer_aprender?: string | null
           quick_wins?: Json | null
+          resultado_esperado?: string | null
+          sistemas_integrar?: Json | null
           tamanho_empresa?: string | null
           tamanho_equipe?: number | null
+          tem_equipe?: boolean | null
           tempo_disponivel?: string | null
           tempo_experiencia?: string | null
           tipo_feedback?: string | null
           tipo_suporte?: string | null
           transcricao_call_url?: string | null
           updated_at?: string | null
+          urgencia_solucao?: string | null
           user_id: string
           video_call_url?: string | null
           vitoria_30_dias?: string | null
+          volume_uso?: string | null
           zona_conforto?: string | null
         }
         Update: {
+          agendar_call_alinhamento?: string | null
           area_aplicacao_ia?: string | null
           area_atuacao?: string | null
           area_atuacao_outro?: string | null
+          areas_futuro_ia?: Json | null
           arquivo_diagnostico_url?: string | null
+          cargo_atual?: string | null
+          como_conheceu_iaplicada?: string | null
+          como_medir_sucesso?: string | null
           completado?: boolean | null
           created_at?: string | null
+          decisor_especifico?: string | null
+          decisores_tecnologia?: string | null
+          definicao_sucesso?: string | null
           desafio_1?: string | null
           desafio_2?: string | null
           desafio_3?: string | null
+          desafio_principal_negocio?: string | null
           direcional_entregas?: string | null
+          disponibilidade_treinamento?: string | null
           duvidas_preocupacoes?: string | null
+          empresa_nome?: string | null
+          equipe_precisa_aprender?: string | null
           estilo_aprendizagem?: string | null
+          experiencia_consultorias?: string | null
           experiencia_ia?: string | null
           feedback_mentora_em?: string | null
           ferramentas_ia?: Json | null
           frequencia_feedback?: string | null
           frequencia_uso_ia?: string | null
+          gatilho_renovacao?: string | null
           id?: string
           idade?: number | null
+          impacto_financeiro_estimado?: string | null
+          importancia_projeto?: number | null
           insight_gerado_em?: string | null
           insight_ia?: Json | null
+          interesse_alem_entrega?: Json | null
+          ja_tentou_antes?: string | null
+          kpi_principal?: string | null
           lidera_equipe?: boolean | null
           limitacoes_tecnicas?: string | null
           link_plano_execucao?: string | null
@@ -1976,40 +2079,63 @@ export type Database = {
           maior_dificuldade_ia?: string | null
           maior_ladrao_tempo?: string | null
           maior_medo_ia?: string | null
+          maior_preocupacao?: string | null
           melhor_horario?: string | null
           meta_12_meses?: string | null
           meta_3_meses?: string | null
           metricas_sucesso?: string | null
           motivacao_mentoria?: string | null
+          motivo_escolha_iaplicada?: string | null
           nao_negociaveis?: string | null
+          nao_pode_acontecer?: string | null
           nivel_autonomia?: string | null
           nivel_comprometimento?: number | null
+          nivel_envolvimento?: string | null
           nivel_ia?: string | null
           nome_completo?: string | null
+          o_que_aprender?: string | null
           objetivo_especifico?: string | null
           objetivo_principal?: string | null
           observacoes_admin?: string | null
+          orcamento_expansao?: string | null
+          outras_areas_potencial?: string | null
           outras_ferramentas?: string | null
+          outros_decisores?: string | null
+          outros_sistemas?: string | null
+          pessoas_para_capacitar_skills?: string | null
           plano_gerado?: boolean | null
           plano_gerado_em?: string | null
           plano_gerado_por?: string | null
           preenchido_por?: string | null
+          preferencia_acompanhamento?: string | null
           preferencia_aprendizado?: string | null
+          preferencia_comunicacao?: string | null
           preferencia_sessoes?: string | null
+          problema_principal?: string | null
+          processo_automatizar?: string | null
           processo_otimizar?: string | null
           profissao?: string | null
+          proximo_projeto_ia?: string | null
+          quantos_capacitar?: number | null
+          quem_vai_usar?: string | null
+          quer_aprender?: string | null
           quick_wins?: Json | null
+          resultado_esperado?: string | null
+          sistemas_integrar?: Json | null
           tamanho_empresa?: string | null
           tamanho_equipe?: number | null
+          tem_equipe?: boolean | null
           tempo_disponivel?: string | null
           tempo_experiencia?: string | null
           tipo_feedback?: string | null
           tipo_suporte?: string | null
           transcricao_call_url?: string | null
           updated_at?: string | null
+          urgencia_solucao?: string | null
           user_id?: string
           video_call_url?: string | null
           vitoria_30_dias?: string | null
+          volume_uso?: string | null
           zona_conforto?: string | null
         }
         Relationships: []
