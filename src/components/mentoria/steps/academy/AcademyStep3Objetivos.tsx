@@ -1,6 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
@@ -14,18 +13,16 @@ interface StepProps {
 }
 
 const objetivoOptions = [
-  { value: "produtividade", label: "Aumentar minha produtividade pessoal" },
-  { value: "carreira", label: "Crescer na carreira usando IA" },
-  { value: "automatizar", label: "Automatizar tarefas repetitivas" },
-  { value: "criar-conteudo", label: "Criar conteúdo com IA" },
-  { value: "analise-dados", label: "Analisar dados e informações" },
-  { value: "novo-negocio", label: "Iniciar um negócio com IA" },
-  { value: "outro", label: "Outro" },
+  { value: "produtividade-pessoal", label: "Aumentar minha produtividade pessoal" },
+  { value: "destacar-carreira", label: "Me destacar na carreira usando IA" },
+  { value: "automatizar-tarefas", label: "Automatizar tarefas repetitivas do meu dia" },
+  { value: "criar-conteudo", label: "Criar conteúdo de qualidade mais rápido" },
+  { value: "entender-ia-profundo", label: "Entender IA profundamente para tomar decisões" },
+  { value: "aplicar-negocio", label: "Aplicar IA no meu negócio/empresa" },
+  { value: "capacitar-equipe", label: "Aprender para capacitar minha equipe depois" },
 ];
 
 export function AcademyStep3Objetivos({ form, onNext, onPrev }: StepProps) {
-  const objetivoAtual = form.watch("objetivo_principal");
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -34,7 +31,7 @@ export function AcademyStep3Objetivos({ form, onNext, onPrev }: StepProps) {
         </div>
         <div>
           <h3 className="text-lg font-semibold text-foreground">Seus Objetivos</h3>
-          <p className="text-sm text-muted-foreground">O que você quer alcançar com IA</p>
+          <p className="text-sm text-muted-foreground">O que você quer alcançar com o Academy</p>
         </div>
       </div>
 
@@ -65,22 +62,6 @@ export function AcademyStep3Objetivos({ form, onNext, onPrev }: StepProps) {
         )}
       />
 
-      {objetivoAtual === "outro" && (
-        <FormField
-          control={form.control}
-          name="objetivo_especifico"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Descreva seu objetivo</FormLabel>
-              <FormControl>
-                <Input placeholder="Qual é o seu objetivo específico?" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      )}
-
       <FormField
         control={form.control}
         name="area_aplicacao_ia"
@@ -101,13 +82,13 @@ export function AcademyStep3Objetivos({ form, onNext, onPrev }: StepProps) {
 
       <FormField
         control={form.control}
-        name="meta_3_meses"
+        name="resultado_esperado_30_dias"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual sua meta para os próximos 3 meses? *</FormLabel>
+            <FormLabel>O que seria uma vitória nos primeiros 30 dias? *</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="Descreva o que você quer ter conquistado daqui 3 meses..."
+                placeholder="Descreva um resultado concreto que te deixaria satisfeito..."
                 className="min-h-[80px]"
                 {...field}
               />
@@ -119,13 +100,13 @@ export function AcademyStep3Objetivos({ form, onNext, onPrev }: StepProps) {
 
       <FormField
         control={form.control}
-        name="projetos_pessoais"
+        name="como_medir_sucesso"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Tem algum projeto pessoal que quer fazer com IA?</FormLabel>
+            <FormLabel>Como você vai saber que o Academy valeu a pena? *</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="Conte se tem alguma ideia de projeto que quer tirar do papel..."
+                placeholder="Descreva como você vai medir o sucesso da sua jornada..."
                 className="min-h-[80px]"
                 {...field}
               />

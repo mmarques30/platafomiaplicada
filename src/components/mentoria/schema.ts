@@ -1,18 +1,18 @@
 import { z } from "zod";
 
 // ============================================
-// ACADEMY SCHEMA - Foco em Aprendizado Pessoal
+// ACADEMY SCHEMA - Foco em Objetivos, Upsell e Relacionamento
 // ============================================
 
-// Step 1: Perfil Profissional
+// Step 1: Perfil e Motivação de Compra
 export const academyStep1Schema = z.object({
-  nome_completo: z.string().min(3, "Nome completo é obrigatório"),
-  idade: z.number().min(18, "Idade mínima: 18").max(100, "Idade máxima: 100"),
-  linkedin: z.string().url("URL inválida").optional().or(z.literal("")),
+  // nome_completo vem do perfil autenticado
   profissao: z.string().min(2, "Profissão é obrigatória"),
   area_atuacao: z.string().min(1, "Selecione uma área"),
   area_atuacao_outro: z.string().optional(),
-  tempo_experiencia: z.string().min(1, "Selecione o tempo de experiência"),
+  como_conheceu_iaplicada: z.string().min(1, "Selecione como nos conheceu"),
+  motivo_compra: z.string().min(10, "Descreva o que te motivou"),
+  expectativa_produto: z.string().min(10, "Descreva o que espera conquistar"),
 });
 
 // Step 2: Experiência com IA
@@ -22,32 +22,36 @@ export const academyStep2Schema = z.object({
   outras_ferramentas: z.string().optional(),
   frequencia_uso_ia: z.string().min(1, "Selecione a frequência"),
   maior_dificuldade_ia: z.string().optional(),
+  ja_fez_curso_ia: z.string().optional(),
+  resultado_curso_anterior: z.string().optional(),
 });
 
-// Step 3: Objetivos de Aprendizado
+// Step 3: Objetivos e Resultados
 export const academyStep3Schema = z.object({
   objetivo_principal: z.string().min(1, "Selecione o objetivo principal"),
-  objetivo_especifico: z.string().optional(),
   area_aplicacao_ia: z.string().min(3, "Descreva a área de aplicação"),
-  meta_3_meses: z.string().min(10, "Descreva sua meta de 3 meses"),
-  projetos_pessoais: z.string().optional(),
+  resultado_esperado_30_dias: z.string().min(10, "Descreva sua vitória em 30 dias"),
+  como_medir_sucesso: z.string().min(10, "Como você vai medir o sucesso?"),
 });
 
-// Step 4: Desafios e Tempo
+// Step 4: Contexto e Potencial de Expansão (Upsell)
 export const academyStep4Schema = z.object({
-  desafio_1: z.string().min(5, "Descreva o primeiro desafio"),
-  desafio_2: z.string().min(5, "Descreva o segundo desafio"),
-  desafio_3: z.string().min(5, "Descreva o terceiro desafio"),
+  maior_desafio_profissional: z.string().min(5, "Descreva seu maior desafio"),
   tempo_disponivel: z.string().min(1, "Selecione o tempo disponível"),
-  maior_ladrao_tempo: z.string().min(10, "Descreva o maior ladrão de tempo"),
+  tarefa_repetitiva_automatizar: z.string().optional(),
+  trabalha_em_empresa: z.string().min(1, "Selecione uma opção"),
+  equipe_poderia_usar_ia: z.string().optional(), // Trigger Skills
+  interesse_projeto_customizado: z.string().optional(), // Trigger Business
 });
 
-// Step 5: Comprometimento
+// Step 5: Comprometimento e Relacionamento
 export const academyStep5Schema = z.object({
   estilo_aprendizagem: z.string().min(1, "Selecione o estilo de aprendizagem"),
-  preferencia_aprendizado: z.string().min(1, "Selecione a preferência"),
   nivel_comprometimento: z.number().min(1).max(10),
   quick_wins: z.array(z.string()).default([]),
+  importancia_ia_carreira: z.number().min(1).max(10).optional(),
+  recomendaria_amigo: z.string().optional(), // NPS
+  preferencia_contato: z.string().optional(),
 });
 
 export const academyFormSchema = z.object({

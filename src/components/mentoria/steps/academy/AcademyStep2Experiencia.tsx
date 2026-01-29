@@ -39,7 +39,16 @@ const frequenciaOptions = [
   { value: "diariamente", label: "Diariamente" },
 ];
 
+const jaFezCursoOptions = [
+  { value: "nao", label: "Não, este é meu primeiro" },
+  { value: "sim-basico", label: "Sim, cursos gratuitos/básicos" },
+  { value: "sim-pago", label: "Sim, cursos pagos" },
+  { value: "sim-varios", label: "Sim, já fiz vários" },
+];
+
 export function AcademyStep2Experiencia({ form, onNext, onPrev }: StepProps) {
+  const jaFezCurso = form.watch("ja_fez_curso_ia");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -175,6 +184,53 @@ export function AcademyStep2Experiencia({ form, onNext, onPrev }: StepProps) {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="ja_fez_curso_ia"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Você já fez algum curso ou treinamento de IA antes?</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                value={field.value}
+                className="grid grid-cols-2 gap-2"
+              >
+                {jaFezCursoOptions.map((opt) => (
+                  <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors">
+                    <RadioGroupItem value={opt.value} id={`curso-${opt.value}`} />
+                    <label htmlFor={`curso-${opt.value}`} className="text-sm cursor-pointer">
+                      {opt.label}
+                    </label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {jaFezCurso && jaFezCurso !== "nao" && (
+        <FormField
+          control={form.control}
+          name="resultado_curso_anterior"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Qual foi o resultado desses cursos anteriores?</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Conte como foi sua experiência e o que conseguiu aplicar..."
+                  className="min-h-[80px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
 
       <div className="flex justify-between pt-4">
         <Button variant="outline" onClick={onPrev} className="gap-2">
