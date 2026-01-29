@@ -4,7 +4,7 @@ import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Brain, Video, FileText } from "lucide-react";
+import { Brain, Video, FileText, UserCog, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -82,9 +82,48 @@ export default function DiagnosticoPainelAcademy() {
                 <Skeleton className="h-32 w-full mt-4" />
               </CardContent>
             </Card>
-          ) : formulario ? (
+          ) : formulario && (formulario.preenchido_por !== 'admin' || formulario.insight_ia) ? (
+            // Diagnóstico completo: preenchido pelo próprio usuário OU já tem insight IA
             <DiagnosticoAcademyPanel diagnostico={formulario} />
+          ) : formulario && formulario.preenchido_por === 'admin' && !formulario.insight_ia ? (
+            // Admin preencheu mas ainda não tem insight IA - usuário pode preencher o próprio
+            <Card className="border-dashed border-2 border-primary/30">
+              <CardContent className="py-12">
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <UserCog className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-medium">Diagnóstico Iniciado pelo Mentor</h3>
+                    <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                      Seu mentor iniciou seu diagnóstico. Complete o formulário para gerar seu plano de desenvolvimento personalizado com IA.
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button 
+                      onClick={() => navigate("/diagnostico/formulario")}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Preencher Meu Diagnóstico
+                    </Button>
+                    
+                    {formulario.arquivo_diagnostico_url && (
+                      <Button 
+                        variant="outline"
+                        onClick={() => window.open(formulario.arquivo_diagnostico_url as string, '_blank')}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Ver Arquivo do Mentor
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ) : (
+            // Sem formulário nenhum
             <Card className="border-dashed border-2">
               <CardContent className="py-12">
                 <div className="text-center space-y-4">
