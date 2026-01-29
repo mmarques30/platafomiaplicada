@@ -1,10 +1,9 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Zap, TrendingUp } from "lucide-react";
 import type { AcademyFormData } from "../../schema";
 
 interface StepProps {
@@ -20,7 +19,32 @@ const tempoOptions = [
   { value: "10h+", label: "Mais de 10 horas por semana" },
 ];
 
+const trabalhaEmEmpresaOptions = [
+  { value: "autonomo", label: "Sou autônomo/freelancer" },
+  { value: "empresa-pequena", label: "Trabalho em empresa pequena (até 50 pessoas)" },
+  { value: "empresa-media", label: "Trabalho em empresa média (50-500 pessoas)" },
+  { value: "empresa-grande", label: "Trabalho em empresa grande (500+ pessoas)" },
+  { value: "empreendedor", label: "Tenho meu próprio negócio" },
+];
+
+const equipeUsarIaOptions = [
+  { value: "nao", label: "Não, é só pra mim" },
+  { value: "talvez", label: "Talvez, preciso ver primeiro" },
+  { value: "sim-poucos", label: "Sim, algumas pessoas (2-5)" },
+  { value: "sim-muitos", label: "Sim, toda a equipe/departamento" },
+];
+
+const interesseProjetoOptions = [
+  { value: "nao", label: "Não no momento" },
+  { value: "talvez-futuro", label: "Talvez no futuro" },
+  { value: "sim-curioso", label: "Sim, tenho curiosidade" },
+  { value: "sim-urgente", label: "Sim, tenho um projeto específico em mente" },
+];
+
 export function AcademyStep4Desafios({ form, onNext, onPrev }: StepProps) {
+  const trabalhaEmpresa = form.watch("trabalha_em_empresa");
+  const showEquipeQuestion = trabalhaEmpresa && !["autonomo"].includes(trabalhaEmpresa);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -28,58 +52,28 @@ export function AcademyStep4Desafios({ form, onNext, onPrev }: StepProps) {
           <Zap className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Desafios e Tempo</h3>
-          <p className="text-sm text-muted-foreground">Entender sua rotina atual</p>
+          <h3 className="text-lg font-semibold text-foreground">Contexto e Potencial</h3>
+          <p className="text-sm text-muted-foreground">Entender seu cenário atual</p>
         </div>
       </div>
 
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          Quais são os 3 maiores desafios que você enfrenta no seu dia a dia profissional?
-        </p>
-
-        <FormField
-          control={form.control}
-          name="desafio_1"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Desafio #1 *</FormLabel>
-              <FormControl>
-                <Input placeholder="Seu maior desafio no trabalho" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="desafio_2"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Desafio #2 *</FormLabel>
-              <FormControl>
-                <Input placeholder="Outro desafio importante" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="desafio_3"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Desafio #3 *</FormLabel>
-              <FormControl>
-                <Input placeholder="Mais um desafio" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="maior_desafio_profissional"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Qual seu maior desafio profissional hoje? *</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Descreva o desafio que mais te impacta no trabalho..."
+                className="min-h-[80px]"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       <FormField
         control={form.control}
@@ -110,13 +104,13 @@ export function AcademyStep4Desafios({ form, onNext, onPrev }: StepProps) {
 
       <FormField
         control={form.control}
-        name="maior_ladrao_tempo"
+        name="tarefa_repetitiva_automatizar"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual atividade mais te rouba tempo no trabalho? *</FormLabel>
+            <FormLabel>Tem alguma tarefa repetitiva que adoraria automatizar?</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="Descreva aquela tarefa que te consome muito tempo..."
+                placeholder="Descreva uma tarefa que te consome tempo e poderia ser automatizada..."
                 className="min-h-[80px]"
                 {...field}
               />
@@ -125,6 +119,96 @@ export function AcademyStep4Desafios({ form, onNext, onPrev }: StepProps) {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="trabalha_em_empresa"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Qual seu contexto de trabalho? *</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                value={field.value}
+                className="space-y-2"
+              >
+                {trabalhaEmEmpresaOptions.map((opt) => (
+                  <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors">
+                    <RadioGroupItem value={opt.value} id={`trabalha-${opt.value}`} />
+                    <label htmlFor={`trabalha-${opt.value}`} className="text-sm cursor-pointer">
+                      {opt.label}
+                    </label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {showEquipeQuestion && (
+        <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-primary">
+            <TrendingUp className="h-4 w-4" />
+            Potencial de Expansão
+          </div>
+
+          <FormField
+            control={form.control}
+            name="equipe_poderia_usar_ia"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Outras pessoas da sua equipe poderiam se beneficiar de IA?</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    className="grid grid-cols-2 gap-2"
+                  >
+                    {equipeUsarIaOptions.map((opt) => (
+                      <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors bg-background">
+                        <RadioGroupItem value={opt.value} id={`equipe-${opt.value}`} />
+                        <label htmlFor={`equipe-${opt.value}`} className="text-sm cursor-pointer">
+                          {opt.label}
+                        </label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="interesse_projeto_customizado"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Você tem interesse em projetos de automação sob medida?</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    className="grid grid-cols-2 gap-2"
+                  >
+                    {interesseProjetoOptions.map((opt) => (
+                      <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors bg-background">
+                        <RadioGroupItem value={opt.value} id={`projeto-${opt.value}`} />
+                        <label htmlFor={`projeto-${opt.value}`} className="text-sm cursor-pointer">
+                          {opt.label}
+                        </label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      )}
 
       <div className="flex justify-between pt-4">
         <Button variant="outline" onClick={onPrev} className="gap-2">

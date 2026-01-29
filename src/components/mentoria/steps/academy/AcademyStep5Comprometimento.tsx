@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckCircle, Rocket } from "lucide-react";
+import { ArrowLeft, CheckCircle, Rocket, Heart } from "lucide-react";
 import type { AcademyFormData } from "../../schema";
 
 interface StepProps {
@@ -21,12 +21,6 @@ const estiloOptions = [
   { value: "misto", label: "Misto - Um pouco de cada" },
 ];
 
-const preferenciaOptions = [
-  { value: "individual", label: "Estudo individual, no meu ritmo" },
-  { value: "grupo", label: "Aprender em grupo, com troca" },
-  { value: "mentoria", label: "Acompanhamento individual" },
-];
-
 const quickWinsOptions = [
   { id: "escrever-melhor", label: "Escrever textos e e-mails melhores" },
   { id: "criar-apresentacoes", label: "Criar apresentações rapidamente" },
@@ -36,8 +30,22 @@ const quickWinsOptions = [
   { id: "gerar-imagens", label: "Gerar imagens e artes" },
 ];
 
+const recomendariaOptions = [
+  { value: "certeza-sim", label: "Com certeza sim!" },
+  { value: "provavelmente-sim", label: "Provavelmente sim" },
+  { value: "talvez", label: "Talvez" },
+  { value: "provavelmente-nao", label: "Provavelmente não" },
+];
+
+const preferenciaContatoOptions = [
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "email", label: "E-mail" },
+  { value: "ambos", label: "Ambos" },
+];
+
 export function AcademyStep5Comprometimento({ form, onPrev, onSubmit, isSubmitting }: StepProps) {
   const comprometimento = form.watch("nivel_comprometimento") || 5;
+  const importanciaIA = form.watch("importancia_ia_carreira") || 5;
 
   return (
     <div className="space-y-6">
@@ -46,8 +54,8 @@ export function AcademyStep5Comprometimento({ form, onPrev, onSubmit, isSubmitti
           <Rocket className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Comprometimento</h3>
-          <p className="text-sm text-muted-foreground">Como você prefere aprender</p>
+          <h3 className="text-lg font-semibold text-foreground">Comprometimento e Relacionamento</h3>
+          <p className="text-sm text-muted-foreground">Últimos detalhes para te conhecermos melhor</p>
         </div>
       </div>
 
@@ -67,33 +75,6 @@ export function AcademyStep5Comprometimento({ form, onPrev, onSubmit, isSubmitti
                   <div key={opt.value} className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors">
                     <RadioGroupItem value={opt.value} id={`estilo-${opt.value}`} />
                     <label htmlFor={`estilo-${opt.value}`} className="text-sm cursor-pointer flex-1">
-                      {opt.label}
-                    </label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="preferencia_aprendizado"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Como você prefere aprender? *</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                value={field.value}
-                className="space-y-2"
-              >
-                {preferenciaOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors">
-                    <RadioGroupItem value={opt.value} id={`pref-${opt.value}`} />
-                    <label htmlFor={`pref-${opt.value}`} className="text-sm cursor-pointer flex-1">
                       {opt.label}
                     </label>
                   </div>
@@ -178,6 +159,97 @@ export function AcademyStep5Comprometimento({ form, onPrev, onSubmit, isSubmitti
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="importancia_ia_carreira"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>
+              De 1 a 10, quão importante é IA para sua carreira?
+              <span className="ml-2 text-primary font-bold">{importanciaIA}</span>
+            </FormLabel>
+            <FormControl>
+              <div className="px-2 py-4">
+                <Slider
+                  min={1}
+                  max={10}
+                  step={1}
+                  value={[field.value || 5]}
+                  onValueChange={(vals) => field.onChange(vals[0])}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>Pouco importante</span>
+                  <span>Essencial</span>
+                </div>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-4">
+        <div className="flex items-center gap-2 text-sm font-medium text-primary">
+          <Heart className="h-4 w-4" />
+          Relacionamento
+        </div>
+
+        <FormField
+          control={form.control}
+          name="recomendaria_amigo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Você indicaria a IAplicada para um amigo?</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  className="grid grid-cols-2 gap-2"
+                >
+                  {recomendariaOptions.map((opt) => (
+                    <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors bg-background">
+                      <RadioGroupItem value={opt.value} id={`recomenda-${opt.value}`} />
+                      <label htmlFor={`recomenda-${opt.value}`} className="text-sm cursor-pointer">
+                        {opt.label}
+                      </label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="preferencia_contato"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Como prefere receber novidades e dicas?</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  className="grid grid-cols-3 gap-2"
+                >
+                  {preferenciaContatoOptions.map((opt) => (
+                    <div key={opt.value} className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors bg-background">
+                      <RadioGroupItem value={opt.value} id={`contato-${opt.value}`} />
+                      <label htmlFor={`contato-${opt.value}`} className="text-sm cursor-pointer">
+                        {opt.label}
+                      </label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       <div className="flex justify-between pt-6">
         <Button variant="outline" onClick={onPrev} className="gap-2">

@@ -1,6 +1,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, User } from "lucide-react";
@@ -25,11 +26,14 @@ const areasAtuacao = [
   { value: "outro", label: "Outro" },
 ];
 
-const tempoExperienciaOptions = [
-  { value: "0-2", label: "0-2 anos" },
-  { value: "3-5", label: "3-5 anos" },
-  { value: "6-10", label: "6-10 anos" },
-  { value: "10+", label: "Mais de 10 anos" },
+const comoConheceuOptions = [
+  { value: "indicacao", label: "Indicação de amigo/colega" },
+  { value: "google", label: "Pesquisa no Google" },
+  { value: "instagram", label: "Instagram" },
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "youtube", label: "YouTube" },
+  { value: "evento", label: "Evento/Palestra" },
+  { value: "outro", label: "Outro" },
 ];
 
 export function AcademyStep1Perfil({ form, onNext }: StepProps) {
@@ -42,60 +46,10 @@ export function AcademyStep1Perfil({ form, onNext }: StepProps) {
           <User className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Seu Perfil Profissional</h3>
-          <p className="text-sm text-muted-foreground">Conte um pouco sobre você</p>
+          <h3 className="text-lg font-semibold text-foreground">Perfil e Motivação</h3>
+          <p className="text-sm text-muted-foreground">Conte sobre você e o que te trouxe aqui</p>
         </div>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <FormField
-          control={form.control}
-          name="nome_completo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome completo *</FormLabel>
-              <FormControl>
-                <Input placeholder="Seu nome completo" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="idade"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Idade *</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Sua idade"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value) || "")}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-
-      <FormField
-        control={form.control}
-        name="linkedin"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>LinkedIn (opcional)</FormLabel>
-            <FormControl>
-              <Input placeholder="https://linkedin.com/in/seu-perfil" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
 
       <FormField
         control={form.control}
@@ -156,25 +110,61 @@ export function AcademyStep1Perfil({ form, onNext }: StepProps) {
 
       <FormField
         control={form.control}
-        name="tempo_experiencia"
+        name="como_conheceu_iaplicada"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Tempo de experiência na área *</FormLabel>
+            <FormLabel>Como você conheceu a IAplicada? *</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
                 value={field.value}
-                className="grid grid-cols-2 md:grid-cols-4 gap-2"
+                className="grid grid-cols-2 md:grid-cols-3 gap-2"
               >
-                {tempoExperienciaOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={opt.value} id={`exp-${opt.value}`} />
-                    <label htmlFor={`exp-${opt.value}`} className="text-sm cursor-pointer">
+                {comoConheceuOptions.map((opt) => (
+                  <div key={opt.value} className="flex items-center space-x-2 p-2 rounded-lg border border-border hover:border-primary/40 transition-colors">
+                    <RadioGroupItem value={opt.value} id={`conheceu-${opt.value}`} />
+                    <label htmlFor={`conheceu-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
                 ))}
               </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="motivo_compra"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>O que te motivou a adquirir o Academy? *</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Conta pra gente o que te fez tomar essa decisão..."
+                className="min-h-[80px]"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="expectativa_produto"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>O que você espera conquistar com o Academy? *</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Descreva suas principais expectativas..."
+                className="min-h-[80px]"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
