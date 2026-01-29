@@ -15,8 +15,8 @@ interface FerramentaDetalhesModalProps {
 
 export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetalhesModalProps) {
   const { user } = useAuth();
-  const { isVisitante, isMentorado, isAdmin } = useUserRole();
-  const { userRating, stats, rate, isRating } = useFerramentaRating(ferramenta?.id);
+  const { isVisitante, isMentorado } = useUserRole();
+  const { userRating, stats, isAdmin, rate, isRating } = useFerramentaRating(ferramenta?.id);
 
   if (!ferramenta) return null;
 
@@ -62,10 +62,13 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
           </div>
         </DialogHeader>
 
-        {/* Avaliação do Mentor */}
+        {/* Avaliação do Mentor (Admin) */}
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-sm text-muted-foreground">Avaliação do Mentor:</span>
-          <RatingStars rating={avaliacao || 0} size="lg" />
+          <span className="text-sm text-muted-foreground">Avaliação do Mentor (peso 60%):</span>
+          <RatingStars rating={stats?.avaliacao || avaliacao || 0} size="lg" />
+          {isAdmin && (
+            <span className="text-xs text-primary font-medium">(Você pode alterar abaixo)</span>
+          )}
         </div>
 
         {/* Avaliação da Comunidade */}
@@ -73,7 +76,7 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium">Avaliação da Comunidade</span>
+              <span className="font-medium">Avaliação da Comunidade (peso 40%)</span>
             </div>
             {stats && stats.total_avaliacoes_comunidade > 0 && (
               <span className="text-sm text-muted-foreground">
@@ -104,30 +107,49 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
             <p className="text-sm text-muted-foreground mb-4">Nenhuma avaliação ainda</p>
           )}
 
-          {/* Seção para avaliar */}
+          {/* Seção para avaliar - Admin avalia como Mentor, Mentorado como Comunidade */}
           {canRate ? (
             <div className="pt-3 border-t">
               <p className="text-sm text-muted-foreground mb-2">
-                {userRating ? "Sua avaliação:" : "Avalie esta ferramenta:"}
+                {isAdmin ? (
+                  <>
+                    <span className="font-medium text-primary">Avaliação do Mentor:</span>
+                    {" "}(Esta avaliação tem peso de 60% no ranking)
+                  </>
+                ) : (
+                  userRating ? "Sua avaliação:" : "Avalie esta ferramenta:"
+                )}
               </p>
               <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => handleRate(star)}
-                    disabled={isRating}
-                    className="p-1 hover:scale-110 transition-transform disabled:opacity-50"
-                  >
-                    <Star
-                      className={`w-6 h-6 cursor-pointer ${
-                        star <= (userRating?.nota || 0)
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-muted hover:text-yellow-400"
-                      }`}
-                    />
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5].map((star) => {
+                  // Admin vê a avaliação do mentor, Mentorado vê sua própria avaliação
+                  const currentRating = isAdmin 
+                    ? (stats?.avaliacao || 0) 
+                    : (userRating?.nota || 0);
+                  
+                  return (
+                    <button
+                      key={star}
+                      onClick={() => handleRate(star)}
+                      disabled={isRating}
+                      className="p-1 hover:scale-110 transition-transform disabled:opacity-50"
+                    >
+                      <Star
+                        className={`w-6 h-6 cursor-pointer ${
+                          star <= currentRating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-muted hover:text-yellow-400"
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
               </div>
+              {isAdmin && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Sua avaliação define a nota do mentor para esta ferramenta.
+                </p>
+              )}
             </div>
           ) : isVisitante ? (
             <div className="pt-3 border-t">
