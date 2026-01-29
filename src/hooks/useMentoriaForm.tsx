@@ -33,6 +33,13 @@ export const useMentoriaForm = () => {
     mutationFn: async (dados: Partial<FormData>) => {
       if (!user) throw new Error("Usuário não autenticado");
 
+      // Buscar nome do perfil para preencher automaticamente
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("nome_completo")
+        .eq("id", user.id)
+        .maybeSingle();
+
       // Verificar se já existe registro para preservar campos de feedback
       const { data: existente } = await supabase
         .from("formulario_diagnostico")
@@ -42,6 +49,7 @@ export const useMentoriaForm = () => {
 
       const formData = {
         ...dados,
+        nome_completo: profile?.nome_completo || dados.nome_completo, // Auto-preencher do perfil
         updated_at: new Date().toISOString(),
       };
 
@@ -82,6 +90,13 @@ export const useMentoriaForm = () => {
     mutationFn: async (dados: FormData) => {
       if (!user) throw new Error("Usuário não autenticado");
 
+      // Buscar nome do perfil para preencher automaticamente
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("nome_completo")
+        .eq("id", user.id)
+        .maybeSingle();
+
       // Verificar se já existe registro para preservar campos de feedback
       const { data: existente } = await supabase
         .from("formulario_diagnostico")
@@ -91,6 +106,7 @@ export const useMentoriaForm = () => {
 
       const formData = {
         ...dados,
+        nome_completo: profile?.nome_completo || dados.nome_completo, // Auto-preencher do perfil
         completado: true,
         updated_at: new Date().toISOString(),
       };

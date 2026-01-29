@@ -14,13 +14,13 @@ interface StepProps {
 }
 
 const querAprenderOptions = [
-  { value: "sim", label: "Sim, quero aprender a usar IA pessoalmente" },
+  { value: "sim", label: "Sim, quero acompanhar e entender a solução" },
   { value: "nao", label: "Não, prefiro apenas receber a solução pronta" },
   { value: "depois", label: "Talvez depois, quando tiver mais tempo" },
 ];
 
 const equipeOptions = [
-  { value: "sim", label: "Sim, a equipe precisará ser capacitada" },
+  { value: "sim", label: "Sim, a equipe precisará ser capacitada (Skills)" },
   { value: "nao", label: "Não, a solução deve ser autossuficiente" },
   { value: "depois", label: "Talvez depois, dependendo da solução" },
 ];
