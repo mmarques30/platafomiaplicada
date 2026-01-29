@@ -36,35 +36,19 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <FormField
-          control={form.control}
-          name="nome_completo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Seu nome completo *</FormLabel>
-              <FormControl>
-                <Input placeholder="Seu nome completo" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="cargo_atual"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Seu cargo *</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: Diretor de Operações" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="cargo_atual"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Seu cargo *</FormLabel>
+            <FormControl>
+              <Input placeholder="Ex: Diretor de Operações" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       <FormField
         control={form.control}

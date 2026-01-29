@@ -64,9 +64,9 @@ export type AcademyFormData = z.infer<typeof academyFormSchema>;
 // BUSINESS SCHEMA - Foco em Entrega e Acompanhamento
 // ============================================
 
-// Step 1: Perfil do Cliente
+// Step 1: Perfil do Cliente (nome_completo preenchido automaticamente do perfil)
 export const businessStep1Schema = z.object({
-  nome_completo: z.string().min(3, "Nome completo é obrigatório"),
+  nome_completo: z.string().optional(), // Preenchido automaticamente do perfil autenticado
   cargo_atual: z.string().min(2, "Cargo é obrigatório"),
   empresa_nome: z.string().min(2, "Nome da empresa é obrigatório"),
   tamanho_empresa: z.string().min(1, "Selecione o tamanho da empresa"),
