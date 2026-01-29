@@ -1,202 +1,73 @@
 
+# Plano: Remover Card de Ferramentas Compartilhadas da Visão Ranking
 
-# Plano: Permitir Mentorados Adicionar Ferramentas na Aba "Criadores"
+## Problema Identificado
 
-## Contexto
+A página de Evolução (`/evolucao`) na aba "Ranking" (comunidade) exibe dois sistemas duplicados:
 
-Atualmente, a aba **Criadores** em `/videos-bonus?tab=criadores` exibe materiais da tabela `materiais_comunidade`, mas as políticas RLS permitem INSERT apenas para admins. Mentorados (Academy/Business) precisam poder compartilhar suas próprias ferramentas com a comunidade.
+1. **Card "Ferramentas Compartilhadas"** (`FerramentasCompartilhadasList`) - usa tabela `ferramentas_compartilhadas`
+2. **Aba "Criadores"** em `/videos-bonus` (`AdicionarMaterialModal`) - usa tabela `materiais_comunidade`
 
-## Problemas Identificados
-
-1. **Política RLS bloqueando mentorados**: A tabela `materiais_comunidade` tem RLS que só permite INSERT para admins
-2. **Sem botão "Adicionar"**: O componente `CriadoresComunidadeTab.tsx` não tem opção para mentorados adicionarem materiais
-3. **Modal existe apenas no admin**: O modal de criação `MaterialCriadoresModal.tsx` está em `/admin/comunidade` e é muito complexo
+O usuário deseja que a funcionalidade de compartilhamento de ferramentas fique **apenas** na aba Criadores da Comunidade.
 
 ---
 
 ## Solução
 
-### 1. Atualizar Políticas RLS da Tabela `materiais_comunidade`
-
-Permitir que mentorados possam inserir materiais onde eles são o criador:
-
-```sql
--- Remover política antiga de INSERT
-DROP POLICY IF EXISTS "materiais_comunidade_insert_policy" ON materiais_comunidade;
-
--- Nova política: Admin pode inserir qualquer coisa, mentorados podem inserir como criador
-CREATE POLICY "materiais_comunidade_insert_policy"
-ON materiais_comunidade FOR INSERT TO authenticated
-WITH CHECK (
-  -- Admin pode inserir qualquer registro
-  (EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')) 
-  OR 
-  -- Mentorados podem inserir apenas onde são o criador
-  (criador_id = auth.uid() AND has_role(auth.uid(), 'mentorado'))
-);
-
--- Mentorados podem atualizar seus próprios materiais
-DROP POLICY IF EXISTS "materiais_comunidade_update_policy" ON materiais_comunidade;
-
-CREATE POLICY "materiais_comunidade_update_policy"
-ON materiais_comunidade FOR UPDATE TO authenticated
-USING (
-  (EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin'))
-  OR
-  (criador_id = auth.uid())
-)
-WITH CHECK (
-  (EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin'))
-  OR
-  (criador_id = auth.uid())
-);
-```
+Remover o componente `FerramentasCompartilhadasList` e o modal `CompartilharFerramentaModal` da página Evolução.
 
 ---
 
-### 2. Criar Hook para Mentorados Adicionarem Materiais
+## Mudanças Necessárias
 
-**Arquivo:** `src/hooks/useMaterialComunidadeSubmit.tsx`
+### Arquivo: `src/pages/Evolucao.tsx`
 
-Hook simplificado para mentorados enviarem materiais:
-- Buscar materiais do próprio usuário
-- Mutation para criar material
-- Upload de arquivos para storage
+**Remover:**
+1. Import do `FerramentasCompartilhadasList`
+2. Import do `CompartilharFerramentaModal`
+3. Estado `modalFerramentaOpen`
+4. Renderização do `FerramentasCompartilhadasList` na aba comunidade
+5. Renderização do `CompartilharFerramentaModal`
 
+**Código atual (linhas 6-8, 26, 82-88):**
 ```typescript
-export function useMaterialComunidadeSubmit() {
-  const { user } = useAuth();
-  
-  // Meus materiais
-  const { data: meusMateriais } = useQuery({...});
-  
-  // Criar material
-  const createMaterial = useMutation({
-    mutationFn: async (material) => {
-      await supabase.from("materiais_comunidade").insert({
-        ...material,
-        criador_id: user.id,
-        adicionado_por: user.id,
-        ativo: false, // Pendente de aprovação
-      });
-    },
-  });
-  
-  return { meusMateriais, createMaterial };
-}
-```
+import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
+import { CompartilharFerramentaModal } from "@/components/evolucao/CompartilharFerramentaModal";
+...
+const [modalFerramentaOpen, setModalFerramentaOpen] = useState(false);
+...
+{/* Ferramentas Mais Compartilhadas */}
+<FerramentasCompartilhadasList onCompartilhar={() => setModalFerramentaOpen(true)} />
 
----
-
-### 3. Criar Modal Simplificado para Mentorados
-
-**Arquivo:** `src/components/comunidade/AdicionarMaterialModal.tsx`
-
-Modal mais simples que o do admin, com campos:
-- **Nome** (obrigatório)
-- **Categoria** (ChatGPT, Claude, Notion, Canva, etc.)
-- **Tipo** (Prompt, Documento, Template, etc.)
-- **Prompt/Orientação** (textarea para conteúdo)
-- **Upload de arquivos** (PDF, PPTX, links)
-- **Links externos** (opcional)
-
-Interface com avatar do usuário exibindo iniciais.
-
----
-
-### 4. Atualizar `CriadoresComunidadeTab.tsx`
-
-Adicionar botão "Contribuir com a Comunidade" para mentorados (Academy/Business):
-
-```typescript
-// No header, ao lado dos filtros
-{(isAcademy || isBusiness) && !isVisitante && (
-  <Button onClick={() => setShowAddModal(true)}>
-    <Plus className="w-4 h-4 mr-2" />
-    Contribuir
-  </Button>
-)}
-
-// Modal de adição
-<AdicionarMaterialModal 
-  open={showAddModal} 
-  onOpenChange={setShowAddModal} 
+<CompartilharFerramentaModal 
+  open={modalFerramentaOpen} 
+  onOpenChange={setModalFerramentaOpen} 
 />
 ```
 
----
-
-### 5. Fluxo de Moderação
-
-Os materiais criados por mentorados:
-1. São inseridos com `ativo = false` (pendente)
-2. Admin vê na aba "Criadores" do painel admin
-3. Admin ativa/aprova o material
-4. Material aparece para toda a comunidade
-
----
-
-## Arquivos a Criar/Modificar
-
-| Arquivo | Ação |
-|---------|------|
-| Migration SQL | Atualizar RLS policies |
-| `src/hooks/useMaterialComunidadeSubmit.tsx` | **CRIAR** - Hook para mentorados |
-| `src/components/comunidade/AdicionarMaterialModal.tsx` | **CRIAR** - Modal simplificado |
-| `src/components/comunidade/CriadoresComunidadeTab.tsx` | **MODIFICAR** - Adicionar botão |
-
----
-
-## Fluxo para Usuários
-
-```text
-Mentorado (Academy/Business):
-  ├─ Acessa Comunidade > Sala de Aula > Criadores
-  ├─ Clica em "Contribuir"
-  ├─ Preenche: Nome, Categoria, Tipo, Prompt/Orientação
-  ├─ Faz upload de PDF/PPTX ou adiciona links
-  ├─ Envia → Material fica pendente de aprovação
-  └─ Avatar com iniciais do nome aparece no card após aprovação
-
-Admin:
-  ├─ Acessa Comunicações > Comunidade > Criadores
-  ├─ Vê materiais pendentes (ativo=false)
-  ├─ Ativa o material
-  └─ Material visível para toda a comunidade
-
-Visitante:
-  ├─ Acessa Sala de Aula > Criadores
-  └─ Apenas visualiza (sem botão "Contribuir")
-```
-
----
-
-## Categorias Disponíveis
-
-Mantendo consistência com o sistema existente:
-- ChatGPT
-- Claude
-- Midjourney
-- Canva
-- Notion
-- Excel
-- Outro
-
-## Tipos de Material
-
-- Prompt
-- Imagem
-- Documento
-- Template
-- Outro
+**Código após remoção:**
+- Aba "Ranking" mostrará apenas `HeroComunidade` e `RankingComunidade`
+- Sem referência a ferramentas compartilhadas
 
 ---
 
 ## Resultado Esperado
 
-- Mentorados Academy e Business podem contribuir com ferramentas
-- Materiais ficam pendentes até aprovação do admin
-- Avatar do criador aparece com as iniciais (como já funciona)
-- Sistema de moderação evita spam/conteúdo inadequado
-- Visitantes podem visualizar mas não contribuir
+| Localização | Antes | Depois |
+|-------------|-------|--------|
+| `/evolucao` (aba Ranking) | Card de ferramentas + botão compartilhar | Apenas Ranking da Comunidade |
+| `/videos-bonus?tab=criadores` | Botão "Contribuir" para Academy/Business | Mantido (única forma de contribuir) |
 
+---
+
+## Arquivos a Modificar
+
+| Arquivo | Ação |
+|---------|------|
+| `src/pages/Evolucao.tsx` | Remover imports, estado e componentes de ferramentas compartilhadas |
+
+---
+
+## Observação
+
+Os arquivos `FerramentasCompartilhadasList.tsx` e `CompartilharFerramentaModal.tsx` podem ser mantidos no código (para eventual uso futuro) ou removidos completamente. A recomendação é apenas remover as referências da página Evolução para manter o código limpo.
