@@ -9,12 +9,14 @@ interface Ferramenta {
   nome: string;
   logo_url: string | null;
   categoria: string;
+  avaliacao?: number | null;
   avaliacao_mari: number | null;
   avaliacao_comunidade: number | null;
   total_avaliacoes_comunidade: number | null;
   gratuito: boolean;
   link_ferramenta: string | null;
   objetivo: string;
+  score_ranking?: number;
 }
 
 interface FerramentasRankingProps {
@@ -25,12 +27,13 @@ interface FerramentasRankingProps {
 export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankingProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  // Ranking Top 5: Claude, Manus, Gamma, ChatGPT, Perplexity
+  // Ranking dinâmico: Top 5 ordenado por score_ranking
   const top5 = useMemo(() => {
-    const ranking = ['claude', 'manus', 'gamma', 'chatgpt', 'perplexity'];
-    return ranking
-      .map(name => ferramentas.find(f => f.nome.toLowerCase().includes(name)))
-      .filter(Boolean) as Ferramenta[];
+    // Ferramentas já vêm ordenadas por score_ranking do hook
+    // Pegar as 5 primeiras com alguma avaliação válida
+    return ferramentas
+      .filter(f => (f.avaliacao || 0) > 0 || (f.avaliacao_comunidade || 0) > 0)
+      .slice(0, 5);
   }, [ferramentas]);
 
   if (top5.length === 0) return null;
@@ -126,11 +129,18 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
               {/* Spacer para empurrar botões para baixo */}
               <div className="flex-grow" />
 
-              {/* Avaliação Mari */}
+              {/* Avaliação Combinada */}
               <div className="flex items-center gap-1.5 mt-3">
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span className="font-semibold text-sm">{ferramenta.avaliacao_mari || 0}</span>
+                <span className="font-semibold text-sm">
+                  {ferramenta.score_ranking?.toFixed(1) || ferramenta.avaliacao_mari || 0}
+                </span>
                 <span className="text-xs text-muted-foreground">/ 5</span>
+                {(ferramenta.total_avaliacoes_comunidade || 0) > 0 && (
+                  <span className="text-xs text-muted-foreground ml-1">
+                    ({ferramenta.total_avaliacoes_comunidade} votos)
+                  </span>
+                )}
               </div>
 
               {/* Ações */}
