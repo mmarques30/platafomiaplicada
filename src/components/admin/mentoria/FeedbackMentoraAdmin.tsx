@@ -39,19 +39,43 @@ export function FeedbackMentoraAdmin({ userId }: FeedbackMentoraAdminProps) {
     }
   }, [diagnostico]);
 
-  // Mutation para salvar feedback
+  // Mutation para salvar feedback - usa UPDATE para não sobrescrever dados do diagnóstico
   const salvarFeedback = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
+      // Verificar se já existe registro
+      const { data: existente } = await supabase
         .from("formulario_diagnostico")
-        .upsert({
-          user_id: userId,
-          video_call_url: videoCallUrl || null,
-          transcricao_call_url: transcricaoUrl || null,
-          link_plano_execucao: planoExecucaoUrl || null,
-          direcional_entregas: direcionalEntregas || null,
-          feedback_mentora_em: new Date().toISOString(),
-        } as any, { onConflict: 'user_id' });
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      const feedbackData = {
+        video_call_url: videoCallUrl || null,
+        transcricao_call_url: transcricaoUrl || null,
+        link_plano_execucao: planoExecucaoUrl || null,
+        direcional_entregas: direcionalEntregas || null,
+        feedback_mentora_em: new Date().toISOString(),
+      };
+
+      let error;
+
+      if (existente) {
+        // UPDATE apenas os campos de feedback, preservando o diagnóstico
+        const result = await supabase
+          .from("formulario_diagnostico")
+          .update(feedbackData as any)
+          .eq("user_id", userId);
+        error = result.error;
+      } else {
+        // INSERT novo registro apenas com campos de feedback
+        const result = await supabase
+          .from("formulario_diagnostico")
+          .insert({
+            user_id: userId,
+            ...feedbackData,
+          } as any);
+        error = result.error;
+      }
 
       if (error) throw error;
     },
