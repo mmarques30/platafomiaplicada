@@ -1,6 +1,8 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, Trophy } from "lucide-react";
 import type { BusinessFormData } from "../../schema";
@@ -12,7 +14,24 @@ interface StepProps {
   isSubmitting: boolean;
 }
 
+const gatilhoRenovacaoOptions = [
+  { value: "resultados", label: "Ver resultados concretos / ROI" },
+  { value: "confianca", label: "Construir confiança no parceiro" },
+  { value: "equipe", label: "Equipe dominar a solução" },
+  { value: "expansao", label: "Identificar mais oportunidades" },
+  { value: "preco", label: "Condições comerciais atrativas" },
+];
+
+const agendarCallOptions = [
+  { value: "sim", label: "Sim, quanto antes" },
+  { value: "em_breve", label: "Em breve, preciso organizar agenda" },
+  { value: "por_email", label: "Prefiro alinhar por e-mail" },
+  { value: "ja_conversamos", label: "Já conversamos, posso prosseguir" },
+];
+
 export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting }: StepProps) {
+  const importancia = form.watch("importancia_projeto") || 5;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -21,23 +40,78 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
           <Trophy className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Expectativas e Sucesso</h3>
+          <h3 className="text-lg font-semibold text-foreground">Sucesso e Parceria</h3>
           <p className="text-sm text-muted-foreground">O que define sucesso para você</p>
         </div>
       </div>
 
       <FormField
         control={form.control}
-        name="como_medir_sucesso"
+        name="definicao_sucesso"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Como você vai medir se a solução funcionou? *</FormLabel>
+            <FormLabel>Como você define sucesso para esse projeto?</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="Ex: Redução de 50% no tempo de resposta aos clientes, economia de 20h semanais da equipe..."
+                placeholder="Ex: Reduzir tempo de atendimento em 50%, economizar R$ 20.000/mês, liberar 10h semanais da equipe..."
                 className="min-h-[100px]"
                 {...field}
               />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="importancia_projeto"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>De 1 a 10, qual a importância desse projeto para a empresa?</FormLabel>
+            <div className="pt-4 pb-2">
+              <FormControl>
+                <Slider
+                  min={1}
+                  max={10}
+                  step={1}
+                  value={[field.value || 5]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                  className="w-full"
+                />
+              </FormControl>
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>1 - Pouco importante</span>
+                <span className="font-bold text-primary text-lg">{importancia}</span>
+                <span>10 - Crítico</span>
+              </div>
+            </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="gatilho_renovacao"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>O que faria você renovar/expandir a parceria conosco?</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                value={field.value}
+                className="space-y-2"
+              >
+                {gatilhoRenovacaoOptions.map((opt) => (
+                  <div key={opt.value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={opt.value} id={`gatilho-${opt.value}`} />
+                    <label htmlFor={`gatilho-${opt.value}`} className="text-sm cursor-pointer">
+                      {opt.label}
+                    </label>
+                  </div>
+                ))}
+              </RadioGroup>
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -64,34 +138,25 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
 
       <FormField
         control={form.control}
-        name="vitoria_30_dias"
+        name="agendar_call_alinhamento"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>O que seria uma "vitória" em 30 dias? *</FormLabel>
+            <FormLabel>Gostaria de agendar uma call de alinhamento?</FormLabel>
             <FormControl>
-              <Textarea
-                placeholder="Descreva o que você considera um marco de sucesso nos primeiros 30 dias..."
-                className="min-h-[100px]"
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="nao_pode_acontecer"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>O que definitivamente NÃO pode acontecer?</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Ex: Não podemos expor dados de clientes, não pode ter erros de cálculo, etc..."
-                className="min-h-[80px]"
-                {...field}
-              />
+              <RadioGroup
+                onValueChange={field.onChange}
+                value={field.value}
+                className="grid grid-cols-2 gap-2"
+              >
+                {agendarCallOptions.map((opt) => (
+                  <div key={opt.value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={opt.value} id={`call-${opt.value}`} />
+                    <label htmlFor={`call-${opt.value}`} className="text-sm cursor-pointer">
+                      {opt.label}
+                    </label>
+                  </div>
+                ))}
+              </RadioGroup>
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -101,7 +166,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
       <div className="p-4 rounded-lg bg-muted/50 border border-border">
         <p className="text-sm text-foreground/80">
           <strong className="text-primary">Próximos passos:</strong> Após enviar este formulário, 
-          vamos analisar suas informações e entrar em contato para alinhar os detalhes do projeto.
+          nossa equipe vai analisar suas informações e entrar em contato para alinhar os detalhes do projeto.
         </p>
       </div>
 

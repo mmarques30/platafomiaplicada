@@ -84,7 +84,7 @@ const FIELD_LABELS: Record<string, string> = {
   duvidas_preocupacoes: "Dúvidas e preocupações",
   vitoria_30_dias: "Vitória em 30 dias",
   quick_wins: "Quick wins esperados",
-  // Business specific
+  // Business specific - Legacy
   cargo_atual: "Cargo atual",
   empresa_nome: "Nome da empresa",
   tem_equipe: "Tem equipe?",
@@ -108,7 +108,26 @@ const FIELD_LABELS: Record<string, string> = {
   disponibilidade_treinamento: "Disponibilidade para treinamento",
   como_medir_sucesso: "Como medir sucesso",
   maior_preocupacao: "Maior preocupação",
-  nao_pode_acontecer: "O que não pode acontecer"
+  nao_pode_acontecer: "O que não pode acontecer",
+  // Business specific - Novos campos
+  como_conheceu_iaplicada: "Como conheceu a IAplicada",
+  desafio_principal_negocio: "Desafio principal do negócio",
+  impacto_financeiro_estimado: "Impacto financeiro estimado",
+  outras_areas_potencial: "Outras áreas com potencial",
+  kpi_principal: "KPI principal",
+  orcamento_expansao: "Orçamento para expansão",
+  decisores_tecnologia: "Decisores de tecnologia",
+  decisor_especifico: "Decisor específico",
+  motivo_escolha_iaplicada: "Motivo da escolha IAplicada",
+  experiencia_consultorias: "Experiência com consultorias",
+  interesse_alem_entrega: "Interesse além da entrega",
+  areas_futuro_ia: "Áreas para IA no futuro",
+  proximo_projeto_ia: "Próximo projeto de IA",
+  pessoas_para_capacitar_skills: "Pessoas para capacitar (Skills)",
+  definicao_sucesso: "Definição de sucesso",
+  gatilho_renovacao: "Gatilho para renovação",
+  importancia_projeto: "Importância do projeto (1-10)",
+  agendar_call_alinhamento: "Agendar call de alinhamento",
 };
 
 // Configuração das etapas por tipo
@@ -121,12 +140,12 @@ const ETAPAS_CONFIG = {
     { titulo: "Comprometimento", schema: academyStep5Schema },
   ],
   business: [
-    { titulo: "Perfil do Cliente", schema: businessStep1Schema },
+    { titulo: "Perfil e Contexto", schema: businessStep1Schema },
     { titulo: "O Que Precisa Ser Construído", schema: businessStep2Schema },
-    { titulo: "Contexto da Entrega", schema: businessStep3Schema },
-    { titulo: "Acompanhamento do Projeto", schema: businessStep4Schema },
-    { titulo: "Interesse em Aprendizado", schema: businessStep5Schema },
-    { titulo: "Expectativas e Sucesso", schema: businessStep6Schema },
+    { titulo: "Visão de Impacto", schema: businessStep3Schema },
+    { titulo: "Tomada de Decisão", schema: businessStep4Schema },
+    { titulo: "Interesse em Expansão", schema: businessStep5Schema },
+    { titulo: "Sucesso e Parceria", schema: businessStep6Schema },
   ],
   legacy: [
     { titulo: "Informações Pessoais", schema: step1Schema },

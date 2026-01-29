@@ -1,9 +1,9 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, MessageSquare } from "lucide-react";
+import { ArrowLeft, ArrowRight, Users } from "lucide-react";
 import type { BusinessFormData } from "../../schema";
 
 interface StepProps {
@@ -12,24 +12,27 @@ interface StepProps {
   onPrev: () => void;
 }
 
-const acompanhamentoOptions = [
-  { value: "reunioes-semanais", label: "Reuniões semanais de alinhamento" },
-  { value: "assincrono", label: "Atualizações assíncronas (mensagens/e-mail)" },
-  { value: "reports", label: "Reports periódicos com status" },
-  { value: "minimo", label: "Mínimo possível - só me avise quando estiver pronto" },
+const decisoresOptions = [
+  { value: "apenas_eu", label: "Apenas eu decido" },
+  { value: "eu_e_socio", label: "Eu e meu sócio/diretoria" },
+  { value: "comite", label: "Comitê de decisão / Board" },
+  { value: "ti_envolvida", label: "TI precisa aprovar" },
+  { value: "outro", label: "Outro processo" },
 ];
 
-const envolvimentoOptions = [
-  { value: "hands-on", label: "Hands-on - quero participar de perto" },
-  { value: "validacoes", label: "Validações - só preciso aprovar etapas" },
-  { value: "delegar", label: "Delegar totalmente - confio no processo" },
+const motivoEscolhaOptions = [
+  { value: "reputacao", label: "Reputação / Cases de sucesso" },
+  { value: "indicacao", label: "Indicação de alguém confiável" },
+  { value: "conteudo", label: "Conteúdos da IAplicada (LinkedIn, etc)" },
+  { value: "reuniao", label: "Conversa / Reunião comercial" },
+  { value: "diferencial", label: "Diferencial do modelo (entrega + capacitação)" },
 ];
 
-const comunicacaoOptions = [
-  { value: "whatsapp", label: "WhatsApp" },
-  { value: "email", label: "E-mail" },
-  { value: "calls", label: "Calls/Reuniões" },
-  { value: "plataforma", label: "Plataforma/Chat interno" },
+const experienciaConsultoriasOptions = [
+  { value: "primeira_vez", label: "Primeira vez contratando consultoria de IA" },
+  { value: "ja_contratou_bem", label: "Já contratei e foi positivo" },
+  { value: "ja_contratou_mal", label: "Já contratei e não gostei da experiência" },
+  { value: "time_interno", label: "Tenho time interno de tecnologia" },
 ];
 
 export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps) {
@@ -38,30 +41,30 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 rounded-lg bg-primary/10">
-          <MessageSquare className="h-5 w-5 text-primary" />
+          <Users className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Acompanhamento do Projeto</h3>
-          <p className="text-sm text-muted-foreground">Como você prefere acompanhar a entrega</p>
+          <h3 className="text-lg font-semibold text-foreground">Tomada de Decisão</h3>
+          <p className="text-sm text-muted-foreground">Quem decide e por que escolheu a IAplicada</p>
         </div>
       </div>
 
       <FormField
         control={form.control}
-        name="preferencia_acompanhamento"
+        name="decisores_tecnologia"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Como prefere acompanhar o desenvolvimento? *</FormLabel>
+            <FormLabel>Quem são os decisores para projetos de tecnologia na empresa?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
                 value={field.value}
                 className="space-y-2"
               >
-                {acompanhamentoOptions.map((opt) => (
+                {decisoresOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={opt.value} id={`acomp-${opt.value}`} />
-                    <label htmlFor={`acomp-${opt.value}`} className="text-sm cursor-pointer">
+                    <RadioGroupItem value={opt.value} id={`dec-${opt.value}`} />
+                    <label htmlFor={`dec-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
@@ -75,41 +78,15 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
 
       <FormField
         control={form.control}
-        name="nivel_envolvimento"
+        name="decisor_especifico"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual seu nível de envolvimento desejado? *</FormLabel>
+            <FormLabel>Quem especificamente precisa aprovar esse projeto?</FormLabel>
             <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                value={field.value}
-                className="space-y-2"
-              >
-                {envolvimentoOptions.map((opt) => (
-                  <div key={opt.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={opt.value} id={`env-${opt.value}`} />
-                    <label htmlFor={`env-${opt.value}`} className="text-sm cursor-pointer">
-                      {opt.label}
-                    </label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="outros_decisores"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Quem mais precisa estar envolvido nas decisões?</FormLabel>
-            <FormControl>
-              <Input 
-                placeholder="Ex: Meu sócio, diretor de TI, ninguém mais..." 
-                {...field} 
+              <Textarea
+                placeholder="Ex: CEO João Silva, Diretora de TI Maria Santos..."
+                className="min-h-[60px]"
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -119,20 +96,47 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
 
       <FormField
         control={form.control}
-        name="preferencia_comunicacao"
+        name="motivo_escolha_iaplicada"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Preferência de comunicação *</FormLabel>
+            <FormLabel>Por que você escolheu a IAplicada?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
                 value={field.value}
-                className="grid grid-cols-2 md:grid-cols-4 gap-2"
+                className="space-y-2"
               >
-                {comunicacaoOptions.map((opt) => (
+                {motivoEscolhaOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={opt.value} id={`com-${opt.value}`} />
-                    <label htmlFor={`com-${opt.value}`} className="text-sm cursor-pointer">
+                    <RadioGroupItem value={opt.value} id={`motivo-${opt.value}`} />
+                    <label htmlFor={`motivo-${opt.value}`} className="text-sm cursor-pointer">
+                      {opt.label}
+                    </label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="experiencia_consultorias"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Qual sua experiência com consultorias/agências de tecnologia?</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                value={field.value}
+                className="space-y-2"
+              >
+                {experienciaConsultoriasOptions.map((opt) => (
+                  <div key={opt.value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={opt.value} id={`exp-${opt.value}`} />
+                    <label htmlFor={`exp-${opt.value}`} className="text-sm cursor-pointer">
                       {opt.label}
                     </label>
                   </div>
