@@ -1,14 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Eye, BarChart3, FileText, GraduationCap, Briefcase, Users, Crown, ClipboardList, Loader2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { DiagnosticoPreviewModal } from "./DiagnosticoPreviewModal";
 import { DiagnosticoEstatisticasDrawer } from "./DiagnosticoEstatisticasDrawer";
 import { RespostasDiagnosticoDrawer } from "./RespostasDiagnosticoDrawer";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 type DiagnosticoTipo = 'academy' | 'business' | 'legacy';
 
@@ -38,24 +41,43 @@ interface FormularioSistema {
 
 export function FormulariosDoSistema() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [estatisticasOpen, setEstatisticasOpen] = useState(false);
   const [respostasOpen, setRespostasOpen] = useState(false);
   const [selectedDiagnostico, setSelectedDiagnostico] = useState<DiagnosticoTipo | null>(null);
 
-  // Buscar formulários do sistema
+  // Buscar formulários do sistema (todos, incluindo inativos)
   const { data: formularios, isLoading } = useQuery({
     queryKey: ['formularios-sistema'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('formularios_sistema')
         .select('*')
-        .eq('ativo', true)
         .order('categoria', { ascending: true });
       
       if (error) throw error;
       return data as FormularioSistema[];
     }
+  });
+
+  // Mutation para toggle ativo/inativo
+  const toggleAtivo = useMutation({
+    mutationFn: async ({ id, ativo }: { id: string; ativo: boolean }) => {
+      const { error } = await supabase
+        .from('formularios_sistema')
+        .update({ ativo })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['formularios-sistema'] });
+      toast.success("Status atualizado!");
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar status");
+    },
   });
 
   // Buscar estatísticas de cada tipo
@@ -104,9 +126,9 @@ export function FormulariosDoSistema() {
   }, {} as Record<string, FormularioSistema[]>) || {};
 
   const categoriaLabels: Record<string, string> = {
-    'diagnostico': '📊 Diagnósticos',
-    'pesquisa': '📝 Pesquisas',
-    'candidatura': '👑 Candidaturas',
+    'diagnostico': 'Diagnósticos',
+    'pesquisa': 'Pesquisas',
+    'candidatura': 'Candidaturas',
   };
 
   const handleVerRespostas = (tipo: DiagnosticoTipo) => {
@@ -161,15 +183,32 @@ export function FormulariosDoSistema() {
               const isDiagnostico = form.categoria === 'diagnostico';
 
               return (
-                <Card key={form.id} className="border border-primary/20 hover:border-primary/40 transition-colors">
+                <Card 
+                  key={form.id} 
+                  className={cn(
+                    "border border-primary/20 hover:border-primary/40 transition-colors",
+                    !form.ativo && "opacity-60"
+                  )}
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="p-2 rounded-lg bg-primary/10">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {form.etapas} etapas
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {!form.ativo && (
+                          <Badge variant="secondary" className="text-xs">
+                            Inativo
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs">
+                          {form.etapas} etapas
+                        </Badge>
+                        <Switch
+                          checked={form.ativo}
+                          onCheckedChange={(ativo) => toggleAtivo.mutate({ id: form.id, ativo })}
+                        />
+                      </div>
                     </div>
                     <CardTitle className="text-base mt-3">{form.titulo}</CardTitle>
                   </CardHeader>
