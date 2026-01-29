@@ -35,45 +35,70 @@ export function DiagnosticoEstatisticasDrawer({
   const { data: estatisticas, isLoading } = useQuery({
     queryKey: ['diagnostico-estatisticas-detalhadas', tipo],
     queryFn: async () => {
-      // Buscar todos os formulários
+      // Buscar formulários com user_id para filtrar por plano
       const { data: formularios, error } = await supabase
         .from('formulario_diagnostico')
-        .select('id, completado, created_at, updated_at, insight_gerado_em, nivel_comprometimento, nivel_ia, area_atuacao, ferramentas_ia');
+        .select('id, completado, created_at, updated_at, insight_gerado_em, nivel_comprometimento, nivel_ia, area_atuacao, ferramentas_ia, user_id');
       
       if (error) throw error;
 
-      const total = formularios?.length || 0;
-      const completados = formularios?.filter(f => f.completado).length || 0;
-      const comInsight = formularios?.filter(f => f.insight_gerado_em).length || 0;
+      // Buscar planos dos usuários
+      const userIds = formularios?.map(f => f.user_id).filter(Boolean) || [];
+      let profiles: { id: string; plano_mentoria: string | null }[] = [];
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, plano_mentoria')
+          .in('id', userIds);
+        profiles = profilesData || [];
+      }
+
+      // Filtrar por tipo do plano
+      const formsFiltrados = formularios?.filter(f => {
+        const plano = profiles.find(p => p.id === f.user_id)?.plano_mentoria;
+        
+        if (tipo === 'business') {
+          return plano === 'business';
+        } else if (tipo === 'academy') {
+          return plano === 'academy' || plano === 'skills';
+        } else {
+          // legacy - usuários sem plano ou planos antigos
+          return !plano || !['academy', 'business', 'skills'].includes(plano);
+        }
+      }) || [];
+
+      const total = formsFiltrados.length;
+      const completados = formsFiltrados.filter(f => f.completado).length;
+      const comInsight = formsFiltrados.filter(f => f.insight_gerado_em).length;
       
       // Taxa de conclusão
       const taxaConclusao = total > 0 ? Math.round((completados / total) * 100) : 0;
       
-      // Média de comprometimento
-      const comprometimentos = formularios?.filter(f => f.nivel_comprometimento).map(f => f.nivel_comprometimento) || [];
+      // Média de comprometimento (usando formsFiltrados)
+      const comprometimentos = formsFiltrados.filter(f => f.nivel_comprometimento).map(f => f.nivel_comprometimento);
       const mediaComprometimento = comprometimentos.length > 0 
         ? (comprometimentos.reduce((a, b) => a + (b || 0), 0) / comprometimentos.length).toFixed(1)
         : 0;
 
-      // Distribuição por nível de IA
+      // Distribuição por nível de IA (usando formsFiltrados)
       const niveisIA: Record<string, number> = {};
-      formularios?.forEach(f => {
+      formsFiltrados.forEach(f => {
         if (f.nivel_ia) {
           niveisIA[f.nivel_ia] = (niveisIA[f.nivel_ia] || 0) + 1;
         }
       });
 
-      // Distribuição por área de atuação
+      // Distribuição por área de atuação (usando formsFiltrados)
       const areasAtuacao: Record<string, number> = {};
-      formularios?.forEach(f => {
+      formsFiltrados.forEach(f => {
         if (f.area_atuacao) {
           areasAtuacao[f.area_atuacao] = (areasAtuacao[f.area_atuacao] || 0) + 1;
         }
       });
 
-      // Ferramentas mais usadas
+      // Ferramentas mais usadas (usando formsFiltrados)
       const ferramentasCount: Record<string, number> = {};
-      formularios?.forEach(f => {
+      formsFiltrados.forEach(f => {
         const ferramentas = f.ferramentas_ia as string[] | null;
         if (ferramentas && Array.isArray(ferramentas)) {
           ferramentas.forEach(ferramenta => {
@@ -87,15 +112,15 @@ export function DiagnosticoEstatisticasDrawer({
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5);
 
-      // Respostas nos últimos 7 dias
+      // Respostas nos últimos 7 dias (usando formsFiltrados)
       const hoje = new Date();
       const respostasPorDia: { dia: string; count: number }[] = [];
       for (let i = 6; i >= 0; i--) {
         const dia = subDays(hoje, i);
-        const count = formularios?.filter(f => {
+        const count = formsFiltrados.filter(f => {
           const created = new Date(f.created_at);
           return created >= startOfDay(dia) && created <= endOfDay(dia);
-        }).length || 0;
+        }).length;
         respostasPorDia.push({
           dia: format(dia, 'dd/MM', { locale: ptBR }),
           count
