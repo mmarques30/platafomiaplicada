@@ -11,7 +11,7 @@ import { Users, CheckCircle2, Clock, TrendingUp, BarChart3 } from "lucide-react"
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-type DiagnosticoTipo = 'academy' | 'business' | 'legacy';
+type DiagnosticoTipo = 'academy' | 'business';
 
 interface DiagnosticoEstatisticasDrawerProps {
   open: boolean;
@@ -22,7 +22,6 @@ interface DiagnosticoEstatisticasDrawerProps {
 const TITULOS = {
   academy: "Diagnóstico Academy",
   business: "Diagnóstico Business",
-  legacy: "Diagnóstico Mentoria",
 };
 
 export function DiagnosticoEstatisticasDrawer({ 
@@ -59,11 +58,9 @@ export function DiagnosticoEstatisticasDrawer({
         
         if (tipo === 'business') {
           return plano === 'business';
-        } else if (tipo === 'academy') {
-          return plano === 'academy' || plano === 'skills';
         } else {
-          // legacy - usuários sem plano ou planos antigos
-          return !plano || !['academy', 'business', 'skills'].includes(plano);
+          // academy - inclui academy e skills
+          return plano === 'academy' || plano === 'skills';
         }
       }) || [];
 

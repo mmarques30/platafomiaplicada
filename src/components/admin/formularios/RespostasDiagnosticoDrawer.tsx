@@ -21,7 +21,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-type DiagnosticoTipo = 'academy' | 'business' | 'legacy';
+type DiagnosticoTipo = 'academy' | 'business';
 
 interface RespostasDiagnosticoDrawerProps {
   open: boolean;
@@ -32,7 +32,6 @@ interface RespostasDiagnosticoDrawerProps {
 const TITULOS = {
   academy: "Diagnóstico Academy",
   business: "Diagnóstico Business",
-  legacy: "Diagnóstico Mentoria",
 };
 
 export function RespostasDiagnosticoDrawer({ 
@@ -51,11 +50,9 @@ export function RespostasDiagnosticoDrawer({
     
     if (tipo === 'business') {
       return plano === 'business';
-    } else if (tipo === 'academy') {
-      return plano === 'academy' || plano === 'skills';
     } else {
-      // legacy - usuários sem plano específico ou planos antigos
-      return !plano || !['academy', 'business', 'skills'].includes(plano);
+      // academy - inclui academy e skills
+      return plano === 'academy' || plano === 'skills';
     }
   }) || [];
 

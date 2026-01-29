@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-type DiagnosticoTipo = 'academy' | 'business' | 'legacy';
+type DiagnosticoTipo = 'academy' | 'business';
 
 // Mapeamento de ícones por nome
 const iconMap: Record<string, React.ElementType> = {
@@ -111,10 +111,6 @@ export function FormulariosDoSistema() {
         return plano === 'business';
       }) || [];
 
-      const diagnosticosLegacy = diagnosticos?.filter(d => {
-        const plano = profiles.find(p => p.id === d.user_id)?.plano_mentoria;
-        return !plano || !['academy', 'business', 'skills'].includes(plano);
-      }) || [];
       
       // Candidaturas
       const { data: candidaturas } = await supabase
@@ -140,10 +136,6 @@ export function FormulariosDoSistema() {
         'diagnostico-business': { 
           total: diagnosticosBusiness.length, 
           completados: diagnosticosBusiness.filter(d => d.completado).length 
-        },
-        'diagnostico-legacy': { 
-          total: diagnosticosLegacy.length, 
-          completados: diagnosticosLegacy.filter(d => d.completado).length 
         },
         'candidatura': { total: totalCandidaturas, completados: completadasCandidaturas },
         'pesquisa': { total: totalPesquisas, completados: completadasPesquisas },
