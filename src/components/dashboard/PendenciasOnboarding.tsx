@@ -6,6 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePendenciasAtivas, PendenciaDashboard } from "@/hooks/admin/usePendenciasDashboard";
+import { useUserPlan } from "@/hooks/useUserPlan";
 
 const PESQUISA_APLICA_ID = "9a357821-4e62-4176-9f6c-46b0668cb450";
 
@@ -14,66 +16,87 @@ interface PendenciaItem {
   label: string;
   completed: boolean;
   link: string;
+  tipo: string;
 }
 
 export function PendenciasOnboarding() {
   const { user } = useAuth();
+  const { plan } = useUserPlan();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Verificar se diagnóstico está completo
-  const { data: diagnostico, isLoading: loadingDiagnostico } = useQuery({
-    queryKey: ["pendencia-diagnostico", user?.id],
+  // Buscar pendências ativas do banco
+  const { data: pendenciasConfig, isLoading: loadingConfig } = usePendenciasAtivas(plan);
+
+  // Verificar status de cada pendência
+  const { data: statusMap, isLoading: loadingStatus } = useQuery({
+    queryKey: ["pendencias-status", user?.id, pendenciasConfig?.map(p => p.id)],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("formulario_diagnostico")
-        .select("completado")
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      return data;
+      if (!pendenciasConfig || pendenciasConfig.length === 0) return {};
+
+      const statusResults: Record<string, boolean> = {};
+
+      for (const pendencia of pendenciasConfig) {
+        if (pendencia.tipo === "diagnostico") {
+          const { data } = await supabase
+            .from("formulario_diagnostico")
+            .select("completado")
+            .eq("user_id", user!.id)
+            .maybeSingle();
+          statusResults[pendencia.id] = data?.completado === true;
+        } else if (pendencia.tipo === "pesquisa") {
+          // Para pesquisas, verifica se existe resposta completada
+          // Se tiver referencia_id, usa esse ID, senão usa o ID padrão
+          const pesquisaId = pendencia.referencia_id || PESQUISA_APLICA_ID;
+          const { data } = await supabase
+            .from("respostas_pesquisas")
+            .select("completado")
+            .eq("pesquisa_id", pesquisaId)
+            .eq("user_id", user!.id)
+            .eq("completado", true)
+            .maybeSingle();
+          statusResults[pendencia.id] = !!data;
+        } else if (pendencia.tipo === "formulario") {
+          // Para formulários customizados com referencia_id
+          // Verificamos na tabela respostas_pesquisas já que não existe respostas_formularios
+          if (pendencia.referencia_id) {
+            const { data } = await supabase
+              .from("respostas_pesquisas")
+              .select("completado")
+              .eq("pesquisa_id", pendencia.referencia_id)
+              .eq("user_id", user!.id)
+              .eq("completado", true)
+              .maybeSingle();
+            statusResults[pendencia.id] = !!data;
+          } else {
+            statusResults[pendencia.id] = false;
+          }
+        } else {
+          statusResults[pendencia.id] = false;
+        }
+      }
+
+      return statusResults;
     },
-    enabled: !!user,
+    enabled: !!user && !!pendenciasConfig && pendenciasConfig.length > 0,
   });
 
-  // Verificar se pesquisa está completa
-  const { data: pesquisa, isLoading: loadingPesquisa } = useQuery({
-    queryKey: ["pendencia-pesquisa", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("respostas_pesquisas")
-        .select("completado")
-        .eq("pesquisa_id", PESQUISA_APLICA_ID)
-        .eq("user_id", user!.id)
-        .eq("completado", true)
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!user,
-  });
+  const isLoading = loadingConfig || loadingStatus;
 
-  const isLoading = loadingDiagnostico || loadingPesquisa;
-
-  // Montar lista de pendências
-  const pendencias: PendenciaItem[] = [
-    {
-      key: "diagnostico",
-      label: "Diagnóstico Estratégico",
-      completed: diagnostico?.completado === true,
-      link: "/meu-diagnostico",
-    },
-    {
-      key: "pesquisa",
-      label: "Pesquisa de Perfil",
-      completed: !!pesquisa,
-      link: "/formulario-aplica",
-    },
-  ];
+  // Montar lista de pendências com status
+  const pendencias: PendenciaItem[] = (pendenciasConfig || []).map(p => ({
+    key: p.id,
+    label: p.titulo,
+    completed: statusMap?.[p.id] ?? false,
+    link: p.link,
+    tipo: p.tipo,
+  }));
 
   const completedCount = pendencias.filter((p) => p.completed).length;
   const totalCount = pendencias.length;
   const allCompleted = completedCount === totalCount;
 
-  // Não mostrar se carregando ou se tudo completo
-  if (isLoading || allCompleted) {
+  // Não mostrar se carregando, se tudo completo, ou se não há pendências
+  if (isLoading || allCompleted || totalCount === 0) {
     return null;
   }
 
