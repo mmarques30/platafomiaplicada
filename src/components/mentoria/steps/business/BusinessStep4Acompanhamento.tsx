@@ -44,8 +44,8 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
           <Users className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Tomada de Decisão</h3>
-          <p className="text-sm text-muted-foreground">Quem decide e por que escolheu a IAplicada</p>
+          <h3 className="text-lg font-semibold text-white">Tomada de Decisão</h3>
+          <p className="text-sm text-zinc-400">Quem decide e por que escolheu a IAplicada</p>
         </div>
       </div>
 
@@ -54,7 +54,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         name="decisores_tecnologia"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Quem são os decisores para projetos de tecnologia na empresa?</FormLabel>
+            <FormLabel className="text-white">Quem são os decisores para projetos de tecnologia na empresa?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -64,7 +64,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 {decisoresOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`dec-${opt.value}`} />
-                    <label htmlFor={`dec-${opt.value}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`dec-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
                       {opt.label}
                     </label>
                   </div>
@@ -81,11 +81,11 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         name="decisor_especifico"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Quem especificamente precisa aprovar esse projeto?</FormLabel>
+            <FormLabel className="text-white">Quem especificamente precisa aprovar esse projeto?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: CEO João Silva, Diretora de TI Maria Santos..."
-                className="min-h-[60px]"
+                className="min-h-[60px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
@@ -99,7 +99,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         name="motivo_escolha_iaplicada"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Por que você escolheu a IAplicada?</FormLabel>
+            <FormLabel className="text-white">Por que você escolheu a IAplicada?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -109,7 +109,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 {motivoEscolhaOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`motivo-${opt.value}`} />
-                    <label htmlFor={`motivo-${opt.value}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`motivo-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
                       {opt.label}
                     </label>
                   </div>
@@ -126,7 +126,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         name="experiencia_consultorias"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual sua experiência com consultorias/agências de tecnologia?</FormLabel>
+            <FormLabel className="text-white">Qual sua experiência com consultorias/agências de tecnologia?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -136,7 +136,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 {experienciaConsultoriasOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`exp-${opt.value}`} />
-                    <label htmlFor={`exp-${opt.value}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`exp-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
                       {opt.label}
                     </label>
                   </div>

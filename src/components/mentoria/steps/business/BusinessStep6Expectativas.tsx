@@ -40,8 +40,8 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
           <Trophy className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Sucesso e Parceria</h3>
-          <p className="text-sm text-muted-foreground">O que define sucesso para você</p>
+          <h3 className="text-lg font-semibold text-white">Sucesso e Parceria</h3>
+          <p className="text-sm text-zinc-400">O que define sucesso para você</p>
         </div>
       </div>
 
@@ -50,11 +50,11 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="definicao_sucesso"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Como você define sucesso para esse projeto?</FormLabel>
+            <FormLabel className="text-white">Como você define sucesso para esse projeto?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: Reduzir tempo de atendimento em 50%, economizar R$ 20.000/mês, liberar 10h semanais da equipe..."
-                className="min-h-[100px]"
+                className="min-h-[100px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
@@ -68,7 +68,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="importancia_projeto"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>De 1 a 10, qual a importância desse projeto para a empresa?</FormLabel>
+            <FormLabel className="text-white">De 1 a 10, qual a importância desse projeto para a empresa?</FormLabel>
             <div className="pt-4 pb-2">
               <FormControl>
                 <Slider
@@ -80,7 +80,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
                   className="w-full"
                 />
               </FormControl>
-              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+              <div className="flex justify-between text-xs text-zinc-400 mt-2">
                 <span>1 - Pouco importante</span>
                 <span className="font-bold text-primary text-lg">{importancia}</span>
                 <span>10 - Crítico</span>
@@ -96,7 +96,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="gatilho_renovacao"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>O que faria você renovar/expandir a parceria conosco?</FormLabel>
+            <FormLabel className="text-white">O que faria você renovar/expandir a parceria conosco?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -106,7 +106,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
                 {gatilhoRenovacaoOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`gatilho-${opt.value}`} />
-                    <label htmlFor={`gatilho-${opt.value}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`gatilho-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
                       {opt.label}
                     </label>
                   </div>
@@ -123,11 +123,11 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="maior_preocupacao"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual seu maior medo ou preocupação com esse projeto?</FormLabel>
+            <FormLabel className="text-white">Qual seu maior medo ou preocupação com esse projeto?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Conte suas preocupações para que possamos endereçá-las..."
-                className="min-h-[80px]"
+                className="min-h-[80px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
@@ -141,7 +141,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="agendar_call_alinhamento"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Gostaria de agendar uma call de alinhamento?</FormLabel>
+            <FormLabel className="text-white">Gostaria de agendar uma call de alinhamento?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -151,7 +151,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
                 {agendarCallOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`call-${opt.value}`} />
-                    <label htmlFor={`call-${opt.value}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`call-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
                       {opt.label}
                     </label>
                   </div>
@@ -163,8 +163,8 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         )}
       />
 
-      <div className="p-4 rounded-lg bg-muted/50 border border-border">
-        <p className="text-sm text-foreground/80">
+      <div className="p-4 rounded-lg bg-zinc-800 border border-zinc-700">
+        <p className="text-sm text-zinc-300">
           <strong className="text-primary">Próximos passos:</strong> Após enviar este formulário, 
           nossa equipe vai analisar suas informações e entrar em contato para alinhar os detalhes do projeto.
         </p>

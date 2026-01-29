@@ -37,13 +37,13 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
           <TrendingUp className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Visão de Impacto</h3>
-          <p className="text-sm text-muted-foreground">Quanto essa solução pode gerar de valor</p>
+          <h3 className="text-lg font-semibold text-white">Visão de Impacto</h3>
+          <p className="text-sm text-zinc-400">Quanto essa solução pode gerar de valor</p>
         </div>
       </div>
 
-      <div className="p-4 rounded-lg bg-muted/50 border border-border mb-6">
-        <p className="text-sm text-foreground/80">
+      <div className="p-4 rounded-lg bg-zinc-800 border border-zinc-700 mb-6">
+        <p className="text-sm text-zinc-300">
           <strong className="text-primary">Por que perguntamos?</strong> Essas informações nos ajudam 
           a priorizar as entregas que geram mais impacto para você.
         </p>
@@ -54,8 +54,8 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         name="impacto_financeiro_estimado"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual o impacto financeiro estimado dessa solução?</FormLabel>
-            <p className="text-xs text-muted-foreground mb-2">
+            <FormLabel className="text-white">Qual o impacto financeiro estimado dessa solução?</FormLabel>
+            <p className="text-xs text-zinc-400 mb-2">
               Quanto você estima economizar ou gerar com essa automação por mês?
             </p>
             <FormControl>
@@ -67,7 +67,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
                 {impactoFinanceiroOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`impacto-${opt.value}`} />
-                    <label htmlFor={`impacto-${opt.value}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`impacto-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
                       {opt.label}
                     </label>
                   </div>
@@ -84,11 +84,11 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         name="kpi_principal"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual é o principal indicador (KPI) que você quer melhorar?</FormLabel>
+            <FormLabel className="text-white">Qual é o principal indicador (KPI) que você quer melhorar?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: Tempo de resposta ao cliente, taxa de conversão, custo por lead, NPS..."
-                className="min-h-[80px]"
+                className="min-h-[80px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
@@ -102,11 +102,11 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         name="outras_areas_potencial"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Além dessa solução, quais outras áreas da empresa poderiam usar IA?</FormLabel>
+            <FormLabel className="text-white">Além dessa solução, quais outras áreas da empresa poderiam usar IA?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: RH, Financeiro, Marketing, Vendas, Operações..."
-                className="min-h-[80px]"
+                className="min-h-[80px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
@@ -120,7 +120,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         name="orcamento_expansao"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual orçamento você tem em mente para expandir o uso de IA?</FormLabel>
+            <FormLabel className="text-white">Qual orçamento você tem em mente para expandir o uso de IA?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -130,7 +130,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
                 {orcamentoExpansaoOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`orc-${opt.value}`} />
-                    <label htmlFor={`orc-${opt.value}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`orc-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
                       {opt.label}
                     </label>
                   </div>
