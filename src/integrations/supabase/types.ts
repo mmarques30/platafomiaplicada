@@ -128,6 +128,44 @@ export type Database = {
         }
         Relationships: []
       }
+      avaliacoes_ferramentas_ia: {
+        Row: {
+          comentario: string | null
+          created_at: string | null
+          ferramenta_id: string
+          id: string
+          nota: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          comentario?: string | null
+          created_at?: string | null
+          ferramenta_id: string
+          id?: string
+          nota: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          comentario?: string | null
+          created_at?: string | null
+          ferramenta_id?: string
+          id?: string
+          nota?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_ferramentas_ia_ferramenta_id_fkey"
+            columns: ["ferramenta_id"]
+            isOneToOne: false
+            referencedRelation: "ferramentas_ia"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       avaliacoes_materiais_comunidade: {
         Row: {
           comentario: string | null

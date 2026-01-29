@@ -3,7 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { ToolLogo } from "@/components/shared/ToolLogo";
-import { ExternalLink, CheckCircle, AlertCircle } from "lucide-react";
+import { ExternalLink, CheckCircle, AlertCircle, Star, Users } from "lucide-react";
+import { useFerramentaRating } from "@/hooks/useFerramentaRating";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/hooks/useAuth";
 
 interface FerramentaDetalhesModalProps {
   ferramenta: any;
@@ -11,6 +14,10 @@ interface FerramentaDetalhesModalProps {
 }
 
 export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetalhesModalProps) {
+  const { user } = useAuth();
+  const { isVisitante, isMentorado, isAdmin } = useUserRole();
+  const { userRating, stats, rate, isRating } = useFerramentaRating(ferramenta?.id);
+
   if (!ferramenta) return null;
 
   const {
@@ -25,6 +32,14 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
     link_ferramenta,
     gratuito,
   } = ferramenta;
+
+  // Verificar se usuário pode avaliar (mentorado ou admin, não visitante)
+  const canRate = user && !isVisitante && (isMentorado || isAdmin);
+
+  const handleRate = (nota: number) => {
+    if (!canRate || isRating) return;
+    rate(nota);
+  };
 
   return (
     <Dialog open={!!ferramenta} onOpenChange={onClose}>
@@ -47,9 +62,80 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
           </div>
         </DialogHeader>
 
-        {/* Avaliação */}
-        <div className="flex items-center gap-3 mb-6">
+        {/* Avaliação do Mentor */}
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-sm text-muted-foreground">Avaliação do Mentor:</span>
           <RatingStars rating={avaliacao || 0} size="lg" />
+        </div>
+
+        {/* Avaliação da Comunidade */}
+        <div className="p-4 rounded-lg border bg-muted/30 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium">Avaliação da Comunidade</span>
+            </div>
+            {stats && stats.total_avaliacoes_comunidade > 0 && (
+              <span className="text-sm text-muted-foreground">
+                {stats.total_avaliacoes_comunidade} {stats.total_avaliacoes_comunidade === 1 ? 'avaliação' : 'avaliações'}
+              </span>
+            )}
+          </div>
+
+          {stats && stats.total_avaliacoes_comunidade > 0 ? (
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-5 h-5 ${
+                      star <= Math.round(stats.avaliacao_comunidade || 0)
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-muted"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-lg font-semibold">
+                {(stats.avaliacao_comunidade || 0).toFixed(1)}
+              </span>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground mb-4">Nenhuma avaliação ainda</p>
+          )}
+
+          {/* Seção para avaliar */}
+          {canRate ? (
+            <div className="pt-3 border-t">
+              <p className="text-sm text-muted-foreground mb-2">
+                {userRating ? "Sua avaliação:" : "Avalie esta ferramenta:"}
+              </p>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => handleRate(star)}
+                    disabled={isRating}
+                    className="p-1 hover:scale-110 transition-transform disabled:opacity-50"
+                  >
+                    <Star
+                      className={`w-6 h-6 cursor-pointer ${
+                        star <= (userRating?.nota || 0)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-muted hover:text-yellow-400"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : isVisitante ? (
+            <div className="pt-3 border-t">
+              <p className="text-sm text-muted-foreground">
+                💡 Adquira um plano para avaliar ferramentas
+              </p>
+            </div>
+          ) : null}
         </div>
 
         {/* Seção: Objetivo */}
