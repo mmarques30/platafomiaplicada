@@ -1,162 +1,202 @@
 
-# Plano: Ranking Dinâmico de Ferramentas Baseado em Avaliações
 
-## Situação Atual
+# Plano: Permitir Mentorados Adicionar Ferramentas na Aba "Criadores"
 
-O sistema de avaliações já está funcionando:
-- Tabela `avaliacoes_ferramentas_ia` criada
-- Trigger `update_ferramenta_rating_stats()` atualiza automaticamente `avaliacao_comunidade` e `total_avaliacoes_comunidade` na tabela `ferramentas_ia`
-- Modal de detalhes permite avaliar ferramentas
+## Contexto
 
-**Problema:** O componente `FerramentasRanking.tsx` usa uma lista **hardcoded** de ferramentas:
-```typescript
-const ranking = ['claude', 'manus', 'gamma', 'chatgpt', 'perplexity'];
-```
+Atualmente, a aba **Criadores** em `/videos-bonus?tab=criadores` exibe materiais da tabela `materiais_comunidade`, mas as políticas RLS permitem INSERT apenas para admins. Mentorados (Academy/Business) precisam poder compartilhar suas próprias ferramentas com a comunidade.
 
-Isso ignora completamente as avaliações da comunidade e do mentor.
+## Problemas Identificados
+
+1. **Política RLS bloqueando mentorados**: A tabela `materiais_comunidade` tem RLS que só permite INSERT para admins
+2. **Sem botão "Adicionar"**: O componente `CriadoresComunidadeTab.tsx` não tem opção para mentorados adicionarem materiais
+3. **Modal existe apenas no admin**: O modal de criação `MaterialCriadoresModal.tsx` está em `/admin/comunidade` e é muito complexo
 
 ---
 
 ## Solução
 
-Criar um ranking dinâmico que ordena ferramentas por uma **pontuação combinada**:
+### 1. Atualizar Políticas RLS da Tabela `materiais_comunidade`
 
-**Fórmula do Score:**
+Permitir que mentorados possam inserir materiais onde eles são o criador:
+
+```sql
+-- Remover política antiga de INSERT
+DROP POLICY IF EXISTS "materiais_comunidade_insert_policy" ON materiais_comunidade;
+
+-- Nova política: Admin pode inserir qualquer coisa, mentorados podem inserir como criador
+CREATE POLICY "materiais_comunidade_insert_policy"
+ON materiais_comunidade FOR INSERT TO authenticated
+WITH CHECK (
+  -- Admin pode inserir qualquer registro
+  (EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')) 
+  OR 
+  -- Mentorados podem inserir apenas onde são o criador
+  (criador_id = auth.uid() AND has_role(auth.uid(), 'mentorado'))
+);
+
+-- Mentorados podem atualizar seus próprios materiais
+DROP POLICY IF EXISTS "materiais_comunidade_update_policy" ON materiais_comunidade;
+
+CREATE POLICY "materiais_comunidade_update_policy"
+ON materiais_comunidade FOR UPDATE TO authenticated
+USING (
+  (EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin'))
+  OR
+  (criador_id = auth.uid())
+)
+WITH CHECK (
+  (EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin'))
+  OR
+  (criador_id = auth.uid())
+);
 ```
-score = (avaliacao_mentor * peso_mentor) + (avaliacao_comunidade * peso_comunidade * fator_relevancia)
-```
-
-Onde:
-- `peso_mentor` = 0.6 (60%)
-- `peso_comunidade` = 0.4 (40%)
-- `fator_relevancia` = min(1, total_avaliacoes / 10) - quanto mais avaliações, mais peso
-
-Isso garante que ferramentas com poucas avaliações não dominem o ranking imediatamente.
 
 ---
 
-## Mudanças Necessárias
+### 2. Criar Hook para Mentorados Adicionarem Materiais
 
-### 1. Hook `useFerramentas.tsx`
+**Arquivo:** `src/hooks/useMaterialComunidadeSubmit.tsx`
 
-Atualizar a query para ordenar por score combinado:
+Hook simplificado para mentorados enviarem materiais:
+- Buscar materiais do próprio usuário
+- Mutation para criar material
+- Upload de arquivos para storage
 
 ```typescript
-export function useFerramentasIA() {
-  return useQuery({
-    queryKey: ["ferramentas-ia"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("ferramentas_ia")
-        .select("*")
-        .eq("ativo", true)
-        .order("avaliacao", { ascending: false }); // mantém ordem base
-
-      if (error) throw error;
-      
-      // Calcular score combinado para ranking
-      return data?.map(f => ({
-        ...f,
-        score_ranking: calcularScoreRanking(f)
-      })).sort((a, b) => b.score_ranking - a.score_ranking);
+export function useMaterialComunidadeSubmit() {
+  const { user } = useAuth();
+  
+  // Meus materiais
+  const { data: meusMateriais } = useQuery({...});
+  
+  // Criar material
+  const createMaterial = useMutation({
+    mutationFn: async (material) => {
+      await supabase.from("materiais_comunidade").insert({
+        ...material,
+        criador_id: user.id,
+        adicionado_por: user.id,
+        ativo: false, // Pendente de aprovação
+      });
     },
   });
+  
+  return { meusMateriais, createMaterial };
 }
-
-function calcularScoreRanking(ferramenta: any): number {
-  const avaliacaoMentor = ferramenta.avaliacao || 0;
-  const avaliacaoComunidade = ferramenta.avaliacao_comunidade || 0;
-  const totalAvaliacoes = ferramenta.total_avaliacoes_comunidade || 0;
-  
-  // Peso base: mentor 60%, comunidade 40%
-  const pesoMentor = 0.6;
-  const pesoComunidade = 0.4;
-  
-  // Fator de relevância: mais avaliações = mais confiável
-  const fatorRelevancia = Math.min(1, totalAvaliacoes / 10);
-  
-  // Se não tem avaliações da comunidade, usa só do mentor
-  if (totalAvaliacoes === 0) {
-    return avaliacaoMentor;
-  }
-  
-  return (avaliacaoMentor * pesoMentor) + 
-         (avaliacaoComunidade * pesoComunidade * fatorRelevancia);
-}
-```
-
-### 2. Componente `FerramentasRanking.tsx`
-
-Remover a lista hardcoded e usar ordenação dinâmica:
-
-```typescript
-// ANTES (hardcoded):
-const top5 = useMemo(() => {
-  const ranking = ['claude', 'manus', 'gamma', 'chatgpt', 'perplexity'];
-  return ranking.map(name => ferramentas.find(f => f.nome.toLowerCase().includes(name))).filter(Boolean);
-}, [ferramentas]);
-
-// DEPOIS (dinâmico):
-const top5 = useMemo(() => {
-  // Ferramentas já vêm ordenadas por score_ranking do hook
-  // Pegar as 5 primeiras com avaliação válida
-  return ferramentas
-    .filter(f => (f.avaliacao || 0) > 0 || (f.avaliacao_comunidade || 0) > 0)
-    .slice(0, 5);
-}, [ferramentas]);
-```
-
-### 3. Exibir Score Combinado no Card
-
-Atualizar o card para mostrar a avaliação combinada:
-
-```typescript
-{/* Avaliação Combinada */}
-<div className="flex items-center gap-1.5 mt-3">
-  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-  <span className="font-semibold text-sm">
-    {ferramenta.score_ranking?.toFixed(1) || ferramenta.avaliacao_mari || 0}
-  </span>
-  <span className="text-xs text-muted-foreground">/ 5</span>
-  {ferramenta.total_avaliacoes_comunidade > 0 && (
-    <span className="text-xs text-muted-foreground ml-1">
-      ({ferramenta.total_avaliacoes_comunidade} votos)
-    </span>
-  )}
-</div>
 ```
 
 ---
 
-## Fluxo do Ranking
+### 3. Criar Modal Simplificado para Mentorados
+
+**Arquivo:** `src/components/comunidade/AdicionarMaterialModal.tsx`
+
+Modal mais simples que o do admin, com campos:
+- **Nome** (obrigatório)
+- **Categoria** (ChatGPT, Claude, Notion, Canva, etc.)
+- **Tipo** (Prompt, Documento, Template, etc.)
+- **Prompt/Orientação** (textarea para conteúdo)
+- **Upload de arquivos** (PDF, PPTX, links)
+- **Links externos** (opcional)
+
+Interface com avatar do usuário exibindo iniciais.
+
+---
+
+### 4. Atualizar `CriadoresComunidadeTab.tsx`
+
+Adicionar botão "Contribuir com a Comunidade" para mentorados (Academy/Business):
+
+```typescript
+// No header, ao lado dos filtros
+{(isAcademy || isBusiness) && !isVisitante && (
+  <Button onClick={() => setShowAddModal(true)}>
+    <Plus className="w-4 h-4 mr-2" />
+    Contribuir
+  </Button>
+)}
+
+// Modal de adição
+<AdicionarMaterialModal 
+  open={showAddModal} 
+  onOpenChange={setShowAddModal} 
+/>
+```
+
+---
+
+### 5. Fluxo de Moderação
+
+Os materiais criados por mentorados:
+1. São inseridos com `ativo = false` (pendente)
+2. Admin vê na aba "Criadores" do painel admin
+3. Admin ativa/aprova o material
+4. Material aparece para toda a comunidade
+
+---
+
+## Arquivos a Criar/Modificar
+
+| Arquivo | Ação |
+|---------|------|
+| Migration SQL | Atualizar RLS policies |
+| `src/hooks/useMaterialComunidadeSubmit.tsx` | **CRIAR** - Hook para mentorados |
+| `src/components/comunidade/AdicionarMaterialModal.tsx` | **CRIAR** - Modal simplificado |
+| `src/components/comunidade/CriadoresComunidadeTab.tsx` | **MODIFICAR** - Adicionar botão |
+
+---
+
+## Fluxo para Usuários
 
 ```text
-1. Usuário avalia ferramenta (1-5 estrelas)
-        ↓
-2. Trigger atualiza avaliacao_comunidade e total_avaliacoes na tabela
-        ↓
-3. Hook useFerramentasIA busca ferramentas e calcula score_ranking
-        ↓
-4. Componente FerramentasRanking exibe Top 5 ordenado por score
-        ↓
-5. Ranking atualiza dinamicamente conforme novas avaliações
+Mentorado (Academy/Business):
+  ├─ Acessa Comunidade > Sala de Aula > Criadores
+  ├─ Clica em "Contribuir"
+  ├─ Preenche: Nome, Categoria, Tipo, Prompt/Orientação
+  ├─ Faz upload de PDF/PPTX ou adiciona links
+  ├─ Envia → Material fica pendente de aprovação
+  └─ Avatar com iniciais do nome aparece no card após aprovação
+
+Admin:
+  ├─ Acessa Comunicações > Comunidade > Criadores
+  ├─ Vê materiais pendentes (ativo=false)
+  ├─ Ativa o material
+  └─ Material visível para toda a comunidade
+
+Visitante:
+  ├─ Acessa Sala de Aula > Criadores
+  └─ Apenas visualiza (sem botão "Contribuir")
 ```
 
 ---
 
-## Arquivos a Modificar
+## Categorias Disponíveis
 
-| Arquivo | Mudança |
-|---------|---------|
-| `src/hooks/useFerramentas.tsx` | Adicionar cálculo de `score_ranking` |
-| `src/components/bibliotecas/FerramentasRanking.tsx` | Remover lista hardcoded, usar ordenação dinâmica |
+Mantendo consistência com o sistema existente:
+- ChatGPT
+- Claude
+- Midjourney
+- Canva
+- Notion
+- Excel
+- Outro
+
+## Tipos de Material
+
+- Prompt
+- Imagem
+- Documento
+- Template
+- Outro
 
 ---
 
 ## Resultado Esperado
 
-- Ferramentas bem avaliadas pela comunidade sobem no ranking
-- Avaliação do mentor ainda tem peso significativo (60%)
-- Conforme mais pessoas avaliam, o peso da comunidade aumenta
-- Top 5 muda dinamicamente baseado nas avaliações reais
-- Cards mostram score combinado e número de votos da comunidade
+- Mentorados Academy e Business podem contribuir com ferramentas
+- Materiais ficam pendentes até aprovação do admin
+- Avatar do criador aparece com as iniciais (como já funciona)
+- Sistema de moderação evita spam/conteúdo inadequado
+- Visitantes podem visualizar mas não contribuir
+
