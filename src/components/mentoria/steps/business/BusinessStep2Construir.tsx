@@ -20,13 +20,13 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
           <Wrench className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">O Que Vamos Construir</h3>
-          <p className="text-sm text-muted-foreground">Descreva o que precisa ser feito</p>
+          <h3 className="text-lg font-semibold text-white">O Que Vamos Construir</h3>
+          <p className="text-sm text-zinc-400">Descreva o que precisa ser feito</p>
         </div>
       </div>
 
-      <div className="p-4 rounded-lg bg-muted/50 border border-border mb-6">
-        <p className="text-sm text-foreground/80">
+      <div className="p-4 rounded-lg bg-zinc-800 border border-zinc-700 mb-6">
+        <p className="text-sm text-zinc-300">
           <strong className="text-primary">Importante:</strong> Quanto mais detalhes você fornecer, 
           mais precisa será a solução que vamos construir para você.
         </p>
@@ -37,11 +37,11 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
         name="problema_principal"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual problema você quer resolver com IA? *</FormLabel>
+            <FormLabel className="text-white">Qual problema você quer resolver com IA? *</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: Gastamos muito tempo respondendo e-mails de clientes com dúvidas repetitivas..."
-                className="min-h-[100px]"
+                className="min-h-[100px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
@@ -55,11 +55,11 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
         name="processo_automatizar"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Descreva o processo/tarefa que quer automatizar *</FormLabel>
+            <FormLabel className="text-white">Descreva o processo/tarefa que quer automatizar *</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: Hoje recebemos cerca de 50 e-mails por dia. Cada um precisa ser lido, categorizado e respondido manualmente..."
-                className="min-h-[100px]"
+                className="min-h-[100px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
@@ -73,11 +73,11 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
         name="resultado_esperado"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Qual resultado você espera dessa solução? *</FormLabel>
+            <FormLabel className="text-white">Qual resultado você espera dessa solução? *</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: Quero que a IA responda automaticamente 80% dos e-mails e me notifique apenas os urgentes..."
-                className="min-h-[100px]"
+                className="min-h-[100px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
@@ -91,11 +91,11 @@ export function BusinessStep2Construir({ form, onNext, onPrev }: StepProps) {
         name="ja_tentou_antes"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Você já tentou resolver isso antes? Como?</FormLabel>
+            <FormLabel className="text-white">Você já tentou resolver isso antes? Como?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Conte se já tentou alguma solução e o que não funcionou..."
-                className="min-h-[80px]"
+                className="min-h-[80px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>

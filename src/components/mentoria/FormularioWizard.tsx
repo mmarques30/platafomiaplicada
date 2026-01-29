@@ -234,8 +234,11 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto relative overflow-hidden">
-      <CardContent className="pt-6">
+    <Card className={cn(
+      "w-full max-w-4xl mx-auto relative overflow-hidden",
+      isBusiness && "bg-zinc-900 border-zinc-700"
+    )}>
+      <CardContent className={cn("pt-6", isBusiness && "text-white")}>
         <div className="flex justify-between items-center mb-4">
           {/* Business Premium Badge */}
           {isBusiness && (

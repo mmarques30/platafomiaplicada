@@ -42,13 +42,13 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
           <Rocket className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Interesse em Expansão</h3>
-          <p className="text-sm text-muted-foreground">Além da entrega, o que mais te interessa?</p>
+          <h3 className="text-lg font-semibold text-white">Interesse em Expansão</h3>
+          <p className="text-sm text-zinc-400">Além da entrega, o que mais te interessa?</p>
         </div>
       </div>
 
-      <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 mb-6">
-        <p className="text-sm text-foreground/80">
+      <div className="p-4 rounded-lg bg-zinc-800 border border-zinc-700 mb-6">
+        <p className="text-sm text-zinc-300">
           <strong className="text-primary">Você já tem acesso à plataforma Academy!</strong> Aqui 
           queremos entender como podemos agregar ainda mais valor para você e sua empresa.
         </p>
@@ -59,8 +59,8 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
         name="interesse_alem_entrega"
         render={() => (
           <FormItem>
-            <FormLabel>Além da entrega da solução, o que mais te interessaria?</FormLabel>
-            <p className="text-xs text-muted-foreground mb-3">Selecione todas as opções que fazem sentido</p>
+            <FormLabel className="text-white">Além da entrega da solução, o que mais te interessaria?</FormLabel>
+            <p className="text-xs text-zinc-400 mb-3">Selecione todas as opções que fazem sentido</p>
             <div className="space-y-3">
               {interesseAlemEntregaOptions.map((option) => (
                 <FormField
@@ -83,7 +83,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
                             }}
                           />
                         </FormControl>
-                        <label className="text-sm cursor-pointer font-normal">
+                        <label className="text-sm cursor-pointer font-normal text-zinc-200">
                           {option.label}
                         </label>
                       </FormItem>
@@ -103,11 +103,11 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
           name="pessoas_para_capacitar_skills"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Quantas pessoas você gostaria de capacitar?</FormLabel>
+              <FormLabel className="text-white">Quantas pessoas você gostaria de capacitar?</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Ex: 5 pessoas do time de atendimento, 3 do marketing..."
-                  className="min-h-[60px]"
+                  className="min-h-[60px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                   {...field}
                 />
               </FormControl>
@@ -122,8 +122,8 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
         name="areas_futuro_ia"
         render={() => (
           <FormItem>
-            <FormLabel>Quais áreas da empresa você pretende automatizar no futuro?</FormLabel>
-            <p className="text-xs text-muted-foreground mb-3">Selecione as áreas com potencial para IA</p>
+            <FormLabel className="text-white">Quais áreas da empresa você pretende automatizar no futuro?</FormLabel>
+            <p className="text-xs text-zinc-400 mb-3">Selecione as áreas com potencial para IA</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {areasFuturoIAOptions.map((area) => (
                 <FormField
@@ -146,7 +146,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
                             }}
                           />
                         </FormControl>
-                        <label className="text-xs cursor-pointer">{area.label}</label>
+                        <label className="text-xs cursor-pointer text-zinc-200">{area.label}</label>
                       </FormItem>
                     );
                   }}
@@ -163,11 +163,11 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
         name="proximo_projeto_ia"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Se pudesse fazer mais um projeto de IA, qual seria?</FormLabel>
+            <FormLabel className="text-white">Se pudesse fazer mais um projeto de IA, qual seria?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Descreva brevemente outro processo ou área que você gostaria de automatizar..."
-                className="min-h-[80px]"
+                className="min-h-[80px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
                 {...field}
               />
             </FormControl>
