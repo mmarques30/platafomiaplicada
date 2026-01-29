@@ -19,7 +19,33 @@ export function useIACopieUse() {
   });
 }
 
-// Hook para Ferramentas de IA
+// Função para calcular score combinado de ranking
+function calcularScoreRanking(ferramenta: {
+  avaliacao?: number | null;
+  avaliacao_comunidade?: number | null;
+  total_avaliacoes_comunidade?: number | null;
+}): number {
+  const avaliacaoMentor = ferramenta.avaliacao || 0;
+  const avaliacaoComunidade = ferramenta.avaliacao_comunidade || 0;
+  const totalAvaliacoes = ferramenta.total_avaliacoes_comunidade || 0;
+  
+  // Peso base: mentor 60%, comunidade 40%
+  const pesoMentor = 0.6;
+  const pesoComunidade = 0.4;
+  
+  // Fator de relevância: mais avaliações = mais confiável (máximo em 10 avaliações)
+  const fatorRelevancia = Math.min(1, totalAvaliacoes / 10);
+  
+  // Se não tem avaliações da comunidade, usa só do mentor
+  if (totalAvaliacoes === 0) {
+    return avaliacaoMentor;
+  }
+  
+  return (avaliacaoMentor * pesoMentor) + 
+         (avaliacaoComunidade * pesoComunidade * fatorRelevancia);
+}
+
+// Hook para Ferramentas de IA com ranking dinâmico
 export function useFerramentasIA() {
   return useQuery({
     queryKey: ["ferramentas-ia"],
@@ -31,7 +57,12 @@ export function useFerramentasIA() {
         .order("avaliacao", { ascending: false });
 
       if (error) throw error;
-      return data;
+      
+      // Calcular score combinado para ranking e ordenar
+      return data?.map(f => ({
+        ...f,
+        score_ranking: calcularScoreRanking(f)
+      })).sort((a, b) => b.score_ranking - a.score_ranking) || [];
     },
   });
 }
