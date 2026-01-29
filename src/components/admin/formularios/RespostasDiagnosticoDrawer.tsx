@@ -45,8 +45,19 @@ export function RespostasDiagnosticoDrawer({
   const { data: formularios, isLoading } = useFormularios();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // Filtrar formulários (por enquanto mostra todos, pode ser refinado para filtrar por plano)
-  const respostas = formularios || [];
+  // Filtrar por plano do usuário baseado no tipo selecionado
+  const respostas = formularios?.filter(f => {
+    const plano = f.profiles?.plano_mentoria;
+    
+    if (tipo === 'business') {
+      return plano === 'business';
+    } else if (tipo === 'academy') {
+      return plano === 'academy' || plano === 'skills';
+    } else {
+      // legacy - usuários sem plano específico ou planos antigos
+      return !plano || !['academy', 'business', 'skills'].includes(plano);
+    }
+  }) || [];
 
   const handleVerDetalhes = (userId: string) => {
     // Navegar para a página de diagnóstico do usuário

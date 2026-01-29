@@ -80,14 +80,41 @@ export function FormulariosDoSistema() {
     },
   });
 
-  // Buscar estatísticas de cada tipo
+  // Buscar estatísticas de cada tipo - separado por plano para diagnósticos
   const { data: estatisticas } = useQuery({
     queryKey: ['formularios-sistema-estatisticas'],
     queryFn: async () => {
-      // Diagnósticos
+      // Diagnósticos com user_id para separar por plano
       const { data: diagnosticos } = await supabase
         .from('formulario_diagnostico')
-        .select('id, completado');
+        .select('id, completado, user_id');
+      
+      // Buscar planos dos usuários
+      const userIds = diagnosticos?.map(d => d.user_id).filter(Boolean) || [];
+      let profiles: { id: string; plano_mentoria: string | null }[] = [];
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, plano_mentoria')
+          .in('id', userIds);
+        profiles = profilesData || [];
+      }
+
+      // Separar diagnósticos por tipo de plano
+      const diagnosticosAcademy = diagnosticos?.filter(d => {
+        const plano = profiles.find(p => p.id === d.user_id)?.plano_mentoria;
+        return plano === 'academy' || plano === 'skills';
+      }) || [];
+
+      const diagnosticosBusiness = diagnosticos?.filter(d => {
+        const plano = profiles.find(p => p.id === d.user_id)?.plano_mentoria;
+        return plano === 'business';
+      }) || [];
+
+      const diagnosticosLegacy = diagnosticos?.filter(d => {
+        const plano = profiles.find(p => p.id === d.user_id)?.plano_mentoria;
+        return !plano || !['academy', 'business', 'skills'].includes(plano);
+      }) || [];
       
       // Candidaturas
       const { data: candidaturas } = await supabase
@@ -99,9 +126,6 @@ export function FormulariosDoSistema() {
         .from('respostas_pesquisas')
         .select('id, completado');
 
-      const totalDiagnosticos = diagnosticos?.length || 0;
-      const completadosDiagnosticos = diagnosticos?.filter(d => d.completado).length || 0;
-
       const totalCandidaturas = candidaturas?.length || 0;
       const completadasCandidaturas = candidaturas?.filter(c => c.status !== 'rascunho').length || 0;
 
@@ -109,7 +133,18 @@ export function FormulariosDoSistema() {
       const completadasPesquisas = pesquisasRespostas?.filter(p => p.completado).length || 0;
 
       return {
-        'diagnostico': { total: totalDiagnosticos, completados: completadosDiagnosticos },
+        'diagnostico-academy': { 
+          total: diagnosticosAcademy.length, 
+          completados: diagnosticosAcademy.filter(d => d.completado).length 
+        },
+        'diagnostico-business': { 
+          total: diagnosticosBusiness.length, 
+          completados: diagnosticosBusiness.filter(d => d.completado).length 
+        },
+        'diagnostico-legacy': { 
+          total: diagnosticosLegacy.length, 
+          completados: diagnosticosLegacy.filter(d => d.completado).length 
+        },
         'candidatura': { total: totalCandidaturas, completados: completadasCandidaturas },
         'pesquisa': { total: totalPesquisas, completados: completadasPesquisas },
       };
@@ -179,8 +214,11 @@ export function FormulariosDoSistema() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {forms.map((form) => {
               const Icon = form.icon ? iconMap[form.icon] || FileText : FileText;
-              const stats = estatisticas?.[form.categoria];
               const isDiagnostico = form.categoria === 'diagnostico';
+              // Para diagnósticos, usar tipo específico; para outros, usar categoria
+              const stats = isDiagnostico 
+                ? estatisticas?.[`diagnostico-${form.tipo}`]
+                : estatisticas?.[form.categoria];
 
               return (
                 <Card 
