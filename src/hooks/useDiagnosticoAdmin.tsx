@@ -57,8 +57,14 @@ export function useDiagnosticoAdmin(userId?: string) {
       arquivoUrl?: string;
       observacoes?: string;
     }) => {
-      const payload: any = {
-        user_id: userId,
+      // Verificar se já existe registro para preservar campos de feedback
+      const { data: existente } = await supabase
+        .from("formulario_diagnostico")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      const diagnosticoData: any = {
         preenchido_por: 'admin',
         completado: true,
         ...(dados || {}),
@@ -66,11 +72,31 @@ export function useDiagnosticoAdmin(userId?: string) {
         ...(observacoes && { observacoes_admin: observacoes }),
       };
 
-      const { data, error } = await supabase
-        .from("formulario_diagnostico")
-        .upsert(payload, { onConflict: 'user_id' })
-        .select()
-        .single();
+      let data, error;
+
+      if (existente) {
+        // UPDATE apenas os campos do diagnóstico, preservando feedback
+        const result = await supabase
+          .from("formulario_diagnostico")
+          .update(diagnosticoData)
+          .eq("user_id", userId)
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      } else {
+        // INSERT novo registro
+        const result = await supabase
+          .from("formulario_diagnostico")
+          .insert({
+            user_id: userId,
+            ...diagnosticoData,
+          })
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) throw error;
       return data;

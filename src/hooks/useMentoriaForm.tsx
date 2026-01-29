@@ -28,22 +28,48 @@ export const useMentoriaForm = () => {
     gcTime: 10 * 60 * 1000, // 10 minutos - mantém em cache
   });
 
-  // Salvar/Atualizar formulário usando upsert para evitar erro de chave duplicada
+  // Salvar/Atualizar formulário - usa UPDATE para preservar campos de feedback
   const salvarMutation = useMutation({
     mutationFn: async (dados: Partial<FormData>) => {
       if (!user) throw new Error("Usuário não autenticado");
 
-      const payload = {
-        user_id: user.id,
+      // Verificar se já existe registro para preservar campos de feedback
+      const { data: existente } = await supabase
+        .from("formulario_diagnostico")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      const formData = {
         ...dados,
         updated_at: new Date().toISOString(),
       };
 
-      const { data, error } = await supabase
-        .from("formulario_diagnostico")
-        .upsert(payload, { onConflict: 'user_id' })
-        .select()
-        .single();
+      let data, error;
+
+      if (existente) {
+        // UPDATE apenas os campos do formulário, preservando feedback da mentora
+        const result = await supabase
+          .from("formulario_diagnostico")
+          .update(formData)
+          .eq("user_id", user.id)
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      } else {
+        // INSERT novo registro
+        const result = await supabase
+          .from("formulario_diagnostico")
+          .insert({
+            user_id: user.id,
+            ...formData,
+          })
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) throw error;
       return data;
@@ -51,23 +77,49 @@ export const useMentoriaForm = () => {
     // Não invalida queries no rascunho para evitar re-render que fecha o Select
   });
 
-  // Finalizar formulário (marcar como completado) usando upsert
+  // Finalizar formulário (marcar como completado) - usa UPDATE para preservar feedback
   const finalizarMutation = useMutation({
     mutationFn: async (dados: FormData) => {
       if (!user) throw new Error("Usuário não autenticado");
 
-      const payload = {
-        user_id: user.id,
+      // Verificar se já existe registro para preservar campos de feedback
+      const { data: existente } = await supabase
+        .from("formulario_diagnostico")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      const formData = {
         ...dados,
         completado: true,
         updated_at: new Date().toISOString(),
       };
 
-      const { data, error } = await supabase
-        .from("formulario_diagnostico")
-        .upsert(payload, { onConflict: 'user_id' })
-        .select()
-        .single();
+      let data, error;
+
+      if (existente) {
+        // UPDATE apenas os campos do formulário, preservando feedback da mentora
+        const result = await supabase
+          .from("formulario_diagnostico")
+          .update(formData)
+          .eq("user_id", user.id)
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      } else {
+        // INSERT novo registro
+        const result = await supabase
+          .from("formulario_diagnostico")
+          .insert({
+            user_id: user.id,
+            ...formData,
+          })
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) throw error;
       return data;
