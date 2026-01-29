@@ -4,8 +4,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, Trophy, Star } from "lucide-react";
 
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
-import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
-import { CompartilharFerramentaModal } from "@/components/evolucao/CompartilharFerramentaModal";
 import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
 import { HeroComunidade } from "@/components/evolucao/HeroComunidade";
 import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndamentoCards";
@@ -23,7 +21,7 @@ export default function Evolucao() {
   const { isAdmin } = useUserRole();
   const { isAcademy } = useEffectivePlan(isAdmin);
   
-  const [modalFerramentaOpen, setModalFerramentaOpen] = useState(false);
+  
 
 
   return (
@@ -78,14 +76,6 @@ export default function Evolucao() {
 
               {/* Ranking Top 3 + Lista */}
               <RankingComunidade ranking={ranking as any || []} />
-
-              {/* Ferramentas Mais Compartilhadas */}
-              <FerramentasCompartilhadasList onCompartilhar={() => setModalFerramentaOpen(true)} />
-              
-              <CompartilharFerramentaModal 
-                open={modalFerramentaOpen} 
-                onOpenChange={setModalFerramentaOpen} 
-              />
             </>
           )}
         </TabsContent>
