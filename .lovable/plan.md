@@ -1,73 +1,207 @@
 
-# Plano: Remover Card de Ferramentas Compartilhadas da Visão Ranking
+# Plano: Gerenciamento de Formulários Ativos na Dashboard
 
-## Problema Identificado
+## Contexto
 
-A página de Evolução (`/evolucao`) na aba "Ranking" (comunidade) exibe dois sistemas duplicados:
+O componente `PendenciasOnboarding` exibe pendências de preenchimento no Dashboard abaixo do header de boas-vindas. Atualmente, os formulários são **hardcoded**:
 
-1. **Card "Ferramentas Compartilhadas"** (`FerramentasCompartilhadasList`) - usa tabela `ferramentas_compartilhadas`
-2. **Aba "Criadores"** em `/videos-bonus` (`AdicionarMaterialModal`) - usa tabela `materiais_comunidade`
+```typescript
+// src/components/dashboard/PendenciasOnboarding.tsx
+const PESQUISA_APLICA_ID = "9a357821-4e62-4176-9f6c-46b0668cb450";
 
-O usuário deseja que a funcionalidade de compartilhamento de ferramentas fique **apenas** na aba Criadores da Comunidade.
+const pendencias: PendenciaItem[] = [
+  { key: "diagnostico", label: "Diagnóstico Estratégico", link: "/meu-diagnostico" },
+  { key: "pesquisa", label: "Pesquisa de Perfil", link: "/formulario-aplica" },
+];
+```
+
+O admin precisa poder ativar/desativar dinamicamente quais formulários aparecem como pendências para os mentorados.
 
 ---
 
 ## Solução
 
-Remover o componente `FerramentasCompartilhadasList` e o modal `CompartilharFerramentaModal` da página Evolução.
+### 1. Criar Tabela de Configuração de Pendências
+
+Nova tabela `pendencias_dashboard` para controlar quais itens aparecem na seção de pendências:
+
+```sql
+CREATE TABLE public.pendencias_dashboard (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tipo TEXT NOT NULL CHECK (tipo IN ('diagnostico', 'pesquisa', 'formulario')),
+  referencia_id UUID, -- ID do formulário/pesquisa (opcional)
+  titulo TEXT NOT NULL,
+  descricao TEXT,
+  link TEXT NOT NULL,
+  icone TEXT DEFAULT 'FileText',
+  ativo BOOLEAN DEFAULT true,
+  ordem INTEGER DEFAULT 0,
+  planos_aplicaveis TEXT[] DEFAULT ARRAY['academy', 'business', 'skills'], -- Quais planos veem
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.pendencias_dashboard ENABLE ROW LEVEL SECURITY;
+
+-- Todos autenticados podem ler pendências ativas
+CREATE POLICY "pendencias_select" ON public.pendencias_dashboard
+  FOR SELECT TO authenticated USING (ativo = true);
+
+-- Apenas admins podem gerenciar
+CREATE POLICY "pendencias_admin" ON public.pendencias_dashboard
+  FOR ALL USING (public.has_role(auth.uid(), 'admin'));
+
+-- Dados iniciais
+INSERT INTO public.pendencias_dashboard (tipo, titulo, link, ordem, planos_aplicaveis) VALUES
+  ('diagnostico', 'Diagnóstico Estratégico', '/meu-diagnostico', 1, ARRAY['academy', 'business', 'skills']),
+  ('pesquisa', 'Pesquisa de Perfil', '/formulario-aplica', 2, ARRAY['academy', 'business', 'skills']);
+```
 
 ---
 
-## Mudanças Necessárias
+### 2. Criar Componente Admin para Gerenciar Pendências
 
-### Arquivo: `src/pages/Evolucao.tsx`
+**Arquivo:** `src/components/admin/dashboard/GerenciarPendencias.tsx`
 
-**Remover:**
-1. Import do `FerramentasCompartilhadasList`
-2. Import do `CompartilharFerramentaModal`
-3. Estado `modalFerramentaOpen`
-4. Renderização do `FerramentasCompartilhadasList` na aba comunidade
-5. Renderização do `CompartilharFerramentaModal`
+Interface com:
+- Lista de todas as pendências com Switch para ativar/desativar
+- Opção de reordenar (drag-and-drop ou setas)
+- Modal para adicionar nova pendência
+- Seletor de planos aplicáveis
 
-**Código atual (linhas 6-8, 26, 82-88):**
-```typescript
-import { FerramentasCompartilhadasList } from "@/components/evolucao/FerramentasCompartilhadasList";
-import { CompartilharFerramentaModal } from "@/components/evolucao/CompartilharFerramentaModal";
-...
-const [modalFerramentaOpen, setModalFerramentaOpen] = useState(false);
-...
-{/* Ferramentas Mais Compartilhadas */}
-<FerramentasCompartilhadasList onCompartilhar={() => setModalFerramentaOpen(true)} />
-
-<CompartilharFerramentaModal 
-  open={modalFerramentaOpen} 
-  onOpenChange={setModalFerramentaOpen} 
-/>
+```text
++----------------------------------------------------------+
+| ⚙️ Gerenciar Pendências da Dashboard                      |
++----------------------------------------------------------+
+| [+ Adicionar Pendência]                                   |
++----------------------------------------------------------+
+| ○━━━━○ Diagnóstico Estratégico      [Academy/Business]    |
+| ○━━━━○ Pesquisa de Perfil           [Academy/Business]    |
+| ○━━━━○ Termo de Aceite              [Inativo]            |
++----------------------------------------------------------+
 ```
 
-**Código após remoção:**
-- Aba "Ranking" mostrará apenas `HeroComunidade` e `RankingComunidade`
-- Sem referência a ferramentas compartilhadas
+---
+
+### 3. Adicionar Aba no Admin Dashboard ou Página Dedicada
+
+Opção 1: Adicionar como aba em `GerenciarAvisos.tsx` (já gerencia avisos da dashboard)
+
+Opção 2: Criar seção em `AdminDashboard.tsx` com acesso rápido
+
+**Recomendação:** Adicionar em `GerenciarAvisos.tsx` como nova aba "Pendências" já que é relacionado ao que aparece na Dashboard.
+
+---
+
+### 4. Atualizar `PendenciasOnboarding.tsx`
+
+Substituir itens hardcoded por query dinâmica:
+
+```typescript
+// Buscar pendências ativas do banco
+const { data: pendenciasConfig } = useQuery({
+  queryKey: ["pendencias-dashboard"],
+  queryFn: async () => {
+    const { data } = await supabase
+      .from("pendencias_dashboard")
+      .select("*")
+      .eq("ativo", true)
+      .order("ordem", { ascending: true });
+    return data;
+  },
+});
+
+// Verificar se usuário já completou cada pendência
+const verificarCompletado = async (tipo: string) => {
+  if (tipo === 'diagnostico') {
+    const { data } = await supabase
+      .from("formulario_diagnostico")
+      .select("completado")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    return data?.completado === true;
+  }
+  if (tipo === 'pesquisa') {
+    const { data } = await supabase
+      .from("respostas_pesquisas")
+      .select("completado")
+      .eq("pesquisa_id", PESQUISA_APLICA_ID)
+      .eq("user_id", user.id)
+      .eq("completado", true)
+      .maybeSingle();
+    return !!data;
+  }
+  return false;
+};
+```
+
+---
+
+## Arquivos a Criar/Modificar
+
+| Arquivo | Acao |
+|---------|------|
+| Migration SQL | **CRIAR** - Tabela `pendencias_dashboard` |
+| `src/hooks/usePendenciasDashboard.tsx` | **CRIAR** - Hook para admin gerenciar |
+| `src/components/admin/dashboard/GerenciarPendencias.tsx` | **CRIAR** - Componente admin |
+| `src/pages/admin/GerenciarAvisos.tsx` | **MODIFICAR** - Adicionar aba "Pendências" |
+| `src/components/dashboard/PendenciasOnboarding.tsx` | **MODIFICAR** - Usar config dinâmica |
+
+---
+
+## Fluxo de Uso
+
+```text
+Admin:
+  ├─ Acessa /admin/avisos
+  ├─ Clica na aba "Pendências"
+  ├─ Vê lista de pendências com switch ativo/inativo
+  ├─ Desativa "Pesquisa de Perfil" → Toggle OFF
+  └─ Mudança reflete imediatamente na Dashboard dos mentorados
+
+Mentorado:
+  ├─ Acessa Dashboard (/)
+  ├─ Vê seção "Complete seu perfil" abaixo do Welcome
+  └─ Vê apenas pendências ativas configuradas pelo admin
+```
+
+---
+
+## Interface do Admin
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│ 📋 Avisos                                               │
+├─────────────────────────────────────────────────────────┤
+│ [Avisos] [Encontros] [Pendências]                       │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Pendências da Dashboard                                │
+│  Configure quais formulários aparecem para os usuários  │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │ [ON] Diagnóstico Estratégico                    │    │
+│  │      /meu-diagnostico                           │    │
+│  │      Academy, Business, Skills                  │    │
+│  └─────────────────────────────────────────────────┘    │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │ [ON] Pesquisa de Perfil                         │    │
+│  │      /formulario-aplica                         │    │
+│  │      Academy, Business                          │    │
+│  └─────────────────────────────────────────────────┘    │
+│                                                         │
+│  [+ Adicionar Pendência]                                │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## Resultado Esperado
 
-| Localização | Antes | Depois |
-|-------------|-------|--------|
-| `/evolucao` (aba Ranking) | Card de ferramentas + botão compartilhar | Apenas Ranking da Comunidade |
-| `/videos-bonus?tab=criadores` | Botão "Contribuir" para Academy/Business | Mantido (única forma de contribuir) |
-
----
-
-## Arquivos a Modificar
-
-| Arquivo | Ação |
-|---------|------|
-| `src/pages/Evolucao.tsx` | Remover imports, estado e componentes de ferramentas compartilhadas |
-
----
-
-## Observação
-
-Os arquivos `FerramentasCompartilhadasList.tsx` e `CompartilharFerramentaModal.tsx` podem ser mantidos no código (para eventual uso futuro) ou removidos completamente. A recomendação é apenas remover as referências da página Evolução para manter o código limpo.
+- Admin pode ativar/desativar formulários que aparecem na Dashboard
+- Mentorados veem apenas pendências ativas
+- Sistema flexível para adicionar novas pendências no futuro
+- Controle granular por plano (Academy, Business, Skills)
