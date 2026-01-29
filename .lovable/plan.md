@@ -1,128 +1,169 @@
 
-# Plano: Preservar Feedback da Mentora ao Salvar Diagnóstico
+# Plano: Corrigir Favoritos e Adicionar Avaliação de Ferramentas
 
-## Problema Identificado
+## Problema 1: Erro ao Favoritar Ferramentas
 
-O sistema está **sobrepondo dados** quando salva o diagnóstico ou o feedback. Isso acontece porque ambos usam `upsert` com apenas alguns campos, e o Supabase interpreta como "substituir toda a linha".
+### Diagnóstico
+As políticas RLS da tabela `favoritos` estão configuradas para `roles: {public}` em vez de `roles: {authenticated}`. Isso pode causar problemas de autenticação dependendo do estado da sessão do usuário.
 
-### Cenário do Bug:
-1. Mentorado preenche o diagnóstico (campos como `nome_completo`, `objetivo_principal`, `insight_ia`, etc.)
-2. Admin salva o Feedback da Mentora (vídeo, transcrição, plano de execução)
-3. O `upsert` no `FeedbackMentoraAdmin` envia **apenas os campos de feedback**, sobrescrevendo os campos do diagnóstico
-4. Resultado: dados do diagnóstico do mentorado são perdidos
+### Solução
+Recriar as políticas RLS com target role correto (`authenticated`):
 
-O mesmo pode ocorrer no sentido inverso.
+```sql
+-- Remover políticas antigas
+DROP POLICY IF EXISTS "Users can view their own favoritos" ON favoritos;
+DROP POLICY IF EXISTS "Users can create their own favoritos" ON favoritos;
+DROP POLICY IF EXISTS "Users can delete their own favoritos" ON favoritos;
 
----
+-- Criar novas políticas para usuários autenticados
+CREATE POLICY "Users can view their own favoritos"
+ON favoritos FOR SELECT TO authenticated
+USING (auth.uid() = user_id);
 
-## Solução
+CREATE POLICY "Users can create their own favoritos"
+ON favoritos FOR INSERT TO authenticated
+WITH CHECK (auth.uid() = user_id);
 
-Modificar as funções de salvamento para usar `UPDATE` em vez de `UPSERT` quando o registro já existe, garantindo que apenas os campos específicos sejam atualizados.
-
----
-
-## Arquivos a Modificar
-
-### 1. `src/components/admin/mentoria/FeedbackMentoraAdmin.tsx`
-
-**Problema (linhas 43-56):**
-```typescript
-const { error } = await supabase
-  .from("formulario_diagnostico")
-  .upsert({
-    user_id: userId,
-    video_call_url: videoCallUrl || null,
-    // ... apenas campos de feedback
-  }, { onConflict: 'user_id' });
-```
-
-**Solução:**
-- Primeiro verificar se o registro existe
-- Se existir, usar `UPDATE` apenas nos campos de feedback
-- Se não existir, criar registro mínimo com os campos de feedback
-
-```typescript
-// Verificar se existe
-const { data: existente } = await supabase
-  .from("formulario_diagnostico")
-  .select("id")
-  .eq("user_id", userId)
-  .maybeSingle();
-
-if (existente) {
-  // UPDATE apenas os campos de feedback
-  const { error } = await supabase
-    .from("formulario_diagnostico")
-    .update({
-      video_call_url: videoCallUrl || null,
-      transcricao_call_url: transcricaoUrl || null,
-      link_plano_execucao: planoExecucaoUrl || null,
-      direcional_entregas: direcionalEntregas || null,
-      feedback_mentora_em: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
-} else {
-  // INSERT novo registro apenas com feedback
-  const { error } = await supabase
-    .from("formulario_diagnostico")
-    .insert({
-      user_id: userId,
-      video_call_url: videoCallUrl || null,
-      // ...
-    });
-}
+CREATE POLICY "Users can delete their own favoritos"
+ON favoritos FOR DELETE TO authenticated
+USING (auth.uid() = user_id);
 ```
 
 ---
 
-### 2. `src/hooks/useDiagnosticoAdmin.tsx`
+## Problema 2: Membros Pagantes Não Podem Avaliar Ferramentas
 
-**Problema (linhas 48-76):** A função `salvarDiagnostico` usa `upsert` com payload parcial.
+### Diagnóstico
+- A tabela `ferramentas_ia` possui campos `avaliacao_comunidade` e `total_avaliacoes_comunidade`
+- **Não existe uma tabela para armazenar avaliações individuais** (similar a `video_ratings`)
+- Não há componente de UI para os usuários avaliarem ferramentas
 
-**Solução:** Aplicar a mesma lógica de verificar existência e usar `UPDATE` quando apropriado.
+### Solução
+Criar estrutura completa de avaliação de ferramentas similar ao sistema de avaliação de vídeos:
 
-- Se já existe registro, usar `UPDATE` apenas nos campos sendo modificados
-- Preservar explicitamente campos de feedback (`video_call_url`, `transcricao_call_url`, etc.)
+#### 1. Criar tabela `avaliacoes_ferramentas_ia`
+
+```sql
+CREATE TABLE avaliacoes_ferramentas_ia (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ferramenta_id UUID NOT NULL REFERENCES ferramentas_ia(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  nota INTEGER NOT NULL CHECK (nota >= 1 AND nota <= 5),
+  comentario TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(ferramenta_id, user_id)
+);
+
+-- Habilitar RLS
+ALTER TABLE avaliacoes_ferramentas_ia ENABLE ROW LEVEL SECURITY;
+
+-- Políticas: apenas mentorados e admins podem avaliar (não visitantes)
+CREATE POLICY "Usuarios podem ver todas as avaliacoes"
+ON avaliacoes_ferramentas_ia FOR SELECT TO authenticated
+USING (true);
+
+CREATE POLICY "Mentorados podem criar avaliacoes"
+ON avaliacoes_ferramentas_ia FOR INSERT TO authenticated
+WITH CHECK (
+  auth.uid() = user_id AND 
+  (has_role(auth.uid(), 'mentorado') OR has_role(auth.uid(), 'admin'))
+);
+
+CREATE POLICY "Usuarios podem atualizar suas avaliacoes"
+ON avaliacoes_ferramentas_ia FOR UPDATE TO authenticated
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Usuarios podem deletar suas avaliacoes"
+ON avaliacoes_ferramentas_ia FOR DELETE TO authenticated
+USING (auth.uid() = user_id);
+```
+
+#### 2. Criar trigger para atualizar média na tabela `ferramentas_ia`
+
+```sql
+CREATE OR REPLACE FUNCTION update_ferramenta_rating_stats()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE ferramentas_ia
+  SET 
+    avaliacao_comunidade = (
+      SELECT AVG(nota) FROM avaliacoes_ferramentas_ia 
+      WHERE ferramenta_id = COALESCE(NEW.ferramenta_id, OLD.ferramenta_id)
+    ),
+    total_avaliacoes_comunidade = (
+      SELECT COUNT(*) FROM avaliacoes_ferramentas_ia 
+      WHERE ferramenta_id = COALESCE(NEW.ferramenta_id, OLD.ferramenta_id)
+    ),
+    updated_at = now()
+  WHERE id = COALESCE(NEW.ferramenta_id, OLD.ferramenta_id);
+  
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+CREATE TRIGGER on_avaliacao_ferramenta_change
+AFTER INSERT OR UPDATE OR DELETE ON avaliacoes_ferramentas_ia
+FOR EACH ROW EXECUTE FUNCTION update_ferramenta_rating_stats();
+```
+
+#### 3. Criar hook `useFerramentaRating` 
+
+Arquivo: `src/hooks/useFerramentaRating.tsx`
+
+Similar ao `useVideoRating.tsx`, mas para ferramentas:
+- Buscar média de avaliação da ferramenta
+- Buscar avaliação do usuário atual
+- Mutation para criar/atualizar avaliação
+
+#### 4. Criar componente de avaliação no modal de detalhes
+
+Arquivo: `src/components/bibliotecas/FerramentaDetalhesModal.tsx`
+
+Adicionar seção de avaliação:
+- Mostrar média atual e total de avaliações
+- Permitir que mentorados (não visitantes) avaliem com 1-5 estrelas
+- Mostrar mensagem para visitantes indicando que precisam de plano ativo
 
 ---
 
-### 3. `src/hooks/useMentoriaForm.tsx`
+## Arquivos a Criar/Modificar
 
-**Problema (linhas 31-52 e 55-74):** Funções `salvarMutation` e `finalizarMutation` usam `upsert`.
-
-**Solução:** 
-- Quando o mentorado salva/finaliza seu diagnóstico, os campos de feedback devem ser preservados
-- Usar lógica similar: verificar se existe e usar `UPDATE` com apenas os campos do formulário
+| Arquivo | Ação |
+|---------|------|
+| Migration SQL | Criar tabela, políticas e trigger |
+| `src/hooks/useFerramentaRating.tsx` | **CRIAR** - Hook para gerenciar avaliações |
+| `src/components/bibliotecas/FerramentaDetalhesModal.tsx` | **MODIFICAR** - Adicionar UI de avaliação |
 
 ---
 
-## Fluxo Corrigido
+## Fluxo para Usuários
 
 ```text
-Antes (BUG):
-  [Diagnóstico preenchido] → Admin salva Feedback → UPSERT sobrescreve tudo
-  Resultado: Diagnóstico perdido ❌
+Mentorado (Academy, Lab, Skills, Club):
+  ├─ Acessa Biblioteca de Ferramentas
+  ├─ Clica em "Ver Detalhes" de uma ferramenta
+  ├─ Vê seção "Avaliar esta ferramenta"
+  ├─ Clica nas estrelas (1-5)
+  └─ Sistema salva e atualiza média automaticamente
 
-Depois (CORRIGIDO):
-  [Diagnóstico preenchido] → Admin salva Feedback → UPDATE apenas campos de feedback
-  Resultado: Ambos preservados ✓
+Visitante:
+  ├─ Acessa Biblioteca de Ferramentas
+  ├─ Clica em "Ver Detalhes"
+  └─ Vê mensagem: "Adquira um plano para avaliar ferramentas"
 ```
-
----
-
-## Resumo das Mudanças
-
-| Arquivo | Mudança |
-|---------|---------|
-| `FeedbackMentoraAdmin.tsx` | Substituir `upsert` por lógica `UPDATE`/`INSERT` |
-| `useDiagnosticoAdmin.tsx` | Preservar campos de feedback ao salvar diagnóstico |
-| `useMentoriaForm.tsx` | Preservar campos de feedback ao mentorado salvar/finalizar |
 
 ---
 
 ## Resultado Esperado
 
-- Quando admin salva Feedback da Mentora, o diagnóstico do mentorado permanece intacto
-- Quando mentorado preenche diagnóstico, o feedback já inserido pelo admin permanece intacto
-- Quando admin preenche diagnóstico manualmente, o feedback também permanece intacto
-- Ambas as seções (Diagnóstico e Feedback) funcionam de forma totalmente independente
+- Erro de favoritos resolvido com políticas RLS corrigidas
+- Mentorados podem avaliar ferramentas de 1 a 5 estrelas
+- Média de avaliação da comunidade calculada automaticamente
+- Visitantes veem as avaliações mas não podem avaliar
+- Admins podem avaliar normalmente
