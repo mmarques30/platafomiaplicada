@@ -1,129 +1,127 @@
 
-# Plano: Excluir páginas Aplique e Avance
+# Plano: Redesenhar página Sobre conforme referência 21st.dev
 
-## Resumo
-Remover completamente as páginas `/aplique` e `/avance` do projeto, incluindo todos os arquivos e referências a elas.
-
----
-
-## Impacto da Remoção
-
-### Arquivos a EXCLUIR
-1. `src/pages/Aplique.tsx` (~456 linhas)
-2. `src/pages/Avance.tsx` (~400 linhas)
-
-### Arquivos a EDITAR (remover referências)
-
-| Arquivo | O que mudar |
-|---------|------------|
-| `src/App.tsx` | Remover imports e rotas `/aplique` e `/avance` |
-| `src/pages/Servicos.tsx` | Substituir links `/aplique` e `/avance` por alternativa (ex: `/servicos` ou remover) |
-| `src/pages/CandidatarMentoria.tsx` | Alterar navegação "Voltar para Aplique" para `/servicos` |
-| `src/pages/Trilhas.tsx` | Remover ou alterar botão CTA que vai para `/aplique` |
-| `src/components/dashboard/CentralConteudoGratuito.tsx` | Alterar link "Ter acesso completo" de `/aplique` para alternativa |
-| `src/components/shared/TrilhaCardBloqueavel.tsx` | Alterar link do cadeado de `/aplique` para alternativa |
-| `src/components/layout/AppSidebar.tsx` | Remover item CTA "Aplique/Avance" do menu lateral |
+## Objetivo
+Redesenhar completamente a página `/sobre` para seguir o layout da referência `about-section-1` do 21st.dev, mantendo consistência de background com o restante do projeto e ocupando todo o espaço disponível.
 
 ---
 
-## Decisões Necessárias
+## Design de Referência (21st.dev/ui-layouts/about-section-1)
 
-Antes de implementar, preciso confirmar para onde direcionar os links que atualmente vão para `/aplique` ou `/avance`:
-
-1. **Página de Serviços (`Servicos.tsx`)**: Os cards "Academy", "Skills" e "Business" apontam para essas páginas
-   - **Opção A**: Redirecionar todos para `/servicos` (a própria página atual)
-   - **Opção B**: Abrir link externo (WhatsApp ou checkout)
-   - **Opção C**: Remover os links "Saiba mais"
-
-2. **Candidatura Mentoria**: Botão "Voltar para Aplique"
-   - **Sugestão**: Alterar para `/servicos`
-
-3. **Trilhas (visitantes bloqueados)**: Cadeado leva para `/aplique`
-   - **Sugestão**: Alterar para `/servicos` ou `/auth`
-
-4. **Dashboard Central (visitantes)**: CTA "Ter acesso completo"
-   - **Sugestão**: Alterar para `/servicos`
-
-5. **Sidebar (menu lateral)**: Item CTA "Aplique" ou "Avance"
-   - **Sugestão**: Remover completamente ou alterar para `/servicos`
+O layout original possui:
+- Fundo limpo ocupando 100% da tela
+- Label "ABOUT" em verde acima do título
+- Grande letra "A" estilizada com sublinhado ondulado antes do título
+- Título em múltiplas linhas com tipografia grande e bold
+- Parágrafo de descrição centralizado
+- Botão CTA "Explore Our Services" estilo pill
+- 4 fotos de pessoas com fundo transparente/recortado em disposição diagonal
 
 ---
 
-## Detalhes Técnicos
+## Solução Proposta
 
-### 1. Excluir arquivos
+### Estrutura Visual
+
 ```
-src/pages/Aplique.tsx
-src/pages/Avance.tsx
+┌─────────────────────────────────────────────────────────┐
+│  [Voltar]                                               │
+│                                                         │
+│                        SOBRE                            │
+│                                                         │
+│              A  Legado de Excelência,                   │
+│                 Como Nossa Dedicação                    │
+│                 Move Tudo o que Fazemos                 │
+│                                                         │
+│    A IAplicada nasceu da experiência prática em         │
+│    operações complexas de empresas como Mercado Livre,  │
+│    Suzano e AngloGold Ashanti...                        │
+│                                                         │
+│              [Conheça nossos serviços →]                │
+│                                                         │
+│         [Foto1]  [Foto2]  [Foto3]  [Foto4]              │
+│            (dispostas em grid diagonal)                 │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### 2. App.tsx - Remover imports e rotas
+### Especificações Técnicas
+
+1. **Background e Layout**
+   - Usar o mesmo fundo escuro do projeto (`bg-[#2a2c28]` ou `bg-background` no modo escuro)
+   - Ocupar `min-h-screen` com flexbox centralizado
+   - Garantir consistência visual com as outras páginas públicas
+
+2. **Conteúdo Principal**
+   - Label "SOBRE" em verde (`text-aplicada-green-700`)
+   - Título grande com letra "A" decorativa e sublinhado ondulado SVG
+   - Texto adaptado para IAplicada:
+     - "Legado de Excelência," (primeira linha)
+     - "Como Nossa Dedicação Move" (segunda linha)  
+     - "Tudo o que Fazemos" (terceira linha)
+   - Descrição: Manter o texto atual sobre Mercado Livre, Suzano, AngloGold Ashanti
+   - Botão CTA arredondado navegando para `/servicos`
+
+3. **Grid de Fotos**
+   - 4 imagens de equipe/profissionais com fundo transparente
+   - Usar placeholders do Unsplash similares à referência (ou imagens locais se disponíveis)
+   - Efeito de hover com escala sutil
+   - Disposição diagonal com rotações leves (-6°, 6°, -6°, 6°)
+
+4. **Animações (Framer Motion)**
+   - Fade-in sequencial para cada elemento
+   - Animação de entrada das fotos com delay escalonado
+
+---
+
+## Arquivos a Modificar
+
+| Arquivo | Alteração |
+|---------|-----------|
+| `src/components/ui/about-section.tsx` | Reescrever completamente seguindo o novo layout |
+| `src/pages/Sobre.tsx` | Ajustar estilos de container para full-screen |
+
+---
+
+## Detalhes de Implementação
+
+### 1. about-section.tsx - Novo Layout
+
 ```tsx
-// Remover:
-import Aplique from "./pages/Aplique";
-import Avance from "./pages/Avance";
-
-// Remover rotas:
-<Route path="/aplique" element={<Aplique />} />
-<Route path="/avance" element={<Avance />} />
+// Elementos principais:
+- Container full-screen com flex center
+- Label "SOBRE" animado
+- Título com letra "A" grande e sublinhado SVG ondulado
+- Parágrafos de descrição
+- Botão CTA estilo pill
+- Grid de 4 fotos com rotação alternada
 ```
 
-### 3. Servicos.tsx - Atualizar links
+### 2. Sobre.tsx - Ajustes
+
 ```tsx
-// Alterar de:
-href="/aplique"
-href="/avance"
-
-// Para (sugestão):
-href="https://wa.me/5511950566101" // WhatsApp ou
-href="/servicos" // Scroll na própria página
+// Mudanças:
+- Remover pt-16 e usar layout full-screen
+- Manter botão Voltar posicionado absolutamente
+- Aplicar background consistente (escuro)
 ```
 
-### 4. CandidatarMentoria.tsx - Alterar navegação
-```tsx
-// Alterar de:
-onClick={() => navigate("/aplique")}
-// Para:
-onClick={() => navigate("/servicos")}
-```
+### 3. Imagens de Equipe
 
-### 5. Trilhas.tsx - Remover/alterar CTA
-```tsx
-// Remover ou alterar:
-<Link to="/aplique">
-```
-
-### 6. CentralConteudoGratuito.tsx - Alterar link
-```tsx
-// Alterar de:
-<Link to="/aplique">
-// Para:
-<Link to="/servicos">
-```
-
-### 7. TrilhaCardBloqueavel.tsx - Alterar link do cadeado
-```tsx
-// Alterar de:
-<Link to="/aplique">
-// Para:
-<Link to="/servicos">
-```
-
-### 8. AppSidebar.tsx - Remover item CTA
-```tsx
-// Remover todo o bloco (linhas 299-324):
-{!isBusiness && !isSkills && !isAcademy && (
-  <SidebarMenuItem>
-    // ... item Aplique/Avance
-  </SidebarMenuItem>
-)}
-```
+Usar imagens do Unsplash (como na referência):
+- Foto 1: https://images.unsplash.com/photo-1539571696357-5a69c17a67c6
+- Foto 2: https://images.unsplash.com/photo-1609179242555-1d7b4b0a568c
+- Foto 3: https://images.unsplash.com/photo-1611695434398-4f4b330623e6
+- Foto 4: https://images.unsplash.com/photo-1567934872913-aacea74458b7
 
 ---
 
 ## Resultado Esperado
 
-- Páginas `/aplique` e `/avance` deixam de existir
-- Todas as referências redirecionam para `/servicos` (ou alternativa escolhida)
-- Nenhum erro 404 ou link quebrado
-- Menu lateral sem o item CTA "Aplique/Avance"
+- Página `/sobre` com layout moderno e elegante idêntico à referência
+- Ocupando 100% do espaço disponível da tela
+- Background escuro consistente com o resto do projeto
+- Animações suaves de entrada
+- 4 fotos de equipe em disposição diagonal
+- Botão CTA levando para `/servicos`
+- Responsivo para mobile e desktop
