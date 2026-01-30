@@ -2,8 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-// Partner logos
+import logoIaplicada from "@/assets/logo-iaplicada.png";
 const partnerLogos = [
   { id: 1, image: "/logos/partners/nubank-logo.png", alt: "Nubank" },
   { id: 2, image: "/logos/partners/raizen-logo.png", alt: "Raízen" },
@@ -81,12 +80,26 @@ export function AboutSection() {
   return (
     <section className="w-full flex flex-col items-center justify-center px-4 py-12 md:py-16 lg:py-20">
       <div className="w-full max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-center"
+        >
+          <img 
+            src={logoIaplicada} 
+            alt="IAplicada Logo" 
+            className="h-24 md:h-32 w-auto"
+          />
+        </motion.div>
+
         {/* Label */}
         <motion.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-block text-sm font-semibold uppercase tracking-widest text-aplicada-green-700 mb-4"
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="inline-block text-sm font-semibold uppercase tracking-widest text-aplicada-green-700"
         >
           Sobre
         </motion.span>
