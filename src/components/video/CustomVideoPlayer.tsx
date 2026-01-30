@@ -41,10 +41,70 @@ export function CustomVideoPlayer({
   const containerRef = useRef<HTMLDivElement>(null);
   const hideControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const retryCountRef = useRef(0);
+  const maxRetries = 3;
 
-  useEffect(() => {
+  const initializePlayer = () => {
     const playerId = `youtube-player-${videoId}`;
     
+    if (playerRef.current) return;
+    
+    const player = new CustomYouTubePlayer(playerId, {
+      videoId,
+      startSeconds,
+      onReady: (p) => {
+        setPlayerReady(true);
+        setIsLoading(false);
+        setError(null);
+        setDuration(p.getDuration());
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+        }
+        retryCountRef.current = 0;
+      },
+      onStateChange: (event) => {
+        const state = event.data;
+        setIsPlaying(state === PlayerState.PLAYING);
+        
+        if (state === PlayerState.ENDED && onEnded) {
+          onEnded();
+        }
+        
+        if (state === PlayerState.PLAYING) {
+          setDuration(playerRef.current?.getDuration() || 0);
+        }
+      },
+      onTimeUpdate: (time) => {
+        setCurrentTime(time);
+        // Parar no tempo limite se definido
+        if (endSeconds && time >= endSeconds) {
+          playerRef.current?.pause();
+          if (onEnded) {
+            onEnded();
+          }
+        }
+        if (onTimeUpdate) {
+          onTimeUpdate(time);
+        }
+      },
+    });
+
+    player.initialize().catch(() => {
+      // Retry on failure
+      if (retryCountRef.current < maxRetries) {
+        retryCountRef.current++;
+        playerRef.current = null;
+        setTimeout(initializePlayer, 2000);
+      } else {
+        setError("Falha ao carregar o vídeo");
+        setIsLoading(false);
+      }
+    });
+    
+    playerRef.current = player;
+  };
+
+  useEffect(() => {
     // Validar YouTube ID
     if (!videoId || videoId.length < 10) {
       setError("ID de vídeo inválido");
@@ -52,56 +112,19 @@ export function CustomVideoPlayer({
       return;
     }
 
-    // Timeout de 10 segundos para detectar falhas
+    // Timeout de 20 segundos para detectar falhas
     loadingTimeoutRef.current = setTimeout(() => {
-      if (!playerReady) {
-        setError("Tempo esgotado ao carregar o vídeo");
+      if (!playerReady && retryCountRef.current < maxRetries) {
+        retryCountRef.current++;
+        playerRef.current = null;
+        initializePlayer();
+      } else if (!playerReady) {
+        setError("Tempo esgotado ao carregar o vídeo. Clique para abrir no YouTube.");
         setIsLoading(false);
       }
-    }, 10000);
+    }, 20000);
     
-    if (!playerRef.current) {
-      const player = new CustomYouTubePlayer(playerId, {
-        videoId,
-        startSeconds,
-        onReady: (p) => {
-          setPlayerReady(true);
-          setIsLoading(false);
-          setDuration(p.getDuration());
-          if (loadingTimeoutRef.current) {
-            clearTimeout(loadingTimeoutRef.current);
-          }
-        },
-        onStateChange: (event) => {
-          const state = event.data;
-          setIsPlaying(state === PlayerState.PLAYING);
-          
-          if (state === PlayerState.ENDED && onEnded) {
-            onEnded();
-          }
-          
-          if (state === PlayerState.PLAYING) {
-            setDuration(playerRef.current?.getDuration() || 0);
-          }
-        },
-        onTimeUpdate: (time) => {
-          setCurrentTime(time);
-          // Parar no tempo limite se definido
-          if (endSeconds && time >= endSeconds) {
-            playerRef.current?.pause();
-            if (onEnded) {
-              onEnded();
-            }
-          }
-          if (onTimeUpdate) {
-            onTimeUpdate(time);
-          }
-        },
-      });
-
-      player.initialize();
-      playerRef.current = player;
-    }
+    initializePlayer();
 
     return () => {
       if (hideControlsTimeoutRef.current) {
@@ -111,7 +134,7 @@ export function CustomVideoPlayer({
         clearTimeout(loadingTimeoutRef.current);
       }
     };
-  }, [videoId, startSeconds, onTimeUpdate, onEnded, playerReady]);
+  }, [videoId, startSeconds]);
 
   const handlePlayPause = () => {
     if (!playerRef.current) return;
