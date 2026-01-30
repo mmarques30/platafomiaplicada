@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 interface TextParallaxContentProps {
   imgUrl: string;
   subheading: string;
-  heading: string;
+  heading: ReactNode;
   children: ReactNode;
 }
 
@@ -71,7 +71,7 @@ const StickyImage = ({ imgUrl }: StickyImageProps) => {
 
 interface OverlayCopyProps {
   subheading: string;
-  heading: string;
+  heading: ReactNode;
 }
 
 const OverlayCopy = ({ subheading, heading }: OverlayCopyProps) => {
