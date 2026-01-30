@@ -1,18 +1,19 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
 
 interface AnimatedNavLinkProps {
-  href: string;
+  to: string;
   children: React.ReactNode;
 }
 
-const AnimatedNavLink = ({ href, children }: AnimatedNavLinkProps) => {
+const AnimatedNavLink = ({ to, children }: AnimatedNavLinkProps) => {
   return (
-    <a
-      href={href}
+    <Link
+      to={to}
       className="relative overflow-hidden inline-block group text-sm text-gray-300 hover:text-white transition-colors"
     >
       <span className="block transition-transform duration-300 group-hover:-translate-y-full">
@@ -21,9 +22,13 @@ const AnimatedNavLink = ({ href, children }: AnimatedNavLinkProps) => {
       <span className="absolute top-full left-0 block transition-transform duration-300 group-hover:-translate-y-full text-white">
         {children}
       </span>
-    </a>
+    </Link>
   );
 };
+
+interface AuthHeaderProps {
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 export function AuthHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -55,8 +60,8 @@ export function AuthHeader() {
   }, [isOpen]);
 
   const navLinksData = [
-    { label: 'Sobre', href: '/aplique' },
-    { label: 'Serviços', href: '/servicos' },
+    { label: 'Sobre', to: '/sobre' },
+    { label: 'Serviços', to: '/servicos' },
   ];
 
   return (
@@ -89,7 +94,7 @@ export function AuthHeader() {
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-8 ml-12">
           {navLinksData.map((link) => (
-            <AnimatedNavLink key={link.label} href={link.href}>
+            <AnimatedNavLink key={link.label} to={link.to}>
               {link.label}
             </AnimatedNavLink>
           ))}
@@ -120,13 +125,14 @@ export function AuthHeader() {
           >
             <nav className="flex flex-col gap-3 pt-4 pb-2">
               {navLinksData.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.href}
+                  to={link.to}
+                  onClick={() => setIsOpen(false)}
                   className="text-gray-300 hover:text-white transition-colors text-sm py-2"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </nav>
           </motion.div>
