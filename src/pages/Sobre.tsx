@@ -14,11 +14,7 @@ export default function Sobre() {
           variant="ghost" 
           className="text-foreground hover:bg-muted"
           onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate('/');
-            }
+            navigate('/auth');
           }}
         >
           <ArrowLeft className="h-5 w-5 mr-2" />
