@@ -1,77 +1,71 @@
 
 
-# Reestruturação do Formulário Academy (Ajustado)
+# Correção: Pesquisa de Perfil Aparece Mesmo Desativada
 
-## Ajuste Solicitado
+## Diagnóstico
 
-O campo `nome_completo` será **removido** do formulário porque o usuário já está cadastrado e essa informação vem do perfil de login (similar ao Business).
+Ao analisar o banco de dados, encontrei o problema:
 
----
+| Tabela | Registro | Status |
+|--------|----------|--------|
+| `pesquisas` | Pesquisa de Perfil IAplicada | `ativo: true` |
+| `pendencias_dashboard` | Pesquisa de Perfil | `ativo: true` |
 
-## Nova Estrutura Proposta (5 Steps)
+A pesquisa aparece para todos os usuários porque a **pendência** está ativa na tabela `pendencias_dashboard`.
 
-### Step 1: Perfil e Motivação de Compra
-**Campos a remover:** `nome_completo`, `idade`, `linkedin`, `tempo_experiencia`
-**Campos a manter:** `profissao`, `area_atuacao`, `area_atuacao_outro`
-**Campos a adicionar:**
-- `como_conheceu_iaplicada` - Como chegou à IAplicada
-- `motivo_compra` - O que motivou a adquirir o Academy
-- `expectativa_produto` - O que espera conquistar
+## Entendimento do Fluxo
 
-### Step 2: Experiência com IA
-**Campos a manter:** `nivel_ia`, `ferramentas_ia`, `outras_ferramentas`, `frequencia_uso_ia`, `maior_dificuldade_ia`
-**Campos a adicionar:**
-- `ja_fez_curso_ia` - Se já fez algum curso/treinamento de IA
-- `resultado_curso_anterior` - Qual foi o resultado (se aplicável)
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                  PendenciasOnboarding.tsx                   │
+│                                                             │
+│  usePendenciasAtivas(userPlan) ─────────────────────────┐   │
+│         │                                               │   │
+│         ▼                                               ▼   │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  SELECT * FROM pendencias_dashboard                  │   │
+│  │  WHERE ativo = true                                  │   │
+│  │  ORDER BY ordem                                      │   │
+│  └──────────────────────────────────────────────────────┘   │
+│         │                                                   │
+│         ▼                                                   │
+│  Filtra por plano do usuário (academy/business/skills)      │
+│         │                                                   │
+│         ▼                                                   │
+│  Exibe lista de pendências no dashboard                     │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### Step 3: Objetivos e Resultados
-**Campos a manter:** `objetivo_principal` (reformulado), `area_aplicacao_ia`
-**Campos a remover:** `objetivo_especifico`, `meta_3_meses`, `projetos_pessoais`
-**Campos a adicionar:**
-- `resultado_esperado_30_dias` - Vitória nos primeiros 30 dias
-- `como_medir_sucesso` - Como saber que valeu a pena
+## Solução
 
-### Step 4: Contexto e Potencial de Expansão (UPSELL)
-**Campos a remover:** `desafio_1`, `desafio_2`, `desafio_3`, `maior_ladrao_tempo`
-**Campos a manter:** `tempo_disponivel`
-**Campos a adicionar:**
-- `maior_desafio_profissional` - Campo único de desafio
-- `tarefa_repetitiva_automatizar` - Tarefa que gostaria de automatizar
-- `trabalha_em_empresa` - Empresa ou autônomo
-- `equipe_poderia_usar_ia` - Trigger para Skills
-- `interesse_projeto_customizado` - Trigger para Business
+A correção envolve **executar uma query SQL** para desativar a pendência "Pesquisa de Perfil" na tabela `pendencias_dashboard`:
 
-### Step 5: Comprometimento e Relacionamento
-**Campos a manter:** `estilo_aprendizagem`, `nivel_comprometimento`, `quick_wins`
-**Campos a remover:** `preferencia_aprendizado`
-**Campos a adicionar:**
-- `importancia_ia_carreira` - Nota de 1-10
-- `recomendaria_amigo` - NPS para programa de indicação
-- `preferencia_contato` - Canal preferido (WhatsApp, Email)
+```sql
+UPDATE pendencias_dashboard 
+SET ativo = false 
+WHERE id = 'ec4c3f4d-f80f-4703-b5d8-04156253afba';
+```
 
----
+Ou, alternativamente, o administrador pode acessar:
+**Painel Admin → Gerenciar Avisos → Aba "Pendências"** e desativar o switch da "Pesquisa de Perfil".
 
-## Arquivos a Modificar
+## Mudança Necessária
 
-| Arquivo | Mudanças |
-|---------|----------|
-| `src/components/mentoria/schema.ts` | Atualizar academyStep1-5Schema |
-| `AcademyStep1Perfil.tsx` | Remover nome/idade/linkedin, adicionar motivação |
-| `AcademyStep2Experiencia.tsx` | Adicionar experiência com cursos anteriores |
-| `AcademyStep3Objetivos.tsx` | Reformular metas, adicionar medição sucesso |
-| `AcademyStep4Desafios.tsx` | Renomear para contexto/expansão, adicionar upsell |
-| `AcademyStep5Comprometimento.tsx` | Adicionar NPS e preferência contato |
+**Tipo**: Migração de banco de dados
 
----
+**SQL a executar**:
+```sql
+-- Desativar a pendência "Pesquisa de Perfil" no dashboard
+UPDATE pendencias_dashboard 
+SET ativo = false, updated_at = now()
+WHERE titulo = 'Pesquisa de Perfil' 
+   OR link = '/formulario-aplica';
+```
 
-## Resumo de Campos
+## Resultado Esperado
 
-| Antes | Depois |
-|-------|--------|
-| 23 campos | 22 campos |
-| Nome pedido no form | Nome vem do login |
-| Idade, LinkedIn | Removidos |
-| 3 desafios separados | 1 desafio + contexto |
-| Sem gatilhos upsell | Skills + Business triggers |
-| Sem NPS | Com NPS e preferência contato |
+Após a correção:
+- A pesquisa de perfil **não aparecerá** mais na lista de pendências do dashboard
+- O componente `PendenciasOnboarding` filtrará automaticamente apenas as pendências ativas
+- Usuários não verão mais o prompt para preencher a pesquisa de perfil
 
