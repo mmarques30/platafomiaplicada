@@ -1,28 +1,56 @@
 
-# Ajuste de Proporção do Vídeo na Página Sobre
+# Correção do Player de Vídeo na Página Sobre
 
-## Problema Identificado
-O vídeo atual está usando a proporção `aspect-video` (16:9 - horizontal), mas o conteúdo do vídeo do YouTube parece ser vertical (estilo Reels/Shorts com proporção 9:16). Isso causa corte nas laterais do vídeo.
+## Problemas Identificados
 
-## Solução Proposta
-Modificar o `CustomVideoPlayer` para aceitar uma proporção customizada e atualizar o `AboutSection` para usar proporção vertical (9:16).
+1. **Card do vídeo muito pequeno**: A largura máxima está limitada a 280-320px, tornando o vídeo difícil de visualizar
+2. **API incorreta do ReactPlayer**: O componente usa `src` ao invés de `url`, causando falha no carregamento
+3. **Controle de tempo incorreto**: Está usando `onTimeUpdate` (evento de video nativo) ao invés de `onProgress` (evento do react-player)
 
 ## Alterações Técnicas
 
-### 1. CustomVideoPlayer.tsx
-- Adicionar nova prop `aspectRatio` com opções: `"video"` (16:9), `"reels"` (9:16), `"square"` (1:1)
-- Aplicar a classe de aspect ratio correta baseada na prop
-- Atualizar os estados de erro e loading para também usar a proporção customizada
+### 1. SimpleVideoPlayer.tsx
+- Corrigir prop `src` para `url` (API correta do react-player)
+- Substituir `onTimeUpdate` por `onProgress` com tipagem correta
+- Usar interface `OnProgressProps` do react-player para controle de tempo
 
 ### 2. about-section.tsx
-- Passar `aspectRatio="reels"` para o CustomVideoPlayer
-- Ajustar o container do vídeo para acomodar a proporção vertical
-- Reduzir a largura máxima do container para que o vídeo vertical não fique muito grande na tela
+- Aumentar a largura máxima do container do vídeo de `max-w-[280px] md:max-w-[320px]` para `max-w-[320px] md:max-w-[380px]`
+- Isso dará mais espaço para o vídeo vertical ser exibido adequadamente
+
+## Código das Correções
+
+### SimpleVideoPlayer.tsx - Mudanças principais:
+```tsx
+// Interface de progresso do react-player
+interface ProgressState {
+  playedSeconds: number;
+}
+
+// Substituir handleTimeUpdate por:
+const handleProgress = useCallback((state: ProgressState) => {
+  if (endSeconds && state.playedSeconds >= endSeconds) {
+    setIsPlaying(false);
+    if (onEnded) {
+      onEnded();
+    }
+  }
+}, [endSeconds, onEnded]);
+
+// No ReactPlayer, corrigir:
+<ReactPlayer
+  url={videoUrl}  // era "src"
+  onProgress={handleProgress}  // era "onTimeUpdate"
+  // ... demais props
+/>
+```
+
+### about-section.tsx - Mudança no container:
+```tsx
+className="w-full max-w-[320px] md:max-w-[380px] shadow-2xl..."
+```
 
 ## Resultado Esperado
-O vídeo será exibido na proporção vertical (9:16), semelhante a um Reel do Instagram, sem cortes, mantendo todo o conteúdo visível.
-
-## Classes de Aspect Ratio
-- `aspect-video` = 16/9 (horizontal padrão)
-- `aspect-[9/16]` = 9/16 (vertical Reels)
-- `aspect-square` = 1/1 (quadrado)
+- O vídeo carregará corretamente
+- O player terá tamanho adequado para o formato vertical (Reels)
+- O vídeo parará automaticamente no tempo 3:26 (206 segundos)
