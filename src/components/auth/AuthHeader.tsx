@@ -56,7 +56,7 @@ export function AuthHeader() {
 
   const navLinksData = [
     { label: 'Sobre', href: '/aplique' },
-    { label: 'Serviços', href: '/avance' },
+    { label: 'Serviços', href: '/servicos' },
   ];
 
   return (

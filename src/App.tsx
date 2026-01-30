@@ -10,6 +10,7 @@ import { useVersionCheck } from "./hooks/useVersionCheck";
 import { AdminViewProvider } from "./contexts/AdminViewContext";
 import { EnvironmentProvider } from "./contexts/EnvironmentContext";
 import Auth from "./pages/Auth";
+import Servicos from "./pages/Servicos";
 import EnvironmentSelector from "./pages/EnvironmentSelector";
 import Dashboard from "./pages/Dashboard";
 import Trilhas from "./pages/Trilhas";
@@ -115,6 +116,7 @@ function AppContent() {
       <Routes>
         {/* Rotas públicas */}
         <Route path="/auth" element={<Auth />} />
+        <Route path="/servicos" element={<Servicos />} />
         <Route path="/selecionar-ambiente" element={<EnvironmentSelector />} />
         <Route path="/aplique" element={<Aplique />} />
         <Route path="/avance" element={<Avance />} />
