@@ -1,110 +1,127 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
-interface DotProps {
+interface Particle {
   x: number;
   y: number;
-  delay: number;
-  color: string;
-  opacity: number;
+  vx: number;
+  vy: number;
+  size: number;
 }
 
-const Dot = ({ x, y, delay, color, opacity }: DotProps) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: opacity, scale: 1 }}
-      transition={{ 
-        duration: 0.5, 
-        delay: delay,
-        ease: "easeOut"
-      }}
-      className="absolute w-1 h-1 rounded-full"
-      style={{
-        left: x,
-        top: y,
-        backgroundColor: color,
-      }}
-    />
-  );
-};
-
 export function AnimatedBackground() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dots, setDots] = useState<DotProps[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const animationFrameRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const spacing = 30;
-    const newDots: DotProps[] = [];
-    
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    for (let x = 0; x < width; x += spacing) {
-      for (let y = 0; y < height; y += spacing) {
-        const distance = Math.sqrt(
-          Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
-        );
-        
-        // Delay baseado na distância do centro
-        const delay = (distance / maxDistance) * 1.5 + Math.random() * 0.3;
-        
-        // Opacidade aleatória
-        const opacityOptions = [0.15, 0.2, 0.25, 0.3, 0.35, 0.4];
-        const opacity = opacityOptions[Math.floor(Math.random() * opacityOptions.length)];
-        
-        // Cores - verde IAplicada
-        const colorOptions = [
-          "rgba(158, 176, 56, 0.8)",
-          "rgba(120, 140, 40, 0.8)",
-          "rgba(100, 120, 35, 0.8)",
-        ];
-        const color = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
 
-        newDots.push({
-          x: x + Math.random() * 5 - 2.5,
-          y: y + Math.random() * 5 - 2.5,
-          delay,
-          color,
-          opacity,
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const particleCount = 60;
+    particlesRef.current = Array.from({ length: particleCount }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      size: Math.random() * 2 + 1,
+    }));
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    const animate = () => {
+      // Dark background matching the brand
+      ctx.fillStyle = "#0a0a0a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particlesRef.current.forEach((particle, i) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+
+        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+
+        const dx = mouseRef.current.x - particle.x;
+        const dy = mouseRef.current.y - particle.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 150) {
+          particle.x -= dx * 0.01;
+          particle.y -= dy * 0.01;
+        }
+
+        // Green particles matching IAplicada brand
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(158, 176, 56, 0.4)";
+        ctx.fill();
+
+        particlesRef.current.forEach((otherParticle, j) => {
+          if (i === j) return;
+          const dx = particle.x - otherParticle.x;
+          const dy = particle.y - otherParticle.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(otherParticle.x, otherParticle.y);
+            ctx.strokeStyle = `rgba(158, 176, 56, ${0.15 * (1 - distance / 120)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
         });
-      }
-    }
+      });
 
-    setDots(newDots);
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden bg-[#0a0a0a]">
-      {/* Grid de pontos animado */}
-      {dots.map((dot, index) => (
-        <Dot key={index} {...dot} />
-      ))}
-      
-      {/* Fallback estático para dots */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `radial-gradient(circle, rgba(158, 176, 56, 0.06) 1px, transparent 1px)`,
-          backgroundSize: '30px 30px',
-        }}
-      />
-      
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+      {/* Canvas de partículas */}
+      <canvas ref={canvasRef} className="absolute inset-0" />
+
       {/* Gradiente central sutil */}
-      <div 
-        className="absolute inset-0"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(158, 176, 56, 0.08) 0%, transparent 60%)',
+          background:
+            "radial-gradient(ellipse at center, rgba(158, 176, 56, 0.08) 0%, transparent 60%)",
         }}
       />
-      
+
       {/* Gradiente inferior */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent pointer-events-none" />
     </div>
   );
 }
