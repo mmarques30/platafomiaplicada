@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logoIaplicada from "@/assets/logo-iaplicada.png";
+import logoIaplicada from "@/assets/logo-iaplicada-icon.png";
 
 export function AboutSection() {
   const navigate = useNavigate();
