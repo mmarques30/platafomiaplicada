@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
 
 interface Particle {
   x: number;
@@ -46,8 +45,7 @@ export function AnimatedBackground() {
     window.addEventListener("mousemove", handleMouseMove);
 
     const animate = () => {
-      // Background escuro olive/verde
-      ctx.fillStyle = "#3d3f39";
+      ctx.fillStyle = "#2a2c28";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle, i) => {
@@ -66,13 +64,11 @@ export function AnimatedBackground() {
           particle.y -= dy * 0.01;
         }
 
-        // Partículas verdes - bem sutis (para manter o fundo dominante)
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(157, 184, 96, 0.03)";
+        ctx.fillStyle = "rgba(157, 184, 96, 0.2)";
         ctx.fill();
 
-        // Linhas conectando partículas próximas
         particlesRef.current.forEach((otherParticle, j) => {
           if (i === j) return;
           const dx = particle.x - otherParticle.x;
@@ -83,7 +79,7 @@ export function AnimatedBackground() {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(121, 141, 60, ${0.015 * (1 - distance / 120)})`;
+            ctx.strokeStyle = `rgba(121, 141, 60, ${0.1 * (1 - distance / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -105,9 +101,9 @@ export function AnimatedBackground() {
   }, []);
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden">
-      {/* Canvas de partículas */}
-      <canvas ref={canvasRef} className="absolute inset-0" />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 w-full h-full -z-10"
+    />
   );
 }
