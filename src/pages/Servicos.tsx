@@ -10,7 +10,7 @@ const Servicos = () => {
       <TextParallaxContent
         imgUrl="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop"
         subheading="Academy"
-        heading={<><span className="whitespace-nowrap">A escola que transforma</span><br /><span className="whitespace-nowrap">sua carreira.</span></>}
+        heading={<><span className="whitespace-nowrap font-bold">A escola que transforma</span><br /><span className="whitespace-nowrap font-bold">sua carreira.</span></>}
       >
         <ExampleContent>
           <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white">
