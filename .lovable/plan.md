@@ -1,127 +1,104 @@
 
-# Plano: Redesenhar página Sobre conforme referência 21st.dev
 
-## Objetivo
-Redesenhar completamente a página `/sobre` para seguir o layout da referência `about-section-1` do 21st.dev, mantendo consistência de background com o restante do projeto e ocupando todo o espaço disponível.
+# Plano: Redesign da Página Sobre com Vídeo
 
----
+## Resumo
 
-## Design de Referência (21st.dev/ui-layouts/about-section-1)
+Redesenhar a página "Sobre" seguindo o layout de referência do PrebuiltUI (imagem/vídeo à esquerda, conteúdo à direita), com as cores da marca IAplicada e integrando o vídeo fornecido.
 
-O layout original possui:
-- Fundo limpo ocupando 100% da tela
-- Label "ABOUT" em verde acima do título
-- Grande letra "A" estilizada com sublinhado ondulado antes do título
-- Título em múltiplas linhas com tipografia grande e bold
-- Parágrafo de descrição centralizado
-- Botão CTA "Explore Our Services" estilo pill
-- 4 fotos de pessoas com fundo transparente/recortado em disposição diagonal
+## Importante sobre o Vídeo do Google Drive
 
----
+O link do Google Drive não pode ser usado diretamente em um player de vídeo HTML porque:
+- Links do Drive são para download/visualização no próprio Drive
+- Não fornecem um stream de vídeo compatível com `<video>` ou `react-player`
 
-## Solução Proposta
+**Soluções disponíveis:**
 
-### Estrutura Visual
+1. **Fazer download do vídeo e hospedar na pasta `public/`** - Recomendado para melhor performance
+2. **Usar serviço como YouTube/Vimeo** - Se o vídeo já estiver hospedado lá
+3. **Usar Storage do Lovable Cloud** - Para hospedar o arquivo de vídeo
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  [Voltar]                                               │
-│                                                         │
-│                        SOBRE                            │
-│                                                         │
-│              A  Legado de Excelência,                   │
-│                 Como Nossa Dedicação                    │
-│                 Move Tudo o que Fazemos                 │
-│                                                         │
-│    A IAplicada nasceu da experiência prática em         │
-│    operações complexas de empresas como Mercado Livre,  │
-│    Suzano e AngloGold Ashanti...                        │
-│                                                         │
-│              [Conheça nossos serviços →]                │
-│                                                         │
-│         [Foto1]  [Foto2]  [Foto3]  [Foto4]              │
-│            (dispostas em grid diagonal)                 │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+Para prosseguir, vou preparar o layout com um placeholder de vídeo e você pode fazer o upload do arquivo de vídeo para a pasta `public/` do projeto.
+
+## Layout Visual Proposto
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│  [← Voltar]                                        (escuro)  │
+│                                                              │
+│  ┌─────────────────────┐    ┌─────────────────────────────┐  │
+│  │                     │    │  [Logo IAplicada]           │  │
+│  │                     │    │                             │  │
+│  │       [VÍDEO]       │    │  IAPLICADA                  │  │
+│  │         ▶           │    │  ─────────                  │  │
+│  │   (aspect-video)    │    │                             │  │
+│  │                     │    │  Descrição...               │  │
+│  │                     │    │                             │  │
+│  └─────────────────────┘    │  [Conheça a IAplicada →]    │  │
+│                              └─────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-### Especificações Técnicas
+## Mudanças Planejadas
 
-1. **Background e Layout**
-   - Usar o mesmo fundo escuro do projeto (`bg-[#2a2c28]` ou `bg-background` no modo escuro)
-   - Ocupar `min-h-screen` com flexbox centralizado
-   - Garantir consistência visual com as outras páginas públicas
+### 1. Atualizar `src/pages/Sobre.tsx`
 
-2. **Conteúdo Principal**
-   - Label "SOBRE" em verde (`text-aplicada-green-700`)
-   - Título grande com letra "A" decorativa e sublinhado ondulado SVG
-   - Texto adaptado para IAplicada:
-     - "Legado de Excelência," (primeira linha)
-     - "Como Nossa Dedicação Move" (segunda linha)  
-     - "Tudo o que Fazemos" (terceira linha)
-   - Descrição: Manter o texto atual sobre Mercado Livre, Suzano, AngloGold Ashanti
-   - Botão CTA arredondado navegando para `/servicos`
+- Background escuro: `bg-[#1a1c19]` (igual à página Serviços)
+- Ajustar botão "Voltar" para tema escuro (`text-white`)
 
-3. **Grid de Fotos**
-   - 4 imagens de equipe/profissionais com fundo transparente
-   - Usar placeholders do Unsplash similares à referência (ou imagens locais se disponíveis)
-   - Efeito de hover com escala sutil
-   - Disposição diagonal com rotações leves (-6°, 6°, -6°, 6°)
+### 2. Redesenhar `src/components/ui/about-section.tsx`
 
-4. **Animações (Framer Motion)**
-   - Fade-in sequencial para cada elemento
-   - Animação de entrada das fotos com delay escalonado
+**Remover:**
+- Carrossel de logos (`PartnersLogosTicker`)
+- Constantes `partnerLogos` e `triplicatedLogos`
+- Seção full-bleed do carrossel
 
----
+**Novo Layout:**
+- Layout flexbox: coluna no mobile, linha no desktop (`flex-col lg:flex-row`)
+- Background escuro consistente
 
-## Arquivos a Modificar
+**Lado Esquerdo - Container de Vídeo:**
+- Proporção 16:9 (`aspect-video`) para evitar bordas pretas
+- Cantos arredondados (`rounded-2xl`)
+- Sombra verde da marca (`shadow-[#9EB038]/40`)
+- Player de vídeo com `react-player` (já instalado no projeto)
+- Fallback: imagem com botão de play centralizado
 
-| Arquivo | Alteração |
-|---------|-----------|
-| `src/components/ui/about-section.tsx` | Reescrever completamente seguindo o novo layout |
-| `src/pages/Sobre.tsx` | Ajustar estilos de container para full-screen |
+**Lado Direito - Conteúdo:**
+- Logo IAplicada (mantido)
+- Título "IAplicada" com "IA" em verde
+- Barra de destaque verde (gradient)
+- Descrição (mantida)
+- Botão CTA verde
 
----
+## Cores e Estilos (Consistentes com Serviços)
 
-## Detalhes de Implementação
+| Elemento | Valor |
+|----------|-------|
+| Background página | `#1a1c19` |
+| Sombra do vídeo | `shadow-[#9EB038]/40` |
+| Barra de destaque | `bg-gradient-to-r from-[#9EB038] to-[#9EB038]/30` |
+| Título "IA" | `text-[#9EB038]` |
+| Título resto | `text-white` |
+| Descrição | `text-neutral-400` |
+| Botão CTA | `bg-gradient-to-r from-[#9EB038] to-[#7A8A2A]` |
 
-### 1. about-section.tsx - Novo Layout
+## Sobre o Aspect Ratio do Vídeo
 
-```tsx
-// Elementos principais:
-- Container full-screen com flex center
-- Label "SOBRE" animado
-- Título com letra "A" grande e sublinhado SVG ondulado
-- Parágrafos de descrição
-- Botão CTA estilo pill
-- Grid de 4 fotos com rotação alternada
-```
+Para evitar bordas pretas:
+- O container usará `aspect-video` (16:9)
+- O vídeo terá `object-cover` para preencher todo o espaço
+- Se o vídeo original tiver proporção diferente, ele será cortado para caber
 
-### 2. Sobre.tsx - Ajustes
+Se o vídeo original for quadrado ou vertical, posso ajustar o container para `aspect-square` ou `aspect-[4/5]` conforme necessário.
 
-```tsx
-// Mudanças:
-- Remover pt-16 e usar layout full-screen
-- Manter botão Voltar posicionado absolutamente
-- Aplicar background consistente (escuro)
-```
+## Arquivos Afetados
 
-### 3. Imagens de Equipe
+1. `src/pages/Sobre.tsx` - Background escuro e botão claro
+2. `src/components/ui/about-section.tsx` - Redesign completo
 
-Usar imagens do Unsplash (como na referência):
-- Foto 1: https://images.unsplash.com/photo-1539571696357-5a69c17a67c6
-- Foto 2: https://images.unsplash.com/photo-1609179242555-1d7b4b0a568c
-- Foto 3: https://images.unsplash.com/photo-1611695434398-4f4b330623e6
-- Foto 4: https://images.unsplash.com/photo-1567934872913-aacea74458b7
+## Próximos Passos após Implementação
 
----
+1. Fazer upload do arquivo de vídeo (MP4) para `public/videos/`
+2. Atualizar o caminho do vídeo no componente
 
-## Resultado Esperado
-
-- Página `/sobre` com layout moderno e elegante idêntico à referência
-- Ocupando 100% do espaço disponível da tela
-- Background escuro consistente com o resto do projeto
-- Animações suaves de entrada
-- 4 fotos de equipe em disposição diagonal
-- Botão CTA levando para `/servicos`
-- Responsivo para mobile e desktop
