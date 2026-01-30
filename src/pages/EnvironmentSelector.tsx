@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gift, GraduationCap, Users, Crown, Lock, ArrowRight, LucideProps } from "lucide-react";
+import { Gift, GraduationCap, Users, Crown, Lock, ArrowRight, ArrowLeft, LucideProps } from "lucide-react";
 import { useEnvironment, Environment, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
+import { Button } from "@/components/ui/button";
 
 const ICONS: Record<Environment, React.ComponentType<LucideProps>> = {
   gratuito: Gift,
@@ -52,8 +54,33 @@ export default function EnvironmentSelector() {
     );
   }
 
+  const { signOut } = useAuth();
+
+  const handleBackToAuth = async () => {
+    await signOut();
+    navigate("/auth", { replace: true });
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a] p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a] p-6 relative">
+      {/* Botão Voltar */}
+      <motion.div
+        className="absolute top-6 left-6"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBackToAuth}
+          className="text-white/60 hover:text-white hover:bg-white/10 gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Sair
+        </Button>
+      </motion.div>
+
       {/* Logo */}
       <motion.img
         src={logoAplicada}
