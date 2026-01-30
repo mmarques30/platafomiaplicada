@@ -1,99 +1,61 @@
 
-# Plano: Página de Serviços com Efeito Parallax
 
-## Resumo
+# Plano: Simplificar Página de Serviços
 
-Criar uma nova página `/servicos` que apresenta os produtos da IAplicada (Academy, Skills e Business) usando um efeito de scroll parallax imersivo. Cada produto terá sua própria seção com imagem sticky, texto animado que aparece conforme o usuário faz scroll, e descrição detalhada.
+## Problema
+A implementação atual adicionou elementos extras que não estavam no design de referência:
+- Hero section no topo (desnecessário)
+- Ícones decorativos (Sparkles, Zap, Building2)
+- Tags/badges verdes com destaques
+- Cards elaborados com bordas e backgrounds
+- Footer CTA section
+- Textos com spans coloridos
 
-## Estrutura das Seções
+## Solução
+Simplificar a página para seguir exatamente o layout de referência do componente `text-parallax-content-scroll`.
 
-A página terá 3 seções principais com o conteúdo especificado:
+## Mudanças
 
-### Seção 1 - IAplicada Academy
-- **Subtítulo**: Academy
-- **Título**: A escola que transforma sua carreira.
-- **Descrição**: "A escola que transforma sua carreira e decola ela em 90 dias: APLICA+ e ferramentas IA testadas pra você produzir 2-3x mais, sem programação, sem tentativa e erro, atualizado todo mês com as novas IAs."
+### 1. Simplificar `src/pages/Servicos.tsx`
 
-### Seção 2 - IAplicada Skills
-- **Subtítulo**: Skills
-- **Título**: Elimine 10-20h/semana de tarefas manuais.
-- **Descrição**: "A solução que elimina especificamente 10-20h/semana de tarefas manuais de equipes operacionais de 3-15 pessoas em empresas em crescimento, trocando planilhas + processos repetitivos por automações práticas que rodam no dia a dia, em 12 semanas, sem exigir conhecimento técnico ou consultoria cara."
+**Remover:**
+- Hero section do topo
+- Importações de ícones (Sparkles, Zap, Building2, ArrowRight)
+- Importação do motion (não será mais usado na página)
+- Footer CTA section
+- Cards elaborados com bordas e ícones
+- Tags/badges
 
-### Seção 3 - IAplicada Business
-- **Subtítulo**: Business
-- **Título**: A única solução que organiza sua operação.
-- **Descrição**: "É a única solução que organiza especificamente a operação, trocando o caos de planilhas + WhatsApp + sistemas desconectados por uma plataforma centralizada que automatiza tarefas e dá visibilidade total, em 30 dias, sem enrolação, sem soluções engessadas, sem dev."
+**Manter:**
+- AuthHeader
+- 3 seções TextParallaxContent com os textos corretos
+- Layout simples seguindo o exemplo de referência
 
-## Design Visual
+### 2. Conteúdo Simplificado de Cada Seção
 
-O efeito parallax funcionará assim:
-1. Uma imagem de fundo fica "sticky" (fixa) enquanto o usuário faz scroll
-2. A imagem escala sutilmente e faz fade out conforme o progresso do scroll
-3. Texto com subheading e heading anima para dentro da tela
-4. Ao continuar scrollando, o texto sai e aparece um card com mais detalhes
+Cada seção terá apenas:
+- Título pequeno (h2 ou similar)
+- Parágrafo com descrição
+- Link "Saiba mais" simples com seta
 
-## Arquivos a Criar/Modificar
+**Academy:**
+- Título: "IAplicada Academy"
+- Descrição completa conforme especificado
+- Link: "Saiba mais"
 
-1. **Novo arquivo**: `src/components/ui/text-parallax-content.tsx`
-   - Componente reutilizável de parallax scroll
-   - Usa Framer Motion (`useScroll`, `useTransform`)
-   - Sub-componentes: StickyImage, OverlayCopy, ExampleContent
+**Skills:**
+- Título: "IAplicada Skills"  
+- Descrição completa conforme especificado
+- Link: "Saiba mais"
 
-2. **Novo arquivo**: `src/pages/Servicos.tsx`
-   - Página principal com as 3 seções de produtos
-   - Usa o componente TextParallaxContent
-   - Header com navegação similar à Auth page
+**Business:**
+- Título: "IAplicada Business"
+- Descrição completa conforme especificado
+- Link: "Saiba mais"
 
-3. **Modificar**: `src/App.tsx`
-   - Adicionar rota `/servicos`
+## Arquivos a Modificar
 
-4. **Modificar**: `src/components/auth/AuthHeader.tsx`
-   - Atualizar link "Serviços" para apontar para `/servicos`
+1. **`src/pages/Servicos.tsx`** - Reescrever para ficar simples como o exemplo de referência
 
-## Detalhes Técnicos
+O componente `text-parallax-content.tsx` já está correto e não precisa de alterações.
 
-### Componente TextParallaxContent
-
-```text
-┌──────────────────────────────────────────────────────────┐
-│                    StickyImage                            │
-│   ┌─────────────────────────────────────────────────┐    │
-│   │  Imagem de fundo sticky                          │    │
-│   │  (escala + opacity animados via scroll)          │    │
-│   │                                                  │    │
-│   │         ┌────────────────────┐                   │    │
-│   │         │  OverlayCopy       │                   │    │
-│   │         │  - Subheading      │                   │    │
-│   │         │  - Heading         │                   │    │
-│   │         └────────────────────┘                   │    │
-│   │                                                  │    │
-│   └─────────────────────────────────────────────────┘    │
-└──────────────────────────────────────────────────────────┘
-┌──────────────────────────────────────────────────────────┐
-│                 ExampleContent                            │
-│   Descrição detalhada do produto + CTA                   │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Animações (via Framer Motion)
-- **StickyImage**: 
-  - `scale`: transforma de 1 para 0.85 conforme scroll
-  - `opacity`: transforma de 1 para 0 conforme scroll
-- **OverlayCopy**:
-  - `y`: texto desliza verticalmente
-  - `opacity`: fade in/out baseado na posição do scroll
-
-### Imagens
-Usar imagens representativas para cada produto (podem ser placeholders ou as imagens já cadastradas no banco de dados dos produtos).
-
-## Cores e Estilo
-
-Seguir a paleta existente do projeto:
-- Background escuro: `#2a2c28` ou similar
-- Verde marca: `#9EB038` / `#C5D63D`
-- Texto branco com variações de opacidade
-
-## Responsividade
-
-- Desktop: Efeito parallax completo
-- Mobile: Versão simplificada com animações mais sutis para performance
