@@ -54,7 +54,7 @@ export function AboutSection() {
           <img 
             src={logoIaplicada} 
             alt="IAplicada Logo" 
-            className="h-12 md:h-14 w-auto"
+            className="h-16 md:h-20 w-auto"
           />
         </motion.div>
 
@@ -65,8 +65,8 @@ export function AboutSection() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mb-4"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white uppercase tracking-wide inline-block">
-            <span className="text-[#9EB038]">IA</span>plicada
+          <h2 className="text-3xl md:text-4xl text-white uppercase tracking-wide inline-block">
+            <span className="text-[#9EB038] font-bold">IA</span>plicada
           </h2>
           <div className="h-0.5 w-full bg-gradient-to-r from-[#9EB038] to-transparent mt-2" />
         </motion.div>
