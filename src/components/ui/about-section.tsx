@@ -30,7 +30,7 @@ export function AboutSection() {
           videoId={videoId}
           thumbnail={thumbnail}
           title="IAplicada - Conheça nossa história"
-          endSeconds={206}
+          endSeconds={207}
           onEnded={handleVideoEnd}
           aspectRatio="reels"
         />
