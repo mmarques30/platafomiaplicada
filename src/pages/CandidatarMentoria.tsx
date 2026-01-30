@@ -240,10 +240,10 @@ export default function CandidatarMentoria() {
           </p>
           
           <Button
-            onClick={() => navigate("/aplique")}
+            onClick={() => navigate("/servicos")}
             className="bg-[#2F302B] hover:bg-[#3D3E39]"
           >
-            Voltar para Aplique
+            Voltar para Serviços
           </Button>
         </Card>
       </div>
@@ -255,7 +255,7 @@ export default function CandidatarMentoria() {
       {/* Botão Voltar */}
       <Button
         variant="ghost"
-        onClick={() => navigate('/aplique')}
+        onClick={() => navigate('/servicos')}
         className="absolute top-4 left-4 z-20 text-foreground hover:bg-muted"
       >
         <ChevronLeft className="w-5 h-5 mr-1" />

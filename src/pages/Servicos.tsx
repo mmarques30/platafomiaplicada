@@ -21,7 +21,7 @@ const Servicos = () => {
               A escola que transforma sua carreira e decola ela em 90 dias. Feita Para profissionais que querem ser 2-3x mais produtivos e indispensáveis na empresa, não mais uma plataforma de IAs soltas nem curso genérico de 6 horas. Acesse a versão gratuita da plataforma por tempo limitado ao se cadastrar.
             </p>
             <a
-              href="/aplique"
+              href="/servicos"
               className="inline-flex items-center gap-1 text-[#9EB038] hover:underline"
             >
               Saiba mais <ArrowUpRight className="w-4 h-4" />
@@ -44,7 +44,7 @@ const Servicos = () => {
               A solução que elimina até 20h/semana de tarefas manuais de equipes, trocando planilhas + processos repetitivos por automações práticas que rodam no dia a dia, em 12 semanas. O Skills é para líderes que querem sua equipe performando ao máximo, resolvendo os problemas reais do dia a dia - não certificados individuais ou nem conhecimento teórico.
             </p>
             <a
-              href="/avance"
+              href="/servicos"
               className="inline-flex items-center gap-1 text-[#9EB038] hover:underline"
             >
               Saiba mais <ArrowUpRight className="w-4 h-4" />
@@ -67,7 +67,7 @@ const Servicos = () => {
               É a única solução que organiza especificamente a operação, trocando o caos de planilhas + WhatsApp + sistemas desconectados por uma plataforma centralizada que automatiza tarefas e dá visibilidade total, em 30 dias, sem enrolação, sem soluções engessadas, sem dev.
             </p>
             <a
-              href="/avance"
+              href="/servicos"
               className="inline-flex items-center gap-1 text-[#9EB038] hover:underline"
             >
               Saiba mais <ArrowUpRight className="w-4 h-4" />

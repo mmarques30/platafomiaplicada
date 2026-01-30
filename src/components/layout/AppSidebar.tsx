@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, Zap, EyeOff } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, EyeOff } from "lucide-react";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -296,32 +296,6 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               </Collapsible>
 
-              {/* CTA Item - Visível apenas para visitantes */}
-              {!isBusiness && !isSkills && !isAcademy && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild className="group">
-                    <NavLink 
-                      to={isVisitante || !effectivePlan ? "/aplique" : "/avance"}
-                      end
-                      className={cn(
-                        "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
-                        location.pathname === (isVisitante || !effectivePlan ? "/aplique" : "/avance")
-                          ? "text-primary font-semibold bg-primary/10" 
-                          : "text-primary/80 hover:text-primary bg-primary/5 hover:bg-primary/10"
-                      )}
-                    >
-                      <span className={cn(
-                        "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                        location.pathname === (isVisitante || !effectivePlan ? "/aplique" : "/avance")
-                          ? "bg-[#0D0D0D] opacity-100" 
-                          : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
-                      )} />
-                      <Zap className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                      {!collapsed && <span className="text-sm">{isVisitante || !effectivePlan ? "Aplique" : "Avance"}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

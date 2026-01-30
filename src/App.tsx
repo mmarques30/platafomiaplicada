@@ -85,8 +85,6 @@ import Comunidade from "./pages/Comunidade";
 import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
 import MateriaisGratuitos from "./pages/MateriaisGratuitos";
 import GerenciarMateriais from "./pages/admin/GerenciarMateriais";
-import Aplique from "./pages/Aplique";
-import Avance from "./pages/Avance";
 import CandidatarMentoria from "./pages/CandidatarMentoria";
 import GerenciarCandidaturas from "./pages/admin/GerenciarCandidaturas";
 import VideosBonus from "./pages/VideosBonus";
@@ -119,8 +117,6 @@ function AppContent() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/servicos" element={<Servicos />} />
         <Route path="/selecionar-ambiente" element={<EnvironmentSelector />} />
-        <Route path="/aplique" element={<Aplique />} />
-        <Route path="/avance" element={<Avance />} />
         <Route path="/formularioaplica" element={<FormularioAplica />} />
         <Route path="/termos-uso" element={<PoliticaUso />} />
         <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
