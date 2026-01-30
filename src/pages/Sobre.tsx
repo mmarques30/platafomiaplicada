@@ -7,9 +7,9 @@ export default function Sobre() {
   const navigate = useNavigate();
   
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Botão Voltar */}
-      <div className="fixed top-4 left-4 z-20">
+      <div className="sticky top-0 left-0 z-20 p-4">
         <Button 
           variant="ghost" 
           className="text-foreground hover:bg-muted"
@@ -20,8 +20,10 @@ export default function Sobre() {
         </Button>
       </div>
       
-      {/* About Section - Full Screen */}
-      <AboutSection />
+      {/* About Section - Flex grow to fill available space */}
+      <div className="flex-1 flex items-center justify-center">
+        <AboutSection />
+      </div>
     </div>
   );
 }
