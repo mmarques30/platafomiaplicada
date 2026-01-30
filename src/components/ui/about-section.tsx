@@ -24,7 +24,7 @@ export function AboutSection() {
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-[280px] md:max-w-[320px] shadow-2xl shadow-[#9EB038]/40 rounded-2xl overflow-hidden"
+        className="w-full max-w-[320px] md:max-w-[380px] shadow-2xl shadow-[#9EB038]/40 rounded-2xl overflow-hidden"
       >
         <SimpleVideoPlayer
           videoId={videoId}

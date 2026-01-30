@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import ReactPlayer from "react-player";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export function SimpleVideoPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [showThumbnail, setShowThumbnail] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const playerRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const aspectClass = aspectRatio === "reels" 
     ? "aspect-[9/16]" 
@@ -52,7 +52,16 @@ export function SimpleVideoPlayer({
     setHasError(true);
   };
 
+  const handlePlayerReady = useCallback(() => {
+    // Player is ready
+  }, []);
+
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  // Set up ref callback for the video element
+  const setVideoRef = useCallback((node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+  }, []);
 
   if (hasError) {
     return (
@@ -104,16 +113,17 @@ export function SimpleVideoPlayer({
         </div>
       ) : (
         <ReactPlayer
-          ref={playerRef}
           src={videoUrl}
           playing={isPlaying}
           controls
           width="100%"
           height="100%"
           style={{ position: 'absolute', top: 0, left: 0 }}
+          ref={setVideoRef}
           onTimeUpdate={handleTimeUpdate}
           onEnded={onEnded}
           onError={handleError}
+          onReady={handlePlayerReady}
           config={{
             youtube: {
               iv_load_policy: 3,
