@@ -90,7 +90,7 @@ export function AboutSection() {
           <img 
             src={logoIaplicada} 
             alt="IAplicada Logo" 
-            className="h-24 md:h-32 w-auto"
+            className="h-16 md:h-20 w-auto"
           />
         </motion.div>
 
