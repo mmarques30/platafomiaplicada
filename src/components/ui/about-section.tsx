@@ -19,12 +19,12 @@ export function AboutSection() {
 
   return (
     <section className="flex flex-col md:flex-row items-center justify-center gap-10 px-4 md:px-8 lg:px-12 py-12 md:py-16">
-      {/* Lado Esquerdo - Vídeo */}
+      {/* Lado Esquerdo - Vídeo Vertical (Reels) */}
       <motion.div
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-lg shadow-2xl shadow-[#9EB038]/40 rounded-2xl overflow-hidden"
+        className="w-full max-w-[280px] md:max-w-[320px] shadow-2xl shadow-[#9EB038]/40 rounded-2xl overflow-hidden"
       >
         <CustomVideoPlayer
           videoId={videoId}
@@ -32,6 +32,7 @@ export function AboutSection() {
           title="IAplicada - Conheça nossa história"
           endSeconds={206}
           onEnded={handleVideoEnd}
+          aspectRatio="reels"
         />
       </motion.div>
 

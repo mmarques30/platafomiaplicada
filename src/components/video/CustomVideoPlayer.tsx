@@ -13,6 +13,7 @@ interface CustomVideoPlayerProps {
   onEnded?: () => void;
   thumbnail?: string;
   title?: string;
+  aspectRatio?: "video" | "reels" | "square";
 }
 
 export function CustomVideoPlayer({
@@ -23,6 +24,7 @@ export function CustomVideoPlayer({
   onEnded,
   thumbnail,
   title,
+  aspectRatio = "video",
 }: CustomVideoPlayerProps) {
   const [playerReady, setPlayerReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -187,10 +189,12 @@ export function CustomVideoPlayer({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const aspectClass = aspectRatio === "reels" ? "aspect-[9/16]" : aspectRatio === "square" ? "aspect-square" : "aspect-video";
+
   // Render de erro
   if (error) {
     return (
-      <div className="relative w-full aspect-video bg-black overflow-hidden rounded-lg flex items-center justify-center">
+      <div className={cn("relative w-full bg-black overflow-hidden rounded-lg flex items-center justify-center", aspectClass)}>
         {thumbnail && (
           <img
             src={thumbnail}
@@ -218,7 +222,7 @@ export function CustomVideoPlayer({
   // Render de loading
   if (isLoading) {
     return (
-      <div className="relative w-full aspect-video bg-black overflow-hidden rounded-lg flex items-center justify-center">
+      <div className={cn("relative w-full bg-black overflow-hidden rounded-lg flex items-center justify-center", aspectClass)}>
         {thumbnail && (
           <img
             src={thumbnail}
@@ -237,7 +241,7 @@ export function CustomVideoPlayer({
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-video bg-black overflow-hidden group rounded-lg"
+      className={cn("relative w-full bg-black overflow-hidden group rounded-lg", aspectClass)}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => isPlaying && !showThumbnail && setShowControls(false)}
     >
