@@ -9,7 +9,7 @@ export default function Sobre() {
   return (
     <div className="min-h-screen bg-background">
       {/* Botão Voltar */}
-      <div className="absolute top-4 left-4 z-20">
+      <div className="fixed top-4 left-4 z-20">
         <Button 
           variant="ghost" 
           className="text-foreground hover:bg-muted"
@@ -20,10 +20,8 @@ export default function Sobre() {
         </Button>
       </div>
       
-      {/* About Section */}
-      <div className="pt-16">
-        <AboutSection />
-      </div>
+      {/* About Section - Full Screen */}
+      <AboutSection />
     </div>
   );
 }
