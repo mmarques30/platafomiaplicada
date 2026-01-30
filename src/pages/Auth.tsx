@@ -45,14 +45,6 @@ export default function Auth() {
           >
             Bem Vindo Aplicado
           </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-            className="text-white/60 mb-8"
-          >
-            acesse e aplique
-          </motion.p>
           
           {/* Card com sub-abas */}
           <motion.div 
