@@ -20,6 +20,7 @@ const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "busin
 
 export default function EnvironmentSelector() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const { 
     availableEnvironments, 
     setEnvironment, 
@@ -53,8 +54,6 @@ export default function EnvironmentSelector() {
       </div>
     );
   }
-
-  const { signOut } = useAuth();
 
   const handleBackToAuth = async () => {
     await signOut();
