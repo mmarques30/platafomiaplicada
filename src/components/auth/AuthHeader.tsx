@@ -65,9 +65,9 @@ export function AuthHeader() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn(
-        "fixed top-4 left-1/2 -translate-x-1/2 z-50",
+        "fixed top-4 left-0 right-0 z-50 mx-auto",
         "bg-black/40 backdrop-blur-md border border-white/10",
-        "px-4 py-2.5 w-[95%] max-w-2xl",
+        "px-6 py-2.5 w-fit max-w-2xl",
         "transition-all duration-300 ease-in-out",
         headerShapeClass
       )}
