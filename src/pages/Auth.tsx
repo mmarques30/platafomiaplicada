@@ -18,10 +18,10 @@ export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [showRecuperarSenha, setShowRecuperarSenha] = useState(false);
 
-  // Redirecionar usuários já autenticados
+  // Redirecionar usuários já autenticados para seleção de ambiente
   useEffect(() => {
     if (!loading && user) {
-      navigate("/");
+      navigate("/selecionar-ambiente");
     }
   }, [user, loading, navigate]);
 

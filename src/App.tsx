@@ -8,7 +8,9 @@ import { TrocarSenhaModal } from "./components/auth/TrocarSenhaModal";
 import { useAuth } from "./hooks/useAuth";
 import { useVersionCheck } from "./hooks/useVersionCheck";
 import { AdminViewProvider } from "./contexts/AdminViewContext";
+import { EnvironmentProvider } from "./contexts/EnvironmentContext";
 import Auth from "./pages/Auth";
+import EnvironmentSelector from "./pages/EnvironmentSelector";
 import Dashboard from "./pages/Dashboard";
 import Trilhas from "./pages/Trilhas";
 import TrilhaDetalhes from "./pages/TrilhaDetalhes";
@@ -113,6 +115,7 @@ function AppContent() {
       <Routes>
         {/* Rotas públicas */}
         <Route path="/auth" element={<Auth />} />
+        <Route path="/selecionar-ambiente" element={<EnvironmentSelector />} />
         <Route path="/aplique" element={<Aplique />} />
         <Route path="/avance" element={<Avance />} />
         <Route path="/formularioaplica" element={<FormularioAplica />} />
@@ -216,7 +219,9 @@ const App = () => (
       <TooltipProvider>
         <BrowserRouter>
           <AdminViewProvider>
-            <AppContent />
+            <EnvironmentProvider>
+              <AppContent />
+            </EnvironmentProvider>
           </AdminViewProvider>
         </BrowserRouter>
       </TooltipProvider>

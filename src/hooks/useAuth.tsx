@@ -57,6 +57,9 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
+      // Limpar ambiente selecionado
+      sessionStorage.removeItem("selected_environment");
+      
       await supabase.auth.signOut();
       
       // CRÍTICO: Limpar TODO o cache do React Query

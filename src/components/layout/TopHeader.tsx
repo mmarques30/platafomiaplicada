@@ -25,6 +25,7 @@ import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { cn } from "@/lib/utils";
 import { forceFullAppReload } from "@/lib/pwaUpdate";
 import { AdminViewSelector } from "@/components/admin/AdminViewSelector";
+import { EnvironmentSwitcher } from "@/components/layout/EnvironmentSwitcher";
 
 export function TopHeader() {
   const navigate = useNavigate();
@@ -213,8 +214,9 @@ export function TopHeader() {
           )}
         </nav>
 
-        {/* RIGHT: Admin View Selector + Refresh + Notifications + Avatar */}
+        {/* RIGHT: Environment Switcher + Admin View Selector + Refresh + Notifications + Avatar */}
         <div className="absolute right-0 top-0 h-full flex items-center gap-1 pr-4">
+          <EnvironmentSwitcher />
           {isAdmin && <AdminViewSelector isAdmin={isAdmin} />}
           <TooltipProvider>
             <Tooltip>
