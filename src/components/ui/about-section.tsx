@@ -126,27 +126,30 @@ export function AboutSection() {
           </Button>
         </motion.div>
 
-        {/* Divider */}
-        <div className="border-t border-border" />
+        {/* Full-bleed divider + partners ticker (escapa do max-width) */}
+        <div className="relative left-1/2 -translate-x-1/2 w-screen max-w-none mt-12">
+          <div className="px-4 md:px-8">
+            <div className="border-t border-border" />
+          </div>
 
-        {/* Partners subtitle */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-sm text-muted-foreground uppercase tracking-wide"
-        >
-          Empresas que já fazem parte da IAplicada
-        </motion.p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-8 px-4 md:px-8 text-center text-sm text-muted-foreground uppercase tracking-wide"
+          >
+            Empresas que já fazem parte da IAplicada
+          </motion.p>
 
-        {/* Logos Carousel */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <PartnersLogosTicker />
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-6"
+          >
+            <PartnersLogosTicker />
+          </motion.div>
+        </div>
       </div>
     </section>
   );
