@@ -46,8 +46,8 @@ export function AnimatedBackground() {
     window.addEventListener("mousemove", handleMouseMove);
 
     const animate = () => {
-      // Dark background matching the brand
-      ctx.fillStyle = "#0a0a0a";
+      // Background escuro olive/verde
+      ctx.fillStyle = "#3d3f39";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle, i) => {
@@ -66,12 +66,13 @@ export function AnimatedBackground() {
           particle.y -= dy * 0.01;
         }
 
-        // Green particles matching IAplicada brand
+        // Partículas verdes
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(158, 176, 56, 0.4)";
+        ctx.fillStyle = "rgba(157, 184, 96, 0.2)";
         ctx.fill();
 
+        // Linhas conectando partículas próximas
         particlesRef.current.forEach((otherParticle, j) => {
           if (i === j) return;
           const dx = particle.x - otherParticle.x;
@@ -82,7 +83,7 @@ export function AnimatedBackground() {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(158, 176, 56, ${0.15 * (1 - distance / 120)})`;
+            ctx.strokeStyle = `rgba(121, 141, 60, ${0.1 * (1 - distance / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -108,20 +109,50 @@ export function AnimatedBackground() {
       {/* Canvas de partículas */}
       <canvas ref={canvasRef} className="absolute inset-0" />
 
-      {/* Gradiente central sutil */}
+      {/* Gradiente diagonal sutil */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#9DB860]/5 via-transparent to-[#798D3C]/10 pointer-events-none" />
+
+      {/* Blob animado superior esquerdo */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(158, 176, 56, 0.08) 0%, transparent 60%)",
+        className="absolute top-20 left-20 w-96 h-96 bg-[#D5D8AC]/20 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.2, 0.3, 0.2],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
         }}
       />
 
-      {/* Gradiente inferior */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent pointer-events-none" />
+      {/* Blob animado inferior direito */}
+      <motion.div
+        className="absolute bottom-20 right-20 w-80 h-80 bg-[#798D3C]/15 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.15, 0.25, 0.15],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      {/* Blob animado central */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#9DB860]/10 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.1, 0.15, 0.1],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
     </div>
   );
 }
