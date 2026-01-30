@@ -87,7 +87,7 @@ export function AuthHeader() {
         </div>
 
         {/* Desktop Nav Links */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-8 ml-12">
           {navLinksData.map((link) => (
             <AnimatedNavLink key={link.label} href={link.href}>
               {link.label}
