@@ -98,7 +98,7 @@ export function AboutSection() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6"
         >
-          <span className="text-aplicada-green-700 font-bold">I</span>Aplicada
+          <span className="text-aplicada-green-700 font-bold">IA</span>plicada
         </motion.h2>
 
         {/* Description */}
