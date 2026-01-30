@@ -7,6 +7,7 @@ import { AnimatedBackground } from "@/components/auth/AnimatedBackground";
 import { AuthHeader } from "@/components/auth/AuthHeader";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignupForm } from "@/components/auth/SignupForm";
+import { Typewriter } from "@/components/ui/typewriter-text";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -36,15 +37,21 @@ export default function Auth() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md text-center"
         >
-          {/* Título */}
-          <motion.h1 
+          {/* Título com efeito typewriter */}
+          <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="text-3xl md:text-4xl font-bold text-white mb-2"
+            className="text-3xl md:text-4xl font-bold text-white mb-8"
           >
-            Bem Vindo Aplicado
-          </motion.h1>
+            <Typewriter
+              text={["BEM VINDO"]}
+              speed={120}
+              loop={false}
+              className="text-white"
+              cursorClassName="bg-[#9EB038]"
+            />
+          </motion.div>
           
           {/* Card com sub-abas */}
           <motion.div 
