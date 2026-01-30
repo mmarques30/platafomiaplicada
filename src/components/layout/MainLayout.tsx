@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { TopHeader } from "./TopHeader";
@@ -6,6 +7,7 @@ import { useIdleLogout } from "@/hooks/useIdleLogout";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAuth } from "@/hooks/useAuth";
+import { useEnvironmentSafe } from "@/hooks/useEnvironment";
 import { GraduationCap, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
@@ -15,11 +17,19 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export function MainLayout() {
   useIdleLogout();
+  const navigate = useNavigate();
   const { isVisitante, isLoading } = useUserRole();
   const { profile } = useUserProfile();
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const environmentContext = useEnvironmentSafe();
+
+  // Redirecionar para seleção de ambiente se não selecionado
+  useEffect(() => {
+    if (!isLoading && environmentContext && !environmentContext.isLoading && !environmentContext.isEnvironmentSelected) {
+      navigate("/selecionar-ambiente", { replace: true });
+    }
+  }, [isLoading, environmentContext, navigate]);
 
   // Modal só aparece para mentorados (não visitantes) com senha temporária
   const showPasswordModal = !isLoading && !isVisitante && profile?.senha_temporaria === true;
