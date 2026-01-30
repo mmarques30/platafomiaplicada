@@ -1,43 +1,129 @@
 
-Objetivo
-- Fazer o clique em “Sobre” levar para a página nova correta (/sobre), que contém o layout e o carrossel de logos que você pediu, em vez de redirecionar para /aplique.
+# Plano: Excluir páginas Aplique e Avance
 
-O que está acontecendo (diagnóstico)
-- O seu menu “Sobre” que aparece no topo das páginas públicas (ex.: /auth e /servicos) é renderizado pelo componente `src/components/auth/AuthHeader.tsx`.
-- Dentro dele, existe este mapeamento:
-  - `Sobre -> /aplique`
-- Por isso, mesmo existindo a rota `/sobre` no `App.tsx` e a página `src/pages/Sobre.tsx`, ao clicar em “Sobre” você continua indo para `/aplique`.
+## Resumo
+Remover completamente as páginas `/aplique` e `/avance` do projeto, incluindo todos os arquivos e referências a elas.
 
-Solução proposta (o que vou mudar)
-1) Corrigir o destino do link “Sobre” no header público
-- Em `src/components/auth/AuthHeader.tsx`, alterar o item:
-  - de `{ label: 'Sobre', href: '/aplique' }`
-  - para `{ label: 'Sobre', href: '/sobre' }`
+---
 
-2) (Recomendado) Trocar navegação por `<Link>` do React Router, em vez de `<a href>`
-- Hoje o header usa `<a href="...">`, o que pode causar reload de página e deixar o comportamento mais “instável” (principalmente em PWA).
-- Vou:
-  - importar `Link` de `react-router-dom`
-  - substituir `AnimatedNavLink` para usar `to="/sobre"` via `<Link>`
-  - trocar também os links do menu mobile para `<Link>`
-  - adicionar `onClick={() => setIsOpen(false)}` nos links mobile para fechar o menu ao navegar
+## Impacto da Remoção
 
-3) Validar que não existe outro “Sobre” apontando para /aplique
-- Já identifiquei que o único lugar com “Sobre -> /aplique” é o `AuthHeader`, mas vou confirmar novamente após a troca.
+### Arquivos a EXCLUIR
+1. `src/pages/Aplique.tsx` (~456 linhas)
+2. `src/pages/Avance.tsx` (~400 linhas)
 
-Como vou testar (checklist)
-- Abrir /auth e clicar em “Sobre”:
-  - Deve navegar para `/sobre` e exibir o título “IAplicada”, a descrição e o carrossel de logos.
-- Abrir /servicos e clicar em “Sobre”:
-  - Deve navegar para `/sobre`.
-- Testar no mobile:
-  - Abrir o menu (hamburger), clicar em “Sobre”
-  - Deve navegar para `/sobre` e o menu deve fechar.
+### Arquivos a EDITAR (remover referências)
 
-Arquivos que serão alterados
-- `src/components/auth/AuthHeader.tsx`
-  - Atualizar o caminho do link “Sobre”
-  - (Opcional recomendado) substituir `<a>` por `<Link>` para navegação interna SPA
+| Arquivo | O que mudar |
+|---------|------------|
+| `src/App.tsx` | Remover imports e rotas `/aplique` e `/avance` |
+| `src/pages/Servicos.tsx` | Substituir links `/aplique` e `/avance` por alternativa (ex: `/servicos` ou remover) |
+| `src/pages/CandidatarMentoria.tsx` | Alterar navegação "Voltar para Aplique" para `/servicos` |
+| `src/pages/Trilhas.tsx` | Remover ou alterar botão CTA que vai para `/aplique` |
+| `src/components/dashboard/CentralConteudoGratuito.tsx` | Alterar link "Ter acesso completo" de `/aplique` para alternativa |
+| `src/components/shared/TrilhaCardBloqueavel.tsx` | Alterar link do cadeado de `/aplique` para alternativa |
+| `src/components/layout/AppSidebar.tsx` | Remover item CTA "Aplique/Avance" do menu lateral |
 
-Resultado esperado
-- “Sobre” sempre abre a página nova `/sobre` (a que contém o layout inspirado no link que você mandou), e não mais `/aplique`.
+---
+
+## Decisões Necessárias
+
+Antes de implementar, preciso confirmar para onde direcionar os links que atualmente vão para `/aplique` ou `/avance`:
+
+1. **Página de Serviços (`Servicos.tsx`)**: Os cards "Academy", "Skills" e "Business" apontam para essas páginas
+   - **Opção A**: Redirecionar todos para `/servicos` (a própria página atual)
+   - **Opção B**: Abrir link externo (WhatsApp ou checkout)
+   - **Opção C**: Remover os links "Saiba mais"
+
+2. **Candidatura Mentoria**: Botão "Voltar para Aplique"
+   - **Sugestão**: Alterar para `/servicos`
+
+3. **Trilhas (visitantes bloqueados)**: Cadeado leva para `/aplique`
+   - **Sugestão**: Alterar para `/servicos` ou `/auth`
+
+4. **Dashboard Central (visitantes)**: CTA "Ter acesso completo"
+   - **Sugestão**: Alterar para `/servicos`
+
+5. **Sidebar (menu lateral)**: Item CTA "Aplique" ou "Avance"
+   - **Sugestão**: Remover completamente ou alterar para `/servicos`
+
+---
+
+## Detalhes Técnicos
+
+### 1. Excluir arquivos
+```
+src/pages/Aplique.tsx
+src/pages/Avance.tsx
+```
+
+### 2. App.tsx - Remover imports e rotas
+```tsx
+// Remover:
+import Aplique from "./pages/Aplique";
+import Avance from "./pages/Avance";
+
+// Remover rotas:
+<Route path="/aplique" element={<Aplique />} />
+<Route path="/avance" element={<Avance />} />
+```
+
+### 3. Servicos.tsx - Atualizar links
+```tsx
+// Alterar de:
+href="/aplique"
+href="/avance"
+
+// Para (sugestão):
+href="https://wa.me/5511950566101" // WhatsApp ou
+href="/servicos" // Scroll na própria página
+```
+
+### 4. CandidatarMentoria.tsx - Alterar navegação
+```tsx
+// Alterar de:
+onClick={() => navigate("/aplique")}
+// Para:
+onClick={() => navigate("/servicos")}
+```
+
+### 5. Trilhas.tsx - Remover/alterar CTA
+```tsx
+// Remover ou alterar:
+<Link to="/aplique">
+```
+
+### 6. CentralConteudoGratuito.tsx - Alterar link
+```tsx
+// Alterar de:
+<Link to="/aplique">
+// Para:
+<Link to="/servicos">
+```
+
+### 7. TrilhaCardBloqueavel.tsx - Alterar link do cadeado
+```tsx
+// Alterar de:
+<Link to="/aplique">
+// Para:
+<Link to="/servicos">
+```
+
+### 8. AppSidebar.tsx - Remover item CTA
+```tsx
+// Remover todo o bloco (linhas 299-324):
+{!isBusiness && !isSkills && !isAcademy && (
+  <SidebarMenuItem>
+    // ... item Aplique/Avance
+  </SidebarMenuItem>
+)}
+```
+
+---
+
+## Resultado Esperado
+
+- Páginas `/aplique` e `/avance` deixam de existir
+- Todas as referências redirecionam para `/servicos` (ou alternativa escolhida)
+- Nenhum erro 404 ou link quebrado
+- Menu lateral sem o item CTA "Aplique/Avance"
