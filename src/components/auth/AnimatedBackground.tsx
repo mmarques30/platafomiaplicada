@@ -110,14 +110,14 @@ export function AnimatedBackground() {
       <canvas ref={canvasRef} className="absolute inset-0" />
 
       {/* Gradiente diagonal sutil */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#9DB860]/5 via-transparent to-[#798D3C]/10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#9DB860]/3 via-transparent to-[#798D3C]/5 pointer-events-none" />
 
       {/* Blob animado superior esquerdo */}
       <motion.div
-        className="absolute top-20 left-20 w-96 h-96 bg-[#D5D8AC]/20 rounded-full blur-3xl pointer-events-none"
+        className="absolute top-20 left-20 w-96 h-96 bg-[#D5D8AC]/10 rounded-full blur-3xl pointer-events-none"
         animate={{
           scale: [1, 1.2, 1],
-          opacity: [0.2, 0.3, 0.2],
+          opacity: [0.1, 0.15, 0.1],
         }}
         transition={{
           duration: 8,
@@ -128,10 +128,10 @@ export function AnimatedBackground() {
 
       {/* Blob animado inferior direito */}
       <motion.div
-        className="absolute bottom-20 right-20 w-80 h-80 bg-[#798D3C]/15 rounded-full blur-3xl pointer-events-none"
+        className="absolute bottom-20 right-20 w-80 h-80 bg-[#798D3C]/8 rounded-full blur-3xl pointer-events-none"
         animate={{
           scale: [1, 1.3, 1],
-          opacity: [0.15, 0.25, 0.15],
+          opacity: [0.08, 0.12, 0.08],
         }}
         transition={{
           duration: 10,
@@ -142,10 +142,10 @@ export function AnimatedBackground() {
 
       {/* Blob animado central */}
       <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#9DB860]/10 rounded-full blur-3xl pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#9DB860]/5 rounded-full blur-3xl pointer-events-none"
         animate={{
           scale: [1, 1.1, 1],
-          opacity: [0.1, 0.15, 0.1],
+          opacity: [0.05, 0.08, 0.05],
         }}
         transition={{
           duration: 12,
