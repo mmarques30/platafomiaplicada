@@ -62,12 +62,12 @@ export function AboutSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-6"
+          className="mb-8"
         >
-          <h2 className="text-3xl md:text-4xl text-white uppercase tracking-wide inline-block">
+          <h2 className="text-4xl md:text-5xl text-white uppercase tracking-wide inline-block">
             <span className="text-[#9EB038] font-bold">IA</span>plicada
           </h2>
-          <div className="h-0.5 w-full bg-gradient-to-r from-[#9EB038] to-transparent mt-2" />
+          <div className="h-0.5 w-full bg-gradient-to-r from-[#9EB038] to-transparent mt-3" />
         </motion.div>
 
         {/* Descrição */}
@@ -75,7 +75,7 @@ export function AboutSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-neutral-400 mb-8 leading-relaxed text-sm md:text-base"
+          className="text-neutral-400 mb-10 leading-relaxed text-sm md:text-base"
         >
           A IAplicada nasceu da experiência prática em operações complexas de empresas como Mercado Livre, Suzano e AngloGold Ashanti. Depois de anos lidando com rotinas, indicadores e gargalos em negócios líderes em e‑commerce, indústria e mineração, transformamos o que funciona lá fora em uma plataforma acessível para a sua empresa.
         </motion.p>
