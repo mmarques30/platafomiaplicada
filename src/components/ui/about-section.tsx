@@ -64,7 +64,7 @@ export function AboutSection() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mb-8"
         >
-          <h2 className="text-4xl md:text-5xl text-white uppercase tracking-wide inline-block">
+          <h2 className="text-4xl md:text-5xl text-white tracking-wide inline-block">
             <span className="text-[#9EB038] font-bold">IA</span>plicada
           </h2>
           <div className="h-0.5 w-full bg-gradient-to-r from-[#9EB038] to-transparent mt-3" />
