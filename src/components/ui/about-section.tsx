@@ -1,40 +1,38 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logoIaplicada from "@/assets/logo-iaplicada-icon.png";
+import { CustomVideoPlayer } from "@/components/video/CustomVideoPlayer";
+import { extractYouTubeId, getYouTubeThumbnail } from "@/lib/youtube";
 
 export function AboutSection() {
   const navigate = useNavigate();
+  
+  const videoUrl = "https://youtu.be/aSzRMV2Uz44";
+  const videoId = extractYouTubeId(videoUrl) || "";
+  const thumbnail = getYouTubeThumbnail(videoId);
+
+  const handleVideoEnd = () => {
+    console.log("Video ended at 3:26");
+  };
 
   return (
     <section className="flex flex-col md:flex-row items-center justify-center gap-10 px-4 md:px-8 lg:px-12 py-12 md:py-16">
-      {/* Lado Esquerdo - Vídeo/Imagem */}
+      {/* Lado Esquerdo - Vídeo */}
       <motion.div
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative shadow-2xl shadow-[#9EB038]/40 rounded-2xl overflow-hidden"
+        className="w-full max-w-lg shadow-2xl shadow-[#9EB038]/40 rounded-2xl overflow-hidden"
       >
-        {/* Placeholder - substituir por imagem/vídeo real */}
-        <img 
-          src="https://images.unsplash.com/photo-1531497865144-0464ef8fb9a9?q=80&w=600&h=600&auto=format&fit=crop"
-          alt="IAplicada Team"
-          className="max-w-md w-full object-cover rounded-2xl"
+        <CustomVideoPlayer
+          videoId={videoId}
+          thumbnail={thumbnail}
+          title="IAplicada - Conheça nossa história"
+          endSeconds={206}
+          onEnded={handleVideoEnd}
         />
-        
-        {/* Botão de Play centralizado */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <button 
-            className="group flex items-center justify-center size-[72px] rounded-full border-2 border-white bg-white/10 backdrop-blur-sm transition-all duration-300 hover:bg-[#9EB038] hover:border-[#9EB038] hover:scale-110"
-            onClick={() => {
-              // TODO: Implementar player de vídeo
-              console.log("Play video");
-            }}
-          >
-            <Play className="h-6 w-6 text-white fill-white ml-1" />
-          </button>
-        </div>
       </motion.div>
 
       {/* Lado Direito - Conteúdo */}
