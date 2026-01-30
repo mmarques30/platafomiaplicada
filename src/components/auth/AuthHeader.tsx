@@ -79,7 +79,7 @@ export function AuthHeader() {
           <img 
             src={logoAplicada}
             alt="IAplicada" 
-            className="h-6 w-auto"
+            className="h-8 w-auto"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
