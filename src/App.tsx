@@ -55,6 +55,7 @@ import IACopieUse from "./pages/IACopieUse";
 import BibliotecaFerramentas from "./pages/BibliotecaFerramentas";
 import BibliotecaPrompts from "./pages/BibliotecaPrompts";
 import MetodosAplicar from "./pages/MetodosAplicar";
+import Sobre from "./pages/Sobre";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
@@ -124,7 +125,7 @@ function AppContent() {
         <Route path="/termos-uso" element={<PoliticaUso />} />
         <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
-        
+        <Route path="/sobre" element={<Sobre />} />
 
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />

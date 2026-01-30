@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogosTicker } from "@/components/LogosTicker";
-import { AboutSection } from "@/components/ui/about-section";
 import { ArrowLeft, Sparkles, Check, Table2, Workflow, TrendingUp, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useButtonClickLogger } from "@/hooks/useButtonClickLogger";
@@ -85,9 +84,6 @@ export default function Aplique() {
         <section className="py-8">
           <LogosTicker />
         </section>
-
-        {/* About Section */}
-        <AboutSection />
         
         {/* Pricing Cards */}
         <section id="precos" className="py-16 px-4">
