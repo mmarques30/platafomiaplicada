@@ -3,50 +3,75 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-// Team photos with diagonal layout
-const teamPhotos = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=500&fit=crop&crop=face",
-    alt: "Team member 1",
-    rotation: -6,
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop&crop=face",
-    alt: "Team member 2",
-    rotation: 6,
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face",
-    alt: "Team member 3",
-    rotation: -6,
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=500&fit=crop&crop=face",
-    alt: "Team member 4",
-    rotation: 6,
-  },
-];
+// Partner logos
+const partnerLogos = [
+  { id: 1, image: "/logos/partners/nubank-logo.png", alt: "Nubank" },
+  { id: 2, image: "/logos/partners/raizen-logo.png", alt: "Raízen" },
+  { id: 3, image: "/logos/partners/unimed-logo.png", alt: "Unimed" },
+  { id: 4, image: "/logos/partners/itau-logo.png", alt: "Itaú" },
+  { id: 5, image: "/logos/partners/klabin-logo.png", alt: "Klabin" },
+  { id: 6, image: "/logos/partners/coca-cola-logo.png", alt: "Coca-Cola" },
+  { id: 7, image: "/logos/partners/usp-logo.png", alt: "USP" },
+  { id: 8, image: "/logos/partners/vivo-logo.png", alt: "Vivo" },
+  { id: 9, image: "/logos/partners/ifood-logo.png", alt: "iFood" },
+  { id: 10, image: "/logos/partners/mercado-livre-logo.png", alt: "Mercado Livre" },
+] as const;
 
-// Wavy underline SVG component
-function WavyUnderline() {
+// Triplicate for infinite loop
+const triplicatedLogos = [...partnerLogos, ...partnerLogos, ...partnerLogos];
+
+function PartnersLogosTicker() {
   return (
-    <svg
-      className="absolute -bottom-2 left-0 w-full h-3"
-      viewBox="0 0 100 12"
-      preserveAspectRatio="none"
-    >
-      <path
-        d="M0 6 Q 12.5 0, 25 6 T 50 6 T 75 6 T 100 6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        className="text-aplicada-green-700"
-      />
-    </svg>
+    <div className="w-full overflow-hidden">
+      <motion.div
+        className="flex items-center gap-12"
+        animate={{
+          translateX: [0, -(partnerLogos.length * 180)]
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      >
+        {triplicatedLogos.map((logo, index) => (
+          <div 
+            key={`${logo.id}-${index}`}
+            className="w-[140px] h-14 flex-shrink-0 flex items-center justify-center"
+          >
+            {/* Light mode - dark logos */}
+            <img 
+              src={logo.image} 
+              alt={logo.alt}
+              loading="lazy"
+              decoding="async"
+              className="h-10 w-auto max-w-[120px] object-contain grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all duration-300 dark:hidden"
+              onError={(e) => {
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  e.currentTarget.style.display = 'none';
+                  const fallback = document.createElement('span');
+                  fallback.className = 'text-sm font-medium text-muted-foreground';
+                  fallback.textContent = logo.alt;
+                  parent.appendChild(fallback);
+                }
+              }}
+            />
+            {/* Dark mode - inverted logos */}
+            <img 
+              src={logo.image} 
+              alt={logo.alt}
+              loading="lazy"
+              decoding="async"
+              className="h-10 w-auto max-w-[120px] object-contain grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all duration-300 hidden dark:block dark:invert"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+        ))}
+      </motion.div>
+    </div>
   );
 }
 
@@ -55,45 +80,33 @@ export function AboutSection() {
 
   return (
     <section className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-16 md:py-24">
-      <div className="max-w-5xl mx-auto text-center">
+      <div className="max-w-4xl mx-auto text-center">
         {/* Label */}
         <motion.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-block text-sm font-semibold uppercase tracking-widest text-aplicada-green-700 mb-8"
+          className="inline-block text-sm font-semibold uppercase tracking-widest text-aplicada-green-700 mb-4"
         >
           Sobre
         </motion.span>
 
-        {/* Title with decorative A */}
-        <motion.div
+        {/* Title */}
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="mb-8"
+          className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-tight">
-            <span className="inline-flex items-baseline">
-              <span className="relative text-aplicada-green-700 text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mr-2">
-                A
-                <WavyUnderline />
-              </span>
-              <span>Legado de Excelência,</span>
-            </span>
-            <br />
-            <span className="block mt-2">Como Nossa Dedicação Move</span>
-            <br />
-            <span className="block mt-2">Tudo o que Fazemos</span>
-          </h1>
-        </motion.div>
+          <span className="text-aplicada-green-700">I</span>Aplicada
+        </motion.h2>
 
         {/* Description */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed"
+          className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed"
         >
           A IAplicada nasceu da experiência prática em operações complexas de empresas como Mercado Livre, Suzano e AngloGold Ashanti. Depois de anos lidando com rotinas, indicadores e gargalos em negócios líderes em e‑commerce, indústria e mineração, transformamos o que funciona lá fora em uma plataforma acessível para a sua empresa.
         </motion.p>
@@ -103,7 +116,7 @@ export function AboutSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-16 md:mb-24"
+          className="mb-16"
         >
           <Button 
             onClick={() => navigate('/servicos')}
@@ -114,39 +127,26 @@ export function AboutSection() {
           </Button>
         </motion.div>
 
-        {/* Team Photos Grid */}
-        <motion.div
+        {/* Divider */}
+        <div className="border-t border-border mb-12" />
+
+        {/* Partners subtitle */}
+        <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="flex flex-wrap justify-center items-end gap-4 md:gap-6 lg:gap-8"
+          className="text-sm text-muted-foreground uppercase tracking-wide mb-8"
         >
-          {teamPhotos.map((photo, index) => (
-            <motion.div
-              key={photo.id}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                duration: 0.6, 
-                delay: 0.5 + index * 0.1,
-                ease: "easeOut"
-              }}
-              className="relative group"
-              style={{ 
-                transform: `rotate(${photo.rotation}deg)`,
-                marginTop: index % 2 === 0 ? '0' : '2rem'
-              }}
-            >
-              <div className="w-32 h-40 md:w-40 md:h-52 lg:w-48 lg:h-64 overflow-hidden rounded-2xl bg-muted transition-transform duration-300 group-hover:scale-105">
-                <img
-                  src={photo.image}
-                  alt={photo.alt}
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-                  loading="lazy"
-                />
-              </div>
-            </motion.div>
-          ))}
+          Empresas que já fazem parte da IAplicada
+        </motion.p>
+
+        {/* Logos Carousel */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <PartnersLogosTicker />
         </motion.div>
       </div>
     </section>
