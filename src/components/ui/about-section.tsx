@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logoIaplicada from "@/assets/logo-iaplicada-icon.png";
-import { CustomVideoPlayer } from "@/components/video/CustomVideoPlayer";
+import { SimpleVideoPlayer } from "@/components/video/SimpleVideoPlayer";
 import { extractYouTubeId, getYouTubeThumbnail } from "@/lib/youtube";
 
 export function AboutSection() {
@@ -26,7 +26,7 @@ export function AboutSection() {
         transition={{ duration: 0.6 }}
         className="w-full max-w-[280px] md:max-w-[320px] shadow-2xl shadow-[#9EB038]/40 rounded-2xl overflow-hidden"
       >
-        <CustomVideoPlayer
+        <SimpleVideoPlayer
           videoId={videoId}
           thumbnail={thumbnail}
           title="IAplicada - Conheça nossa história"
