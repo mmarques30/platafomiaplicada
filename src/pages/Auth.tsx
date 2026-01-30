@@ -42,13 +42,13 @@ export default function Auth() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="text-3xl md:text-4xl font-bold text-white mb-8"
+            className="text-3xl md:text-4xl font-extrabold text-white mb-8"
           >
             <Typewriter
-              text={["BEM VINDO"]}
+              text={["Bem Vindo a IAplicada"]}
               speed={120}
               loop={false}
-              className="text-white"
+              className="text-white font-extrabold"
               cursorClassName="bg-[#9EB038]"
             />
           </motion.div>
