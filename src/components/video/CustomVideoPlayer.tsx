@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 interface CustomVideoPlayerProps {
   videoId: string;
   startSeconds?: number;
+  endSeconds?: number;
   onTimeUpdate?: (currentTime: number) => void;
   onEnded?: () => void;
   thumbnail?: string;
@@ -17,6 +18,7 @@ interface CustomVideoPlayerProps {
 export function CustomVideoPlayer({
   videoId,
   startSeconds = 0,
+  endSeconds,
   onTimeUpdate,
   onEnded,
   thumbnail,
@@ -82,6 +84,13 @@ export function CustomVideoPlayer({
         },
         onTimeUpdate: (time) => {
           setCurrentTime(time);
+          // Parar no tempo limite se definido
+          if (endSeconds && time >= endSeconds) {
+            playerRef.current?.pause();
+            if (onEnded) {
+              onEnded();
+            }
+          }
           if (onTimeUpdate) {
             onTimeUpdate(time);
           }
