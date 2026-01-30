@@ -66,10 +66,10 @@ export function AnimatedBackground() {
           particle.y -= dy * 0.01;
         }
 
-        // Partículas verdes - mais sutis
+        // Partículas verdes - bem sutis (para manter o fundo dominante)
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(157, 184, 96, 0.08)";
+        ctx.fillStyle = "rgba(157, 184, 96, 0.03)";
         ctx.fill();
 
         // Linhas conectando partículas próximas
@@ -83,7 +83,7 @@ export function AnimatedBackground() {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(121, 141, 60, ${0.04 * (1 - distance / 120)})`;
+            ctx.strokeStyle = `rgba(121, 141, 60, ${0.015 * (1 - distance / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -108,51 +108,6 @@ export function AnimatedBackground() {
     <div className="fixed inset-0 -z-10 overflow-hidden">
       {/* Canvas de partículas */}
       <canvas ref={canvasRef} className="absolute inset-0" />
-
-      {/* Gradiente diagonal muito sutil */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#9DB860]/[0.02] via-transparent to-[#798D3C]/[0.03] pointer-events-none" />
-
-      {/* Blob animado superior esquerdo */}
-      <motion.div
-        className="absolute top-20 left-20 w-96 h-96 bg-[#D5D8AC]/[0.04] rounded-full blur-3xl pointer-events-none"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.04, 0.06, 0.04],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Blob animado inferior direito */}
-      <motion.div
-        className="absolute bottom-20 right-20 w-80 h-80 bg-[#798D3C]/[0.03] rounded-full blur-3xl pointer-events-none"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.03, 0.05, 0.03],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Blob animado central */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#9DB860]/[0.02] rounded-full blur-3xl pointer-events-none"
-        animate={{
-          scale: [1, 1.1, 1],
-          opacity: [0.02, 0.04, 0.02],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
     </div>
   );
 }
