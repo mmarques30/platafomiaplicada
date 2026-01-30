@@ -122,7 +122,7 @@ export function CentralConteudoGratuito() {
 
         {/* CTA */}
         <div className="flex justify-end mt-2">
-          <Link to="/aplique">
+          <Link to="/servicos">
             <motion.button
               whileHover={{ x: 4 }}
               className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"

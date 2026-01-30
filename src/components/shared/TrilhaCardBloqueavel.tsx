@@ -29,7 +29,7 @@ export function TrilhaCardBloqueavel({
   // VISITANTE sem conteúdo disponível → Cadeado clicável para /aplique
   if (isVisitante && !temConteudoDisponivel) {
     return (
-      <Link to="/aplique" className="block">
+      <Link to="/servicos" className="block">
         <div className="relative overflow-hidden rounded-xl shadow-md w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow aspect-[9/16]">
           <img
             src={imagem_url || "/placeholder.svg"}

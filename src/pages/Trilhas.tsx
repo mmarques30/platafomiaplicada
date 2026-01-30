@@ -25,7 +25,7 @@ export default function Trilhas() {
 
             {/* Botão CTA abaixo do welcome */}
             <Link 
-              to="/aplique"
+              to="/servicos"
               className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-lg text-red-600 bg-red-50/50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/30 text-base font-medium transition-colors"
             >
               <Zap className="h-5 w-5" />
