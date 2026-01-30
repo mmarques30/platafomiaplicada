@@ -47,7 +47,8 @@ export default function Auth() {
             <Typewriter
               text={["Bem Vindo a IAplicada"]}
               speed={120}
-              loop={false}
+              delay={30000}
+              loop={true}
               className="text-white font-extrabold"
               cursorClassName="bg-[#9EB038]"
             />
