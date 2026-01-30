@@ -121,7 +121,7 @@ export function AboutSection() {
             onClick={() => navigate('/servicos')}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 rounded-full text-base"
           >
-            Conheça nossos serviços
+            Conheça a IAplicada
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>
