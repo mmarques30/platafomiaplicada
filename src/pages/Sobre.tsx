@@ -7,12 +7,12 @@ export default function Sobre() {
   const navigate = useNavigate();
   
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#1a1c19] flex flex-col">
       {/* Botão Voltar */}
       <div className="sticky top-0 left-0 z-20 p-4">
         <Button 
           variant="ghost" 
-          className="text-foreground hover:bg-muted"
+          className="text-white hover:bg-white/10"
           onClick={() => {
             navigate('/auth');
           }}
