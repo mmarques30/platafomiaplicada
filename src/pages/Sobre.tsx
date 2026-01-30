@@ -13,7 +13,13 @@ export default function Sobre() {
         <Button 
           variant="ghost" 
           className="text-foreground hover:bg-muted"
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate('/');
+            }
+          }}
         >
           <ArrowLeft className="h-5 w-5 mr-2" />
           Voltar
