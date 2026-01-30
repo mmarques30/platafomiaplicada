@@ -86,7 +86,7 @@ export function SignupForm() {
           type="text"
           placeholder="Seu nome"
           required
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+          className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
         />
       </div>
 
@@ -100,7 +100,7 @@ export function SignupForm() {
           type="email"
           placeholder="seu@email.com"
           required
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+          className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
         />
       </div>
 
@@ -114,7 +114,7 @@ export function SignupForm() {
           type="tel"
           placeholder="(00) 00000-0000"
           required
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+          className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
         />
       </div>
       
@@ -128,7 +128,7 @@ export function SignupForm() {
           placeholder="Mínimo 6 caracteres"
           required
           minLength={6}
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+          className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
         />
         <p className="text-xs text-white/50">
           Você vai usar essa senha para acessar depois
