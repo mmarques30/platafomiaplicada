@@ -33,7 +33,7 @@ const Servicos = () => {
       <TextParallaxContent
         imgUrl="https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=2070&auto=format&fit=crop"
         subheading="Skills"
-        heading="Elimine 10-20h/semana de tarefas manuais."
+        heading={<><span className="whitespace-nowrap font-bold">Sua equipe até 50%</span><br /><span className="whitespace-nowrap font-bold">mais produtiva em 12 semanas</span></>}
       >
         <ExampleContent>
           <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white">
@@ -41,7 +41,7 @@ const Servicos = () => {
           </h2>
           <div className="col-span-1 md:col-span-8">
             <p className="mb-4 text-xl text-neutral-400 md:text-2xl">
-              A solução que elimina especificamente 10-20h/semana de tarefas manuais de equipes operacionais de 3-15 pessoas em empresas em crescimento, trocando planilhas + processos repetitivos por automações práticas que rodam no dia a dia, em 12 semanas, sem exigir conhecimento técnico ou consultoria cara.
+              A solução que elimina até 20h/semana de tarefas manuais de equipes, trocando planilhas + processos repetitivos por automações práticas que rodam no dia a dia, em 12 semanas. O Skills é para líderes que querem sua equipe performando ao máximo, resolvendo os problemas reais do dia a dia - não certificados individuais ou nem conhecimento teórico.
             </p>
             <a
               href="/avance"
