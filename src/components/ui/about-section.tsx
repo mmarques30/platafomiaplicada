@@ -79,8 +79,8 @@ export function AboutSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-16 md:py-24">
-      <div className="max-w-4xl mx-auto text-center">
+    <section className="w-full flex flex-col items-center justify-center px-4 py-12 md:py-16 lg:py-20">
+      <div className="w-full max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
         {/* Label */}
         <motion.span
           initial={{ opacity: 0, y: 20 }}
@@ -116,7 +116,6 @@ export function AboutSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-16"
         >
           <Button 
             onClick={() => navigate('/servicos')}
@@ -128,14 +127,14 @@ export function AboutSection() {
         </motion.div>
 
         {/* Divider */}
-        <div className="border-t border-border mb-12" />
+        <div className="border-t border-border" />
 
         {/* Partners subtitle */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-sm text-muted-foreground uppercase tracking-wide mb-8"
+          className="text-sm text-muted-foreground uppercase tracking-wide"
         >
           Empresas que já fazem parte da IAplicada
         </motion.p>
