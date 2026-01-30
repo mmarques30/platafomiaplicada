@@ -67,7 +67,7 @@ export function AuthHeader() {
       className={cn(
         "fixed top-4 left-0 right-0 z-50 mx-auto",
         "bg-black/40 backdrop-blur-md border border-white/10",
-        "px-6 py-2.5 w-fit max-w-2xl",
+        "px-8 py-3.5 w-fit max-w-2xl",
         "transition-all duration-300 ease-in-out",
         headerShapeClass
       )}
@@ -79,7 +79,7 @@ export function AuthHeader() {
           <img 
             src={logoAplicada}
             alt="IAplicada" 
-            className="h-8 w-auto"
+            className="h-10 w-auto"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
