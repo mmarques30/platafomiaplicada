@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -18,13 +20,31 @@ import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/Busi
 import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
 import { IAplicadaRoadmap } from "@/components/mentoria/business/IAplicadaRoadmap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSearchParams } from "react-router-dom";
 
 export default function Mentoria() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
-  const { isBusiness, isBusinessColaborativo, isBusinessIAplicada } = useEffectivePlan(isAdmin);
+  const { isBusiness, isBusinessColaborativo, isBusinessIAplicada, isSkills } = useEffectivePlan(isAdmin);
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Redirecionar usuários Skills para suas páginas específicas
+  useEffect(() => {
+    if (isSkills && !isBusiness) {
+      const tab = searchParams.get("tab");
+      // Mapear tabs para rotas Skills
+      if (tab === "roadmap") {
+        navigate('/skills/roadmap', { replace: true });
+      } else {
+        navigate('/skills/equipe', { replace: true });
+      }
+    }
+  }, [isSkills, isBusiness, navigate, searchParams]);
+
+  // Se Skills (sem Business), não renderizar (aguardar redirect)
+  if (isSkills && !isBusiness) {
+    return null;
+  }
   
   // Mostrar aba Evolução apenas para Business Colaborativo (não IAplicada)
   const showEvolucaoTab = isBusiness && !isBusinessIAplicada;
