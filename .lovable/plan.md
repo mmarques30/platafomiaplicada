@@ -1,59 +1,114 @@
 
-Objetivo (o que você pediu)
-- O item “Cupons” na sidebar ainda está “branco/apagado”.
-- Ajustar definitivamente o estilo para:
-  - Estado normal: texto (e ícone) verde da marca.
-  - Estado ativo (depois de clicar / na página /cupons): texto preto em fundo verde.
+# Plano: Reformular Página de Cupons
 
-Diagnóstico (por que não resolveu antes)
-- Hoje o “Cupons” está dentro de `<SidebarMenuButton asChild>`.
-- O `SidebarMenuButton` injeta classes padrão (hover/active/bg/text) via Radix Slot e pode sobrescrever/competir com as classes do `NavLink`, deixando o estilo inconsistente (especialmente cor de fundo).
-- Resultado: mesmo forçando `!text-white` e `!bg-...`, o comportamento pode continuar “quebrando” dependendo da ordem de merge/estado (hover/active/data-active), e o botão continua parecendo “branco”.
+## Resumo das Mudanças
+1. Remover o ícone do título "Descontos IAplicada"
+2. Reformular o card de cupom para formato mais discreto com fundo verde da marca
+3. Criar sistema de abas, com sub-aba "Academy" contendo o cupom e descrição introdutória
 
-Solução definitiva (mais robusta)
-- Remover o `SidebarMenuButton` do item “Cupons” e renderizar o `NavLink` direto dentro do `SidebarMenuItem`.
-- Assim, não há mais “briga” de estilos: o `NavLink` passa a ser 100% responsável pelo visual.
-- Replicar apenas as classes essenciais de layout do sidebar (flex, padding, arredondado) e manter o comportamento de colapso (ícone sozinho quando a sidebar estiver fechada).
+---
 
-Implementação (o que será alterado)
-Arquivo: `src/components/layout/AppSidebar.tsx`
+## Mudanças Detalhadas
 
-1) Localizar o bloco:
-- `/* Menu Cupons - Apenas visitantes (após Comunidade) */`
+### 1. Remover ícone do título
+**Arquivo:** `src/pages/Cupons.tsx`
+- Remover a prop `icon` do componente `PageTitle`
+- Manter apenas o título "Descontos IAplicada"
 
-2) Substituir o trecho atual:
-- Remover:
-  - `<SidebarMenuButton asChild ...>`
-  - e manter apenas:
-    - `<SidebarMenuItem> + <NavLink>`
+**De:**
+```tsx
+<PageTitle 
+  primary="Descontos" 
+  secondary="IAplicada"
+  icon={<Ticket className="h-7 w-7 text-primary" />}
+/>
+```
 
-3) Novo estilo (regras)
-- Estado normal (não ativo):
-  - `bg-transparent` (sem fundo)
-  - `text-aplicada-green-700` (texto/ícone verde)
-  - hover opcional: `hover:bg-aplicada-green-700/10` (fundo leve só ao passar o mouse)
-- Estado ativo (quando estiver em /cupons):
-  - `bg-aplicada-green-700` (fundo verde)
-  - `text-black` (texto/ícone preto)
-- Mantém “Cupons” escondido quando a sidebar estiver colapsada (apenas ícone), como já acontece hoje usando `collapsed`.
+**Para:**
+```tsx
+<PageTitle 
+  primary="Descontos" 
+  secondary="IAplicada"
+/>
+```
 
-4) Detalhe importante para o modo colapsado (mini sidebar)
-- Adicionar as classes de comportamento do sidebar no `NavLink`:
-  - `group-data-[collapsible=icon]:!size-8`
-  - `group-data-[collapsible=icon]:!p-2`
-- Isso garante que o item se comporte igual aos demais quando a sidebar estiver fechada.
+---
 
-Checklist de validação (como confirmar que ficou certo)
-1) Na rota “/” (visitante):
-- “Cupons” deve aparecer com texto verde (não branco).
-2) Ao clicar em “Cupons”:
-- Navega para `/cupons`
-- O item “Cupons” fica com fundo verde e texto preto (ativo).
-3) Ao sair de `/cupons`:
-- Volta ao estado normal (texto verde, sem fundo).
-4) Testar com sidebar aberta e colapsada:
-- Aberta: mostra ícone + “Cupons”
-- Colapsada: mostra apenas o ícone (cor correta conforme ativo/inativo)
+### 2. Criar estrutura de abas
+**Arquivo:** `src/pages/Cupons.tsx`
+- Adicionar import do componente Tabs
+- Criar estrutura com TabsList e TabsTrigger para "Academy"
+- Possibilidade de adicionar mais abas no futuro
 
-Arquivos a serem alterados
-- `src/components/layout/AppSidebar.tsx` (apenas o item “Cupons” do visitante)
+**Estrutura:**
+```text
++---------------------------+
+|  Descontos IAplicada      |
++---------------------------+
+| [Academy]  [Outras abas]  |
++---------------------------+
+| Conteúdo da aba           |
++---------------------------+
+```
+
+---
+
+### 3. Adicionar descrição introdutória na aba Academy
+**Arquivo:** `src/pages/Cupons.tsx`
+- Texto explicativo antes do cupom
+- Mensagem: "O Academy é o primeiro passo da sua jornada na IAplicada. Aqui você começa sua trilha de aprendizado em Inteligência Artificial aplicada ao seu dia a dia profissional."
+
+---
+
+### 4. Reformular card de cupom
+**Arquivo:** `src/pages/Cupons.tsx`
+- Formato compacto (tipo tabela/inline)
+- Fundo verde da marca (`bg-aplicada-green-700`)
+- Texto branco para contraste
+- Layout horizontal com cupom + botão copiar + botão comprar
+
+**Novo design:**
+```text
++-----------------------------------------------+
+| bg-aplicada-green-700                         |
+| +-------------------------------------------+ |
+| |  ComunidadeIAplicada  [📋] [Comprar Agora]| |
+| +-------------------------------------------+ |
++-----------------------------------------------+
+```
+
+---
+
+## Estrutura Final da Página
+
+```text
+Descontos IAplicada (sem ícone)
+
+[Academy]
+
+Descrição:
+"O Academy é o primeiro passo da sua jornada..."
+
++-- Card compacto verde --+
+| Cupom: XXX  [📋] [CTA]  |
++-------------------------+
+
+[Tabela comparativa]
+
+[CTA final com foto da Mari]
+```
+
+---
+
+## Arquivos a Serem Alterados
+- `src/pages/Cupons.tsx` (única mudança necessária)
+
+---
+
+## Cores Utilizadas
+| Elemento | Cor Tailwind | Código |
+|----------|-------------|--------|
+| Fundo do card | bg-aplicada-green-700 | #9EB038 |
+| Texto do card | text-white | #FFFFFF |
+| Hover do botão | hover:bg-aplicada-green-800 | #889C2D |
+
