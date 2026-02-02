@@ -223,7 +223,8 @@ export function TopHeader() {
 
         {/* RIGHT: Environment Switcher + Admin View Selector + Refresh + Notifications + Avatar */}
         <div className="absolute right-0 top-0 h-full flex items-center gap-1 pr-4">
-          {!(isAdmin && isViewingAs) && <EnvironmentSwitcher />}
+          {/* Evita badges duplicados: para Admin mantemos apenas o "Ver como..." */}
+          {!isAdmin && <EnvironmentSwitcher />}
           {isAdmin && <AdminViewSelector isAdmin={isAdmin} />}
           <TooltipProvider>
             <Tooltip>
