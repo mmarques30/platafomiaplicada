@@ -24,6 +24,9 @@ export default function Mentoria() {
   const { isBusiness, isBusinessColaborativo, isBusinessIAplicada } = useEffectivePlan(isAdmin);
   const [searchParams, setSearchParams] = useSearchParams();
   
+  // Mostrar aba Evolução apenas para Business Colaborativo (não IAplicada)
+  const showEvolucaoTab = isBusiness && !isBusinessIAplicada;
+  
   // Ler tab da URL ou usar padrão
   const tabFromUrl = searchParams.get("tab");
   const validTabs = ["visao-geral", "roadmap", "evolucao-aprendizado"];
@@ -49,7 +52,7 @@ export default function Mentoria() {
 
       {/* Tabs - Diferente para Business vs Academy */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
-        <TabsList className={`w-full md:w-auto grid ${isBusiness ? 'grid-cols-3' : 'grid-cols-2'} md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6`}>
+        <TabsList className={`w-full md:w-auto grid ${showEvolucaoTab ? 'grid-cols-3' : 'grid-cols-2'} md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6`}>
           <TabsTrigger
             value="visao-geral"
             className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
@@ -62,7 +65,7 @@ export default function Mentoria() {
           >
             Roadmap
           </TabsTrigger>
-          {isBusiness && (
+          {showEvolucaoTab && (
             <TabsTrigger
               value="evolucao-aprendizado"
               className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
@@ -106,8 +109,8 @@ export default function Mentoria() {
           )}
         </TabsContent>
 
-        {/* Aba Evolução Aprendizado - Apenas Business */}
-        {isBusiness && (
+        {/* Aba Evolução Aprendizado - Apenas Business Colaborativo */}
+        {showEvolucaoTab && (
           <TabsContent value="evolucao-aprendizado" className="mt-0 space-y-6">
             <BusinessEvolucaoAprendizado />
           </TabsContent>

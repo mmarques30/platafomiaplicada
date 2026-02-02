@@ -70,8 +70,9 @@ export function AppSidebar() {
       case "skills":
         return "skills";
       case "business":
-      case "business_iaplicada":
         return "business";
+      case "business_iaplicada":
+        return "business_iaplicada";
       default:
         return currentEnvironment;
     }
@@ -266,7 +267,12 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
 
+                // Detectar se é IAplicada para filtrar bibliotecas
+                const isBusinessIAplicadaEnv = effectiveEnvironment === 'business_iaplicada' 
+                  || effectivePlan === 'business_iaplicada';
+                
                 // Renderizar Bibliotecas imediatamente após "Aprender"
+                // Para IAplicada: apenas Prompts e Ferramentas
                 const bibliotecasMenu = renderBibliotecasAfter && !isVisitante ? (
                   <Collapsible 
                     key="bibliotecas_menu"
@@ -304,70 +310,110 @@ export function AppSidebar() {
                       
                       <CollapsibleContent>
                         <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild className="group">
-                              <NavLink 
-                                to="/ia-copie-use" 
-                                end
-                                className={cn(
-                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                  location.pathname === '/ia-copie-use'
-                                    ? "text-primary font-semibold" 
-                                    : "text-sidebar-foreground/70 hover:text-primary"
-                                )}
-                              >
-                                {!collapsed && <span>IA "Copie e Use"</span>}
-                              </NavLink>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild className="group">
-                              <NavLink 
-                                to="/biblioteca-ferramentas" 
-                                end
-                                className={cn(
-                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                  location.pathname === '/biblioteca-ferramentas'
-                                    ? "text-primary font-semibold" 
-                                    : "text-sidebar-foreground/70 hover:text-primary"
-                                )}
-                              >
-                                {!collapsed && <span>Ferramentas</span>}
-                              </NavLink>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild className="group">
-                              <NavLink 
-                                to="/biblioteca-prompts" 
-                                end
-                                className={cn(
-                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                  location.pathname === '/biblioteca-prompts'
-                                    ? "text-primary font-semibold" 
-                                    : "text-sidebar-foreground/70 hover:text-primary"
-                                )}
-                              >
-                                {!collapsed && <span>Prompts</span>}
-                              </NavLink>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild className="group">
-                              <NavLink 
-                                to="/metodos-aplicar" 
-                                end
-                                className={cn(
-                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                  location.pathname === '/metodos-aplicar'
-                                    ? "text-primary font-semibold" 
-                                    : "text-sidebar-foreground/70 hover:text-primary"
-                                )}
-                              >
-                                {!collapsed && <span>Métodos</span>}
-                              </NavLink>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
+                          {/* IAplicada: apenas Prompts e Ferramentas */}
+                          {isBusinessIAplicadaEnv ? (
+                            <>
+                              <SidebarMenuItem>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink 
+                                    to="/biblioteca-prompts" 
+                                    end
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      location.pathname === '/biblioteca-prompts'
+                                        ? "text-primary font-semibold" 
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>Prompts</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                              <SidebarMenuItem>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink 
+                                    to="/biblioteca-ferramentas" 
+                                    end
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      location.pathname === '/biblioteca-ferramentas'
+                                        ? "text-primary font-semibold" 
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>Ferramentas</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            </>
+                          ) : (
+                            <>
+                              <SidebarMenuItem>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink 
+                                    to="/ia-copie-use" 
+                                    end
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      location.pathname === '/ia-copie-use'
+                                        ? "text-primary font-semibold" 
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>IA "Copie e Use"</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                              <SidebarMenuItem>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink 
+                                    to="/biblioteca-ferramentas" 
+                                    end
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      location.pathname === '/biblioteca-ferramentas'
+                                        ? "text-primary font-semibold" 
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>Ferramentas</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                              <SidebarMenuItem>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink 
+                                    to="/biblioteca-prompts" 
+                                    end
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      location.pathname === '/biblioteca-prompts'
+                                        ? "text-primary font-semibold" 
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>Prompts</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                              <SidebarMenuItem>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink 
+                                    to="/metodos-aplicar" 
+                                    end
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      location.pathname === '/metodos-aplicar'
+                                        ? "text-primary font-semibold" 
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>Métodos</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            </>
+                          )}
                         </SidebarMenu>
                       </CollapsibleContent>
                     </SidebarMenuItem>
