@@ -1,89 +1,105 @@
 
-# Novo Design dos Cards de Seleção de Ambiente
+# Plano: Seletores de Usuários para Simulação Academy e Skills
 
-## Objetivo
-Modernizar a tela de seleção de ambientes com um design mais visual e clean, usando imagens nos cards em vez de ícones, com títulos posicionados abaixo dos cards.
+## Contexto
+Atualmente a simulação de planos funciona assim:
+- **Business**: Abre modal para selecionar um usuário específico do plano Business
+- **Academy/Skills**: Apenas muda o modo de visualização genérico, sem selecionar um usuário real
 
-## Design Proposto
+O objetivo é permitir que você selecione usuários específicos de cada plano para ver exatamente o que eles estão vendo.
 
-### Estrutura Visual
-- **Card**: Imagem quadrada ocupando todo o espaço, sem textos internos
-- **Título**: Posicionado abaixo do card, centralizado
-- **Descrição**: Removida ou mostrada apenas no hover para manter o visual limpo
-- **Efeito hover**: Glow sutil + "Acessar" aparece
+## Solução
 
-### Mudanças de Layout
+### 1. Criar Modal Genérico de Seleção de Usuários por Plano
+Criar um componente reutilizável `UserSelectorByPlanModal` que:
+- Recebe o tipo de plano como parâmetro (academy, skills, ou business)
+- Filtra e exibe usuários do plano selecionado
+- Permite busca por nome/email
+- Ao selecionar, passa userId e userName para o contexto
 
-**Antes:**
+**Arquivo:** `src/components/admin/UserSelectorByPlanModal.tsx`
+
+### 2. Refatorar AdminViewSelector
+Modificar para que ao clicar em **qualquer** opção de plano (Academy, Skills, Business), abra o modal de seleção correspondente:
+
 ```text
-┌─────────────────────┐
-│     ┌───────┐       │
-│     │ Ícone │       │
-│     └───────┘       │
-│      Título         │
-│    Descrição...     │
-│     [Acessar]       │
-└─────────────────────┘
+┌─────────────────────────────────────┐
+│  AdminViewSelector (dropdown)       │
+├─────────────────────────────────────┤
+│  > Visitante (gratuito)             │  → Ativa modo visitante direto
+│  > Academy                          │  → Abre modal com usuários Academy
+│  > Skills                           │  → Abre modal com usuários Skills  
+│  > Business                         │  → Abre modal com usuários Business
+│  ─────────────────────────────       │
+│  > Voltar para Admin                │
+└─────────────────────────────────────┘
 ```
 
-**Depois:**
-```text
-┌─────────────────────┐
-│                     │
-│      [Imagem]       │
-│                     │
-└─────────────────────┘
-       Título
-```
+### 3. Unificar Banner de Simulação
+O banner no TopHeader exibirá:
+- **Visitante**: "Visualizando como: Visitante"
+- **Academy/Skills/Business**: "Visualizando como: [Nome do Usuário] (Plano)"
 
-## Alterações Técnicas
+### Detalhes Técnicos
 
-### 1. Adicionar Imagem ao Projeto
-- Copiar `user-uploads://icon_business_clean.jpg` para `src/assets/env-business.jpg`
-- Para os outros ambientes, usarei ícones Lucide estilizados até que imagens sejam fornecidas
-
-### 2. Modificar `src/pages/EnvironmentSelector.tsx`
-
-**Alterações no card:**
-- Remover descrição e CTA de dentro do card
-- Card mostra apenas a imagem (para Business) ou ícone estilizado (outros)
-- Título movido para fora do card, abaixo dele
-- Descrição aparece no hover (tooltip ou fade-in)
-
-**Novo mapeamento de assets:**
+#### Novo Componente: UserSelectorByPlanModal
 ```tsx
-const ENVIRONMENT_IMAGES: Partial<Record<Environment, string>> = {
-  business: envBusinessImage, // Imagem fornecida
-};
+interface UserSelectorByPlanModalProps {
+  open: boolean;
+  onClose: () => void;
+  onSelect: (userId: string, userName: string) => void;
+  planType: "academy" | "skills" | "business";
+}
 ```
+- Reutiliza a estrutura do `BusinessUserSelectorModal`
+- Ícone e título dinâmicos por plano
+- Filtra `user.plano_mentoria === planType`
 
-**Nova estrutura do card:**
+#### Modificações no AdminViewSelector
+- Estado: `selectedPlanForModal: "academy" | "skills" | "business" | null`
+- Ao clicar em Academy/Skills/Business → abre modal com o plano selecionado
+- Visitante continua setando direto (`setViewAs("visitante")`)
+
+#### Modificações no TopHeader
 ```tsx
-<motion.button className="flex flex-col items-center gap-3">
-  {/* Card com imagem/ícone */}
-  <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden">
-    {ENVIRONMENT_IMAGES[env] ? (
-      <img src={ENVIRONMENT_IMAGES[env]} className="w-full h-full object-cover" />
-    ) : (
-      <div className="w-full h-full flex items-center justify-center bg-white/5">
-        <Icon className="h-10 w-10" style={{ color: config.color }} />
-      </div>
-    )}
+// Banner unificado
+{isAdmin && isViewingAs && (
+  <div className="fixed top-0 ... bg-amber-500 text-black ...">
+    👁️ Visualizando como: <strong>
+      {viewAs === 'visitante' 
+        ? 'Visitante'
+        : `${impersonatedUserName} (${viewAs})`
+      }
+    </strong>
+    <Button onClick={resetView}>Sair da simulação</Button>
   </div>
-  
-  {/* Título abaixo */}
-  <span className="text-white font-medium">{config.label}</span>
-</motion.button>
+)}
+
+// Posição do header ajustada
+isAdmin && isViewingAs ? "top-10" : "top-0"
 ```
 
-### 3. Ajustes de Espaçamento
-- Grid com `gap-8` para dar mais respiro entre cards
-- Cards com tamanho fixo para consistência
-- Descrição visível apenas no hover via tooltip ou opacity transition
+## Arquivos a Criar/Modificar
 
-## Resultado Esperado
-- Visual mais clean e moderno
-- Cards com aparência de "app icons"
-- Business com a imagem premium fornecida
-- Outros ambientes mantêm ícones até receberem imagens próprias
-- Experiência mais visual e menos textual
+| Arquivo | Ação |
+|---------|------|
+| `src/components/admin/UserSelectorByPlanModal.tsx` | **Criar** - Modal genérico para seleção |
+| `src/components/admin/AdminViewSelector.tsx` | **Modificar** - Usar novo modal para todos os planos |
+| `src/components/admin/BusinessUserSelectorModal.tsx` | **Remover** - Substituído pelo modal genérico |
+| `src/components/layout/TopHeader.tsx` | **Modificar** - Banner unificado para todos os modos |
+
+## Fluxo de Uso
+
+1. Admin clica no botão "Ver como..."
+2. Escolhe um plano (ex: Academy)
+3. Modal abre com lista de usuários Academy
+4. Admin busca e seleciona um usuário
+5. Banner amarelo aparece: "Visualizando como: João Silva (Academy)"
+6. Toda a interface reflete a visão daquele usuário específico
+7. Admin clica em "Sair da simulação" para voltar
+
+## Resultado Final
+- Um único ponto de entrada (botão dropdown)
+- Seleção de usuário específico para TODOS os planos
+- Um único banner de indicação de simulação
+- Experiência consistente e intuitiva
