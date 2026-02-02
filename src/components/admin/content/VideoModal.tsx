@@ -189,6 +189,15 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
       return;
     }
 
+    // Validar se pelo menos uma URL foi fornecida
+    const youtubeUrl = data.youtube_url?.trim();
+    const driveUrl = data.google_drive_url?.trim();
+
+    if (!youtubeUrl && !driveUrl) {
+      toast.error("Informe pelo menos uma URL: YouTube ou Google Drive");
+      return;
+    }
+
     // Validar se módulo foi selecionado
     if (!data.modulo_id) {
       toast.error("Selecione um módulo");
@@ -240,8 +249,8 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
             <Textarea {...register("descricao")} rows={3} />
           </div>
           <div className="space-y-2">
-            <Label>URL do YouTube</Label>
-            <Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
+            <Label>URL do YouTube (opcional se usar Drive)</Label>
+            <Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." />
           </div>
           <div className="space-y-2">
             <Label>URL do Google Drive (Alternativo)</Label>
