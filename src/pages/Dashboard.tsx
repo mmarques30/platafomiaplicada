@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, X, Zap } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
@@ -45,14 +45,6 @@ export default function Dashboard() {
           // Layout visitante - similar a outros ambientes
           <div className="space-y-6">
             <WelcomeHeader />
-
-            <Link 
-              to="/servicos"
-              className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-lg text-red-600 bg-red-50/50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/30 text-base font-medium transition-colors"
-            >
-              <Zap className="h-5 w-5" />
-              Ter acesso ao Academy
-            </Link>
 
             <PWAInstallBanner />
             <CentralConteudoGratuito />
