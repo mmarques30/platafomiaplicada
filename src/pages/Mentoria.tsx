@@ -15,6 +15,8 @@ import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
 import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
+import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
+import { IAplicadaRoadmap } from "@/components/mentoria/business/IAplicadaRoadmap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams } from "react-router-dom";
 
@@ -75,11 +77,13 @@ export default function Mentoria() {
           )}
         </TabsList>
 
-        {/* Aba Visão Geral - Diferente para Business */}
+        {/* Aba Visão Geral - Diferente para cada tipo */}
         <TabsContent value="visao-geral" className="mt-0 space-y-4">
-          {isBusiness ? (
+          {isBusinessIAplicada ? (
+            <IAplicadaVisaoGeral />
+          ) : isBusiness ? (
             <>
-              {/* Business: ROI → Pendências */}
+              {/* Business Colaborativo: ROI → Pendências */}
               <BusinessROIChart />
               <BusinessReportsCard />
             </>
@@ -97,9 +101,11 @@ export default function Mentoria() {
           )}
         </TabsContent>
 
-        {/* Aba Roadmap (antiga Meu Processo) */}
+        {/* Aba Roadmap - Diferente para cada tipo */}
         <TabsContent value="roadmap" className="mt-0 space-y-6">
-          {isBusiness ? (
+          {isBusinessIAplicada ? (
+            <IAplicadaRoadmap />
+          ) : isBusiness ? (
             <BusinessExecutiveRoadmap />
           ) : (
             <>
