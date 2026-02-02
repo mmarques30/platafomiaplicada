@@ -244,6 +244,16 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
             <Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
           </div>
           <div className="space-y-2">
+            <Label>URL do Google Drive (Alternativo)</Label>
+            <Input 
+              {...register("google_drive_url")} 
+              placeholder="https://drive.google.com/file/d/..." 
+            />
+            <p className="text-xs text-muted-foreground">
+              Usado como fallback quando o YouTube bloquear o vídeo
+            </p>
+          </div>
+          <div className="space-y-2">
             <Label>Módulo</Label>
             <Select 
               value={watch("modulo_id") || undefined}

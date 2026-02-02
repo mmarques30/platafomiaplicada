@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, SkipForward } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, SkipForward, HardDrive, ExternalLink } from "lucide-react";
 import { CustomYouTubePlayer, PlayerState } from "@/lib/youtubePlayer";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 interface CustomVideoPlayerProps {
   videoId: string;
+  googleDriveUrl?: string | null;
   startSeconds?: number;
   endSeconds?: number;
   onTimeUpdate?: (currentTime: number) => void;
@@ -18,6 +19,7 @@ interface CustomVideoPlayerProps {
 
 export function CustomVideoPlayer({
   videoId,
+  googleDriveUrl,
   startSeconds = 0,
   endSeconds,
   onTimeUpdate,
@@ -230,13 +232,25 @@ export function CustomVideoPlayer({
             Erro ao carregar vídeo
           </div>
           <p className="text-white/80 text-sm">{error}</p>
-          <Button
-            onClick={() => window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank')}
-            variant="outline"
-            className="bg-white/10 hover:bg-white/20 text-white border-white/30"
-          >
-            Abrir no YouTube
-          </Button>
+          <div className="flex flex-col gap-2">
+            {googleDriveUrl && (
+              <Button
+                onClick={() => window.open(googleDriveUrl, '_blank')}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <HardDrive className="h-4 w-4 mr-2" />
+                Assistir no Google Drive
+              </Button>
+            )}
+            <Button
+              onClick={() => window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank')}
+              variant="outline"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/30"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Abrir no YouTube
+            </Button>
+          </div>
         </div>
       </div>
     );
