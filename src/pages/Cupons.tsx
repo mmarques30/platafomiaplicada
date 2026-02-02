@@ -80,38 +80,38 @@ export default function Cupons() {
         </Card>
 
         {/* Tabela Comparativa */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold text-center">
+        <section className="space-y-2">
+          <h2 className="text-xl font-semibold text-center mb-4">
             Compare e escolha a melhor opção
           </h2>
           
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-aplicada-green-400/30 bg-gradient-to-br from-aplicada-cream/60 via-aplicada-green-100/40 to-aplicada-green-200/30">
             <div className="min-w-[700px]">
               {/* Header da Tabela */}
-              <div className="grid grid-cols-5 gap-2 mb-4">
-                <div className="p-4">
-                  <span className="text-sm font-medium text-muted-foreground">
+              <div className="grid grid-cols-5 gap-0">
+                <div className="p-4 flex items-end">
+                  <span className="text-sm font-semibold text-foreground">
                     Características
                   </span>
                 </div>
                 
                 {/* IAplicada - Destacado */}
-                <div className="p-4 rounded-t-xl bg-primary/10 border-2 border-primary border-b-0 text-center">
-                  <Badge className="mb-2 bg-primary text-primary-foreground">
+                <div className="p-4 rounded-t-xl bg-primary text-center">
+                  <Badge className="mb-2 bg-white text-primary font-semibold">
                     Recomendado
                   </Badge>
-                  <h3 className="font-bold text-lg text-primary">IAplicada</h3>
+                  <h3 className="font-bold text-lg text-white">IAplicada</h3>
                 </div>
                 
                 {/* Concorrentes */}
-                <div className="p-4 rounded-t-xl bg-muted/50 text-center">
-                  <h3 className="font-medium text-muted-foreground mt-6">Adapta</h3>
+                <div className="p-4 text-center flex items-end justify-center">
+                  <h3 className="font-medium text-foreground/70">Adapta</h3>
                 </div>
-                <div className="p-4 rounded-t-xl bg-muted/50 text-center">
-                  <h3 className="font-medium text-muted-foreground mt-6">Viver IA</h3>
+                <div className="p-4 text-center flex items-end justify-center">
+                  <h3 className="font-medium text-foreground/70">Viver IA</h3>
                 </div>
-                <div className="p-4 rounded-t-xl bg-muted/50 text-center">
-                  <h3 className="font-medium text-muted-foreground mt-6">Asimov</h3>
+                <div className="p-4 text-center flex items-end justify-center">
+                  <h3 className="font-medium text-foreground/70">Asimov</h3>
                 </div>
               </div>
 
@@ -119,59 +119,60 @@ export default function Cupons() {
               {features.map((feature, index) => (
                 <div 
                   key={feature.name}
-                  className={`grid grid-cols-5 gap-2 ${
-                    index % 2 === 0 ? "bg-muted/30" : ""
+                  className={`grid grid-cols-5 gap-0 ${
+                    index % 2 === 0 ? "bg-aplicada-green-200/20" : "bg-white/30"
                   }`}
                 >
-                  <div className="p-4 flex items-center">
-                    <span className="text-sm font-medium">{feature.name}</span>
+                  <div className="p-3 flex items-center border-b border-aplicada-green-400/20">
+                    <span className="text-sm font-medium text-foreground">{feature.name}</span>
                   </div>
                   
                   {/* IAplicada */}
-                  <div className="p-4 bg-primary/5 border-x-2 border-primary flex items-center justify-center">
+                  <div className="p-3 bg-primary/10 border-x-2 border-primary border-b border-aplicada-green-400/20 flex items-center justify-center">
                     {feature.iaplicada ? (
-                      <Check className="h-5 w-5 text-primary" />
+                      <Check className="h-5 w-5 text-primary font-bold" strokeWidth={3} />
                     ) : (
                       <Minus className="h-5 w-5 text-muted-foreground/40" />
                     )}
                   </div>
                   
                   {/* Adapta */}
-                  <div className="p-4 flex items-center justify-center">
+                  <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
                     {feature.adapta ? (
-                      <Check className="h-5 w-5 text-muted-foreground" />
+                      <Check className="h-5 w-5 text-foreground/50" />
                     ) : (
-                      <Minus className="h-5 w-5 text-muted-foreground/40" />
+                      <Minus className="h-5 w-5 text-foreground/30" />
                     )}
                   </div>
                   
                   {/* Viver IA */}
-                  <div className="p-4 flex items-center justify-center">
+                  <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
                     {feature.viverIA ? (
-                      <Check className="h-5 w-5 text-muted-foreground" />
+                      <Check className="h-5 w-5 text-foreground/50" />
                     ) : (
-                      <Minus className="h-5 w-5 text-muted-foreground/40" />
+                      <Minus className="h-5 w-5 text-foreground/30" />
                     )}
                   </div>
                   
                   {/* Asimov */}
-                  <div className="p-4 flex items-center justify-center">
+                  <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
                     {feature.asimov ? (
-                      <Check className="h-5 w-5 text-muted-foreground" />
+                      <Check className="h-5 w-5 text-foreground/50" />
                     ) : (
-                      <Minus className="h-5 w-5 text-muted-foreground/40" />
+                      <Minus className="h-5 w-5 text-foreground/30" />
                     )}
                   </div>
                 </div>
               ))}
 
               {/* Footer da coluna IAplicada */}
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-5 gap-0">
                 <div className="p-4" />
-                <div className="p-4 rounded-b-xl bg-primary/10 border-2 border-primary border-t-0 flex justify-center">
+                <div className="p-4 rounded-b-xl bg-primary border-2 border-primary border-t-0 flex justify-center">
                   <Button 
                     onClick={handlePurchase}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2"
+                    variant="secondary"
+                    className="bg-white hover:bg-white/90 text-primary font-semibold gap-2"
                   >
                     Começar Agora
                     <ExternalLink className="h-4 w-4" />
