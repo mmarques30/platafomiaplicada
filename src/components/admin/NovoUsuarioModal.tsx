@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/card";
 import { useCreateUser } from "@/hooks/admin/useUsers";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { SkillsEquipeSelector, type SkillsEquipeData } from "./SkillsEquipeSelector";
 
 type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha";
 
@@ -37,6 +38,11 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
   const [selectedPlano, setSelectedPlano] = useState<string>("");
   const [skillsLiberado, setSkillsLiberado] = useState(false);
+  const [skillsEquipeData, setSkillsEquipeData] = useState<SkillsEquipeData>({
+    equipeId: null,
+    novaEquipe: null,
+    papelEquipe: "membro",
+  });
   
   const createUser = useCreateUser();
 
@@ -54,8 +60,23 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     });
   };
 
+  const isSkillsValid = () => {
+    if (selectedPlano !== "skills") return true;
+    
+    // Must have either existing team or valid new team data
+    if (skillsEquipeData.equipeId) return true;
+    if (skillsEquipeData.novaEquipe?.nome && skillsEquipeData.novaEquipe?.empresa) return true;
+    
+    return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (selectedPlano === "skills" && !isSkillsValid()) {
+      toast.error("Para o plano Skills, é obrigatório selecionar ou criar uma equipe.");
+      return;
+    }
 
     await createUser.mutateAsync({
       email,
@@ -64,6 +85,10 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
       roles: selectedRoles,
       planoMentoria: selectedPlano || null,
       skillsLiberado: selectedPlano === "business" ? skillsLiberado : false,
+      // Skills team data
+      equipeId: selectedPlano === "skills" ? skillsEquipeData.equipeId : null,
+      novaEquipe: selectedPlano === "skills" ? skillsEquipeData.novaEquipe : null,
+      papelEquipe: selectedPlano === "skills" ? skillsEquipeData.papelEquipe : undefined,
     });
 
     // Resetar form
@@ -73,6 +98,11 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     setSelectedRoles([]);
     setSelectedPlano("");
     setSkillsLiberado(false);
+    setSkillsEquipeData({
+      equipeId: null,
+      novaEquipe: null,
+      papelEquipe: "membro",
+    });
     onOpenChange(false);
   };
 
@@ -207,6 +237,17 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
               Selecione o produto/plano que este usuário terá acesso
             </p>
             
+            {/* Skills Team Selector - apenas para Skills */}
+            {selectedPlano === "skills" && (
+              <div className="mt-4">
+                <SkillsEquipeSelector
+                  value={skillsEquipeData}
+                  onChange={setSkillsEquipeData}
+                  showLiderOption={true}
+                />
+              </div>
+            )}
+            
             {/* Switch para liberar Skills - apenas para Business */}
             {selectedPlano === "business" && (
               <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
@@ -235,7 +276,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={createUser.isPending}>
+            <Button type="submit" disabled={createUser.isPending || (selectedPlano === "skills" && !isSkillsValid())}>
               {createUser.isPending ? "Criando..." : "Criar Usuário"}
             </Button>
           </DialogFooter>
