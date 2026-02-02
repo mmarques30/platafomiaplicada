@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Newspaper, Globe, Lightbulb, FileText, ExternalLink, ImageIcon, Users } from "lucide-react";
@@ -11,16 +11,17 @@ import { useConteudosDashboard, TipoConteudo } from "@/hooks/useConteudosDashboa
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { CriadoresComunidadeTab } from "@/components/comunidade/CriadoresComunidadeTab";
+import { useUserRole } from "@/hooks/useUserRole";
 import logo3d from "@/assets/logo-3d.png";
 
 type TabValue = TipoConteudo | "todos" | "criadores";
 
-const tabs = [
+const allTabs = [
   { value: "todos" as const, label: "Todos", icon: FileText },
   { value: "noticia" as TipoConteudo, label: "Notícias IA", icon: Globe },
   { value: "dica" as TipoConteudo, label: "Dicas Práticas", icon: Lightbulb },
   { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
-  { value: "criadores" as const, label: "Criadores", icon: Users },
+  { value: "criadores" as const, label: "Criadores", icon: Users, hiddenForVisitors: true },
 ];
 
 const tipoIcons = {
@@ -37,8 +38,15 @@ const tipoBadgeColors = {
 
 export default function Central() {
   const [searchParams] = useSearchParams();
+  const { isVisitante } = useUserRole();
   const tabFromUrl = searchParams.get('tab') as TabValue | null;
-  const validTabs = ["todos", "noticia", "dica", "newsletter", "criadores"];
+  
+  // Filtrar tabs baseado no tipo de usuário
+  const tabs = useMemo(() => {
+    return allTabs.filter(tab => !tab.hiddenForVisitors || !isVisitante);
+  }, [isVisitante]);
+  
+  const validTabs = tabs.map(t => t.value);
   const [activeTab, setActiveTab] = useState<TabValue>(
     tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "todos"
   );
