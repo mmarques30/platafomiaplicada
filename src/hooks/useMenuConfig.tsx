@@ -51,7 +51,11 @@ export function useMenuConfig() {
     // Skills/Business têm acesso separado ao Academy
     const hiddenByEnvironment: Record<string, string[]> = {
       skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
-      business: ['trilhas', 'calendario'],
+      business: [
+        'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+        'trilhas_skills', 'skills_equipe', 'skills_backlog', 'skills_roadmap', 
+        'skills_entregas', 'skills_lider'
+      ],
     };
     
     const hiddenMenus = hiddenByEnvironment[currentEnvironment || ''] || [];
