@@ -1,8 +1,8 @@
-import { Check, Minus, Ticket, Copy, ExternalLink, ArrowRight } from "lucide-react";
+import { Check, Minus, Copy, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import mariAvatar from "@/assets/mari-avatar-new.png";
 
@@ -37,161 +37,170 @@ export default function Cupons() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container py-6 px-4 space-y-8">
-        {/* Header */}
+      <main className="container py-6 px-4 space-y-6">
+        {/* Header - Sem ícone */}
         <PageTitle 
           primary="Descontos" 
           secondary="IAplicada"
-          icon={<Ticket className="h-7 w-7 text-primary" />}
         />
 
-        {/* Card CTA com Cupom */}
-        <Card className="border-2 border-foreground bg-foreground/5 dark:bg-foreground/10">
-          <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl text-foreground">
-              Cupom de Desconto
-            </CardTitle>
-            <CardDescription className="text-base">
-              Use o cupom abaixo no checkout para garantir seu desconto exclusivo
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-3 bg-background rounded-lg border-2 border-dashed border-foreground/40 px-6 py-3">
-              <code className="text-xl font-bold text-foreground tracking-wider">
-                {COUPON_CODE}
-              </code>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopyCoupon}
-                className="text-foreground hover:text-foreground/80 hover:bg-foreground/10"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            </div>
-            <Button 
-              onClick={handlePurchase}
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2"
-            >
-              Comprar Agora
-              <ExternalLink className="h-4 w-4" />
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Sistema de Abas */}
+        <Tabs defaultValue="academy" className="w-full">
+          <TabsList className="bg-muted">
+            <TabsTrigger value="academy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              Academy
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Tabela Comparativa */}
-        <section className="space-y-2">
-          <h2 className="text-xl font-semibold text-center mb-4">
-            Compare e escolha a melhor opção
-          </h2>
-          
-          <div className="overflow-x-auto rounded-xl border border-aplicada-green-400/30 bg-gradient-to-br from-aplicada-cream/60 via-aplicada-green-100/40 to-aplicada-green-200/30">
-            <div className="min-w-[700px]">
-              {/* Header da Tabela */}
-              <div className="grid grid-cols-5 gap-0">
-                <div className="p-4 flex items-end">
-                  <span className="text-sm font-semibold text-aplicada-green-600">
-                    Características
-                  </span>
-                </div>
-                
-                {/* IAplicada - Destacado */}
-                <div className="p-4 rounded-t-xl bg-primary text-center">
-                  <Badge className="mb-2 bg-white text-primary font-semibold">
-                    Recomendado
-                  </Badge>
-                  <h3 className="font-bold text-lg text-white">IAplicada</h3>
-                </div>
-                
-                {/* Concorrentes */}
-                <div className="p-4 text-center flex items-end justify-center">
-                  <h3 className="font-medium text-foreground/70">Adapta</h3>
-                </div>
-                <div className="p-4 text-center flex items-end justify-center">
-                  <h3 className="font-medium text-foreground/70">Viver IA</h3>
-                </div>
-                <div className="p-4 text-center flex items-end justify-center">
-                  <h3 className="font-medium text-foreground/70">Asimov</h3>
+          <TabsContent value="academy" className="space-y-6 mt-4">
+            {/* Descrição introdutória */}
+            <p className="text-muted-foreground text-base">
+              O Academy é o primeiro passo da sua jornada na IAplicada. Aqui você começa sua trilha de aprendizado em Inteligência Artificial aplicada ao seu dia a dia profissional.
+            </p>
+
+            {/* Card de Cupom Compacto */}
+            <div className="bg-aplicada-green-700 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-white text-sm font-medium">Cupom:</span>
+                <code className="text-white font-bold text-lg tracking-wider">
+                  {COUPON_CODE}
+                </code>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopyCoupon}
+                  className="text-white hover:text-white hover:bg-white/20"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copiar
+                </Button>
+                <Button 
+                  onClick={handlePurchase}
+                  size="sm"
+                  className="bg-white text-aplicada-green-700 hover:bg-white/90 font-semibold"
+                >
+                  Comprar Agora
+                  <ExternalLink className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Tabela Comparativa */}
+            <section className="space-y-2">
+              <h2 className="text-xl font-semibold text-center mb-4">
+                Compare e escolha a melhor opção
+              </h2>
+              
+              <div className="overflow-x-auto rounded-xl border border-aplicada-green-400/30 bg-gradient-to-br from-aplicada-cream/60 via-aplicada-green-100/40 to-aplicada-green-200/30">
+                <div className="min-w-[700px]">
+                  {/* Header da Tabela */}
+                  <div className="grid grid-cols-5 gap-0">
+                    <div className="p-4 flex items-end">
+                      <span className="text-sm font-semibold text-aplicada-green-600">
+                        Características
+                      </span>
+                    </div>
+                    
+                    {/* IAplicada - Destacado */}
+                    <div className="p-4 rounded-t-xl bg-primary text-center">
+                      <Badge className="mb-2 bg-white text-primary font-semibold">
+                        Recomendado
+                      </Badge>
+                      <h3 className="font-bold text-lg text-white">IAplicada</h3>
+                    </div>
+                    
+                    {/* Concorrentes */}
+                    <div className="p-4 text-center flex items-end justify-center">
+                      <h3 className="font-medium text-foreground/70">Adapta</h3>
+                    </div>
+                    <div className="p-4 text-center flex items-end justify-center">
+                      <h3 className="font-medium text-foreground/70">Viver IA</h3>
+                    </div>
+                    <div className="p-4 text-center flex items-end justify-center">
+                      <h3 className="font-medium text-foreground/70">Asimov</h3>
+                    </div>
+                  </div>
+
+                  {/* Linhas de Features */}
+                  {features.map((feature, index) => (
+                    <div 
+                      key={feature.name}
+                      className={`grid grid-cols-5 gap-0 ${
+                        index % 2 === 0 ? "bg-aplicada-green-200/20" : "bg-white/30"
+                      }`}
+                    >
+                      <div className="p-3 flex items-center border-b border-aplicada-green-400/20">
+                        <span className="text-sm font-medium text-foreground">{feature.name}</span>
+                      </div>
+                      
+                      {/* IAplicada */}
+                      <div className="p-3 bg-primary/10 border-x-2 border-primary border-b border-aplicada-green-400/20 flex items-center justify-center">
+                        {feature.iaplicada ? (
+                          <Check className="h-5 w-5 text-primary font-bold" strokeWidth={3} />
+                        ) : (
+                          <Minus className="h-5 w-5 text-muted-foreground/40" />
+                        )}
+                      </div>
+                      
+                      {/* Adapta */}
+                      <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
+                        {feature.adapta ? (
+                          <Check className="h-5 w-5 text-foreground/50" />
+                        ) : (
+                          <Minus className="h-5 w-5 text-foreground/30" />
+                        )}
+                      </div>
+                      
+                      {/* Viver IA */}
+                      <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
+                        {feature.viverIA ? (
+                          <Check className="h-5 w-5 text-foreground/50" />
+                        ) : (
+                          <Minus className="h-5 w-5 text-foreground/30" />
+                        )}
+                      </div>
+                      
+                      {/* Asimov */}
+                      <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
+                        {feature.asimov ? (
+                          <Check className="h-5 w-5 text-foreground/50" />
+                        ) : (
+                          <Minus className="h-5 w-5 text-foreground/30" />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
                 </div>
               </div>
+            </section>
 
-              {/* Linhas de Features */}
-              {features.map((feature, index) => (
-                <div 
-                  key={feature.name}
-                  className={`grid grid-cols-5 gap-0 ${
-                    index % 2 === 0 ? "bg-aplicada-green-200/20" : "bg-white/30"
-                  }`}
-                >
-                  <div className="p-3 flex items-center border-b border-aplicada-green-400/20">
-                    <span className="text-sm font-medium text-foreground">{feature.name}</span>
-                  </div>
-                  
-                  {/* IAplicada */}
-                  <div className="p-3 bg-primary/10 border-x-2 border-primary border-b border-aplicada-green-400/20 flex items-center justify-center">
-                    {feature.iaplicada ? (
-                      <Check className="h-5 w-5 text-primary font-bold" strokeWidth={3} />
-                    ) : (
-                      <Minus className="h-5 w-5 text-muted-foreground/40" />
-                    )}
-                  </div>
-                  
-                  {/* Adapta */}
-                  <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
-                    {feature.adapta ? (
-                      <Check className="h-5 w-5 text-foreground/50" />
-                    ) : (
-                      <Minus className="h-5 w-5 text-foreground/30" />
-                    )}
-                  </div>
-                  
-                  {/* Viver IA */}
-                  <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
-                    {feature.viverIA ? (
-                      <Check className="h-5 w-5 text-foreground/50" />
-                    ) : (
-                      <Minus className="h-5 w-5 text-foreground/30" />
-                    )}
-                  </div>
-                  
-                  {/* Asimov */}
-                  <div className="p-3 flex items-center justify-center border-b border-aplicada-green-400/20">
-                    {feature.asimov ? (
-                      <Check className="h-5 w-5 text-foreground/50" />
-                    ) : (
-                      <Minus className="h-5 w-5 text-foreground/30" />
-                    )}
-                  </div>
-                </div>
-              ))}
-
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Final com foto da Mari */}
-        <section className="flex flex-col md:flex-row items-center gap-6 py-6">
-          {/* Foto da Mari */}
-          <div className="flex-shrink-0">
-            <img 
-              src={mariAvatar} 
-              alt="Mariana - Mentora IAplicada" 
-              className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-primary shadow-lg"
-            />
-          </div>
-          
-          {/* Texto */}
-          <div className="flex-1 text-center md:text-left space-y-3">
-            <h3 className="text-xl md:text-2xl font-bold text-foreground">
-              A escola de IA prática com aplicação real que você precisa
-            </h3>
-            <p className="text-muted-foreground text-sm md:text-base">
-              Na IAplicada Academy, você não aprende só teoria — você implementa IA no seu trabalho desde a primeira semana. 
-              Trilhas focadas em resultados, comunidade ativa e suporte para transformar seu dia a dia profissional.
-            </p>
-          </div>
-        </section>
+            {/* CTA Final com foto da Mari */}
+            <section className="flex flex-col md:flex-row items-center gap-6 py-6">
+              {/* Foto da Mari */}
+              <div className="flex-shrink-0">
+                <img 
+                  src={mariAvatar} 
+                  alt="Mariana - Mentora IAplicada" 
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-primary shadow-lg"
+                />
+              </div>
+              
+              {/* Texto */}
+              <div className="flex-1 text-center md:text-left space-y-3">
+                <h3 className="text-xl md:text-2xl font-bold text-foreground">
+                  A escola de IA prática com aplicação real que você precisa
+                </h3>
+                <p className="text-muted-foreground text-sm md:text-base">
+                  Na IAplicada Academy, você não aprende só teoria — você implementa IA no seu trabalho desde a primeira semana. 
+                  Trilhas focadas em resultados, comunidade ativa e suporte para transformar seu dia a dia profissional.
+                </p>
+              </div>
+            </section>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
