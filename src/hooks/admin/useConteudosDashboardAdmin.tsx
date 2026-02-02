@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -224,4 +225,16 @@ export async function formatarTextoComIA(texto: string): Promise<string> {
   }
 
   return response.data.textoFormatado;
+}
+
+export function useNextOrdem() {
+  const { data: conteudos } = useConteudosDashboardAdmin();
+  
+  const nextOrdem = useMemo(() => {
+    if (!conteudos?.length) return 1;
+    const maxOrdem = Math.max(...conteudos.map(c => c.ordem));
+    return maxOrdem + 1;
+  }, [conteudos]);
+  
+  return nextOrdem;
 }
