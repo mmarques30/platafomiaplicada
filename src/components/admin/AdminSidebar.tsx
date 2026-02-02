@@ -91,6 +91,7 @@ const menuGroups: MenuGroup[] = [
       { path: "/admin/mentoria/bonus", label: "Bônus Globais" },
       { path: "/admin/mentoria/academy", label: "Academy" },
       { path: "/admin/mentoria/business", label: "Business" },
+      { path: "/admin/mentoria/skills", label: "Skills" },
       { path: "/admin/mentoria/preview-paineis", label: "Preview Painéis" },
       { path: "/admin/formularios", label: "Diagnósticos" },
       { path: "/admin/duvidas", label: "Central de Dúvidas" },

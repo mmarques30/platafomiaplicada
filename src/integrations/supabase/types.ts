@@ -1125,6 +1125,74 @@ export type Database = {
           },
         ]
       }
+      conteudos_liberados_skills: {
+        Row: {
+          created_at: string | null
+          equipe_id: string
+          fase_roadmap_id: string | null
+          id: string
+          liberado_por: string | null
+          modulo_id: string | null
+          motivo: string | null
+          ordem: number | null
+          trilha_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          equipe_id: string
+          fase_roadmap_id?: string | null
+          id?: string
+          liberado_por?: string | null
+          modulo_id?: string | null
+          motivo?: string | null
+          ordem?: number | null
+          trilha_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          equipe_id?: string
+          fase_roadmap_id?: string | null
+          id?: string
+          liberado_por?: string | null
+          modulo_id?: string | null
+          motivo?: string | null
+          ordem?: number | null
+          trilha_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conteudos_liberados_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conteudos_liberados_skills_fase_roadmap_id_fkey"
+            columns: ["fase_roadmap_id"]
+            isOneToOne: false
+            referencedRelation: "roadmap_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conteudos_liberados_skills_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "modulos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conteudos_liberados_skills_trilha_id_fkey"
+            columns: ["trilha_id"]
+            isOneToOne: false
+            referencedRelation: "trilhas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contratos_business: {
         Row: {
           cases_referencia: string | null
