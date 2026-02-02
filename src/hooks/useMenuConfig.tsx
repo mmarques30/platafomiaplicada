@@ -61,8 +61,9 @@ export function useMenuConfig() {
       ],
       
       // Business IAplicada: versão mais restrita (cliente apenas acompanha)
+      // NÃO oculta 'aprender' - mostra Central como submenu
       business_iaplicada: [
-        'aprender', 'trilhas', 'trilhas_skills', 'calendario', 'central_conteudo',
+        'trilhas', 'trilhas_skills', 'calendario', 'central_conteudo',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas', 'meu_progresso_conteudo',
         'skills_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_lider',
         'comunidade', 'comunidade_feed', 'comunidade_sala'
