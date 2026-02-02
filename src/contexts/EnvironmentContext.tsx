@@ -72,7 +72,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
   const availableEnvironments = useMemo<Environment[]>(() => {
     // Admin vê todos para simulação
     if (isAdmin) {
-      return ["gratuito", "academy", "skills", "business", "business_iaplicada"];
+      return ["gratuito", "academy", "skills", "business"];
     }
     
     // Visitante só vê gratuito
