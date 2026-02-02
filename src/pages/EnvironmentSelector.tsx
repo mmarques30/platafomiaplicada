@@ -135,7 +135,7 @@ export default function EnvironmentSelector() {
               {/* Card com imagem ou ícone */}
               <div
                 className={cn(
-                  "relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden transition-all duration-300",
+                  "relative w-32 h-32 md:w-40 md:h-40 overflow-hidden transition-all duration-300",
                   !isAvailable && "opacity-40"
                 )}
               >
