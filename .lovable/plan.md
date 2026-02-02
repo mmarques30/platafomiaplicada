@@ -1,121 +1,116 @@
 
-# Plano: Redirecionamento dos botões "Saiba mais" na página de Serviços
+# Plano: Corrigir Regra de Cupom Academy15 para Visitantes Engajados
 
-## Objetivo
-Configurar os links "Saiba mais" na página `/servicos` para:
-1. **Academy**: Redirecionar para cadastro gratuito (`/auth`) se não logado, ou para `/cupons` se já tiver acesso
-2. **Skills e Business**: Abrir WhatsApp para falar com especialista: `http://wa.me/5511950566101`
+## Diagnóstico do Problema
+
+### Por que nenhum visitante recebeu o cupom Academy15?
+
+**Problema 1: Regra muito restritiva**
+A função atual `check_visitor_engagement` verifica se o visitante acessou a plataforma em **4 dias diferentes nas últimas 2 semanas**:
+
+```sql
+-- Regra atual (muito restritiva)
+SELECT COUNT(DISTINCT DATE(accessed_at)) >= 4
+FROM content_access_logs
+WHERE accessed_at >= NOW() - INTERVAL '14 days'
+```
+
+**Problema 2: A função não é executada automaticamente**
+A função `check_visitor_engagement` só é chamada pela edge function `process-visitor-expirations`, que precisa ser acionada manualmente ou via cron job (não configurado).
 
 ---
 
-## Alterações Necessárias
+## Dados Atuais
 
-### Arquivo: `src/pages/Servicos.tsx`
+| Situação | Quantidade |
+|----------|------------|
+| Total de visitantes | 150 |
+| Visitantes com Academy12 | 150 |
+| Visitantes com Academy15 | 0 |
+| **Visitantes com 10+ acessos** | **8** |
 
-**Mudanças:**
-1. Importar `useAuth` para verificar se usuário está logado
-2. Importar `useNavigate` para navegação programática
-3. Substituir os links `<a>` por botões/links com lógica condicional
-
-**Lógica do botão Academy:**
-```text
-Se usuário NÃO está logado → Redireciona para /auth (com tab de signup)
-Se usuário ESTÁ logado → Redireciona para /cupons
-```
-
-**Lógica dos botões Skills e Business:**
-```text
-Sempre → Abre WhatsApp: http://wa.me/5511950566101
-```
+### Top visitantes por acessos:
+| Email | Acessos |
+|-------|---------|
+| marcosmartinsdeoliveira75@gmail.com | 20 |
+| robertocr@me.com | 19 |
+| anavmguimaraes@hotmail.com | 17 |
+| aarmelin@uol.com.br | 15 |
+| silgoliveira06@gmail.com | 14 |
+| mariana.mrcabral@gmail.com | 12 |
+| wanpereira15@gmail.com | 12 |
+| ellenrejo@hotmail.com | 11 |
 
 ---
 
-## Código Final
+## Solução Proposta
 
-```tsx
-// Importações adicionais
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+### 1. Atualizar a função `check_visitor_engagement`
 
-const Servicos = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
+**Nova regra:** Visitante é engajado se consumiu **10 ou mais conteúdos** (total, sem limite de tempo).
 
-  const handleAcademyClick = () => {
-    if (user) {
-      navigate("/cupons");
-    } else {
-      navigate("/auth?tab=signup");
-    }
-  };
-
-  const handleSpecialistClick = () => {
-    window.open("http://wa.me/5511950566101", "_blank");
-  };
-
-  return (
-    // ... estrutura existente
+```sql
+CREATE OR REPLACE FUNCTION check_visitor_engagement(visitor_id UUID)
+RETURNS BOOLEAN AS $$
+DECLARE
+  total_acessos INTEGER;
+BEGIN
+  SELECT COUNT(*)
+  INTO total_acessos
+  FROM content_access_logs cal
+  JOIN profiles p ON cal.user_email = p.email
+  WHERE p.id = visitor_id;
     
-    // Academy - botão com lógica
-    <button
-      onClick={handleAcademyClick}
-      className="inline-flex items-center gap-1 text-[#9EB038] hover:underline"
-    >
-      Saiba mais <ArrowUpRight className="w-4 h-4" />
-    </button>
-    
-    // Skills e Business - link para WhatsApp
-    <button
-      onClick={handleSpecialistClick}
-      className="inline-flex items-center gap-1 text-[#9EB038] hover:underline"
-    >
-      Falar com especialista <ArrowUpRight className="w-4 h-4" />
-    </button>
-  );
-};
+  RETURN COALESCE(total_acessos, 0) >= 10;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+```
+
+### 2. Atualizar visitantes existentes que já se qualificam
+
+```sql
+-- Atualizar cupom para visitantes que já têm 10+ acessos
+UPDATE public.profiles p
+SET cupom_especial = 'Academy15'
+WHERE p.is_visitante = true
+  AND (
+    SELECT COUNT(*)
+    FROM content_access_logs cal
+    WHERE cal.user_email = p.email
+  ) >= 10;
+```
+
+### 3. Atualizar descrição do cupom na tabela
+
+```sql
+UPDATE public.cupons_visitantes
+SET descricao = 'Cupom para visitantes engajados (consumiram +10 conteúdos)'
+WHERE codigo = 'Academy15';
 ```
 
 ---
 
-## Atualização da Página Auth (Opcional)
+## Arquivos a Serem Modificados
 
-Para suportar o parâmetro `?tab=signup`, faremos uma pequena modificação no `Auth.tsx` para ler o parâmetro da URL e já abrir na aba de cadastro:
+| Tipo | Descrição |
+|------|-----------|
+| Migração SQL | Atualizar função + cupons existentes + descrição |
 
-```tsx
-import { useSearchParams } from "react-router-dom";
+---
 
-// Dentro do componente
-const [searchParams] = useSearchParams();
-const initialTab = searchParams.get("tab") === "signup" ? "signup" : "login";
-const [activeTab, setActiveTab] = useState<"login" | "signup">(initialTab);
+## Resultado Esperado
+
+Após a migração:
+- **8 visitantes** serão automaticamente atualizados para cupom Academy15
+- Novos visitantes que atingirem 10+ acessos serão elegíveis quando a edge function rodar
+- A descrição do cupom refletirá a nova regra
+
+---
+
+## Validação
+
+Após a migração, a consulta deve retornar:
 ```
-
----
-
-## Resumo dos Arquivos
-
-| Arquivo | Alteração |
-|---------|-----------|
-| `src/pages/Servicos.tsx` | Adicionar lógica de redirecionamento nos botões |
-| `src/pages/Auth.tsx` | Ler parâmetro `?tab=signup` da URL |
-
----
-
-## Fluxo do Usuário
-
-### Cenário 1: Visitante clica em "Saiba mais" do Academy
-1. Usuário não logado clica no botão
-2. É redirecionado para `/auth?tab=signup`
-3. Página de auth abre já na aba "Criar Conta"
-4. Após cadastro, pode acessar `/cupons`
-
-### Cenário 2: Usuário logado clica em "Saiba mais" do Academy
-1. Usuário já autenticado clica no botão
-2. É redirecionado diretamente para `/cupons`
-3. Vê seu cupom de desconto e pode comprar
-
-### Cenário 3: Qualquer pessoa clica em "Saiba mais" do Skills ou Business
-1. Usuário clica no botão
-2. Abre WhatsApp com número do especialista
-3. Pode iniciar conversa diretamente
-
+Academy12: ~142 visitantes
+Academy15: 8 visitantes
+```
