@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, X, FileText, Loader2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Upload, X, FileText, Loader2, Globe, Lock } from "lucide-react";
 import { useMaterialComunidadeSubmit } from "@/hooks/useMaterialComunidadeSubmit";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,6 +63,7 @@ export function AdicionarMaterialModal({ open, onOpenChange }: AdicionarMaterial
   const [tipo, setTipo] = useState("");
   const [categoria, setCategoria] = useState("");
   const [conteudoTexto, setConteudoTexto] = useState("");
+  const [visibilidade, setVisibilidade] = useState<"gratuito" | "pago">("pago");
   const [arquivos, setArquivos] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -132,6 +134,7 @@ export function AdicionarMaterialModal({ open, onOpenChange }: AdicionarMaterial
         categoria,
         conteudo_texto: conteudoTexto.trim() || null,
         arquivos_url: uploadedUrls,
+        visibilidade,
       });
 
       // Reset form
@@ -140,6 +143,7 @@ export function AdicionarMaterialModal({ open, onOpenChange }: AdicionarMaterial
       setTipo("");
       setCategoria("");
       setConteudoTexto("");
+      setVisibilidade("pago");
       setArquivos([]);
       onOpenChange(false);
     } catch (error) {
@@ -212,6 +216,42 @@ export function AdicionarMaterialModal({ open, onOpenChange }: AdicionarMaterial
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          {/* Visibilidade */}
+          <div className="space-y-3">
+            <Label>Visibilidade *</Label>
+            <RadioGroup
+              value={visibilidade}
+              onValueChange={(v) => setVisibilidade(v as "gratuito" | "pago")}
+              className="space-y-2"
+              disabled={isLoading}
+            >
+              <div className="flex items-start space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                <RadioGroupItem value="gratuito" id="gratuito" className="mt-0.5" />
+                <label htmlFor="gratuito" className="flex-1 cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-aplicada-green-600" />
+                    <span className="font-medium">Comunidade Gratuita</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Visível para todos, incluindo visitantes
+                  </p>
+                </label>
+              </div>
+              <div className="flex items-start space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                <RadioGroupItem value="pago" id="pago" className="mt-0.5" />
+                <label htmlFor="pago" className="flex-1 cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-primary" />
+                    <span className="font-medium">Comunidade Paga</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Apenas para mentorados (Academy, Skills, Business)
+                  </p>
+                </label>
+              </div>
+            </RadioGroup>
           </div>
 
           {/* Descrição */}

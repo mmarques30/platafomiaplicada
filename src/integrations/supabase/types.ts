@@ -2457,6 +2457,7 @@ export type Database = {
           total_avaliacoes: number | null
           total_comentarios: number | null
           updated_at: string | null
+          visibilidade: string
         }
         Insert: {
           adicionado_por?: string | null
@@ -2475,6 +2476,7 @@ export type Database = {
           total_avaliacoes?: number | null
           total_comentarios?: number | null
           updated_at?: string | null
+          visibilidade?: string
         }
         Update: {
           adicionado_por?: string | null
@@ -2493,6 +2495,7 @@ export type Database = {
           total_avaliacoes?: number | null
           total_comentarios?: number | null
           updated_at?: string | null
+          visibilidade?: string
         }
         Relationships: [
           {

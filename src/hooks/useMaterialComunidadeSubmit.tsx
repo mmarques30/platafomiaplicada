@@ -10,6 +10,7 @@ export interface MaterialSubmitData {
   categoria: string;
   conteudo_texto: string | null;
   arquivos_url: string[];
+  visibilidade: "gratuito" | "pago";
 }
 
 export function useMaterialComunidadeSubmit() {
@@ -48,6 +49,7 @@ export function useMaterialComunidadeSubmit() {
           categoria: material.categoria,
           conteudo_texto: material.conteudo_texto,
           arquivos_url: material.arquivos_url,
+          visibilidade: material.visibilidade,
           criador_id: user.id,
           adicionado_por: user.id,
           ativo: false, // Pendente de aprovação

@@ -30,13 +30,14 @@ interface UseMateriaisComunidadeOptions {
   tipo?: string;
   categoria?: string;
   includeInactive?: boolean;
+  visibilidade?: "gratuito" | "pago";
 }
 
 export function useMateriaisComunidade(options: UseMateriaisComunidadeOptions = {}) {
-  const { tipo, categoria, includeInactive = false } = options;
+  const { tipo, categoria, includeInactive = false, visibilidade } = options;
 
   const { data: materiais, isLoading } = useQuery({
-    queryKey: ["materiais-comunidade", tipo, categoria, includeInactive],
+    queryKey: ["materiais-comunidade", tipo, categoria, includeInactive, visibilidade],
     queryFn: async () => {
       let query = supabase
         .from("materiais_comunidade")
@@ -61,6 +62,11 @@ export function useMateriaisComunidade(options: UseMateriaisComunidadeOptions = 
 
       if (categoria && categoria !== "all") {
         query = query.eq("categoria", categoria);
+      }
+
+      // Filtrar por visibilidade (visitantes só veem gratuitos)
+      if (visibilidade) {
+        query = query.eq("visibilidade", visibilidade);
       }
 
       const { data, error } = await query;
