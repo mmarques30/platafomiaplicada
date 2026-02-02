@@ -80,6 +80,10 @@ export function AppSidebar() {
 
   const sidebarMenus = getSidebarMenus(effectivePlan, effectiveEnvironment);
   
+  // Detectar se é Business IAplicada (para filtros especiais)
+  const isBusinessIAplicadaEnv = effectiveEnvironment === 'business_iaplicada' 
+    || effectivePlan === 'business_iaplicada';
+  
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
   const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key && menu.menu_key !== 'interacoes');
@@ -163,7 +167,10 @@ export function AppSidebar() {
                 const isExpanded = expandedMenus.includes(menu.menu_key);
                 
                 // Renderizar Bibliotecas logo após "Aprender" (menu_key === 'aprender')
-                const renderBibliotecasAfter = menu.menu_key === 'aprender';
+                // Para IAplicada: renderizar após "inicio" já que "aprender" não existe
+                const renderBibliotecasAfter = isBusinessIAplicadaEnv 
+                  ? menu.menu_key === 'inicio'
+                  : menu.menu_key === 'aprender';
                 
                 const menuElement = hasSubMenus ? (
                   <Collapsible 
@@ -267,10 +274,6 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
 
-                // Detectar se é IAplicada para filtrar bibliotecas
-                const isBusinessIAplicadaEnv = effectiveEnvironment === 'business_iaplicada' 
-                  || effectivePlan === 'business_iaplicada';
-                
                 // Renderizar Bibliotecas imediatamente após "Aprender"
                 // Para IAplicada: apenas Prompts e Ferramentas
                 const bibliotecasMenu = renderBibliotecasAfter && !isVisitante ? (
