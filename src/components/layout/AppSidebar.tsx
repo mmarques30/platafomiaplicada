@@ -266,51 +266,73 @@ export function AppSidebar() {
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     
-                    <CollapsibleContent className="pl-6 space-y-1 mt-1">
-                      <NavLink 
-                        to="/ia-copie-use" 
-                        className={cn(
-                          "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                          location.pathname === '/ia-copie-use'
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}
-                      >
-                        {!collapsed && <span>IA "Copie e Use"</span>}
-                      </NavLink>
-                      <NavLink 
-                        to="/biblioteca-ferramentas" 
-                        className={cn(
-                          "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                          location.pathname === '/biblioteca-ferramentas'
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}
-                      >
-                        {!collapsed && <span>Ferramentas</span>}
-                      </NavLink>
-                      <NavLink 
-                        to="/biblioteca-prompts" 
-                        className={cn(
-                          "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                          location.pathname === '/biblioteca-prompts'
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}
-                      >
-                        {!collapsed && <span>Prompts</span>}
-                      </NavLink>
-                      <NavLink 
-                        to="/metodos-aplicar" 
-                        className={cn(
-                          "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                          location.pathname === '/metodos-aplicar'
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}
-                      >
-                        {!collapsed && <span>Métodos</span>}
-                      </NavLink>
+                    <CollapsibleContent>
+                      <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild className="group">
+                            <NavLink 
+                              to="/ia-copie-use" 
+                              end
+                              className={cn(
+                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                location.pathname === '/ia-copie-use'
+                                  ? "text-primary font-semibold" 
+                                  : "text-sidebar-foreground/70 hover:text-primary"
+                              )}
+                            >
+                              {!collapsed && <span>IA "Copie e Use"</span>}
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild className="group">
+                            <NavLink 
+                              to="/biblioteca-ferramentas" 
+                              end
+                              className={cn(
+                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                location.pathname === '/biblioteca-ferramentas'
+                                  ? "text-primary font-semibold" 
+                                  : "text-sidebar-foreground/70 hover:text-primary"
+                              )}
+                            >
+                              {!collapsed && <span>Ferramentas</span>}
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild className="group">
+                            <NavLink 
+                              to="/biblioteca-prompts" 
+                              end
+                              className={cn(
+                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                location.pathname === '/biblioteca-prompts'
+                                  ? "text-primary font-semibold" 
+                                  : "text-sidebar-foreground/70 hover:text-primary"
+                              )}
+                            >
+                              {!collapsed && <span>Prompts</span>}
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild className="group">
+                            <NavLink 
+                              to="/metodos-aplicar" 
+                              end
+                              className={cn(
+                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                location.pathname === '/metodos-aplicar'
+                                  ? "text-primary font-semibold" 
+                                  : "text-sidebar-foreground/70 hover:text-primary"
+                              )}
+                            >
+                              {!collapsed && <span>Métodos</span>}
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      </SidebarMenu>
                     </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
@@ -351,36 +373,46 @@ export function AppSidebar() {
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     
-                    <CollapsibleContent className="pl-6 space-y-1 mt-1">
-                      {/* Feed */}
-                      <NavLink 
-                        to="/comunidade" 
-                        className={cn(
-                          "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                          location.pathname === '/comunidade'
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
+                    <CollapsibleContent>
+                      <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
+                        {/* Feed */}
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild className="group">
+                            <NavLink 
+                              to="/comunidade" 
+                              end
+                              className={cn(
+                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                location.pathname === '/comunidade'
+                                  ? "text-primary font-semibold" 
+                                  : "text-sidebar-foreground/70 hover:text-primary"
+                              )}
+                            >
+                              {!collapsed && <span>Feed</span>}
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        
+                        {/* Sala de Aula - oculto para Academy */}
+                        {!isAcademy && (
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild className="group">
+                              <NavLink 
+                                to="/videos-bonus" 
+                                end
+                                className={cn(
+                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                  location.pathname === '/videos-bonus'
+                                    ? "text-primary font-semibold" 
+                                    : "text-sidebar-foreground/70 hover:text-primary"
+                                )}
+                              >
+                                {!collapsed && <span>Sala de Aula</span>}
+                              </NavLink>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
                         )}
-                      >
-                        <LucideIcons.MessageCircle className="h-4 w-4" strokeWidth={1.5} />
-                        {!collapsed && <span>Feed</span>}
-                      </NavLink>
-                      
-                      {/* Sala de Aula - oculto para Academy */}
-                      {!isAcademy && (
-                        <NavLink 
-                          to="/videos-bonus" 
-                          className={cn(
-                            "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                            location.pathname === '/videos-bonus'
-                              ? "text-primary font-semibold" 
-                              : "text-sidebar-foreground hover:text-primary"
-                          )}
-                        >
-                          <LucideIcons.PlayCircle className="h-4 w-4" strokeWidth={1.5} />
-                          {!collapsed && <span>Sala de Aula</span>}
-                        </NavLink>
-                      )}
+                      </SidebarMenu>
                     </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
