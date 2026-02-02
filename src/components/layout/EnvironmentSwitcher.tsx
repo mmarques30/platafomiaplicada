@@ -12,7 +12,7 @@ import {
 import { useEnvironment, Environment, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
 import { cn } from "@/lib/utils";
 
-const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business"];
+const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business", "business_iaplicada"];
 
 export function EnvironmentSwitcher() {
   const navigate = useNavigate();
