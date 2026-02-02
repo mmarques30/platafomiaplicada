@@ -1,47 +1,108 @@
 
 
-# Plano: Ocultar EnvironmentSwitcher Durante Simulação
+# Plano: Separar Ambientes - Academy sem "Cursos" e sem "Sala de Aula"
 
-## Diagnóstico
+## Objetivo
+Diferenciar a experiência do ambiente **Academy** removendo:
+1. O dropdown "Cursos" do menu superior (já que o usuário Academy já está no único curso disponível)
+2. O link "Sala de Aula" do menu lateral Comunidade
 
-Analisando a imagem e o código, identifiquei que há **dois componentes distintos** exibindo informações simultâneas:
+O ambiente **Gratuito** permanece inalterado.
 
-| Componente | Propósito | No Screenshot |
-|------------|-----------|---------------|
-| `EnvironmentSwitcher` | Mostra/alterna o ambiente do usuário logado | Badge "Skills" |
-| `AdminViewSelector` | Permite admin simular como outro usuário | Dropdown "Business" |
+## Alterações Necessárias
 
-Ambos são exibidos porque:
-- Linha 226: `<EnvironmentSwitcher />` sempre renderiza
-- Linha 227: `{isAdmin && <AdminViewSelector isAdmin={isAdmin} />}` renderiza para admins
-
-**Problema**: Quando admin está simulando, o `EnvironmentSwitcher` mostra o ambiente do admin (Skills), mas deveria mostrar o do usuário simulado ou ser ocultado.
-
-## Solução
-
-Durante uma simulação ativa (`isViewingAs`), **ocultar o `EnvironmentSwitcher`** pois:
-1. O ambiente simulado é determinado pelo plano do usuário selecionado
-2. O banner amarelo já indica claramente qual plano está sendo simulado
-3. Exibir dois indicadores de ambiente causa confusão
-
-## Alteração
+### 1. TopHeader.tsx - Ocultar Dropdown "Cursos" para Academy
 
 **Arquivo:** `src/components/layout/TopHeader.tsx`
 
-**Linha 226** - Adicionar condição para ocultar durante simulação:
+O dropdown "Cursos" (linhas 141-182) será condicionalmente ocultado quando:
+- `isAcademy === true` (plano efetivo é Academy)
+
+**Lógica:**
+- Gratuito (Visitante): Vê o dropdown "Cursos" ✅
+- Academy: **NÃO vê** o dropdown "Cursos" ❌
+- Skills/Business: Vê o dropdown "Cursos" ✅
 
 ```tsx
 // Antes:
-<EnvironmentSwitcher />
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button>Cursos...</Button>
+  </DropdownMenuTrigger>
+  ...
+</DropdownMenu>
 
 // Depois:
-{!(isAdmin && isViewingAs) && <EnvironmentSwitcher />}
+{!isAcademy && (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button>Cursos...</Button>
+    </DropdownMenuTrigger>
+    ...
+  </DropdownMenu>
+)}
 ```
 
-## Resultado
+### 2. AppSidebar.tsx - Ocultar "Sala de Aula" para Academy
 
-- **Sem simulação ativa**: Admin vê seu `EnvironmentSwitcher` normalmente + botão "Ver como..."
-- **Com simulação ativa**: Admin vê apenas o banner amarelo no topo + dropdown amarelo do `AdminViewSelector`
+**Arquivo:** `src/components/layout/AppSidebar.tsx`
 
-Apenas UMA indicação de ambiente/plano será visível por vez.
+O link "Sala de Aula" dentro do menu expansível "Comunidade" (linhas 282-294) será condicionalmente ocultado quando:
+- `isAcademy === true` (plano efetivo é Academy)
+
+**Lógica:**
+- Gratuito (Visitante): Vê "Sala de Aula" ✅
+- Academy: **NÃO vê** "Sala de Aula" ❌  
+- Skills/Business: Vê "Sala de Aula" ✅
+
+```tsx
+// Antes:
+{/* Sala de Aula */}
+<NavLink to="/videos-bonus">
+  <PlayCircle />
+  <span>Sala de Aula</span>
+</NavLink>
+
+// Depois:
+{/* Sala de Aula - não exibir para Academy */}
+{!isAcademy && (
+  <NavLink to="/videos-bonus">
+    <PlayCircle />
+    <span>Sala de Aula</span>
+  </NavLink>
+)}
+```
+
+## Detalhes Técnicos
+
+### TopHeader.tsx
+- Já tem acesso a `isAcademy` via `useEffectivePlan` (linha 35)
+- Basta envolver o dropdown `<DropdownMenu>` de "Cursos" com `{!isAcademy && (...)}`
+
+### AppSidebar.tsx
+- Já tem acesso a `isAcademy` via `useEffectivePlan` (linha 36)
+- Basta envolver o `<NavLink to="/videos-bonus">` com `{!isAcademy && (...)}`
+
+## Fluxo de Verificação
+
+| Ambiente | Dropdown "Cursos" | Link "Sala de Aula" |
+|----------|-------------------|---------------------|
+| Gratuito | ✅ Visível | ✅ Visível |
+| Academy | ❌ Oculto | ❌ Oculto |
+| Skills | ✅ Visível | ✅ Visível |
+| Business | ✅ Visível | ✅ Visível |
+
+## Arquivos a Modificar
+
+| Arquivo | Alteração |
+|---------|-----------|
+| `src/components/layout/TopHeader.tsx` | Adicionar `{!isAcademy && (...)}` ao dropdown "Cursos" |
+| `src/components/layout/AppSidebar.tsx` | Adicionar `{!isAcademy && (...)}` ao link "Sala de Aula" |
+
+## Resultado Final
+
+Usuários Academy terão uma interface mais focada:
+- Sem opção de troca de curso (já estão no Academy)
+- Sem acesso à Sala de Aula da comunidade (conteúdo gratuito)
+- Mantém acesso ao Feed da Comunidade
 
