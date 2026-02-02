@@ -1,77 +1,52 @@
 
-# Plano: Corrigir Filtragem de Menus Academy no Ambiente Skills
 
-## Problema
+# Plano: Suporte a Google Drive como Alternativa ao YouTube
 
-No ambiente Skills, os menus específicos do Academy (Minha Evolução, Meu Diagnóstico, Minhas Dúvidas) continuam aparecendo, mesmo com a lógica de filtragem implementada.
+## Resumo
 
-## Diagnóstico
+Adicionar um campo opcional `google_drive_url` na tabela `videos` para permitir que vídeos sejam disponibilizados via Google Drive como alternativa quando o YouTube bloquear o conteúdo. O player de vídeo verificará se o YouTube falhou e oferecerá o link do Drive como fallback.
 
-A lógica atual está correta no código:
-```typescript
-const getEnvironmentHiddenMenus = (environment: string | null): string[] => {
-  switch (environment) {
-    case 'skills':
-      return ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'];
-    // ...
-  }
-};
+---
+
+## Alterações Necessárias
+
+### 1. Banco de Dados: Nova Coluna
+
+Adicionar o campo `google_drive_url` (texto, opcional) na tabela `videos`:
+
+```sql
+ALTER TABLE public.videos 
+ADD COLUMN google_drive_url text;
+
+COMMENT ON COLUMN public.videos.google_drive_url IS 'URL alternativa do Google Drive para casos onde o YouTube não está disponível';
 ```
 
-Os `menu_key` no banco de dados estão corretos:
-| menu_key | label | planos_permitidos |
-|----------|-------|-------------------|
-| `evolucao` | Minha Evolução | `['academy', 'skills']` |
-| `meu_diagnostico` | Meu Diagnóstico | `['academy', 'skills']` |
-| `minhas_duvidas` | Minhas Dúvidas | `['academy', 'skills']` |
+### 2. Modal de Edição de Vídeo (Admin)
 
-O problema pode ser uma das seguintes causas:
-1. O `currentEnvironment` pode estar como `null` no momento da renderização
-2. O filtro pode não estar sendo aplicado em algum caminho de código
-3. Pode haver um problema de re-renderização
+Adicionar campo no `VideoModal.tsx` para inserir a URL do Google Drive:
 
-## Solução
-
-### 1. Garantir que a Filtragem Funcione Mesmo Durante Loading
-
-Adicionar verificação para retornar menus vazios enquanto o ambiente não está definido, ou adicionar `console.log` para debug:
-
-### 2. Mover a lógica para o hook `useMenuConfig`
-
-A solução mais robusta é integrar a filtragem por ambiente diretamente no hook `useMenuConfig`, já que ele é responsável por retornar os menus filtrados:
-
-```typescript
-// Em useMenuConfig.tsx
-const getSidebarMenus = (userPlan?: string | null, environment?: string | null) => {
-  // Menus a ocultar por ambiente
-  const hiddenByEnvironment: Record<string, string[]> = {
-    skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
-    business: ['trilhas', 'calendario'],
-  };
-  
-  const hiddenMenus = hiddenByEnvironment[environment || ''] || [];
-  
-  return menuConfig?.filter(m => {
-    if (m.tipo !== 'sidebar' || !m.visivel) return false;
-    
-    // Filtrar por ambiente selecionado
-    if (hiddenMenus.includes(m.menu_key)) return false;
-    
-    // Filtrar por plano
-    if (!m.planos_permitidos || m.planos_permitidos.length === 0) return true;
-    if (!userPlan) return false;
-    return m.planos_permitidos.includes(userPlan);
-  }) || [];
-};
+```
+┌─────────────────────────────────────────────────────┐
+│ URL do YouTube                                      │
+│ [https://youtube.com/watch?v=...              ]    │
+├─────────────────────────────────────────────────────┤
+│ URL do Google Drive (Alternativo)                   │
+│ [https://drive.google.com/file/d/...          ]    │
+│ ⓘ Usado quando o YouTube bloquear o vídeo          │
+└─────────────────────────────────────────────────────┘
 ```
 
-### 3. Atualizar AppSidebar.tsx
+### 3. Player de Vídeo: Lógica de Fallback
 
-Passar o `currentEnvironment` para o `getSidebarMenus`:
+No `CustomVideoPlayer.tsx`, quando ocorrer erro de carregamento:
+- Se `google_drive_url` existir, mostrar botão "Assistir no Google Drive"
+- Manter o botão "Abrir no YouTube" como segunda opção
 
-```typescript
-const sidebarMenus = getSidebarMenus(effectivePlan, currentEnvironment);
-```
+### 4. Atualizar o Vídeo Específico
+
+Atualizar o vídeo 20 ("Pare de Fazer, Comece a Delegar") com a URL do Drive:
+- **ID**: `38007daa-bf99-409f-993f-d996b595c734`
+- **Google Drive URL**: `https://drive.google.com/file/d/12HCoZ_I_k81q5TydookcUfyO8sxaEn-V/view`
 
 ---
 
@@ -79,59 +54,141 @@ const sidebarMenus = getSidebarMenus(effectivePlan, currentEnvironment);
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/hooks/useMenuConfig.tsx` | Adicionar parâmetro `environment` ao `getSidebarMenus` e aplicar filtro |
-| `src/components/layout/AppSidebar.tsx` | Passar `currentEnvironment` para `getSidebarMenus` |
+| Migration SQL | Adicionar coluna `google_drive_url` |
+| `src/components/admin/content/VideoModal.tsx` | Campo de input para URL do Drive |
+| `src/components/video/CustomVideoPlayer.tsx` | Prop `googleDriveUrl` + botão fallback |
+| `src/pages/VideoPlayer.tsx` | Passar `googleDriveUrl` para o player |
+| `src/pages/TrilhaDetalhes.tsx` | Passar `googleDriveUrl` para o player |
 
 ---
 
 ## Seção Técnica
 
-### useMenuConfig.tsx - Código Atualizado
+### Migration SQL
 
-```typescript
-const getSidebarMenus = (userPlan?: string | null, currentEnvironment?: string | null) => {
-  // Menus a ocultar quando em ambiente específico
-  // Skills/Business têm acesso separado ao Academy
-  const hiddenByEnvironment: Record<string, string[]> = {
-    skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
-    business: ['trilhas', 'calendario'],
-  };
-  
-  const hiddenMenus = hiddenByEnvironment[currentEnvironment || ''] || [];
-  
-  return menuConfig?.filter(m => {
-    if (m.tipo !== 'sidebar' || !m.visivel) return false;
-    
-    // Filtrar menus por ambiente selecionado
-    if (hiddenMenus.includes(m.menu_key)) return false;
-    
-    // Se planos_permitidos = null, menu visível para todos
-    if (!m.planos_permitidos || m.planos_permitidos.length === 0) return true;
-    
-    // Se não tem plano, não mostra menus restritos
-    if (!userPlan) return false;
-    
-    // Verifica se o plano do usuário está na lista de permitidos
-    return m.planos_permitidos.includes(userPlan);
-  }) || [];
-};
+```sql
+-- Adicionar coluna para URL alternativa do Google Drive
+ALTER TABLE public.videos 
+ADD COLUMN IF NOT EXISTS google_drive_url text;
+
+COMMENT ON COLUMN public.videos.google_drive_url IS 
+  'URL alternativa do Google Drive para fallback quando YouTube não estiver disponível';
+
+-- Atualizar o vídeo específico
+UPDATE public.videos 
+SET google_drive_url = 'https://drive.google.com/file/d/12HCoZ_I_k81q5TydookcUfyO8sxaEn-V/view?usp=sharing'
+WHERE id = '38007daa-bf99-409f-993f-d996b595c734';
 ```
 
-### AppSidebar.tsx - Chamada Atualizada
+### VideoModal.tsx - Novo Campo
 
-```typescript
-const sidebarMenus = getSidebarMenus(effectivePlan, currentEnvironment);
+```tsx
+<div className="space-y-2">
+  <Label>URL do YouTube</Label>
+  <Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
+</div>
+
+<div className="space-y-2">
+  <Label>URL do Google Drive (Alternativo)</Label>
+  <Input 
+    {...register("google_drive_url")} 
+    placeholder="https://drive.google.com/file/d/..." 
+  />
+  <p className="text-xs text-muted-foreground">
+    Usado como fallback quando o YouTube bloquear o vídeo
+  </p>
+</div>
 ```
 
-E remover a função `getEnvironmentHiddenMenus` do AppSidebar já que a filtragem será feita no hook.
+### CustomVideoPlayer.tsx - Props Atualizadas
+
+```tsx
+interface CustomVideoPlayerProps {
+  videoId: string;
+  googleDriveUrl?: string | null;  // Nova prop
+  startSeconds?: number;
+  // ...resto igual
+}
+```
+
+### Lógica de Fallback no Erro
+
+```tsx
+if (error) {
+  return (
+    <div className={cn("relative w-full bg-black overflow-hidden rounded-lg flex items-center justify-center", aspectClass)}>
+      {/* ...thumbnail overlay... */}
+      <div className="relative z-10 text-center space-y-4 p-6">
+        <div className="text-red-500 text-lg font-semibold">
+          Erro ao carregar vídeo
+        </div>
+        <p className="text-white/80 text-sm">{error}</p>
+        <div className="flex flex-col gap-2">
+          {googleDriveUrl && (
+            <Button
+              onClick={() => window.open(googleDriveUrl, '_blank')}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <HardDrive className="h-4 w-4 mr-2" />
+              Assistir no Google Drive
+            </Button>
+          )}
+          <Button
+            onClick={() => window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank')}
+            variant="outline"
+            className="bg-white/10 hover:bg-white/20 text-white border-white/30"
+          >
+            Abrir no YouTube
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+### VideoPlayer.tsx - Passando a Prop
+
+```tsx
+<CustomVideoPlayer
+  videoId={video.youtube_id}
+  googleDriveUrl={video.google_drive_url}  // Nova prop
+  startSeconds={progresso?.tempo_assistido || 0}
+  onTimeUpdate={handleTimeUpdate}
+  onEnded={handleVideoEnded}
+  thumbnail={video.thumbnail_customizado_url || getYouTubeThumbnail(video.youtube_id)}
+  title={video.titulo}
+/>
+```
+
+---
+
+## Fluxo de Experiência do Usuário
+
+```text
+1. Usuário acessa vídeo
+   ↓
+2. Player tenta carregar YouTube
+   ↓
+3. ✅ Sucesso → Exibe vídeo normalmente
+   ❌ Falha → Verifica se tem URL do Drive
+      ↓
+4. Se tem Drive URL:
+   → Mostra "Assistir no Google Drive" (primário)
+   → Mostra "Abrir no YouTube" (secundário)
+   
+   Se não tem Drive URL:
+   → Mostra apenas "Abrir no YouTube"
+```
 
 ---
 
 ## Comportamento Final
 
-| Ambiente Selecionado | Menus Ocultos |
-|---------------------|---------------|
-| Academy | Nenhum |
-| Skills | Trilhas, Calendário, Minha Evolução, Meu Diagnóstico, Minhas Dúvidas |
-| Business | Trilhas, Calendário |
-| Gratuito | Baseado apenas no plano |
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|-------------|-----------|
+| `youtube_url` | text | ✅ | URL principal do YouTube |
+| `google_drive_url` | text | ❌ | URL de backup no Google Drive |
+
+O vídeo será exibido via YouTube por padrão. Apenas quando houver erro de carregamento (bloqueio, indisponibilidade), o botão do Google Drive aparecerá como opção prioritária.
+
