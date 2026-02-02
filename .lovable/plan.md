@@ -1,232 +1,173 @@
 
+# Plano: Reproduzir Vídeo Diretamente do Google Drive
 
-# Plano: Correções Business IAplicada (3 itens)
+## Problema
 
-## Resumo
+O vídeo do Google Drive não está sendo reproduzido no player. Atualmente:
+- O player **sempre** tenta carregar do YouTube usando o `youtube_id`
+- Quando falha, oferece o Google Drive como **link externo** (abre nova aba)
+- O usuário quer que o vídeo seja reproduzido **diretamente** do Drive no player
 
-Corrigir três problemas identificados para o plano Business IAplicada:
+## Diagnóstico Técnico
 
-1. **Devolutiva do Diagnóstico** - Criar seção que mostre as respostas que o usuário preencheu
-2. **Badge na Tabela de Usuários** - Adicionar tratamento para "business_iaplicada" 
-3. **Menu Lateral Business** - Ajustar para mostrar apenas: Central, Bibliotecas, Meu Progresso (Visão Geral, Roadmap, Entregas)
+O link salvo: `https://drive.google.com/file/d/12HCoZ_I_k81q5TydookcUfyO8sxaEn-V/view?usp=sharing`
 
----
+Para reproduzir vídeo do Google Drive via iframe, é necessário:
+1. Converter URL `/view` para `/preview`
+2. Usar iframe direto (react-player não suporta Google Drive nativamente)
+3. Configurar `crossOrigin="anonymous"` no elemento de vídeo
 
-## Problema 1: Devolutiva do Diagnóstico Business
+## Solução Proposta
 
-### Situação Atual
-- Quando o usuário Business preenche o formulário, ele é redirecionado para o `BusinessDashboard`
-- O dashboard mostra KPIs, gráficos e projetos
-- **Não existe** uma visualização das respostas que ele preencheu
+Criar um player híbrido que:
+1. **Se tiver `google_drive_url`** → prioriza reprodução via iframe do Drive
+2. **Senão** → usa YouTube como antes
+3. Se ambos falharem → oferece links externos como fallback
 
-### Solução
-Criar uma seção "Resumo do Diagnóstico" no `BusinessDashboard` que exiba:
-- Dados do projeto (problema principal, processo a automatizar)
-- Expectativas (resultado esperado, impacto financeiro)
-- Contexto (área de atuação, tamanho da equipe, decisores)
-- Objetivos (KPIs, métricas de sucesso)
+### Formato das URLs
 
-### Arquivos a Modificar
-| Arquivo | Alteração |
-|---------|-----------|
-| `src/components/mentoria/business/BusinessDashboard.tsx` | Adicionar seção de resumo do diagnóstico |
-| `src/components/mentoria/business/BusinessDiagnosticoResumo.tsx` | Novo componente para exibir respostas |
+| Formato Original | Formato Embed |
+|-----------------|---------------|
+| `drive.google.com/file/d/ID/view` | `drive.google.com/file/d/ID/preview` |
 
----
-
-## Problema 2: Badge "business_iaplicada" na Tabela
-
-### Situação Atual
-O código em `GerenciarUsuarios.tsx` (linhas 210-231):
-```tsx
-{(user as any).plano_mentoria === "academy" && "Academy"}
-{(user as any).plano_mentoria === "skills" && "Skills"}
-{(user as any).plano_mentoria === "business" && "Business"}
-// business_iaplicada NÃO está mapeado!
-```
-
-### Solução
-Adicionar tratamento para "business_iaplicada":
-```tsx
-{(user as any).plano_mentoria === "business_iaplicada"
-  ? "border-violet-500 text-violet-700"
-  : // ...outros
-}
-{(user as any).plano_mentoria === "business_iaplicada" && "Business IAplicada"}
-```
-
-### Arquivo a Modificar
-| Arquivo | Alteração |
-|---------|-----------|
-| `src/pages/admin/GerenciarUsuarios.tsx` | Adicionar badge para "business_iaplicada" |
-
----
-
-## Problema 3: Menu Lateral Business IAplicada
-
-### Situação Atual
-- O filtro `hiddenByEnvironment` no `useMenuConfig` oculta apenas: `['trilhas', 'calendario']` para business
-- Mas o requisito é mostrar **apenas**: Central, Bibliotecas (prompts/ferramentas), Meu Progresso (Visão Geral, Roadmap, Entregas)
-
-### Solução
-Atualizar a lógica de filtragem para ocultar todos os menus que não fazem parte da visão Business:
+### Função de Conversão
 
 ```typescript
-const hiddenByEnvironment: Record<string, string[]> = {
-  skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
-  business: [
-    'trilhas',           // Ocultar trilhas gerais
-    'calendario',        // Ocultar calendário
-    'evolucao',          // Ocultar Minha Evolução (Academy)
-    'meu_diagnostico',   // Ocultar Meu Diagnóstico (Academy)
-    'minhas_duvidas',    // Ocultar Minhas Dúvidas (Academy)
-    'trilhas_skills',    // Ocultar Trilhas Skills
-    // Skills específicos
-    'skills_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_lider',
-  ],
-};
+function getGoogleDriveEmbedUrl(url: string): string | null {
+  // Extrair o FILE_ID do link de compartilhamento
+  const match = url.match(/\/d\/([^/]+)/);
+  if (!match) return null;
+  
+  const fileId = match[1];
+  return `https://drive.google.com/file/d/${fileId}/preview`;
+}
 ```
 
-### Verificar Bibliotecas no Sidebar
-Confirmar que a seção "Bibliotecas" (Prompts e Ferramentas) aparece corretamente para o Business. Se não existir no `menu_config`, precisa ser adicionada.
-
-### Arquivo a Modificar
-| Arquivo | Alteração |
-|---------|-----------|
-| `src/hooks/useMenuConfig.tsx` | Expandir lista de menus ocultos para ambiente business |
-
 ---
-
-## Menu Esperado para Business IAplicada
-
-```text
-├── Início
-│   └── Central
-├── Bibliotecas (verificar se existe no menu_config)
-│   ├── Biblioteca de Prompts
-│   └── Biblioteca de Ferramentas
-└── Meu Progresso
-    ├── Visão Geral      (/mentoria)
-    ├── Roadmap          (/mentoria?tab=roadmap)
-    └── Entregas         (criar rota ou usar existente)
-```
-
-**Nota**: "Evolução Aprendizado" (`meu_progresso_conteudo`) está configurado para `business/business_iaplicada`, mas o requisito menciona "Entregas". Preciso confirmar se:
-- "Entregas" é a mesma coisa que "Evolução Aprendizado"
-- Ou se é uma nova página a ser criada
-
----
-
-## Arquivos a Criar
-
-| Arquivo | Descrição |
-|---------|-----------|
-| `src/components/mentoria/business/BusinessDiagnosticoResumo.tsx` | Componente para exibir resumo das respostas |
 
 ## Arquivos a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/pages/admin/GerenciarUsuarios.tsx` | Badge para "business_iaplicada" |
-| `src/hooks/useMenuConfig.tsx` | Expandir `hiddenByEnvironment` para business |
-| `src/components/mentoria/business/BusinessDashboard.tsx` | Adicionar seção de resumo |
+| `src/components/video/CustomVideoPlayer.tsx` | Adicionar lógica para priorizar Google Drive quando disponível |
+| `src/pages/TrilhaDetalhes.tsx` | Passar `googleDriveUrl` para o iframe quando disponível |
+| `src/lib/google-drive.ts` | Novo arquivo com funções de conversão de URLs |
 
 ---
 
-## Seção Técnica
+## Implementação
 
-### BusinessDiagnosticoResumo.tsx
+### 1. Novo Utilitário: `src/lib/google-drive.ts`
 
-```tsx
-interface Props {
-  diagnostico: {
-    problema_principal?: string;
-    processo_automatizar?: string;
-    resultado_esperado?: string;
-    impacto_financeiro_estimado?: string;
-    kpi_principal?: string;
-    definicao_sucesso?: string;
-    // ...outros campos relevantes
-  };
+```typescript
+/**
+ * Converte URL de compartilhamento do Google Drive para URL de embed
+ * Input:  https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+ * Output: https://drive.google.com/file/d/FILE_ID/preview
+ */
+export function getGoogleDriveEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  
+  const match = url.match(/\/d\/([^/]+)/);
+  if (!match) return null;
+  
+  const fileId = match[1];
+  return `https://drive.google.com/file/d/${fileId}/preview`;
 }
 
-export function BusinessDiagnosticoResumo({ diagnostico }: Props) {
-  const sections = [
-    {
-      title: "O Projeto",
-      items: [
-        { label: "Problema Principal", value: diagnostico.problema_principal },
-        { label: "Processo a Automatizar", value: diagnostico.processo_automatizar },
-        { label: "Resultado Esperado", value: diagnostico.resultado_esperado },
-      ]
-    },
-    {
-      title: "Impacto Esperado",
-      items: [
-        { label: "Impacto Financeiro", value: diagnostico.impacto_financeiro_estimado },
-        { label: "KPI Principal", value: diagnostico.kpi_principal },
-        { label: "Definição de Sucesso", value: diagnostico.definicao_sucesso },
-      ]
-    },
-  ];
+/**
+ * Verifica se uma URL é do Google Drive
+ */
+export function isGoogleDriveUrl(url: string): boolean {
+  return url?.includes('drive.google.com');
+}
+```
 
+### 2. Atualizar `CustomVideoPlayer.tsx`
+
+Adicionar lógica para escolher fonte:
+
+```typescript
+// No início do componente
+const driveEmbedUrl = googleDriveUrl 
+  ? getGoogleDriveEmbedUrl(googleDriveUrl) 
+  : null;
+
+// Priorizar Google Drive quando disponível
+const useGoogleDrive = !!driveEmbedUrl;
+```
+
+Se `useGoogleDrive`, renderizar iframe do Drive em vez do player YouTube:
+
+```tsx
+if (useGoogleDrive && driveEmbedUrl) {
   return (
-    <div className="bg-[#0D0D0D] rounded-xl p-6 border border-white/10">
-      <h2 className="text-xl font-bold text-white mb-4">Resumo do Diagnóstico</h2>
-      <div className="grid md:grid-cols-2 gap-6">
-        {sections.map(section => (
-          <div key={section.title}>
-            <h3 className="text-lg font-semibold text-white/90 mb-3">{section.title}</h3>
-            <div className="space-y-2">
-              {section.items.filter(i => i.value).map(item => (
-                <div key={item.label}>
-                  <span className="text-white/50 text-sm">{item.label}:</span>
-                  <p className="text-white">{item.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className={cn("relative w-full bg-black overflow-hidden rounded-lg", aspectClass)}>
+      {showThumbnail && thumbnail ? (
+        // ... thumbnail com botão play
+      ) : (
+        <iframe
+          src={driveEmbedUrl}
+          className="w-full h-full"
+          allow="autoplay; encrypted-media"
+          allowFullScreen
+        />
+      )}
     </div>
   );
 }
 ```
 
-### GerenciarUsuarios.tsx - Badge Atualizado
+### 3. Atualizar `TrilhaDetalhes.tsx`
+
+Passar a propriedade `google_drive_url` para o player embarcado:
 
 ```tsx
-<Badge 
-  variant="outline"
-  className={`text-xs ${
-    (user as any).plano_mentoria === "academy"
-      ? "border-blue-500 text-blue-700"
-      : (user as any).plano_mentoria === "skills"
-      ? "border-orange-500 text-orange-700"
-      : (user as any).plano_mentoria === "business"
-      ? "border-purple-500 text-purple-700"
-      : (user as any).plano_mentoria === "business_iaplicada"
-      ? "border-violet-500 text-violet-700"
-      : "border-gray-500 text-gray-700"
-  }`}
->
-  {(user as any).plano_mentoria === "academy" && "Academy"}
-  {(user as any).plano_mentoria === "skills" && "Skills"}
-  {(user as any).plano_mentoria === "business" && "Business"}
-  {(user as any).plano_mentoria === "business_iaplicada" && "Business IAplicada"}
-</Badge>
+// Onde usa iframe do YouTube (linha 263-269)
+{currentVideo.google_drive_url ? (
+  <iframe
+    src={getGoogleDriveEmbedUrl(currentVideo.google_drive_url)}
+    title={currentVideo.titulo}
+    allow="autoplay; encrypted-media"
+    allowFullScreen
+    className="w-full h-full"
+  />
+) : (
+  <iframe
+    src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?...`}
+    // ... resto igual
+  />
+)}
 ```
 
-### useMenuConfig.tsx - Filtro Expandido
+---
 
-```typescript
-const hiddenByEnvironment: Record<string, string[]> = {
-  skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
-  business: [
-    'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
-    'trilhas_skills', 'skills_equipe', 'skills_backlog', 'skills_roadmap', 
-    'skills_entregas', 'skills_lider'
-  ],
-};
+## Comportamento Final
+
+```text
+1. Usuário acessa vídeo
+   ↓
+2. Verifica se tem google_drive_url configurado
+   ↓
+   ├── SIM → Usa iframe do Google Drive (/preview)
+   │          Player embed nativo do Drive
+   │
+   └── NÃO → Usa YouTube como fonte
+              ├── Sucesso → Exibe vídeo
+              └── Falha → Mostra botões de fallback
 ```
 
+---
+
+## Vantagens da Solução
+
+1. **Prioriza Drive** quando configurado (evita bloqueios YouTube)
+2. **Mantém compatibilidade** com vídeos apenas no YouTube
+3. **Fallback robusto** se ambos falharem
+4. **Sem dependência de API** - usa apenas iframe embed
+
+## Limitações Conhecidas
+
+- O embed do Google Drive não permite controles customizados (play/pause externos)
+- Não é possível rastrear tempo assistido no vídeo do Drive
+- O Drive precisa ter permissão de visualização "Qualquer pessoa com o link"
