@@ -36,7 +36,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin, isMentorado, isLoading: roleLoading } = useUserRole();
   const { effectivePlan, isVisitante, isBusiness, isSkills, isAcademy, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading);
-  const { isViewingAs, resetView } = useAdminViewContext();
+  const { isViewingAs, resetView, viewAs } = useAdminViewContext();
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
   const { isLider: isSkillsLider } = useSkillsMembro();
@@ -57,7 +57,27 @@ export function AppSidebar() {
     return IconComponent || Home;
   };
 
-  const sidebarMenus = getSidebarMenus(effectivePlan, currentEnvironment);
+  // Em modo simulação, o EnvironmentSwitcher fica oculto; então garantimos que o filtro de menus
+  // acompanhe o plano simulado (evita cenário: ambiente "business" ocultando submenus de academy/skills).
+  const effectiveEnvironment = (() => {
+    if (!isViewingAs) return currentEnvironment;
+
+    switch (viewAs) {
+      case "visitante":
+        return "gratuito";
+      case "academy":
+        return "academy";
+      case "skills":
+        return "skills";
+      case "business":
+      case "business_iaplicada":
+        return "business";
+      default:
+        return currentEnvironment;
+    }
+  })();
+
+  const sidebarMenus = getSidebarMenus(effectivePlan, effectiveEnvironment);
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
