@@ -11,6 +11,11 @@ interface ImportRequest {
   users: UserToImport[];
   planoMentoria?: string;
   roles?: string[];
+  equipeId?: string;
+  novaEquipe?: {
+    nome: string;
+    empresa: string;
+  };
 }
 
 Deno.serve(async (req) => {
@@ -61,13 +66,41 @@ Deno.serve(async (req) => {
       )
     }
 
-    const { users, planoMentoria, roles: userRoles }: ImportRequest = await req.json()
+    const { users, planoMentoria, roles: userRoles, equipeId, novaEquipe }: ImportRequest = await req.json()
 
     console.log(`Admin ${user.id} starting batch import of ${users.length} users`)
 
     const planosValidos = ['academy', 'skills', 'business'];
     if (planoMentoria && !planosValidos.includes(planoMentoria)) {
       throw new Error(`Plano de mentoria inválido. Valores aceitos: ${planosValidos.join(', ')}`)
+    }
+
+    // Validate Skills requires team
+    if (planoMentoria === 'skills' && !equipeId && !novaEquipe) {
+      throw new Error('Para o plano Skills, é obrigatório informar uma equipe existente ou criar uma nova.')
+    }
+
+    // Handle Skills team - create once for batch if needed
+    let targetEquipeId = equipeId || null;
+    
+    if (planoMentoria === 'skills' && novaEquipe && !equipeId) {
+      const { data: newEquipe, error: equipeError } = await supabaseAdmin
+        .from('equipes_skills')
+        .insert({
+          nome: novaEquipe.nome,
+          empresa_nome: novaEquipe.empresa,
+          status: 'ativo',
+        })
+        .select()
+        .single();
+
+      if (equipeError) {
+        console.error('Error creating team:', equipeError)
+        throw new Error('Erro ao criar equipe: ' + equipeError.message)
+      }
+      
+      targetEquipeId = newEquipe.id;
+      console.log('New team created for batch import:', targetEquipeId)
     }
 
     const results = {
@@ -178,6 +211,26 @@ Deno.serve(async (req) => {
         if (!rolesConfirmed) {
           results.errors.push({ email: importUser.email, error: 'Roles não foram confirmadas' })
           continue
+        }
+
+        // 6. Link to Skills team if applicable
+        if (planoMentoria === 'skills' && targetEquipeId) {
+          const { error: membroError } = await supabaseAdmin
+            .from('membros_equipe_skills')
+            .insert({
+              equipe_id: targetEquipeId,
+              user_id: userId,
+              papel: 'membro',
+              status: 'ativo'
+            });
+
+          if (membroError) {
+            console.error(`Error linking user ${importUser.email} to team:`, membroError)
+            results.errors.push({ email: importUser.email, error: 'Usuário criado mas não vinculado à equipe: ' + membroError.message })
+            continue
+          }
+          
+          console.log(`User ${importUser.email} linked to team ${targetEquipeId}`)
         }
 
         console.log(`Successfully created user: ${importUser.email}`)

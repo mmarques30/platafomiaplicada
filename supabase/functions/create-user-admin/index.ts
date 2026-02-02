@@ -49,14 +49,32 @@ Deno.serve(async (req) => {
       )
     }
 
-    const { email, password, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado } = await req.json()
+    const { 
+      email, 
+      password, 
+      nomeCompleto, 
+      roles: userRoles, 
+      planoMentoria, 
+      origemConsultoria, 
+      empresaConsultoria, 
+      skillsLiberado,
+      // New Skills team fields
+      equipeId,
+      novaEquipe,
+      papelEquipe
+    } = await req.json()
 
-    console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado })
+    console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado, equipeId, novaEquipe, papelEquipe })
 
     // Validar planoMentoria
     const planosValidos = ['academy', 'skills', 'business'];
     if (planoMentoria && !planosValidos.includes(planoMentoria)) {
       throw new Error(`Plano de mentoria inválido. Valores aceitos: ${planosValidos.join(', ')}`)
+    }
+
+    // Validate Skills requires team
+    if (planoMentoria === 'skills' && !equipeId && !novaEquipe) {
+      throw new Error('Para o plano Skills, é obrigatório informar uma equipe existente ou criar uma nova.')
     }
 
     // 1. Criar usuário via Admin API
@@ -158,7 +176,64 @@ Deno.serve(async (req) => {
       throw new Error('Roles não foram confirmadas no banco')
     }
 
-    console.log('Roles confirmed - User created by admin:', user.id)
+    console.log('Roles confirmed')
+
+    // 6. Handle Skills team association
+    if (planoMentoria === 'skills') {
+      let targetEquipeId = equipeId;
+
+      // Create new team if needed
+      if (novaEquipe && !equipeId) {
+        const { data: newEquipe, error: equipeError } = await supabaseAdmin
+          .from('equipes_skills')
+          .insert({
+            nome: novaEquipe.nome,
+            empresa_nome: novaEquipe.empresa,
+            lider_id: papelEquipe === 'lider' ? userId : null,
+            status: 'ativo',
+          })
+          .select()
+          .single();
+
+        if (equipeError) {
+          console.error('Error creating team:', equipeError)
+          throw new Error('Erro ao criar equipe: ' + equipeError.message)
+        }
+        
+        targetEquipeId = newEquipe.id;
+        console.log('New team created:', targetEquipeId)
+      }
+
+      // Link user to team
+      if (targetEquipeId) {
+        const { error: membroError } = await supabaseAdmin
+          .from('membros_equipe_skills')
+          .insert({
+            equipe_id: targetEquipeId,
+            user_id: userId,
+            papel: papelEquipe || 'membro',
+            status: 'ativo'
+          });
+
+        if (membroError) {
+          console.error('Error linking user to team:', membroError)
+          throw new Error('Erro ao vincular usuário à equipe: ' + membroError.message)
+        }
+
+        console.log('User linked to team:', targetEquipeId, 'as', papelEquipe || 'membro')
+
+        // If leader, update team's lider_id (in case of existing team)
+        if (papelEquipe === 'lider' && equipeId) {
+          await supabaseAdmin
+            .from('equipes_skills')
+            .update({ lider_id: userId })
+            .eq('id', targetEquipeId);
+          console.log('Team leader updated')
+        }
+      }
+    }
+
+    console.log('User creation complete - Created by admin:', user.id)
 
     return new Response(
       JSON.stringify({ 

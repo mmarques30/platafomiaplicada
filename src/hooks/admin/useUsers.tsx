@@ -96,6 +96,9 @@ export function useCreateUser() {
       roles,
       planoMentoria,
       skillsLiberado,
+      equipeId,
+      novaEquipe,
+      papelEquipe,
     }: {
       email: string;
       password: string;
@@ -103,6 +106,9 @@ export function useCreateUser() {
       roles: AppRole[];
       planoMentoria?: string | null;
       skillsLiberado?: boolean;
+      equipeId?: string | null;
+      novaEquipe?: { nome: string; empresa: string } | null;
+      papelEquipe?: "lider" | "membro";
     }) => {
       // Chamar edge function ao invés de fazer diretamente
       const { data, error } = await supabase.functions.invoke("create-user-admin", {
@@ -113,6 +119,9 @@ export function useCreateUser() {
           roles,
           planoMentoria,
           skillsLiberado: planoMentoria === "business" ? skillsLiberado : false,
+          equipeId,
+          novaEquipe,
+          papelEquipe,
         },
       });
 
@@ -123,6 +132,7 @@ export function useCreateUser() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-equipes-skills"] });
       toast.success("Usuário criado com sucesso!");
     },
     onError: (error) => {
@@ -274,6 +284,8 @@ export function useImportUsersBatch() {
       users,
       planoMentoria,
       roles,
+      equipeId,
+      novaEquipe,
     }: {
       users: Array<{
         email: string;
@@ -282,12 +294,16 @@ export function useImportUsersBatch() {
       }>;
       planoMentoria?: string;
       roles?: AppRole[];
+      equipeId?: string | null;
+      novaEquipe?: { nome: string; empresa: string } | null;
     }) => {
       const { data, error } = await supabase.functions.invoke("import-users-batch", {
         body: { 
           users, 
           planoMentoria,
-          roles 
+          roles,
+          equipeId,
+          novaEquipe,
         },
       });
 
@@ -298,6 +314,7 @@ export function useImportUsersBatch() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-equipes-skills"] });
       toast.success(`${data.imported} usuários importados com sucesso! ${data.failed > 0 ? `(${data.failed} falharam)` : ''}`);
     },
     onError: (error) => {

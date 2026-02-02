@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { SkillsEquipeSelector, type SkillsEquipeData } from "@/components/admin/SkillsEquipeSelector";
 
 interface ParsedUser {
   email: string;
@@ -30,6 +31,11 @@ export default function ImportarUsuarios() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [skillsEquipeData, setSkillsEquipeData] = useState<SkillsEquipeData>({
+    equipeId: null,
+    novaEquipe: null,
+    papelEquipe: "membro",
+  });
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -96,6 +102,16 @@ export default function ImportarUsuarios() {
     );
   };
 
+  const isSkillsValid = () => {
+    if (plano !== "skills") return true;
+    
+    // Must have either existing team or valid new team data
+    if (skillsEquipeData.equipeId) return true;
+    if (skillsEquipeData.novaEquipe?.nome && skillsEquipeData.novaEquipe?.empresa) return true;
+    
+    return false;
+  };
+
   const handleImport = async () => {
     const validUsers = parsedUsers.filter(u => u.isValid);
     
@@ -117,6 +133,15 @@ export default function ImportarUsuarios() {
       return;
     }
 
+    if (plano === "skills" && !isSkillsValid()) {
+      toast({
+        title: "Equipe obrigatória",
+        description: "Para o plano Skills, é necessário selecionar ou criar uma equipe.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsImporting(true);
     setResult(null);
 
@@ -131,7 +156,9 @@ export default function ImportarUsuarios() {
         body: {
           users: usersToImport,
           planoMentoria: plano || undefined,
-          roles: roles
+          roles: roles,
+          equipeId: plano === "skills" ? skillsEquipeData.equipeId : undefined,
+          novaEquipe: plano === "skills" ? skillsEquipeData.novaEquipe : undefined,
         }
       });
 
@@ -164,6 +191,11 @@ export default function ImportarUsuarios() {
     setPlano("");
     setRoles(["aluno_trilha"]);
     setPassword("aplica2025");
+    setSkillsEquipeData({
+      equipeId: null,
+      novaEquipe: null,
+      papelEquipe: "membro",
+    });
   };
 
   const validUsersCount = parsedUsers.filter(u => u.isValid).length;
@@ -262,6 +294,16 @@ export default function ImportarUsuarios() {
             </div>
           </div>
 
+          {/* Skills Team Selector - apenas para plano Skills */}
+          {plano === "skills" && !result?.success && (
+            <SkillsEquipeSelector
+              value={skillsEquipeData}
+              onChange={setSkillsEquipeData}
+              showLiderOption={false}
+              disabled={result?.success}
+            />
+          )}
+
           {/* Senha padrão */}
           <div className="space-y-2">
             <Label htmlFor="password">Senha padrão</Label>
@@ -352,7 +394,7 @@ export default function ImportarUsuarios() {
           {parsedUsers.length > 0 && !result && (
             <Button 
               onClick={handleImport} 
-              disabled={isImporting || validUsersCount === 0}
+              disabled={isImporting || validUsersCount === 0 || (plano === "skills" && !isSkillsValid())}
               className="w-full"
             >
               {isImporting ? (
