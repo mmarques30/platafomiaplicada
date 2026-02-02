@@ -138,48 +138,51 @@ export function TopHeader() {
             Página Inicial
           </NavLink>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className={cn(
-                  "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                  isCursosActive ? "text-primary" : "text-white/60 hover:text-white"
+          {/* Dropdown Cursos - oculto para Academy (já está no único curso) */}
+          {!isAcademy && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className={cn(
+                    "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
+                    isCursosActive ? "text-primary" : "text-white/60 hover:text-white"
+                  )}
+                >
+                  Cursos
+                  <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
+                {/* Academy: sempre visível, é o acesso base para todos os planos */}
+                {hasEffectiveAccessTo("trilhas") && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/trilhas" className="cursor-pointer">
+                      Academy
+                    </Link>
+                  </DropdownMenuItem>
                 )}
-              >
-                Cursos
-                <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
-              {/* Academy: sempre visível, é o acesso base para todos os planos */}
-              {hasEffectiveAccessTo("trilhas") && (
-                <DropdownMenuItem asChild>
-                  <Link to="/trilhas" className="cursor-pointer">
-                    Academy
-                  </Link>
-                </DropdownMenuItem>
-              )}
-              
-              {/* Business: só aparece se TEM acesso business */}
-              {hasEffectiveAccessTo("business") && isProdutoAtivo("business") && (
-                <DropdownMenuItem asChild>
-                  <Link to="/mentoria" className="cursor-pointer">
-                    Business
-                  </Link>
-                </DropdownMenuItem>
-              )}
-              
-              {/* Skills: aparece APENAS se o plano efetivo É skills (não para business) */}
-              {isSkills && isProdutoAtivo("skills") && (
-                <DropdownMenuItem asChild>
-                  <Link to="/skills" className="cursor-pointer">
-                    Skills
-                  </Link>
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                
+                {/* Business: só aparece se TEM acesso business */}
+                {hasEffectiveAccessTo("business") && isProdutoAtivo("business") && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/mentoria" className="cursor-pointer">
+                      Business
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                
+                {/* Skills: aparece APENAS se o plano efetivo É skills (não para business) */}
+                {isSkills && isProdutoAtivo("skills") && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/skills" className="cursor-pointer">
+                      Skills
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           
           {!isVisitante && (
             <DropdownMenu>
