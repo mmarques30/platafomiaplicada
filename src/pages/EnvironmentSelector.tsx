@@ -135,10 +135,8 @@ export default function EnvironmentSelector() {
               {/* Card com imagem ou ícone */}
               <div
                 className={cn(
-                  "relative w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden transition-all duration-300",
-                  isAvailable
-                    ? "ring-2 ring-white/10 group-hover:ring-white/30"
-                    : "opacity-40"
+                  "relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden transition-all duration-300",
+                  !isAvailable && "opacity-40"
                 )}
               >
                 {/* Glow effect */}
