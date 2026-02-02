@@ -1,105 +1,47 @@
 
-# Plano: Seletores de Usuários para Simulação Academy e Skills
 
-## Contexto
-Atualmente a simulação de planos funciona assim:
-- **Business**: Abre modal para selecionar um usuário específico do plano Business
-- **Academy/Skills**: Apenas muda o modo de visualização genérico, sem selecionar um usuário real
+# Plano: Ocultar EnvironmentSwitcher Durante Simulação
 
-O objetivo é permitir que você selecione usuários específicos de cada plano para ver exatamente o que eles estão vendo.
+## Diagnóstico
+
+Analisando a imagem e o código, identifiquei que há **dois componentes distintos** exibindo informações simultâneas:
+
+| Componente | Propósito | No Screenshot |
+|------------|-----------|---------------|
+| `EnvironmentSwitcher` | Mostra/alterna o ambiente do usuário logado | Badge "Skills" |
+| `AdminViewSelector` | Permite admin simular como outro usuário | Dropdown "Business" |
+
+Ambos são exibidos porque:
+- Linha 226: `<EnvironmentSwitcher />` sempre renderiza
+- Linha 227: `{isAdmin && <AdminViewSelector isAdmin={isAdmin} />}` renderiza para admins
+
+**Problema**: Quando admin está simulando, o `EnvironmentSwitcher` mostra o ambiente do admin (Skills), mas deveria mostrar o do usuário simulado ou ser ocultado.
 
 ## Solução
 
-### 1. Criar Modal Genérico de Seleção de Usuários por Plano
-Criar um componente reutilizável `UserSelectorByPlanModal` que:
-- Recebe o tipo de plano como parâmetro (academy, skills, ou business)
-- Filtra e exibe usuários do plano selecionado
-- Permite busca por nome/email
-- Ao selecionar, passa userId e userName para o contexto
+Durante uma simulação ativa (`isViewingAs`), **ocultar o `EnvironmentSwitcher`** pois:
+1. O ambiente simulado é determinado pelo plano do usuário selecionado
+2. O banner amarelo já indica claramente qual plano está sendo simulado
+3. Exibir dois indicadores de ambiente causa confusão
 
-**Arquivo:** `src/components/admin/UserSelectorByPlanModal.tsx`
+## Alteração
 
-### 2. Refatorar AdminViewSelector
-Modificar para que ao clicar em **qualquer** opção de plano (Academy, Skills, Business), abra o modal de seleção correspondente:
+**Arquivo:** `src/components/layout/TopHeader.tsx`
 
-```text
-┌─────────────────────────────────────┐
-│  AdminViewSelector (dropdown)       │
-├─────────────────────────────────────┤
-│  > Visitante (gratuito)             │  → Ativa modo visitante direto
-│  > Academy                          │  → Abre modal com usuários Academy
-│  > Skills                           │  → Abre modal com usuários Skills  
-│  > Business                         │  → Abre modal com usuários Business
-│  ─────────────────────────────       │
-│  > Voltar para Admin                │
-└─────────────────────────────────────┘
-```
+**Linha 226** - Adicionar condição para ocultar durante simulação:
 
-### 3. Unificar Banner de Simulação
-O banner no TopHeader exibirá:
-- **Visitante**: "Visualizando como: Visitante"
-- **Academy/Skills/Business**: "Visualizando como: [Nome do Usuário] (Plano)"
-
-### Detalhes Técnicos
-
-#### Novo Componente: UserSelectorByPlanModal
 ```tsx
-interface UserSelectorByPlanModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSelect: (userId: string, userName: string) => void;
-  planType: "academy" | "skills" | "business";
-}
-```
-- Reutiliza a estrutura do `BusinessUserSelectorModal`
-- Ícone e título dinâmicos por plano
-- Filtra `user.plano_mentoria === planType`
+// Antes:
+<EnvironmentSwitcher />
 
-#### Modificações no AdminViewSelector
-- Estado: `selectedPlanForModal: "academy" | "skills" | "business" | null`
-- Ao clicar em Academy/Skills/Business → abre modal com o plano selecionado
-- Visitante continua setando direto (`setViewAs("visitante")`)
-
-#### Modificações no TopHeader
-```tsx
-// Banner unificado
-{isAdmin && isViewingAs && (
-  <div className="fixed top-0 ... bg-amber-500 text-black ...">
-    👁️ Visualizando como: <strong>
-      {viewAs === 'visitante' 
-        ? 'Visitante'
-        : `${impersonatedUserName} (${viewAs})`
-      }
-    </strong>
-    <Button onClick={resetView}>Sair da simulação</Button>
-  </div>
-)}
-
-// Posição do header ajustada
-isAdmin && isViewingAs ? "top-10" : "top-0"
+// Depois:
+{!(isAdmin && isViewingAs) && <EnvironmentSwitcher />}
 ```
 
-## Arquivos a Criar/Modificar
+## Resultado
 
-| Arquivo | Ação |
-|---------|------|
-| `src/components/admin/UserSelectorByPlanModal.tsx` | **Criar** - Modal genérico para seleção |
-| `src/components/admin/AdminViewSelector.tsx` | **Modificar** - Usar novo modal para todos os planos |
-| `src/components/admin/BusinessUserSelectorModal.tsx` | **Remover** - Substituído pelo modal genérico |
-| `src/components/layout/TopHeader.tsx` | **Modificar** - Banner unificado para todos os modos |
+- **Sem simulação ativa**: Admin vê seu `EnvironmentSwitcher` normalmente + botão "Ver como..."
+- **Com simulação ativa**: Admin vê apenas o banner amarelo no topo + dropdown amarelo do `AdminViewSelector`
 
-## Fluxo de Uso
+Apenas UMA indicação de ambiente/plano será visível por vez.
 
-1. Admin clica no botão "Ver como..."
-2. Escolhe um plano (ex: Academy)
-3. Modal abre com lista de usuários Academy
-4. Admin busca e seleciona um usuário
-5. Banner amarelo aparece: "Visualizando como: João Silva (Academy)"
-6. Toda a interface reflete a visão daquele usuário específico
-7. Admin clica em "Sair da simulação" para voltar
-
-## Resultado Final
-- Um único ponto de entrada (botão dropdown)
-- Seleção de usuário específico para TODOS os planos
-- Um único banner de indicação de simulação
-- Experiência consistente e intuitiva
