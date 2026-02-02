@@ -106,84 +106,294 @@ export default function Central() {
             <CriadoresComunidadeTab />
           </TabsContent>
 
-          {/* Tabs de Conteúdo */}
-          {activeTab !== "criadores" && (
-            <TabsContent value={activeTab} className="mt-6 flex-1">
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                    <Skeleton key={i} className="h-72 rounded-xl" />
-                  ))}
-                </div>
-              ) : filteredConteudos.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                  {filteredConteudos.map((conteudo) => {
-                    const TipoIcon = tipoIcons[conteudo.tipo as keyof typeof tipoIcons];
-                    return (
-                      <motion.div
-                        key={conteudo.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        whileHover={{ y: -4 }}
-                        transition={{ duration: 0.2 }}
+          {/* Tabs de Conteúdo - Todos, Notícias, Dicas, Newsletter */}
+          <TabsContent value="todos" className="mt-6 flex-1">
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                  <Skeleton key={i} className="h-72 rounded-xl" />
+                ))}
+              </div>
+            ) : allConteudos.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {allConteudos.map((conteudo) => {
+                  const TipoIcon = tipoIcons[conteudo.tipo as keyof typeof tipoIcons];
+                  return (
+                    <motion.div
+                      key={conteudo.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileHover={{ y: -4 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card 
+                        className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
+                        onClick={() => setSelectedConteudo(conteudo)}
                       >
-                        <Card 
-                          className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
-                          onClick={() => setSelectedConteudo(conteudo)}
-                        >
-                          {/* Imagem */}
-                          {conteudo.imagem_url ? (
-                            <div className="aspect-video w-full overflow-hidden bg-muted">
-                              <img 
-                                src={conteudo.imagem_url} 
-                                alt={conteudo.titulo}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                            </div>
-                          ) : (
-                            <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
-                              <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
-                            </div>
-                          )}
+                        {conteudo.imagem_url ? (
+                          <div className="aspect-video w-full overflow-hidden bg-muted">
+                            <img 
+                              src={conteudo.imagem_url} 
+                              alt={conteudo.titulo}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        ) : (
+                          <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
+                            <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
+                          </div>
+                        )}
 
-                          <CardHeader className="pb-2">
-                            <div className="flex items-center justify-between gap-2 mb-2">
-                              <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
-                                {conteudo.tipo === 'newsletter' ? 'Newsletter' : 
-                                 conteudo.tipo === 'noticia' ? 'Notícia' : 'Dica'}
-                              </Badge>
-                              {conteudo.destaque && (
-                                <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
-                              )}
-                            </div>
-                            <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
-                              {conteudo.titulo}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm text-muted-foreground line-clamp-3">
-                              {conteudo.resumo}
-                            </p>
-                            <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                              <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
-                              {conteudo.link_externo && (
-                                <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
-                  <p className="text-muted-foreground">Nenhum conteúdo disponível nesta categoria</p>
-                </div>
-              )}
-            </TabsContent>
-          )}
+                        <CardHeader className="pb-2">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
+                              {conteudo.tipo === 'newsletter' ? 'Newsletter' : 
+                               conteudo.tipo === 'noticia' ? 'Notícia' : 'Dica'}
+                            </Badge>
+                            {conteudo.destaque && (
+                              <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
+                            )}
+                          </div>
+                          <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
+                            {conteudo.titulo}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground line-clamp-3">
+                            {conteudo.resumo}
+                          </p>
+                          <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
+                            <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
+                            {conteudo.link_externo && (
+                              <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
+                <p className="text-muted-foreground">Nenhum conteúdo disponível</p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="noticia" className="mt-6 flex-1">
+            {loadingNoticia ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {[1, 2, 3, 4].map(i => (
+                  <Skeleton key={i} className="h-72 rounded-xl" />
+                ))}
+              </div>
+            ) : (noticias || []).length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {(noticias || []).map((conteudo) => (
+                  <motion.div
+                    key={conteudo.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Card 
+                      className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
+                      onClick={() => setSelectedConteudo(conteudo)}
+                    >
+                      {conteudo.imagem_url ? (
+                        <div className="aspect-video w-full overflow-hidden bg-muted">
+                          <img 
+                            src={conteudo.imagem_url} 
+                            alt={conteudo.titulo}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
+                          <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
+                        </div>
+                      )}
+
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
+                            Notícia
+                          </Badge>
+                          {conteudo.destaque && (
+                            <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
+                          )}
+                        </div>
+                        <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
+                          {conteudo.titulo}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground line-clamp-3">
+                          {conteudo.resumo}
+                        </p>
+                        <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
+                          <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
+                          {conteudo.link_externo && (
+                            <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
+                <p className="text-muted-foreground">Nenhuma notícia disponível</p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="dica" className="mt-6 flex-1">
+            {loadingDica ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {[1, 2, 3, 4].map(i => (
+                  <Skeleton key={i} className="h-72 rounded-xl" />
+                ))}
+              </div>
+            ) : (dicas || []).length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {(dicas || []).map((conteudo) => (
+                  <motion.div
+                    key={conteudo.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Card 
+                      className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
+                      onClick={() => setSelectedConteudo(conteudo)}
+                    >
+                      {conteudo.imagem_url ? (
+                        <div className="aspect-video w-full overflow-hidden bg-muted">
+                          <img 
+                            src={conteudo.imagem_url} 
+                            alt={conteudo.titulo}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
+                          <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
+                        </div>
+                      )}
+
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
+                            Dica
+                          </Badge>
+                          {conteudo.destaque && (
+                            <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
+                          )}
+                        </div>
+                        <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
+                          {conteudo.titulo}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground line-clamp-3">
+                          {conteudo.resumo}
+                        </p>
+                        <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
+                          <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
+                          {conteudo.link_externo && (
+                            <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
+                <p className="text-muted-foreground">Nenhuma dica disponível</p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="newsletter" className="mt-6 flex-1">
+            {loadingNewsletter ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {[1, 2, 3, 4].map(i => (
+                  <Skeleton key={i} className="h-72 rounded-xl" />
+                ))}
+              </div>
+            ) : (newsletters || []).length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {(newsletters || []).map((conteudo) => (
+                  <motion.div
+                    key={conteudo.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Card 
+                      className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
+                      onClick={() => setSelectedConteudo(conteudo)}
+                    >
+                      {conteudo.imagem_url ? (
+                        <div className="aspect-video w-full overflow-hidden bg-muted">
+                          <img 
+                            src={conteudo.imagem_url} 
+                            alt={conteudo.titulo}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
+                          <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
+                        </div>
+                      )}
+
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
+                            Newsletter
+                          </Badge>
+                          {conteudo.destaque && (
+                            <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
+                          )}
+                        </div>
+                        <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
+                          {conteudo.titulo}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground line-clamp-3">
+                          {conteudo.resumo}
+                        </p>
+                        <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
+                          <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
+                          {conteudo.link_externo && (
+                            <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
+                <p className="text-muted-foreground">Nenhuma newsletter disponível</p>
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
 
         {/* Modal de Detalhes */}
