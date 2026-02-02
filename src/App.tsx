@@ -38,6 +38,7 @@ import SkillsBacklog from "./pages/skills/SkillsBacklog";
 import SkillsRoadmap from "./pages/skills/SkillsRoadmap";
 import SkillsEntregas from "./pages/skills/SkillsEntregas";
 import SkillsLiderDashboard from "./pages/skills/SkillsLiderDashboard";
+import SkillsTrilhas from "./pages/skills/SkillsTrilhas";
 
 import MentoriaSessoes from "./pages/MentoriaSessoes";
 import MentoriaRecursos from "./pages/MentoriaRecursos";
@@ -80,6 +81,7 @@ import MentoriaAcademyPage from "./pages/admin/mentoria/MentoriaAcademyPage";
 import MentoriaBusinessPage from "./pages/admin/mentoria/MentoriaBusinessPage";
 import AdminEtapaBusinessPage from "./pages/admin/mentoria/AdminEtapaBusinessPage";
 import PreviewPaineisPage from "./pages/admin/mentoria/PreviewPaineisPage";
+import MentoriaSkillsPage from "./pages/admin/mentoria/MentoriaSkillsPage";
 import GerenciarProdutos from "./pages/admin/GerenciarProdutos";
 import MinhasTarefas from "./pages/admin/MinhasTarefas";
 import Auditoria from "./pages/admin/Auditoria";
@@ -158,7 +160,7 @@ function AppContent() {
             <Route path="/skills/roadmap" element={<SkillsRoadmap />} />
             <Route path="/skills/entregas" element={<SkillsEntregas />} />
             <Route path="/skills/lider" element={<SkillsLiderDashboard />} />
-            <Route path="/skills/entregas" element={<SkillsEntregas />} />
+            <Route path="/skills/trilhas" element={<SkillsTrilhas />} />
             
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/mentoria" element={<Mentoria />} />
@@ -209,6 +211,7 @@ function AppContent() {
             <Route path="mentoria/business" element={<MentoriaBusinessPage />} />
             <Route path="mentoria/business/etapa/:etapaId" element={<AdminEtapaBusinessPage />} />
             <Route path="mentoria/preview-paineis" element={<PreviewPaineisPage />} />
+            <Route path="mentoria/skills" element={<MentoriaSkillsPage />} />
             <Route path="duvidas" element={<GerenciarTodasDuvidas />} />
             <Route path="produtos" element={<GerenciarProdutos />} />
             <Route path="materiais" element={<GerenciarMateriais />} />
