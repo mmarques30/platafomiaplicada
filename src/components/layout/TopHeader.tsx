@@ -223,7 +223,7 @@ export function TopHeader() {
 
         {/* RIGHT: Environment Switcher + Admin View Selector + Refresh + Notifications + Avatar */}
         <div className="absolute right-0 top-0 h-full flex items-center gap-1 pr-4">
-          <EnvironmentSwitcher />
+          {!(isAdmin && isViewingAs) && <EnvironmentSwitcher />}
           {isAdmin && <AdminViewSelector isAdmin={isAdmin} />}
           <TooltipProvider>
             <Tooltip>
