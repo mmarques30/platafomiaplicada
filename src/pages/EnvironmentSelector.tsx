@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import envBusinessImage from "@/assets/env-business.jpg";
 import envSkillsImage from "@/assets/env-skills.jpg";
+import envAcademyImage from "@/assets/env-academy.jpg";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -20,6 +21,7 @@ const ICONS: Record<Environment, React.ComponentType<LucideProps>> = {
 };
 
 const ENVIRONMENT_IMAGES: Partial<Record<Environment, string>> = {
+  academy: envAcademyImage,
   skills: envSkillsImage,
   business: envBusinessImage,
 };
