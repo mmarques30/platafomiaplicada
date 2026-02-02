@@ -75,14 +75,12 @@ export function VideoMaterialsList({ materiais }: VideoMaterialsListProps) {
 
   const MaterialItem = ({ material, isLink }: { material: Material; isLink: boolean }) => {
     const { icon: Icon, color, bg } = getFileIcon(material.url, material.tipo);
-    const fileName = material.url.split('/').pop() || material.titulo;
 
     return (
       <a
         href={material.url}
-        target={isLink ? "_blank" : undefined}
-        rel={isLink ? "noopener noreferrer" : undefined}
-        download={!isLink ? fileName : undefined}
+        target="_blank"
+        rel="noopener noreferrer"
         className={cn(
           "flex items-center gap-3 p-3 rounded-lg border border-border/50",
           "hover:border-border hover:bg-accent/50 transition-all duration-200",
