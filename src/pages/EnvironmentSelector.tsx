@@ -30,7 +30,9 @@ const ENVIRONMENT_IMAGES: Partial<Record<Environment, string>> = {
   business_iaplicada: envBusinessImage, // Usa mesma imagem do business
 };
 
-const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business", "business_iaplicada"];
+// Importante: o ambiente "business_iaplicada" não deve aparecer na seleção inicial.
+// Usuários desse plano entram via "business" e a experiência é ajustada por identificação interna.
+const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business"];
 
 export default function EnvironmentSelector() {
   const navigate = useNavigate();
