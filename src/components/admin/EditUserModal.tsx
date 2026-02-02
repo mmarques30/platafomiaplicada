@@ -137,8 +137,11 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       },
     });
 
-    // Se for Skills, atualizar vínculo com equipe
-    if (selectedPlano === "skills" && (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe)) {
+    // Atualizar vínculo Skills quando configuração está visível e há dados de equipe
+    const shouldUpdateSkills = (selectedPlano === "skills" || (selectedPlano === "business" && skillsLiberado)) && 
+                               (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe);
+    
+    if (shouldUpdateSkills) {
       await updateSkillsMembro.mutateAsync({
         userId: user.id,
         equipeId: skillsEquipeData.equipeId,
@@ -171,8 +174,11 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
 
   if (!user) return null;
 
-  const isSkillsPlan = selectedPlano === "skills";
   const hasSkillsVinculo = !!userSkillsMembro;
+  
+  // Mostrar configuração Skills quando plano é Skills OU Business com Skills liberado
+  const showSkillsConfig = selectedPlano === "skills" || 
+                           (selectedPlano === "business" && skillsLiberado);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -182,10 +188,9 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         </DialogHeader>
 
         <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="info">Informações</TabsTrigger>
             <TabsTrigger value="acesso">Acesso</TabsTrigger>
-            <TabsTrigger value="skills" disabled={!isSkillsPlan}>Skills</TabsTrigger>
             <TabsTrigger value="seguranca">Segurança</TabsTrigger>
           </TabsList>
 
@@ -325,6 +330,55 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                 )}
               </div>
 
+              {/* Configuração Skills - aparece quando plano é Skills ou Business com Skills liberado */}
+              {showSkillsConfig && (
+                <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Configuração Skills</Label>
+                    {hasSkillsVinculo && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleRemoveSkillsVinculo}
+                        disabled={removeSkillsMembro.isPending}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Remover Vínculo
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {loadingSkillsMembro ? (
+                    <div className="py-4 text-center text-muted-foreground text-sm">
+                      Carregando...
+                    </div>
+                  ) : (
+                    <>
+                      <SkillsEquipeSelector
+                        value={skillsEquipeData}
+                        onChange={setSkillsEquipeData}
+                        showLiderOption={true}
+                      />
+
+                      <div>
+                        <Label htmlFor="cargo-skills">Cargo na Empresa</Label>
+                        <Input
+                          id="cargo-skills"
+                          value={cargo}
+                          onChange={(e) => setCargo(e.target.value)}
+                          placeholder="Ex: Analista de Marketing"
+                          className="mt-1"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Cargo/função do colaborador na empresa (opcional)
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
               <div>
                 <Label className="mb-2 block">Data de Expiração do Acesso</Label>
                 <Popover>
@@ -372,53 +426,6 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                   onCheckedChange={setContaAtiva}
                 />
               </div>
-            </TabsContent>
-
-            {/* Nova aba Skills */}
-            <TabsContent value="skills" className="space-y-4">
-              {loadingSkillsMembro ? (
-                <div className="py-8 text-center text-muted-foreground">Carregando...</div>
-              ) : (
-                <>
-                  {hasSkillsVinculo && (
-                    <Alert>
-                      <AlertDescription className="flex items-center justify-between">
-                        <span>Este usuário já está vinculado a uma equipe Skills.</span>
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={handleRemoveSkillsVinculo}
-                          disabled={removeSkillsMembro.isPending}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Remover Vínculo
-                        </Button>
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  <SkillsEquipeSelector
-                    value={skillsEquipeData}
-                    onChange={setSkillsEquipeData}
-                    showLiderOption={true}
-                  />
-
-                  <div>
-                    <Label htmlFor="cargo-skills">Cargo na Empresa</Label>
-                    <Input
-                      id="cargo-skills"
-                      value={cargo}
-                      onChange={(e) => setCargo(e.target.value)}
-                      placeholder="Ex: Analista de Marketing"
-                      className="mt-1"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Cargo/função do colaborador na empresa (opcional)
-                    </p>
-                  </div>
-                </>
-              )}
             </TabsContent>
 
             <TabsContent value="seguranca" className="space-y-4">
