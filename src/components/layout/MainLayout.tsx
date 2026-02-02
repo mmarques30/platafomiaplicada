@@ -13,6 +13,7 @@ import { GraduationCap, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import { MarIAnaFloatingButton } from "@/components/shared/MarIAnaFloatingButton";
+import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNotice";
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -65,6 +66,7 @@ export function MainLayout() {
           </main>
         </div>
         {(!isLoading && !isVisitante) && <MarIAnaFloatingButton />}
+        {(!isLoading && isVisitante) && <VisitorExpirationNotice />}
         
         {/* Modal de senha temporária - apenas para mentorados cadastrados pelo admin */}
         {showPasswordModal && user && (

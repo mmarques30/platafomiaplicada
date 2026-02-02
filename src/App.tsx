@@ -98,6 +98,7 @@ import Instalar from "./pages/Instalar";
 import Central from "./pages/Central";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import Cupons from "./pages/Cupons";
+import AcessoExpirado from "./pages/AcessoExpirado";
 import HistoricoSenhas from "./pages/admin/HistoricoSenhas";
 import GerenciarPermissoesEquipe from "./pages/admin/GerenciarPermissoesEquipe";
 import { PWAUpdatePrompt } from "./components/shared/PWAUpdatePrompt";
@@ -122,6 +123,7 @@ function AppContent() {
         <Route path="/termos-uso" element={<PoliticaUso />} />
         <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+        <Route path="/acesso-expirado" element={<AcessoExpirado />} />
         <Route path="/sobre" element={<Sobre />} />
 
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>

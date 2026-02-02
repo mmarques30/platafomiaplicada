@@ -21,7 +21,21 @@ export function useAuth() {
 
         // Atualizar ultimo_acesso quando o usuário faz login
         if (session?.user) {
-          setTimeout(() => {
+          setTimeout(async () => {
+            // Verificar se é visitante com acesso expirado
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("is_visitante, acesso_expirado")
+              .eq("id", session.user.id)
+              .single();
+            
+            // Se acesso expirado, redirecionar
+            if (profile?.is_visitante && profile?.acesso_expirado) {
+              window.location.href = "/acesso-expirado";
+              return;
+            }
+            
+            // Atualizar ultimo_acesso
             supabase
               .from("profiles")
               .update({ ultimo_acesso: new Date().toISOString() })

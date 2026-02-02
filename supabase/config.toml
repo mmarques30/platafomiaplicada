@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.formatar-texto-conteudo]
 verify_jwt = false
+
+[functions.process-visitor-expirations]
+verify_jwt = false
