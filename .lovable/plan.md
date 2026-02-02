@@ -1,114 +1,110 @@
 
+# Plano: Corrigir Simulação Skills e Ocultar Botão Cursos para Skills
 
-# Plano: Ajustar Visibilidade de Menus por Ambiente
+## Problemas Identificados
 
-## Contexto
-
-Usuários Skills e Business têm acesso ao ambiente Academy separadamente. Portanto, quando estão no ambiente Skills ou Business, não devem ver menus duplicados que são específicos do Academy.
-
-| Ambiente | Menus a Remover |
-|----------|-----------------|
-| **Skills** | Trilhas, Calendário, Minha Evolução, Meu Diagnóstico, Minhas Dúvidas |
-| **Business** (ambos tipos) | Trilhas, Calendário |
-
-## Estratégia
-
-Adicionar filtragem no `AppSidebar.tsx` baseada no **ambiente selecionado** (`currentEnvironment`), removendo os menus conforme tabela acima.
-
----
-
-## Alterações
-
-### 1. AppSidebar.tsx
-
-Importar o hook `useEnvironment` e adicionar lógica de filtragem:
-
+### Problema 1: UserSelectorByPlanModal não mostra Business com Skills Liberado
+No `UserSelectorByPlanModal.tsx` (linha 55), o filtro é:
 ```typescript
-import { useEnvironment } from "@/hooks/useEnvironment";
-
-// Dentro do componente
-const { currentEnvironment } = useEnvironment();
-
-// Menus a ocultar por ambiente
-const menusToHideByEnvironment: Record<string, string[]> = {
-  skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
-  business: ['trilhas', 'calendario'],
-};
-
-// Aplicar filtro após obter submenus
-const getSubMenus = (parentKey: string) => {
-  // ... lógica existente ...
-  
-  // Filtrar menus baseado no ambiente selecionado
-  const menusToHide = menusToHideByEnvironment[currentEnvironment || ''] || [];
-  
-  return sidebarMenus
-    .filter(menu => menu.parent_key === parentKey)
-    .filter(menu => !menusToHide.includes(menu.menu_key))
-    .filter(menu => menu.menu_key !== 'skills_lider' || isSkillsLider);
-};
+return allUsers.filter(user => user.plano_mentoria === planType);
 ```
 
-### 2. Estrutura Final por Ambiente
+Isso exclui usuários como "Livia" que são **Business** mas têm `skills_liberado = true`.
 
-**Ambiente Academy:**
-- Aprender → Trilhas, Calendário, Central
-- Meu Progresso → Minha Evolução, Meu Diagnóstico, Minhas Dúvidas
+### Problema 2: Botão "Cursos" aparece para Skills
+No `TopHeader.tsx` (linha 142), a condição é:
+```typescript
+{!isVisitante && !isAcademy && !isBusiness && (
+```
 
-**Ambiente Skills:**
-- Aprender → Central (Trilhas e Calendário removidos)
-- Meu Progresso → Minha Equipe, Backlog, Roadmap, Minhas Entregas, Painel do Líder
-
-**Ambiente Business:**
-- Aprender → Central (Trilhas e Calendário removidos)
-- Meu Progresso → Visão Geral, Roadmap, Evolução Aprendizado
+Isso significa que Skills **vê** o dropdown Cursos, quando deveria ver apenas a opção de trocar de ambiente.
 
 ---
 
-## Arquivo a Modificar
+## Solução
+
+### 1. UserSelectorByPlanModal.tsx
+
+Ajustar o filtro para incluir usuários Business com Skills liberado quando o plano selecionado for "skills":
+
+```typescript
+const planUsers = useMemo(() => {
+  if (!allUsers) return [];
+  
+  if (planType === 'skills') {
+    // Skills: usuários com plano skills OU business com skills_liberado
+    return allUsers.filter(user => 
+      user.plano_mentoria === 'skills' || 
+      ((user.plano_mentoria === 'business' || user.plano_mentoria === 'business_iaplicada') && user.skills_liberado)
+    );
+  }
+  
+  return allUsers.filter(user => user.plano_mentoria === planType);
+}, [allUsers, planType]);
+```
+
+### 2. TopHeader.tsx
+
+Adicionar `isSkills` à condição para ocultar o dropdown "Cursos":
+
+```typescript
+{/* Dropdown Cursos - oculto para Visitante, Academy, Skills e Business */}
+{!isVisitante && !isAcademy && !isSkills && !isBusiness && (
+```
+
+Isso garante que Skills use **apenas** o seletor de ambiente para navegar entre Academy e Skills.
+
+---
+
+## Arquivos a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/components/layout/AppSidebar.tsx` | Adicionar filtro por ambiente selecionado |
+| `src/components/admin/UserSelectorByPlanModal.tsx` | Incluir Business+Skills no filtro "skills" |
+| `src/components/layout/TopHeader.tsx` | Adicionar `!isSkills` na condição do dropdown Cursos |
 
 ---
 
 ## Seção Técnica
 
-### Mapeamento de menu_keys a ocultar
-
-Com base nos dados do banco:
-
-| menu_key | label | parent_key | Ocultar em |
-|----------|-------|------------|------------|
-| `trilhas` | Trilhas | aprender | Skills, Business |
-| `calendario` | Calendário | aprender | Skills, Business |
-| `evolucao` | Minha Evolução | meu_progresso | Skills |
-| `meu_diagnostico` | Meu Diagnóstico | meu_progresso | Skills |
-| `minhas_duvidas` | Minhas Dúvidas | meu_progresso | Skills |
-
-### Código Completo
+### Filtro Corrigido para Skills
 
 ```typescript
-// Menus a ocultar quando em ambiente específico
-// Skills e Business terão acesso separado ao Academy, então menus duplicados são ocultados
-const getEnvironmentHiddenMenus = (environment: string | null): string[] => {
-  switch (environment) {
-    case 'skills':
-      return ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'];
-    case 'business':
-      return ['trilhas', 'calendario'];
-    default:
-      return [];
+// UserSelectorByPlanModal.tsx
+const planUsers = useMemo(() => {
+  if (!allUsers) return [];
+  
+  // Para Skills, incluir também Business com skills_liberado
+  if (planType === 'skills') {
+    return allUsers.filter(user => 
+      user.plano_mentoria === 'skills' || 
+      ((user.plano_mentoria === 'business' || user.plano_mentoria === 'business_iaplicada') && user.skills_liberado)
+    );
   }
-};
-
-// No getSubMenus, aplicar filtro
-const hiddenMenus = getEnvironmentHiddenMenus(currentEnvironment);
-
-return sidebarMenus
-  .filter(menu => menu.parent_key === parentKey)
-  .filter(menu => !hiddenMenus.includes(menu.menu_key))
-  .filter(menu => menu.menu_key !== 'skills_lider' || isSkillsLider);
+  
+  return allUsers.filter(user => user.plano_mentoria === planType);
+}, [allUsers, planType]);
 ```
 
+### Condição Atualizada TopHeader
+
+```typescript
+// TopHeader.tsx linha 142
+{/* Dropdown Cursos - oculto para todos os planos pagos (usam Environment Switcher) */}
+{!isVisitante && !isAcademy && !isSkills && !isBusiness && (
+  <DropdownMenu>
+    ...
+  </DropdownMenu>
+)}
+```
+
+### Comportamento Final
+
+| Usuário | Vê Dropdown "Cursos" | Usa Environment Switcher |
+|---------|---------------------|-------------------------|
+| Visitante | ❌ | ❌ (não tem ambientes) |
+| Academy | ❌ | ✅ (Academy, Gratuito) |
+| Skills | ❌ | ✅ (Skills, Academy, Gratuito) |
+| Business | ❌ | ✅ (Business, Academy, Gratuito) |
+| Business + Skills | ❌ | ✅ (Business, Skills, Academy, Gratuito) |
+| Admin | ❌ | ✅ (todos) |
