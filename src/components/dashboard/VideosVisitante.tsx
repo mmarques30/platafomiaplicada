@@ -27,7 +27,7 @@ export function VideosVisitante() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4">
         {[1, 2, 3, 4].map((i) => (
           <Skeleton key={i} className="h-[140px] sm:h-[180px] md:h-[280px] rounded-xl" />
         ))}
@@ -46,7 +46,7 @@ export function VideosVisitante() {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4">
       {videos.map((video) => (
         <VideoCardVertical
           key={video.id}
