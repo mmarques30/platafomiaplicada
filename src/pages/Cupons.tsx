@@ -41,13 +41,13 @@ export default function Cupons() {
         <PageTitle 
           primary="Cupons" 
           secondary="exclusivos"
-          icon={<Ticket className="h-7 w-7 text-emerald-500" />}
+          icon={<Ticket className="h-7 w-7 text-primary" />}
         />
 
         {/* Card CTA com Cupom */}
-        <Card className="border-2 border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20">
+        <Card className="border-2 border-foreground bg-foreground/5 dark:bg-foreground/10">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl text-emerald-700 dark:text-emerald-400">
+            <CardTitle className="text-2xl text-foreground">
               Cupom de Desconto
             </CardTitle>
             <CardDescription className="text-base">
@@ -55,15 +55,15 @@ export default function Cupons() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-3 bg-white dark:bg-background rounded-lg border-2 border-dashed border-emerald-400 px-6 py-3">
-              <code className="text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">
+            <div className="flex items-center gap-3 bg-background rounded-lg border-2 border-dashed border-foreground/40 px-6 py-3">
+              <code className="text-xl font-bold text-foreground tracking-wider">
                 {COUPON_CODE}
               </code>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleCopyCoupon}
-                className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100"
+                className="text-foreground hover:text-foreground/80 hover:bg-foreground/10"
               >
                 <Copy className="h-4 w-4" />
               </Button>
@@ -71,7 +71,7 @@ export default function Cupons() {
             <Button 
               onClick={handlePurchase}
               size="lg"
-              className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold gap-2"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2"
             >
               Comprar Agora
               <ExternalLink className="h-4 w-4" />
