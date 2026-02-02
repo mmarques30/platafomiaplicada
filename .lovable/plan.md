@@ -1,116 +1,160 @@
 
-# Plano: Corrigir Regra de Cupom Academy15 para Visitantes Engajados
 
-## Diagnóstico do Problema
+# Plano: Melhorar Popup de Notificação de Expiração para Visitantes
 
-### Por que nenhum visitante recebeu o cupom Academy15?
-
-**Problema 1: Regra muito restritiva**
-A função atual `check_visitor_engagement` verifica se o visitante acessou a plataforma em **4 dias diferentes nas últimas 2 semanas**:
-
-```sql
--- Regra atual (muito restritiva)
-SELECT COUNT(DISTINCT DATE(accessed_at)) >= 4
-FROM content_access_logs
-WHERE accessed_at >= NOW() - INTERVAL '14 days'
-```
-
-**Problema 2: A função não é executada automaticamente**
-A função `check_visitor_engagement` só é chamada pela edge function `process-visitor-expirations`, que precisa ser acionada manualmente ou via cron job (não configurado).
+## Objetivo
+Ajustar o componente `VisitorExpirationNotice` para:
+1. Remover todos os emojis das mensagens
+2. Personalizar mensagens com base no cupom do usuário (Academy12 ou Academy15)
+3. Adicionar verificação de duplicidade de conta na edge function
 
 ---
 
-## Dados Atuais
+## Alterações no Componente de Popup
 
-| Situação | Quantidade |
-|----------|------------|
-| Total de visitantes | 150 |
-| Visitantes com Academy12 | 150 |
-| Visitantes com Academy15 | 0 |
-| **Visitantes com 10+ acessos** | **8** |
+### Arquivo: `src/components/shared/VisitorExpirationNotice.tsx`
 
-### Top visitantes por acessos:
-| Email | Acessos |
-|-------|---------|
-| marcosmartinsdeoliveira75@gmail.com | 20 |
-| robertocr@me.com | 19 |
-| anavmguimaraes@hotmail.com | 17 |
-| aarmelin@uol.com.br | 15 |
-| silgoliveira06@gmail.com | 14 |
-| mariana.mrcabral@gmail.com | 12 |
-| wanpereira15@gmail.com | 12 |
-| ellenrejo@hotmail.com | 11 |
+**Mudanças:**
+- Remover emojis dos títulos
+- Melhorar textos para serem mais profissionais
+- Personalizar mensagens baseadas no engajamento do usuário
 
----
+### Configuração Atualizada (sem emojis):
 
-## Solução Proposta
-
-### 1. Atualizar a função `check_visitor_engagement`
-
-**Nova regra:** Visitante é engajado se consumiu **10 ou mais conteúdos** (total, sem limite de tempo).
-
-```sql
-CREATE OR REPLACE FUNCTION check_visitor_engagement(visitor_id UUID)
-RETURNS BOOLEAN AS $$
-DECLARE
-  total_acessos INTEGER;
-BEGIN
-  SELECT COUNT(*)
-  INTO total_acessos
-  FROM content_access_logs cal
-  JOIN profiles p ON cal.user_email = p.email
-  WHERE p.id = visitor_id;
-    
-  RETURN COALESCE(total_acessos, 0) >= 10;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
-```
-
-### 2. Atualizar visitantes existentes que já se qualificam
-
-```sql
--- Atualizar cupom para visitantes que já têm 10+ acessos
-UPDATE public.profiles p
-SET cupom_especial = 'Academy15'
-WHERE p.is_visitante = true
-  AND (
-    SELECT COUNT(*)
-    FROM content_access_logs cal
-    WHERE cal.user_email = p.email
-  ) >= 10;
-```
-
-### 3. Atualizar descrição do cupom na tabela
-
-```sql
-UPDATE public.cupons_visitantes
-SET descricao = 'Cupom para visitantes engajados (consumiram +10 conteúdos)'
-WHERE codigo = 'Academy15';
+```typescript
+const urgencyConfig = {
+  "7_dias": {
+    icon: Gift,
+    title: "Seu acesso gratuito expira em 7 dias",
+    description: `Você aproveitou bem a comunidade! Garanta ${desconto} de desconto exclusivo no Academy e continue sua jornada de aprendizado em IA.`,
+    bgClass: "bg-aplicada-green-600/95",
+    borderClass: "border-aplicada-green-400",
+  },
+  "3_dias": {
+    icon: Clock,
+    title: "Restam apenas 3 dias de acesso gratuito",
+    description: `O tempo está passando! Aproveite ${desconto} de desconto exclusivo no Academy antes que seu acesso expire.`,
+    bgClass: "bg-amber-600/95",
+    borderClass: "border-amber-400",
+  },
+  "1_dia": {
+    icon: AlertTriangle,
+    title: "Ultimo dia de acesso gratuito",
+    description: `Esta é sua ultima chance de garantir ${desconto} de desconto no Academy. Amanha seu acesso sera encerrado.`,
+    bgClass: "bg-red-600/95",
+    borderClass: "border-red-400",
+  },
+};
 ```
 
 ---
 
-## Arquivos a Serem Modificados
+## Alterações na Edge Function
 
-| Tipo | Descrição |
-|------|-----------|
-| Migração SQL | Atualizar função + cupons existentes + descrição |
+### Arquivo: `supabase/functions/process-visitor-expirations/index.ts`
+
+**Mudanças:**
+1. Remover emojis das notificações do sistema
+2. Adicionar verificação de duplicidade antes de expirar
+3. Mensagens mais profissionais
+
+### Notificações Atualizadas:
+
+```typescript
+// Linha 103-108: Títulos sem emojis
+titulo: notice.type === "1_dia" 
+  ? "Ultimo dia de acesso gratuito" 
+  : notice.type === "3_dias"
+  ? "Restam 3 dias de acesso gratuito"
+  : "Seu acesso gratuito expira em 7 dias",
+mensagem: `Garanta ${isEngaged ? "15%" : "12%"} de desconto no Academy com o cupom ${isEngaged ? "Academy15" : "Academy12"}. Aproveite essa oportunidade exclusiva!`,
+```
+
+### Verificação de Duplicidade:
+
+```typescript
+// Antes de marcar como expirado, verificar se já é mentorado
+const { data: jaMentorado } = await supabase
+  .from("profiles")
+  .select("id, plano_mentoria")
+  .ilike("email", visitante.email)
+  .eq("is_visitante", false)
+  .eq("conta_ativa", true)
+  .neq("id", visitante.id)
+  .maybeSingle();
+
+if (jaMentorado) {
+  // Converter visitante automaticamente (já é mentorado por outra conta)
+  await supabase
+    .from("profiles")
+    .update({ 
+      is_visitante: false,
+      data_conversao: new Date().toISOString(),
+      acesso_expirado: false
+    })
+    .eq("id", visitante.id);
+  
+  results.convertidos_automatico = (results.convertidos_automatico || 0) + 1;
+  continue; // Não processar expiração
+}
+```
 
 ---
 
-## Resultado Esperado
+## Resumo dos Arquivos
 
-Após a migração:
-- **8 visitantes** serão automaticamente atualizados para cupom Academy15
-- Novos visitantes que atingirem 10+ acessos serão elegíveis quando a edge function rodar
-- A descrição do cupom refletirá a nova regra
+| Arquivo | Alteração |
+|---------|-----------|
+| `src/components/shared/VisitorExpirationNotice.tsx` | Remover emojis, melhorar textos |
+| `supabase/functions/process-visitor-expirations/index.ts` | Remover emojis, adicionar verificação de duplicidade |
 
 ---
 
-## Validação
+## Mensagens Finais por Tipo de Notificação
 
-Após a migração, a consulta deve retornar:
+### 7 Dias Antes
+
+| Campo | Valor |
+|-------|-------|
+| **Título** | Seu acesso gratuito expira em 7 dias |
+| **Descrição (12%)** | Você aproveitou bem a comunidade! Garanta 12% de desconto exclusivo no Academy e continue sua jornada de aprendizado em IA. |
+| **Descrição (15%)** | Você aproveitou bem a comunidade! Garanta 15% de desconto exclusivo no Academy e continue sua jornada de aprendizado em IA. |
+| **Cor** | Verde (aplicada-green) |
+
+### 3 Dias Antes
+
+| Campo | Valor |
+|-------|-------|
+| **Título** | Restam apenas 3 dias de acesso gratuito |
+| **Descrição (12%)** | O tempo está passando! Aproveite 12% de desconto exclusivo no Academy antes que seu acesso expire. |
+| **Descrição (15%)** | O tempo está passando! Aproveite 15% de desconto exclusivo no Academy antes que seu acesso expire. |
+| **Cor** | Amarelo/Laranja (amber) |
+
+### 1 Dia Antes
+
+| Campo | Valor |
+|-------|-------|
+| **Título** | Ultimo dia de acesso gratuito |
+| **Descrição (12%)** | Esta é sua ultima chance de garantir 12% de desconto no Academy. Amanha seu acesso sera encerrado. |
+| **Descrição (15%)** | Esta é sua ultima chance de garantir 15% de desconto no Academy. Amanha seu acesso sera encerrado. |
+| **Cor** | Vermelho (red) |
+
+---
+
+## Fluxo Visual do Popup
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  [X]                                                            │
+│  ┌─────┐                                                        │
+│  │ 🎁  │  Seu acesso gratuito expira em 7 dias                 │
+│  └─────┘                                                        │
+│         Você aproveitou bem a comunidade! Garanta 15% de       │
+│         desconto exclusivo no Academy...                        │
+│                                                                  │
+│         Cupom: [ Academy15 ]                                    │
+│                                                                  │
+│         [ Copiar ]  [ Conhecer Academy → ]                      │
+└─────────────────────────────────────────────────────────────────┘
 ```
-Academy12: ~142 visitantes
-Academy15: 8 visitantes
-```
+
