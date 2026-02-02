@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Newspaper, Globe, Lightbulb, FileText, ExternalLink, ImageIcon } from "lucide-react";
+import { Newspaper, Globe, Lightbulb, FileText, ExternalLink, ImageIcon, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,13 +10,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useConteudosDashboard, TipoConteudo } from "@/hooks/useConteudosDashboard";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { CriadoresComunidadeTab } from "@/components/comunidade/CriadoresComunidadeTab";
 import logo3d from "@/assets/logo-3d.png";
+
+type TabValue = TipoConteudo | "todos" | "criadores";
 
 const tabs = [
   { value: "todos" as const, label: "Todos", icon: FileText },
   { value: "noticia" as TipoConteudo, label: "Notícias IA", icon: Globe },
   { value: "dica" as TipoConteudo, label: "Dicas Práticas", icon: Lightbulb },
   { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
+  { value: "criadores" as const, label: "Criadores", icon: Users },
 ];
 
 const tipoIcons = {
@@ -33,11 +37,14 @@ const tipoBadgeColors = {
 
 export default function Central() {
   const [searchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get('tab') as TipoConteudo | null;
-  const [activeTab, setActiveTab] = useState<TipoConteudo | "todos">(tabFromUrl || "todos");
+  const tabFromUrl = searchParams.get('tab') as TabValue | null;
+  const validTabs = ["todos", "noticia", "dica", "newsletter", "criadores"];
+  const [activeTab, setActiveTab] = useState<TabValue>(
+    tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "todos"
+  );
 
   useEffect(() => {
-    if (tabFromUrl) {
+    if (tabFromUrl && validTabs.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
@@ -80,7 +87,7 @@ export default function Central() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TipoConteudo | "todos")} className="flex-1 flex flex-col">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="flex-1 flex flex-col">
           <TabsList className="inline-flex w-fit gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40">
             {tabs.map((tab) => (
               <TabsTrigger
@@ -94,81 +101,89 @@ export default function Central() {
             ))}
           </TabsList>
 
-          <TabsContent value={activeTab} className="mt-6 flex-1">
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                  <Skeleton key={i} className="h-72 rounded-xl" />
-                ))}
-              </div>
-            ) : filteredConteudos.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {filteredConteudos.map((conteudo) => {
-                  const TipoIcon = tipoIcons[conteudo.tipo as keyof typeof tipoIcons];
-                  return (
-                    <motion.div
-                      key={conteudo.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ y: -4 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Card 
-                        className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
-                        onClick={() => setSelectedConteudo(conteudo)}
-                      >
-                        {/* Imagem */}
-                        {conteudo.imagem_url ? (
-                          <div className="aspect-video w-full overflow-hidden bg-muted">
-                            <img 
-                              src={conteudo.imagem_url} 
-                              alt={conteudo.titulo}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          </div>
-                        ) : (
-                          <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
-                            <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
-                          </div>
-                        )}
-
-                        <CardHeader className="pb-2">
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
-                              {conteudo.tipo === 'newsletter' ? 'Newsletter' : 
-                               conteudo.tipo === 'noticia' ? 'Notícia' : 'Dica'}
-                            </Badge>
-                            {conteudo.destaque && (
-                              <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
-                            )}
-                          </div>
-                          <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
-                            {conteudo.titulo}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground line-clamp-3">
-                            {conteudo.resumo}
-                          </p>
-                          <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                            <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
-                            {conteudo.link_externo && (
-                              <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
-                <p className="text-muted-foreground">Nenhum conteúdo disponível nesta categoria</p>
-              </div>
-            )}
+          {/* Tab Criadores */}
+          <TabsContent value="criadores" className="mt-6 flex-1">
+            <CriadoresComunidadeTab />
           </TabsContent>
+
+          {/* Tabs de Conteúdo */}
+          {activeTab !== "criadores" && (
+            <TabsContent value={activeTab} className="mt-6 flex-1">
+              {isLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                    <Skeleton key={i} className="h-72 rounded-xl" />
+                  ))}
+                </div>
+              ) : filteredConteudos.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                  {filteredConteudos.map((conteudo) => {
+                    const TipoIcon = tipoIcons[conteudo.tipo as keyof typeof tipoIcons];
+                    return (
+                      <motion.div
+                        key={conteudo.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ y: -4 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Card 
+                          className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
+                          onClick={() => setSelectedConteudo(conteudo)}
+                        >
+                          {/* Imagem */}
+                          {conteudo.imagem_url ? (
+                            <div className="aspect-video w-full overflow-hidden bg-muted">
+                              <img 
+                                src={conteudo.imagem_url} 
+                                alt={conteudo.titulo}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                          ) : (
+                            <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
+                              <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
+                            </div>
+                          )}
+
+                          <CardHeader className="pb-2">
+                            <div className="flex items-center justify-between gap-2 mb-2">
+                              <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
+                                {conteudo.tipo === 'newsletter' ? 'Newsletter' : 
+                                 conteudo.tipo === 'noticia' ? 'Notícia' : 'Dica'}
+                              </Badge>
+                              {conteudo.destaque && (
+                                <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
+                              )}
+                            </div>
+                            <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
+                              {conteudo.titulo}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground line-clamp-3">
+                              {conteudo.resumo}
+                            </p>
+                            <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
+                              <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
+                              {conteudo.link_externo && (
+                                <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
+                  <p className="text-muted-foreground">Nenhum conteúdo disponível nesta categoria</p>
+                </div>
+              )}
+            </TabsContent>
+          )}
         </Tabs>
 
         {/* Modal de Detalhes */}

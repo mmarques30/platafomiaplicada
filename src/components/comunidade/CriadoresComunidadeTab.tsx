@@ -38,15 +38,19 @@ export function CriadoresComunidadeTab() {
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const { isAcademy, isBusiness, isVisitante, isLoading: isPlanLoading } = useUserPlan();
+  const { isAcademy, isBusiness, isSkills, isVisitante, isLoading: isPlanLoading } = useUserPlan();
+
+  // Visitantes veem apenas materiais gratuitos, pagantes veem todos
+  const visibilidadeFilter = isVisitante ? "gratuito" : undefined;
 
   const { materiais, isLoading } = useMateriaisComunidade({
     tipo: tipoFilter,
     categoria: categoriaFilter,
+    visibilidade: visibilidadeFilter,
   });
 
-  // Mentorados Academy e Business podem contribuir (não visitantes)
-  const canContribute = (isAcademy || isBusiness) && !isVisitante;
+  // Mentorados Academy, Skills e Business podem contribuir (não visitantes)
+  const canContribute = (isAcademy || isBusiness || isSkills) && !isVisitante;
 
   if (isLoading) {
     return (
