@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LayoutGrid, List, Sparkles, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
 
 const TIPOS = [
@@ -40,7 +40,7 @@ export function CriadoresComunidadeTab() {
   const [showAddModal, setShowAddModal] = useState(false);
 
   const { user } = useAuth();
-  const { isVisitante, isLoading: isPlanLoading } = useUserPlan();
+  const { isVisitante, isLoading: isPlanLoading } = useUserRole();
 
   // Visitantes veem apenas materiais gratuitos, pagantes veem todos
   const visibilidadeFilter = isVisitante ? "gratuito" : undefined;
