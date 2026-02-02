@@ -20,7 +20,7 @@ export default function Dashboard() {
   // Visitantes são redirecionados para /trilhas (nova homepage para acesso gratuito)
   useEffect(() => {
     if (!loadingRole && isVisitante) {
-      navigate("/trilhas", { replace: true });
+      navigate("/central", { replace: true });
     }
   }, [isVisitante, loadingRole, navigate]);
 

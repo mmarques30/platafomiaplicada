@@ -11,26 +11,56 @@ export const getFileNameFromUrl = (url: string): string => {
 };
 
 /**
- * Faz download real (blob + download attribute), evitando problemas de preview/nova aba.
- * Lança erro se não conseguir baixar.
+ * Faz download de arquivos com fallback para diferentes estratégias.
+ * Para arquivos do Supabase Storage, usa link direto (mais confiável).
+ * Para outros arquivos, tenta fetch + blob com fallback para link direto.
  */
 export async function downloadUrl(url: string, filename?: string) {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Falha ao baixar: ${res.status}`);
+  const finalName = filename || getFileNameFromUrl(url);
+
+  // Detectar se é URL do Supabase Storage
+  const isSupabaseStorage = url.includes('supabase.co/storage');
+
+  // Para Supabase Storage: usar link direto (mais confiável)
+  if (isSupabaseStorage) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = finalName;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return;
   }
 
-  const blob = await res.blob();
-  const objectUrl = URL.createObjectURL(blob);
+  // Para outros arquivos: tentar fetch + blob
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Falha ao baixar: ${res.status}`);
 
-  const a = document.createElement("a");
-  a.href = objectUrl;
-  a.download = filename || getFileNameFromUrl(url);
-  a.rel = "noopener noreferrer";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
 
-  // Pequeno delay para evitar revogar cedo em alguns navegadores
-  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = finalName;
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    // Pequeno delay para evitar revogar cedo em alguns navegadores
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  } catch {
+    // Fallback: link direto
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = finalName;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 }
