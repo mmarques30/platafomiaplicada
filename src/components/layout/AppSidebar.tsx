@@ -279,19 +279,21 @@ export function AppSidebar() {
                       {!collapsed && <span>Feed</span>}
                     </NavLink>
                     
-                    {/* Sala de Aula */}
-                    <NavLink 
-                      to="/videos-bonus" 
-                      className={cn(
-                        "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
-                        location.pathname === '/videos-bonus'
-                          ? "text-primary font-semibold" 
-                          : "text-sidebar-foreground hover:text-primary"
-                      )}
-                    >
-                      <LucideIcons.PlayCircle className="h-4 w-4" strokeWidth={1.5} />
-                      {!collapsed && <span>Sala de Aula</span>}
-                    </NavLink>
+                    {/* Sala de Aula - oculto para Academy */}
+                    {!isAcademy && (
+                      <NavLink 
+                        to="/videos-bonus" 
+                        className={cn(
+                          "flex items-center gap-2 py-2 px-4 rounded-lg text-sm transition-colors",
+                          location.pathname === '/videos-bonus'
+                            ? "text-primary font-semibold" 
+                            : "text-sidebar-foreground hover:text-primary"
+                        )}
+                      >
+                        <LucideIcons.PlayCircle className="h-4 w-4" strokeWidth={1.5} />
+                        {!collapsed && <span>Sala de Aula</span>}
+                      </NavLink>
+                    )}
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
