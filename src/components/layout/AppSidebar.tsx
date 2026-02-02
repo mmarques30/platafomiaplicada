@@ -442,12 +442,12 @@ export function AppSidebar() {
                       end 
                       className={({ isActive }) => cn(
                         "relative rounded-lg transition-all duration-200 font-semibold pl-4 py-2.5",
-                        "bg-aplicada-green-700 text-white hover:bg-aplicada-green-800",
-                        isActive && "ring-2 ring-primary/50 ring-offset-2"
+                        "!bg-aplicada-green-700 !text-white hover:!bg-aplicada-green-800",
+                        isActive && "ring-2 ring-aplicada-green-500/50 ring-offset-2"
                       )}
                     >
-                      <LucideIcons.Ticket className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                      {!collapsed && <span className="text-sm">Cupons</span>}
+                      <LucideIcons.Ticket className="h-4 w-4 shrink-0 !text-white" strokeWidth={1.5} />
+                      {!collapsed && <span className="text-sm !text-white">Cupons</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
