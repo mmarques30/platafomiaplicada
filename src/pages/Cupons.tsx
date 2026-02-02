@@ -91,7 +91,7 @@ export default function Cupons() {
               {/* Header da Tabela */}
               <div className="grid grid-cols-5 gap-0">
                 <div className="p-4 flex items-end">
-                  <span className="text-sm font-semibold text-foreground">
+                  <span className="text-sm font-semibold text-aplicada-green-600">
                     Características
                   </span>
                 </div>
@@ -192,16 +192,6 @@ export default function Cupons() {
                   Na IAplicada Academy, você não aprende só teoria — você implementa IA no seu trabalho desde a primeira semana. 
                   Trilhas focadas em resultados, comunidade ativa e suporte para transformar seu dia a dia profissional.
                 </p>
-                <div className="pt-2">
-                  <Button 
-                    onClick={handlePurchase}
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2"
-                  >
-                    Quero Começar Agora
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </div>
               </div>
             </div>
           </CardContent>
