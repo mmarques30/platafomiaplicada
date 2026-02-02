@@ -1,268 +1,137 @@
 
+# Plano: Corrigir Filtragem de Menus Academy no Ambiente Skills
 
-# Plano: Trilhas Skills + Painel Admin Skills
+## Problema
 
-## Resumo
+No ambiente Skills, os menus específicos do Academy (Minha Evolução, Meu Diagnóstico, Minhas Dúvidas) continuam aparecendo, mesmo com a lógica de filtragem implementada.
 
-Implementar duas funcionalidades interconectadas:
-1. **Menu "Trilhas Skills"** no ambiente Skills (submenu de "Aprender") - exibe conteúdos direcionados para a equipe após diagnóstico
-2. **Aba "Skills" no Admin > Mentoria** - gestão de equipes, liberação de conteúdos e análises com IA
+## Diagnóstico
 
----
-
-## Contexto Atual
-
-### Estrutura Skills Existente
-- Tabelas: `equipes_skills`, `membros_equipe_skills`, `diagnosticos_skills`, `backlog_skills`, `roadmap_skills`, `entregas_skills`
-- Páginas: `SkillsDiagnostico`, `SkillsEquipe`, `SkillsBacklog`, `SkillsRoadmap`, `SkillsEntregas`, `SkillsLiderDashboard`
-- Não existe vínculo entre trilhas/módulos e equipes Skills
-
-### Estrutura Conteúdo Existente
-- Trilhas e módulos possuem `nivel_minimo_acesso` (academy, lab, skills, club)
-- Não há campo para vincular conteúdo específico a equipes Skills
-
----
-
-## Parte 1: Trilhas Skills (Ambiente do Usuário)
-
-### 1.1 Novo Menu no Sidebar
-
-Adicionar item no `menu_config` dentro do grupo "Aprender":
-
-| menu_key | label | url | parent_key | planos_permitidos |
-|----------|-------|-----|------------|-------------------|
-| `trilhas_skills` | Trilhas Skills | `/skills/trilhas` | `aprender` | `['skills']` |
-
-### 1.2 Nova Tabela: `conteudos_liberados_skills`
-
-Tabela para vincular conteúdos específicos às equipes:
-
-```sql
-CREATE TABLE public.conteudos_liberados_skills (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  equipe_id uuid NOT NULL REFERENCES equipes_skills(id) ON DELETE CASCADE,
-  trilha_id uuid REFERENCES trilhas(id) ON DELETE CASCADE,
-  modulo_id uuid REFERENCES modulos(id) ON DELETE CASCADE,
-  liberado_por uuid REFERENCES auth.users(id),
-  motivo text, -- "diagnostico", "manual", "fase_roadmap"
-  fase_roadmap_id uuid REFERENCES roadmap_skills(id) ON DELETE SET NULL,
-  ordem integer DEFAULT 0,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
-  
-  CONSTRAINT check_trilha_ou_modulo CHECK (
-    (trilha_id IS NOT NULL AND modulo_id IS NULL) OR 
-    (trilha_id IS NULL AND modulo_id IS NOT NULL)
-  )
-);
+A lógica atual está correta no código:
+```typescript
+const getEnvironmentHiddenMenus = (environment: string | null): string[] => {
+  switch (environment) {
+    case 'skills':
+      return ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'];
+    // ...
+  }
+};
 ```
 
-### 1.3 Nova Página: `/skills/trilhas`
+Os `menu_key` no banco de dados estão corretos:
+| menu_key | label | planos_permitidos |
+|----------|-------|-------------------|
+| `evolucao` | Minha Evolução | `['academy', 'skills']` |
+| `meu_diagnostico` | Meu Diagnóstico | `['academy', 'skills']` |
+| `minhas_duvidas` | Minhas Dúvidas | `['academy', 'skills']` |
 
-Componente `SkillsTrilhas.tsx`:
-- Busca conteúdos liberados para a equipe do usuário via `conteudos_liberados_skills`
-- Exibe trilhas/módulos em formato de cards
-- Filtra por fase do roadmap se houver associação
-- Mostra progresso de conclusão
+O problema pode ser uma das seguintes causas:
+1. O `currentEnvironment` pode estar como `null` no momento da renderização
+2. O filtro pode não estar sendo aplicado em algum caminho de código
+3. Pode haver um problema de re-renderização
 
-### 1.4 Hook: `useSkillsTrilhas`
+## Solução
+
+### 1. Garantir que a Filtragem Funcione Mesmo Durante Loading
+
+Adicionar verificação para retornar menus vazios enquanto o ambiente não está definido, ou adicionar `console.log` para debug:
+
+### 2. Mover a lógica para o hook `useMenuConfig`
+
+A solução mais robusta é integrar a filtragem por ambiente diretamente no hook `useMenuConfig`, já que ele é responsável por retornar os menus filtrados:
 
 ```typescript
-// Busca conteúdos liberados para a equipe do usuário
-// Retorna trilhas e módulos com metadados de progresso
+// Em useMenuConfig.tsx
+const getSidebarMenus = (userPlan?: string | null, environment?: string | null) => {
+  // Menus a ocultar por ambiente
+  const hiddenByEnvironment: Record<string, string[]> = {
+    skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
+    business: ['trilhas', 'calendario'],
+  };
+  
+  const hiddenMenus = hiddenByEnvironment[environment || ''] || [];
+  
+  return menuConfig?.filter(m => {
+    if (m.tipo !== 'sidebar' || !m.visivel) return false;
+    
+    // Filtrar por ambiente selecionado
+    if (hiddenMenus.includes(m.menu_key)) return false;
+    
+    // Filtrar por plano
+    if (!m.planos_permitidos || m.planos_permitidos.length === 0) return true;
+    if (!userPlan) return false;
+    return m.planos_permitidos.includes(userPlan);
+  }) || [];
+};
+```
+
+### 3. Atualizar AppSidebar.tsx
+
+Passar o `currentEnvironment` para o `getSidebarMenus`:
+
+```typescript
+const sidebarMenus = getSidebarMenus(effectivePlan, currentEnvironment);
 ```
 
 ---
-
-## Parte 2: Painel Admin Skills
-
-### 2.1 Nova Página Admin: `/admin/mentoria/skills`
-
-Componente `MentoriaSkillsPage.tsx` com estrutura de abas:
-
-| Aba | Descrição |
-|-----|-----------|
-| **Equipes** | Lista e gerencia equipes Skills |
-| **Diagnósticos** | Visualiza diagnósticos individuais e consolidados |
-| **Conteúdos** | Libera trilhas/módulos para equipes |
-| **Roadmap** | Visualiza/edita roadmap da equipe |
-| **Análises IA** | Insights e recomendações gerados por IA |
-
-### 2.2 Aba Equipes
-
-- Selecionar equipe para gerenciar
-- Ver membros e status dos diagnósticos
-- Ações: editar equipe, adicionar membros
-
-### 2.3 Aba Diagnósticos
-
-- Tabela com diagnósticos individuais dos membros
-- Card com diagnóstico consolidado (gerado por IA)
-- Botão para regenerar consolidado
-
-### 2.4 Aba Conteúdos (Liberação)
-
-**Funcionalidades:**
-- Lista conteúdos já liberados para a equipe
-- Botão "Adicionar Conteúdo" abre modal com:
-  - Seletor de trilha ou módulo
-  - Campo de motivo
-  - Associação opcional a fase do roadmap
-- Ordenação por drag-and-drop
-- Exclusão individual
-
-**Interface:**
-```
-┌─────────────────────────────────────────────────┐
-│ Conteúdos Liberados para [Equipe]               │
-├─────────────────────────────────────────────────┤
-│ + Adicionar Conteúdo                            │
-├─────────────────────────────────────────────────┤
-│ 📚 Fundamentos de Automação        │ Diagnóstico │
-│ 📚 Comunicação com IA              │ Fase 1      │
-│ 📦 Módulo: Prompts Básicos         │ Manual      │
-└─────────────────────────────────────────────────┘
-```
-
-### 2.5 Aba Roadmap
-
-- Visualização do roadmap de 12 semanas da equipe
-- Edição de fases (semana início/fim, status)
-- Vinculação de conteúdos por fase
-
-### 2.6 Aba Análises IA
-
-**Dados exibidos:**
-- Insights do diagnóstico consolidado
-- Processos com maior potencial de economia
-- Recomendações de conteúdo baseadas nos gargalos
-- Métricas de progresso da equipe
-
----
-
-## Arquivos a Criar
-
-| Arquivo | Descrição |
-|---------|-----------|
-| `src/pages/skills/SkillsTrilhas.tsx` | Página de trilhas direcionadas |
-| `src/pages/admin/mentoria/MentoriaSkillsPage.tsx` | Página admin Skills |
-| `src/hooks/useSkillsTrilhas.ts` | Hook para buscar conteúdos da equipe |
-| `src/hooks/admin/useConteudosSkillsAdmin.ts` | Hook admin para gerenciar conteúdos |
-| `src/components/admin/skills/EquipesSkillsTab.tsx` | Aba equipes |
-| `src/components/admin/skills/DiagnosticosSkillsTab.tsx` | Aba diagnósticos |
-| `src/components/admin/skills/ConteudosSkillsTab.tsx` | Aba liberação conteúdos |
-| `src/components/admin/skills/RoadmapSkillsTab.tsx` | Aba roadmap |
-| `src/components/admin/skills/AnalisesIASkillsTab.tsx` | Aba análises IA |
-| `src/components/admin/skills/ConteudoLiberacaoModal.tsx` | Modal adicionar conteúdo |
 
 ## Arquivos a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/App.tsx` | Adicionar rotas `/skills/trilhas` e `/admin/mentoria/skills` |
-| `src/components/admin/AdminSidebar.tsx` | Adicionar link "Skills" no grupo Mentoria |
-| `src/components/layout/AppSidebar.tsx` | Garantir que `trilhas_skills` apareça no ambiente Skills |
+| `src/hooks/useMenuConfig.tsx` | Adicionar parâmetro `environment` ao `getSidebarMenus` e aplicar filtro |
+| `src/components/layout/AppSidebar.tsx` | Passar `currentEnvironment` para `getSidebarMenus` |
 
 ---
 
-## Migrations de Banco
+## Seção Técnica
 
-### Migration 1: Tabela de conteúdos liberados
+### useMenuConfig.tsx - Código Atualizado
 
-```sql
--- Criar tabela de conteúdos liberados por equipe Skills
-CREATE TABLE public.conteudos_liberados_skills (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  equipe_id uuid NOT NULL REFERENCES public.equipes_skills(id) ON DELETE CASCADE,
-  trilha_id uuid REFERENCES public.trilhas(id) ON DELETE CASCADE,
-  modulo_id uuid REFERENCES public.modulos(id) ON DELETE CASCADE,
-  liberado_por uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  motivo text DEFAULT 'manual',
-  fase_roadmap_id uuid REFERENCES public.roadmap_skills(id) ON DELETE SET NULL,
-  ordem integer DEFAULT 0,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
+```typescript
+const getSidebarMenus = (userPlan?: string | null, currentEnvironment?: string | null) => {
+  // Menus a ocultar quando em ambiente específico
+  // Skills/Business têm acesso separado ao Academy
+  const hiddenByEnvironment: Record<string, string[]> = {
+    skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
+    business: ['trilhas', 'calendario'],
+  };
   
-  CONSTRAINT check_trilha_ou_modulo CHECK (
-    (trilha_id IS NOT NULL AND modulo_id IS NULL) OR 
-    (trilha_id IS NULL AND modulo_id IS NOT NULL)
-  )
-);
-
--- Índices
-CREATE INDEX idx_conteudos_liberados_skills_equipe ON public.conteudos_liberados_skills(equipe_id);
-CREATE INDEX idx_conteudos_liberados_skills_trilha ON public.conteudos_liberados_skills(trilha_id);
-CREATE INDEX idx_conteudos_liberados_skills_modulo ON public.conteudos_liberados_skills(modulo_id);
-
--- RLS
-ALTER TABLE public.conteudos_liberados_skills ENABLE ROW LEVEL SECURITY;
-
--- Políticas
-CREATE POLICY "Membros podem ver conteúdos da sua equipe" ON public.conteudos_liberados_skills
-  FOR SELECT USING (
-    equipe_id IN (
-      SELECT equipe_id FROM public.membros_equipe_skills 
-      WHERE user_id = auth.uid() AND status = 'ativo'
-    )
-  );
-
-CREATE POLICY "Admins podem gerenciar todos os conteúdos" ON public.conteudos_liberados_skills
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-  );
+  const hiddenMenus = hiddenByEnvironment[currentEnvironment || ''] || [];
+  
+  return menuConfig?.filter(m => {
+    if (m.tipo !== 'sidebar' || !m.visivel) return false;
+    
+    // Filtrar menus por ambiente selecionado
+    if (hiddenMenus.includes(m.menu_key)) return false;
+    
+    // Se planos_permitidos = null, menu visível para todos
+    if (!m.planos_permitidos || m.planos_permitidos.length === 0) return true;
+    
+    // Se não tem plano, não mostra menus restritos
+    if (!userPlan) return false;
+    
+    // Verifica se o plano do usuário está na lista de permitidos
+    return m.planos_permitidos.includes(userPlan);
+  }) || [];
+};
 ```
 
-### Migration 2: Menu trilhas_skills
+### AppSidebar.tsx - Chamada Atualizada
 
-```sql
-INSERT INTO public.menu_config (menu_key, label, url, parent_key, planos_permitidos, icon, ordem, tipo, visivel, editavel)
-VALUES ('trilhas_skills', 'Trilhas Skills', '/skills/trilhas', 'aprender', ARRAY['skills'], 'BookMarked', 20, 'sidebar', true, true);
+```typescript
+const sidebarMenus = getSidebarMenus(effectivePlan, currentEnvironment);
 ```
+
+E remover a função `getEnvironmentHiddenMenus` do AppSidebar já que a filtragem será feita no hook.
 
 ---
 
-## Fluxo de Uso
+## Comportamento Final
 
-### Fluxo Admin
-```
-1. Admin acessa /admin/mentoria/skills
-2. Seleciona equipe na aba "Equipes"
-3. Visualiza diagnósticos em "Diagnósticos"
-4. Libera conteúdos em "Conteúdos" baseado nos insights
-5. Acompanha progresso em "Análises IA"
-```
-
-### Fluxo Usuário Skills
-```
-1. Membro da equipe acessa ambiente Skills
-2. Menu "Aprender" > "Trilhas Skills"
-3. Visualiza conteúdos liberados para sua equipe
-4. Consome conteúdo conforme roadmap/prioridade
-```
-
----
-
-## Diagrama de Relacionamentos
-
-```
-┌──────────────────┐     ┌────────────────────────────┐
-│  equipes_skills  │────▶│ conteudos_liberados_skills │
-└──────────────────┘     └────────────────────────────┘
-         │                          │
-         │                          ├────▶ trilhas
-         │                          │
-         ▼                          └────▶ modulos
-┌──────────────────┐
-│ roadmap_skills   │◀────────────────────────┘
-└──────────────────┘      (fase_roadmap_id)
-```
-
----
-
-## Próximos Passos (Fora deste escopo)
-
-1. **IA para recomendação automática** - baseada nos diagnósticos, sugerir trilhas
-2. **Notificações** - avisar membros quando novo conteúdo for liberado
-3. **Métricas de consumo** - tracking de progresso por membro
-4. **Certificação** - emissão após conclusão de trilha
-
+| Ambiente Selecionado | Menus Ocultos |
+|---------------------|---------------|
+| Academy | Nenhum |
+| Skills | Trilhas, Calendário, Minha Evolução, Meu Diagnóstico, Minhas Dúvidas |
+| Business | Trilhas, Calendário |
+| Gratuito | Baseado apenas no plano |
