@@ -491,8 +491,8 @@ export function AppSidebar() {
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                         
-                        {/* Sala de Aula - oculto para Academy */}
-                        {!isAcademy && (
+                        {/* Sala de Aula - exclusivo para visitantes (gratuito) */}
+                        {isVisitante && (
                           <SidebarMenuItem>
                             <SidebarMenuButton asChild className="group">
                               <NavLink 
