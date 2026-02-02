@@ -77,7 +77,7 @@ export function AboutSection() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-neutral-400 mb-10 leading-relaxed text-sm md:text-base"
         >
-          A IAplicada nasceu da experiência prática em operações complexas de empresas como Mercado Livre, Suzano e AngloGold Ashanti. Depois de anos lidando com rotinas, indicadores e gargalos em negócios líderes em e‑commerce, indústria e mineração, transformamos o que funciona lá fora em uma plataforma acessível para a sua empresa.
+          A IAplicada nasceu da experiência prática em operações complexas de empresas como Mercado Livre, Suzano e AngloGold Ashanti. Depois de anos lidando com rotinas, indicadores e gargalos em negócios líderes em e‑commerce, indústria e mineração, transformamos o que funciona lá fora em um ecossistema completo, pra sua carreira, time e empresa.
         </motion.p>
 
         {/* CTA Button */}
