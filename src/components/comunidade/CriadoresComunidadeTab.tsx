@@ -38,7 +38,7 @@ export function CriadoresComunidadeTab() {
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const { plan, isAcademy, isBusiness, isSkills, isVisitante, isLoading: isPlanLoading } = useUserPlan();
+  const { isVisitante, isLoading: isPlanLoading } = useUserPlan();
 
   // Visitantes veem apenas materiais gratuitos, pagantes veem todos
   const visibilidadeFilter = isVisitante ? "gratuito" : undefined;
@@ -49,9 +49,10 @@ export function CriadoresComunidadeTab() {
     visibilidade: visibilidadeFilter,
   });
 
-  // Mentorados Academy, Skills e Business podem contribuir
-  // Verifica se tem plano (não é visitante E tem um plano válido)
-  const canContribute = !isPlanLoading && !isVisitante && !!plan;
+  // Mentorados (não visitantes) podem contribuir.
+  // Alguns perfis podem estar temporariamente sem plano_mentoria preenchido,
+  // então aqui a regra principal é "não ser visitante".
+  const canContribute = !isPlanLoading && !isVisitante;
 
   if (isLoading) {
     return (
