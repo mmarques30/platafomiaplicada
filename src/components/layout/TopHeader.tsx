@@ -55,7 +55,7 @@ export function TopHeader() {
   }, []);
   
   const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
-  const isComunicacoesActive = ['/chat-mariana', '/notificacoes', '/avisos'].some(path => location.pathname.startsWith(path));
+  const isComunicacoesActive = ['/chat', '/notificacoes', '/avisos'].some(path => location.pathname.startsWith(path));
 
   const { data: avisosCount } = useAvisosAtivosCount();
 
@@ -201,7 +201,7 @@ export function TopHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
                 <DropdownMenuItem asChild>
-                  <Link to="/chat-mariana" className="cursor-pointer">
+                  <Link to="/chat" className="cursor-pointer">
                     Chat MarIAna
                   </Link>
                 </DropdownMenuItem>
