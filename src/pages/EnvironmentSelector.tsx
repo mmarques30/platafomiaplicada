@@ -199,18 +199,6 @@ export default function EnvironmentSelector() {
           );
         })}
       </div>
-
-      {/* Info para Admin */}
-      {isAdmin && (
-        <motion.p
-          className="mt-10 text-xs text-white/40"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          👑 Como admin, você tem acesso a todos os ambientes para simulação
-        </motion.p>
-      )}
     </div>
   );
 }
