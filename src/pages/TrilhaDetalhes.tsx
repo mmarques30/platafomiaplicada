@@ -15,6 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ArrowLeft, Play, CheckCircle2, Clock, ChevronDown } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
+import { getGoogleDriveEmbedUrl } from "@/lib/google-drive";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { VideoFeedbackSection } from "@/components/video/VideoFeedbackSection";
@@ -260,13 +261,23 @@ export default function TrilhaDetalhes() {
           <div className="flex-1 flex flex-col gap-4 min-w-0">
             {/* 1. Player de Vídeo */}
             <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
-              <iframe
-                src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
-                title={currentVideo.titulo}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
+              {currentVideo.google_drive_url ? (
+                <iframe
+                  src={getGoogleDriveEmbedUrl(currentVideo.google_drive_url) || ''}
+                  title={currentVideo.titulo}
+                  allow="autoplay; encrypted-media; fullscreen"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              ) : (
+                <iframe
+                  src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?start=${getVideoProgress(currentVideo.id)?.tempo_assistido || 0}&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=1&playsinline=1`}
+                  title={currentVideo.titulo}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              )}
             </div>
 
             {/* 2. Título e Informações do Vídeo */}

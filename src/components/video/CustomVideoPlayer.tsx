@@ -4,6 +4,7 @@ import { CustomYouTubePlayer, PlayerState } from "@/lib/youtubePlayer";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { getGoogleDriveEmbedUrl } from "@/lib/google-drive";
 
 interface CustomVideoPlayerProps {
   videoId: string;
@@ -28,6 +29,7 @@ export function CustomVideoPlayer({
   title,
   aspectRatio = "video",
 }: CustomVideoPlayerProps) {
+  // Todos os hooks devem vir antes de qualquer return condicional
   const [playerReady, setPlayerReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -45,6 +47,12 @@ export function CustomVideoPlayer({
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef(0);
   const maxRetries = 3;
+
+  // Verifica se deve usar Google Drive
+  const driveEmbedUrl = googleDriveUrl ? getGoogleDriveEmbedUrl(googleDriveUrl) : null;
+  const useGoogleDrive = !!driveEmbedUrl;
+
+  const aspectClass = aspectRatio === "reels" ? "aspect-[9/16]" : aspectRatio === "square" ? "aspect-square" : "aspect-video";
 
   const initializePlayer = () => {
     const playerId = `youtube-player-${videoId}`;
@@ -107,6 +115,9 @@ export function CustomVideoPlayer({
   };
 
   useEffect(() => {
+    // Se está usando Google Drive, não inicializa YouTube
+    if (useGoogleDrive) return;
+
     // Validar YouTube ID
     if (!videoId || videoId.length < 10) {
       setError("ID de vídeo inválido");
@@ -136,7 +147,7 @@ export function CustomVideoPlayer({
         clearTimeout(loadingTimeoutRef.current);
       }
     };
-  }, [videoId, startSeconds]);
+  }, [videoId, startSeconds, useGoogleDrive]);
 
   const handlePlayPause = () => {
     if (!playerRef.current) return;
@@ -214,7 +225,42 @@ export function CustomVideoPlayer({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const aspectClass = aspectRatio === "reels" ? "aspect-[9/16]" : aspectRatio === "square" ? "aspect-square" : "aspect-video";
+  // Se for Google Drive, renderiza iframe simples
+  if (useGoogleDrive) {
+    return (
+      <div className={cn("relative w-full bg-black overflow-hidden rounded-lg", aspectClass)}>
+        {showThumbnail && thumbnail ? (
+          <div className="absolute inset-0 w-full h-full">
+            <img
+              src={thumbnail}
+              alt={title || "Video thumbnail"}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <Button
+                size="lg"
+                onClick={() => setShowThumbnail(false)}
+                className="w-20 h-20 rounded-full bg-primary hover:bg-primary/90 hover:scale-110 transition-transform"
+              >
+                <Play className="h-10 w-10 ml-1" fill="currentColor" />
+              </Button>
+            </div>
+            <div className="absolute top-4 right-4 bg-black/80 px-3 py-1.5 rounded text-sm text-white font-medium">
+              IA Aplicada
+            </div>
+          </div>
+        ) : (
+          <iframe
+            src={driveEmbedUrl}
+            title={title || "Video"}
+            className="w-full h-full"
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen
+          />
+        )}
+      </div>
+    );
+  }
 
   // Render de erro
   if (error) {
@@ -228,7 +274,7 @@ export function CustomVideoPlayer({
           />
         )}
         <div className="relative z-10 text-center space-y-4 p-6">
-          <div className="text-red-500 text-lg font-semibold">
+          <div className="text-destructive text-lg font-semibold">
             Erro ao carregar vídeo
           </div>
           <p className="text-white/80 text-sm">{error}</p>
@@ -236,7 +282,7 @@ export function CustomVideoPlayer({
             {googleDriveUrl && (
               <Button
                 onClick={() => window.open(googleDriveUrl, '_blank')}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <HardDrive className="h-4 w-4 mr-2" />
                 Assistir no Google Drive
