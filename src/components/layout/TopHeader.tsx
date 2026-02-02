@@ -55,7 +55,7 @@ export function TopHeader() {
   }, []);
   
   const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
-  const isFerramentasActive = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(path => location.pathname.startsWith(path));
+  const isComunicacoesActive = ['/chat-mariana', '/notificacoes', '/avisos'].some(path => location.pathname.startsWith(path));
 
   const { data: avisosCount } = useAvisosAtivosCount();
 
@@ -138,8 +138,8 @@ export function TopHeader() {
             Página Inicial
           </NavLink>
           
-          {/* Dropdown Cursos - oculto para Academy (já está no único curso) */}
-          {!isAcademy && (
+          {/* Dropdown Cursos - oculto para Academy e Business (já estão no único curso) */}
+          {!isAcademy && !isBusiness && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -184,6 +184,7 @@ export function TopHeader() {
             </DropdownMenu>
           )}
           
+          {/* Comunicações - visível para Academy, Skills e Business */}
           {!isVisitante && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -191,32 +192,22 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isFerramentasActive ? "text-primary" : "text-white/60 hover:text-white"
+                    isComunicacoesActive ? "text-primary" : "text-white/60 hover:text-white"
                   )}
                 >
-                  Bibliotecas
+                  Comunicações
                   <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
                 <DropdownMenuItem asChild>
-                  <Link to="/ia-copie-use" className="cursor-pointer">
-                    IA "Copie e Use"
+                  <Link to="/chat-mariana" className="cursor-pointer">
+                    Chat MarIAna
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/biblioteca-ferramentas" className="cursor-pointer">
-                    Biblioteca de Ferramentas
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/biblioteca-prompts" className="cursor-pointer">
-                    Biblioteca de Prompts
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/metodos-aplicar" className="cursor-pointer">
-                    Métodos para Aplicar
+                  <Link to="/notificacoes" className="cursor-pointer">
+                    Avisos
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
