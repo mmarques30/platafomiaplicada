@@ -171,31 +171,27 @@ export default function Cupons() {
         </section>
 
         {/* CTA Final com foto da Mari */}
-        <Card className="border-2 border-primary bg-gradient-to-r from-aplicada-green-100/50 via-aplicada-cream to-aplicada-green-200/40">
-          <CardContent className="p-6 md:p-8">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              {/* Foto da Mari */}
-              <div className="flex-shrink-0">
-                <img 
-                  src={mariAvatar} 
-                  alt="Mariana - Mentora IAplicada" 
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-primary shadow-lg"
-                />
-              </div>
-              
-              {/* Texto */}
-              <div className="flex-1 text-center md:text-left space-y-3">
-                <h3 className="text-xl md:text-2xl font-bold text-foreground">
-                  A escola de IA prática com aplicação real que você precisa
-                </h3>
-                <p className="text-muted-foreground text-sm md:text-base">
-                  Na IAplicada Academy, você não aprende só teoria — você implementa IA no seu trabalho desde a primeira semana. 
-                  Trilhas focadas em resultados, comunidade ativa e suporte para transformar seu dia a dia profissional.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <section className="flex flex-col md:flex-row items-center gap-6 py-6">
+          {/* Foto da Mari */}
+          <div className="flex-shrink-0">
+            <img 
+              src={mariAvatar} 
+              alt="Mariana - Mentora IAplicada" 
+              className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-primary shadow-lg"
+            />
+          </div>
+          
+          {/* Texto */}
+          <div className="flex-1 text-center md:text-left space-y-3">
+            <h3 className="text-xl md:text-2xl font-bold text-foreground">
+              A escola de IA prática com aplicação real que você precisa
+            </h3>
+            <p className="text-muted-foreground text-sm md:text-base">
+              Na IAplicada Academy, você não aprende só teoria — você implementa IA no seu trabalho desde a primeira semana. 
+              Trilhas focadas em resultados, comunidade ativa e suporte para transformar seu dia a dia profissional.
+            </p>
+          </div>
+        </section>
       </main>
     </div>
   );
