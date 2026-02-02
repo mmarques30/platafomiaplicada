@@ -42,17 +42,6 @@ export function AppSidebar() {
   const { isLider: isSkillsLider } = useSkillsMembro();
   const { currentEnvironment } = useEnvironment();
   
-  // Menus a ocultar quando em ambiente específico (Skills/Business têm acesso separado ao Academy)
-  const getEnvironmentHiddenMenus = (environment: string | null): string[] => {
-    switch (environment) {
-      case 'skills':
-        return ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'];
-      case 'business':
-        return ['trilhas', 'calendario'];
-      default:
-        return [];
-    }
-  };
   const collapsed = !open;
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [logoError, setLogoError] = useState(false);
@@ -68,7 +57,7 @@ export function AppSidebar() {
     return IconComponent || Home;
   };
 
-  const sidebarMenus = getSidebarMenus(effectivePlan);
+  const sidebarMenus = getSidebarMenus(effectivePlan, currentEnvironment);
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
@@ -93,13 +82,9 @@ export function AppSidebar() {
       return [];
     }
     
-    // Obter menus a ocultar baseado no ambiente selecionado
-    const hiddenMenus = getEnvironmentHiddenMenus(currentEnvironment);
-    
-    // Filtrar menu "Painel do Líder" se não for líder Skills + filtrar por ambiente
+    // Filtrar menu "Painel do Líder" se não for líder Skills
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
-      .filter(menu => !hiddenMenus.includes(menu.menu_key))
       .filter(menu => menu.menu_key !== 'skills_lider' || isSkillsLider);
   };
 
