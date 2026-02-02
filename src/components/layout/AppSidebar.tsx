@@ -112,7 +112,10 @@ export function AppSidebar() {
   }, [location.pathname]);
 
   return (
-    <Sidebar className="border-r border-sidebar-border bg-sidebar pt-14">
+    <Sidebar className={cn(
+      "border-r border-sidebar-border bg-sidebar",
+      isViewingAs ? "pt-24" : "pt-14"
+    )}>
       <SidebarContent className="pt-2 pb-4">
         <SidebarGroup>
           <SidebarGroupContent>
