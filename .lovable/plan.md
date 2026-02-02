@@ -1,82 +1,73 @@
 
-# Plano: Correções de Acesso e Interface
+# Plano: Melhorar Campos Autor e Ordem no Modal de Conteúdo
 
 ## Problemas Identificados
 
-### 1. Botão "Contribuir" aparecendo para visitantes
-O componente `CriadoresComunidadeTab.tsx` usa `useUserPlan()` diretamente na linha 43, que não considera quando um admin está simulando como visitante através do `AdminViewContext`. 
+### 1. Campo "Autor" é texto livre
+Atualmente, o campo "Autor" (linhas 660-666 do `ConteudoModal.tsx`) é um `<Input>` de texto livre:
+```tsx
+<Input
+  {...register('autor')}
+  placeholder="Nome do autor"
+/>
+```
 
-Além disso, mesmo para visitantes reais, pode haver um problema de timing onde `isPlanLoading` é `false` mas `isVisitante` ainda não foi corretamente determinado.
+O usuário deseja que seja uma **lista suspensa** baseada nos membros cadastrados (profiles).
 
-### 2. EnvironmentSwitcher mostrando ícones e descrições
-O dropdown de troca de ambientes está exibindo ícones coloridos e descrições completas. O usuário deseja uma versão simplificada mostrando apenas os nomes dos ambientes.
+### 2. Campo "Ordem de Exibição" é manual
+Atualmente, o campo "Ordem" (linhas 668-675) é um input numérico que exige entrada manual:
+```tsx
+<Input
+  {...register('ordem', { valueAsNumber: true })}
+  type="number"
+  placeholder="0"
+/>
+```
+
+O usuário deseja que a ordem seja **calculada automaticamente** baseada nos conteúdos já existentes.
 
 ---
 
 ## Solução
 
-### Correção 1: Ocultar botão "Contribuir" para visitantes
+### Correção 1: Autor como Lista Suspensa
 
-**Arquivo:** `src/components/comunidade/CriadoresComunidadeTab.tsx`
+Substituir o `<Input>` do campo Autor por um `<Select>` que lista os membros da comunidade (já disponíveis via `useCommunityMembers`):
 
-Substituir o uso de `useUserPlan()` por `useUserRole()` que já tem a lógica de visitante com simulação:
-
-```typescript
-// Linha 12-13: Trocar imports
-import { useUserRole } from "@/hooks/useUserRole";
-
-// Linha 43: Substituir useUserPlan por useUserRole
-const { isVisitante, isLoading: isPlanLoading } = useUserRole();
-
-// A lógica canContribute permanece igual (linha 59)
-const canContribute = !!user && !isPlanLoading && !isVisitante;
-```
-
-O hook `useUserRole()` já inclui a lógica de simulação do admin (`effectiveIsVisitante`), garantindo que quando um admin está "vendo como visitante", o botão não apareça.
-
----
-
-### Correção 2: Simplificar EnvironmentSwitcher
-
-**Arquivo:** `src/components/layout/EnvironmentSwitcher.tsx`
-
-Remover ícones e descrições do dropdown, mantendo apenas os nomes dos ambientes:
-
-#### Antes (linhas 81-111):
 ```tsx
-<DropdownMenuItem ...>
-  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={...}>
-    <Icon className="h-4 w-4" style={...} />
-  </div>
-  <div className="flex-1">
-    <div className="font-medium text-sm">{config.label}</div>
-    <div className="text-xs text-muted-foreground truncate">
-      {config.description}
-    </div>
-  </div>
-  {!isAvailable && <Lock ... />}
-  {isActive && <div className="w-2 h-2 rounded-full bg-primary" />}
-</DropdownMenuItem>
+<div className="space-y-2">
+  <Label>Autor</Label>
+  <Select
+    value={watch('autor') || ''}
+    onValueChange={(v) => setValue('autor', v || '')}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Selecione um autor..." />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="">Nenhum</SelectItem>
+      {members.map(member => (
+        <SelectItem key={member.id} value={member.nome_completo}>
+          {member.nome_completo}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
 ```
 
-#### Depois:
-```tsx
-<DropdownMenuItem ...>
-  <span className="flex-1 font-medium text-sm">{config.label}</span>
-  {!isAvailable && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
-  {isActive && <div className="w-2 h-2 rounded-full bg-primary" />}
-</DropdownMenuItem>
-```
+### Correção 2: Ordem Automática
 
-Também remover o ícone do botão trigger:
+Modificar o hook `useConteudosDashboardAdmin` para expor a próxima ordem disponível e calcular automaticamente quando um novo conteúdo é criado:
 
-#### Antes (linha 64):
-```tsx
-<CurrentIcon className="h-4 w-4" style={{ color: environmentConfig.color }} />
-```
+1. **Adicionar função para calcular próxima ordem**:
+   - Consultar o valor máximo de `ordem` existente
+   - Retornar `maxOrdem + 1` para novos conteúdos
 
-#### Depois:
-Remover esta linha completamente.
+2. **No modal**: 
+   - Remover o campo de input manual da ordem
+   - Ao criar novo conteúdo, usar a próxima ordem automaticamente
+   - Ao editar, manter a ordem existente (ou permitir ajuste via drag-and-drop futuro)
 
 ---
 
@@ -84,50 +75,117 @@ Remover esta linha completamente.
 
 | Arquivo | Mudança |
 |---------|---------|
-| `src/components/comunidade/CriadoresComunidadeTab.tsx` | Trocar `useUserPlan` por `useUserRole` para considerar simulação admin |
-| `src/components/layout/EnvironmentSwitcher.tsx` | Remover ícones e descrições, manter apenas nomes dos ambientes |
+| `src/hooks/admin/useConteudosDashboardAdmin.tsx` | Adicionar função `getNextOrdem()` que retorna a próxima ordem disponível |
+| `src/components/admin/content/ConteudoModal.tsx` | Trocar input de Autor por Select com membros; remover input de Ordem manual e usar valor automático |
+
+---
+
+## Detalhes Técnicos
+
+### Hook - Nova função para próxima ordem
+
+```typescript
+export function useNextOrdem() {
+  const { data: conteudos } = useConteudosDashboardAdmin();
+  
+  const nextOrdem = useMemo(() => {
+    if (!conteudos?.length) return 1;
+    const maxOrdem = Math.max(...conteudos.map(c => c.ordem));
+    return maxOrdem + 1;
+  }, [conteudos]);
+  
+  return nextOrdem;
+}
+```
+
+### Modal - Campo Autor
+
+**Antes:**
+```tsx
+<div className="space-y-2">
+  <Label>Autor</Label>
+  <Input
+    {...register('autor')}
+    placeholder="Nome do autor"
+  />
+</div>
+```
+
+**Depois:**
+```tsx
+<div className="space-y-2">
+  <Label>Autor</Label>
+  <Select
+    value={watch('autor') || ''}
+    onValueChange={(v) => setValue('autor', v || '')}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Selecione um autor..." />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="">Nenhum</SelectItem>
+      {members.map(member => (
+        <SelectItem key={member.id} value={member.nome_completo}>
+          {member.nome_completo}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+```
+
+### Modal - Ordem Automática
+
+**Antes:**
+```tsx
+<div className="space-y-2">
+  <Label>Ordem de Exibição</Label>
+  <Input
+    {...register('ordem', { valueAsNumber: true })}
+    type="number"
+    placeholder="0"
+  />
+</div>
+```
+
+**Depois:**
+- Remover este campo do formulário
+- No `useEffect` de inicialização, definir `ordem` automaticamente para novos conteúdos:
+
+```tsx
+// No início do componente
+const nextOrdem = useNextOrdem();
+
+// No useEffect quando não é edição
+useEffect(() => {
+  if (!conteudo) {
+    // Novo conteúdo - usar próxima ordem
+    setValue('ordem', nextOrdem);
+  }
+}, [conteudo, nextOrdem, setValue]);
+```
 
 ---
 
 ## Resultado Esperado
 
-### Antes
-```
-┌──────────────────────────────────────┐
-│ 🎁 Gratuito ▼                        │
-├──────────────────────────────────────┤
-│ Ambiente atual                       │
-│──────────────────────────────────────│
-│ [🎁] Gratuito                        │
-│      Explore conteúdos gratuitos...  │
-│ [🎓] Academy                         │
-│      Trilhas completas + diagnós...  │
-│ [👥] Skills                          │
-│      Academy + capacitação para...   │
-│ [👑] Business                        │
-│      Academy + mentoria 1:1 + ro...  │
-│──────────────────────────────────────│
-│ ↺ Voltar para seleção                │
-└──────────────────────────────────────┘
+### Campo Autor
+```text
+┌─────────────────────────────────────┐
+│ Autor                               │
+│ ┌─────────────────────────────────┐ │
+│ │ Selecione um autor...         ▼ │ │
+│ ├─────────────────────────────────┤ │
+│ │ Nenhum                          │ │
+│ │ João Silva                      │ │
+│ │ Maria Santos                    │ │
+│ │ Pedro Oliveira                  │ │
+│ │ ...                             │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
 ```
 
-### Depois
-```
-┌──────────────────────────────────────┐
-│ Gratuito ▼                           │
-├──────────────────────────────────────┤
-│ Ambiente atual                       │
-│──────────────────────────────────────│
-│ Gratuito                           ● │
-│ Academy                          🔒 │
-│ Skills                           🔒 │
-│ Business                         🔒 │
-│──────────────────────────────────────│
-│ ↺ Voltar para seleção                │
-└──────────────────────────────────────┘
-```
-
-### Botão Contribuir
-- **Visitante real**: Não aparece ✓
-- **Admin simulando visitante**: Não aparece ✓
-- **Mentorado (Academy/Skills/Business)**: Aparece ✓
+### Ordem de Exibição
+- **Novo conteúdo**: Ordem calculada automaticamente (próximo número disponível)
+- **Edição**: Mantém a ordem existente
+- Campo removido da interface (ordem gerenciada internamente)
