@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Star, FileText, Newspaper, Lightbulb, Globe, Video, Eye } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, FileText, Newspaper, Lightbulb, Globe, Video, Eye, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -43,6 +43,7 @@ const tipoIcons: Record<TipoConteudo, React.ReactNode> = {
   noticia: <Globe className="h-4 w-4" />,
   dica: <Lightbulb className="h-4 w-4" />,
   material: <Video className="h-4 w-4" />,
+  criador: <Users className="h-4 w-4" />,
 };
 
 const tipoLabels: Record<TipoConteudo, string> = {
@@ -50,6 +51,7 @@ const tipoLabels: Record<TipoConteudo, string> = {
   noticia: "Notícia",
   dica: "Dica",
   material: "Material",
+  criador: "Criador",
 };
 
 export function CentralTab() {
@@ -108,6 +110,7 @@ export function CentralTab() {
               <SelectItem value="noticia">Notícia</SelectItem>
               <SelectItem value="dica">Dica</SelectItem>
               <SelectItem value="material">Material</SelectItem>
+              <SelectItem value="criador">Criador</SelectItem>
             </SelectContent>
           </Select>
 
