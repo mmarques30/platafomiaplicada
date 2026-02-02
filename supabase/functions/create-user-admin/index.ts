@@ -49,9 +49,9 @@ Deno.serve(async (req) => {
       )
     }
 
-    const { email, password, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria } = await req.json()
+    const { email, password, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado } = await req.json()
 
-    console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria })
+    console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado })
 
     // Validar planoMentoria
     const planosValidos = ['academy', 'skills', 'business'];
@@ -113,6 +113,11 @@ Deno.serve(async (req) => {
     
     if (empresaConsultoria) {
       updateData.empresa_consultoria = empresaConsultoria
+    }
+    
+    // Skills liberado só faz sentido para plano business
+    if (planoMentoria === 'business') {
+      updateData.skills_liberado = skillsLiberado ?? false
     }
 
     const { error: profileError } = await supabaseAdmin

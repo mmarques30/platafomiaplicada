@@ -153,10 +153,12 @@ export default function EnvironmentSelector() {
                   />
                 )}
 
-                {/* Lock overlay para ambientes bloqueados */}
+                {/* Lock overlay para ambientes bloqueados - visual clean */}
                 {isLocked && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-                    <Lock className="h-6 w-6 text-white/50" />
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <div className="bg-black/30 backdrop-blur-[2px] rounded-full p-3">
+                      <Lock className="h-5 w-5 text-white/60" />
+                    </div>
                   </div>
                 )}
 

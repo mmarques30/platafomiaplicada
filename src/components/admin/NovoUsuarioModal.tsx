@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { useCreateUser } from "@/hooks/admin/useUsers";
 import { toast } from "sonner";
@@ -35,6 +36,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
   const [selectedPlano, setSelectedPlano] = useState<string>("");
+  const [skillsLiberado, setSkillsLiberado] = useState(false);
   
   const createUser = useCreateUser();
 
@@ -61,6 +63,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
       nomeCompleto,
       roles: selectedRoles,
       planoMentoria: selectedPlano || null,
+      skillsLiberado: selectedPlano === "business" ? skillsLiberado : false,
     });
 
     // Resetar form
@@ -69,6 +72,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     setNomeCompleto("");
     setSelectedRoles([]);
     setSelectedPlano("");
+    setSkillsLiberado(false);
     onOpenChange(false);
   };
 
@@ -202,6 +206,25 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
             <p className="text-sm text-muted-foreground mt-2">
               Selecione o produto/plano que este usuário terá acesso
             </p>
+            
+            {/* Switch para liberar Skills - apenas para Business */}
+            {selectedPlano === "business" && (
+              <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
+                <div>
+                  <Label htmlFor="skills-liberado-novo" className="text-sm font-medium">
+                    Liberar acesso ao Skills
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Permite acessar o ambiente Skills além do Business
+                  </p>
+                </div>
+                <Switch
+                  id="skills-liberado-novo"
+                  checked={skillsLiberado}
+                  onCheckedChange={setSkillsLiberado}
+                />
+              </div>
+            )}
           </div>
 
           <DialogFooter>
