@@ -350,14 +350,14 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
               <div className="space-y-2">
                 <Label>Criador (membro da comunidade)</Label>
                 <Select
-                  value={criadorId || ''}
-                  onValueChange={(v) => setCriadorId(v || null)}
+                  value={criadorId || '_none'}
+                  onValueChange={(v) => setCriadorId(v === '_none' ? null : v)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um membro..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhum</SelectItem>
+                    <SelectItem value="_none">Nenhum</SelectItem>
                     {members.map(member => (
                       <SelectItem key={member.id} value={member.id}>
                         {member.nome_completo}
@@ -662,14 +662,14 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                 <div className="space-y-2">
                   <Label>Autor</Label>
                   <Select
-                    value={watch('autor') || ''}
-                    onValueChange={(v) => setValue('autor', v || '')}
+                    value={watch('autor') || '_none'}
+                    onValueChange={(v) => setValue('autor', v === '_none' ? '' : v)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione um autor..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Nenhum</SelectItem>
+                      <SelectItem value="_none">Nenhum</SelectItem>
                       {members.map(member => (
                         <SelectItem key={member.id} value={member.nome_completo}>
                           {member.nome_completo}
