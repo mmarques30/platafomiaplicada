@@ -67,8 +67,14 @@ export function AppSidebar() {
   
   // Obter submenus de um parent
   const getSubMenus = (parentKey: string) => {
-    // Visitantes não têm submenus - retornar vazio (só quando não está carregando)
+    // Visitantes têm submenus específicos para "início"
     if (!isLoadingState && isVisitante) {
+      if (parentKey === 'inicio') {
+        return [
+          { menu_key: 'inicio_visao', label: 'Visão Geral', url: '/', icon: null, parent_key: 'inicio' },
+          { menu_key: 'inicio_central', label: 'Central', url: '/central', icon: null, parent_key: 'inicio' },
+        ] as any[];
+      }
       return [];
     }
     return sidebarMenus.filter(menu => menu.parent_key === parentKey);
