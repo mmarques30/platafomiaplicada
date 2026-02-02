@@ -117,94 +117,93 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1 px-3">
-              {mainMenus.map((menu) => {
+              {mainMenus.map((menu, index) => {
                 const isActive = location.pathname === menu.url;
                 const IconComponent = getIconComponent(menu.icon);
                 const subMenus = getSubMenus(menu.menu_key);
                 const hasSubMenus = subMenus.length > 0;
                 const isExpanded = expandedMenus.includes(menu.menu_key);
                 
-                if (hasSubMenus) {
-                  return (
-                    <Collapsible 
-                      key={menu.menu_key} 
-                      open={isExpanded}
-                      onOpenChange={() => toggleMenu(menu.menu_key)}
-                    >
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <div className="flex items-center w-full">
-                            <NavLink
-                              to={getMenuUrl(menu)}
-                            className={cn(
-                              "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
-                              isActive 
-                                ? "text-primary font-semibold" 
-                                : "text-sidebar-foreground hover:text-primary"
-                            )}
-                          >
-                            <span className={cn(
-                              "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                              isActive 
-                                ? "bg-[#0D0D0D] opacity-100" 
-                                : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
-                            )} />
-                              <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                              {!collapsed && <span className="text-sm">{menu.label}</span>}
-                            </NavLink>
-                            {!collapsed && (
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  toggleMenu(menu.menu_key);
-                                }}
-                                className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
-                              >
-                                <ChevronDown 
+                // Renderizar Bibliotecas logo após "Aprender" (menu_key === 'aprender')
+                const renderBibliotecasAfter = menu.menu_key === 'aprender';
+                
+                const menuElement = hasSubMenus ? (
+                  <Collapsible 
+                    key={menu.menu_key} 
+                    open={isExpanded}
+                    onOpenChange={() => toggleMenu(menu.menu_key)}
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <div className="flex items-center w-full">
+                          <NavLink
+                            to={getMenuUrl(menu)}
+                          className={cn(
+                            "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
+                            isActive 
+                              ? "text-primary font-semibold" 
+                              : "text-sidebar-foreground hover:text-primary"
+                          )}
+                        >
+                          <span className={cn(
+                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                            isActive 
+                              ? "bg-[#0D0D0D] opacity-100" 
+                              : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                          )} />
+                            <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                            {!collapsed && <span className="text-sm">{menu.label}</span>}
+                          </NavLink>
+                          {!collapsed && (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                toggleMenu(menu.menu_key);
+                              }}
+                              className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
+                            >
+                              <ChevronDown 
+                                className={cn(
+                                  "h-4 w-4 transition-transform duration-200 text-sidebar-foreground/60",
+                                  isExpanded && "rotate-180"
+                                )} 
+                                strokeWidth={1.5}
+                              />
+                            </button>
+                          )}
+                        </div>
+                      </CollapsibleTrigger>
+                    </SidebarMenuItem>
+                    
+                    <CollapsibleContent>
+                      <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
+                        {subMenus.map((subMenu) => {
+                          const subIsActive = location.pathname === subMenu.url;
+                          const SubIconComponent = subMenu.icon ? getIconComponent(subMenu.icon) : null;
+                          
+                          return (
+                            <SidebarMenuItem key={subMenu.menu_key}>
+                              <SidebarMenuButton asChild className="group">
+                                <NavLink 
+                                  to={subMenu.url || "/"} 
+                                  end 
                                   className={cn(
-                                    "h-4 w-4 transition-transform duration-200 text-sidebar-foreground/60",
-                                    isExpanded && "rotate-180"
-                                  )} 
-                                  strokeWidth={1.5}
-                                />
-                              </button>
-                            )}
-                          </div>
-                        </CollapsibleTrigger>
-                      </SidebarMenuItem>
-                      
-                      <CollapsibleContent>
-                        <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                          {subMenus.map((subMenu) => {
-                            const subIsActive = location.pathname === subMenu.url;
-                            const SubIconComponent = subMenu.icon ? getIconComponent(subMenu.icon) : null;
-                            
-                            return (
-                              <SidebarMenuItem key={subMenu.menu_key}>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to={subMenu.url || "/"} 
-                                    end 
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      subIsActive 
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
-                                    )}
-                                  >
-                                    {!collapsed && <span>{subMenu.label}</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                            );
-                          })}
-                        </SidebarMenu>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  );
-                }
-
-                return (
+                                    "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                    subIsActive 
+                                      ? "text-primary font-semibold" 
+                                      : "text-sidebar-foreground/70 hover:text-primary"
+                                  )}
+                                >
+                                  {!collapsed && <span>{subMenu.label}</span>}
+                                </NavLink>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          );
+                        })}
+                      </SidebarMenu>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ) : (
                   <SidebarMenuItem key={menu.menu_key}>
                     <SidebarMenuButton asChild className="group">
                       <NavLink 
@@ -229,114 +228,123 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
+
+                // Renderizar Bibliotecas imediatamente após "Aprender"
+                const bibliotecasMenu = renderBibliotecasAfter && !isVisitante ? (
+                  <Collapsible 
+                    key="bibliotecas_menu"
+                    open={expandedMenus.includes('bibliotecas_menu')} 
+                    onOpenChange={() => toggleMenu('bibliotecas_menu')}
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="group w-full relative">
+                          <span className={cn(
+                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                            ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
+                              ? "bg-[#0D0D0D] opacity-100" 
+                              : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                          )} />
+                          <div className={cn(
+                            "flex items-center gap-2 rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 w-full",
+                            ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
+                              ? "text-primary font-semibold" 
+                              : "text-sidebar-foreground hover:text-primary"
+                          )}>
+                            <LucideIcons.Library className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                            {!collapsed && (
+                              <>
+                                <span className="text-sm flex-1 text-left">Bibliotecas</span>
+                                <LucideIcons.ChevronDown className={cn(
+                                  "h-4 w-4 transition-transform duration-200",
+                                  expandedMenus.includes('bibliotecas_menu') && "rotate-180"
+                                )} />
+                              </>
+                            )}
+                          </div>
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent>
+                        <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild className="group">
+                              <NavLink 
+                                to="/ia-copie-use" 
+                                end
+                                className={cn(
+                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                  location.pathname === '/ia-copie-use'
+                                    ? "text-primary font-semibold" 
+                                    : "text-sidebar-foreground/70 hover:text-primary"
+                                )}
+                              >
+                                {!collapsed && <span>IA "Copie e Use"</span>}
+                              </NavLink>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild className="group">
+                              <NavLink 
+                                to="/biblioteca-ferramentas" 
+                                end
+                                className={cn(
+                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                  location.pathname === '/biblioteca-ferramentas'
+                                    ? "text-primary font-semibold" 
+                                    : "text-sidebar-foreground/70 hover:text-primary"
+                                )}
+                              >
+                                {!collapsed && <span>Ferramentas</span>}
+                              </NavLink>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild className="group">
+                              <NavLink 
+                                to="/biblioteca-prompts" 
+                                end
+                                className={cn(
+                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                  location.pathname === '/biblioteca-prompts'
+                                    ? "text-primary font-semibold" 
+                                    : "text-sidebar-foreground/70 hover:text-primary"
+                                )}
+                              >
+                                {!collapsed && <span>Prompts</span>}
+                              </NavLink>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild className="group">
+                              <NavLink 
+                                to="/metodos-aplicar" 
+                                end
+                                className={cn(
+                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                  location.pathname === '/metodos-aplicar'
+                                    ? "text-primary font-semibold" 
+                                    : "text-sidebar-foreground/70 hover:text-primary"
+                                )}
+                              >
+                                {!collapsed && <span>Métodos</span>}
+                              </NavLink>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                ) : null;
+
+                return (
+                  <>
+                    {menuElement}
+                    {bibliotecasMenu}
+                  </>
+                );
               })}
 
-              {/* Bibliotecas - Menu expansível para Academy, Skills e Business */}
-              {!isVisitante && (
-                <Collapsible 
-                  open={expandedMenus.includes('bibliotecas_menu')} 
-                  onOpenChange={() => toggleMenu('bibliotecas_menu')}
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="group w-full relative">
-                        <span className={cn(
-                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                          ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
-                            ? "bg-[#0D0D0D] opacity-100" 
-                            : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
-                        )} />
-                        <div className={cn(
-                          "flex items-center gap-2 rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 w-full",
-                          ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}>
-                          <LucideIcons.Library className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                          {!collapsed && (
-                            <>
-                              <span className="text-sm flex-1 text-left">Bibliotecas</span>
-                              <LucideIcons.ChevronDown className={cn(
-                                "h-4 w-4 transition-transform duration-200",
-                                expandedMenus.includes('bibliotecas_menu') && "rotate-180"
-                              )} />
-                            </>
-                          )}
-                        </div>
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    
-                    <CollapsibleContent>
-                      <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                        <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="group">
-                            <NavLink 
-                              to="/ia-copie-use" 
-                              end
-                              className={cn(
-                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                location.pathname === '/ia-copie-use'
-                                  ? "text-primary font-semibold" 
-                                  : "text-sidebar-foreground/70 hover:text-primary"
-                              )}
-                            >
-                              {!collapsed && <span>IA "Copie e Use"</span>}
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="group">
-                            <NavLink 
-                              to="/biblioteca-ferramentas" 
-                              end
-                              className={cn(
-                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                location.pathname === '/biblioteca-ferramentas'
-                                  ? "text-primary font-semibold" 
-                                  : "text-sidebar-foreground/70 hover:text-primary"
-                              )}
-                            >
-                              {!collapsed && <span>Ferramentas</span>}
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="group">
-                            <NavLink 
-                              to="/biblioteca-prompts" 
-                              end
-                              className={cn(
-                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                location.pathname === '/biblioteca-prompts'
-                                  ? "text-primary font-semibold" 
-                                  : "text-sidebar-foreground/70 hover:text-primary"
-                              )}
-                            >
-                              {!collapsed && <span>Prompts</span>}
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="group">
-                            <NavLink 
-                              to="/metodos-aplicar" 
-                              end
-                              className={cn(
-                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                location.pathname === '/metodos-aplicar'
-                                  ? "text-primary font-semibold" 
-                                  : "text-sidebar-foreground/70 hover:text-primary"
-                              )}
-                            >
-                              {!collapsed && <span>Métodos</span>}
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      </SidebarMenu>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
-              )}
 
               {/* Comunidade - Menu expansível (oculto para Business) */}
               {!isBusiness && (
