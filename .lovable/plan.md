@@ -1,281 +1,194 @@
 
-# Plano: Diferenciação de Papéis no Skills (Líder vs Colaborador)
+# Plano: Ajustar Edição de Skills no EditUserModal
 
-## Contexto
+## Problema Identificado
 
-O módulo Skills já possui a estrutura de `papel` ("lider" ou "membro") na tabela `membros_equipe_skills`, porém atualmente:
-1. Ambos os papéis veem exatamente as mesmas telas
-2. O líder não tem visão diferenciada para acompanhar a equipe
-3. Não existe painel de gestão exclusivo para o líder
+Atualmente no `EditUserModal.tsx`:
 
-O líder precisa:
-- Ver TUDO que os colaboradores estão desenvolvendo
-- Acompanhar evolução de cada membro individualmente
-- Validar entregas (aprovar/rejeitar)
-- Ver métricas de engajamento e produtividade
-- Receber alertas de atrasos
+1. A aba "Skills" está desabilitada com `disabled={!isSkillsPlan}` (linha 188), ou seja, só funciona quando o plano é "skills"
+2. Usuários Business com `skillsLiberado=true` **não conseguem acessar a aba Skills** para edição
+3. A lógica de submit só atualiza Skills quando `selectedPlano === "skills"` (linha 141), ignorando Business com Skills liberado
 
-## Funcionalidades por Papel
+## Solução Proposta
 
-| Funcionalidade | Colaborador | Líder |
-|----------------|-------------|-------|
-| Preencher diagnóstico individual | Sim | Sim |
-| Ver equipe e membros | Sim | Sim |
-| Ver diagnóstico consolidado | Sim | Sim |
-| Ver backlog da equipe | Sim | Sim |
-| Ver roadmap | Sim | Sim |
-| **Minhas Entregas** | Só as próprias | Todas da equipe |
-| **Validar/Aprovar entregas** | Não | Sim |
-| **Painel de Gestão** | Não | Sim |
-| **Métricas de equipe** | Básico | Completo |
-| **Alertas de atraso** | Não | Sim |
+Remover a aba separada "Skills" e **integrar a configuração do Skills diretamente na aba "Acesso"**, que aparece condicionalmente quando:
+- O plano selecionado é "skills", OU
+- O plano é "business" E `skillsLiberado=true`
 
----
+## Alterações no EditUserModal.tsx
 
-## Alterações Necessárias
+### 1. Remover aba Skills do TabsList
 
-### 1. Hook Central: `useSkillsMembro`
+Mudar de 4 colunas para 3:
 
-Criar um hook que retorna dados do membro atual incluindo seu papel:
+```text
+Antes:  [Informações] [Acesso] [Skills] [Segurança]
+Depois: [Informações] [Acesso] [Segurança]
+```
+
+### 2. Adicionar seção Skills dentro da aba "Acesso"
+
+Após o switch de "Liberar acesso ao Skills" (para Business) ou após os cards de plano (para Skills):
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Aba: Acesso                                                    │
+├─────────────────────────────────────────────────────────────────┤
+│  Permissões (Roles)                                             │
+│  [x] Administrador  [x] Mentorado  [ ] Aluno da Trilha          │
+│                                                                  │
+│  Produto / Plano                                                │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐            │
+│  │ Sem plano│ │ Academy  │ │ Skills ✓ │ │ Business │            │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘            │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │ Configuração Skills                            (colapsável) ││
+│  │ ┌─────────────────────────────────────────────────────────┐ ││
+│  │ │ Equipe: [Select equipe existente ▼]                     │ ││
+│  │ │ ou [+ Criar nova equipe]                                │ ││
+│  │ │                                                          │ ││
+│  │ │ Cargo: [______________________]                         │ ││
+│  │ │ [ ] Definir como Líder da equipe                        │ ││
+│  │ │                                                          │ ││
+│  │ │ [Remover Vínculo Skills] (se já vinculado)              │ ││
+│  │ └─────────────────────────────────────────────────────────┘ ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                  │
+│  Data de Expiração: [__________]                                │
+│  Conta Ativa: [Switch]                                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 3. Lógica de Exibição
 
 ```typescript
-// src/hooks/useSkillsMembro.ts
-export function useSkillsMembro() {
-  // Retorna: equipe_id, papel ('lider' | 'membro'), isLider, cargo
-  // Usado por todos os hooks e páginas Skills
+// Mostrar configuração Skills quando:
+const showSkillsConfig = selectedPlano === "skills" || 
+                         (selectedPlano === "business" && skillsLiberado);
+```
+
+### 4. Atualizar Lógica de Submit
+
+```typescript
+// Atualizar vínculo Skills quando há acesso liberado
+if (showSkillsConfig && (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe)) {
+  await updateSkillsMembro.mutateAsync({
+    userId: user.id,
+    equipeId: skillsEquipeData.equipeId,
+    novaEquipe: skillsEquipeData.novaEquipe,
+    papelEquipe: skillsEquipeData.papelEquipe,
+    cargo,
+  });
 }
 ```
 
-### 2. Atualizar `useSkillsEntregas`
+---
 
-- **Colaborador**: Vê apenas suas próprias entregas (`responsavel_id = user.id`)
-- **Líder**: Vê TODAS as entregas da equipe com nome do responsável
+## Estrutura Final da Aba Acesso
 
-### 3. Atualizar `useSkillsEquipe`
+A seção de configuração Skills aparecerá como um bloco destacado:
 
-- Já retorna `isLider`, manter
-- Adicionar métricas de engajamento para líder (trilhas assistidas, entregas no prazo)
+1. **Para plano Skills**: Aparece logo abaixo dos cards de plano
+2. **Para plano Business**: Aparece abaixo do switch "Liberar acesso ao Skills" quando ativado
 
-### 4. Nova Página: Painel do Líder
-
-```
-/skills/lider
-```
-
-Visão exclusiva com:
-- Progresso individual de cada membro (diagnóstico, trilhas, entregas)
-- Entregas aguardando validação
-- Alertas de atraso
-- Métricas consolidadas (horas economizadas, entregas concluídas vs planejadas)
-
-### 5. Atualizar Página de Entregas
-
-- Colaborador vê "Minhas Entregas" com foco na execução
-- Líder vê "Entregas da Equipe" com filtro por membro e ação de validação
-
-### 6. Atualizar Menu Lateral
-
-Adicionar item de menu condicional para líderes:
-
-```sql
--- Novo menu apenas para líderes
-INSERT INTO menu_config (menu_key, label, url, icon, parent_key, planos_permitidos, ordem, tipo, visivel)
-VALUES ('skills_lider', 'Painel do Líder', '/skills/lider', 'LayoutDashboard', 'meu_progresso', ARRAY['skills'], 38, 'sidebar', true);
-```
+Ambos os cenários mostram:
+- Seletor de equipe (existente ou nova)
+- Campo de cargo
+- Checkbox de líder
+- Botão de remover vínculo (se já existir)
 
 ---
 
-## Arquivos a Criar
-
-| Arquivo | Descrição |
-|---------|-----------|
-| `src/hooks/useSkillsMembro.ts` | Hook central com papel do usuário |
-| `src/hooks/useSkillsLider.ts` | Dados agregados para visão do líder |
-| `src/pages/skills/SkillsLiderDashboard.tsx` | Painel exclusivo do líder |
-| `src/components/skills/lider/LiderProgressoMembro.tsx` | Card de progresso individual |
-| `src/components/skills/lider/LiderEntregasValidacao.tsx` | Lista de entregas para validar |
-| `src/components/skills/lider/LiderMetricasEquipe.tsx` | Gráficos de métricas |
-| `src/components/skills/lider/LiderAlertasAtraso.tsx` | Alertas de atraso |
-
-## Arquivos a Modificar
+## Arquivo a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/hooks/useSkillsEntregas.ts` | Lógica condicional por papel |
-| `src/pages/skills/SkillsEntregas.tsx` | UI diferenciada para líder (validação) |
-| `src/pages/skills/SkillsEquipe.tsx` | Métricas adicionais para líder |
-| `src/App.tsx` | Nova rota `/skills/lider` |
-| `src/components/layout/AppSidebar.tsx` | Exibir menu "Painel do Líder" apenas para líderes |
+| `src/components/admin/EditUserModal.tsx` | Remover aba Skills, integrar na aba Acesso |
 
 ---
 
-## Detalhamento Técnico
+## Seção Técnica
 
-### Hook useSkillsMembro
+### Código da Seção Skills na Aba Acesso
 
 ```typescript
-export function useSkillsMembro() {
-  const { user } = useAuth();
-  
-  const { data, isLoading } = useQuery({
-    queryKey: ["skills-membro", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("membros_equipe_skills")
-        .select("equipe_id, papel, cargo, status")
-        .eq("user_id", user.id)
-        .eq("status", "ativo")
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!user?.id,
-  });
+{/* Configuração Skills - aparece quando plano é Skills ou Business com Skills liberado */}
+{showSkillsConfig && (
+  <div className="space-y-4 mt-4">
+    <div className="flex items-center justify-between">
+      <Label className="text-sm font-medium">Configuração Skills</Label>
+      {hasSkillsVinculo && (
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={handleRemoveSkillsVinculo}
+          disabled={removeSkillsMembro.isPending}
+        >
+          <Trash2 className="h-4 w-4 mr-1" />
+          Remover Vínculo
+        </Button>
+      )}
+    </div>
+    
+    {loadingSkillsMembro ? (
+      <div className="py-4 text-center text-muted-foreground text-sm">
+        Carregando...
+      </div>
+    ) : (
+      <>
+        <SkillsEquipeSelector
+          value={skillsEquipeData}
+          onChange={setSkillsEquipeData}
+          showLiderOption={true}
+        />
 
-  return {
-    equipeId: data?.equipe_id,
-    papel: data?.papel as "lider" | "membro" | null,
-    isLider: data?.papel === "lider",
-    isMembro: data?.papel === "membro",
-    cargo: data?.cargo,
-    isLoading,
-  };
-}
+        <div>
+          <Label htmlFor="cargo-skills">Cargo na Empresa</Label>
+          <Input
+            id="cargo-skills"
+            value={cargo}
+            onChange={(e) => setCargo(e.target.value)}
+            placeholder="Ex: Analista de Marketing"
+            className="mt-1"
+          />
+        </div>
+      </>
+    )}
+  </div>
+)}
 ```
 
-### useSkillsEntregas Atualizado
+### Variável de Controle
 
 ```typescript
-export function useSkillsEntregas() {
-  const { user } = useAuth();
-  const { equipeId, isLider } = useSkillsMembro();
-
-  const { data: entregas, isLoading } = useQuery({
-    queryKey: ["entregas-skills", equipeId, isLider],
-    queryFn: async () => {
-      let query = supabase
-        .from("entregas_skills")
-        .select(`
-          *,
-          responsavel:responsavel_id (id, nome, avatar_url)
-        `)
-        .eq("equipe_id", equipeId);
-      
-      // Se não for líder, filtra apenas as próprias entregas
-      if (!isLider) {
-        query = query.eq("responsavel_id", user.id);
-      }
-      
-      return (await query).data || [];
-    },
-    enabled: !!equipeId,
-  });
-
-  return { entregas, isLoading, isLider };
-}
+// Determina se deve mostrar configuração Skills
+const showSkillsConfig = selectedPlano === "skills" || 
+                         (selectedPlano === "business" && skillsLiberado);
 ```
 
-### Hook useSkillsLider (Exclusivo)
+### Submit Atualizado
 
 ```typescript
-export function useSkillsLider() {
-  const { equipeId, isLider } = useSkillsMembro();
-  
-  // Entregas aguardando validação
-  const { data: entregasParaValidar } = useQuery({...});
-  
-  // Progresso de cada membro (diagnóstico, trilhas, entregas)
-  const { data: progressoMembros } = useQuery({...});
-  
-  // Métricas consolidadas
-  const { data: metricas } = useQuery({...});
-  
-  // Alertas de atraso
-  const { data: alertas } = useQuery({...});
-  
-  return { entregasParaValidar, progressoMembros, metricas, alertas };
-}
-```
+const onSubmit = async (data: any) => {
+  if (!user) return;
 
-### Fluxo de Validação de Entrega
+  const showSkillsConfig = selectedPlano === "skills" || 
+                           (selectedPlano === "business" && skillsLiberado);
 
-1. Colaborador submete entrega → status muda para `aguardando_validacao`
-2. Líder vê na aba "Para Validar" no painel
-3. Líder clica em "Aprovar" ou "Rejeitar"
-4. Se aprovado: `status = 'aprovada'`, `aprovado_por = lider_id`, `aprovado_em = now()`
-5. Se rejeitado: status volta para `em_andamento` com feedback
+  // Atualizar dados gerais
+  await updateUser.mutateAsync({...});
 
-### Menu Condicional para Líder
-
-No AppSidebar, adicionar lógica para mostrar "Painel do Líder" apenas quando `isLider`:
-
-```typescript
-// Buscar papel do usuário no Skills
-const { isLider: isSkillsLider } = useSkillsMembro();
-
-// Filtrar menu - se for skills_lider e não for líder, ocultar
-const filteredMenus = sidebarMenus.filter(menu => {
-  if (menu.menu_key === 'skills_lider' && !isSkillsLider) {
-    return false;
+  // Atualizar Skills se configuração está visível e há dados de equipe
+  if (showSkillsConfig && (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe)) {
+    await updateSkillsMembro.mutateAsync({
+      userId: user.id,
+      equipeId: skillsEquipeData.equipeId,
+      novaEquipe: skillsEquipeData.novaEquipe,
+      papelEquipe: skillsEquipeData.papelEquipe,
+      cargo,
+    });
   }
-  return true;
-});
+};
 ```
-
----
-
-## Painel do Líder - Layout
-
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  Painel do Líder                                              [Equipe XYZ]  │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌────────────┐ │
-│  │ Para Validar    │ │ Entregas Mês    │ │ Horas Econom.   │ │ Alertas    │ │
-│  │      3          │ │    12/18        │ │     24h         │ │    2       │ │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘ └────────────┘ │
-│                                                                              │
-│  ┌──────────────────────────────────────────────────────────────────────────┤
-│  │ Entregas Aguardando Validação                                            │
-│  │ ┌─────────────────────────────────────────────────────────────────────┐  │
-│  │ │ [Avatar] João - "Automatizar relatório X"   [Ver] [Aprovar][Rejeitar] │ │
-│  │ │ [Avatar] Maria - "Criar dashboard Y"        [Ver] [Aprovar][Rejeitar] │ │
-│  │ └─────────────────────────────────────────────────────────────────────┘  │
-│  │                                                                           │
-│  │ Progresso da Equipe                                                      │
-│  │ ┌─────────────────────────────────────────────────────────────────────┐  │
-│  │ │ [Avatar] João    Diagnóstico: ✓  Trilhas: 60%  Entregas: 3/5       │  │
-│  │ │ [Avatar] Maria   Diagnóstico: ✓  Trilhas: 45%  Entregas: 2/4       │  │
-│  │ │ [Avatar] Pedro   Diagnóstico: ⏳ Trilhas: 0%   Entregas: 0/3   ⚠️  │  │
-│  │ └─────────────────────────────────────────────────────────────────────┘  │
-│  └──────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ┌──────────────────────────────────────────────────────────────────────────┤
-│  │ Métricas do Projeto                        [Gráfico de evolução 12sem] │  │
-│  └──────────────────────────────────────────────────────────────────────────┤
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Ordem de Implementação
-
-### Fase 1: Hook Central e Menu
-1. Criar `useSkillsMembro.ts`
-2. Adicionar menu "Painel do Líder" no banco (condicional)
-3. Atualizar AppSidebar para ocultar menu para não-líderes
-
-### Fase 2: Painel do Líder
-4. Criar página `SkillsLiderDashboard.tsx`
-5. Criar hook `useSkillsLider.ts`
-6. Implementar componentes do painel (progresso, validação, métricas)
-
-### Fase 3: Validação de Entregas
-7. Atualizar `useSkillsEntregas.ts` com lógica de papel
-8. Adicionar mutation para aprovar/rejeitar entrega
-9. Atualizar `SkillsEntregas.tsx` com UI de validação para líder
-
-### Fase 4: Métricas e Alertas
-10. Criar lógica de cálculo de métricas
-11. Implementar alertas de atraso
-12. Adicionar gráficos de evolução
