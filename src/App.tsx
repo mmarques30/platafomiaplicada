@@ -97,6 +97,7 @@ import FormularioAplica from "./pages/FormularioAplica";
 import Instalar from "./pages/Instalar";
 import Central from "./pages/Central";
 import RedefinirSenha from "./pages/RedefinirSenha";
+import Cupons from "./pages/Cupons";
 import HistoricoSenhas from "./pages/admin/HistoricoSenhas";
 import GerenciarPermissoesEquipe from "./pages/admin/GerenciarPermissoesEquipe";
 import { PWAUpdatePrompt } from "./components/shared/PWAUpdatePrompt";
@@ -171,6 +172,7 @@ function AppContent() {
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
             <Route path="/videos-bonus" element={<VideosBonus />} />
             <Route path="/central" element={<Central />} />
+            <Route path="/cupons" element={<Cupons />} />
             <Route path="/instalar" element={<Instalar />} />
             <Route path="/politica-servicos" element={<PoliticaServicos />} />
           </Route>

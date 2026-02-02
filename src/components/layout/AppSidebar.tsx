@@ -354,6 +354,26 @@ export function AppSidebar() {
               })}
 
 
+              {/* Menu Cupons - Apenas visitantes */}
+              {isVisitante && !isLoadingState && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild className="group">
+                    <NavLink 
+                      to="/cupons" 
+                      end 
+                      className={({ isActive }) => cn(
+                        "relative rounded-lg transition-all duration-200 font-semibold pl-4 py-2.5",
+                        "bg-emerald-500 text-white hover:bg-emerald-600",
+                        isActive && "ring-2 ring-emerald-300 ring-offset-2"
+                      )}
+                    >
+                      <LucideIcons.Ticket className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                      {!collapsed && <span className="text-sm">Cupons</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+
               {/* Comunidade - Menu expansível (oculto para Business) */}
               {!isBusiness && (
                 <Collapsible 
