@@ -1,19 +1,25 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gift, GraduationCap, Users, Crown, Lock, ArrowRight, ArrowLeft, LucideProps } from "lucide-react";
+import { Gift, GraduationCap, Users, Crown, Lock, LucideProps } from "lucide-react";
 import { useEnvironment, Environment, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
+import envBusinessImage from "@/assets/env-business.jpg";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const ICONS: Record<Environment, React.ComponentType<LucideProps>> = {
   gratuito: Gift,
   academy: GraduationCap,
   skills: Users,
   business: Crown,
+};
+
+const ENVIRONMENT_IMAGES: Partial<Record<Environment, string>> = {
+  business: envBusinessImage,
 };
 
 const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business"];
@@ -29,8 +35,6 @@ export default function EnvironmentSelector() {
   } = useEnvironment();
   const { isAdmin } = useUserRole();
 
-  // Se já tem ambiente selecionado e está carregando, aguardar
-  // Se já tem ambiente selecionado e não está carregando, redirecionar
   useEffect(() => {
     if (!isLoading && currentEnvironment) {
       navigate("/", { replace: true });
@@ -39,7 +43,6 @@ export default function EnvironmentSelector() {
 
   const handleSelectEnvironment = (env: Environment) => {
     if (!availableEnvironments.includes(env)) {
-      // Ambiente bloqueado - poderia abrir modal de upgrade
       return;
     }
     
@@ -92,7 +95,7 @@ export default function EnvironmentSelector() {
 
       {/* Título */}
       <motion.div
-        className="text-center mb-10"
+        className="text-center mb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
@@ -106,12 +109,13 @@ export default function EnvironmentSelector() {
       </motion.div>
 
       {/* Cards de Ambiente */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-5xl">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 md:gap-12 w-full max-w-3xl">
         {ALL_ENVIRONMENTS.map((env, index) => {
           const config = ENVIRONMENT_CONFIG[env];
           const Icon = ICONS[env];
           const isAvailable = availableEnvironments.includes(env);
           const isLocked = !isAvailable;
+          const hasImage = ENVIRONMENT_IMAGES[env];
 
           return (
             <motion.button
@@ -119,81 +123,74 @@ export default function EnvironmentSelector() {
               onClick={() => handleSelectEnvironment(env)}
               disabled={isLocked}
               className={cn(
-                "relative group p-6 rounded-2xl border transition-all duration-300",
-                "flex flex-col items-center text-center",
-                isAvailable
-                  ? "bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10 cursor-pointer"
-                  : "bg-white/[0.02] border-white/5 cursor-not-allowed opacity-50"
+                "relative group flex flex-col items-center gap-3",
+                isLocked && "cursor-not-allowed"
               )}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
-              whileHover={isAvailable ? { scale: 1.02, y: -4 } : {}}
+              whileHover={isAvailable ? { scale: 1.05, y: -4 } : {}}
               whileTap={isAvailable ? { scale: 0.98 } : {}}
             >
-              {/* Glow effect */}
-              {isAvailable && (
-                <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"
-                  style={{ backgroundColor: config.color }}
-                />
-              )}
-
-              {/* Lock icon para ambientes bloqueados */}
-              {isLocked && (
-                <div className="absolute top-3 right-3">
-                  <Lock className="h-4 w-4 text-white/30" />
-                </div>
-              )}
-
-              {/* Ícone */}
+              {/* Card com imagem ou ícone */}
               <div
                 className={cn(
-                  "w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-colors",
-                  isAvailable ? "bg-white/10" : "bg-white/5"
+                  "relative w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden transition-all duration-300",
+                  isAvailable
+                    ? "ring-2 ring-white/10 group-hover:ring-white/30"
+                    : "opacity-40"
                 )}
-                style={isAvailable ? { backgroundColor: `${config.color}20` } : {}}
               >
-                <Icon
-                  className={cn(
-                    "h-8 w-8 transition-colors",
-                    isAvailable ? "text-white" : "text-white/30"
-                  )}
-                  style={isAvailable ? { color: config.color } : {}}
-                />
+                {/* Glow effect */}
+                {isAvailable && (
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 blur-xl z-0"
+                    style={{ backgroundColor: config.color }}
+                  />
+                )}
+
+                {/* Lock overlay para ambientes bloqueados */}
+                {isLocked && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+                    <Lock className="h-6 w-6 text-white/50" />
+                  </div>
+                )}
+
+                {/* Conteúdo do card */}
+                {hasImage ? (
+                  <img
+                    src={ENVIRONMENT_IMAGES[env]}
+                    alt={config.label}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className={cn(
+                      "w-full h-full flex items-center justify-center",
+                      isAvailable ? "bg-white/5" : "bg-white/[0.02]"
+                    )}
+                    style={isAvailable ? { backgroundColor: `${config.color}15` } : {}}
+                  >
+                    <Icon
+                      className={cn(
+                        "h-10 w-10 md:h-12 md:w-12 transition-colors",
+                        isAvailable ? "text-white" : "text-white/30"
+                      )}
+                      style={isAvailable ? { color: config.color } : {}}
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* Nome */}
-              <h3
+              {/* Título abaixo do card */}
+              <span
                 className={cn(
-                  "text-lg font-semibold mb-2 transition-colors",
+                  "text-sm md:text-base font-medium transition-colors",
                   isAvailable ? "text-white" : "text-white/40"
                 )}
               >
                 {config.label}
-              </h3>
-
-              {/* Descrição */}
-              <p
-                className={cn(
-                  "text-sm leading-relaxed",
-                  isAvailable ? "text-white/60" : "text-white/30"
-                )}
-              >
-                {config.description}
-              </p>
-
-              {/* CTA */}
-              {isAvailable ? (
-                <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                  Acessar
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-              ) : (
-                <div className="mt-4 text-xs text-white/30">
-                  Faça upgrade para acessar
-                </div>
-              )}
+              </span>
             </motion.button>
           );
         })}
@@ -202,7 +199,7 @@ export default function EnvironmentSelector() {
       {/* Info para Admin */}
       {isAdmin && (
         <motion.p
-          className="mt-8 text-xs text-white/40"
+          className="mt-10 text-xs text-white/40"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
