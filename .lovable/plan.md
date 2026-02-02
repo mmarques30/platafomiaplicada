@@ -1,95 +1,85 @@
 
-# Plano: Ajustar Ordem da Central e Remover Subaba Extra
+# Plano: Corrigir Botão "Contribuir" Aparecendo para Visitantes
 
-## Mudanças Solicitadas
+## Problema Identificado
 
-### 1. Reordenar Tabs na Central de Conteúdo Gratuito
+O botão "Contribuir" está aparecendo para usuários visitantes (gratuitos) na aba "Criadores" da Central de Conteúdo. De acordo com a captura de tela, um usuário com `is_visitante = true` no banco de dados está vendo o botão quando não deveria.
 
-**Arquivo:** `src/components/dashboard/CentralConteudoGratuito.tsx`
+## Análise da Causa Raiz
 
-**Situação Atual (linha 15-20):**
+A lógica atual em `CriadoresComunidadeTab.tsx` (linhas 41 e 55):
+
 ```tsx
-const tabs = [
-  { value: "newsletter" as TabValue, label: "Newsletter", icon: Newspaper },
-  { value: "noticia" as TabValue, label: "Notícias IA", icon: Globe },
-  { value: "dica" as TabValue, label: "Dicas Práticas", icon: Lightbulb },
-  { value: "material" as TabValue, label: "Materiais", icon: FileText },
-];
+const { isVisitante, isLoading: isPlanLoading } = useUserPlan();
+const canContribute = !isPlanLoading && !isVisitante;
 ```
 
-**Nova Ordem:**
+O problema é uma **condição de corrida (race condition)**:
+1. Quando `isPlanLoading` se torna `false`, o React Query pode ainda não ter os dados corretos
+2. O `isVisitante` retorna `false` por padrão (`data?.isVisitante ?? false`) antes dos dados serem carregados
+3. Isso resulta em `canContribute = true` brevemente
+
+## Solução
+
+Inverter a lógica para que o botão **só apareça quando tivermos certeza de que o usuário NÃO é visitante**:
+
+1. Durante o loading: **não mostrar o botão** (já funciona)
+2. Após o loading: **só mostrar se `isVisitante` for explicitamente `false`**
+
+A correção mais segura é: durante o loading, `canContribute` deve ser `false`. Após o loading, verificar se `isVisitante` é `false` E se temos dados válidos do usuário.
+
+## Arquivo a Modificar
+
+**`src/components/comunidade/CriadoresComunidadeTab.tsx`**
+
+### Antes (linha 52-55)
 ```tsx
-const tabs = [
-  { value: "noticia" as TabValue, label: "Notícias IA", icon: Globe },
-  { value: "dica" as TabValue, label: "Dicas Práticas", icon: Lightbulb },
-  { value: "material" as TabValue, label: "Materiais", icon: FileText },
-  { value: "newsletter" as TabValue, label: "Newsletter", icon: Newspaper },
-];
+// Mentorados (não visitantes) podem contribuir.
+// Alguns perfis podem estar temporariamente sem plano_mentoria preenchido,
+// então aqui a regra principal é "não ser visitante".
+const canContribute = !isPlanLoading && !isVisitante;
 ```
 
-**Estado inicial:** Alterar de `"newsletter"` para `"noticia"` (linha 23)
-
----
-
-### 2. Remover Subaba "Visão Geral" para Visitantes
-
-**Arquivo:** `src/components/layout/AppSidebar.tsx`
-
-**Situação Atual (linha 69-81):**
+### Depois
 ```tsx
-const getSubMenus = (parentKey: string) => {
-  if (!isLoadingState && isVisitante) {
-    if (parentKey === 'inicio') {
-      return [
-        { menu_key: 'inicio_central', label: 'Central', url: '/central', ... },
-        { menu_key: 'inicio_visao', label: 'Visão Geral', url: '/', ... },
-      ] as any[];
-    }
-    return [];
-  }
-  return sidebarMenus.filter(menu => menu.parent_key === parentKey);
-};
+// Mentorados (não visitantes) podem contribuir.
+// IMPORTANTE: Durante o loading, canContribute é false para evitar flash do botão.
+// Só mostramos o botão quando temos certeza que o usuário NÃO é visitante.
+const canContribute = !isPlanLoading && isVisitante === false;
 ```
 
-**Correção:** Remover a entrada "Visão Geral" - manter apenas "Central"
+**Observação**: A mudança de `!isVisitante` para `isVisitante === false` é sutil mas importante:
+- `!isVisitante` retorna `true` quando `isVisitante` é `false`, `undefined`, `null`, ou `0`
+- `isVisitante === false` retorna `true` **apenas** quando `isVisitante` é explicitamente `false`
+
+Porém, como o hook retorna `isVisitante: isProfileVisitante` e `isProfileVisitante` é `data?.isVisitante ?? false`, o valor será sempre `boolean`, nunca `undefined`.
+
+A abordagem mais robusta é garantir que não renderizamos o botão enquanto estamos em loading, o que já está coberto por `!isPlanLoading`. O verdadeiro problema pode ser que o `isPlanLoading` está retornando `false` antes do `isVisitante` ser determinado.
+
+### Solução Alternativa Mais Robusta
+
+Verificar também se há um usuário autenticado e se os dados foram carregados:
+
 ```tsx
-const getSubMenus = (parentKey: string) => {
-  if (!isLoadingState && isVisitante) {
-    if (parentKey === 'inicio') {
-      return [
-        { menu_key: 'inicio_central', label: 'Central', url: '/central', icon: null, parent_key: 'inicio' },
-      ] as any[];
-    }
-    return [];
-  }
-  return sidebarMenus.filter(menu => menu.parent_key === parentKey);
-};
+// Importar useAuth
+import { useAuth } from "@/hooks/useAuth";
+
+// No componente
+const { user } = useAuth();
+const { isVisitante, isLoading: isPlanLoading } = useUserPlan();
+
+// Mentorados (não visitantes) podem contribuir.
+// Só mostramos o botão quando:
+// 1. Há um usuário autenticado
+// 2. O loading terminou
+// 3. O usuário NÃO é visitante
+const canContribute = !!user && !isPlanLoading && !isVisitante;
 ```
 
----
+## Comportamento Esperado
 
-## Comportamento Final
-
-### Menu Lateral para Visitantes
-```
-┌─────────────────┐
-│ ▼ Início        │ → / (Dashboard visitante)
-│    • Central    │ → /central
-└─────────────────┘
-│   Comunidade    │ (já existe)
-└─────────────────┘
-```
-
-### Ordem das Tabs na Central (Dashboard Visitante)
-```
-[ Notícias IA | Dicas Práticas | Materiais | Newsletter ]
-```
-
----
-
-## Arquivos a Modificar
-
-| Arquivo | Mudança |
-|---------|---------|
-| `src/components/dashboard/CentralConteudoGratuito.tsx` | Reordenar tabs e alterar estado inicial |
-| `src/components/layout/AppSidebar.tsx` | Remover "Visão Geral" dos submenus de visitantes |
+| Estado | `isPlanLoading` | `isVisitante` | `canContribute` | Botão |
+|--------|-----------------|---------------|-----------------|-------|
+| Carregando | `true` | `false` (padrão) | `false` | Oculto |
+| Visitante logado | `false` | `true` | `false` | Oculto |
+| Mentorado logado | `false` | `false` | `true` | Visível |
