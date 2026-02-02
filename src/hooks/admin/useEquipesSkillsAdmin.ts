@@ -74,3 +74,142 @@ export function useCreateEquipeSkills() {
     },
   });
 }
+
+// Hook para buscar dados de membro Skills de um usuário específico
+export function useUserSkillsMembro(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["user-skills-membro", userId],
+    queryFn: async () => {
+      if (!userId) return null;
+      const { data, error } = await supabase
+        .from("membros_equipe_skills")
+        .select("id, equipe_id, papel, cargo, status")
+        .eq("user_id", userId)
+        .eq("status", "ativo")
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+}
+
+// Hook para atualizar/criar vínculo de membro Skills
+export function useUpdateUserSkillsMembro() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      equipeId,
+      novaEquipe,
+      papelEquipe,
+      cargo,
+    }: {
+      userId: string;
+      equipeId?: string | null;
+      novaEquipe?: { nome: string; empresa: string } | null;
+      papelEquipe: "lider" | "membro";
+      cargo?: string;
+    }) => {
+      let targetEquipeId = equipeId;
+
+      // Se precisa criar nova equipe
+      if (novaEquipe && !equipeId) {
+        const { data: newEquipe, error: equipeError } = await supabase
+          .from("equipes_skills")
+          .insert({
+            nome: novaEquipe.nome,
+            empresa_nome: novaEquipe.empresa,
+            status: "ativo",
+            lider_id: papelEquipe === "lider" ? userId : null,
+          })
+          .select()
+          .single();
+
+        if (equipeError) throw equipeError;
+        targetEquipeId = newEquipe.id;
+      }
+
+      if (!targetEquipeId) {
+        throw new Error("Equipe é obrigatória");
+      }
+
+      // Verificar se já existe vínculo
+      const { data: existing } = await supabase
+        .from("membros_equipe_skills")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("status", "ativo")
+        .maybeSingle();
+
+      if (existing) {
+        // Atualizar vínculo existente
+        const { error } = await supabase
+          .from("membros_equipe_skills")
+          .update({
+            equipe_id: targetEquipeId,
+            papel: papelEquipe,
+            cargo: cargo || null,
+          })
+          .eq("id", existing.id);
+
+        if (error) throw error;
+      } else {
+        // Criar novo vínculo
+        const { error } = await supabase
+          .from("membros_equipe_skills")
+          .insert({
+            user_id: userId,
+            equipe_id: targetEquipeId,
+            papel: papelEquipe,
+            cargo: cargo || null,
+            status: "ativo",
+          });
+
+        if (error) throw error;
+      }
+
+      // Se for líder, atualizar lider_id na equipe
+      if (papelEquipe === "lider") {
+        await supabase
+          .from("equipes_skills")
+          .update({ lider_id: userId })
+          .eq("id", targetEquipeId);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-equipes-skills"] });
+      queryClient.invalidateQueries({ queryKey: ["user-skills-membro"] });
+      toast.success("Vínculo Skills atualizado!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar vínculo: " + error.message);
+    },
+  });
+}
+
+// Hook para remover vínculo de membro Skills
+export function useRemoveUserSkillsMembro() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from("membros_equipe_skills")
+        .update({ status: "inativo" })
+        .eq("user_id", userId)
+        .eq("status", "ativo");
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-equipes-skills"] });
+      queryClient.invalidateQueries({ queryKey: ["user-skills-membro"] });
+      toast.success("Vínculo Skills removido!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao remover vínculo: " + error.message);
+    },
+  });
+}
