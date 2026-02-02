@@ -3,6 +3,7 @@ import { AuthHeader } from "@/components/auth/AuthHeader";
 import { ArrowUpRight } from "lucide-react";
 import academyParallaxBg from "@/assets/academy-parallax-bg.jpg";
 import businessParallaxBg from "@/assets/business-parallax-bg.jpg";
+import skillsParallaxBg from "@/assets/skills-parallax-bg.jpg";
 const Servicos = () => {
   return (
     <div className="bg-[#1a1c19]">
@@ -32,7 +33,7 @@ const Servicos = () => {
       </TextParallaxContent>
 
       <TextParallaxContent
-        imgUrl="https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=2070&auto=format&fit=crop"
+        imgUrl={skillsParallaxBg}
         subheading="Skills"
         heading={<><span className="whitespace-nowrap font-bold">Sua equipe até 50%</span><br /><span className="whitespace-nowrap font-bold">mais produtiva</span></>}
       >
