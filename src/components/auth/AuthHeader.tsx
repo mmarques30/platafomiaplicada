@@ -80,16 +80,16 @@ export function AuthHeader() {
       {/* Desktop Header */}
       <div className="flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <Link to="/auth" className="flex items-center gap-2">
           <img 
             src={logoAplicada}
             alt="IAplicada" 
-            className="h-10 w-auto"
+            className="h-10 w-auto cursor-pointer"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
-        </div>
+        </Link>
 
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-8 ml-12">
