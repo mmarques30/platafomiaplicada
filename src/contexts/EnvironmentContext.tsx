@@ -88,10 +88,10 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
           ? ["gratuito", "academy", "skills", "business"]
           : ["gratuito", "academy", "business"];
       case "business_iaplicada":
-        // IAplicada tem acesso a business_iaplicada (não colaborativo)
+        // IAplicada entra pelo ambiente "business", identificação interna determina o que vê
         return skillsLiberado 
-          ? ["gratuito", "academy", "skills", "business_iaplicada"]
-          : ["gratuito", "academy", "business_iaplicada"];
+          ? ["gratuito", "academy", "skills", "business"]
+          : ["gratuito", "academy", "business"];
       case "skills":
         return ["gratuito", "academy", "skills"];
       case "academy":
