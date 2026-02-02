@@ -1,80 +1,71 @@
 
-
-# Plano: Migrar Conteúdo de Criador para a Nova Estrutura
+# Plano: Corrigir Visibilidade da Sala de Aula para Visitantes
 
 ## Problema Identificado
 
-O material que existia na aba "Criadores" (tabela `materiais_comunidade`) **não foi migrado** para a nova tabela `conteudos_dashboard` com tipo `criador`. O conteúdo ainda existe no banco de dados antigo, mas não aparece na nova Central de Conteúdo.
+O hook `useEffectivePlan` tem um bug na linha 153 que faz visitantes serem marcados como `isAcademy = true`:
 
-## Dados a Migrar
+```typescript
+// Linha 153 (BUG)
+const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills;
+```
 
-| Campo | Valor Original | Destino na Central |
-|-------|----------------|-------------------|
-| titulo | Estrutura e Serviços de FP&A e Controladoria | titulo |
-| tipo | template | tipo = `criador` |
-| categoria | outro | categoria = `Outro` |
-| descricao | (texto sobre FP&A) | resumo + conteudo |
-| criador_id | 7d61d3bb-bcb6-42b1-acf0-c2276536d185 | criador_id |
-| arquivos_url | [2 arquivos] | arquivos_url |
-| ativo | true | ativo |
-| ordem | 1 | ordem |
-| visibilidade | pago | visivel_gratuitos = false |
-| Criador | Livia Pesso | autor = "Livia Pesso" |
+**Lógica atual para visitante:**
+- `effectiveIsBusiness = false`
+- `effectiveIsSkills = false`  
+- `effectiveIsAcademy = !false && !false = true` ← ERRADO!
+
+**Consequência:** No sidebar (linha 413), a condição `{!isAcademy && ...}` se torna `false`, ocultando o menu "Sala de Aula" para visitantes.
 
 ## Solução
 
-Executar uma migração SQL para copiar o conteúdo da tabela antiga para a nova, adaptando os campos conforme a nova estrutura.
+Corrigir a lógica no hook `useEffectivePlan` para considerar que visitantes NÃO são Academy:
 
-### SQL de Migração
-
-```sql
-INSERT INTO public.conteudos_dashboard (
-  tipo,
-  titulo,
-  resumo,
-  conteudo,
-  categoria,
-  criador_id,
-  arquivos_url,
-  autor,
-  ativo,
-  ordem,
-  visivel_gratuitos,
-  destaque
-)
-SELECT
-  'criador' as tipo,
-  titulo,
-  LEFT(descricao, 200) as resumo,
-  descricao as conteudo,
-  CASE 
-    WHEN categoria = 'outro' THEN 'Outro'
-    WHEN categoria = 'chatgpt' THEN 'ChatGPT'
-    WHEN categoria = 'claude' THEN 'Claude'
-    WHEN categoria = 'midjourney' THEN 'Midjourney'
-    WHEN categoria = 'canva' THEN 'Canva'
-    WHEN categoria = 'notion' THEN 'Notion'
-    WHEN categoria = 'excel' THEN 'Excel'
-    ELSE 'Outro'
-  END as categoria,
-  criador_id,
-  arquivos_url,
-  (SELECT nome_completo FROM profiles WHERE id = criador_id) as autor,
-  ativo,
-  ordem,
-  CASE WHEN visibilidade = 'gratuito' THEN true ELSE false END as visivel_gratuitos,
-  false as destaque
-FROM public.materiais_comunidade
-WHERE ativo = true;
+```typescript
+// Correção: só é Academy se tiver plano Academy e não for visitante
+const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills && !effectiveIsVisitante && plan === 'academy';
 ```
+
+Mas como `effectiveIsVisitante` depende de `isLoading`, precisamos ajustar a ordem de cálculo.
+
+**Solução Correta:**
+
+```typescript
+// Linha 150-157 - CORRIGIR PARA:
+
+// Visitante real: flag do profile OU não tem plano (sem ser admin)
+// IMPORTANTE: Durante loading, não marcar como visitante para evitar redirect prematuro
+const effectiveIsVisitante = isLoading ? false : (isRealVisitante || (!isAdmin && !plan));
+
+// Sem simulação: flags de plano (só se não for visitante)
+const effectiveIsBusiness = isAdmin || isBusiness;
+const effectiveIsSkills = !effectiveIsBusiness && isSkills;
+// Corrigir: visitantes NÃO são Academy
+const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills && !effectiveIsVisitante && isAcademy;
+```
+
+A mudança-chave é adicionar `&& !effectiveIsVisitante && isAcademy` na condição de `effectiveIsAcademy`, garantindo que:
+1. Visitantes não sejam marcados como Academy
+2. Só marca como Academy se o plano real for "academy"
+
+---
+
+## Arquivo a Modificar
+
+| Arquivo | Mudança |
+|---------|---------|
+| `src/hooks/useUserPlan.tsx` | Corrigir lógica de `effectiveIsAcademy` para não incluir visitantes |
+
+---
 
 ## Resultado Esperado
 
-Após a migração, o conteúdo de **Livia Pesso** ("Estrutura e Serviços de FP&A e Controladoria") aparecerá na Central de Conteúdo em **Gerenciar Conteúdo > Central** com o tipo "Criador" e categoria "Outro".
+| Tipo de Usuário | isAcademy | Menu "Sala de Aula" |
+|-----------------|-----------|---------------------|
+| **Visitante** | `false` | Visível |
+| **Academy** | `true` | Oculto |
+| **Skills** | `false` | Visível |
+| **Business** | `false` | Menu Comunidade oculto |
+| **Admin** | `false` | Visível (como Business) |
 
-## Arquivos a Modificar
-
-| Tipo | Descrição |
-|------|-----------|
-| Migração SQL | Copiar dados de `materiais_comunidade` para `conteudos_dashboard` |
-
+Com essa correção, visitantes poderão ver e acessar a Sala de Aula normalmente.
