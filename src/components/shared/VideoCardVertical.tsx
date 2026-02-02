@@ -34,7 +34,7 @@ export function VideoCardVertical({
       className="block group"
       onClick={handleClick}
     >
-      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-neutral-800 aspect-[9/16] max-h-[200px] sm:max-h-[240px] md:max-h-[280px]">
+      <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-neutral-800 aspect-[9/16] max-h-[220px] sm:max-h-[260px] md:max-h-[310px]">
         <img
           src={thumbnailUrl}
           alt={titulo}

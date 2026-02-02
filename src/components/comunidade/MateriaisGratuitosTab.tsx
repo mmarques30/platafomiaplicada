@@ -4,20 +4,14 @@ import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
-
-type Material = {
-  id: string;
-  titulo: string;
-  descricao: string | null;
-  categoria: string;
-  url: string;
-  tipo: string | null;
-  arquivos_url: Json | null;
-  links_url: Json | null;
-};
+import { useState } from "react";
+import { MaterialGratuitoModal, type MaterialGratuito } from "@/components/comunidade/MaterialGratuitoModal";
+import { downloadUrl, getFileNameFromUrl } from "@/lib/download";
+import { toast } from "sonner";
 
 const categoriaIconMap: Record<string, typeof FileText> = {
   templates: FileText,
@@ -47,6 +41,7 @@ const getArquivoUrls = (arquivos_url: Json | null): string[] => {
 
 export function MateriaisGratuitosTab() {
   const { logAccess } = useContentAccessLogger();
+  const [selectedMaterial, setSelectedMaterial] = useState<MaterialGratuito | null>(null);
   
   const { data: materiais, isLoading } = useQuery({
     queryKey: ['materiais-gratuitos-comunidade'],
@@ -59,12 +54,22 @@ export function MateriaisGratuitosTab() {
         .order('ordem', { ascending: true });
 
       if (error) throw error;
-      return data as Material[];
+      return data as MaterialGratuito[];
     },
   });
 
-  const handleAccessClick = (material: Material) => {
+  const handleAccessClick = (material: MaterialGratuito) => {
     logAccess('material', material.id, material.titulo);
+  };
+
+  const safeDownload = async (url: string) => {
+    try {
+      await downloadUrl(url, getFileNameFromUrl(url));
+    } catch (e) {
+      console.error(e);
+      toast.error("Não foi possível baixar este arquivo. Abrindo em nova aba...");
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
   };
 
   return (
@@ -112,9 +117,20 @@ export function MateriaisGratuitosTab() {
                   const arquivos = getArquivoUrls(material.arquivos_url);
                   const primaryUrl = material.url || links[0];
                   const hasFiles = arquivos.length > 0;
+                  const hasAnyContent = !!primaryUrl || hasFiles || !!material.descricao;
                   
                   return (
-                    <TableRow key={material.id}>
+                    <TableRow
+                      key={material.id}
+                      className={cn(
+                        hasAnyContent && "cursor-pointer hover:bg-accent/50",
+                      )}
+                      onClick={() => {
+                        if (!hasAnyContent) return;
+                        handleAccessClick(material);
+                        setSelectedMaterial(material);
+                      }}
+                    >
                       <TableCell className="font-medium">{material.titulo}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -128,18 +144,19 @@ export function MateriaisGratuitosTab() {
                           {primaryUrl && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <a
-                                  href={primaryUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={() => handleAccessClick(material)}
-                                  className={cn(
-                                    "p-1.5 rounded-md hover:bg-primary/10 transition-colors",
-                                    "text-primary hover:text-primary"
-                                  )}
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAccessClick(material);
+                                    window.open(primaryUrl, "_blank", "noopener,noreferrer");
+                                  }}
                                 >
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
+                                  <ExternalLink className="h-4 w-4 text-primary" />
+                                </Button>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Acessar material</p>
@@ -147,22 +164,23 @@ export function MateriaisGratuitosTab() {
                             </Tooltip>
                           )}
 
-                          {/* Download arquivos */}
+                          {/* Download primeiro arquivo (atalho) */}
                           {hasFiles && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <a
-                                  href={arquivos[0]}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={() => handleAccessClick(material)}
-                                  className={cn(
-                                    "p-1.5 rounded-md hover:bg-primary/10 transition-colors",
-                                    "text-primary hover:text-primary"
-                                  )}
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAccessClick(material);
+                                    void safeDownload(arquivos[0]);
+                                  }}
                                 >
-                                  <Download className="h-4 w-4" />
-                                </a>
+                                  <Download className="h-4 w-4 text-primary" />
+                                </Button>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Baixar arquivo</p>
@@ -184,6 +202,12 @@ export function MateriaisGratuitosTab() {
           </Table>
         </div>
       )}
+
+      <MaterialGratuitoModal
+        material={selectedMaterial}
+        open={!!selectedMaterial}
+        onOpenChange={(open) => !open && setSelectedMaterial(null)}
+      />
 
       {/* Empty State */}
       {!isLoading && materiais && materiais.length === 0 && (

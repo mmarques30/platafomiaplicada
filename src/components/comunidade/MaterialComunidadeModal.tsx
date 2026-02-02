@@ -14,6 +14,7 @@ import { Copy, Download, Check, FileText, Image as ImageIcon, FileSpreadsheet, L
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { downloadUrl, getFileNameFromUrl } from "@/lib/download";
 
 const getFileName = (url: string): string => {
   try {
@@ -89,8 +90,14 @@ export function MaterialComunidadeModal({ materialId, open, onOpenChange }: Mate
     }
   };
 
-  const handleDownload = (url: string) => {
-    window.open(url, "_blank");
+  const handleDownload = async (url: string) => {
+    try {
+      await downloadUrl(url, getFileNameFromUrl(url));
+    } catch (e) {
+      console.error(e);
+      toast.error("Não foi possível baixar este arquivo. Abrindo em nova aba...");
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
   };
 
   const handleSubmitAvaliacao = () => {
@@ -181,7 +188,7 @@ export function MaterialComunidadeModal({ materialId, open, onOpenChange }: Mate
                             className="max-h-[200px] rounded-lg object-contain bg-muted"
                           />
                         )}
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(url)}>
+                        <Button variant="outline" size="sm" onClick={() => void handleDownload(url)}>
                           <Download className="w-4 h-4 mr-2" />
                           {getFileName(url)}
                         </Button>
