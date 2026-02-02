@@ -46,9 +46,21 @@ export function useMenuConfig() {
     return menuConfig?.find(m => m.menu_key === menuKey);
   };
 
-  const getSidebarMenus = (userPlan?: string | null) => {
+  const getSidebarMenus = (userPlan?: string | null, currentEnvironment?: string | null) => {
+    // Menus a ocultar quando em ambiente específico
+    // Skills/Business têm acesso separado ao Academy
+    const hiddenByEnvironment: Record<string, string[]> = {
+      skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
+      business: ['trilhas', 'calendario'],
+    };
+    
+    const hiddenMenus = hiddenByEnvironment[currentEnvironment || ''] || [];
+    
     return menuConfig?.filter(m => {
       if (m.tipo !== 'sidebar' || !m.visivel) return false;
+      
+      // Filtrar menus por ambiente selecionado
+      if (hiddenMenus.includes(m.menu_key)) return false;
       
       // Se planos_permitidos = null, menu visível para todos
       if (!m.planos_permitidos || m.planos_permitidos.length === 0) return true;
