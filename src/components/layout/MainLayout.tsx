@@ -8,21 +8,24 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { useEnvironmentSafe } from "@/hooks/useEnvironment";
+import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { GraduationCap, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import { MarIAnaFloatingButton } from "@/components/shared/MarIAnaFloatingButton";
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
 export function MainLayout() {
   useIdleLogout();
   const navigate = useNavigate();
-  const { isVisitante, isLoading } = useUserRole();
+  const { isVisitante, isAdmin, isLoading } = useUserRole();
   const { profile } = useUserProfile();
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const environmentContext = useEnvironmentSafe();
+  const { isViewingAs } = useAdminViewContext();
 
   // Redirecionar para seleção de ambiente se não selecionado
   useEffect(() => {
@@ -51,7 +54,10 @@ export function MainLayout() {
   return (
     <SidebarProvider>
       <TopHeader />
-      <div className="min-h-screen flex w-full bg-background pt-14">
+      <div className={cn(
+        "min-h-screen flex w-full bg-background",
+        isAdmin && isViewingAs ? "pt-24" : "pt-14"
+      )}>
         <AppSidebar />
         <div className="flex-1 flex flex-col">
           <main className="flex-1 overflow-x-hidden">
