@@ -86,7 +86,6 @@ import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
 import MateriaisGratuitos from "./pages/MateriaisGratuitos";
 import GerenciarMateriais from "./pages/admin/GerenciarMateriais";
 import CandidatarMentoria from "./pages/CandidatarMentoria";
-import GerenciarCandidaturas from "./pages/admin/GerenciarCandidaturas";
 import VideosBonus from "./pages/VideosBonus";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import PoliticaServicos from "./pages/PoliticaServicos";
@@ -185,7 +184,6 @@ function AppContent() {
             <Route index element={<AdminDashboard />} />
             <Route path="usuarios" element={<GerenciarUsuarios />} />
             <Route path="visitantes" element={<GerenciarVisitantes />} />
-            <Route path="candidaturas" element={<GerenciarCandidaturas />} />
             <Route path="conteudo" element={<GerenciarConteudo />} />
             <Route path="bibliotecas" element={<GerenciarBibliotecas />} />
             <Route path="avisos" element={<GerenciarAvisos />} />
