@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.organizar-backlog]
 verify_jwt = false
+
+[functions.formatar-texto-conteudo]
+verify_jwt = false

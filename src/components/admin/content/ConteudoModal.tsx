@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Upload, X, FileText, Image as ImageIcon, Plus, Trash2 } from "lucide-react";
+import { Upload, X, FileText, Image as ImageIcon, Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,11 +28,15 @@ import {
   useCreateConteudo,
   useUpdateConteudo,
   uploadMidia,
+  formatarTextoComIA,
+  CATEGORIAS_CRIADOR,
   type ConteudoDashboardAdmin,
   type ConteudoFormData,
   type TipoConteudo,
+  type CategoriaConteudo,
   type EstiloTexto,
 } from "@/hooks/admin/useConteudosDashboardAdmin";
+import { useCommunityMembers } from "@/hooks/useCommunityMembers";
 
 interface ConteudoModalProps {
   open: boolean;
@@ -43,12 +47,17 @@ interface ConteudoModalProps {
 export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
   const createConteudo = useCreateConteudo();
   const updateConteudo = useUpdateConteudo();
+  const { members } = useCommunityMembers();
   const isEditing = !!conteudo;
 
   const [isUploading, setIsUploading] = useState(false);
+  const [isFormatting, setIsFormatting] = useState(false);
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
   const [pdfFileName, setPdfFileName] = useState<string | null>(null);
   const [galeriaImagens, setGaleriaImagens] = useState<string[]>([]);
+  const [arquivosUrl, setArquivosUrl] = useState<{ nome: string; url: string }[]>([]);
+  const [categoria, setCategoria] = useState<CategoriaConteudo | null>(null);
+  const [criadorId, setCriadorId] = useState<string | null>(null);
   const [estiloTexto, setEstiloTexto] = useState<EstiloTexto>({
     fontSize: 16,
     lineHeight: 1.5,
@@ -74,6 +83,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
   const destaque = watch('destaque');
   const ativo = watch('ativo');
   const visivelGratuitos = watch('visivel_gratuitos');
+  const conteudoTexto = watch('conteudo');
 
   useEffect(() => {
     if (conteudo) {
@@ -92,6 +102,9 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
       setImagemPreview(conteudo.imagem_url);
       setPdfFileName(conteudo.arquivo_pdf_url ? 'Arquivo anexado' : null);
       setGaleriaImagens(conteudo.galeria_imagens || []);
+      setCategoria(conteudo.categoria);
+      setCriadorId(conteudo.criador_id);
+      setArquivosUrl((conteudo.arquivos_url || []).map(url => ({ nome: url.split('/').pop() || 'Arquivo', url })));
       setEstiloTexto(conteudo.estilo_texto || {
         fontSize: 16,
         lineHeight: 1.5,
@@ -113,6 +126,9 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
       setImagemPreview(null);
       setPdfFileName(null);
       setGaleriaImagens([]);
+      setCategoria(null);
+      setCriadorId(null);
+      setArquivosUrl([]);
       setEstiloTexto({
         fontSize: 16,
         lineHeight: 1.5,
@@ -190,16 +206,64 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
     }
   };
 
+  const handleArquivoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const url = await uploadMidia(file, 'arquivo');
+      setArquivosUrl(prev => [...prev, { nome: file.name, url }]);
+      toast.success("Arquivo adicionado!");
+    } catch (error) {
+      console.error('Erro ao enviar arquivo:', error);
+      toast.error("Erro ao enviar arquivo");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const removeGaleriaImage = (index: number) => {
     setGaleriaImagens(prev => prev.filter((_, i) => i !== index));
   };
 
+  const removeArquivo = (index: number) => {
+    setArquivosUrl(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFormatarComIA = async () => {
+    if (!conteudoTexto?.trim()) {
+      toast.error("Adicione algum conteúdo para formatar");
+      return;
+    }
+
+    setIsFormatting(true);
+    try {
+      const textoFormatado = await formatarTextoComIA(conteudoTexto);
+      setValue('conteudo', textoFormatado);
+      toast.success("Texto formatado com sucesso!");
+    } catch (error) {
+      console.error('Erro ao formatar texto:', error);
+      toast.error("Erro ao formatar texto com IA");
+    } finally {
+      setIsFormatting(false);
+    }
+  };
+
   const onSubmit = async (data: ConteudoFormData) => {
+    if (tipo === 'criador' && !categoria) {
+      toast.error("Selecione uma categoria para conteúdo de criador");
+      return;
+    }
+
     const payload: ConteudoFormData = {
       ...data,
       imagem_url: imagemPreview || undefined,
       galeria_imagens: galeriaImagens,
       estilo_texto: estiloTexto,
+      categoria: tipo === 'criador' ? categoria : null,
+      criador_id: tipo === 'criador' ? criadorId : null,
+      arquivos_url: arquivosUrl.map(a => a.url),
     };
 
     try {
@@ -225,7 +289,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
 
         <ScrollArea className="max-h-[calc(90vh-120px)] pr-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Tipo e Título */}
+            {/* Tipo e Categoria */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Tipo *</Label>
@@ -241,21 +305,66 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                     <SelectItem value="noticia">Notícia</SelectItem>
                     <SelectItem value="dica">Dica</SelectItem>
                     <SelectItem value="material">Material (Aulas ao Vivo)</SelectItem>
+                    <SelectItem value="criador">Criador</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="md:col-span-2 space-y-2">
-                <Label>Título *</Label>
-                <Input
-                  {...register('titulo', { required: 'Título é obrigatório' })}
-                  placeholder="Título do conteúdo"
-                />
-                {errors.titulo && (
-                  <p className="text-sm text-destructive">{errors.titulo.message}</p>
-                )}
+              {tipo === 'criador' && (
+                <div className="space-y-2">
+                  <Label>Categoria *</Label>
+                  <Select
+                    value={categoria || ''}
+                    onValueChange={(v) => setCategoria(v as CategoriaConteudo)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIAS_CRIADOR.map(cat => (
+                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <div className={tipo === 'criador' ? '' : 'md:col-span-2'}>
+                <div className="space-y-2">
+                  <Label>Título *</Label>
+                  <Input
+                    {...register('titulo', { required: 'Título é obrigatório' })}
+                    placeholder="Título do conteúdo"
+                  />
+                  {errors.titulo && (
+                    <p className="text-sm text-destructive">{errors.titulo.message}</p>
+                  )}
+                </div>
               </div>
             </div>
+
+            {/* Criador (apenas para tipo criador) */}
+            {tipo === 'criador' && (
+              <div className="space-y-2">
+                <Label>Criador (membro da comunidade)</Label>
+                <Select
+                  value={criadorId || ''}
+                  onValueChange={(v) => setCriadorId(v || null)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um membro..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Nenhum</SelectItem>
+                    {members.map(member => (
+                      <SelectItem key={member.id} value={member.id}>
+                        {member.nome_completo}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Resumo */}
             <div className="space-y-2">
@@ -270,9 +379,26 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
               )}
             </div>
 
-            {/* Conteúdo Completo */}
+            {/* Conteúdo Completo com botão IA */}
             <div className="space-y-2">
-              <Label>Conteúdo Completo</Label>
+              <div className="flex items-center justify-between">
+                <Label>Conteúdo Completo</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleFormatarComIA}
+                  disabled={isFormatting || !conteudoTexto?.trim()}
+                  className="gap-2"
+                >
+                  {isFormatting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  Formatar com IA
+                </Button>
+              </div>
               <Textarea
                 {...register('conteudo')}
                 placeholder="Conteúdo detalhado (suporta Markdown)..."
@@ -280,7 +406,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                 className="font-mono text-sm"
               />
               <p className="text-xs text-muted-foreground">
-                Suporta formatação Markdown: **negrito**, *itálico*, # títulos, - listas
+                Suporta formatação Markdown: **negrito**, *itálico*, # títulos, - listas. Use o botão "Formatar com IA" para organizar automaticamente.
               </p>
             </div>
 
@@ -401,6 +527,40 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                   )}
                 </div>
               </div>
+
+              {/* Arquivos Múltiplos (para tipo criador) */}
+              {tipo === 'criador' && (
+                <div className="space-y-2">
+                  <Label>Arquivos Anexos</Label>
+                  <div className="space-y-2">
+                    {arquivosUrl.map((arquivo, index) => (
+                      <div key={index} className="flex items-center gap-2 px-3 py-2 bg-muted rounded">
+                        <FileText className="h-4 w-4" />
+                        <span className="text-sm flex-1 truncate">{arquivo.nome}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => removeArquivo(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                    <label className="flex items-center gap-2 px-4 py-2 border rounded cursor-pointer hover:bg-muted transition-colors w-fit">
+                      <Plus className="h-4 w-4" />
+                      <span className="text-sm">Adicionar arquivo</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={handleArquivoUpload}
+                        disabled={isUploading}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
             </div>
 
             <Separator />

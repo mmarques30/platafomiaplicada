@@ -971,10 +971,13 @@ export type Database = {
       conteudos_dashboard: {
         Row: {
           arquivo_pdf_url: string | null
+          arquivos_url: Json | null
           ativo: boolean | null
           autor: string | null
+          categoria: string | null
           conteudo: string | null
           created_at: string
+          criador_id: string | null
           destaque: boolean | null
           estilo_texto: Json | null
           galeria_imagens: Json | null
@@ -991,10 +994,13 @@ export type Database = {
         }
         Insert: {
           arquivo_pdf_url?: string | null
+          arquivos_url?: Json | null
           ativo?: boolean | null
           autor?: string | null
+          categoria?: string | null
           conteudo?: string | null
           created_at?: string
+          criador_id?: string | null
           destaque?: boolean | null
           estilo_texto?: Json | null
           galeria_imagens?: Json | null
@@ -1011,10 +1017,13 @@ export type Database = {
         }
         Update: {
           arquivo_pdf_url?: string | null
+          arquivos_url?: Json | null
           ativo?: boolean | null
           autor?: string | null
+          categoria?: string | null
           conteudo?: string | null
           created_at?: string
+          criador_id?: string | null
           destaque?: boolean | null
           estilo_texto?: Json | null
           galeria_imagens?: Json | null
@@ -1029,7 +1038,22 @@ export type Database = {
           updated_at?: string
           visivel_gratuitos?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conteudos_dashboard_criador_id_fkey"
+            columns: ["criador_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conteudos_dashboard_criador_id_fkey"
+            columns: ["criador_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       contratos_business: {
         Row: {

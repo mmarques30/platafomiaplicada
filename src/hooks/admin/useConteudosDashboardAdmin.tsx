@@ -2,7 +2,19 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export type TipoConteudo = 'newsletter' | 'noticia' | 'dica' | 'material';
+export type TipoConteudo = 'newsletter' | 'noticia' | 'dica' | 'material' | 'criador';
+
+export type CategoriaConteudo = 'ChatGPT' | 'Claude' | 'Midjourney' | 'Canva' | 'Notion' | 'Excel' | 'Outro';
+
+export const CATEGORIAS_CRIADOR: CategoriaConteudo[] = [
+  'ChatGPT',
+  'Claude', 
+  'Midjourney',
+  'Canva',
+  'Notion',
+  'Excel',
+  'Outro'
+];
 
 export interface EstiloTexto {
   fontSize: number;
@@ -28,6 +40,9 @@ export interface ConteudoDashboardAdmin {
   ativo: boolean;
   ordem: number;
   visivel_gratuitos: boolean;
+  categoria: CategoriaConteudo | null;
+  criador_id: string | null;
+  arquivos_url: string[];
   created_at: string;
   updated_at: string;
 }
@@ -48,6 +63,9 @@ export interface ConteudoFormData {
   ativo?: boolean;
   ordem?: number;
   visivel_gratuitos?: boolean;
+  categoria?: CategoriaConteudo | null;
+  criador_id?: string | null;
+  arquivos_url?: string[];
 }
 
 export function useConteudosDashboardAdmin() {
@@ -71,7 +89,8 @@ export function useConteudosDashboardAdmin() {
           textAlign: 'left'
         },
         galeria_imagens: (item.galeria_imagens as unknown as string[]) || [],
-        tags: (item.tags as unknown as string[]) || []
+        tags: (item.tags as unknown as string[]) || [],
+        arquivos_url: (item.arquivos_url as unknown as string[]) || [],
       })) as ConteudoDashboardAdmin[];
     },
   });
@@ -100,6 +119,9 @@ export function useCreateConteudo() {
           ativo: data.ativo ?? true,
           ordem: data.ordem ?? 0,
           visivel_gratuitos: data.visivel_gratuitos ?? false,
+          categoria: data.categoria || null,
+          criador_id: data.criador_id || null,
+          arquivos_url: data.arquivos_url || [],
         });
 
       if (error) throw error;
@@ -169,7 +191,7 @@ export function useDeleteConteudo() {
   });
 }
 
-export async function uploadMidia(file: File, tipo: 'imagem' | 'pdf'): Promise<string> {
+export async function uploadMidia(file: File, tipo: 'imagem' | 'pdf' | 'arquivo'): Promise<string> {
   const fileExt = file.name.split('.').pop();
   const fileName = `${tipo}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
@@ -184,4 +206,22 @@ export async function uploadMidia(file: File, tipo: 'imagem' | 'pdf'): Promise<s
     .getPublicUrl(fileName);
 
   return data.publicUrl;
+}
+
+export async function formatarTextoComIA(texto: string): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (!session) {
+    throw new Error("Usuário não autenticado");
+  }
+
+  const response = await supabase.functions.invoke('formatar-texto-conteudo', {
+    body: { texto },
+  });
+
+  if (response.error) {
+    throw new Error(response.error.message);
+  }
+
+  return response.data.textoFormatado;
 }
