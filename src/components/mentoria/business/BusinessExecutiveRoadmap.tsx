@@ -1,24 +1,8 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { 
-  Clock, 
-  ChevronRight,
-  ChevronDown,
-  FileText,
-  CheckCircle2,
-  Circle
-} from "lucide-react";
+import { Clock, Circle } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
-import { useNavigate } from "react-router-dom";
-import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 interface FaseProjeto {
   nome: string;
@@ -27,9 +11,7 @@ interface FaseProjeto {
 
 export function BusinessExecutiveRoadmap() {
   const businessUserId = useBusinessUserId();
-  const { contrato, reports, isLoading } = useContratosBusiness(businessUserId);
-  const navigate = useNavigate();
-  const [reportsExpanded, setReportsExpanded] = useState(false);
+  const { contrato, isLoading } = useContratosBusiness(businessUserId);
 
   if (isLoading) {
     return (
@@ -128,81 +110,6 @@ export function BusinessExecutiveRoadmap() {
               ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Card de Reports */}
-      <Card className={`border-border/50 bg-card/50 ${isPreview ? 'border-dashed' : ''}`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Reports</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isPreview ? (
-            <p className="text-muted-foreground text-sm text-center py-4">
-              Seus reports executivos aparecerão aqui
-            </p>
-          ) : !reports || reports.length === 0 ? (
-            <div className="flex items-center justify-center py-4">
-              <FileText className="h-5 w-5 text-muted-foreground mr-2" />
-              <p className="text-sm text-muted-foreground">
-                Nenhum report disponível ainda
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {/* 2 Reports Visíveis */}
-              {reports.slice(0, 2).map((report) => (
-                <div
-                  key={report.id}
-                  onClick={() => navigate(`/mentoria/reports#${report.id}`)}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors border border-border/50"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">{report.titulo}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {report.data_envio && format(parseISO(report.data_envio), "dd MMM yyyy", { locale: ptBR })}
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              ))}
-
-              {/* Dropdown para reports ocultos */}
-              {reports.length > 2 && (
-                <Collapsible open={reportsExpanded} onOpenChange={setReportsExpanded}>
-                  <CollapsibleTrigger className="flex items-center justify-center w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <ChevronDown className={`h-4 w-4 mr-1 transition-transform ${reportsExpanded ? 'rotate-180' : ''}`} />
-                    {reportsExpanded 
-                      ? 'Ocultar' 
-                      : `Ver mais ${reports.length - 2} reports`}
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-2 pt-2">
-                    {reports.slice(2).map((report) => (
-                      <div
-                        key={report.id}
-                        onClick={() => navigate(`/mentoria/reports#${report.id}`)}
-                        className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors border border-border/50"
-                      >
-                        <div className="flex items-center gap-3">
-                          <FileText className="h-4 w-4 text-primary" />
-                          <div>
-                            <p className="text-sm font-medium">{report.titulo}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {report.data_envio && format(parseISO(report.data_envio), "dd MMM yyyy", { locale: ptBR })}
-                            </p>
-                          </div>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>
-              )}
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
