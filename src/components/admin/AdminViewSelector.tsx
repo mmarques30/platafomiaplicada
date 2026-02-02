@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, User, GraduationCap, Briefcase, Building2 } from "lucide-react";
+import { Eye, EyeOff, User, GraduationCap, Briefcase, Building2, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,13 +16,14 @@ interface AdminViewSelectorProps {
   isAdmin: boolean;
 }
 
-type PlanType = 'academy' | 'skills' | 'business';
+type PlanType = 'academy' | 'skills' | 'business' | 'business_iaplicada';
 
 const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }[] = [
   { mode: "visitante", label: "Visitante (gratuito)", icon: <User className="h-4 w-4" /> },
   { mode: "academy", label: "Academy", icon: <GraduationCap className="h-4 w-4" /> },
   { mode: "skills", label: "Skills", icon: <Briefcase className="h-4 w-4" /> },
   { mode: "business", label: "Business", icon: <Building2 className="h-4 w-4" /> },
+  { mode: "business_iaplicada", label: "Business iAplicada", icon: <Wrench className="h-4 w-4" /> },
 ];
 
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {

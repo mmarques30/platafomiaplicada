@@ -21,7 +21,7 @@ import { useSearchParams } from "react-router-dom";
 export default function Mentoria() {
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
-  const { isBusiness } = useEffectivePlan(isAdmin);
+  const { isBusiness, isBusinessColaborativo, isBusinessIAplicada } = useEffectivePlan(isAdmin);
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Ler tab da URL ou usar padrão

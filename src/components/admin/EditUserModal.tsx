@@ -49,7 +49,8 @@ interface EditUserModalProps {
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
   { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
-  { value: "business", label: "Business", description: "B2C Premium - Mentoria 1:1 completa" },
+  { value: "business", label: "Business", description: "Consultoria colaborativa - cliente participa" },
+  { value: "business_iaplicada", label: "Business iAplicada", description: "iAplicada constrói - cliente acompanha" },
 ];
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
@@ -61,7 +62,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const { data: userSkillsMembro, isLoading: loadingSkillsMembro } = useUserSkillsMembro(user?.id);
   
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
-  const [selectedPlano, setSelectedPlano] = useState<"academy" | "skills" | "business" | null>(null);
+  const [selectedPlano, setSelectedPlano] = useState<"academy" | "skills" | "business" | "business_iaplicada" | null>(null);
   const [dataExpiracao, setDataExpiracao] = useState<Date | undefined>();
   const [contaAtiva, setContaAtiva] = useState(true);
   const [novaSenha, setNovaSenha] = useState("");
@@ -83,7 +84,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setValue("linkedin", user.linkedin || "");
       
       setSelectedRoles(user.roles as AppRole[]);
-      setSelectedPlano((user.plano_mentoria as "academy" | "skills" | "business") || null);
+      setSelectedPlano((user.plano_mentoria as "academy" | "skills" | "business" | "business_iaplicada") || null);
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
       setSkillsLiberado(user.skills_liberado ?? false);
@@ -133,12 +134,13 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         data_expiracao_acesso: dataExpiracao?.toISOString() || null,
         conta_ativa: contaAtiva,
         roles: selectedRoles,
-        skills_liberado: selectedPlano === "business" ? skillsLiberado : false,
+        skills_liberado: (selectedPlano === "business" || selectedPlano === "business_iaplicada") ? skillsLiberado : false,
       },
     });
 
     // Atualizar vínculo Skills quando configuração está visível e há dados de equipe
-    const shouldUpdateSkills = (selectedPlano === "skills" || (selectedPlano === "business" && skillsLiberado)) && 
+    const isAnyBusiness = selectedPlano === "business" || selectedPlano === "business_iaplicada";
+    const shouldUpdateSkills = (selectedPlano === "skills" || (isAnyBusiness && skillsLiberado)) && 
                                (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe);
     
     if (shouldUpdateSkills) {
@@ -176,9 +178,10 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
 
   const hasSkillsVinculo = !!userSkillsMembro;
   
-  // Mostrar configuração Skills quando plano é Skills OU Business com Skills liberado
+  // Mostrar configuração Skills quando plano é Skills OU qualquer Business com Skills liberado
+  const isAnyBusinessPlan = selectedPlano === "business" || selectedPlano === "business_iaplicada";
   const showSkillsConfig = selectedPlano === "skills" || 
-                           (selectedPlano === "business" && skillsLiberado);
+                           (isAnyBusinessPlan && skillsLiberado);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -289,7 +292,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                           ? "border-primary bg-primary/10"
                           : "hover:border-primary/50"
                       )}
-                      onClick={() => setSelectedPlano(plano.value as "academy" | "skills" | "business")}
+                      onClick={() => setSelectedPlano(plano.value as "academy" | "skills" | "business" | "business_iaplicada")}
                     >
                       <p className={cn(
                         "font-semibold mb-1 text-sm",
@@ -310,8 +313,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                   Selecione o produto/plano deste usuário
                 </p>
                 
-                {/* Switch para liberar Skills - apenas para Business */}
-                {selectedPlano === "business" && (
+                {/* Switch para liberar Skills - para ambos os tipos Business */}
+                {isAnyBusinessPlan && (
                   <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
                     <div>
                       <Label htmlFor="skills-liberado" className="text-sm font-medium">
