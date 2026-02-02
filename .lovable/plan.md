@@ -1,56 +1,44 @@
 
-# Correção do Player de Vídeo na Página Sobre
+# Tornar Logo Clicável no AuthHeader
 
-## Problemas Identificados
+## Objetivo
+Fazer com que ao clicar no logo da IAplicada no menu superior, o usuário seja redirecionado para a página de autenticação (`/auth`).
 
-1. **Card do vídeo muito pequeno**: A largura máxima está limitada a 280-320px, tornando o vídeo difícil de visualizar
-2. **API incorreta do ReactPlayer**: O componente usa `src` ao invés de `url`, causando falha no carregamento
-3. **Controle de tempo incorreto**: Está usando `onTimeUpdate` (evento de video nativo) ao invés de `onProgress` (evento do react-player)
+## Alteração Técnica
 
-## Alterações Técnicas
+### Arquivo: `src/components/auth/AuthHeader.tsx`
 
-### 1. SimpleVideoPlayer.tsx
-- Corrigir prop `src` para `url` (API correta do react-player)
-- Substituir `onTimeUpdate` por `onProgress` com tipagem correta
-- Usar interface `OnProgressProps` do react-player para controle de tempo
+Envolver a imagem do logo em um componente `Link` do react-router-dom para navegação SPA:
 
-### 2. about-section.tsx
-- Aumentar a largura máxima do container do vídeo de `max-w-[280px] md:max-w-[320px]` para `max-w-[320px] md:max-w-[380px]`
-- Isso dará mais espaço para o vídeo vertical ser exibido adequadamente
-
-## Código das Correções
-
-### SimpleVideoPlayer.tsx - Mudanças principais:
+**Antes (linhas 83-92):**
 ```tsx
-// Interface de progresso do react-player
-interface ProgressState {
-  playedSeconds: number;
-}
-
-// Substituir handleTimeUpdate por:
-const handleProgress = useCallback((state: ProgressState) => {
-  if (endSeconds && state.playedSeconds >= endSeconds) {
-    setIsPlaying(false);
-    if (onEnded) {
-      onEnded();
-    }
-  }
-}, [endSeconds, onEnded]);
-
-// No ReactPlayer, corrigir:
-<ReactPlayer
-  url={videoUrl}  // era "src"
-  onProgress={handleProgress}  // era "onTimeUpdate"
-  // ... demais props
-/>
+<div className="flex items-center gap-2">
+  <img 
+    src={logoAplicada}
+    alt="IAplicada" 
+    className="h-10 w-auto"
+    onError={(e) => {
+      e.currentTarget.style.display = 'none';
+    }}
+  />
+</div>
 ```
 
-### about-section.tsx - Mudança no container:
+**Depois:**
 ```tsx
-className="w-full max-w-[320px] md:max-w-[380px] shadow-2xl..."
+<Link to="/auth" className="flex items-center gap-2">
+  <img 
+    src={logoAplicada}
+    alt="IAplicada" 
+    className="h-10 w-auto cursor-pointer"
+    onError={(e) => {
+      e.currentTarget.style.display = 'none';
+    }}
+  />
+</Link>
 ```
 
-## Resultado Esperado
-- O vídeo carregará corretamente
-- O player terá tamanho adequado para o formato vertical (Reels)
-- O vídeo parará automaticamente no tempo 3:26 (206 segundos)
+## Resultado
+- Clicar no logo em `/sobre` ou `/servicos` navegará para `/auth`
+- Navegação será via SPA (sem recarregar a página)
+- Cursor mudará para pointer indicando que é clicável
