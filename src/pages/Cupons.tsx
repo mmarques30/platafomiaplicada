@@ -46,8 +46,11 @@ export default function Cupons() {
 
         {/* Sistema de Abas */}
         <Tabs defaultValue="academy" className="w-full">
-          <TabsList className="bg-muted">
-            <TabsTrigger value="academy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+          <TabsList className="bg-muted/50 rounded-full p-1">
+            <TabsTrigger 
+              value="academy" 
+              className="rounded-full px-6 data-[state=active]:bg-aplicada-green-100 data-[state=active]:text-aplicada-green-700 data-[state=active]:shadow-sm"
+            >
               Academy
             </TabsTrigger>
           </TabsList>
@@ -59,7 +62,7 @@ export default function Cupons() {
             </p>
 
             {/* Card de Cupom Compacto */}
-            <div className="bg-aplicada-green-700 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="bg-aplicada-green-600/90 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-white text-sm font-medium">Cupom:</span>
                 <code className="text-white font-bold text-lg tracking-wider">
