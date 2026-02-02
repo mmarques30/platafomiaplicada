@@ -207,7 +207,7 @@ export default function GerenciarUsuários() {
                   </div>
                 </TableCell>
                 <TableCell className={adminTheme.tableCell}>
-                  {(user as any).plano_mentoria ? (
+                {(user as any).plano_mentoria ? (
                     <Badge 
                       variant="outline"
                       className={`text-xs ${
@@ -217,12 +217,15 @@ export default function GerenciarUsuários() {
                           ? "border-orange-500 text-orange-700"
                           : (user as any).plano_mentoria === "business"
                           ? "border-purple-500 text-purple-700"
+                          : (user as any).plano_mentoria === "business_iaplicada"
+                          ? "border-violet-500 text-violet-700"
                           : "border-gray-500 text-gray-700"
                       }`}
                     >
                       {(user as any).plano_mentoria === "academy" && "Academy"}
                       {(user as any).plano_mentoria === "skills" && "Skills"}
                       {(user as any).plano_mentoria === "business" && "Business"}
+                      {(user as any).plano_mentoria === "business_iaplicada" && "Business IAplicada"}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="border-gray-400 text-gray-600 text-xs">

@@ -9,6 +9,7 @@ import { BusinessKPICards } from "./BusinessKPICards";
 import { BusinessPerformanceCharts } from "./BusinessPerformanceCharts";
 import { BusinessProjetosSection } from "./BusinessProjetosSection";
 import { BusinessRoadmap } from "./BusinessRoadmap";
+import { BusinessDiagnosticoResumo } from "./BusinessDiagnosticoResumo";
 
 
 interface FormularioDiagnostico {
@@ -147,6 +148,9 @@ export function BusinessDashboard({ diagnostico, userId }: BusinessDashboardProp
           dataDiagnostico={diagnostico.created_at}
           plano="Business Premium"
         />
+
+        {/* Resumo do Diagnóstico */}
+        <BusinessDiagnosticoResumo diagnostico={diagnostico} />
 
         {/* KPI Cards */}
         <BusinessKPICards data={kpiData} />
