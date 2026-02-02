@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gift, GraduationCap, Users, Crown, Lock, LucideProps } from "lucide-react";
+import { Gift, GraduationCap, Users, Crown, Lock, LucideProps, Wrench } from "lucide-react";
 import { useEnvironment, Environment, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,6 +19,7 @@ const ICONS: Record<Environment, React.ComponentType<LucideProps>> = {
   academy: GraduationCap,
   skills: Users,
   business: Crown,
+  business_iaplicada: Wrench,
 };
 
 const ENVIRONMENT_IMAGES: Partial<Record<Environment, string>> = {
@@ -26,9 +27,10 @@ const ENVIRONMENT_IMAGES: Partial<Record<Environment, string>> = {
   academy: envAcademyImage,
   skills: envSkillsImage,
   business: envBusinessImage,
+  business_iaplicada: envBusinessImage, // Usa mesma imagem do business
 };
 
-const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business"];
+const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business", "business_iaplicada"];
 
 export default function EnvironmentSelector() {
   const navigate = useNavigate();

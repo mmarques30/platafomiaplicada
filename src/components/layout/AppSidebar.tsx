@@ -59,9 +59,17 @@ export function AppSidebar() {
 
   // Em modo simulação, o EnvironmentSwitcher fica oculto; então garantimos que o filtro de menus
   // acompanhe o plano simulado (evita cenário: ambiente "business" ocultando submenus de academy/skills).
+  // Para usuários reais: se o plano é business_iaplicada, forçamos esse ambiente.
   const effectiveEnvironment = (() => {
-    if (!isViewingAs) return currentEnvironment;
+    if (!isViewingAs) {
+      // Usuário real: se plano é business_iaplicada, usar esse ambiente
+      if (effectivePlan === 'business_iaplicada') {
+        return 'business_iaplicada';
+      }
+      return currentEnvironment;
+    }
 
+    // Simulação: manter lógica existente
     switch (viewAs) {
       case "visitante":
         return "gratuito";

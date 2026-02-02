@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, ReactNo
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 
-export type Environment = "gratuito" | "academy" | "skills" | "business";
+export type Environment = "gratuito" | "academy" | "skills" | "business" | "business_iaplicada";
 
 interface EnvironmentContextType {
   currentEnvironment: Environment | null;
@@ -50,6 +50,12 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
     color: "hsl(45, 93%, 47%)",
     description: "Academy + mentoria 1:1 + roadmap",
   },
+  business_iaplicada: {
+    label: "Business iAplicada",
+    icon: "Wrench",
+    color: "hsl(45, 93%, 47%)",
+    description: "Acompanhamento de projeto - iAplicada constrói",
+  },
 };
 
 export function EnvironmentProvider({ children }: { children: ReactNode }) {
@@ -81,6 +87,11 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
         return skillsLiberado 
           ? ["gratuito", "academy", "skills", "business"]
           : ["gratuito", "academy", "business"];
+      case "business_iaplicada":
+        // IAplicada tem acesso a business_iaplicada (não colaborativo)
+        return skillsLiberado 
+          ? ["gratuito", "academy", "skills", "business_iaplicada"]
+          : ["gratuito", "academy", "business_iaplicada"];
       case "skills":
         return ["gratuito", "academy", "skills"];
       case "academy":
