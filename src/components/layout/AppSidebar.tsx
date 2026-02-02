@@ -26,6 +26,7 @@ import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
+import { useEnvironment } from "@/hooks/useEnvironment";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import * as LucideIcons from "lucide-react";
 
@@ -39,6 +40,19 @@ export function AppSidebar() {
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
   const { isLider: isSkillsLider } = useSkillsMembro();
+  const { currentEnvironment } = useEnvironment();
+  
+  // Menus a ocultar quando em ambiente específico (Skills/Business têm acesso separado ao Academy)
+  const getEnvironmentHiddenMenus = (environment: string | null): string[] => {
+    switch (environment) {
+      case 'skills':
+        return ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'];
+      case 'business':
+        return ['trilhas', 'calendario'];
+      default:
+        return [];
+    }
+  };
   const collapsed = !open;
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [logoError, setLogoError] = useState(false);
@@ -78,9 +92,14 @@ export function AppSidebar() {
       }
       return [];
     }
-    // Filtrar menu "Painel do Líder" se não for líder Skills
+    
+    // Obter menus a ocultar baseado no ambiente selecionado
+    const hiddenMenus = getEnvironmentHiddenMenus(currentEnvironment);
+    
+    // Filtrar menu "Painel do Líder" se não for líder Skills + filtrar por ambiente
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
+      .filter(menu => !hiddenMenus.includes(menu.menu_key))
       .filter(menu => menu.menu_key !== 'skills_lider' || isSkillsLider);
   };
 
