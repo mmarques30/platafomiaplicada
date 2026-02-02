@@ -29,6 +29,7 @@ import {
   useUpdateConteudo,
   uploadMidia,
   formatarTextoComIA,
+  useNextOrdem,
   CATEGORIAS_CRIADOR,
   type ConteudoDashboardAdmin,
   type ConteudoFormData,
@@ -48,6 +49,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
   const createConteudo = useCreateConteudo();
   const updateConteudo = useUpdateConteudo();
   const { members } = useCommunityMembers();
+  const nextOrdem = useNextOrdem();
   const isEditing = !!conteudo;
 
   const [isUploading, setIsUploading] = useState(false);
@@ -120,7 +122,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
         link_externo: '',
         destaque: false,
         ativo: true,
-        ordem: 0,
+        ordem: nextOrdem,
         visivel_gratuitos: false,
       });
       setImagemPreview(null);
@@ -659,19 +661,22 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
 
                 <div className="space-y-2">
                   <Label>Autor</Label>
-                  <Input
-                    {...register('autor')}
-                    placeholder="Nome do autor"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Ordem de Exibição</Label>
-                  <Input
-                    {...register('ordem', { valueAsNumber: true })}
-                    type="number"
-                    placeholder="0"
-                  />
+                  <Select
+                    value={watch('autor') || ''}
+                    onValueChange={(v) => setValue('autor', v || '')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um autor..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Nenhum</SelectItem>
+                      {members.map(member => (
+                        <SelectItem key={member.id} value={member.nome_completo}>
+                          {member.nome_completo}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
