@@ -164,7 +164,7 @@ function EntregaCard({ entrega, isLider, onIniciar, onSubmeter }: EntregaCardPro
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={entrega.responsavel.avatar_url} />
                   <AvatarFallback>
-                    {entrega.responsavel.nome?.substring(0, 2).toUpperCase() || "??"}
+                    {entrega.responsavel.nome_completo?.substring(0, 2).toUpperCase() || "??"}
                   </AvatarFallback>
                 </Avatar>
               )}
@@ -181,7 +181,7 @@ function EntregaCard({ entrega, isLider, onIniciar, onSubmeter }: EntregaCardPro
             
             {isLider && entrega.responsavel && (
               <p className="text-sm text-muted-foreground mt-1">
-                Responsável: {entrega.responsavel.nome}
+                Responsável: {entrega.responsavel.nome_completo}
               </p>
             )}
             
