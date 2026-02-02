@@ -147,14 +147,15 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
     };
   }
 
-  // Sem simulação: admin vê como business (padrão)
-  const effectiveIsBusiness = isAdmin || isBusiness;
-  const effectiveIsSkills = !effectiveIsBusiness && isSkills;
-  const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills;
-  
   // Visitante real: flag do profile OU não tem plano (sem ser admin)
   // IMPORTANTE: Durante loading, não marcar como visitante para evitar redirect prematuro
   const effectiveIsVisitante = isLoading ? false : (isRealVisitante || (!isAdmin && !plan));
+
+  // Sem simulação: admin vê como business (padrão)
+  const effectiveIsBusiness = isAdmin || isBusiness;
+  const effectiveIsSkills = !effectiveIsBusiness && isSkills;
+  // Corrigir: visitantes NÃO são Academy - só é Academy se tiver plano academy real
+  const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills && !effectiveIsVisitante && isAcademy;
 
   return {
     plan,
