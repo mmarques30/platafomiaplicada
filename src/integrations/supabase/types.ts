@@ -1217,6 +1217,39 @@ export type Database = {
           },
         ]
       }
+      cupons_visitantes: {
+        Row: {
+          ativo: boolean | null
+          codigo: string
+          created_at: string | null
+          desconto_percentual: number
+          descricao: string | null
+          id: string
+          tipo: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          desconto_percentual: number
+          descricao?: string | null
+          id?: string
+          tipo?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          desconto_percentual?: number
+          descricao?: string | null
+          id?: string
+          tipo?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cursos: {
         Row: {
           ativo: boolean | null
