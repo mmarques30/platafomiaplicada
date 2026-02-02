@@ -39,8 +39,8 @@ export default function Cupons() {
       <main className="container py-6 px-4 space-y-8">
         {/* Header */}
         <PageTitle 
-          primary="Cupons" 
-          secondary="exclusivos"
+          primary="Descontos" 
+          secondary="IAplicada"
           icon={<Ticket className="h-7 w-7 text-primary" />}
         />
 
@@ -177,9 +177,9 @@ export default function Cupons() {
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="p-4 rounded-b-xl bg-muted/50" />
-                <div className="p-4 rounded-b-xl bg-muted/50" />
-                <div className="p-4 rounded-b-xl bg-muted/50" />
+                <div className="p-4" />
+                <div className="p-4" />
+                <div className="p-4" />
               </div>
             </div>
           </div>
