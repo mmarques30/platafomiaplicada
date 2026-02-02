@@ -72,7 +72,6 @@ export function AppSidebar() {
       if (parentKey === 'inicio') {
         return [
           { menu_key: 'inicio_central', label: 'Central', url: '/central', icon: null, parent_key: 'inicio' },
-          { menu_key: 'inicio_visao', label: 'Visão Geral', url: '/', icon: null, parent_key: 'inicio' },
         ] as any[];
       }
       return [];
