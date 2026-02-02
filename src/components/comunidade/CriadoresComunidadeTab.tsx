@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LayoutGrid, List, Sparkles, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useAuth } from "@/hooks/useAuth";
 
 const TIPOS = [
   { value: "all", label: "Todos os Tipos" },
@@ -38,6 +39,7 @@ export function CriadoresComunidadeTab() {
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  const { user } = useAuth();
   const { isVisitante, isLoading: isPlanLoading } = useUserPlan();
 
   // Visitantes veem apenas materiais gratuitos, pagantes veem todos
@@ -50,9 +52,11 @@ export function CriadoresComunidadeTab() {
   });
 
   // Mentorados (não visitantes) podem contribuir.
-  // Alguns perfis podem estar temporariamente sem plano_mentoria preenchido,
-  // então aqui a regra principal é "não ser visitante".
-  const canContribute = !isPlanLoading && !isVisitante;
+  // IMPORTANTE: Só mostramos o botão quando:
+  // 1. Há um usuário autenticado
+  // 2. O loading terminou
+  // 3. O usuário NÃO é visitante
+  const canContribute = !!user && !isPlanLoading && !isVisitante;
 
   if (isLoading) {
     return (
