@@ -55,7 +55,8 @@ export function AppSidebar() {
   const sidebarMenus = getSidebarMenus(effectivePlan);
   
   // Pegar todos os menus principais (sem parent_key)
-  const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key);
+  // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
+  const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key && menu.menu_key !== 'interacoes');
   
   // Filtrar para visitantes: apenas início (sem submenus expansíveis)
   // Enquanto loading, não filtra como visitante para evitar flicker
