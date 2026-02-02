@@ -1,128 +1,72 @@
 
-# Plano: Ajustes na Visão Gratuita - Cards, Materiais e Navegação
+# Plano: Corrigir Corte do Menu Lateral no Modo Simulação
 
-## Resumo das Correções
-Três ajustes serão implementados para melhorar a experiência dos usuários com acesso gratuito (visitantes):
+## Problema Identificado
+Quando o modo de simulação está ativo, o menu lateral (sidebar) fica parcialmente cortado porque não considera a altura adicional do banner amarelo de simulação.
 
-1. **Cards maiores na Sala de Aula** - Aumentar o tamanho dos cards de vídeo na aba "Aula"
-2. **Materiais com preview e download funcional** - Corrigir erros de download e permitir visualização do conteúdo
-3. **"Início" redireciona para Central** - Visitantes devem ir para `/central` (não `/trilhas`)
+### Layout Atual
 
----
-
-## Problema 1: Cards de Vídeo Pequenos
-
-### Situação Atual
-O componente `VideosVisitante` usa um grid com muitas colunas (`grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7`), resultando em cards muito pequenos.
-
-### Solução
-Reduzir o número de colunas para que cada card tenha mais espaço:
-
-| Breakpoint | Antes | Depois |
-|------------|-------|--------|
-| Mobile (base) | 3 colunas | 2 colunas |
-| sm (640px) | 4 colunas | 3 colunas |
-| md (768px) | 5 colunas | 4 colunas |
-| lg (1024px) | 6 colunas | 5 colunas |
-| xl (1280px) | 7 colunas | 6 colunas |
-
-### Arquivo: `src/components/dashboard/VideosVisitante.tsx`
-- Alterar grid de `grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7`
-- Para: `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6`
-
----
-
-## Problema 2: Erro ao Baixar Materiais
-
-### Situação Atual
-A função `downloadUrl` em `src/lib/download.ts` usa `fetch()` que pode falhar com arquivos do Supabase Storage por:
-- Problemas de CORS
-- O arquivo não permitir download via fetch
-
-### Solução
-Melhorar a função de download para tentar múltiplas estratégias:
-1. Tentar download via fetch + blob (método atual)
-2. Se falhar, usar um link direto com `download` attribute
-3. Como fallback final, abrir em nova aba
-
-### Arquivo: `src/lib/download.ts`
-Adicionar lógica de fallback para arquivos do Supabase Storage:
-
-```typescript
-export async function downloadUrl(url: string, filename?: string) {
-  const finalName = filename || getFileNameFromUrl(url);
-  
-  // Detectar se é URL do Supabase Storage
-  const isSupabaseStorage = url.includes('supabase.co/storage');
-  
-  // Para Supabase Storage: usar link direto (mais confiável)
-  if (isSupabaseStorage) {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = finalName;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    return;
-  }
-
-  // Para outros arquivos: tentar fetch + blob
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Falha: ${res.status}`);
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = finalName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-  } catch {
-    // Fallback: link direto
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = finalName;
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }
-}
+```text
++---------------------------------------------+
+| Banner Simulação (40px) - py-2, z-[60]      |  <-- fixed top-0
++---------------------------------------------+
+| Header Principal (56px) - h-14, z-50        |  <-- fixed top-10 (quando simulando)
++---------------------------------------------+
+| Sidebar (pt-14) | Conteúdo (pt-14)          |  <-- Problema: só 56px de padding
++---------------------------------------------+
 ```
 
----
+### Medidas
+| Elemento | Altura | Classe |
+|----------|--------|--------|
+| Banner simulação | 40px | `py-2 text-sm` |
+| Header principal | 56px | `h-14` |
+| Espaço necessário (simulando) | 96px | `pt-24` |
+| Espaço atual | 56px | `pt-14` |
 
-## Problema 3: "Início" Redireciona para Trilhas
+## Solução
 
-### Situação Atual
-Quando visitante clica em "Início" na sidebar:
-1. Navega para `/` (Dashboard.tsx)
-2. Dashboard detecta `isVisitante` e redireciona para `/trilhas`
-3. `/trilhas` mostra conteúdo gratuito mas o usuário quer ir para a "Central"
+Adicionar condição para ajustar o padding-top quando `isViewingAs` está ativo:
 
-### Solução
-Alterar o redirecionamento no Dashboard de `/trilhas` para `/central`:
+### Arquivo 1: `src/components/layout/MainLayout.tsx`
 
-### Arquivo: `src/pages/Dashboard.tsx`
-Linha 23: Alterar de `navigate("/trilhas", { replace: true })` para `navigate("/central", { replace: true })`
+**Mudança:**
+- Importar `useAdminViewContext` para detectar modo simulação
+- Alterar `pt-14` para condicional baseado em `isViewingAs`
 
----
+```tsx
+// Importar o context
+import { useAdminViewContext } from "@/contexts/AdminViewContext";
 
-## Arquivos a Modificar
+// Dentro do componente
+const { isViewingAs } = useAdminViewContext();
+const { isAdmin } = useUserRole();
 
-| Arquivo | Mudança |
-|---------|---------|
-| `src/components/dashboard/VideosVisitante.tsx` | Reduzir colunas do grid (2 lugares) |
-| `src/lib/download.ts` | Adicionar lógica de fallback para Supabase Storage |
-| `src/pages/Dashboard.tsx` | Mudar redirect de `/trilhas` para `/central` |
+// Na div principal (linha 54)
+<div className={cn(
+  "min-h-screen flex w-full bg-background",
+  isAdmin && isViewingAs ? "pt-24" : "pt-14"
+)}>
+```
 
----
+### Arquivo 2: `src/components/layout/AppSidebar.tsx`
+
+**Mudança:**
+- Já tem acesso a `isViewingAs` via `useAdminViewContext`
+- Alterar `pt-14` para condicional
+
+```tsx
+// Na linha 115
+<Sidebar className={cn(
+  "border-r border-sidebar-border bg-sidebar",
+  isViewingAs ? "pt-24" : "pt-14"
+)}>
+```
+
+## Cálculo
+- `pt-14` = 3.5rem = 56px (header normal)
+- `pt-24` = 6rem = 96px (banner 40px + header 56px)
 
 ## Impacto
-- **Cards maiores**: Melhor visualização em mobile e desktop
-- **Downloads funcionando**: Materiais do Supabase Storage serão baixados corretamente
-- **Navegação correta**: Visitantes terão experiência consistente ao clicar em "Início"
+- **Modo normal**: Nenhuma mudança visual
+- **Modo simulação**: Sidebar e conteúdo ficam abaixo do banner + header, sem corte
