@@ -71,7 +71,6 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: "/admin/usuarios", label: "Gerenciar Usuários" },
       { path: "/admin/visitantes", label: "Visitantes" },
-      { path: "/admin/candidaturas", label: "Candidaturas" },
     ],
   },
   {
