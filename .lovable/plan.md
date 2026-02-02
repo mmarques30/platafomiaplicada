@@ -1,85 +1,216 @@
 
-# Plano: Corrigir Botão "Contribuir" Aparecendo para Visitantes
 
-## Problema Identificado
+# Plano: Ajustar Acesso ao Menu de Ambientes
 
-O botão "Contribuir" está aparecendo para usuários visitantes (gratuitos) na aba "Criadores" da Central de Conteúdo. De acordo com a captura de tela, um usuário com `is_visitante = true` no banco de dados está vendo o botão quando não deveria.
+## Resumo das Regras de Acesso
 
-## Análise da Causa Raiz
+| Plano do Usuário | Ambientes Disponíveis |
+|------------------|----------------------|
+| **Visitante** | Gratuito |
+| **Academy** | Gratuito, Academy |
+| **Skills** | Gratuito, Academy, Skills |
+| **Business** | Gratuito, Academy, Business + Skills (se liberado) |
+| **Admin** | Todos (para teste) |
 
-A lógica atual em `CriadoresComunidadeTab.tsx` (linhas 41 e 55):
+## Mudanças Necessárias
 
-```tsx
-const { isVisitante, isLoading: isPlanLoading } = useUserPlan();
-const canContribute = !isPlanLoading && !isVisitante;
+### 1. Banco de Dados: Novo Campo `skills_liberado`
+
+Adicionar uma coluna na tabela `profiles` para controlar a liberação do Skills para usuários Business:
+
+```sql
+ALTER TABLE public.profiles 
+ADD COLUMN skills_liberado BOOLEAN DEFAULT FALSE;
 ```
 
-O problema é uma **condição de corrida (race condition)**:
-1. Quando `isPlanLoading` se torna `false`, o React Query pode ainda não ter os dados corretos
-2. O `isVisitante` retorna `false` por padrão (`data?.isVisitante ?? false`) antes dos dados serem carregados
-3. Isso resulta em `canContribute = true` brevemente
+**Objetivo**: Permitir que admins liberem o acesso ao ambiente Skills para usuários que já possuem o plano Business.
 
-## Solução
+---
 
-Inverter a lógica para que o botão **só apareça quando tivermos certeza de que o usuário NÃO é visitante**:
+### 2. Context de Ambiente: Atualizar Lógica de Acesso
 
-1. Durante o loading: **não mostrar o botão** (já funciona)
-2. Após o loading: **só mostrar se `isVisitante` for explicitamente `false`**
+**Arquivo:** `src/contexts/EnvironmentContext.tsx`
 
-A correção mais segura é: durante o loading, `canContribute` deve ser `false`. Após o loading, verificar se `isVisitante` é `false` E se temos dados válidos do usuário.
+Ajustar o `useMemo` de `availableEnvironments` para implementar as novas regras:
 
-## Arquivo a Modificar
+```text
+Antes (linhas 77-87):
+- business → gratuito, academy, business
+- skills → gratuito, academy, skills
 
-**`src/components/comunidade/CriadoresComunidadeTab.tsx`**
-
-### Antes (linha 52-55)
-```tsx
-// Mentorados (não visitantes) podem contribuir.
-// Alguns perfis podem estar temporariamente sem plano_mentoria preenchido,
-// então aqui a regra principal é "não ser visitante".
-const canContribute = !isPlanLoading && !isVisitante;
+Depois:
+- business → gratuito, academy, business + skills (se skills_liberado=true)
+- skills → gratuito, academy, skills
+- academy → gratuito, academy
 ```
 
-### Depois
-```tsx
-// Mentorados (não visitantes) podem contribuir.
-// IMPORTANTE: Durante o loading, canContribute é false para evitar flash do botão.
-// Só mostramos o botão quando temos certeza que o usuário NÃO é visitante.
-const canContribute = !isPlanLoading && isVisitante === false;
+Será necessário:
+1. Buscar o campo `skills_liberado` do perfil junto com `plano_mentoria`
+2. Retornar o array de ambientes baseado nas novas regras
+
+---
+
+### 3. Hook useUserPlan: Expor `skillsLiberado`
+
+**Arquivo:** `src/hooks/useUserPlan.tsx`
+
+Atualizar a query para buscar o novo campo e expor no retorno:
+
+```typescript
+// Na query
+.select("plano_mentoria, is_visitante, skills_liberado")
+
+// No retorno
+skillsLiberado: data?.skills_liberado ?? false
 ```
 
-**Observação**: A mudança de `!isVisitante` para `isVisitante === false` é sutil mas importante:
-- `!isVisitante` retorna `true` quando `isVisitante` é `false`, `undefined`, `null`, ou `0`
-- `isVisitante === false` retorna `true` **apenas** quando `isVisitante` é explicitamente `false`
+---
 
-Porém, como o hook retorna `isVisitante: isProfileVisitante` e `isProfileVisitante` é `data?.isVisitante ?? false`, o valor será sempre `boolean`, nunca `undefined`.
+### 4. Página de Seleção de Ambiente: Visual do Cadeado
 
-A abordagem mais robusta é garantir que não renderizamos o botão enquanto estamos em loading, o que já está coberto por `!isPlanLoading`. O verdadeiro problema pode ser que o `isPlanLoading` está retornando `false` antes do `isVisitante` ser determinado.
+**Arquivo:** `src/pages/EnvironmentSelector.tsx`
 
-### Solução Alternativa Mais Robusta
+Ajustar o visual do cadeado para ambientes bloqueados:
+- Remover o overlay escuro (`bg-black/60`)
+- Exibir cadeado transparente e discreto sobre o card
+- Manter a opacidade reduzida no card
 
-Verificar também se há um usuário autenticado e se os dados foram carregados:
+```text
+Antes (linhas 156-161):
+<div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+  <Lock className="h-6 w-6 text-white/50" />
+</div>
 
-```tsx
-// Importar useAuth
-import { useAuth } from "@/hooks/useAuth";
-
-// No componente
-const { user } = useAuth();
-const { isVisitante, isLoading: isPlanLoading } = useUserPlan();
-
-// Mentorados (não visitantes) podem contribuir.
-// Só mostramos o botão quando:
-// 1. Há um usuário autenticado
-// 2. O loading terminou
-// 3. O usuário NÃO é visitante
-const canContribute = !!user && !isPlanLoading && !isVisitante;
+Depois:
+<div className="absolute inset-0 flex items-center justify-center z-10">
+  <div className="bg-black/30 backdrop-blur-[2px] rounded-full p-3">
+    <Lock className="h-5 w-5 text-white/60" />
+  </div>
+</div>
 ```
 
-## Comportamento Esperado
+---
 
-| Estado | `isPlanLoading` | `isVisitante` | `canContribute` | Botão |
-|--------|-----------------|---------------|-----------------|-------|
-| Carregando | `true` | `false` (padrão) | `false` | Oculto |
-| Visitante logado | `false` | `true` | `false` | Oculto |
-| Mentorado logado | `false` | `false` | `true` | Visível |
+### 5. Modais de Usuário Admin: Switch para Skills
+
+**Arquivos:**
+- `src/components/admin/EditUserModal.tsx`
+- `src/components/admin/NovoUsuarioModal.tsx`
+
+Adicionar um switch visível **apenas quando o plano for Business**:
+
+```text
+┌────────────────────────────────────────┐
+│ Produto / Plano                        │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
+│ │ Academy  │ │  Skills  │ │ Business │ │
+│ └──────────┘ └──────────┘ └──────────┘ │
+│                                        │
+│ ◉ Liberar acesso ao Skills            │ ← aparece só quando Business selecionado
+│   Permite acessar o ambiente Skills    │
+└────────────────────────────────────────┘
+```
+
+Isso será um Switch com label "Liberar acesso ao Skills".
+
+---
+
+### 6. Hook useUsers: Incluir Campo na Query
+
+**Arquivo:** `src/hooks/admin/useUsers.ts`
+
+Atualizar as queries de usuários para incluir o novo campo `skills_liberado` e a mutation de update para aceitá-lo.
+
+---
+
+## Arquivos a Modificar
+
+| Arquivo | Mudança |
+|---------|---------|
+| Migração SQL | Adicionar coluna `skills_liberado` |
+| `src/contexts/EnvironmentContext.tsx` | Nova lógica de acesso com `skillsLiberado` |
+| `src/hooks/useUserPlan.tsx` | Buscar e expor `skills_liberado` |
+| `src/pages/EnvironmentSelector.tsx` | Visual clean do cadeado |
+| `src/components/admin/EditUserModal.tsx` | Switch para liberar Skills (Business) |
+| `src/components/admin/NovoUsuarioModal.tsx` | Switch para liberar Skills (Business) |
+| `src/hooks/admin/useUsers.ts` | Incluir campo na query e mutation |
+
+---
+
+## Fluxo Visual do Cadeado
+
+```text
+┌─────────────────────────────────────────────────────┐
+│                 ANTES                               │
+│  ┌───────────┐                                      │
+│  │███████████│  Overlay preto escuro                │
+│  │███ 🔒 ████│  Cadeado centralizado                │
+│  │███████████│                                      │
+│  └───────────┘                                      │
+│                                                     │
+│                 DEPOIS                              │
+│  ┌───────────┐                                      │
+│  │   imagem  │  Imagem com opacidade reduzida       │
+│  │    🔒     │  Cadeado pequeno, transparente       │
+│  │           │  sobre fundo blur sutil              │
+│  └───────────┘                                      │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Seção Técnica
+
+### Tipo Atualizado do Retorno de useUserPlan
+
+```typescript
+return {
+  plan,
+  hasAccessTo,
+  isLoading,
+  isAcademy: plan === "academy",
+  isSkills: plan === "skills",
+  isBusiness: plan === "business",
+  isVisitante: isProfileVisitante,
+  skillsLiberado: data?.skills_liberado ?? false, // NOVO
+};
+```
+
+### Lógica Atualizada no EnvironmentContext
+
+```typescript
+const availableEnvironments = useMemo<Environment[]>(() => {
+  if (isAdmin) {
+    return ["gratuito", "academy", "skills", "business"];
+  }
+  
+  if (isVisitante) {
+    return ["gratuito"];
+  }
+  
+  switch (plan) {
+    case "business":
+      // Business sempre tem academy, e skills só se liberado
+      return skillsLiberado 
+        ? ["gratuito", "academy", "skills", "business"]
+        : ["gratuito", "academy", "business"];
+    case "skills":
+      return ["gratuito", "academy", "skills"];
+    case "academy":
+      return ["gratuito", "academy"];
+    default:
+      return ["gratuito"];
+  }
+}, [plan, isVisitante, isAdmin, skillsLiberado]);
+```
+
+### Mutation de Update no Admin
+
+```typescript
+// Em useUpdateUser
+const updates = {
+  ...existingFields,
+  skills_liberado: data.skillsLiberado, // NOVO
+};
+```
+
