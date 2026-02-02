@@ -35,7 +35,7 @@ export function TopHeader() {
   const { effectivePlan, isBusiness, isSkills, isAcademy, isVisitante, hasEffectiveAccessTo } = useEffectivePlan(isAdmin);
   const { profile } = useUserProfile();
   const { data: produtosAtivos } = useProdutosAtivos();
-  const { viewAs, impersonatedUserName, resetView } = useAdminViewContext();
+  const { viewAs, impersonatedUserName, resetView, isViewingAs } = useAdminViewContext();
   
   // Verifica se um produto está ativo pelo slug
   const isProdutoAtivo = (slug: string) => {
@@ -80,15 +80,22 @@ export function TopHeader() {
 
   return (
     <>
-      {/* Banner de simulação Business */}
-      {isAdmin && viewAs === 'business' && impersonatedUserName && (
-        <div className="fixed top-0 left-0 right-0 bg-aplicada-green-700 text-white text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
-          <span>👁️ Visualizando como: <strong>{impersonatedUserName}</strong> (Business)</span>
+      {/* Banner de simulação unificado */}
+      {isAdmin && isViewingAs && (
+        <div className="fixed top-0 left-0 right-0 bg-amber-500 text-black text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
+          <span>
+            👁️ Visualizando como: <strong>
+              {viewAs === 'visitante' 
+                ? 'Visitante' 
+                : `${impersonatedUserName} (${viewAs === 'academy' ? 'Academy' : viewAs === 'skills' ? 'Skills' : 'Business'})`
+              }
+            </strong>
+          </span>
           <Button 
             size="sm" 
             variant="ghost" 
             onClick={resetView} 
-            className="h-7 px-3 text-white hover:text-white hover:bg-aplicada-green-800"
+            className="h-7 px-3 text-black hover:text-black hover:bg-amber-600"
           >
             Sair da simulação
           </Button>
@@ -99,7 +106,7 @@ export function TopHeader() {
         className={cn(
           "fixed z-50 w-full border-b border-white/10 bg-[#0D0D0D] transition-transform duration-300 ease-in-out",
           isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0",
-          isAdmin && viewAs === 'business' && impersonatedUserName ? "top-10" : "top-0"
+          isAdmin && isViewingAs ? "top-10" : "top-0"
         )}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

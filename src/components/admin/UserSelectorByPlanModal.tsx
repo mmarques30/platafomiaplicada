@@ -7,36 +7,59 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Building2, User } from 'lucide-react';
+import { Search, Building2, User, GraduationCap, Briefcase } from 'lucide-react';
 import { useUsers } from '@/hooks/admin/useUsers';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-interface BusinessUserSelectorModalProps {
+type PlanType = 'academy' | 'skills' | 'business';
+
+interface UserSelectorByPlanModalProps {
   open: boolean;
   onClose: () => void;
   onSelect: (userId: string, userName: string) => void;
+  planType: PlanType;
 }
 
-export function BusinessUserSelectorModal({ open, onClose, onSelect }: BusinessUserSelectorModalProps) {
+const planConfig: Record<PlanType, { title: string; icon: React.ReactNode; emptyMessage: string }> = {
+  academy: {
+    title: 'Selecionar Mentorado Academy',
+    icon: <GraduationCap className="h-5 w-5 text-primary" />,
+    emptyMessage: 'Nenhum mentorado Academy encontrado',
+  },
+  skills: {
+    title: 'Selecionar Mentorado Skills',
+    icon: <Briefcase className="h-5 w-5 text-primary" />,
+    emptyMessage: 'Nenhum mentorado Skills encontrado',
+  },
+  business: {
+    title: 'Selecionar Mentorado Business',
+    icon: <Building2 className="h-5 w-5 text-primary" />,
+    emptyMessage: 'Nenhum mentorado Business encontrado',
+  },
+};
+
+export function UserSelectorByPlanModal({ open, onClose, onSelect, planType }: UserSelectorByPlanModalProps) {
   const { data: allUsers, isLoading } = useUsers();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Filtrar apenas usuários business
-  const businessUsers = useMemo(() => {
+  const config = planConfig[planType];
+
+  // Filtrar usuários pelo plano
+  const planUsers = useMemo(() => {
     if (!allUsers) return [];
-    return allUsers.filter(user => user.plano_mentoria === 'business');
-  }, [allUsers]);
+    return allUsers.filter(user => user.plano_mentoria === planType);
+  }, [allUsers, planType]);
 
   // Filtrar por termo de busca
   const filteredUsers = useMemo(() => {
-    if (!searchTerm.trim()) return businessUsers;
+    if (!searchTerm.trim()) return planUsers;
     
     const term = searchTerm.toLowerCase();
-    return businessUsers.filter(user => 
+    return planUsers.filter(user => 
       user.nome_completo?.toLowerCase().includes(term) ||
       user.email?.toLowerCase().includes(term)
     );
-  }, [businessUsers, searchTerm]);
+  }, [planUsers, searchTerm]);
 
   const getInitials = (nome?: string | null, email?: string | null) => {
     if (nome) {
@@ -50,11 +73,19 @@ export function BusinessUserSelectorModal({ open, onClose, onSelect }: BusinessU
     return "U";
   };
 
-  const handleSelect = (user: typeof businessUsers[0]) => {
+  const handleSelect = (user: typeof planUsers[0]) => {
     const displayName = user.nome_completo || user.email || 'Usuário';
     onSelect(user.id, displayName);
     onClose();
     setSearchTerm('');
+  };
+
+  const getPlanIcon = () => {
+    switch (planType) {
+      case 'academy': return <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />;
+      case 'skills': return <Briefcase className="h-4 w-4 text-muted-foreground shrink-0" />;
+      case 'business': return <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />;
+    }
   };
 
   return (
@@ -62,8 +93,8 @@ export function BusinessUserSelectorModal({ open, onClose, onSelect }: BusinessU
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-primary" />
-            Selecionar Mentorado Business
+            {config.icon}
+            {config.title}
           </DialogTitle>
         </DialogHeader>
 
@@ -88,8 +119,8 @@ export function BusinessUserSelectorModal({ open, onClose, onSelect }: BusinessU
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <User className="h-12 w-12 text-muted-foreground/50 mb-3" />
               <p className="text-muted-foreground">
-                {businessUsers.length === 0 
-                  ? "Nenhum mentorado Business encontrado"
+                {planUsers.length === 0 
+                  ? config.emptyMessage
                   : "Nenhum resultado para a busca"
                 }
               </p>
@@ -116,7 +147,7 @@ export function BusinessUserSelectorModal({ open, onClose, onSelect }: BusinessU
                       {user.email}
                     </p>
                   </div>
-                  <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
+                  {getPlanIcon()}
                 </div>
               ))}
             </div>

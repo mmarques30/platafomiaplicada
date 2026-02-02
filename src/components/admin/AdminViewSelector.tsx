@@ -10,11 +10,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAdminView } from "@/hooks/useAdminView";
 import { AdminViewMode } from "@/contexts/AdminViewContext";
-import { BusinessUserSelectorModal } from "./BusinessUserSelectorModal";
+import { UserSelectorByPlanModal } from "./UserSelectorByPlanModal";
 
 interface AdminViewSelectorProps {
   isAdmin: boolean;
 }
+
+type PlanType = 'academy' | 'skills' | 'business';
 
 const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }[] = [
   { mode: "visitante", label: "Visitante (gratuito)", icon: <User className="h-4 w-4" /> },
@@ -25,33 +27,35 @@ const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }
 
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
   const { viewAs, setViewAs, resetView, canUseViewAs, impersonatedUserName } = useAdminView(isAdmin);
-  const [showBusinessModal, setShowBusinessModal] = useState(false);
+  const [selectedPlanForModal, setSelectedPlanForModal] = useState<PlanType | null>(null);
 
   if (!canUseViewAs) return null;
 
   const currentView = viewOptions.find((opt) => opt.mode === viewAs);
 
   const handleOptionClick = (mode: AdminViewMode) => {
-    if (mode === "business") {
-      // Para Business, abrir modal de seleção
-      setShowBusinessModal(true);
-    } else {
-      // Para outros modos, setar diretamente
+    if (mode === "visitante") {
+      // Visitante não requer seleção de usuário
       setViewAs(mode);
+    } else {
+      // Para Academy, Skills e Business, abrir modal de seleção
+      setSelectedPlanForModal(mode as PlanType);
     }
   };
 
-  const handleBusinessUserSelect = (userId: string, userName: string) => {
-    setViewAs("business", userId, userName);
+  const handleUserSelect = (userId: string, userName: string) => {
+    if (selectedPlanForModal) {
+      setViewAs(selectedPlanForModal, userId, userName);
+    }
   };
 
   // Determinar o label do botão
   const getButtonLabel = () => {
     if (!currentView) return "Ver como...";
-    if (viewAs === "business" && impersonatedUserName) {
+    if (viewAs !== "visitante" && impersonatedUserName) {
       // Truncar nome se muito longo
       const shortName = impersonatedUserName.split(" ")[0];
-      return `Business: ${shortName}`;
+      return `${currentView.label}: ${shortName}`;
     }
     return currentView.label;
   };
@@ -63,7 +67,7 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
           <Button 
             variant={viewAs ? "default" : "outline"} 
             size="sm" 
-            className={`h-8 gap-2 ${viewAs ? "bg-yellow-500 hover:bg-yellow-600 text-black" : ""}`}
+            className={`h-8 gap-2 ${viewAs ? "bg-amber-500 hover:bg-amber-600 text-black" : ""}`}
           >
             <Eye className="h-4 w-4" />
             {getButtonLabel()}
@@ -78,7 +82,7 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
             >
               {option.icon}
               {option.label}
-              {option.mode === "business" && viewAs === "business" && impersonatedUserName && (
+              {option.mode !== "visitante" && viewAs === option.mode && impersonatedUserName && (
                 <span className="ml-auto text-xs text-muted-foreground">
                   ({impersonatedUserName.split(" ")[0]})
                 </span>
@@ -97,11 +101,14 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <BusinessUserSelectorModal
-        open={showBusinessModal}
-        onClose={() => setShowBusinessModal(false)}
-        onSelect={handleBusinessUserSelect}
-      />
+      {selectedPlanForModal && (
+        <UserSelectorByPlanModal
+          open={!!selectedPlanForModal}
+          onClose={() => setSelectedPlanForModal(null)}
+          onSelect={handleUserSelect}
+          planType={selectedPlanForModal}
+        />
+      )}
     </>
   );
 }
