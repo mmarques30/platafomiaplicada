@@ -2,6 +2,7 @@ import { TextParallaxContent, ExampleContent } from "@/components/ui/text-parall
 import { AuthHeader } from "@/components/auth/AuthHeader";
 import { ArrowUpRight } from "lucide-react";
 import academyParallaxBg from "@/assets/academy-parallax-bg.jpg";
+import businessParallaxBg from "@/assets/business-parallax-bg.jpg";
 const Servicos = () => {
   return (
     <div className="bg-[#1a1c19]">
@@ -54,7 +55,7 @@ const Servicos = () => {
       </TextParallaxContent>
 
       <TextParallaxContent
-        imgUrl="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
+        imgUrl={businessParallaxBg}
         subheading="Business"
         heading="A única solução que organiza sua operação."
       >
