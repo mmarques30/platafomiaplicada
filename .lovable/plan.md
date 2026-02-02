@@ -1,73 +1,117 @@
 
-# Plano: Tornar URL do YouTube Opcional
+# Plano: Adicionar Business iAplicada às Opções de Admin e Unificar Visão Business
 
-## Problema Identificado
+## Contexto
 
-No arquivo `src/components/admin/content/VideoModal.tsx`, linha 244:
+O usuário esclareceu que:
+1. Usuários Business (ambos tipos) entram pelo ambiente "business"
+2. A identificação interna (colaborativo vs iAplicada) determina o que ele vê
+3. Admin precisa poder simular Business iAplicada para testes
 
-```typescript
-<Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
-```
-
-O atributo `required` no campo de URL do YouTube impede a criação de vídeos que usam apenas Google Drive como fonte.
-
----
-
-## Solução
-
-Remover o atributo `required` do campo `youtube_url` e adicionar validação customizada para exigir **pelo menos uma** das URLs (YouTube ou Google Drive).
-
----
-
-## Arquivo a Modificar
+## Arquivos a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/components/admin/content/VideoModal.tsx` | Remover `required` e adicionar validação customizada |
+| `src/contexts/EnvironmentContext.tsx` | Adicionar `business_iaplicada` aos ambientes disponíveis para admin |
+| `src/components/layout/EnvironmentSwitcher.tsx` | Adicionar `business_iaplicada` à lista de todos os ambientes |
 
 ---
 
-## Seção Técnica
+## Detalhamento das Alterações
 
-### Linha 244 - Remover `required`
+### 1. EnvironmentContext.tsx (linha 74-76)
 
+**Antes:**
 ```typescript
-// ANTES
-<Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
-
-// DEPOIS
-<Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." />
-```
-
-### Adicionar Validação no `onSubmit` (linha ~192)
-
-```typescript
-// Validar se pelo menos uma URL foi fornecida
-const youtubeUrl = data.youtube_url?.trim();
-const driveUrl = data.google_drive_url?.trim();
-
-if (!youtubeUrl && !driveUrl) {
-  toast.error("Informe pelo menos uma URL: YouTube ou Google Drive");
-  return;
+if (isAdmin) {
+  return ["gratuito", "academy", "skills", "business"];
 }
 ```
 
-### Atualizar Texto de Ajuda (linhas 243-244)
-
+**Depois:**
 ```typescript
-<div className="space-y-2">
-  <Label>URL do YouTube (opcional se usar Drive)</Label>
-  <Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." />
-</div>
+if (isAdmin) {
+  return ["gratuito", "academy", "skills", "business", "business_iaplicada"];
+}
+```
+
+### 2. EnvironmentSwitcher.tsx (linha 15)
+
+**Antes:**
+```typescript
+const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business"];
+```
+
+**Depois:**
+```typescript
+const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business", "business_iaplicada"];
+```
+
+---
+
+## Hierarquia Final de Acesso (Confirmada)
+
+| Plano | Ambientes Disponíveis |
+|-------|----------------------|
+| Gratuito (Visitante) | `gratuito` |
+| Academy | `gratuito`, `academy` |
+| Skills | `gratuito`, `academy`, `skills` |
+| Business | `gratuito`, `academy`, `business` |
+| Business + Skills | `gratuito`, `academy`, `skills`, `business` |
+| Business iAplicada | `gratuito`, `academy`, `business_iaplicada` |
+| Business iAplicada + Skills | `gratuito`, `academy`, `skills`, `business_iaplicada` |
+| **Admin (simulação)** | `gratuito`, `academy`, `skills`, `business`, `business_iaplicada` |
+
+---
+
+## Fluxo de Identificação Interna
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                  Usuário entra na plataforma                │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│           useUserPlan verifica plano_mentoria               │
+│                                                             │
+│   • business → Business Colaborativo                        │
+│   • business_iaplicada → Business iAplicada                 │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│         EnvironmentContext define ambientes                 │
+│                                                             │
+│   • business → ambiente "business"                          │
+│   • business_iaplicada → ambiente "business_iaplicada"      │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│      Componentes adaptam interface baseado no ambiente      │
+│                                                             │
+│   • Menus diferentes (AppSidebar)                           │
+│   • Abas diferentes (/mentoria)                             │
+│   • Permissões diferentes                                   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Resultado Esperado
 
-| Cenário | Antes | Depois |
-|---------|-------|--------|
-| Apenas YouTube | ✅ Funciona | ✅ Funciona |
-| YouTube + Drive | ✅ Funciona | ✅ Funciona |
-| Apenas Drive | ❌ Erro "required" | ✅ Funciona |
-| Nenhuma URL | ❌ Erro "required" | ❌ Toast "Informe pelo menos uma URL" |
+### Para Admin - Dropdown "Ver como...":
+- ✅ Visitante (gratuito)
+- ✅ Academy
+- ✅ Skills
+- ✅ Business
+- ✅ Business iAplicada ← **NOVO**
+
+### Para Admin - EnvironmentSwitcher:
+- ✅ Mostra todos os 5 ambientes
+- ✅ Pode alternar entre todos para testar interfaces
+
+### Para Usuário Real Business iAplicada:
+- ✅ Vê apenas: `gratuito`, `academy`, `business_iaplicada`
+- ✅ Interface e menus específicos do iAplicada
