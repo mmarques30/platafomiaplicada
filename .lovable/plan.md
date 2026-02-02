@@ -1,173 +1,150 @@
 
-# Plano: Reproduzir Vídeo Diretamente do Google Drive
+# Plano: Correções Skills - Menu Lateral + Trilhas Skills
 
-## Problema
+## Problemas Identificados
 
-O vídeo do Google Drive não está sendo reproduzido no player. Atualmente:
-- O player **sempre** tenta carregar do YouTube usando o `youtube_id`
-- Quando falha, oferece o Google Drive como **link externo** (abre nova aba)
-- O usuário quer que o vídeo seja reproduzido **diretamente** do Drive no player
+### Problema 1: Menu "Meu Progresso" sumiu para usuário Skills (Lucio)
+O `hiddenByEnvironment` no `useMenuConfig.tsx` está **incorretamente** ocultando os menus `evolucao`, `meu_diagnostico` e `minhas_duvidas` quando o ambiente é "skills", mesmo que esses menus tenham `planos_permitidos: [academy, skills]`.
 
-## Diagnóstico Técnico
-
-O link salvo: `https://drive.google.com/file/d/12HCoZ_I_k81q5TydookcUfyO8sxaEn-V/view?usp=sharing`
-
-Para reproduzir vídeo do Google Drive via iframe, é necessário:
-1. Converter URL `/view` para `/preview`
-2. Usar iframe direto (react-player não suporta Google Drive nativamente)
-3. Configurar `crossOrigin="anonymous"` no elemento de vídeo
-
-## Solução Proposta
-
-Criar um player híbrido que:
-1. **Se tiver `google_drive_url`** → prioriza reprodução via iframe do Drive
-2. **Senão** → usa YouTube como antes
-3. Se ambos falharem → oferece links externos como fallback
-
-### Formato das URLs
-
-| Formato Original | Formato Embed |
-|-----------------|---------------|
-| `drive.google.com/file/d/ID/view` | `drive.google.com/file/d/ID/preview` |
-
-### Função de Conversão
-
+**Configuração atual (errada):**
 ```typescript
-function getGoogleDriveEmbedUrl(url: string): string | null {
-  // Extrair o FILE_ID do link de compartilhamento
-  const match = url.match(/\/d\/([^/]+)/);
-  if (!match) return null;
-  
-  const fileId = match[1];
-  return `https://drive.google.com/file/d/${fileId}/preview`;
+hiddenByEnvironment: {
+  skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
+  // ...
 }
+```
+
+**Problema**: O `trilhas` (Trilhas gerais) deve ser ocultado para Skills, mas `evolucao`, `meu_diagnostico`, `minhas_duvidas` devem aparecer porque o usuário Skills PRECISA desses menus.
+
+### Problema 2: Aba "Trilhas Skills" em Aprender
+A aba já existe no banco de dados (`menu_key: trilhas_skills`, `parent_key: aprender`, `planos_permitidos: [skills]`, `url: /skills/trilhas`) e a página `SkillsTrilhas` já está implementada. Porém, ela está sendo **ocultada** pelo mesmo `hiddenByEnvironment` que oculta `trilhas_skills` para business.
+
+### Problema 3: Admin Skills já existe
+A página de administração `/admin/mentoria/skills` com `MentoriaSkillsPage` já existe e já tem:
+- Aba Equipes
+- Aba Diagnósticos
+- Aba Conteúdos (liberação de trilhas)
+- Aba Roadmap
+- Aba Análises IA
+
+---
+
+## Correção Necessária
+
+### Arquivo: `src/hooks/useMenuConfig.tsx`
+
+**Lógica atual (problemática):**
+```typescript
+const hiddenByEnvironment: Record<string, string[]> = {
+  skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
+  business: [
+    'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+    'trilhas_skills', 'skills_equipe', 'skills_backlog', 'skills_roadmap', 
+    'skills_entregas', 'skills_lider'
+  ],
+};
+```
+
+**Correção:**
+```typescript
+const hiddenByEnvironment: Record<string, string[]> = {
+  // Skills: oculta apenas trilhas gerais e calendário (usa Trilhas Skills específicas)
+  skills: ['trilhas', 'calendario'],
+  
+  // Business: oculta Academy-only e Skills-only menus
+  business: [
+    'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+    'trilhas_skills', 'skills_equipe', 'skills_backlog', 'skills_roadmap', 
+    'skills_entregas', 'skills_lider'
+  ],
+};
 ```
 
 ---
 
-## Arquivos a Modificar
+## Menu Final Esperado para Skills
+
+Após correção, o menu lateral para um usuário Skills (como Lucio) deve ser:
+
+```text
+├── Início
+│   └── Central
+├── Aprender
+│   ├── Trilhas Skills      ← Novo submenu (já está no banco)
+│   └── Central
+├── Bibliotecas
+│   ├── IA "Copie e Use"
+│   ├── Ferramentas
+│   ├── Prompts
+│   └── Métodos
+├── Meu Progresso
+│   ├── Minha Evolução       ← Deve aparecer
+│   ├── Meu Diagnóstico      ← Deve aparecer
+│   ├── Minhas Dúvidas       ← Deve aparecer
+│   ├── Minha Equipe
+│   ├── Backlog
+│   ├── Roadmap
+│   └── Minhas Entregas
+└── Comunidade
+```
+
+---
+
+## Resumo das Alterações
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/components/video/CustomVideoPlayer.tsx` | Adicionar lógica para priorizar Google Drive quando disponível |
-| `src/pages/TrilhaDetalhes.tsx` | Passar `googleDriveUrl` para o iframe quando disponível |
-| `src/lib/google-drive.ts` | Novo arquivo com funções de conversão de URLs |
+| `src/hooks/useMenuConfig.tsx` | Corrigir `hiddenByEnvironment.skills` para NÃO ocultar `evolucao`, `meu_diagnostico`, `minhas_duvidas` |
 
 ---
 
-## Implementação
+## Verificação Adicional: Admin Skills
 
-### 1. Novo Utilitário: `src/lib/google-drive.ts`
+Já existe e funciona em `/admin/mentoria/skills`:
+- ✅ Equipes: gestão de equipes Skills
+- ✅ Diagnósticos: visualização de diagnósticos por equipe
+- ✅ Conteúdos: liberação de trilhas/módulos para equipes
+- ✅ Roadmap: gestão do roadmap de 12 semanas
+- ✅ Análises IA: análises consolidadas por IA
 
+Nenhuma alteração necessária no painel admin.
+
+---
+
+## Seção Técnica
+
+### Alteração em useMenuConfig.tsx
+
+Linhas 52-59 - alterar de:
 ```typescript
-/**
- * Converte URL de compartilhamento do Google Drive para URL de embed
- * Input:  https://drive.google.com/file/d/FILE_ID/view?usp=sharing
- * Output: https://drive.google.com/file/d/FILE_ID/preview
- */
-export function getGoogleDriveEmbedUrl(url: string): string | null {
-  if (!url) return null;
-  
-  const match = url.match(/\/d\/([^/]+)/);
-  if (!match) return null;
-  
-  const fileId = match[1];
-  return `https://drive.google.com/file/d/${fileId}/preview`;
-}
-
-/**
- * Verifica se uma URL é do Google Drive
- */
-export function isGoogleDriveUrl(url: string): boolean {
-  return url?.includes('drive.google.com');
-}
+const hiddenByEnvironment: Record<string, string[]> = {
+  skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
+  business: [
+    'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+    'trilhas_skills', 'skills_equipe', 'skills_backlog', 'skills_roadmap', 
+    'skills_entregas', 'skills_lider'
+  ],
+};
 ```
 
-### 2. Atualizar `CustomVideoPlayer.tsx`
-
-Adicionar lógica para escolher fonte:
-
+Para:
 ```typescript
-// No início do componente
-const driveEmbedUrl = googleDriveUrl 
-  ? getGoogleDriveEmbedUrl(googleDriveUrl) 
-  : null;
-
-// Priorizar Google Drive quando disponível
-const useGoogleDrive = !!driveEmbedUrl;
+const hiddenByEnvironment: Record<string, string[]> = {
+  // Skills: oculta trilhas gerais (usa Trilhas Skills) e calendário
+  // NÃO ocultar evolucao, meu_diagnostico, minhas_duvidas - são necessários para Skills
+  skills: ['trilhas', 'calendario'],
+  
+  // Business: oculta menus Academy-only e Skills-only
+  business: [
+    'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+    'trilhas_skills', 'skills_equipe', 'skills_backlog', 'skills_roadmap', 
+    'skills_entregas', 'skills_lider'
+  ],
+};
 ```
 
-Se `useGoogleDrive`, renderizar iframe do Drive em vez do player YouTube:
+### Resultado Esperado
 
-```tsx
-if (useGoogleDrive && driveEmbedUrl) {
-  return (
-    <div className={cn("relative w-full bg-black overflow-hidden rounded-lg", aspectClass)}>
-      {showThumbnail && thumbnail ? (
-        // ... thumbnail com botão play
-      ) : (
-        <iframe
-          src={driveEmbedUrl}
-          className="w-full h-full"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-        />
-      )}
-    </div>
-  );
-}
-```
-
-### 3. Atualizar `TrilhaDetalhes.tsx`
-
-Passar a propriedade `google_drive_url` para o player embarcado:
-
-```tsx
-// Onde usa iframe do YouTube (linha 263-269)
-{currentVideo.google_drive_url ? (
-  <iframe
-    src={getGoogleDriveEmbedUrl(currentVideo.google_drive_url)}
-    title={currentVideo.titulo}
-    allow="autoplay; encrypted-media"
-    allowFullScreen
-    className="w-full h-full"
-  />
-) : (
-  <iframe
-    src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?...`}
-    // ... resto igual
-  />
-)}
-```
-
----
-
-## Comportamento Final
-
-```text
-1. Usuário acessa vídeo
-   ↓
-2. Verifica se tem google_drive_url configurado
-   ↓
-   ├── SIM → Usa iframe do Google Drive (/preview)
-   │          Player embed nativo do Drive
-   │
-   └── NÃO → Usa YouTube como fonte
-              ├── Sucesso → Exibe vídeo
-              └── Falha → Mostra botões de fallback
-```
-
----
-
-## Vantagens da Solução
-
-1. **Prioriza Drive** quando configurado (evita bloqueios YouTube)
-2. **Mantém compatibilidade** com vídeos apenas no YouTube
-3. **Fallback robusto** se ambos falharem
-4. **Sem dependência de API** - usa apenas iframe embed
-
-## Limitações Conhecidas
-
-- O embed do Google Drive não permite controles customizados (play/pause externos)
-- Não é possível rastrear tempo assistido no vídeo do Drive
-- O Drive precisa ter permissão de visualização "Qualquer pessoa com o link"
+1. **Usuário Skills (Lucio)**: Verá os menus `Minha Evolução`, `Meu Diagnóstico`, `Minhas Dúvidas` + todos os menus específicos Skills
+2. **Trilhas Skills**: Aparecerá em "Aprender" como submenu para usuários Skills
+3. **Admin Skills**: Já está funcionando em `/admin/mentoria/skills`
