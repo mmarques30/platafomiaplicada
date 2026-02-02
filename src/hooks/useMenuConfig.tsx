@@ -48,9 +48,12 @@ export function useMenuConfig() {
 
   const getSidebarMenus = (userPlan?: string | null, currentEnvironment?: string | null) => {
     // Menus a ocultar quando em ambiente específico
-    // Skills/Business têm acesso separado ao Academy
     const hiddenByEnvironment: Record<string, string[]> = {
-      skills: ['trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas'],
+      // Skills: oculta trilhas gerais (usa Trilhas Skills) e calendário
+      // NÃO ocultar evolucao, meu_diagnostico, minhas_duvidas - são necessários para Skills
+      skills: ['trilhas', 'calendario'],
+      
+      // Business: oculta menus Academy-only e Skills-only
       business: [
         'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'trilhas_skills', 'skills_equipe', 'skills_backlog', 'skills_roadmap', 
