@@ -283,6 +283,76 @@ export type Database = {
           },
         ]
       }
+      backlog_skills: {
+        Row: {
+          area_impactada: string | null
+          created_at: string | null
+          descricao: string | null
+          equipe_id: string | null
+          horas_estimadas_economia: number | null
+          id: string
+          ordem: number | null
+          origem: string | null
+          prioridade: string | null
+          responsavel_id: string | null
+          status: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          area_impactada?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          horas_estimadas_economia?: number | null
+          id?: string
+          ordem?: number | null
+          origem?: string | null
+          prioridade?: string | null
+          responsavel_id?: string | null
+          status?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          area_impactada?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          horas_estimadas_economia?: number | null
+          id?: string
+          ordem?: number | null
+          origem?: string | null
+          prioridade?: string | null
+          responsavel_id?: string | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backlog_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       biblioteca_prompts: {
         Row: {
           ativo: boolean | null
@@ -1339,6 +1409,147 @@ export type Database = {
         }
         Relationships: []
       }
+      diagnostico_consolidado_skills: {
+        Row: {
+          created_at: string | null
+          dores_comuns: Json | null
+          equipe_id: string | null
+          gerado_em: string | null
+          id: string
+          insights_ia: string | null
+          potencial_economia_horas: number | null
+          processos_maior_potencial: Json | null
+          recomendacoes: Json | null
+          sobreposicoes_esforco: Json | null
+          total_horas_manuais_semana: number | null
+          updated_at: string | null
+          versao: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          dores_comuns?: Json | null
+          equipe_id?: string | null
+          gerado_em?: string | null
+          id?: string
+          insights_ia?: string | null
+          potencial_economia_horas?: number | null
+          processos_maior_potencial?: Json | null
+          recomendacoes?: Json | null
+          sobreposicoes_esforco?: Json | null
+          total_horas_manuais_semana?: number | null
+          updated_at?: string | null
+          versao?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          dores_comuns?: Json | null
+          equipe_id?: string | null
+          gerado_em?: string | null
+          id?: string
+          insights_ia?: string | null
+          potencial_economia_horas?: number | null
+          processos_maior_potencial?: Json | null
+          recomendacoes?: Json | null
+          sobreposicoes_esforco?: Json | null
+          total_horas_manuais_semana?: number | null
+          updated_at?: string | null
+          versao?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostico_consolidado_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: true
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnosticos_skills: {
+        Row: {
+          area_atuacao: string | null
+          cargo: string | null
+          completado: boolean | null
+          created_at: string | null
+          equipe_id: string | null
+          ferramentas_atuais: Json | null
+          gargalos_identificados: Json | null
+          id: string
+          interesse_em_ia: string | null
+          ja_usou_ia: string | null
+          onde_perde_mais_tempo: string | null
+          onde_poderia_ser_mais_produtivo: string | null
+          processos_mais_demorados: string | null
+          processos_repetitivos: string | null
+          tarefas_manuais: Json | null
+          tempo_na_empresa: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          area_atuacao?: string | null
+          cargo?: string | null
+          completado?: boolean | null
+          created_at?: string | null
+          equipe_id?: string | null
+          ferramentas_atuais?: Json | null
+          gargalos_identificados?: Json | null
+          id?: string
+          interesse_em_ia?: string | null
+          ja_usou_ia?: string | null
+          onde_perde_mais_tempo?: string | null
+          onde_poderia_ser_mais_produtivo?: string | null
+          processos_mais_demorados?: string | null
+          processos_repetitivos?: string | null
+          tarefas_manuais?: Json | null
+          tempo_na_empresa?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          area_atuacao?: string | null
+          cargo?: string | null
+          completado?: boolean | null
+          created_at?: string | null
+          equipe_id?: string | null
+          ferramentas_atuais?: Json | null
+          gargalos_identificados?: Json | null
+          id?: string
+          interesse_em_ia?: string | null
+          ja_usou_ia?: string | null
+          onde_perde_mais_tempo?: string | null
+          onde_poderia_ser_mais_produtivo?: string | null
+          processos_mais_demorados?: string | null
+          processos_repetitivos?: string | null
+          tarefas_manuais?: Json | null
+          tempo_na_empresa?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnosticos_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnosticos_skills_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnosticos_skills_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       documentos_business: {
         Row: {
           arquivo_url: string | null
@@ -1596,6 +1807,164 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "etapas_business"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      entregas_skills: {
+        Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
+          backlog_item_id: string | null
+          created_at: string | null
+          descricao: string | null
+          equipe_id: string | null
+          id: string
+          instrucoes: string | null
+          prazo: string | null
+          prompts_recomendados: Json | null
+          responsavel_id: string | null
+          roadmap_fase_id: string | null
+          status: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          backlog_item_id?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          id?: string
+          instrucoes?: string | null
+          prazo?: string | null
+          prompts_recomendados?: Json | null
+          responsavel_id?: string | null
+          roadmap_fase_id?: string | null
+          status?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          backlog_item_id?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          id?: string
+          instrucoes?: string | null
+          prazo?: string | null
+          prompts_recomendados?: Json | null
+          responsavel_id?: string | null
+          roadmap_fase_id?: string | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entregas_skills_aprovado_por_fkey"
+            columns: ["aprovado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_skills_aprovado_por_fkey"
+            columns: ["aprovado_por"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "entregas_skills_backlog_item_id_fkey"
+            columns: ["backlog_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "entregas_skills_roadmap_fase_id_fkey"
+            columns: ["roadmap_fase_id"]
+            isOneToOne: false
+            referencedRelation: "roadmap_skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      equipes_skills: {
+        Row: {
+          created_at: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          empresa_nome: string | null
+          id: string
+          lider_id: string | null
+          nome: string
+          setor: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          empresa_nome?: string | null
+          id?: string
+          lider_id?: string | null
+          nome: string
+          setor?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          empresa_nome?: string | null
+          id?: string
+          lider_id?: string | null
+          nome?: string
+          setor?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipes_skills_lider_id_fkey"
+            columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipes_skills_lider_id_fkey"
+            columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -2636,6 +3005,58 @@ export type Database = {
         }
         Relationships: []
       }
+      membros_equipe_skills: {
+        Row: {
+          cargo: string | null
+          created_at: string | null
+          equipe_id: string
+          id: string
+          papel: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          cargo?: string | null
+          created_at?: string | null
+          equipe_id: string
+          id?: string
+          papel?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          cargo?: string | null
+          created_at?: string | null
+          equipe_id?: string
+          id?: string
+          papel?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membros_equipe_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membros_equipe_skills_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membros_equipe_skills_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       menu_config: {
         Row: {
           created_at: string | null
@@ -2728,6 +3149,50 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      metricas_skills: {
+        Row: {
+          created_at: string | null
+          engajamento_trilhas: number | null
+          entregas_concluidas: number | null
+          entregas_planejadas: number | null
+          equipe_id: string | null
+          horas_economizadas: number | null
+          id: string
+          processos_automatizados: number | null
+          semana: number
+        }
+        Insert: {
+          created_at?: string | null
+          engajamento_trilhas?: number | null
+          entregas_concluidas?: number | null
+          entregas_planejadas?: number | null
+          equipe_id?: string | null
+          horas_economizadas?: number | null
+          id?: string
+          processos_automatizados?: number | null
+          semana: number
+        }
+        Update: {
+          created_at?: string | null
+          engajamento_trilhas?: number | null
+          entregas_concluidas?: number | null
+          entregas_planejadas?: number | null
+          equipe_id?: string | null
+          horas_economizadas?: number | null
+          id?: string
+          processos_automatizados?: number | null
+          semana?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metricas_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       modulos: {
         Row: {
@@ -3789,6 +4254,56 @@ export type Database = {
           },
         ]
       }
+      roadmap_skills: {
+        Row: {
+          created_at: string | null
+          data_prevista: string | null
+          descricao: string | null
+          equipe_id: string | null
+          id: string
+          numero_fase: number
+          semana_fim: number | null
+          semana_inicio: number | null
+          status: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_prevista?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          id?: string
+          numero_fase: number
+          semana_fim?: number | null
+          semana_inicio?: number | null
+          status?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_prevista?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          id?: string
+          numero_fase?: number
+          semana_fim?: number | null
+          semana_inicio?: number | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmap_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessoes_mentoria: {
         Row: {
           created_at: string
@@ -4540,6 +5055,8 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      is_leader_of_skills_team: { Args: { team_id: string }; Returns: boolean }
+      is_member_of_skills_team: { Args: { team_id: string }; Returns: boolean }
       user_has_access_level: {
         Args: {
           required_level: Database["public"]["Enums"]["nivel_acesso_plano"]

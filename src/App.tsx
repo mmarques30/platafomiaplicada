@@ -32,6 +32,11 @@ import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MeuDiagnostico from "./pages/MeuDiagnostico";
 import DiagnosticoPainelAcademy from "./pages/DiagnosticoPainelAcademy";
 import MinhasDuvidas from "./pages/MinhasDuvidas";
+import SkillsDiagnostico from "./pages/skills/SkillsDiagnostico";
+import SkillsEquipe from "./pages/skills/SkillsEquipe";
+import SkillsBacklog from "./pages/skills/SkillsBacklog";
+import SkillsRoadmap from "./pages/skills/SkillsRoadmap";
+import SkillsEntregas from "./pages/skills/SkillsEntregas";
 
 import MentoriaSessoes from "./pages/MentoriaSessoes";
 import MentoriaRecursos from "./pages/MentoriaRecursos";
@@ -144,6 +149,14 @@ function AppContent() {
             <Route path="/minhas-duvidas" element={<MinhasDuvidas />} />
             <Route path="/diagnostico/formulario" element={<MentoriaDiagnostico />} />
             <Route path="/diagnostico/painel" element={<DiagnosticoPainelAcademy />} />
+            
+            {/* Skills routes */}
+            <Route path="/skills/diagnostico" element={<SkillsDiagnostico />} />
+            <Route path="/skills/equipe" element={<SkillsEquipe />} />
+            <Route path="/skills/backlog" element={<SkillsBacklog />} />
+            <Route path="/skills/roadmap" element={<SkillsRoadmap />} />
+            <Route path="/skills/entregas" element={<SkillsEntregas />} />
+            
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
