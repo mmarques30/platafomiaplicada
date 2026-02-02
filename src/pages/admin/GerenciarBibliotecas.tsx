@@ -6,11 +6,10 @@ import { PromptsTab } from "@/components/admin/bibliotecas/PromptsTab";
 import { IACopieUseTab } from "@/components/admin/bibliotecas/IACopieUseTab";
 import { MetodosTab } from "@/components/admin/bibliotecas/MetodosTab";
 import { FormulariosCustomizados } from "@/components/admin/formularios/FormulariosCustomizados";
-import { PromptsAnalyticsTab } from "@/components/admin/bibliotecas/PromptsAnalyticsTab";
 import { adminTheme } from "@/components/admin/adminTheme";
-import { Library, Wrench, MessageSquare, BarChart3, Copy, BookOpen, FileText } from "lucide-react";
+import { Library, Wrench, MessageSquare, Copy, BookOpen, FileText } from "lucide-react";
 
-const validTabs = ["ferramentas", "prompts", "analytics-prompts", "ia-copie-use", "metodos", "formularios"];
+const validTabs = ["ferramentas", "prompts", "ia-copie-use", "metodos", "formularios"];
 
 export default function GerenciarBibliotecas() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,10 +46,6 @@ export default function GerenciarBibliotecas() {
             <MessageSquare className={adminTheme.tabsIcon} />
             Prompts
           </TabsTrigger>
-          <TabsTrigger value="analytics-prompts" className={adminTheme.tabsTrigger}>
-            <BarChart3 className={adminTheme.tabsIcon} />
-            Analytics Prompts
-          </TabsTrigger>
           <TabsTrigger value="ia-copie-use" className={adminTheme.tabsTrigger}>
             <Copy className={adminTheme.tabsIcon} />
             IA Copie e Use
@@ -71,10 +66,6 @@ export default function GerenciarBibliotecas() {
 
         <TabsContent value="prompts" className={adminTheme.tabsContent}>
           <PromptsTab />
-        </TabsContent>
-
-        <TabsContent value="analytics-prompts" className={adminTheme.tabsContent}>
-          <PromptsAnalyticsTab />
         </TabsContent>
 
         <TabsContent value="ia-copie-use" className={adminTheme.tabsContent}>

@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatsCard } from "@/components/admin/StatsCard";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { usePromptsAnalytics, type Periodo } from "@/hooks/admin/usePromptsAnalytics";
 import { useEngajamentoCompleto } from "@/hooks/admin/useEngajamentoCompleto";
 import {
   FileText,
@@ -13,7 +10,6 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  Copy,
   Video,
   Star,
   Wrench,
@@ -22,8 +18,6 @@ import {
   Eye,
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -45,16 +39,14 @@ const CHART_COLORS = [
 ];
 
 export function EngajamentoTab() {
-  const [periodo, setPeriodo] = useState<Periodo>("7d");
-  const { data: promptsData, isLoading: promptsLoading } = usePromptsAnalytics(periodo);
   const { data: engajamentoData, isLoading: engajamentoLoading } = useEngajamentoCompleto();
 
-  const isLoading = promptsLoading || engajamentoLoading;
+  const isLoading = engajamentoLoading;
 
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case 'up': return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'down': return <TrendingDown className="h-4 w-4 text-red-500" />;
+      case 'up': return <TrendingUp className="h-4 w-4 text-emerald-500" />;
+      case 'down': return <TrendingDown className="h-4 w-4 text-destructive" />;
       default: return <Minus className="h-4 w-4 text-muted-foreground" />;
     }
   };
@@ -76,142 +68,8 @@ export function EngajamentoTab() {
     );
   }
 
-  const tendenciaValor = promptsData?.tendenciaValor ?? 0;
-  const tendenciaGeral = promptsData?.tendenciaGeral ?? 'stable';
-
   return (
     <div className="space-y-8">
-      {/* Seletor de Período */}
-      <div className="flex justify-end">
-        <Tabs value={periodo} onValueChange={(v) => setPeriodo(v as Periodo)}>
-          <TabsList>
-            <TabsTrigger value="7d">7 dias</TabsTrigger>
-            <TabsTrigger value="30d">30 dias</TabsTrigger>
-            <TabsTrigger value="90d">90 dias</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      {/* ========== PROMPTS COPIADOS ========== */}
-      <section>
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Copy className="h-5 w-5" />
-          Prompts Copiados
-        </h3>
-        <div className="grid gap-4 md:grid-cols-3 mb-4">
-          <StatsCard
-            title="Total de Cópias"
-            value={promptsData?.totalCopias ?? 0}
-            description={`Últimos ${periodo === "7d" ? "7" : periodo === "30d" ? "30" : "90"} dias`}
-            icon={FileText}
-          />
-          <StatsCard
-            title="Média Diária"
-            value={promptsData?.mediaDiaria ?? 0}
-            description="Cópias por dia"
-            icon={TrendingUp}
-          />
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Tendência</p>
-                  <p className="text-2xl font-bold flex items-center gap-2">
-                    {tendenciaGeral === 'up' ? '+' : tendenciaGeral === 'down' ? '-' : ''}
-                    {Math.abs(tendenciaValor).toFixed(0)}%
-                    {getTrendIcon(tendenciaGeral)}
-                  </p>
-                </div>
-                <Badge variant={tendenciaGeral === 'up' ? 'default' : tendenciaGeral === 'down' ? 'destructive' : 'secondary'}>
-                  vs período anterior
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {promptsData?.copiasPorDia && promptsData.copiasPorDia.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Cópias por Dia</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={promptsData.copiasPorDia}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis 
-                      dataKey="data" 
-                      className="text-xs"
-                      tickFormatter={(value) => {
-                        const date = new Date(value);
-                        return `${date.getDate()}/${date.getMonth() + 1}`;
-                      }}
-                    />
-                    <YAxis className="text-xs" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(var(--background))', 
-                        border: '1px solid hsl(var(--border))' 
-                      }}
-                      labelFormatter={(value) => new Date(value).toLocaleDateString('pt-BR')}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="copias" 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2}
-                      dot={false}
-                      name="Cópias"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {promptsData?.topPrompts && promptsData.topPrompts.length > 0 && (
-          <Card className="mt-4">
-            <CardHeader>
-              <CardTitle className="text-base">Top 10 Prompts Copiados</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">#</TableHead>
-                    <TableHead>Prompt</TableHead>
-                    <TableHead className="text-right">Cópias</TableHead>
-                    <TableHead className="text-right">Tendência</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {promptsData.topPrompts.slice(0, 10).map((prompt, index) => (
-                    <TableRow key={prompt.titulo}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell className="max-w-xs truncate">{prompt.titulo}</TableCell>
-                      <TableCell className="text-right">{prompt.copias}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <span className={
-                            prompt.tendencia === 'up' ? 'text-green-500' : 
-                            prompt.tendencia === 'down' ? 'text-red-500' : 
-                            'text-muted-foreground'
-                          }>
-                            {prompt.percentualMudanca > 0 ? '+' : ''}{prompt.percentualMudanca.toFixed(0)}%
-                          </span>
-                          {getTrendIcon(prompt.tendencia)}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
-      </section>
 
       {/* ========== VÍDEOS ASSISTIDOS ========== */}
       <section>
