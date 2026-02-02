@@ -15,12 +15,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Key } from "lucide-react";
+import { CalendarIcon, Key, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useUpdateUser, useResetUserPassword } from "@/hooks/admin/useUsers";
+import { useUserSkillsMembro, useUpdateUserSkillsMembro, useRemoveUserSkillsMembro } from "@/hooks/admin/useEquipesSkillsAdmin";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { SkillsEquipeSelector, SkillsEquipeData } from "./SkillsEquipeSelector";
 
 type AppRole = "admin" | "mentorado" | "aluno_trilha";
 
@@ -54,6 +56,9 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const updateUser = useUpdateUser();
   const resetPassword = useResetUserPassword();
+  const updateSkillsMembro = useUpdateUserSkillsMembro();
+  const removeSkillsMembro = useRemoveUserSkillsMembro();
+  const { data: userSkillsMembro, isLoading: loadingSkillsMembro } = useUserSkillsMembro(user?.id);
   
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
   const [selectedPlano, setSelectedPlano] = useState<"academy" | "skills" | "business" | null>(null);
@@ -62,6 +67,12 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const [novaSenha, setNovaSenha] = useState("");
   const [forcarTroca, setForcarTroca] = useState(false);
   const [skillsLiberado, setSkillsLiberado] = useState(false);
+  const [skillsEquipeData, setSkillsEquipeData] = useState<SkillsEquipeData>({
+    equipeId: null,
+    novaEquipe: null,
+    papelEquipe: "membro",
+  });
+  const [cargo, setCargo] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -79,6 +90,25 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
     }
   }, [user, setValue]);
 
+  // Carregar dados do vínculo Skills existente
+  useEffect(() => {
+    if (userSkillsMembro) {
+      setSkillsEquipeData({
+        equipeId: userSkillsMembro.equipe_id,
+        novaEquipe: null,
+        papelEquipe: (userSkillsMembro.papel as "lider" | "membro") || "membro",
+      });
+      setCargo(userSkillsMembro.cargo || "");
+    } else {
+      setSkillsEquipeData({
+        equipeId: null,
+        novaEquipe: null,
+        papelEquipe: "membro",
+      });
+      setCargo("");
+    }
+  }, [userSkillsMembro]);
+
   const toggleRole = (role: AppRole) => {
     setSelectedRoles(prev =>
       prev.includes(role)
@@ -90,6 +120,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const onSubmit = async (data: any) => {
     if (!user) return;
 
+    // Atualizar dados gerais do usuário
     await updateUser.mutateAsync({
       userId: user.id,
       updates: {
@@ -105,6 +136,17 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         skills_liberado: selectedPlano === "business" ? skillsLiberado : false,
       },
     });
+
+    // Se for Skills, atualizar vínculo com equipe
+    if (selectedPlano === "skills" && (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe)) {
+      await updateSkillsMembro.mutateAsync({
+        userId: user.id,
+        equipeId: skillsEquipeData.equipeId,
+        novaEquipe: skillsEquipeData.novaEquipe,
+        papelEquipe: skillsEquipeData.papelEquipe,
+        cargo,
+      });
+    }
 
     onOpenChange(false);
   };
@@ -122,7 +164,15 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
     setForcarTroca(false);
   };
 
+  const handleRemoveSkillsVinculo = async () => {
+    if (!user) return;
+    await removeSkillsMembro.mutateAsync(user.id);
+  };
+
   if (!user) return null;
+
+  const isSkillsPlan = selectedPlano === "skills";
+  const hasSkillsVinculo = !!userSkillsMembro;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -132,9 +182,10 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         </DialogHeader>
 
         <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="info">Informações</TabsTrigger>
             <TabsTrigger value="acesso">Acesso</TabsTrigger>
+            <TabsTrigger value="skills" disabled={!isSkillsPlan}>Skills</TabsTrigger>
             <TabsTrigger value="seguranca">Segurança</TabsTrigger>
           </TabsList>
 
@@ -323,6 +374,53 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
               </div>
             </TabsContent>
 
+            {/* Nova aba Skills */}
+            <TabsContent value="skills" className="space-y-4">
+              {loadingSkillsMembro ? (
+                <div className="py-8 text-center text-muted-foreground">Carregando...</div>
+              ) : (
+                <>
+                  {hasSkillsVinculo && (
+                    <Alert>
+                      <AlertDescription className="flex items-center justify-between">
+                        <span>Este usuário já está vinculado a uma equipe Skills.</span>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={handleRemoveSkillsVinculo}
+                          disabled={removeSkillsMembro.isPending}
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Remover Vínculo
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <SkillsEquipeSelector
+                    value={skillsEquipeData}
+                    onChange={setSkillsEquipeData}
+                    showLiderOption={true}
+                  />
+
+                  <div>
+                    <Label htmlFor="cargo-skills">Cargo na Empresa</Label>
+                    <Input
+                      id="cargo-skills"
+                      value={cargo}
+                      onChange={(e) => setCargo(e.target.value)}
+                      placeholder="Ex: Analista de Marketing"
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Cargo/função do colaborador na empresa (opcional)
+                    </p>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+
             <TabsContent value="seguranca" className="space-y-4">
               <Alert>
                 <Key className="h-4 w-4" />
@@ -367,8 +465,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={updateUser.isPending}>
-                {updateUser.isPending ? "Salvando..." : "Salvar Alterações"}
+              <Button type="submit" disabled={updateUser.isPending || updateSkillsMembro.isPending}>
+                {(updateUser.isPending || updateSkillsMembro.isPending) ? "Salvando..." : "Salvar Alterações"}
               </Button>
             </DialogFooter>
           </form>
