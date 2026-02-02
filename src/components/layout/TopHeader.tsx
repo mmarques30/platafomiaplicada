@@ -138,8 +138,8 @@ export function TopHeader() {
             Página Inicial
           </NavLink>
           
-          {/* Dropdown Cursos - oculto para Visitante, Academy e Business */}
-          {!isVisitante && !isAcademy && !isBusiness && (
+          {/* Dropdown Cursos - oculto para todos os planos (usam Environment Switcher) */}
+          {!isVisitante && !isAcademy && !isSkills && !isBusiness && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 

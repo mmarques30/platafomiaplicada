@@ -52,6 +52,15 @@ export function UserSelectorByPlanModal({ open, onClose, onSelect, planType }: U
   // Filtrar usuários pelo plano
   const planUsers = useMemo(() => {
     if (!allUsers) return [];
+    
+    // Para Skills, incluir também Business com skills_liberado
+    if (planType === 'skills') {
+      return allUsers.filter(user => 
+        user.plano_mentoria === 'skills' || 
+        ((user.plano_mentoria === 'business' || user.plano_mentoria === 'business_iaplicada') && user.skills_liberado)
+      );
+    }
+    
     return allUsers.filter(user => user.plano_mentoria === planType);
   }, [allUsers, planType]);
 
