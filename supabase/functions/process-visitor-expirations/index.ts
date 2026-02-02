@@ -30,16 +30,56 @@ Deno.serve(async (req) => {
       throw new Error(`Erro ao buscar visitantes: ${visitantesError.message}`);
     }
 
-    const results = {
+    const results: Record<string, number> = {
       expirados: 0,
       notificacoes_7_dias: 0,
       notificacoes_3_dias: 0,
       notificacoes_1_dia: 0,
       cupons_atualizados: 0,
+      convertidos_automatico: 0,
     };
 
     for (const visitante of visitantes || []) {
       const expiracaoDate = new Date(visitante.acesso_expira_em);
+      
+      // VERIFICAÇÃO DE DUPLICIDADE: Checar se já é mentorado por outro registro
+      const { data: jaMentorado } = await supabase
+        .from("profiles")
+        .select("id, plano_mentoria")
+        .ilike("email", visitante.email)
+        .eq("is_visitante", false)
+        .eq("conta_ativa", true)
+        .neq("id", visitante.id)
+        .maybeSingle();
+      
+      if (jaMentorado) {
+        // Converter visitante automaticamente (já é mentorado por outra conta)
+        await supabase
+          .from("profiles")
+          .update({ 
+            is_visitante: false,
+            data_conversao: new Date().toISOString(),
+            acesso_expirado: false
+          })
+          .eq("id", visitante.id);
+        
+        // Atualizar role
+        await supabase
+          .from("user_roles")
+          .delete()
+          .eq("user_id", visitante.id)
+          .eq("role", "visitante");
+        
+        await supabase
+          .from("user_roles")
+          .upsert({ 
+            user_id: visitante.id, 
+            role: "mentorado" 
+          });
+        
+        results.convertidos_automatico = (results.convertidos_automatico || 0) + 1;
+        continue; // Não processar expiração
+      }
       
       // Verificar se já expirou
       if (expiracaoDate <= now) {
@@ -101,11 +141,11 @@ Deno.serve(async (req) => {
                 user_id: visitante.id,
                 tipo: "info",
                 titulo: notice.type === "1_dia" 
-                  ? "🚨 Último dia de acesso gratuito!" 
+                  ? "Último dia de acesso gratuito" 
                   : notice.type === "3_dias"
-                  ? "⏰ Restam 3 dias de acesso gratuito"
+                  ? "Restam 3 dias de acesso gratuito"
                   : "Seu acesso gratuito expira em 7 dias",
-                mensagem: `Garanta desconto exclusivo no Academy com o cupom ${isEngaged ? "Academy15" : "Academy12"}. Não perca essa oportunidade!`,
+                mensagem: `Garanta ${isEngaged ? "15%" : "12%"} de desconto no Academy com o cupom ${isEngaged ? "Academy15" : "Academy12"}. Aproveite essa oportunidade exclusiva!`,
                 link: "/cupons",
               });
 
