@@ -63,22 +63,22 @@ export function VisitorExpirationNotice() {
   const urgencyConfig = {
     "7_dias": {
       icon: Gift,
-      title: "Seu acesso gratuito expira em 7 dias!",
-      description: `Garanta ${desconto} de desconto no Academy e continue sua jornada de aprendizado em IA.`,
+      title: "Seu acesso gratuito expira em 7 dias",
+      description: `Você aproveitou bem a comunidade! Garanta ${desconto} de desconto exclusivo no Academy e continue sua jornada de aprendizado em IA.`,
       bgClass: "bg-aplicada-green-600/95",
       borderClass: "border-aplicada-green-400",
     },
     "3_dias": {
       icon: Clock,
-      title: "⏰ Restam apenas 3 dias de acesso gratuito!",
-      description: `Aproveite ${desconto} de desconto exclusivo no Academy antes que seu acesso expire.`,
+      title: "Restam apenas 3 dias de acesso gratuito",
+      description: `O tempo está passando! Aproveite ${desconto} de desconto exclusivo no Academy antes que seu acesso expire.`,
       bgClass: "bg-amber-600/95",
       borderClass: "border-amber-400",
     },
     "1_dia": {
       icon: AlertTriangle,
-      title: "🚨 Último dia! Seu acesso expira amanhã",
-      description: `Esta é sua última chance de garantir ${desconto} de desconto no Academy!`,
+      title: "Último dia de acesso gratuito",
+      description: `Esta é sua última chance de garantir ${desconto} de desconto no Academy. Amanhã seu acesso será encerrado.`,
       bgClass: "bg-red-600/95",
       borderClass: "border-red-400",
     },
