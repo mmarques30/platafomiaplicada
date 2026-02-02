@@ -1,127 +1,73 @@
 
-# Plano: Corrigir Menus e Navegação do Ambiente Skills
+# Plano: Tornar URL do YouTube Opcional
 
 ## Problema Identificado
 
-Ao acessar como usuário Skills (simulação como "Lucio Torres"), a interface mostra:
+No arquivo `src/components/admin/content/VideoModal.tsx`, linha 244:
 
-1. **Menus duplicados/incorretos** - Aparecem menus Academy junto com menus Skills:
-   - ❌ Minha Evolução (Academy - não deveria aparecer)
-   - ❌ Meu Diagnóstico (Academy - não deveria aparecer)
-   - ❌ Minhas Dúvidas (Academy - não deveria aparecer)
-   - ✅ Minha Equipe (Skills)
-   - ✅ Backlog (Skills)
-   - ✅ Roadmap (Skills)
-   - ✅ Minhas Entregas (Skills)
+```typescript
+<Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
+```
 
-2. **Página errada** - A rota `/mentoria?tab=roadmap` mostra conteúdo Business (com "Diagnóstico IA") quando deveria redirecionar para `/skills/roadmap`
-
-## Estrutura Correta (conforme documentado)
-
-| Plano | Menus "Meu Progresso" |
-|-------|----------------------|
-| Academy | Minha Evolução, Meu Diagnóstico, Minhas Dúvidas |
-| Skills | Minha Equipe, Backlog, Roadmap, Minhas Entregas |
-| Business | Visão Geral, Roadmap, Evolução Aprendizado |
-| Business iAplicada | Visão Geral, Roadmap, Entregas |
+O atributo `required` no campo de URL do YouTube impede a criação de vídeos que usam apenas Google Drive como fonte.
 
 ---
 
 ## Solução
 
-### Parte 1: Atualizar Banco de Dados (menu_config)
-
-Remover `skills` do campo `planos_permitidos` dos menus Academy-only:
-
-| Menu Key | Antes | Depois |
-|----------|-------|--------|
-| `evolucao` | `[academy, skills]` | `[academy]` |
-| `meu_diagnostico` | `[academy, skills]` | `[academy]` |
-| `minhas_duvidas` | `[academy, skills]` | `[academy]` |
-
-### Parte 2: Adicionar Redirecionamento na Página Mentoria
-
-A página `/mentoria` deve redirecionar usuários Skills para suas rotas específicas:
-
-```typescript
-// Mentoria.tsx - Adicionar no início
-if (isSkills) {
-  // Redirecionar Skills para suas páginas específicas
-  navigate('/skills/equipe', { replace: true });
-  return null;
-}
-```
+Remover o atributo `required` do campo `youtube_url` e adicionar validação customizada para exigir **pelo menos uma** das URLs (YouTube ou Google Drive).
 
 ---
 
-## Arquivos a Modificar
+## Arquivo a Modificar
 
-| Tipo | Alteração |
-|------|-----------|
-| **Migração SQL** | Atualizar `planos_permitidos` dos 3 menus |
-| `src/pages/Mentoria.tsx` | Adicionar redirecionamento para usuários Skills |
+| Arquivo | Alteração |
+|---------|-----------|
+| `src/components/admin/content/VideoModal.tsx` | Remover `required` e adicionar validação customizada |
 
 ---
 
 ## Seção Técnica
 
-### SQL Migration
-
-```sql
--- Remover 'skills' dos menus Academy-only
-UPDATE menu_config 
-SET planos_permitidos = ARRAY['academy']
-WHERE menu_key IN ('evolucao', 'meu_diagnostico', 'minhas_duvidas');
-```
-
-### Mentoria.tsx
+### Linha 244 - Remover `required`
 
 ```typescript
-import { useNavigate } from "react-router-dom";
+// ANTES
+<Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." required />
 
-export default function Mentoria() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { isAdmin } = useUserRole();
-  const { isBusiness, isBusinessIAplicada, isSkills } = useEffectivePlan(isAdmin);
-  
-  // Redirecionar Skills para páginas específicas
-  useEffect(() => {
-    if (isSkills && !isBusiness) {
-      navigate('/skills/equipe', { replace: true });
-    }
-  }, [isSkills, isBusiness, navigate]);
+// DEPOIS
+<Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." />
+```
 
-  // Se Skills, não renderizar (aguardar redirect)
-  if (isSkills && !isBusiness) {
-    return null;
-  }
-  
-  // ... resto do componente
+### Adicionar Validação no `onSubmit` (linha ~192)
+
+```typescript
+// Validar se pelo menos uma URL foi fornecida
+const youtubeUrl = data.youtube_url?.trim();
+const driveUrl = data.google_drive_url?.trim();
+
+if (!youtubeUrl && !driveUrl) {
+  toast.error("Informe pelo menos uma URL: YouTube ou Google Drive");
+  return;
 }
+```
+
+### Atualizar Texto de Ajuda (linhas 243-244)
+
+```typescript
+<div className="space-y-2">
+  <Label>URL do YouTube (opcional se usar Drive)</Label>
+  <Input {...register("youtube_url")} placeholder="https://youtube.com/watch?v=..." />
+</div>
 ```
 
 ---
 
 ## Resultado Esperado
 
-### Usuário Skills - Sidebar:
-```text
-Meu Progresso
-├── Minha Equipe (/skills/equipe)
-├── Backlog (/skills/backlog)
-├── Roadmap (/skills/roadmap)
-└── Minhas Entregas (/skills/entregas)
-```
-
-### Navegação Skills:
-- `/mentoria` → Redireciona para `/skills/equipe`
-- `/mentoria?tab=roadmap` → Redireciona para `/skills/roadmap`
-
-### Usuário Academy - Sidebar (sem alteração):
-```text
-Meu Progresso
-├── Minha Evolução (/evolucao)
-├── Meu Diagnóstico (/meu-diagnostico)
-└── Minhas Dúvidas (/minhas-duvidas)
-```
+| Cenário | Antes | Depois |
+|---------|-------|--------|
+| Apenas YouTube | ✅ Funciona | ✅ Funciona |
+| YouTube + Drive | ✅ Funciona | ✅ Funciona |
+| Apenas Drive | ❌ Erro "required" | ✅ Funciona |
+| Nenhuma URL | ❌ Erro "required" | ❌ Toast "Informe pelo menos uma URL" |
