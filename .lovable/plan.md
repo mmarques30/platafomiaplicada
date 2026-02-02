@@ -1,342 +1,281 @@
 
-# Plano: Associar Usuários Skills a Times e Empresas no Cadastro
+# Plano: Diferenciação de Papéis no Skills (Líder vs Colaborador)
 
 ## Contexto
 
-Atualmente, ao criar usuários com plano Skills, eles não são automaticamente vinculados a uma equipe (`equipes_skills`) ou empresa. Como a trilha do Skills é compartilhada entre membros de um time, precisamos:
+O módulo Skills já possui a estrutura de `papel` ("lider" ou "membro") na tabela `membros_equipe_skills`, porém atualmente:
+1. Ambos os papéis veem exatamente as mesmas telas
+2. O líder não tem visão diferenciada para acompanhar a equipe
+3. Não existe painel de gestão exclusivo para o líder
 
-1. Permitir ao admin selecionar/criar uma equipe ao cadastrar usuários Skills
-2. Associar automaticamente o novo usuário como membro dessa equipe
-3. Ajustar a importação em lote para também vincular à equipe
+O líder precisa:
+- Ver TUDO que os colaboradores estão desenvolvendo
+- Acompanhar evolução de cada membro individualmente
+- Validar entregas (aprovar/rejeitar)
+- Ver métricas de engajamento e produtividade
+- Receber alertas de atrasos
+
+## Funcionalidades por Papel
+
+| Funcionalidade | Colaborador | Líder |
+|----------------|-------------|-------|
+| Preencher diagnóstico individual | Sim | Sim |
+| Ver equipe e membros | Sim | Sim |
+| Ver diagnóstico consolidado | Sim | Sim |
+| Ver backlog da equipe | Sim | Sim |
+| Ver roadmap | Sim | Sim |
+| **Minhas Entregas** | Só as próprias | Todas da equipe |
+| **Validar/Aprovar entregas** | Não | Sim |
+| **Painel de Gestão** | Não | Sim |
+| **Métricas de equipe** | Básico | Completo |
+| **Alertas de atraso** | Não | Sim |
 
 ---
+
+## Alterações Necessárias
+
+### 1. Hook Central: `useSkillsMembro`
+
+Criar um hook que retorna dados do membro atual incluindo seu papel:
+
+```typescript
+// src/hooks/useSkillsMembro.ts
+export function useSkillsMembro() {
+  // Retorna: equipe_id, papel ('lider' | 'membro'), isLider, cargo
+  // Usado por todos os hooks e páginas Skills
+}
+```
+
+### 2. Atualizar `useSkillsEntregas`
+
+- **Colaborador**: Vê apenas suas próprias entregas (`responsavel_id = user.id`)
+- **Líder**: Vê TODAS as entregas da equipe com nome do responsável
+
+### 3. Atualizar `useSkillsEquipe`
+
+- Já retorna `isLider`, manter
+- Adicionar métricas de engajamento para líder (trilhas assistidas, entregas no prazo)
+
+### 4. Nova Página: Painel do Líder
+
+```
+/skills/lider
+```
+
+Visão exclusiva com:
+- Progresso individual de cada membro (diagnóstico, trilhas, entregas)
+- Entregas aguardando validação
+- Alertas de atraso
+- Métricas consolidadas (horas economizadas, entregas concluídas vs planejadas)
+
+### 5. Atualizar Página de Entregas
+
+- Colaborador vê "Minhas Entregas" com foco na execução
+- Líder vê "Entregas da Equipe" com filtro por membro e ação de validação
+
+### 6. Atualizar Menu Lateral
+
+Adicionar item de menu condicional para líderes:
+
+```sql
+-- Novo menu apenas para líderes
+INSERT INTO menu_config (menu_key, label, url, icon, parent_key, planos_permitidos, ordem, tipo, visivel)
+VALUES ('skills_lider', 'Painel do Líder', '/skills/lider', 'LayoutDashboard', 'meu_progresso', ARRAY['skills'], 38, 'sidebar', true);
+```
+
+---
+
+## Arquivos a Criar
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `src/hooks/useSkillsMembro.ts` | Hook central com papel do usuário |
+| `src/hooks/useSkillsLider.ts` | Dados agregados para visão do líder |
+| `src/pages/skills/SkillsLiderDashboard.tsx` | Painel exclusivo do líder |
+| `src/components/skills/lider/LiderProgressoMembro.tsx` | Card de progresso individual |
+| `src/components/skills/lider/LiderEntregasValidacao.tsx` | Lista de entregas para validar |
+| `src/components/skills/lider/LiderMetricasEquipe.tsx` | Gráficos de métricas |
+| `src/components/skills/lider/LiderAlertasAtraso.tsx` | Alertas de atraso |
 
 ## Arquivos a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/components/admin/NovoUsuarioModal.tsx` | Adicionar seletor de equipe quando plano = Skills |
-| `src/pages/admin/ImportarUsuarios.tsx` | Adicionar seletor de equipe para importação Skills |
-| `supabase/functions/create-user-admin/index.ts` | Receber `equipeId` e vincular na tabela `membros_equipe_skills` |
-| `supabase/functions/import-users-batch/index.ts` | Receber `equipeId` e vincular cada usuário à equipe |
-| `src/hooks/admin/useUsers.tsx` | Passar `equipeId` para as funções de criação |
-| `src/hooks/useEquipesSkills.ts` | Novo hook para buscar/criar equipes Skills (admin) |
+| `src/hooks/useSkillsEntregas.ts` | Lógica condicional por papel |
+| `src/pages/skills/SkillsEntregas.tsx` | UI diferenciada para líder (validação) |
+| `src/pages/skills/SkillsEquipe.tsx` | Métricas adicionais para líder |
+| `src/App.tsx` | Nova rota `/skills/lider` |
+| `src/components/layout/AppSidebar.tsx` | Exibir menu "Painel do Líder" apenas para líderes |
 
 ---
 
-## Fluxo de Cadastro Individual (NovoUsuarioModal)
+## Detalhamento Técnico
 
-Quando o admin seleciona plano **Skills**:
-
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Produto / Plano                                                │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐                        │
-│  │ Academy  │ │  Skills  │ │ Business │                        │
-│  └──────────┘ └──────────┘ └──────────┘                        │
-│                    ▲ selecionado                                │
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────────┐│
-│  │  Equipe Skills                                              ││
-│  │  ┌───────────────────────────────────────────────────────┐  ││
-│  │  │ Selecionar equipe existente    ▼                      │  ││
-│  │  └───────────────────────────────────────────────────────┘  ││
-│  │     ou                                                       ││
-│  │  [ + Criar nova equipe ]                                    ││
-│  │                                                              ││
-│  │  Se criar nova:                                             ││
-│  │  ┌──────────────────────────┐ ┌──────────────────────────┐  ││
-│  │  │ Nome da Equipe           │ │ Empresa                  │  ││
-│  │  └──────────────────────────┘ └──────────────────────────┘  ││
-│  │                                                              ││
-│  │  [ ] Definir como Líder da equipe                           ││
-│  └─────────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Alterações no NovoUsuarioModal
+### Hook useSkillsMembro
 
 ```typescript
-// Novos estados
-const [equipeId, setEquipeId] = useState<string>("");
-const [criarNovaEquipe, setCriarNovaEquipe] = useState(false);
-const [novaEquipeNome, setNovaEquipeNome] = useState("");
-const [novaEquipeEmpresa, setNovaEquipeEmpresa] = useState("");
-const [isLider, setIsLider] = useState(false);
+export function useSkillsMembro() {
+  const { user } = useAuth();
+  
+  const { data, isLoading } = useQuery({
+    queryKey: ["skills-membro", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("membros_equipe_skills")
+        .select("equipe_id, papel, cargo, status")
+        .eq("user_id", user.id)
+        .eq("status", "ativo")
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
-// Buscar equipes existentes
-const { data: equipesSkills } = useEquipesSkillsAdmin();
+  return {
+    equipeId: data?.equipe_id,
+    papel: data?.papel as "lider" | "membro" | null,
+    isLider: data?.papel === "lider",
+    isMembro: data?.papel === "membro",
+    cargo: data?.cargo,
+    isLoading,
+  };
+}
+```
 
-// No submit, passar dados da equipe
-await createUser.mutateAsync({
-  email,
-  password,
-  nomeCompleto,
-  roles: selectedRoles,
-  planoMentoria: selectedPlano || null,
-  // Novos campos
-  equipeId: criarNovaEquipe ? null : equipeId,
-  novaEquipe: criarNovaEquipe ? {
-    nome: novaEquipeNome,
-    empresa: novaEquipeEmpresa,
-  } : null,
-  papelEquipe: isLider ? 'lider' : 'membro',
+### useSkillsEntregas Atualizado
+
+```typescript
+export function useSkillsEntregas() {
+  const { user } = useAuth();
+  const { equipeId, isLider } = useSkillsMembro();
+
+  const { data: entregas, isLoading } = useQuery({
+    queryKey: ["entregas-skills", equipeId, isLider],
+    queryFn: async () => {
+      let query = supabase
+        .from("entregas_skills")
+        .select(`
+          *,
+          responsavel:responsavel_id (id, nome, avatar_url)
+        `)
+        .eq("equipe_id", equipeId);
+      
+      // Se não for líder, filtra apenas as próprias entregas
+      if (!isLider) {
+        query = query.eq("responsavel_id", user.id);
+      }
+      
+      return (await query).data || [];
+    },
+    enabled: !!equipeId,
+  });
+
+  return { entregas, isLoading, isLider };
+}
+```
+
+### Hook useSkillsLider (Exclusivo)
+
+```typescript
+export function useSkillsLider() {
+  const { equipeId, isLider } = useSkillsMembro();
+  
+  // Entregas aguardando validação
+  const { data: entregasParaValidar } = useQuery({...});
+  
+  // Progresso de cada membro (diagnóstico, trilhas, entregas)
+  const { data: progressoMembros } = useQuery({...});
+  
+  // Métricas consolidadas
+  const { data: metricas } = useQuery({...});
+  
+  // Alertas de atraso
+  const { data: alertas } = useQuery({...});
+  
+  return { entregasParaValidar, progressoMembros, metricas, alertas };
+}
+```
+
+### Fluxo de Validação de Entrega
+
+1. Colaborador submete entrega → status muda para `aguardando_validacao`
+2. Líder vê na aba "Para Validar" no painel
+3. Líder clica em "Aprovar" ou "Rejeitar"
+4. Se aprovado: `status = 'aprovada'`, `aprovado_por = lider_id`, `aprovado_em = now()`
+5. Se rejeitado: status volta para `em_andamento` com feedback
+
+### Menu Condicional para Líder
+
+No AppSidebar, adicionar lógica para mostrar "Painel do Líder" apenas quando `isLider`:
+
+```typescript
+// Buscar papel do usuário no Skills
+const { isLider: isSkillsLider } = useSkillsMembro();
+
+// Filtrar menu - se for skills_lider e não for líder, ocultar
+const filteredMenus = sidebarMenus.filter(menu => {
+  if (menu.menu_key === 'skills_lider' && !isSkillsLider) {
+    return false;
+  }
+  return true;
 });
 ```
 
 ---
 
-## Novo Hook: useEquipesSkillsAdmin
-
-```typescript
-// src/hooks/admin/useEquipesSkillsAdmin.ts
-export function useEquipesSkillsAdmin() {
-  return useQuery({
-    queryKey: ["admin-equipes-skills"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("equipes_skills")
-        .select(`
-          id,
-          nome,
-          empresa_nome,
-          status,
-          lider_id,
-          membros_equipe_skills(count)
-        `)
-        .eq("status", "ativo")
-        .order("nome");
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
-export function useCreateEquipeSkills() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async ({ nome, empresa }: { nome: string; empresa: string }) => {
-      const { data, error } = await supabase
-        .from("equipes_skills")
-        .insert({ nome, empresa_nome: empresa })
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-equipes-skills"] });
-    },
-  });
-}
-```
-
----
-
-## Alterações na Edge Function create-user-admin
-
-```typescript
-// Receber novos parâmetros
-const { 
-  email, password, nomeCompleto, roles: userRoles, 
-  planoMentoria, skillsLiberado,
-  // Novos
-  equipeId,
-  novaEquipe,
-  papelEquipe 
-} = await req.json()
-
-// Se for Skills, vincular à equipe
-if (planoMentoria === 'skills') {
-  let targetEquipeId = equipeId;
-  
-  // Se precisa criar nova equipe
-  if (novaEquipe && !equipeId) {
-    const { data: newEquipe, error: equipeError } = await supabaseAdmin
-      .from('equipes_skills')
-      .insert({
-        nome: novaEquipe.nome,
-        empresa_nome: novaEquipe.empresa,
-        lider_id: papelEquipe === 'lider' ? userId : null,
-      })
-      .select()
-      .single();
-    
-    if (equipeError) throw equipeError;
-    targetEquipeId = newEquipe.id;
-  }
-  
-  // Vincular usuário à equipe
-  if (targetEquipeId) {
-    const { error: membroError } = await supabaseAdmin
-      .from('membros_equipe_skills')
-      .insert({
-        equipe_id: targetEquipeId,
-        user_id: userId,
-        papel: papelEquipe || 'membro',
-        status: 'ativo'
-      });
-    
-    if (membroError) throw membroError;
-    
-    // Se for líder, atualizar lider_id na equipe
-    if (papelEquipe === 'lider') {
-      await supabaseAdmin
-        .from('equipes_skills')
-        .update({ lider_id: userId })
-        .eq('id', targetEquipeId);
-    }
-  }
-}
-```
-
----
-
-## Alterações na Importação em Lote
-
-### ImportarUsuarios.tsx
-
-Quando plano Skills for selecionado, exibir:
+## Painel do Líder - Layout
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Configurações Skills                                           │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Equipe para todos os usuários    ▼                        │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│     ou                                                          │
-│  [ + Criar nova equipe ]                                        │
-│                                                                  │
-│  Se criar nova:                                                 │
-│  ┌──────────────────────────┐ ┌──────────────────────────────┐  │
-│  │ Nome da Equipe           │ │ Empresa                      │  │
-│  └──────────────────────────┘ └──────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### import-users-batch Edge Function
-
-```typescript
-const { 
-  users, planoMentoria, roles,
-  // Novos
-  equipeId,
-  novaEquipe
-} = await req.json()
-
-// Se for Skills, criar equipe ou usar existente
-let targetEquipeId = equipeId;
-
-if (planoMentoria === 'skills' && novaEquipe && !equipeId) {
-  const { data: newEquipe, error } = await supabaseAdmin
-    .from('equipes_skills')
-    .insert({
-      nome: novaEquipe.nome,
-      empresa_nome: novaEquipe.empresa,
-    })
-    .select()
-    .single();
-  
-  if (error) throw error;
-  targetEquipeId = newEquipe.id;
-}
-
-// Para cada usuário importado, vincular à equipe
-if (planoMentoria === 'skills' && targetEquipeId) {
-  await supabaseAdmin
-    .from('membros_equipe_skills')
-    .insert({
-      equipe_id: targetEquipeId,
-      user_id: userId,
-      papel: 'membro',
-      status: 'ativo'
-    });
-}
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Painel do Líder                                              [Equipe XYZ]  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌────────────┐ │
+│  │ Para Validar    │ │ Entregas Mês    │ │ Horas Econom.   │ │ Alertas    │ │
+│  │      3          │ │    12/18        │ │     24h         │ │    2       │ │
+│  └─────────────────┘ └─────────────────┘ └─────────────────┘ └────────────┘ │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────────┤
+│  │ Entregas Aguardando Validação                                            │
+│  │ ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │ │ [Avatar] João - "Automatizar relatório X"   [Ver] [Aprovar][Rejeitar] │ │
+│  │ │ [Avatar] Maria - "Criar dashboard Y"        [Ver] [Aprovar][Rejeitar] │ │
+│  │ └─────────────────────────────────────────────────────────────────────┘  │
+│  │                                                                           │
+│  │ Progresso da Equipe                                                      │
+│  │ ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │ │ [Avatar] João    Diagnóstico: ✓  Trilhas: 60%  Entregas: 3/5       │  │
+│  │ │ [Avatar] Maria   Diagnóstico: ✓  Trilhas: 45%  Entregas: 2/4       │  │
+│  │ │ [Avatar] Pedro   Diagnóstico: ⏳ Trilhas: 0%   Entregas: 0/3   ⚠️  │  │
+│  │ └─────────────────────────────────────────────────────────────────────┘  │
+│  └──────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────────┤
+│  │ Métricas do Projeto                        [Gráfico de evolução 12sem] │  │
+│  └──────────────────────────────────────────────────────────────────────────┤
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Resumo das Alterações
+## Ordem de Implementação
 
-| Componente | Alteração |
-|------------|-----------|
-| **NovoUsuarioModal** | Adicionar seção "Equipe Skills" quando plano = skills |
-| **ImportarUsuarios** | Adicionar seletor de equipe para importação Skills |
-| **useUsers.tsx** | Passar `equipeId`, `novaEquipe`, `papelEquipe` |
-| **useEquipesSkillsAdmin** | Novo hook para listar/criar equipes |
-| **create-user-admin** | Criar equipe se necessário + vincular membro |
-| **import-users-batch** | Criar equipe se necessário + vincular membros |
+### Fase 1: Hook Central e Menu
+1. Criar `useSkillsMembro.ts`
+2. Adicionar menu "Painel do Líder" no banco (condicional)
+3. Atualizar AppSidebar para ocultar menu para não-líderes
 
----
+### Fase 2: Painel do Líder
+4. Criar página `SkillsLiderDashboard.tsx`
+5. Criar hook `useSkillsLider.ts`
+6. Implementar componentes do painel (progresso, validação, métricas)
 
-## Validações
+### Fase 3: Validação de Entregas
+7. Atualizar `useSkillsEntregas.ts` com lógica de papel
+8. Adicionar mutation para aprovar/rejeitar entrega
+9. Atualizar `SkillsEntregas.tsx` com UI de validação para líder
 
-1. Se plano = Skills, equipe é **obrigatória** (existente ou nova)
-2. Se criar nova equipe, nome e empresa são obrigatórios
-3. Primeiro usuário de uma nova equipe pode ser marcado como líder
-4. Na importação em lote, todos usuários vão para a mesma equipe (não é possível definir líder individual)
-
----
-
-## Seção Técnica
-
-### Interface do Select de Equipe
-
-```typescript
-interface EquipeSkillsOption {
-  id: string;
-  nome: string;
-  empresa_nome: string;
-  membros_count: number;
-}
-
-// Componente
-<Select value={equipeId} onValueChange={setEquipeId}>
-  <SelectTrigger>
-    <SelectValue placeholder="Selecione uma equipe" />
-  </SelectTrigger>
-  <SelectContent>
-    {equipesSkills?.map((eq) => (
-      <SelectItem key={eq.id} value={eq.id}>
-        {eq.nome} ({eq.empresa_nome}) - {eq.membros_count} membros
-      </SelectItem>
-    ))}
-  </SelectContent>
-</Select>
-```
-
-### Dados Enviados ao Backend
-
-```typescript
-// Criação individual
-{
-  email: string;
-  password: string;
-  nomeCompleto: string;
-  roles: string[];
-  planoMentoria: 'skills';
-  equipeId?: string; // UUID da equipe existente
-  novaEquipe?: {
-    nome: string;
-    empresa: string;
-  };
-  papelEquipe?: 'lider' | 'membro';
-}
-
-// Importação em lote
-{
-  users: Array<{ email, nomeCompleto, password }>;
-  planoMentoria: 'skills';
-  roles: string[];
-  equipeId?: string;
-  novaEquipe?: {
-    nome: string;
-    empresa: string;
-  };
-}
-```
+### Fase 4: Métricas e Alertas
+10. Criar lógica de cálculo de métricas
+11. Implementar alertas de atraso
+12. Adicionar gráficos de evolução
