@@ -1,8 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckSquare, Clock, FileText, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CheckSquare, Clock, FileText, Send, CheckCircle2, AlertCircle, Play, XCircle } from "lucide-react";
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -15,7 +16,7 @@ const STATUS_CONFIG = {
 };
 
 export default function SkillsEntregas() {
-  const { entregas, isLoading } = useSkillsEntregas();
+  const { entregas, isLoading, isLider, submeterEntrega, iniciarEntrega } = useSkillsEntregas();
 
   if (isLoading) {
     return (
@@ -37,9 +38,13 @@ export default function SkillsEntregas() {
           <CheckSquare className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Minhas Entregas</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {isLider ? "Entregas da Equipe" : "Minhas Entregas"}
+          </h1>
           <p className="text-muted-foreground">
-            Tarefas atribuídas a você no projeto
+            {isLider 
+              ? "Visualize e acompanhe todas as entregas da equipe" 
+              : "Tarefas atribuídas a você no projeto"}
           </p>
         </div>
       </div>
@@ -99,21 +104,35 @@ export default function SkillsEntregas() {
 
         <TabsContent value="pendentes" className="mt-6 space-y-4">
           {entregasPendentes.map((entrega) => (
-            <EntregaCard key={entrega.id} entrega={entrega} />
+            <EntregaCard 
+              key={entrega.id} 
+              entrega={entrega} 
+              isLider={isLider}
+              onIniciar={() => iniciarEntrega.mutate(entrega.id)}
+              onSubmeter={() => submeterEntrega.mutate(entrega.id)}
+            />
           ))}
           {entregasPendentes.length === 0 && <EmptyState message="Nenhuma entrega pendente" />}
         </TabsContent>
 
         <TabsContent value="aguardando" className="mt-6 space-y-4">
           {entregasAguardando.map((entrega) => (
-            <EntregaCard key={entrega.id} entrega={entrega} />
+            <EntregaCard 
+              key={entrega.id} 
+              entrega={entrega} 
+              isLider={isLider}
+            />
           ))}
           {entregasAguardando.length === 0 && <EmptyState message="Nenhuma entrega aguardando validação" />}
         </TabsContent>
 
         <TabsContent value="aprovadas" className="mt-6 space-y-4">
           {entregasAprovadas.map((entrega) => (
-            <EntregaCard key={entrega.id} entrega={entrega} />
+            <EntregaCard 
+              key={entrega.id} 
+              entrega={entrega} 
+              isLider={isLider}
+            />
           ))}
           {entregasAprovadas.length === 0 && <EmptyState message="Nenhuma entrega aprovada ainda" />}
         </TabsContent>
@@ -122,7 +141,14 @@ export default function SkillsEntregas() {
   );
 }
 
-function EntregaCard({ entrega }: { entrega: any }) {
+interface EntregaCardProps {
+  entrega: any;
+  isLider?: boolean;
+  onIniciar?: () => void;
+  onSubmeter?: () => void;
+}
+
+function EntregaCard({ entrega, isLider, onIniciar, onSubmeter }: EntregaCardProps) {
   const status = STATUS_CONFIG[entrega.status as keyof typeof STATUS_CONFIG];
   const StatusIcon = status?.icon || Clock;
   const isAtrasada = entrega.prazo && new Date(entrega.prazo) < new Date() && entrega.status !== 'aprovada';
@@ -132,15 +158,33 @@ function EntregaCard({ entrega }: { entrega: any }) {
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{entrega.titulo}</h3>
-              {isAtrasada && (
-                <Badge variant="destructive" className="text-xs">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  Atrasada
-                </Badge>
+            <div className="flex items-center gap-3">
+              {/* Show responsible avatar for leader */}
+              {isLider && entrega.responsavel && (
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={entrega.responsavel.avatar_url} />
+                  <AvatarFallback>
+                    {entrega.responsavel.nome?.substring(0, 2).toUpperCase() || "??"}
+                  </AvatarFallback>
+                </Avatar>
               )}
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold">{entrega.titulo}</h3>
+                {isAtrasada && (
+                  <Badge variant="destructive" className="text-xs">
+                    <AlertCircle className="h-3 w-3 mr-1" />
+                    Atrasada
+                  </Badge>
+                )}
+              </div>
             </div>
+            
+            {isLider && entrega.responsavel && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Responsável: {entrega.responsavel.nome}
+              </p>
+            )}
+            
             {entrega.descricao && (
               <p className="text-sm text-muted-foreground mt-1">{entrega.descricao}</p>
             )}
@@ -161,8 +205,23 @@ function EntregaCard({ entrega }: { entrega: any }) {
               {status?.label}
             </Badge>
             
-            {(entrega.status === 'pendente' || entrega.status === 'em_andamento') && (
-              <Button size="sm">
+            {/* Actions based on status and role */}
+            {!isLider && entrega.status === 'pendente' && onIniciar && (
+              <Button size="sm" onClick={onIniciar}>
+                <Play className="h-4 w-4 mr-1" />
+                Iniciar
+              </Button>
+            )}
+            
+            {!isLider && entrega.status === 'em_andamento' && onSubmeter && (
+              <Button size="sm" onClick={onSubmeter}>
+                <Send className="h-4 w-4 mr-1" />
+                Enviar para Validação
+              </Button>
+            )}
+            
+            {(entrega.status === 'pendente' || entrega.status === 'em_andamento') && entrega.instrucoes && (
+              <Button size="sm" variant="outline">
                 Ver Instruções
               </Button>
             )}

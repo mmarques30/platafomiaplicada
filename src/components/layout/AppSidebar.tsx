@@ -26,6 +26,7 @@ import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
+import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import * as LucideIcons from "lucide-react";
 
 export function AppSidebar() {
@@ -37,6 +38,7 @@ export function AppSidebar() {
   const { isViewingAs, resetView } = useAdminViewContext();
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
+  const { isLider: isSkillsLider } = useSkillsMembro();
   const collapsed = !open;
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [logoError, setLogoError] = useState(false);
@@ -76,7 +78,10 @@ export function AppSidebar() {
       }
       return [];
     }
-    return sidebarMenus.filter(menu => menu.parent_key === parentKey);
+    // Filtrar menu "Painel do Líder" se não for líder Skills
+    return sidebarMenus
+      .filter(menu => menu.parent_key === parentKey)
+      .filter(menu => menu.menu_key !== 'skills_lider' || isSkillsLider);
   };
 
   const toggleMenu = (menuKey: string) => {
