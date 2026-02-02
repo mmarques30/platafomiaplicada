@@ -11,7 +11,7 @@ import { Search, Building2, User, GraduationCap, Briefcase } from 'lucide-react'
 import { useUsers } from '@/hooks/admin/useUsers';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-type PlanType = 'academy' | 'skills' | 'business';
+type PlanType = 'academy' | 'skills' | 'business' | 'business_iaplicada';
 
 interface UserSelectorByPlanModalProps {
   open: boolean;
@@ -35,6 +35,11 @@ const planConfig: Record<PlanType, { title: string; icon: React.ReactNode; empty
     title: 'Selecionar Mentorado Business',
     icon: <Building2 className="h-5 w-5 text-primary" />,
     emptyMessage: 'Nenhum mentorado Business encontrado',
+  },
+  business_iaplicada: {
+    title: 'Selecionar Mentorado Business iAplicada',
+    icon: <Building2 className="h-5 w-5 text-primary" />,
+    emptyMessage: 'Nenhum mentorado Business iAplicada encontrado',
   },
 };
 
@@ -84,7 +89,9 @@ export function UserSelectorByPlanModal({ open, onClose, onSelect, planType }: U
     switch (planType) {
       case 'academy': return <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />;
       case 'skills': return <Briefcase className="h-4 w-4 text-muted-foreground shrink-0" />;
-      case 'business': return <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />;
+      case 'business': 
+      case 'business_iaplicada': 
+        return <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />;
     }
   };
 

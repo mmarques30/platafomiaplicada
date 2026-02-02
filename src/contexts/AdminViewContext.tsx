@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-export type AdminViewMode = "visitante" | "academy" | "skills" | "business" | null;
+export type AdminViewMode = "visitante" | "academy" | "skills" | "business" | "business_iaplicada" | null;
 
 interface AdminViewContextType {
   viewAs: AdminViewMode;

@@ -5095,6 +5095,7 @@ export type Database = {
         | "lab"
         | "skills"
         | "business"
+        | "business_iaplicada"
       status_projeto:
         | "planejamento"
         | "em_andamento"
@@ -5246,6 +5247,7 @@ export const Constants = {
         "lab",
         "skills",
         "business",
+        "business_iaplicada",
       ],
       status_projeto: [
         "planejamento",

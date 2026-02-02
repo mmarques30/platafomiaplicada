@@ -8,6 +8,7 @@ const planoNomes: Record<string, string> = {
   academy: "IAplicada Academy",
   skills: "IAplicada Skills",
   business: "IAplicada Business",
+  business_iaplicada: "IAplicada Business iAplicada",
 };
 
 export function MeuPlanoCard() {
