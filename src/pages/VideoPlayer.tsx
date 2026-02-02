@@ -215,6 +215,7 @@ export default function VideoPlayer() {
               <CardContent className="p-0">
                 <CustomVideoPlayer
                   videoId={video.youtube_id}
+                  googleDriveUrl={video.google_drive_url}
                   startSeconds={progresso?.tempo_assistido || 0}
                   onTimeUpdate={handleTimeUpdate}
                   onEnded={handleVideoEnded}

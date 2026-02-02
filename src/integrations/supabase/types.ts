@@ -4872,6 +4872,7 @@ export type Database = {
           data_disponibilidade: string | null
           descricao: string | null
           duracao: number | null
+          google_drive_url: string | null
           id: string
           materiais: Json | null
           modulo_id: string
@@ -4897,6 +4898,7 @@ export type Database = {
           data_disponibilidade?: string | null
           descricao?: string | null
           duracao?: number | null
+          google_drive_url?: string | null
           id?: string
           materiais?: Json | null
           modulo_id: string
@@ -4922,6 +4924,7 @@ export type Database = {
           data_disponibilidade?: string | null
           descricao?: string | null
           duracao?: number | null
+          google_drive_url?: string | null
           id?: string
           materiais?: Json | null
           modulo_id?: string
