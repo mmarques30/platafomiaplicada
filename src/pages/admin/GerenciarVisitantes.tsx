@@ -13,10 +13,12 @@ import { VisitorAccessDrawer } from "@/components/admin/VisitorAccessDrawer";
 import { useContentAccessMetrics } from "@/hooks/admin/useContentAccessMetrics";
 import { useAcademyPurchaseClicks } from "@/hooks/admin/useButtonClickLogs";
 import { StatsCard } from "@/components/admin/StatsCard";
-import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText, MousePointerClick, Download, ChevronDown, Search, UserPlus } from "lucide-react";
-import { format } from "date-fns";
+import { Users, UserCheck, Trash2, Pencil, Eye, TrendingUp, Video, FileText, MousePointerClick, Download, ChevronDown, Search, UserPlus, Clock, RefreshCw, Tag } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function GerenciarVisitantes() {
   const { visitantes, isLoading, convertToMentorado, deleteVisitante } = useVisitantes();
@@ -586,8 +588,10 @@ export default function GerenciarVisitantes() {
                         <TableHead>Nome</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead className="hidden md:table-cell">Telefone</TableHead>
-                        <TableHead className="hidden lg:table-cell">Data Cadastro</TableHead>
+                        <TableHead className="hidden lg:table-cell">Cadastro</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead className="text-center">Dias Restantes</TableHead>
+                        <TableHead className="text-center">Cupom</TableHead>
                         <TableHead className="text-center">Acessos</TableHead>
                         <TableHead className="text-right">Ações</TableHead>
                       </TableRow>
@@ -595,20 +599,74 @@ export default function GerenciarVisitantes() {
                     <TableBody>
                       {filteredVisitantes.map((visitante) => {
                         const accessCount = metrics?.accessesByUser?.[visitante.email || ''] || 0;
+                        const diasRestantes = visitante.acesso_expira_em 
+                          ? differenceInDays(new Date(visitante.acesso_expira_em), new Date())
+                          : null;
+                        const isExpired = visitante.acesso_expirado || (diasRestantes !== null && diasRestantes < 0);
+                        
+                        const handleExtendAccess = async () => {
+                          const { error } = await supabase
+                            .from("profiles")
+                            .update({ 
+                              acesso_expira_em: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                              acesso_expirado: false,
+                              conta_ativa: true
+                            })
+                            .eq("id", visitante.id);
+                          
+                          if (error) {
+                            toast.error("Erro ao estender acesso");
+                          } else {
+                            toast.success("Acesso estendido por 30 dias!");
+                            window.location.reload();
+                          }
+                        };
+                        
                         return (
                           <TableRow key={visitante.id}>
                             <TableCell className="font-medium">{visitante.nome_completo}</TableCell>
                             <TableCell className="max-w-[150px] truncate">{visitante.email}</TableCell>
                             <TableCell className="hidden md:table-cell">{visitante.telefone || "-"}</TableCell>
                             <TableCell className="hidden lg:table-cell">
-                              {visitante.created_at ? format(new Date(visitante.created_at), "dd/MM/yyyy", { locale: ptBR }) : "-"}
+                              {visitante.created_at ? format(new Date(visitante.created_at), "dd/MM/yy", { locale: ptBR }) : "-"}
                             </TableCell>
                             <TableCell>
-                              {visitante.conta_ativa ? (
-                                <Badge variant="default">Ativo</Badge>
+                              {isExpired ? (
+                                <Badge variant="destructive">Expirado</Badge>
+                              ) : visitante.conta_ativa ? (
+                                diasRestantes !== null && diasRestantes <= 7 ? (
+                                  <Badge className="bg-amber-500 text-white">Expirando</Badge>
+                                ) : (
+                                  <Badge variant="default">Ativo</Badge>
+                                )
                               ) : (
                                 <Badge variant="secondary">Inativo</Badge>
                               )}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {isExpired ? (
+                                <span className="text-destructive font-medium">-</span>
+                              ) : diasRestantes !== null ? (
+                                <Badge 
+                                  variant="outline" 
+                                  className={cn(
+                                    diasRestantes <= 3 && "border-destructive text-destructive",
+                                    diasRestantes > 3 && diasRestantes <= 7 && "border-amber-500 text-amber-600",
+                                    diasRestantes > 7 && "border-primary text-primary"
+                                  )}
+                                >
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {diasRestantes}d
+                                </Badge>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge variant="outline" className="text-xs">
+                                <Tag className="h-3 w-3 mr-1" />
+                                {visitante.cupom_especial || "Academy12"}
+                              </Badge>
                             </TableCell>
                             <TableCell className="text-center">
                               <Button
@@ -618,22 +676,30 @@ export default function GerenciarVisitantes() {
                                 className="gap-1 text-primary hover:text-primary"
                               >
                                 <Eye className="h-4 w-4" />
-                                <span className="hidden sm:inline">Ver</span> ({accessCount})
+                                ({accessCount})
                               </Button>
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex justify-end gap-1 sm:gap-2">
+                              <div className="flex justify-end gap-1">
+                                {isExpired && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={handleExtendAccess}
+                                    className="text-primary"
+                                    title="Reativar +30 dias"
+                                  >
+                                    <RefreshCw className="h-4 w-4" />
+                                  </Button>
+                                )}
                                 <Button variant="outline" size="sm" onClick={() => handleEdit(visitante)}>
                                   <Pencil className="h-4 w-4" />
-                                  <span className="hidden lg:inline ml-1">Editar</span>
                                 </Button>
                                 <Button variant="outline" size="sm" onClick={() => handleConvert(visitante.id)} disabled={!visitante.conta_ativa}>
                                   <UserCheck className="h-4 w-4" />
-                                  <span className="hidden lg:inline ml-1">Converter</span>
                                 </Button>
                                 <Button variant="destructive" size="sm" onClick={() => handleDelete(visitante.id)}>
                                   <Trash2 className="h-4 w-4" />
-                                  <span className="hidden lg:inline ml-1">Excluir</span>
                                 </Button>
                               </div>
                             </TableCell>

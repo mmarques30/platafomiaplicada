@@ -5,6 +5,8 @@ import { PageTitle } from "@/components/shared/PageTitle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import mariAvatar from "@/assets/mari-avatar-new.png";
+import { useVisitorExpiration } from "@/hooks/useVisitorExpiration";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const features = [
   { name: "Resultados reais em 30 dias", iaplicada: true, adapta: false, viverIA: false, asimov: false },
@@ -20,12 +22,21 @@ const features = [
   { name: "Foco em freelance/side hustle", iaplicada: false, adapta: false, viverIA: true, asimov: false },
 ];
 
-const COUPON_CODE = "ComunidadeIAplicada";
 const PURCHASE_LINK = "https://clkdmg.site/pay/iaplicadaacademy";
 
 export default function Cupons() {
+  const { isVisitante } = useUserRole();
+  const { data: expirationData } = useVisitorExpiration();
+  
+  // Cupom dinâmico: usa o cupom especial do visitante ou padrão
+  const couponCode = isVisitante && expirationData?.cupomEspecial 
+    ? expirationData.cupomEspecial 
+    : "Academy12";
+  
+  const desconto = couponCode === "Academy15" ? "15%" : "12%";
+
   const handleCopyCoupon = () => {
-    navigator.clipboard.writeText(COUPON_CODE);
+    navigator.clipboard.writeText(couponCode);
     toast.success("Cupom copiado!", {
       description: "Cole no checkout para aplicar o desconto.",
     });
@@ -59,14 +70,19 @@ export default function Cupons() {
             {/* Descrição introdutória */}
             <p className="text-muted-foreground text-base">
               O Academy é o primeiro passo da sua jornada na IAplicada. Aqui você começa sua trilha de aprendizado em Inteligência Artificial aplicada ao seu dia a dia profissional.
+              {isVisitante && expirationData?.diasRestantes !== null && expirationData.diasRestantes <= 7 && (
+                <span className="block mt-2 text-sm font-medium text-primary">
+                  🎁 Você tem um cupom especial de {desconto} de desconto!
+                </span>
+              )}
             </p>
 
             {/* Card de Cupom Compacto */}
             <div className="bg-aplicada-green-600/90 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <span className="text-white text-sm font-medium">Cupom:</span>
+                <span className="text-white text-sm font-medium">Cupom ({desconto} off):</span>
                 <code className="text-white font-bold text-lg tracking-wider">
-                  {COUPON_CODE}
+                  {couponCode}
                 </code>
               </div>
               <div className="flex items-center gap-2">

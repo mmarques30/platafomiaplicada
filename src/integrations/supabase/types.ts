@@ -3200,11 +3200,14 @@ export type Database = {
       }
       profiles: {
         Row: {
+          acesso_expira_em: string | null
+          acesso_expirado: boolean | null
           adicionado_grupo_whatsapp: boolean | null
           avatar_url: string | null
           bio: string | null
           conta_ativa: boolean | null
           created_at: string | null
+          cupom_especial: string | null
           data_conversao: string | null
           data_expiracao_acesso: string | null
           email: string | null
@@ -3229,11 +3232,14 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          acesso_expira_em?: string | null
+          acesso_expirado?: boolean | null
           adicionado_grupo_whatsapp?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           conta_ativa?: boolean | null
           created_at?: string | null
+          cupom_especial?: string | null
           data_conversao?: string | null
           data_expiracao_acesso?: string | null
           email?: string | null
@@ -3258,11 +3264,14 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          acesso_expira_em?: string | null
+          acesso_expirado?: boolean | null
           adicionado_grupo_whatsapp?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           conta_ativa?: boolean | null
           created_at?: string | null
+          cupom_especial?: string | null
           data_conversao?: string | null
           data_expiracao_acesso?: string | null
           email?: string | null
@@ -4332,6 +4341,48 @@ export type Database = {
           },
         ]
       }
+      visitor_expiration_notices: {
+        Row: {
+          created_at: string | null
+          dismissed_at: string | null
+          id: string
+          notice_type: string
+          shown_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          dismissed_at?: string | null
+          id?: string
+          notice_type: string
+          shown_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          dismissed_at?: string | null
+          id?: string
+          notice_type?: string
+          shown_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitor_expiration_notices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visitor_expiration_notices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       historico_completo: {
@@ -4367,6 +4418,10 @@ export type Database = {
       calcular_progresso_preparacao: {
         Args: { p_projeto_id: string; p_user_id: string }
         Returns: number
+      }
+      check_visitor_engagement: {
+        Args: { visitor_id: string }
+        Returns: boolean
       }
       get_gratuito_stats: {
         Args: never
