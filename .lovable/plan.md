@@ -1,194 +1,297 @@
 
-# Plano: Ajustar Edição de Skills no EditUserModal
 
-## Problema Identificado
+# Plano: Criar Diferenciação Business vs Business iAplicada
 
-Atualmente no `EditUserModal.tsx`:
+## Contexto do Problema
 
-1. A aba "Skills" está desabilitada com `disabled={!isSkillsPlan}` (linha 188), ou seja, só funciona quando o plano é "skills"
-2. Usuários Business com `skillsLiberado=true` **não conseguem acessar a aba Skills** para edição
-3. A lógica de submit só atualiza Skills quando `selectedPlano === "skills"` (linha 141), ignorando Business com Skills liberado
+Atualmente existe apenas um tipo "business" no enum `plano_mentoria`. O usuário precisa diferenciar dois cenários:
 
-## Solução Proposta
+| Tipo | Descrição | Participação do Cliente |
+|------|-----------|------------------------|
+| **Business** | Construção em conjunto | Cliente participa ativamente do desenvolvimento |
+| **Business iAplicada** | iAplicada constrói para a empresa | Cliente recebe entregas prontas |
 
-Remover a aba separada "Skills" e **integrar a configuração do Skills diretamente na aba "Acesso"**, que aparece condicionalmente quando:
-- O plano selecionado é "skills", OU
-- O plano é "business" E `skillsLiberado=true`
+A diferença principal está na **visão do "Meu Progresso"** - o Business iAplicada terá uma interface de acompanhamento diferente (a ser construída posteriormente).
 
-## Alterações no EditUserModal.tsx
+---
 
-### 1. Remover aba Skills do TabsList
+## Estratégia de Implementação
 
-Mudar de 4 colunas para 3:
+### Opção Escolhida: Novo valor no Enum + Campo Auxiliar
 
-```text
-Antes:  [Informações] [Acesso] [Skills] [Segurança]
-Depois: [Informações] [Acesso] [Segurança]
+Adicionar `business_iaplicada` ao enum `plano_mentoria` existente. Isso permite:
+- Filtros e queries SQL diretos
+- Menus específicos por tipo
+- Hooks de acesso simplificados
+- Compatibilidade com estrutura existente
+
+---
+
+## Alterações no Banco de Dados
+
+### 1. Expandir o Enum `plano_mentoria`
+
+```sql
+ALTER TYPE plano_mentoria ADD VALUE 'business_iaplicada';
 ```
 
-### 2. Adicionar seção Skills dentro da aba "Acesso"
+### 2. Atualizar Função de Acesso (se necessário)
 
-Após o switch de "Liberar acesso ao Skills" (para Business) ou após os cards de plano (para Skills):
+A função `user_has_access_level` continua funcionando pois ambos os tipos Business terão acesso ao conteúdo Academy.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  Aba: Acesso                                                    │
-├─────────────────────────────────────────────────────────────────┤
-│  Permissões (Roles)                                             │
-│  [x] Administrador  [x] Mentorado  [ ] Aluno da Trilha          │
-│                                                                  │
-│  Produto / Plano                                                │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐            │
-│  │ Sem plano│ │ Academy  │ │ Skills ✓ │ │ Business │            │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘            │
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────────┐│
-│  │ Configuração Skills                            (colapsável) ││
-│  │ ┌─────────────────────────────────────────────────────────┐ ││
-│  │ │ Equipe: [Select equipe existente ▼]                     │ ││
-│  │ │ ou [+ Criar nova equipe]                                │ ││
-│  │ │                                                          │ ││
-│  │ │ Cargo: [______________________]                         │ ││
-│  │ │ [ ] Definir como Líder da equipe                        │ ││
-│  │ │                                                          │ ││
-│  │ │ [Remover Vínculo Skills] (se já vinculado)              │ ││
-│  │ └─────────────────────────────────────────────────────────┘ ││
-│  └─────────────────────────────────────────────────────────────┘│
-│                                                                  │
-│  Data de Expiração: [__________]                                │
-│  Conta Ativa: [Switch]                                          │
-└─────────────────────────────────────────────────────────────────┘
-```
+---
 
-### 3. Lógica de Exibição
+## Alterações nos Tipos TypeScript
+
+### `src/hooks/useUserPlan.tsx`
+
+Atualizar o tipo `UserPlan`:
 
 ```typescript
-// Mostrar configuração Skills quando:
-const showSkillsConfig = selectedPlano === "skills" || 
-                         (selectedPlano === "business" && skillsLiberado);
+export type UserPlan = "academy" | "skills" | "business" | "business_iaplicada" | null;
 ```
 
-### 4. Atualizar Lógica de Submit
+Atualizar verificações:
 
 ```typescript
-// Atualizar vínculo Skills quando há acesso liberado
-if (showSkillsConfig && (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe)) {
-  await updateSkillsMembro.mutateAsync({
-    userId: user.id,
-    equipeId: skillsEquipeData.equipeId,
-    novaEquipe: skillsEquipeData.novaEquipe,
-    papelEquipe: skillsEquipeData.papelEquipe,
-    cargo,
-  });
-}
+const hasAccessTo = (product: "trilhas" | "skills" | "business") => {
+  if (!plan) return false;
+  
+  switch (product) {
+    case "trilhas":
+      return ["academy", "skills", "business", "business_iaplicada"].includes(plan);
+    case "skills":
+      return plan === "skills";
+    case "business":
+      // Ambos os tipos Business têm acesso ao ambiente Business
+      return plan === "business" || plan === "business_iaplicada";
+    default:
+      return false;
+  }
+};
+
+// Novos helpers
+const isBusinessColaborativo = plan === "business";
+const isBusinessIAplicada = plan === "business_iaplicada";
+const isAnyBusiness = isBusinessColaborativo || isBusinessIAplicada;
 ```
 
 ---
 
-## Estrutura Final da Aba Acesso
+## Alterações no Admin
 
-A seção de configuração Skills aparecerá como um bloco destacado:
+### NovoUsuarioModal.tsx e EditUserModal.tsx
 
-1. **Para plano Skills**: Aparece logo abaixo dos cards de plano
-2. **Para plano Business**: Aparece abaixo do switch "Liberar acesso ao Skills" quando ativado
+Atualizar array de planos:
 
-Ambos os cenários mostram:
-- Seletor de equipe (existente ou nova)
-- Campo de cargo
-- Checkbox de líder
-- Botão de remover vínculo (se já existir)
+```typescript
+const PLANOS = [
+  { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
+  { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
+  { value: "business", label: "Business", description: "Consultoria colaborativa" },
+  { value: "business_iaplicada", label: "Business iAplicada", description: "iAplicada constrói para a empresa" },
+];
+```
 
 ---
 
-## Arquivo a Modificar
+## Alterações no AdminViewSelector
+
+### `src/components/admin/AdminViewSelector.tsx`
+
+Adicionar opção de simulação:
+
+```typescript
+const viewOptions = [
+  { mode: "visitante", label: "Visitante", icon: <User /> },
+  { mode: "academy", label: "Academy", icon: <GraduationCap /> },
+  { mode: "skills", label: "Skills", icon: <Briefcase /> },
+  { mode: "business", label: "Business", icon: <Building2 /> },
+  { mode: "business_iaplicada", label: "Business iAplicada", icon: <Wrench /> },
+];
+```
+
+### `src/contexts/AdminViewContext.tsx`
+
+Atualizar tipo:
+
+```typescript
+export type AdminViewMode = 
+  | "visitante" 
+  | "academy" 
+  | "skills" 
+  | "business" 
+  | "business_iaplicada" 
+  | null;
+```
+
+---
+
+## Alterações no Hook useEffectivePlan
+
+```typescript
+// Verificações atualizadas
+const effectiveIsBusiness = isAdmin || isBusiness || isBusinessIAplicada;
+const effectiveIsBusinessColaborativo = isBusiness;
+const effectiveIsBusinessIAplicada = isBusinessIAplicada;
+
+return {
+  // ...existing
+  isBusiness: effectiveIsBusiness, // true para ambos os tipos
+  isBusinessColaborativo: effectiveIsBusinessColaborativo,
+  isBusinessIAplicada: effectiveIsBusinessIAplicada,
+};
+```
+
+---
+
+## Alterações nos Menus
+
+### Banco de Dados - menu_config
+
+Atualizar `planos_permitidos` para incluir `business_iaplicada` onde aplicável:
+
+```sql
+UPDATE menu_config 
+SET planos_permitidos = array_append(planos_permitidos, 'business_iaplicada')
+WHERE 'business' = ANY(planos_permitidos);
+```
+
+Para menus específicos do Business iAplicada (futuros):
+
+```sql
+INSERT INTO menu_config (menu_key, label, url, planos_permitidos, ...)
+VALUES ('meu_progresso_iaplicada', 'Acompanhamento', '/acompanhamento', ARRAY['business_iaplicada'], ...);
+```
+
+---
+
+## Alterações na Página Mentoria
+
+### `src/pages/Mentoria.tsx`
+
+Adicionar lógica condicional:
+
+```typescript
+const { isBusiness, isBusinessColaborativo, isBusinessIAplicada } = useEffectivePlan(isAdmin);
+
+// Renderização condicional
+{isBusinessColaborativo && (
+  // Visão atual do Business colaborativo
+  <BusinessDashboard />
+)}
+
+{isBusinessIAplicada && (
+  // Nova visão para Business iAplicada (a ser construída)
+  <BusinessIAplicadaDashboard />
+)}
+```
+
+---
+
+## Arquivos a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/components/admin/EditUserModal.tsx` | Remover aba Skills, integrar na aba Acesso |
+| **Banco de Dados** | Adicionar `business_iaplicada` ao enum |
+| `src/hooks/useUserPlan.tsx` | Atualizar tipo e lógicas |
+| `src/contexts/AdminViewContext.tsx` | Atualizar AdminViewMode |
+| `src/components/admin/AdminViewSelector.tsx` | Adicionar opção de simulação |
+| `src/components/admin/NovoUsuarioModal.tsx` | Adicionar opção no seletor de planos |
+| `src/components/admin/EditUserModal.tsx` | Adicionar opção no seletor de planos |
+| `src/pages/admin/ImportarUsuarios.tsx` | Adicionar opção no seletor de planos |
+| `src/pages/Mentoria.tsx` | Lógica condicional por tipo |
+| `src/components/ecossistema/MeuPlanoCard.tsx` | Adicionar label do plano |
+| **menu_config (banco)** | Atualizar planos_permitidos |
+
+---
+
+## Arquivos a Criar (Placeholder)
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `src/pages/BusinessIAplicadaDashboard.tsx` | Placeholder para visão futura |
+
+---
+
+## Fluxo Visual
+
+```text
+                        ┌─────────────────────────────────┐
+                        │         Tipo Business           │
+                        └─────────────────────────────────┘
+                                       │
+               ┌───────────────────────┴───────────────────────┐
+               ▼                                               ▼
+    ┌─────────────────────┐                       ┌─────────────────────┐
+    │     Business        │                       │  Business iAplicada │
+    │   (Colaborativo)    │                       │     (Entrega)       │
+    └─────────────────────┘                       └─────────────────────┘
+               │                                               │
+               ▼                                               ▼
+    ┌─────────────────────┐                       ┌─────────────────────┐
+    │ Cliente participa   │                       │ Cliente acompanha   │
+    │ do desenvolvimento  │                       │ entregas prontas    │
+    └─────────────────────┘                       └─────────────────────┘
+               │                                               │
+               ▼                                               ▼
+    ┌─────────────────────┐                       ┌─────────────────────┐
+    │ /mentoria           │                       │ /acompanhamento     │
+    │ (visão atual)       │                       │ (a ser construída)  │
+    └─────────────────────┘                       └─────────────────────┘
+```
 
 ---
 
 ## Seção Técnica
 
-### Código da Seção Skills na Aba Acesso
+### Migration SQL
 
-```typescript
-{/* Configuração Skills - aparece quando plano é Skills ou Business com Skills liberado */}
-{showSkillsConfig && (
-  <div className="space-y-4 mt-4">
-    <div className="flex items-center justify-between">
-      <Label className="text-sm font-medium">Configuração Skills</Label>
-      {hasSkillsVinculo && (
-        <Button
-          type="button"
-          variant="destructive"
-          size="sm"
-          onClick={handleRemoveSkillsVinculo}
-          disabled={removeSkillsMembro.isPending}
-        >
-          <Trash2 className="h-4 w-4 mr-1" />
-          Remover Vínculo
-        </Button>
-      )}
-    </div>
-    
-    {loadingSkillsMembro ? (
-      <div className="py-4 text-center text-muted-foreground text-sm">
-        Carregando...
-      </div>
-    ) : (
-      <>
-        <SkillsEquipeSelector
-          value={skillsEquipeData}
-          onChange={setSkillsEquipeData}
-          showLiderOption={true}
-        />
+```sql
+-- Adicionar novo valor ao enum
+ALTER TYPE plano_mentoria ADD VALUE 'business_iaplicada';
 
-        <div>
-          <Label htmlFor="cargo-skills">Cargo na Empresa</Label>
-          <Input
-            id="cargo-skills"
-            value={cargo}
-            onChange={(e) => setCargo(e.target.value)}
-            placeholder="Ex: Analista de Marketing"
-            className="mt-1"
-          />
-        </div>
-      </>
-    )}
-  </div>
-)}
+-- Atualizar menus para incluir novo plano
+UPDATE menu_config 
+SET planos_permitidos = array_append(planos_permitidos, 'business_iaplicada')
+WHERE 'business' = ANY(planos_permitidos);
 ```
 
-### Variável de Controle
+### Tipo Atualizado
 
 ```typescript
-// Determina se deve mostrar configuração Skills
-const showSkillsConfig = selectedPlano === "skills" || 
-                         (selectedPlano === "business" && skillsLiberado);
+// useUserPlan.tsx
+export type UserPlan = "academy" | "skills" | "business" | "business_iaplicada" | null;
+
+// Helper para verificar qualquer tipo Business
+const isAnyBusiness = (plan: UserPlan) => 
+  plan === "business" || plan === "business_iaplicada";
 ```
 
-### Submit Atualizado
+### Constante de Planos para Admin
 
 ```typescript
-const onSubmit = async (data: any) => {
-  if (!user) return;
-
-  const showSkillsConfig = selectedPlano === "skills" || 
-                           (selectedPlano === "business" && skillsLiberado);
-
-  // Atualizar dados gerais
-  await updateUser.mutateAsync({...});
-
-  // Atualizar Skills se configuração está visível e há dados de equipe
-  if (showSkillsConfig && (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe)) {
-    await updateSkillsMembro.mutateAsync({
-      userId: user.id,
-      equipeId: skillsEquipeData.equipeId,
-      novaEquipe: skillsEquipeData.novaEquipe,
-      papelEquipe: skillsEquipeData.papelEquipe,
-      cargo,
-    });
-  }
-};
+const PLANOS = [
+  { 
+    value: "academy", 
+    label: "Academy", 
+    description: "B2C Individual - Acesso às trilhas" 
+  },
+  { 
+    value: "skills", 
+    label: "Skills", 
+    description: "B2B - Licença corporativa" 
+  },
+  { 
+    value: "business", 
+    label: "Business", 
+    description: "Consultoria colaborativa - cliente participa" 
+  },
+  { 
+    value: "business_iaplicada", 
+    label: "Business iAplicada", 
+    description: "iAplicada constrói - cliente acompanha" 
+  },
+];
 ```
+
