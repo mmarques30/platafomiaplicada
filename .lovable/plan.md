@@ -1,71 +1,80 @@
 
-# Plano: Corrigir Visibilidade da Sala de Aula para Visitantes
+# Plano: Corrigir Erro ao Editar Conteúdo de Criador
 
 ## Problema Identificado
 
-O hook `useEffectivePlan` tem um bug na linha 153 que faz visitantes serem marcados como `isAcademy = true`:
+O erro ocorre porque o componente `Select` do Radix UI **não aceita strings vazias** como valor em `SelectItem`. No código atual:
 
-```typescript
-// Linha 153 (BUG)
-const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills;
+**Linha 672 do ConteudoModal.tsx:**
+```tsx
+<SelectItem value="">Nenhum</SelectItem>
 ```
 
-**Lógica atual para visitante:**
-- `effectiveIsBusiness = false`
-- `effectiveIsSkills = false`  
-- `effectiveIsAcademy = !false && !false = true` ← ERRADO!
-
-**Consequência:** No sidebar (linha 413), a condição `{!isAcademy && ...}` se torna `false`, ocultando o menu "Sala de Aula" para visitantes.
+Quando o usuário tenta editar um conteúdo do tipo "criador", o modal tenta renderizar o `Select` de Autor e quebra porque:
+1. O valor `""` (string vazia) não é válido para `SelectItem`
+2. Isso causa um erro de renderização que trava toda a página
 
 ## Solução
 
-Corrigir a lógica no hook `useEffectivePlan` para considerar que visitantes NÃO são Academy:
+Substituir a string vazia por um valor placeholder como `"none"` ou `"_none"`, e ajustar a lógica para converter esse valor de volta para `null`/`""` ao salvar.
 
-```typescript
-// Correção: só é Academy se tiver plano Academy e não for visitante
-const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills && !effectiveIsVisitante && plan === 'academy';
+### Correção no Campo Autor (linhas 664-679):
+
+**Antes:**
+```tsx
+<Select
+  value={watch('autor') || ''}
+  onValueChange={(v) => setValue('autor', v || '')}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Selecione um autor..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="">Nenhum</SelectItem>
+    {members.map(member => (
+      <SelectItem key={member.id} value={member.nome_completo}>
+        {member.nome_completo}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
 ```
 
-Mas como `effectiveIsVisitante` depende de `isLoading`, precisamos ajustar a ordem de cálculo.
-
-**Solução Correta:**
-
-```typescript
-// Linha 150-157 - CORRIGIR PARA:
-
-// Visitante real: flag do profile OU não tem plano (sem ser admin)
-// IMPORTANTE: Durante loading, não marcar como visitante para evitar redirect prematuro
-const effectiveIsVisitante = isLoading ? false : (isRealVisitante || (!isAdmin && !plan));
-
-// Sem simulação: flags de plano (só se não for visitante)
-const effectiveIsBusiness = isAdmin || isBusiness;
-const effectiveIsSkills = !effectiveIsBusiness && isSkills;
-// Corrigir: visitantes NÃO são Academy
-const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills && !effectiveIsVisitante && isAcademy;
+**Depois:**
+```tsx
+<Select
+  value={watch('autor') || '_none'}
+  onValueChange={(v) => setValue('autor', v === '_none' ? '' : v)}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Selecione um autor..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="_none">Nenhum</SelectItem>
+    {members.map(member => (
+      <SelectItem key={member.id} value={member.nome_completo}>
+        {member.nome_completo}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
 ```
 
-A mudança-chave é adicionar `&& !effectiveIsVisitante && isAcademy` na condição de `effectiveIsAcademy`, garantindo que:
-1. Visitantes não sejam marcados como Academy
-2. Só marca como Academy se o plano real for "academy"
+A mesma correção deve ser aplicada ao Select de "Criador" (criador_id) que está nas linhas 349-368.
 
 ---
 
-## Arquivo a Modificar
+## Arquivos a Modificar
 
 | Arquivo | Mudança |
 |---------|---------|
-| `src/hooks/useUserPlan.tsx` | Corrigir lógica de `effectiveIsAcademy` para não incluir visitantes |
+| `src/components/admin/content/ConteudoModal.tsx` | Substituir `value=""` por `value="_none"` nos dois Select (Autor e Criador) e ajustar a lógica de conversão |
 
 ---
 
 ## Resultado Esperado
 
-| Tipo de Usuário | isAcademy | Menu "Sala de Aula" |
-|-----------------|-----------|---------------------|
-| **Visitante** | `false` | Visível |
-| **Academy** | `true` | Oculto |
-| **Skills** | `false` | Visível |
-| **Business** | `false` | Menu Comunidade oculto |
-| **Admin** | `false` | Visível (como Business) |
-
-Com essa correção, visitantes poderão ver e acessar a Sala de Aula normalmente.
+Após a correção:
+- O modal de edição abrirá normalmente para conteúdos do tipo "criador"
+- A opção "Nenhum" funcionará corretamente sem causar erros
+- O campo será salvo como string vazia ou null no banco quando "Nenhum" for selecionado
