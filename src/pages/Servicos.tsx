@@ -1,14 +1,14 @@
 import { TextParallaxContent, ExampleContent } from "@/components/ui/text-parallax-content";
 import { AuthHeader } from "@/components/auth/AuthHeader";
 import { ArrowUpRight } from "lucide-react";
-
+import academyParallaxBg from "@/assets/academy-parallax-bg.jpg";
 const Servicos = () => {
   return (
     <div className="bg-[#1a1c19]">
       <AuthHeader />
       
       <TextParallaxContent
-        imgUrl="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop"
+        imgUrl={academyParallaxBg}
         subheading="Academy"
         heading={<><span className="whitespace-nowrap font-bold">A escola que transforma</span><br /><span className="whitespace-nowrap font-bold">sua carreira.</span></>}
       >
