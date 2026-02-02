@@ -3199,6 +3199,7 @@ export type Database = {
           profissao: string | null
           senha_alterada_em: string | null
           senha_temporaria: boolean | null
+          skills_liberado: boolean | null
           telefone: string | null
           ultimo_acesso: string | null
           updated_at: string | null
@@ -3227,6 +3228,7 @@ export type Database = {
           profissao?: string | null
           senha_alterada_em?: string | null
           senha_temporaria?: boolean | null
+          skills_liberado?: boolean | null
           telefone?: string | null
           ultimo_acesso?: string | null
           updated_at?: string | null
@@ -3255,6 +3257,7 @@ export type Database = {
           profissao?: string | null
           senha_alterada_em?: string | null
           senha_temporaria?: boolean | null
+          skills_liberado?: boolean | null
           telefone?: string | null
           ultimo_acesso?: string | null
           updated_at?: string | null

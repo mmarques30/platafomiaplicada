@@ -40,6 +40,7 @@ interface EditUserModalProps {
     origem_consultoria?: boolean;
     empresa_consultoria?: string;
     roles: string[];
+    skills_liberado?: boolean;
   } | null;
 }
 
@@ -60,6 +61,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const [contaAtiva, setContaAtiva] = useState(true);
   const [novaSenha, setNovaSenha] = useState("");
   const [forcarTroca, setForcarTroca] = useState(false);
+  const [skillsLiberado, setSkillsLiberado] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -73,6 +75,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setSelectedPlano((user.plano_mentoria as "academy" | "skills" | "business") || null);
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
+      setSkillsLiberado(user.skills_liberado ?? false);
     }
   }, [user, setValue]);
 
@@ -99,6 +102,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         data_expiracao_acesso: dataExpiracao?.toISOString() || null,
         conta_ativa: contaAtiva,
         roles: selectedRoles,
+        skills_liberado: selectedPlano === "business" ? skillsLiberado : false,
       },
     });
 
@@ -249,6 +253,25 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                 <p className="text-sm text-muted-foreground mt-2">
                   Selecione o produto/plano deste usuário
                 </p>
+                
+                {/* Switch para liberar Skills - apenas para Business */}
+                {selectedPlano === "business" && (
+                  <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
+                    <div>
+                      <Label htmlFor="skills-liberado" className="text-sm font-medium">
+                        Liberar acesso ao Skills
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Permite acessar o ambiente Skills além do Business
+                      </p>
+                    </div>
+                    <Switch
+                      id="skills-liberado"
+                      checked={skillsLiberado}
+                      onCheckedChange={setSkillsLiberado}
+                    />
+                  </div>
+                )}
               </div>
 
               <div>

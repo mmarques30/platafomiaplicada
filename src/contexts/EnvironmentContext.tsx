@@ -57,7 +57,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     return sessionStorage.getItem("selected_environment") as Environment | null;
   });
   
-  const { plan, isVisitante, isLoading: planLoading } = useUserPlan();
+  const { plan, isVisitante, isLoading: planLoading, skillsLiberado } = useUserPlan();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   
   const isLoading = planLoading || roleLoading;
@@ -77,7 +77,10 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     // Baseado no plano - hierarquia paralela
     switch (plan) {
       case "business":
-        return ["gratuito", "academy", "business"];
+        // Business sempre tem academy, e skills só se liberado
+        return skillsLiberado 
+          ? ["gratuito", "academy", "skills", "business"]
+          : ["gratuito", "academy", "business"];
       case "skills":
         return ["gratuito", "academy", "skills"];
       case "academy":
@@ -85,7 +88,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
       default:
         return ["gratuito"];
     }
-  }, [plan, isVisitante, isAdmin]);
+  }, [plan, isVisitante, isAdmin, skillsLiberado]);
 
   const setEnvironment = (env: Environment) => {
     setCurrentEnvironment(env);

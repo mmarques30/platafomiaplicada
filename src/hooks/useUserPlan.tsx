@@ -12,17 +12,18 @@ export function useUserPlan() {
   const { data, isPending } = useQuery({
     queryKey: ["user-plan", user?.id],
     queryFn: async () => {
-      if (!user) return { plan: null, isVisitante: false };
+      if (!user) return { plan: null, isVisitante: false, skillsLiberado: false };
       const { data, error } = await supabase
         .from("profiles")
-        .select("plano_mentoria, is_visitante")
+        .select("plano_mentoria, is_visitante, skills_liberado")
         .eq("id", user.id)
         .single();
 
       if (error) throw error;
       return {
         plan: data?.plano_mentoria as UserPlan,
-        isVisitante: data?.is_visitante ?? false
+        isVisitante: data?.is_visitante ?? false,
+        skillsLiberado: data?.skills_liberado ?? false
       };
     },
     enabled: !!user,
@@ -33,6 +34,7 @@ export function useUserPlan() {
 
   const plan = data?.plan ?? null;
   const isProfileVisitante = data?.isVisitante ?? false;
+  const skillsLiberado = data?.skillsLiberado ?? false;
 
   // Loading inclui auth + query pending
   const isLoading = authLoading || isPending;
@@ -66,6 +68,7 @@ export function useUserPlan() {
     isSkills: plan === "skills",
     isBusiness: plan === "business",
     isVisitante: isProfileVisitante,
+    skillsLiberado,
   };
 }
 
