@@ -1,75 +1,216 @@
 
 
-# Resolver Página Antiga Persistente
+# Diagnóstico: Imagens Lentas para Carregar
 
-## Problema Identificado
+## O Que Está Acontecendo
 
-A screenshot mostra uma versão **completamente desatualizada** do site publicado. O código atual tem:
+As imagens estão demorando para carregar por **duas razões principais**:
 
-| Elemento | Código Atual | Site Publicado |
-|----------|--------------|----------------|
-| Título | "Bem Vindo a IAplicada" | "Bem vindo Aplicado" |
-| Layout | Card central com abas | Dois colunas com depoimentos |
-| Botões | "Entrar" / "Criar Conta" (abas) | "Acessar" / "Criar Conta Grátis" (lado a lado) |
-| Google | Botão presente | Ausente |
+### 1. Imagens de Ambientes (Locais)
 
-**O código está correto. O site publicado não foi atualizado.**
+As imagens `env-*.jpg` estão em `src/assets/` e são importadas via ES6:
 
-## Causa Raiz
+```tsx
+// EnvironmentSelector.tsx
+import envBusinessImage from "@/assets/env-business.jpg";
+import envSkillsImage from "@/assets/env-skills.jpg";
+import envAcademyImage from "@/assets/env-academy.jpg";
+import envGratuitoImage from "@/assets/env-gratuito.jpg";
+```
 
-O Lovable mantém versões separadas:
-1. **Preview** - O que você vê aqui no editor (atualizado)
-2. **Publicado** - O que está em `platafomiaplicada.lovable.app` (desatualizado)
+**Problema**: Arquivos JPG grandes (provavelmente > 200KB cada) sem otimização de carregamento. O navegador precisa baixar todos antes de renderizar.
 
-Quando você clica "voltar ao início" no erro do Google OAuth, o navegador vai para o site **publicado**, que ainda tem a versão antiga.
+### 2. Imagens de Trilhas (Supabase Storage)
 
-## Solução
+As URLs vêm do banco de dados:
+```
+https://ocwpsanqtfubixerjive.supabase.co/storage/v1/object/public/trilhas-imagens/0.379...png
+```
 
-### Passo 1: Republicar o Site
+**Problema**: Imagens PNG armazenadas sem otimização (podem ser > 500KB cada).
 
-Clique no botão **"Publish"** (canto superior direito do Lovable) e depois **"Update"** para enviar as alterações mais recentes para produção.
+---
 
-### Passo 2: Limpar Cache do Navegador
+## Causas Raiz
 
-Após publicar, o navegador pode ainda mostrar a versão antiga por cache. Para resolver:
+| Fonte | Problema | Impacto |
+|-------|----------|---------|
+| Ambientes (locais) | JPGs grandes, sem preload | ~1-2s para carregar cada |
+| Trilhas (Supabase) | PNGs não otimizados, sem CDN com resize | ~2-4s para carregar cada |
+| PWA Cache | StaleWhileRevalidate para imagens | Primeiro acesso é lento |
 
-**Opção A - Aba Anônima:**
-- Abra uma nova aba anônima (Ctrl+Shift+N ou Cmd+Shift+N)
-- Acesse `platafomiaplicada.lovable.app/auth`
+---
 
-**Opção B - Hard Refresh:**
-- Na página do site, pressione Ctrl+Shift+R (Windows) ou Cmd+Shift+R (Mac)
+## Solução Proposta
 
-**Opção C - Limpar Cache Manualmente:**
-- Chrome: Configurações → Privacidade → Limpar dados de navegação
-- Safari: Develop → Empty Caches
+### A. Para Imagens de Ambientes (Efeito Imediato)
 
-### Passo 3: Verificar PWA Cache
+1. **Adicionar preload** das imagens críticas no `EnvironmentSelector.tsx`
+2. **Usar placeholder blur** enquanto carrega (shimmer effect)
+3. **Converter para WebP** se possível (menor tamanho)
 
-O projeto tem configuração de PWA que pode cachear assets agressivamente. Se mesmo após republicar a versão antiga persistir:
+### B. Para Imagens de Trilhas (Otimização)
 
-1. Abra DevTools (F12)
-2. Vá para Application → Storage
-3. Clique em "Clear site data"
-4. Recarregue a página
+1. **Adicionar skeleton/placeholder** durante carregamento
+2. **Implementar progressive loading** com blur
+3. **Usar `fetchpriority="high"`** para imagens acima do fold
 
-## Verificação
+### C. Para PWA Cache (Configuração)
 
-Após republicar, a página de login deve mostrar:
-- Título animado "Bem Vindo a IAplicada"
-- Card central com abas "Entrar" / "Criar Conta"  
-- Formulário de email/senha
-- Divisor "ou"
-- Botão "Continuar com Google"
-- Link "Esqueceu a senha?"
+1. **Mudar estratégia** de `StaleWhileRevalidate` para `CacheFirst` com fallback
+2. **Pre-cache** imagens críticas
 
-## Resumo
+---
 
-| Ação | Onde |
-|------|------|
-| Republicar site | Botão "Publish" → "Update" no Lovable |
-| Limpar cache | Aba anônima ou Ctrl+Shift+R |
-| Limpar PWA cache | DevTools → Application → Clear site data |
+## Implementação Detalhada
 
-**Nenhuma alteração de código é necessária** - o código já está correto e inclui o botão de login com Google.
+### Arquivo 1: `src/pages/EnvironmentSelector.tsx`
+
+Adicionar preload e estados de loading:
+
+```tsx
+// Adicionar preload via link no useEffect
+useEffect(() => {
+  const images = [envBusinessImage, envSkillsImage, envAcademyImage, envGratuitoImage];
+  images.forEach(src => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = src;
+    document.head.appendChild(link);
+  });
+}, []);
+```
+
+Adicionar skeleton enquanto imagem não carrega:
+
+```tsx
+<div className="relative w-40 h-40">
+  {!imageLoaded && (
+    <div className="absolute inset-0 bg-white/5 animate-pulse rounded-3xl" />
+  )}
+  <img
+    src={ENVIRONMENT_IMAGES[env]}
+    alt={config.label}
+    onLoad={() => setImageLoaded(true)}
+    className={cn(
+      "w-full h-full object-cover transition-opacity duration-300",
+      imageLoaded ? "opacity-100" : "opacity-0"
+    )}
+  />
+</div>
+```
+
+### Arquivo 2: `src/components/shared/TrilhaCard.tsx`
+
+Adicionar skeleton e progressive loading:
+
+```tsx
+import { useState } from "react";
+
+export function TrilhaCard({ id, titulo, imagem_url, visivel_apenas_pro }: TrilhaCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  return (
+    <Link to={`/trilhas/${id}`} className="block group">
+      <div className="overflow-hidden rounded-xl shadow-md ...">
+        {/* Skeleton enquanto carrega */}
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-muted animate-pulse" />
+        )}
+        <img
+          src={imagem_url || "/placeholder.svg"}
+          alt={titulo}
+          loading="lazy"
+          onLoad={() => setImageLoaded(true)}
+          className={cn(
+            "block w-full h-full object-cover ...",
+            imageLoaded ? "opacity-100" : "opacity-0"
+          )}
+        />
+        ...
+      </div>
+    </Link>
+  );
+}
+```
+
+### Arquivo 3: Criar `src/components/shared/OptimizedImage.tsx`
+
+Componente reutilizável para todas as imagens:
+
+```tsx
+interface OptimizedImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+  priority?: boolean;
+}
+
+export function OptimizedImage({ src, alt, className, priority = false }: OptimizedImageProps) {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative w-full h-full">
+      {!loaded && !error && (
+        <div className="absolute inset-0 bg-muted animate-pulse" />
+      )}
+      <img
+        src={error ? "/placeholder.svg" : src}
+        alt={alt}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+        className={cn(
+          "transition-opacity duration-300",
+          loaded ? "opacity-100" : "opacity-0",
+          className
+        )}
+      />
+    </div>
+  );
+}
+```
+
+### Arquivo 4: `vite.config.ts`
+
+Ajustar cache de imagens para CacheFirst:
+
+```ts
+{
+  urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/,
+  handler: 'CacheFirst',  // Mudança: era StaleWhileRevalidate
+  options: {
+    cacheName: 'images-cache-v11',
+    expiration: {
+      maxEntries: 200,
+      maxAgeSeconds: 7 * 24 * 60 * 60 // 7 dias
+    }
+  }
+}
+```
+
+---
+
+## Resumo das Alterações
+
+| Arquivo | Alteração |
+|---------|-----------|
+| `EnvironmentSelector.tsx` | Preload + skeleton + fade-in |
+| `TrilhaCard.tsx` | Skeleton + fade-in |
+| `TrilhaCardBloqueavel.tsx` | Skeleton + fade-in |
+| `VideoCardVertical.tsx` | Skeleton + fade-in |
+| `ModuloCard.tsx` | Skeleton + fade-in |
+| Novo: `OptimizedImage.tsx` | Componente reutilizável |
+| `vite.config.ts` | Cache strategy para CacheFirst |
+
+---
+
+## Resultado Esperado
+
+- **Primeira visita**: Skeleton/shimmer visível enquanto carrega (UX melhorada)
+- **Visitas seguintes**: Imagens carregam instantaneamente do cache
+- **Experiência geral**: Transições suaves com fade-in
 
