@@ -20,7 +20,7 @@ const Servicos = () => {
   };
 
   const handleSpecialistClick = () => {
-    window.open("http://wa.me/5511950566101", "_blank");
+    window.open("https://wa.me/5511950566101", "_blank");
   };
 
   return (
