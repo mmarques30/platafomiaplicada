@@ -86,12 +86,14 @@ const Servicos = () => {
             <p className="mb-4 text-xl text-neutral-400 md:text-2xl">
               É a única solução que organiza especificamente a operação, trocando o caos de planilhas + WhatsApp + sistemas desconectados por uma plataforma centralizada que automatiza tarefas e dá visibilidade total, em 30 dias, sem enrolação, sem soluções engessadas, sem dev.
             </p>
-            <button
-              onClick={handleSpecialistClick}
-              className="inline-flex items-center gap-1 text-[#9EB038] hover:underline"
+            <a
+              href="https://iaplicada.com/business/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#9EB038] text-[#1a1c19] font-semibold rounded-lg hover:bg-[#889C2D] transition-colors duration-200"
             >
-              Falar com especialista <ArrowUpRight className="w-4 h-4" />
-            </button>
+              Saber mais <ArrowUpRight className="w-5 h-5" />
+            </a>
           </div>
         </ExampleContent>
       </TextParallaxContent>
