@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.verificar-google-login]
 verify_jwt = false
+
+[functions.get-users-auth-providers]
+verify_jwt = true
