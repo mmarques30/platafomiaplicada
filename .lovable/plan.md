@@ -1,56 +1,100 @@
 
-# Correção: Erro 404 após Login com Google
 
-## Problema Identificado
+# Visualização do Método de Login no Painel Admin
 
-Após o Google OAuth retornar, o usuário vê uma página 404. Isso acontece porque:
+## Objetivo
 
-1. O `redirect_uri` está configurado como `window.location.origin` (raiz `/`)
-2. A raiz `/` é uma rota protegida que requer autenticação
-3. Quando o OAuth retorna com tokens na URL, pode haver um momento onde a sessão ainda não foi processada
-4. Se houver parâmetros não reconhecidos na URL, o React Router pode tratar como rota inexistente
+Adicionar uma coluna ou indicador visual na tabela de usuários do painel admin que mostre se cada usuário utiliza **Google** ou **Email/Senha** para fazer login.
 
-## Solução
+## Como Funciona a Detecção
 
-Alterar o `redirect_uri` para apontar para a página de autenticação (`/auth`) em vez da raiz. A página `/auth` já tem lógica para:
-- Processar o retorno do OAuth
-- Detectar se o usuário está autenticado via `useAuth`
-- Redirecionar automaticamente para `/selecionar-ambiente` quando logado
+No Lovable Cloud, o método de login fica armazenado no campo `app_metadata.provider` da tabela `auth.users`:
+- `google` = Login via Google OAuth
+- `email` = Login via email/senha tradicional
 
-## Alteração Necessária
+Como a tabela `auth.users` é protegida, precisamos criar uma edge function para consultar essa informação.
 
-### Arquivo: `src/components/auth/GoogleLoginVerificationModal.tsx`
+## Alterações Necessárias
 
-**Linha 67-69:** Alterar o `redirect_uri`:
+### 1. Nova Edge Function: `get-users-auth-providers`
 
-```typescript
-// De:
-const { error: oauthError } = await lovable.auth.signInWithOAuth("google", {
-  redirect_uri: window.location.origin,
-});
-
-// Para:
-const { error: oauthError } = await lovable.auth.signInWithOAuth("google", {
-  redirect_uri: `${window.location.origin}/auth`,
-});
-```
-
-## Fluxo Corrigido
+Criar uma função que consulte o `app_metadata.provider` de todos os usuários:
 
 ```text
-┌──────────────┐      ┌─────────────┐      ┌──────────────┐      ┌───────────────────┐
-│  Usuário     │ ───▶ │   Google    │ ───▶ │   /auth      │ ───▶ │ /selecionar-      │
-│  clica       │      │   OAuth     │      │   (processa  │      │  ambiente         │
-│  "Google"    │      │   consent   │      │   callback)  │      │                   │
-└──────────────┘      └─────────────┘      └──────────────┘      └───────────────────┘
+supabase/functions/get-users-auth-providers/index.ts
 ```
 
-## Arquivos Afetados
+A função vai:
+- Verificar se o solicitante é admin
+- Usar `supabaseAdmin.auth.admin.listUsers()` para listar todos os usuários
+- Retornar um mapa de `userId -> provider`
 
-- `src/components/auth/GoogleLoginVerificationModal.tsx` - Alterar redirect_uri
+### 2. Novo Hook: `useUsersAuthProviders`
 
-## Resultado Esperado
+Criar um hook para consumir a edge function:
 
-- Após autenticar com Google, o usuário retorna para `/auth`
-- A página `/auth` detecta a sessão ativa e redireciona automaticamente para `/selecionar-ambiente`
-- Sem mais erro 404 após login com Google
+```text
+src/hooks/admin/useUsersAuthProviders.tsx
+```
+
+### 3. Atualizar Página de Gerenciar Usuários
+
+```text
+src/pages/admin/GerenciarUsuarios.tsx
+```
+
+Adicionar:
+- Nova coluna "Login" na tabela
+- Badge visual indicando o método:
+  - **Google**: Badge azul com ícone do Google
+  - **Email**: Badge cinza com ícone de envelope
+
+## Visual Final
+
+| Nome | Email | ... | Login | Status | Ações |
+|------|-------|-----|-------|--------|-------|
+| João | joao@... | ... | 🔷 Google | Ativo | ✏️ 🗑️ |
+| Maria | maria@... | ... | 📧 Email | Ativo | ✏️ 🗑️ |
+
+## Arquivos a Criar/Modificar
+
+1. `supabase/functions/get-users-auth-providers/index.ts` - Nova edge function
+2. `src/hooks/admin/useUsersAuthProviders.tsx` - Novo hook
+3. `src/pages/admin/GerenciarUsuarios.tsx` - Adicionar coluna na tabela
+
+## Detalhes Técnicos
+
+### Edge Function
+
+```typescript
+// Usa auth.admin.listUsers() que retorna app_metadata
+const { data: { users } } = await supabaseAdmin.auth.admin.listUsers()
+
+const providers: Record<string, string> = {}
+users.forEach(user => {
+  providers[user.id] = user.app_metadata?.provider || 'email'
+})
+
+return providers
+```
+
+### Badge Component
+
+```tsx
+{authProvider === 'google' ? (
+  <Badge className="bg-blue-100 text-blue-700 border-blue-200">
+    <svg>...</svg> Google
+  </Badge>
+) : (
+  <Badge variant="outline" className="text-muted-foreground">
+    <Mail className="h-3 w-3 mr-1" /> Email
+  </Badge>
+)}
+```
+
+## Considerações de Performance
+
+- A listagem de usuários do auth só é chamada uma vez por acesso à página
+- O hook faz cache via React Query
+- Para páginas com muitos usuários, a paginação do `listUsers()` será implementada
+
