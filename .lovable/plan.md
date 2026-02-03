@@ -1,117 +1,118 @@
 
-# Plano: Adicionar Business iAplicada às Opções de Admin e Unificar Visão Business
+# Plano: Restaurar Botão "Contribuir" na Aba Materiais
 
 ## Contexto
 
-O usuário esclareceu que:
-1. Usuários Business (ambos tipos) entram pelo ambiente "business"
-2. A identificação interna (colaborativo vs iAplicada) determina o que ele vê
-3. Admin precisa poder simular Business iAplicada para testes
+O botão de contribuição (para compartilhar materiais) está funcionando corretamente na aba "Criadores" da Sala de Aula (`/videos-bonus?tab=criadores`), porém **nunca foi implementado** na aba "Materiais" da página Métodos para Aplicar (`/metodos-aplicar?tab=materiais`).
 
-## Arquivos a Modificar
+O componente `MateriaisBibliotecaTab.tsx` atualmente exibe apenas os materiais da comunidade, sem permitir que os membros contribuam com novos materiais.
 
-| Arquivo | Alteração |
-|---------|-----------|
-| `src/contexts/EnvironmentContext.tsx` | Adicionar `business_iaplicada` aos ambientes disponíveis para admin |
-| `src/components/layout/EnvironmentSwitcher.tsx` | Adicionar `business_iaplicada` à lista de todos os ambientes |
+## Requisitos Confirmados
 
----
+1. **Quem pode contribuir**: Usuários autenticados dos planos Academy, Skills e Business (não visitantes)
+2. **Tipos permitidos**: Vários tipos (Prompt, Documento, Template, Imagem, Ferramenta, etc.)
+3. **Visibilidade configurável pelo membro**: O usuário escolhe se o material será visível para:
+   - **"Comunidade Gratuita"** (visibilidade = "gratuito"): Visitantes E membros veem
+   - **"Comunidade Paga"** (visibilidade = "pago"): Apenas membros veem
+4. **Moderação**: Materiais enviados precisam de aprovação do admin antes de ficarem visíveis (`ativo = false`)
 
-## Detalhamento das Alterações
+## Solução
 
-### 1. EnvironmentContext.tsx (linha 74-76)
+Reutilizar o modal `AdicionarMaterialModal` que já existe e funciona perfeitamente na aba Criadores. Este modal já possui:
+- Seleção de tipo e categoria
+- Opção de visibilidade (Gratuito ou Pago) com ícones e descrições claras
+- Upload de múltiplos arquivos
+- Campo de descrição e prompt/orientação
+- Envio para aprovação (`ativo = false`)
 
-**Antes:**
-```typescript
-if (isAdmin) {
-  return ["gratuito", "academy", "skills", "business"];
-}
-```
+## Alterações Técnicas
 
-**Depois:**
-```typescript
-if (isAdmin) {
-  return ["gratuito", "academy", "skills", "business", "business_iaplicada"];
-}
-```
+### Arquivo: `src/components/biblioteca/MateriaisBibliotecaTab.tsx`
 
-### 2. EnvironmentSwitcher.tsx (linha 15)
+1. **Adicionar imports necessários**:
+   - `Button` de `@/components/ui/button`
+   - `Plus` de `lucide-react`
+   - `AdicionarMaterialModal` de `@/components/comunidade/AdicionarMaterialModal`
+   - `useAuth` de `@/hooks/useAuth`
+   - `useUserRole` de `@/hooks/useUserRole`
+   - `useState` (já importado)
 
-**Antes:**
-```typescript
-const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business"];
-```
+2. **Adicionar estado para controlar o modal**:
+   ```typescript
+   const [showAddModal, setShowAddModal] = useState(false);
+   ```
 
-**Depois:**
-```typescript
-const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business", "business_iaplicada"];
-```
+3. **Adicionar lógica de permissão**:
+   ```typescript
+   const { user } = useAuth();
+   const { isVisitante, isLoading: isPlanLoading } = useUserRole();
+   
+   // Apenas membros autenticados (não visitantes) podem contribuir
+   const canContribute = !!user && !isPlanLoading && !isVisitante;
+   ```
 
----
+4. **Adicionar botão "Contribuir" na área de filtros**:
+   - Posicionado à direita dos dropdowns de filtro
+   - Visível apenas quando `canContribute` é verdadeiro
+   - Estilo consistente com o resto da interface
 
-## Hierarquia Final de Acesso (Confirmada)
+5. **Renderizar o modal ao final do componente**:
+   ```tsx
+   <AdicionarMaterialModal
+     open={showAddModal}
+     onOpenChange={setShowAddModal}
+   />
+   ```
 
-| Plano | Ambientes Disponíveis |
-|-------|----------------------|
-| Gratuito (Visitante) | `gratuito` |
-| Academy | `gratuito`, `academy` |
-| Skills | `gratuito`, `academy`, `skills` |
-| Business | `gratuito`, `academy`, `business` |
-| Business + Skills | `gratuito`, `academy`, `skills`, `business` |
-| Business iAplicada | `gratuito`, `academy`, `business_iaplicada` |
-| Business iAplicada + Skills | `gratuito`, `academy`, `skills`, `business_iaplicada` |
-| **Admin (simulação)** | `gratuito`, `academy`, `skills`, `business`, `business_iaplicada` |
-
----
-
-## Fluxo de Identificação Interna
+## Layout Visual
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                  Usuário entra na plataforma                │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│           useUserPlan verifica plano_mentoria               │
-│                                                             │
-│   • business → Business Colaborativo                        │
-│   • business_iaplicada → Business iAplicada                 │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│         EnvironmentContext define ambientes                 │
-│                                                             │
-│   • business → ambiente "business"                          │
-│   • business_iaplicada → ambiente "business_iaplicada"      │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│      Componentes adaptam interface baseado no ambiente      │
-│                                                             │
-│   • Menus diferentes (AppSidebar)                           │
-│   • Abas diferentes (/mentoria)                             │
-│   • Permissões diferentes                                   │
-└─────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  ANTES (atual)                                                     │
+├────────────────────────────────────────────────────────────────────┤
+│  [Buscar materiais...] [Tipo ▼] [Categoria ▼]                      │
+│                                                                    │
+│  Cards de materiais...                                             │
+└────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────┐
+│  DEPOIS (com botão)                                                │
+├────────────────────────────────────────────────────────────────────┤
+│  [Buscar materiais...] [Tipo ▼] [Categoria ▼]   [+ Contribuir]     │
+│                                                                    │
+│  Cards de materiais...                                             │
+│                                                                    │
+│  + AdicionarMaterialModal (renderizado quando showAddModal=true)   │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
----
+## Fluxo do Usuário
+
+1. Membro (Academy/Skills/Business) acessa `/metodos-aplicar?tab=materiais`
+2. Vê o botão "Contribuir" à direita dos filtros
+3. Clica no botão → abre o modal `AdicionarMaterialModal`
+4. Preenche os campos:
+   - Nome da ferramenta/material
+   - Tipo e Categoria
+   - **Visibilidade**: "Comunidade Gratuita" (todos veem) ou "Comunidade Paga" (só membros)
+   - Descrição (opcional)
+   - Prompt/Orientação (opcional)
+   - Arquivos (PDF, PPTX, DOCX, TXT, MD)
+5. Envia → material fica com `ativo = false` aguardando aprovação
+6. Toast de sucesso: "Material enviado para aprovação!"
+7. Admin aprova no painel → material aparece para a comunidade
+
+## Reutilização de Código
+
+O modal `AdicionarMaterialModal` já implementa:
+- Validação de campos obrigatórios
+- Upload de arquivos para o storage `materiais-comunidade`
+- Inserção na tabela `materiais_comunidade` com `ativo = false`
+- Seleção de visibilidade com RadioGroup
+- Feedback visual durante envio
+
+Não é necessário criar nenhum componente ou hook novo.
 
 ## Resultado Esperado
 
-### Para Admin - Dropdown "Ver como...":
-- ✅ Visitante (gratuito)
-- ✅ Academy
-- ✅ Skills
-- ✅ Business
-- ✅ Business iAplicada ← **NOVO**
-
-### Para Admin - EnvironmentSwitcher:
-- ✅ Mostra todos os 5 ambientes
-- ✅ Pode alternar entre todos para testar interfaces
-
-### Para Usuário Real Business iAplicada:
-- ✅ Vê apenas: `gratuito`, `academy`, `business_iaplicada`
-- ✅ Interface e menus específicos do iAplicada
+Após a implementação, membros dos planos Academy, Skills e Business poderão compartilhar ferramentas e materiais diretamente pela aba Materiais, escolhendo se querem que visitantes também vejam ou apenas outros membros.
