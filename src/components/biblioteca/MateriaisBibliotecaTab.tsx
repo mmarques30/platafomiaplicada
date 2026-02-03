@@ -2,11 +2,15 @@ import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMateriaisComunidade } from "@/hooks/useMateriaisComunidade";
-import { Search, FileText, Download, ExternalLink, Users } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
+import { Search, FileText, Download, ExternalLink, Users, Plus } from "lucide-react";
 import { AnimatedAvatarTooltip } from "@/components/comunidade/AnimatedAvatarTooltip";
+import { AdicionarMaterialModal } from "@/components/comunidade/AdicionarMaterialModal";
 import { cn } from "@/lib/utils";
 
 const TIPOS = [
@@ -32,6 +36,13 @@ export function MateriaisBibliotecaTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTipo, setSelectedTipo] = useState<string>("all");
   const [selectedCategoria, setSelectedCategoria] = useState<string>("all");
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const { user } = useAuth();
+  const { isVisitante, isLoading: isPlanLoading } = useUserRole();
+
+  // Apenas membros autenticados (não visitantes) podem contribuir
+  const canContribute = !!user && !isPlanLoading && !isVisitante;
 
   const { materiais, isLoading } = useMateriaisComunidade({
     tipo: selectedTipo !== "all" ? selectedTipo : undefined,
@@ -57,45 +68,58 @@ export function MateriaisBibliotecaTab() {
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Filtros */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        {/* Busca */}
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder="Buscar materiais..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-4 flex-1">
+          {/* Busca */}
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Buscar materiais..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Dropdown de Tipo */}
+          <Select value={selectedTipo} onValueChange={setSelectedTipo}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              {TIPOS.map((tipo) => (
+                <SelectItem key={tipo.value} value={tipo.value}>
+                  {tipo.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Dropdown de Categoria */}
+          <Select value={selectedCategoria} onValueChange={setSelectedCategoria}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIAS.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>
+                  {cat.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Dropdown de Tipo */}
-        <Select value={selectedTipo} onValueChange={setSelectedTipo}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Tipo" />
-          </SelectTrigger>
-          <SelectContent>
-            {TIPOS.map((tipo) => (
-              <SelectItem key={tipo.value} value={tipo.value}>
-                {tipo.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Dropdown de Categoria */}
-        <Select value={selectedCategoria} onValueChange={setSelectedCategoria}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIAS.map((cat) => (
-              <SelectItem key={cat.value} value={cat.value}>
-                {cat.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Botão Contribuir - visível apenas para membros */}
+        {canContribute && (
+          <Button 
+            onClick={() => setShowAddModal(true)}
+            className="shrink-0"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Contribuir
+          </Button>
+        )}
       </div>
 
       {/* Conteúdo */}
@@ -188,6 +212,12 @@ export function MateriaisBibliotecaTab() {
           </div>
         </Card>
       )}
+
+      {/* Modal de Adicionar Material */}
+      <AdicionarMaterialModal
+        open={showAddModal}
+        onOpenChange={setShowAddModal}
+      />
     </div>
   );
 }
