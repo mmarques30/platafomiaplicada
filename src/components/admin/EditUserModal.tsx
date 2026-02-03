@@ -26,6 +26,12 @@ import { SkillsEquipeSelector, SkillsEquipeData } from "./SkillsEquipeSelector";
 
 type AppRole = "admin" | "mentorado" | "aluno_trilha";
 
+// Verifica se o email é do Google (@gmail.com ou @googlemail.com)
+function isGoogleEmail(email: string): boolean {
+  const lowerEmail = email.toLowerCase();
+  return lowerEmail.endsWith("@gmail.com") || lowerEmail.endsWith("@googlemail.com");
+}
+
 interface EditUserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -43,6 +49,7 @@ interface EditUserModalProps {
     empresa_consultoria?: string;
     roles: string[];
     skills_liberado?: boolean;
+    google_login_autorizado?: boolean;
   } | null;
 }
 
@@ -68,6 +75,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const [novaSenha, setNovaSenha] = useState("");
   const [forcarTroca, setForcarTroca] = useState(false);
   const [skillsLiberado, setSkillsLiberado] = useState(false);
+  const [googleLoginAutorizado, setGoogleLoginAutorizado] = useState(false);
   const [skillsEquipeData, setSkillsEquipeData] = useState<SkillsEquipeData>({
     equipeId: null,
     novaEquipe: null,
@@ -88,6 +96,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
       setSkillsLiberado(user.skills_liberado ?? false);
+      setGoogleLoginAutorizado(user.google_login_autorizado ?? false);
     }
   }, [user, setValue]);
 
@@ -135,6 +144,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         conta_ativa: contaAtiva,
         roles: selectedRoles,
         skills_liberado: (selectedPlano === "business" || selectedPlano === "business_iaplicada") ? skillsLiberado : false,
+        google_login_autorizado: googleLoginAutorizado,
       },
     });
 
@@ -429,6 +439,25 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                   onCheckedChange={setContaAtiva}
                 />
               </div>
+
+              {/* Toggle de autorização Google - só aparece se email não é @gmail.com */}
+              {user && !isGoogleEmail(user.email) && (
+                <div className="flex items-center justify-between space-x-2 p-3 bg-muted/50 rounded-lg">
+                  <div>
+                    <Label htmlFor="google-login-autorizado" className="text-sm font-medium">
+                      Autorizar Login com Google
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Permite login com Google mesmo com email não @gmail.com
+                    </p>
+                  </div>
+                  <Switch
+                    id="google-login-autorizado"
+                    checked={googleLoginAutorizado}
+                    onCheckedChange={setGoogleLoginAutorizado}
+                  />
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="seguranca" className="space-y-4">

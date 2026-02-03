@@ -3779,6 +3779,7 @@ export type Database = {
           email: string | null
           email_acesso_enviado: boolean | null
           empresa_consultoria: string | null
+          google_login_autorizado: boolean | null
           id: string
           idade: number | null
           is_visitante: boolean | null
@@ -3811,6 +3812,7 @@ export type Database = {
           email?: string | null
           email_acesso_enviado?: boolean | null
           empresa_consultoria?: string | null
+          google_login_autorizado?: boolean | null
           id: string
           idade?: number | null
           is_visitante?: boolean | null
@@ -3843,6 +3845,7 @@ export type Database = {
           email?: string | null
           email_acesso_enviado?: boolean | null
           empresa_consultoria?: string | null
+          google_login_autorizado?: boolean | null
           id?: string
           idade?: number | null
           is_visitante?: boolean | null

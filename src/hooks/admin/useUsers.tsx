@@ -161,6 +161,7 @@ export function useUpdateUser() {
         conta_ativa?: boolean;
         roles?: AppRole[];
         skills_liberado?: boolean;
+        google_login_autorizado?: boolean;
       };
     }) => {
       const { roles, ...profileUpdates } = updates;

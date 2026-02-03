@@ -6,10 +6,13 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { RecuperarSenhaModal } from "@/components/auth/RecuperarSenhaModal";
+import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
+import { GoogleLoginVerificationModal } from "@/components/auth/GoogleLoginVerificationModal";
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showRecuperarSenha, setShowRecuperarSenha] = useState(false);
+  const [showGoogleVerification, setShowGoogleVerification] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -73,6 +76,19 @@ export function LoginForm() {
           {isLoading ? "Acessando..." : "Acessar"}
         </Button>
 
+        {/* Divisor com "ou" */}
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-white/10" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-zinc-900 px-4 text-white/40">ou</span>
+          </div>
+        </div>
+
+        {/* Botão Google */}
+        <GoogleLoginButton onClick={() => setShowGoogleVerification(true)} />
+
         {/* Link esqueceu a senha */}
         <div className="text-center mt-3">
           <button
@@ -89,6 +105,12 @@ export function LoginForm() {
       <RecuperarSenhaModal
         open={showRecuperarSenha}
         onOpenChange={setShowRecuperarSenha}
+      />
+
+      {/* Modal de verificação Google */}
+      <GoogleLoginVerificationModal
+        open={showGoogleVerification}
+        onOpenChange={setShowGoogleVerification}
       />
     </>
   );
