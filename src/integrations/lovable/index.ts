@@ -2,7 +2,20 @@
 
 import { createLovableAuth } from "@lovable.dev/cloud-auth-js";
 import { supabase } from "../supabase/client";
-const lovableAuth = createLovableAuth({});
+
+// Detectar se está em domínio Lovable nativo
+const isLovableDomain = 
+  typeof window !== "undefined" && (
+    window.location.hostname.includes("lovable.app") ||
+    window.location.hostname.includes("lovableproject.com")
+  );
+
+// Para domínios próprios, usar URL absoluta do broker via domínio Lovable
+const lovableAuth = createLovableAuth({
+  oauthBrokerUrl: isLovableDomain 
+    ? "/~oauth/initiate" 
+    : "https://platafomiaplicada.lovable.app/~oauth/initiate",
+});
 
 export const lovable = {
   auth: {
