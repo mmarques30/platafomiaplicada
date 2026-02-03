@@ -65,7 +65,7 @@ export function GoogleLoginVerificationModal({ open, onOpenChange }: GoogleLogin
       setIsRedirecting(true);
       
       const { error: oauthError } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth`,
       });
 
       if (oauthError) {
