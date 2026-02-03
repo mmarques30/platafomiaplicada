@@ -97,12 +97,12 @@ export default defineConfig(({ mode }) => ({
           },
           {
             urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/,
-            handler: 'StaleWhileRevalidate',
+            handler: 'CacheFirst',
             options: {
-              cacheName: 'images-cache-v10',
+              cacheName: 'images-cache-v11',
               expiration: {
                 maxEntries: 200,
-                maxAgeSeconds: 86400
+                maxAgeSeconds: 7 * 24 * 60 * 60 // 7 dias
               }
             }
           }
