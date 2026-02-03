@@ -1,118 +1,171 @@
 
-# Plano: Restaurar Botão "Contribuir" na Aba Materiais
+# Plano: Login com Google com Restrições de Acesso
 
-## Contexto
+## Resumo das Regras de Negócio (Atualizado)
 
-O botão de contribuição (para compartilhar materiais) está funcionando corretamente na aba "Criadores" da Sala de Aula (`/videos-bonus?tab=criadores`), porém **nunca foi implementado** na aba "Materiais" da página Métodos para Aplicar (`/metodos-aplicar?tab=materiais`).
+| Tipo de Usuário | Email Google (@gmail.com) | Email Não-Google | Novo Cadastro |
+|-----------------|---------------------------|------------------|---------------|
+| **Mentorado existente** | Pode usar Google | Precisa autorização do admin | N/A |
+| **Visitante existente** | Pode usar Google | Não pode usar Google | N/A |
+| **Novo usuário** | Não pode (precisa preencher dados primeiro) | Não pode | Só via formulário |
 
-O componente `MateriaisBibliotecaTab.tsx` atualmente exibe apenas os materiais da comunidade, sem permitir que os membros contribuam com novos materiais.
+## Arquitetura da Solução
 
-## Requisitos Confirmados
-
-1. **Quem pode contribuir**: Usuários autenticados dos planos Academy, Skills e Business (não visitantes)
-2. **Tipos permitidos**: Vários tipos (Prompt, Documento, Template, Imagem, Ferramenta, etc.)
-3. **Visibilidade configurável pelo membro**: O usuário escolhe se o material será visível para:
-   - **"Comunidade Gratuita"** (visibilidade = "gratuito"): Visitantes E membros veem
-   - **"Comunidade Paga"** (visibilidade = "pago"): Apenas membros veem
-4. **Moderação**: Materiais enviados precisam de aprovação do admin antes de ficarem visíveis (`ativo = false`)
-
-## Solução
-
-Reutilizar o modal `AdicionarMaterialModal` que já existe e funciona perfeitamente na aba Criadores. Este modal já possui:
-- Seleção de tipo e categoria
-- Opção de visibilidade (Gratuito ou Pago) com ícones e descrições claras
-- Upload de múltiplos arquivos
-- Campo de descrição e prompt/orientação
-- Envio para aprovação (`ativo = false`)
-
-## Alterações Técnicas
-
-### Arquivo: `src/components/biblioteca/MateriaisBibliotecaTab.tsx`
-
-1. **Adicionar imports necessários**:
-   - `Button` de `@/components/ui/button`
-   - `Plus` de `lucide-react`
-   - `AdicionarMaterialModal` de `@/components/comunidade/AdicionarMaterialModal`
-   - `useAuth` de `@/hooks/useAuth`
-   - `useUserRole` de `@/hooks/useUserRole`
-   - `useState` (já importado)
-
-2. **Adicionar estado para controlar o modal**:
-   ```typescript
-   const [showAddModal, setShowAddModal] = useState(false);
-   ```
-
-3. **Adicionar lógica de permissão**:
-   ```typescript
-   const { user } = useAuth();
-   const { isVisitante, isLoading: isPlanLoading } = useUserRole();
-   
-   // Apenas membros autenticados (não visitantes) podem contribuir
-   const canContribute = !!user && !isPlanLoading && !isVisitante;
-   ```
-
-4. **Adicionar botão "Contribuir" na área de filtros**:
-   - Posicionado à direita dos dropdowns de filtro
-   - Visível apenas quando `canContribute` é verdadeiro
-   - Estilo consistente com o resto da interface
-
-5. **Renderizar o modal ao final do componente**:
-   ```tsx
-   <AdicionarMaterialModal
-     open={showAddModal}
-     onOpenChange={setShowAddModal}
-   />
-   ```
-
-## Layout Visual
+O fluxo de login com Google exige validação especial antes de permitir o acesso:
 
 ```text
-┌────────────────────────────────────────────────────────────────────┐
-│  ANTES (atual)                                                     │
-├────────────────────────────────────────────────────────────────────┤
-│  [Buscar materiais...] [Tipo ▼] [Categoria ▼]                      │
-│                                                                    │
-│  Cards de materiais...                                             │
-└────────────────────────────────────────────────────────────────────┘
-
-┌────────────────────────────────────────────────────────────────────┐
-│  DEPOIS (com botão)                                                │
-├────────────────────────────────────────────────────────────────────┤
-│  [Buscar materiais...] [Tipo ▼] [Categoria ▼]   [+ Contribuir]     │
-│                                                                    │
-│  Cards de materiais...                                             │
-│                                                                    │
-│  + AdicionarMaterialModal (renderizado quando showAddModal=true)   │
-└────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│  FLUXO DE LOGIN COM GOOGLE                                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  1. Usuário clica em "Entrar com Google"                                │
+│                     ↓                                                   │
+│  2. Abre modal pedindo email para verificação prévia                    │
+│                     ↓                                                   │
+│  3. Edge function verifica se email existe na base                      │
+│     - NÃO EXISTE → Bloquear (novos devem usar formulário)               │
+│     - EXISTE:                                                           │
+│         - Email @gmail.com → Permitir (mentorado OU visitante)          │
+│         - Email não-Google + Visitante → Bloquear                       │
+│         - Email não-Google + Mentorado → Verificar autorização          │
+│                     ↓                                                   │
+│  4. Se aprovado, redirecionar para OAuth do Google                      │
+│                     ↓                                                   │
+│  5. Callback processa login                                             │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Fluxo do Usuário
+## Implementação Detalhada
 
-1. Membro (Academy/Skills/Business) acessa `/metodos-aplicar?tab=materiais`
-2. Vê o botão "Contribuir" à direita dos filtros
-3. Clica no botão → abre o modal `AdicionarMaterialModal`
-4. Preenche os campos:
-   - Nome da ferramenta/material
-   - Tipo e Categoria
-   - **Visibilidade**: "Comunidade Gratuita" (todos veem) ou "Comunidade Paga" (só membros)
-   - Descrição (opcional)
-   - Prompt/Orientação (opcional)
-   - Arquivos (PDF, PPTX, DOCX, TXT, MD)
-5. Envia → material fica com `ativo = false` aguardando aprovação
-6. Toast de sucesso: "Material enviado para aprovação!"
-7. Admin aprova no painel → material aparece para a comunidade
+### Parte 1: Migração de Banco de Dados
 
-## Reutilização de Código
+Adicionar campo `google_login_autorizado` na tabela `profiles` para mentorados com email não-Google que receberam autorização do admin.
 
-O modal `AdicionarMaterialModal` já implementa:
-- Validação de campos obrigatórios
-- Upload de arquivos para o storage `materiais-comunidade`
-- Inserção na tabela `materiais_comunidade` com `ativo = false`
-- Seleção de visibilidade com RadioGroup
-- Feedback visual durante envio
+```sql
+ALTER TABLE profiles 
+ADD COLUMN google_login_autorizado boolean DEFAULT false;
 
-Não é necessário criar nenhum componente ou hook novo.
+COMMENT ON COLUMN profiles.google_login_autorizado IS 
+  'Autorização do admin para login com Google quando o email não é @gmail.com';
+```
+
+### Parte 2: Configurar OAuth do Lovable Cloud
+
+Usar a ferramenta `supabase--configure-social-auth` para gerar o módulo de integração com Google OAuth. Isso criará automaticamente os arquivos necessários em `src/integrations/lovable/`.
+
+### Parte 3: Edge Function de Verificação
+
+Criar `supabase/functions/verificar-google-login/index.ts` que valida se o usuário pode fazer login com Google ANTES de redirecionar para o OAuth.
+
+**Lógica da função:**
+
+```typescript
+// Pseudocódigo da validação
+function verificarPermissao(email: string) {
+  const profile = await getProfileByEmail(email);
+  
+  // Novo usuário - deve usar formulário para preencher telefone
+  if (!profile) {
+    return { permitido: false, motivo: 'novo_usuario' };
+  }
+  
+  // Email do Google (@gmail.com ou @googlemail.com) - pode sempre
+  if (isGoogleEmail(email)) {
+    return { permitido: true };
+  }
+  
+  // Visitante com email não-Google - não pode
+  if (profile.is_visitante) {
+    return { permitido: false, motivo: 'visitante_email_nao_google' };
+  }
+  
+  // Mentorado com email não-Google - precisa autorização
+  if (profile.google_login_autorizado) {
+    return { permitido: true };
+  }
+  
+  return { permitido: false, motivo: 'nao_autorizado' };
+}
+```
+
+### Parte 4: Componentes de Frontend
+
+#### 4.1 Novo Componente: `GoogleLoginButton.tsx`
+
+Botão estilizado para login com Google, seguindo o padrão visual da página de auth.
+
+#### 4.2 Novo Componente: `GoogleLoginVerificationModal.tsx`
+
+Modal que aparece ao clicar no botão Google:
+- Input para o usuário digitar seu email
+- Validação em tempo real
+- Chamada à edge function de verificação
+- Mensagens de erro contextuais
+- Se aprovado, inicia o fluxo OAuth
+
+#### 4.3 Atualizar: `LoginForm.tsx`
+
+Adicionar o botão Google e integrar com o modal de verificação.
+
+**Layout atualizado:**
+```text
+┌──────────────────────────────────────────┐
+│  Email                                   │
+│  [_______________________________]       │
+│                                          │
+│  Senha                                   │
+│  [_______________________________]       │
+│                                          │
+│  [         Acessar         ]             │
+│                                          │
+│  ─────────── ou ───────────              │
+│                                          │
+│  [G] Entrar com Google                   │
+│                                          │
+│  Esqueceu a senha?                       │
+└──────────────────────────────────────────┘
+```
+
+### Parte 5: Painel Admin - Autorização de Login Google
+
+Adicionar toggle no modal de edição de mentorado (`EditMentoradoModal.tsx`) para autorizar login com Google quando o email não é @gmail.com.
+
+O toggle só aparece quando o email do mentorado NÃO é @gmail.com (para emails Google, a autorização é automática).
+
+## Mensagens de Feedback para o Usuário
+
+| Situação | Mensagem |
+|----------|----------|
+| Email não encontrado | "Este email não está cadastrado. Use a aba 'Criar Conta' para se registrar com seus dados." |
+| Visitante com email não-Google | "O login com Google está disponível apenas para emails @gmail.com. Entre com email e senha." |
+| Mentorado sem autorização | "Seu email não é do Google. Solicite autorização ao administrador para usar este método de login." |
+| Sucesso | Redireciona para OAuth do Google |
+
+## Arquivos a Criar
+
+1. `supabase/functions/verificar-google-login/index.ts` - Edge function de validação
+2. `src/components/auth/GoogleLoginButton.tsx` - Botão de login com Google
+3. `src/components/auth/GoogleLoginVerificationModal.tsx` - Modal de verificação de email
+
+## Arquivos a Modificar
+
+1. `src/components/auth/LoginForm.tsx` - Adicionar botão Google e integração
+2. `src/components/admin/EditMentoradoModal.tsx` - Adicionar toggle de autorização Google
+3. `supabase/config.toml` - Adicionar configuração da edge function
+4. Migração SQL para adicionar coluna `google_login_autorizado`
+
+## Segurança
+
+- A verificação acontece ANTES do OAuth, evitando criação de contas não autorizadas
+- O campo `google_login_autorizado` só pode ser alterado por admins (protegido por RLS)
+- Novos cadastros via Google são impossíveis (validação requer email já existente)
+- Edge function usa CORS adequado e não requer JWT (verificação é por email)
 
 ## Resultado Esperado
 
-Após a implementação, membros dos planos Academy, Skills e Business poderão compartilhar ferramentas e materiais diretamente pela aba Materiais, escolhendo se querem que visitantes também vejam ou apenas outros membros.
+Após a implementação:
+- Mentorados e visitantes com @gmail.com podem logar com Google imediatamente
+- Mentorados com outros emails precisam de autorização prévia do admin
+- Visitantes com emails não-Google são orientados a usar email/senha
+- Novos usuários são orientados a criar conta pelo formulário (coletando telefone)
