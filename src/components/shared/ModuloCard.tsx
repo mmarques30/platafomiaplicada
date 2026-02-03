@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ModuloCardProps {
   trilhaId: string;
@@ -18,6 +20,8 @@ export function ModuloCard({
   imagem_url,
   visivel_apenas_pro
 }: ModuloCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   return (
     <Link 
       to={`/trilhas/${trilhaId}?modulo=${moduloId}`} 
@@ -29,11 +33,18 @@ export function ModuloCard({
             🔒 PRO
           </div>
         )}
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-muted animate-pulse" />
+        )}
         <img
           src={imagem_url || "/placeholder.svg"}
           alt={titulo}
           loading="lazy"
-          className="block w-full h-full object-cover object-center"
+          onLoad={() => setImageLoaded(true)}
+          className={cn(
+            "block w-full h-full object-cover object-center transition-opacity duration-300",
+            imageLoaded ? "opacity-100" : "opacity-0"
+          )}
         />
         
         {/* Overlay com título e descrição */}

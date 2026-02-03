@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Gift, GraduationCap, Users, Crown, Lock, LucideProps, Wrench } from "lucide-react";
@@ -45,11 +45,29 @@ export default function EnvironmentSelector() {
   } = useEnvironment();
   const { isAdmin } = useUserRole();
 
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+
+  // Preload images
+  useEffect(() => {
+    const images = [envBusinessImage, envSkillsImage, envAcademyImage, envGratuitoImage];
+    images.forEach(src => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = src;
+      document.head.appendChild(link);
+    });
+  }, []);
+
   useEffect(() => {
     if (!isLoading && currentEnvironment) {
       navigate("/", { replace: true });
     }
   }, [currentEnvironment, isLoading, navigate]);
+
+  const handleImageLoad = (env: Environment) => {
+    setLoadedImages(prev => new Set(prev).add(env));
+  };
 
   const handleSelectEnvironment = (env: Environment) => {
     if (!availableEnvironments.includes(env)) {
@@ -168,11 +186,20 @@ export default function EnvironmentSelector() {
 
                 {/* Conteúdo do card */}
                 {hasImage ? (
-                  <img
-                    src={ENVIRONMENT_IMAGES[env]}
-                    alt={config.label}
-                    className="w-full h-full object-cover"
-                  />
+                  <>
+                    {!loadedImages.has(env) && (
+                      <div className="absolute inset-0 bg-white/5 animate-pulse" />
+                    )}
+                    <img
+                      src={ENVIRONMENT_IMAGES[env]}
+                      alt={config.label}
+                      onLoad={() => handleImageLoad(env)}
+                      className={cn(
+                        "w-full h-full object-cover transition-opacity duration-300",
+                        loadedImages.has(env) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </>
                 ) : (
                   <div
                     className={cn(

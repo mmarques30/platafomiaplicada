@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Lock, Clock } from "lucide-react";
 import { FavoriteButton } from "./FavoriteButton";
+import { cn } from "@/lib/utils";
 
 interface TrilhaCardBloqueavelProps {
   id: string;
@@ -25,17 +27,25 @@ export function TrilhaCardBloqueavel({
   temConteudoDisponivel = true,
   aspectRatio = "9/16"
 }: TrilhaCardBloqueavelProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
   
   // VISITANTE sem conteúdo disponível → Cadeado clicável para /aplique
   if (isVisitante && !temConteudoDisponivel) {
     return (
       <Link to="/servicos" className="block">
         <div className="relative overflow-hidden rounded-xl shadow-md w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow aspect-[9/16]">
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-muted animate-pulse" />
+          )}
           <img
             src={imagem_url || "/placeholder.svg"}
             alt={titulo}
             loading="lazy"
-            className="block w-full h-full object-cover object-center opacity-50 grayscale"
+            onLoad={() => setImageLoaded(true)}
+            className={cn(
+              "block w-full h-full object-cover object-center opacity-50 grayscale transition-opacity duration-300",
+              imageLoaded ? "opacity-50" : "opacity-0"
+            )}
           />
           
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -68,11 +78,18 @@ export function TrilhaCardBloqueavel({
             </div>
           )}
           
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-muted animate-pulse" />
+          )}
           <img
             src={imagem_url || "/placeholder.svg"}
             alt={titulo}
             loading="lazy"
-            className="block w-full h-full object-cover object-center opacity-50 grayscale"
+            onLoad={() => setImageLoaded(true)}
+            className={cn(
+              "block w-full h-full object-cover object-center opacity-50 grayscale transition-opacity duration-300",
+              imageLoaded ? "opacity-50" : "opacity-0"
+            )}
           />
           
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -113,11 +130,18 @@ export function TrilhaCardBloqueavel({
             size="md"
           />
         </div>
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-muted animate-pulse" />
+        )}
         <img
           src={imagem_url || "/placeholder.svg"}
           alt={titulo}
           loading="lazy"
-          className="block w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          onLoad={() => setImageLoaded(true)}
+          className={cn(
+            "block w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-500",
+            imageLoaded ? "opacity-100" : "opacity-0"
+          )}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
           <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-primary shadow-2xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">

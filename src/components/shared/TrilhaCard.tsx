@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { FavoriteButton } from "./FavoriteButton";
+import { cn } from "@/lib/utils";
 
 interface TrilhaCardProps {
   id: string;
@@ -10,6 +12,8 @@ interface TrilhaCardProps {
 }
 
 export function TrilhaCard({ id, titulo, imagem_url, visivel_apenas_pro }: TrilhaCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   return (
     <Link to={`/trilhas/${id}`} className="block group">
       <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative h-[280px] sm:h-[320px] md:h-[400px] w-full bg-muted border-2 border-primary/10 hover:border-primary/30">
@@ -26,11 +30,18 @@ export function TrilhaCard({ id, titulo, imagem_url, visivel_apenas_pro }: Trilh
             size="md"
           />
         </div>
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-muted animate-pulse" />
+        )}
         <img
           src={imagem_url || "/placeholder.svg"}
           alt={titulo}
           loading="lazy"
-          className="block w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          onLoad={() => setImageLoaded(true)}
+          className={cn(
+            "block w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-500",
+            imageLoaded ? "opacity-100" : "opacity-0"
+          )}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
           <div className="w-14 h-14 rounded-full bg-primary shadow-2xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">

@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Play } from "lucide-react";
 import { getYouTubeThumbnail } from "@/lib/youtube";
 import { FavoriteButton } from "./FavoriteButton";
 import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
+import { cn } from "@/lib/utils";
 
 interface VideoCardVerticalProps {
   id: string;
@@ -21,6 +23,7 @@ export function VideoCardVertical({
   trilha_id,
   aspectRatio = "9/16"
 }: VideoCardVerticalProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const thumbnailUrl = getYouTubeThumbnail(youtube_id, thumbnail_customizado_url);
   const { logAccess } = useContentAccessLogger();
 
@@ -35,11 +38,18 @@ export function VideoCardVertical({
       onClick={handleClick}
     >
       <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-neutral-800 aspect-[9/16]">
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-neutral-700 animate-pulse" />
+        )}
         <img
           src={thumbnailUrl}
           alt={titulo}
           loading="lazy"
-          className="block w-full h-full object-cover object-center bg-neutral-700"
+          onLoad={() => setImageLoaded(true)}
+          className={cn(
+            "block w-full h-full object-cover object-center bg-neutral-700 transition-opacity duration-300",
+            imageLoaded ? "opacity-100" : "opacity-0"
+          )}
         />
         
         {/* Botão de Favoritar */}
