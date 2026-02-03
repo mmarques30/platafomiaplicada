@@ -1,55 +1,56 @@
 
-# Correção: Login com Google para Qualquer Email Cadastrado
+# Correção: Erro 404 após Login com Google
 
 ## Problema Identificado
 
-A lógica atual na edge function `verificar-google-login` verifica se o email é `@gmail.com` ou `@googlemail.com` para permitir o login. Porém, o usuário quer que **qualquer pessoa já cadastrada** possa usar o Google Login, independente do domínio do email.
+Após o Google OAuth retornar, o usuário vê uma página 404. Isso acontece porque:
 
-## Nova Regra de Negócio Simplificada
+1. O `redirect_uri` está configurado como `window.location.origin` (raiz `/`)
+2. A raiz `/` é uma rota protegida que requer autenticação
+3. Quando o OAuth retorna com tokens na URL, pode haver um momento onde a sessão ainda não foi processada
+4. Se houver parâmetros não reconhecidos na URL, o React Router pode tratar como rota inexistente
 
-| Situação | Resultado |
-|----------|-----------|
-| Email não cadastrado | Bloquear (deve usar formulário) |
-| Email cadastrado (qualquer domínio) | Permitir Google Login |
+## Solução
 
-## Alterações Necessárias
+Alterar o `redirect_uri` para apontar para a página de autenticação (`/auth`) em vez da raiz. A página `/auth` já tem lógica para:
+- Processar o retorno do OAuth
+- Detectar se o usuário está autenticado via `useAuth`
+- Redirecionar automaticamente para `/selecionar-ambiente` quando logado
 
-### 1. Simplificar Edge Function
+## Alteração Necessária
 
-**Arquivo:** `supabase/functions/verificar-google-login/index.ts`
+### Arquivo: `src/components/auth/GoogleLoginVerificationModal.tsx`
 
-A lógica será drasticamente simplificada:
-- Remover a função `isGoogleEmail()`
-- Remover verificações de `is_visitante` e `google_login_autorizado`
-- Apenas verificar se o email existe na base de dados
+**Linha 67-69:** Alterar o `redirect_uri`:
 
 ```typescript
-// Nova lógica simplificada:
-if (!profile) {
-  return { permitido: false, motivo: "novo_usuario" }
-}
-return { permitido: true }
+// De:
+const { error: oauthError } = await lovable.auth.signInWithOAuth("google", {
+  redirect_uri: window.location.origin,
+});
+
+// Para:
+const { error: oauthError } = await lovable.auth.signInWithOAuth("google", {
+  redirect_uri: `${window.location.origin}/auth`,
+});
 ```
 
-### 2. Corrigir Estilo do Botão Cancelar
+## Fluxo Corrigido
 
-**Arquivo:** `src/components/auth/GoogleLoginVerificationModal.tsx`
+```text
+┌──────────────┐      ┌─────────────┐      ┌──────────────┐      ┌───────────────────┐
+│  Usuário     │ ───▶ │   Google    │ ───▶ │   /auth      │ ───▶ │ /selecionar-      │
+│  clica       │      │   OAuth     │      │   (processa  │      │  ambiente         │
+│  "Google"    │      │   consent   │      │   callback)  │      │                   │
+└──────────────┘      └─────────────┘      └──────────────┘      └───────────────────┘
+```
 
-Adicionar fundo escuro ao botão para torná-lo visível:
-- De: `className="flex-1 border-white/10 text-white hover:bg-zinc-800"`
-- Para: `className="flex-1 bg-zinc-800 border-white/10 text-white hover:bg-zinc-700"`
+## Arquivos Afetados
 
-### 3. Manter ou Remover Campo `google_login_autorizado`?
-
-Como a nova regra permite qualquer email cadastrado, o campo `google_login_autorizado` na tabela `profiles` e o toggle no painel admin não são mais necessários. Porém, recomendo **manter** por enquanto para evitar erros de migração e possibilitar voltar à regra anterior se necessário.
-
-## Arquivos a Modificar
-
-1. `supabase/functions/verificar-google-login/index.ts` - Simplificar lógica de validação
-2. `src/components/auth/GoogleLoginVerificationModal.tsx` - Corrigir estilo do botão
+- `src/components/auth/GoogleLoginVerificationModal.tsx` - Alterar redirect_uri
 
 ## Resultado Esperado
 
-- Qualquer usuário já cadastrado (mentorado ou visitante, qualquer domínio) pode usar Google Login
-- Novos usuários continuam sendo direcionados para o formulário de cadastro
-- Botão "Cancelar" ficará visível com fundo escuro
+- Após autenticar com Google, o usuário retorna para `/auth`
+- A página `/auth` detecta a sessão ativa e redireciona automaticamente para `/selecionar-ambiente`
+- Sem mais erro 404 após login com Google
