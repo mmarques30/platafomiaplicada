@@ -135,7 +135,7 @@ export function GoogleLoginVerificationModal({ open, onOpenChange }: GoogleLogin
               variant="outline"
               onClick={handleClose}
               disabled={isVerifying || isRedirecting}
-              className="flex-1 border-white/10 text-white hover:bg-zinc-800"
+              className="flex-1 bg-zinc-800 border-white/10 text-white hover:bg-zinc-700"
             >
               Cancelar
             </Button>
