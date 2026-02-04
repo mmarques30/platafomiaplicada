@@ -33,11 +33,11 @@ const Servicos = () => {
         heading={<><span className="whitespace-nowrap font-bold">A escola que transforma</span><br /><span className="whitespace-nowrap font-bold">sua carreira.</span></>}
       >
         <ExampleContent>
-          <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white">
+          <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white mt-8">
             IAplicada Academy
           </h2>
-          <div className="col-span-1 md:col-span-8">
-            <p className="mb-4 text-xl text-neutral-400 md:text-2xl">
+          <div className="col-span-1 md:col-span-8 mt-8">
+            <p className="mb-4 text-base text-neutral-400 md:text-lg">
               A escola que transforma sua carreira e decola ela em 90 dias. Feita Para profissionais que querem ser 2-3x mais produtivos e indispensáveis na empresa, não mais uma plataforma de IAs soltas nem curso genérico de 6 horas. Acesse a versão gratuita da plataforma por tempo limitado ao se cadastrar.
             </p>
             <button
@@ -56,11 +56,11 @@ const Servicos = () => {
         heading={<><span className="whitespace-nowrap font-bold">Sua equipe até 50%</span><br /><span className="whitespace-nowrap font-bold">mais produtiva</span></>}
       >
         <ExampleContent>
-          <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white">
+          <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white mt-8">
             IAplicada Skills
           </h2>
-          <div className="col-span-1 md:col-span-8">
-            <p className="mb-4 text-xl text-neutral-400 md:text-2xl">
+          <div className="col-span-1 md:col-span-8 mt-8">
+            <p className="mb-4 text-base text-neutral-400 md:text-lg">
               A solução que elimina até 20h/semana de tarefas manuais de equipes, trocando planilhas + processos repetitivos por automações práticas que rodam no dia a dia, em 12 semanas. O Skills é para líderes que querem sua equipe performando ao máximo, resolvendo os problemas reais do dia a dia - não certificados individuais ou nem conhecimento teórico.
             </p>
             <button
@@ -79,11 +79,11 @@ const Servicos = () => {
         heading="A única solução que organiza sua operação."
       >
         <ExampleContent>
-          <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white">
+          <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white mt-8">
             IAplicada Business
           </h2>
-          <div className="col-span-1 md:col-span-8">
-            <p className="mb-4 text-xl text-neutral-400 md:text-2xl">
+          <div className="col-span-1 md:col-span-8 mt-8">
+            <p className="mb-4 text-base text-neutral-400 md:text-lg">
               É a única solução que organiza especificamente a operação, trocando o caos de planilhas + WhatsApp + sistemas desconectados por uma plataforma centralizada que automatiza tarefas e dá visibilidade total, em 30 dias, sem enrolação, sem soluções engessadas, sem dev.
             </p>
             <a
