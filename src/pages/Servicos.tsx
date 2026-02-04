@@ -42,9 +42,9 @@ const Servicos = () => {
             </p>
             <button
               onClick={handleAcademyClick}
-              className="inline-flex items-center gap-1 text-[#9EB038] hover:underline"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#1a1c19] border border-[#2a2c29] text-[#9EB038] font-medium rounded-sm hover:border-[#9EB038] transition-all duration-300 uppercase tracking-wider text-xs"
             >
-              Saiba mais <ArrowUpRight className="w-4 h-4" />
+              Saiba mais <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
             </button>
           </div>
         </ExampleContent>
@@ -65,9 +65,9 @@ const Servicos = () => {
             </p>
             <button
               onClick={handleSpecialistClick}
-              className="inline-flex items-center gap-1 text-[#9EB038] hover:underline"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#1a1c19] border border-[#2a2c29] text-[#9EB038] font-medium rounded-sm hover:border-[#9EB038] transition-all duration-300 uppercase tracking-wider text-xs"
             >
-              Falar com especialista <ArrowUpRight className="w-4 h-4" />
+              Falar com especialista <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
             </button>
           </div>
         </ExampleContent>
