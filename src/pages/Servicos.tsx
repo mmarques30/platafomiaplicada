@@ -90,9 +90,9 @@ const Servicos = () => {
               href="https://iaplicada.com/business/"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-8 py-4 border border-[#9EB038] text-[#9EB038] font-medium rounded-sm hover:bg-[#9EB038] hover:text-[#1a1c19] transition-all duration-300 uppercase tracking-wider text-sm"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#1a1c19] border border-[#2a2c29] text-[#9EB038] font-medium rounded-sm hover:border-[#9EB038] transition-all duration-300 uppercase tracking-wider text-xs"
             >
-              Saber mais <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+              Saber mais <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
             </a>
           </div>
         </ExampleContent>
