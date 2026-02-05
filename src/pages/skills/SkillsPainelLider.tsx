@@ -188,10 +188,10 @@ export default function SkillsPainelLider() {
       {/* Alertas */}
       {alertas.length > 0 && (
         <div>
-          <div className="border-l-4 pl-4 mb-4" style={{ borderColor: brandGreen }}>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Atencao Necessaria</h2>
-            <p className="text-gray-600 text-sm">Itens que precisam de acompanhamento</p>
-          </div>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Atencao Necessaria</h3>
+          <p className="text-gray-500 text-sm">Itens que precisam de acompanhamento</p>
+        </div>
 
           <div className="space-y-3">
             {alertas.map((alerta, index) => (
@@ -230,9 +230,9 @@ export default function SkillsPainelLider() {
 
       {/* Cronograma */}
       <div>
-        <div className="border-l-4 pl-4 mb-4" style={{ borderColor: brandGreen }}>
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Cronograma</h2>
-          <p className="text-gray-600 text-sm">Progresso nas 12 semanas</p>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Cronograma</h3>
+          <p className="text-gray-500 text-sm">Progresso nas 12 semanas</p>
         </div>
 
         <div className="bg-white p-6 rounded-lg border border-gray-200">
@@ -277,9 +277,9 @@ export default function SkillsPainelLider() {
 
       {/* Equipe */}
       <div>
-        <div className="border-l-4 pl-4 mb-4" style={{ borderColor: brandGreen }}>
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Equipe</h2>
-          <p className="text-gray-600 text-sm">Acompanhamento individual</p>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Equipe</h3>
+          <p className="text-gray-500 text-sm">Acompanhamento individual</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -332,9 +332,9 @@ export default function SkillsPainelLider() {
 
       {/* Entregas */}
       <div>
-        <div className="border-l-4 pl-4 mb-4" style={{ borderColor: brandGreen }}>
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Entregas</h2>
-          <p className="text-gray-600 text-sm">Status dos projetos da equipe</p>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Entregas</h3>
+          <p className="text-gray-500 text-sm">Status dos projetos da equipe</p>
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
