@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { TrocarSenhaModal } from "./components/auth/TrocarSenhaModal";
 import { useAuth } from "./hooks/useAuth";
@@ -164,6 +164,13 @@ function AppContent() {
             <Route path="/skills/lider" element={<SkillsLiderDashboard />} />
             <Route path="/skills/trilhas" element={<SkillsTrilhas />} />
             <Route path="/skills/progresso" element={<SkillsMeuProgresso />} />
+
+            {/* Aliases/redirects para evitar 404 por links antigos ou barra final */}
+            <Route path="/skills/progresso/" element={<Navigate to="/skills/progresso" replace />} />
+            <Route path="/skills/meu-progresso" element={<Navigate to="/skills/progresso" replace />} />
+            <Route path="/skills/painel-lider" element={<Navigate to="/skills/progresso" replace />} />
+            <Route path="/skills/painel-do-lider" element={<Navigate to="/skills/progresso" replace />} />
+            <Route path="/skills/lider/" element={<Navigate to="/skills/lider" replace />} />
             
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/mentoria" element={<Mentoria />} />
