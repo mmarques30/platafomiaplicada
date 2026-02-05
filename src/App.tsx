@@ -39,6 +39,7 @@ import SkillsRoadmap from "./pages/skills/SkillsRoadmap";
 import SkillsEntregas from "./pages/skills/SkillsEntregas";
 import SkillsLiderDashboard from "./pages/skills/SkillsLiderDashboard";
 import SkillsTrilhas from "./pages/skills/SkillsTrilhas";
+import SkillsMeuProgresso from "./pages/skills/SkillsMeuProgresso";
 
 import MentoriaSessoes from "./pages/MentoriaSessoes";
 import MentoriaRecursos from "./pages/MentoriaRecursos";
@@ -162,6 +163,7 @@ function AppContent() {
             <Route path="/skills/entregas" element={<SkillsEntregas />} />
             <Route path="/skills/lider" element={<SkillsLiderDashboard />} />
             <Route path="/skills/trilhas" element={<SkillsTrilhas />} />
+            <Route path="/skills/progresso" element={<SkillsMeuProgresso />} />
             
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/mentoria" element={<Mentoria />} />
