@@ -132,8 +132,16 @@ export function AppSidebar() {
   // Helper para determinar URL dinâmica baseada no plano
   const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
     if (menu.menu_key === 'meu_progresso') {
-      // Business vai para /mentoria (Visão Geral), demais para /evolucao
-      return effectivePlan === 'business' ? '/mentoria' : '/evolucao';
+      // Skills vai para /skills/progresso
+      if (effectivePlan === 'skills' || effectiveEnvironment === 'skills') {
+        return '/skills/progresso';
+      }
+      // Business vai para /mentoria (Visão Geral)
+      if (effectivePlan === 'business' || effectivePlan === 'business_iaplicada') {
+        return '/mentoria';
+      }
+      // Demais (Academy) vai para /evolucao
+      return '/evolucao';
     }
     return menu.url || "/";
   };
