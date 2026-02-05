@@ -4,6 +4,7 @@ import { Users, Clock, CheckCircle, TrendingUp, AlertCircle } from "lucide-react
 // Brand colors
 const brandGreen = '#738925';
 const brandBlack = '#0D0D0D';
+const brandBeigeLight = '#F5F5DC';
 
 // Mock data
 const equipe = [
@@ -118,6 +119,17 @@ const getMemberCardClasses = (status: string) => {
   }
 };
 
+// Pill-style section header
+const SectionHeader = ({ title, subtitle }: { title: string; subtitle: string }) => (
+  <div 
+    className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
+    style={{ backgroundColor: brandBeigeLight }}
+  >
+    <span className="font-semibold text-gray-900">{title}</span>
+    <span className="text-gray-500 text-sm">{subtitle}</span>
+  </div>
+);
+
 export default function SkillsPainelLider() {
   const alertas = [
     ...equipe.filter(m => m.status === 'atrasado').map(m => ({
@@ -185,55 +197,9 @@ export default function SkillsPainelLider() {
         </div>
       </div>
 
-      {/* Alertas */}
-      {alertas.length > 0 && (
-        <div>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Atencao Necessaria</h3>
-          <p className="text-gray-500 text-sm">Itens que precisam de acompanhamento</p>
-        </div>
-
-          <div className="space-y-3">
-            {alertas.map((alerta, index) => (
-              <div 
-                key={index} 
-                className={`rounded-lg p-4 ${
-                  alerta.tipo === 'error' 
-                    ? 'bg-red-50 border border-red-200' 
-                    : 'bg-yellow-50 border border-yellow-200'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <AlertCircle 
-                    className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                      alerta.tipo === 'error' ? 'text-red-600' : 'text-yellow-600'
-                    }`} 
-                  />
-                  <div>
-                    <p className={`font-semibold text-sm ${
-                      alerta.tipo === 'error' ? 'text-red-800' : 'text-yellow-800'
-                    }`}>
-                      {alerta.titulo}
-                    </p>
-                    <p className={`text-sm ${
-                      alerta.tipo === 'error' ? 'text-red-700' : 'text-yellow-700'
-                    }`}>
-                      {alerta.descricao}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Cronograma */}
       <div>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Cronograma</h3>
-          <p className="text-gray-500 text-sm">Progresso nas 12 semanas</p>
-        </div>
+        <SectionHeader title="Cronograma" subtitle="Progresso nas 12 semanas" />
 
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-4">
@@ -277,10 +243,7 @@ export default function SkillsPainelLider() {
 
       {/* Equipe */}
       <div>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Equipe</h3>
-          <p className="text-gray-500 text-sm">Acompanhamento individual</p>
-        </div>
+        <SectionHeader title="Equipe" subtitle="Acompanhamento individual" />
 
         <div className="grid md:grid-cols-2 gap-4">
           {equipe.map((membro) => (
@@ -332,10 +295,7 @@ export default function SkillsPainelLider() {
 
       {/* Entregas */}
       <div>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Entregas</h3>
-          <p className="text-gray-500 text-sm">Status dos projetos da equipe</p>
-        </div>
+        <SectionHeader title="Entregas" subtitle="Status dos projetos da equipe" />
 
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <Table>
@@ -385,6 +345,46 @@ export default function SkillsPainelLider() {
           </Table>
         </div>
       </div>
+
+      {/* Alertas - agora por ultimo */}
+      {alertas.length > 0 && (
+        <div>
+          <SectionHeader title="Atencao Necessaria" subtitle="Itens que precisam de acompanhamento" />
+
+          <div className="space-y-3">
+            {alertas.map((alerta, index) => (
+              <div 
+                key={index} 
+                className={`rounded-lg p-4 ${
+                  alerta.tipo === 'error' 
+                    ? 'bg-red-50 border border-red-200' 
+                    : 'bg-yellow-50 border border-yellow-200'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <AlertCircle 
+                    className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                      alerta.tipo === 'error' ? 'text-red-600' : 'text-yellow-600'
+                    }`} 
+                  />
+                  <div>
+                    <p className={`font-semibold text-sm ${
+                      alerta.tipo === 'error' ? 'text-red-800' : 'text-yellow-800'
+                    }`}>
+                      {alerta.titulo}
+                    </p>
+                    <p className={`text-sm ${
+                      alerta.tipo === 'error' ? 'text-red-700' : 'text-yellow-700'
+                    }`}>
+                      {alerta.descricao}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
