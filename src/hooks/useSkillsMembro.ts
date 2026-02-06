@@ -5,8 +5,8 @@ import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { useUserRole } from "./useUserRole";
 
 export function useSkillsMembro() {
-  const { user } = useAuth();
-  const { isAdmin } = useUserRole();
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
   
   // Obter contexto de simulação (admin visualizando como outro usuário)
   let impersonatedUserId: string | null = null;
@@ -47,6 +47,6 @@ export function useSkillsMembro() {
     isLider: data?.papel === "lider",
     isMembro: data?.papel === "membro",
     cargo: data?.cargo ?? null,
-    isLoading,
+    isLoading: isLoading || authLoading || roleLoading,
   };
 }
