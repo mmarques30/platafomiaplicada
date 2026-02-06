@@ -46,7 +46,11 @@ const MOCK_EQUIPE = {
   pending: ["Colaborador C", "Colaborador D"],
 };
 
-export default function DiagnosticoResults() {
+interface DiagnosticoResultsProps {
+  onRefill?: () => void;
+}
+
+export default function DiagnosticoResults({ onRefill }: DiagnosticoResultsProps) {
   return (
     <div className="space-y-6">
       {/* Perfil Mapeado */}
