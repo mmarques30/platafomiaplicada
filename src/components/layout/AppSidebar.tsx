@@ -297,7 +297,7 @@ export function AppSidebar() {
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="group w-full relative">
+                        <SidebarMenuButton className="group w-full relative pl-4">
                           <span className={cn(
                             "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                             ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
@@ -305,7 +305,7 @@ export function AppSidebar() {
                               : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
                           )} />
                           <div className={cn(
-                            "flex items-center gap-2 rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 w-full",
+                            "flex items-center gap-3 rounded-lg transition-all duration-200 font-medium py-2.5 w-full",
                             ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
                               ? "text-primary font-semibold" 
                               : "text-sidebar-foreground hover:text-primary"
@@ -444,7 +444,7 @@ export function AppSidebar() {
                         to="/squad" 
                         end
                         className={cn(
-                          "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
+                          "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 flex items-center gap-3",
                           location.pathname === '/squad'
                             ? "text-primary font-semibold" 
                             : "text-sidebar-foreground hover:text-primary"
@@ -480,7 +480,7 @@ export function AppSidebar() {
                 >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="group w-full relative">
+                      <SidebarMenuButton className="group w-full relative pl-4">
                         <span className={cn(
                           "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                           (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
@@ -488,7 +488,7 @@ export function AppSidebar() {
                             : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
                         )} />
                         <div className={cn(
-                          "flex items-center gap-2 rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 w-full",
+                          "flex items-center gap-3 rounded-lg transition-all duration-200 font-medium py-2.5 w-full",
                           (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
                             ? "text-primary font-semibold" 
                             : "text-sidebar-foreground hover:text-primary"
