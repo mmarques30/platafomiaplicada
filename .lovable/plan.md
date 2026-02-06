@@ -1,335 +1,192 @@
 
+# Plano Completo: Correção e Implementação do Painel do Líder Skills
 
-# Plano: Painel do Lider - Dashboard Analitico
+## Problema Identificado
 
-## Visao Geral
+Existem duas estruturas de dados paralelas:
 
-Criar um dashboard executivo unico e visual para o lider do Squad, focado em analise de performance, metricas de ROI, filtros interativos, ranking de colaboradores e evolucao de maturidade de IA no negocio.
+| Tabelas Corretas (pré-existentes) | Tabelas Duplicadas (criadas por erro) |
+|-----------------------------------|---------------------------------------|
+| equipes_skills | squads |
+| membros_equipe_skills | membros_squad |
+| entregas_skills | entregas_squad |
+| roadmap_skills | roadmap_squad |
+| metricas_skills | metricas_squad |
 
----
+O painel do líder (`SquadLiderPainel.tsx`) está usando as tabelas `squads` (vazias), enquanto deveria usar as tabelas `*_skills` já existentes e populáveis via admin.
 
-## Layout do Dashboard
-
-Pagina unica scrollavel com blocos visuais integrados:
-
-```text
-+----------------------------------------------------------+
-|  HEADER: Painel do Lider - [Nome do Squad]               |
-+----------------------------------------------------------+
-|  FILTROS: [Periodo] [Colaborador] [Projeto] [Status]     |
-+----------------------------------------------------------+
-|  [KPI]  |  [KPI]  |  [KPI]  |  [KPI]                    |
-+----------------------------------------------------------+
-|  CRONOGRAMA 12 SEMANAS (barra horizontal)                |
-+----------------------------------------------------------+
-|  GRAFICO: Impacto vs ROI      |  GRAFICO: Maturidade IA  |
-|  (AreaChart com 2 curvas)     |  (BarChart por semana)   |
-+----------------------------------------------------------+
-|  RANKING DE ENTREGAS POR COLABORADOR                     |
-|  (Tabela com indicadores de performance e avaliacao)     |
-+----------------------------------------------------------+
-|  RESUMO DE IMPACTO (ROI consolidado)                     |
-+----------------------------------------------------------+
-```
+Além disso, o menu está duplicado: há código hardcoded no `AppSidebar.tsx` + entradas dinâmicas no `menu_config`.
 
 ---
 
-## Bloco 1: Filtros Interativos
+## Correções Necessárias
 
-Barra de filtros no topo para segmentar os dados:
+### 1. Remover Duplicação do Menu
 
-| Filtro | Opcoes | Funcao |
-|--------|--------|--------|
-| Periodo | Ultima semana / Ultimo mes / Ultimos 3 meses / Todo o programa | Filtra dados por intervalo de tempo |
-| Colaborador | Todos / Lista de membros | Foca metricas em um membro especifico |
-| Projeto | Todos / Lista de entregas | Analisa uma entrega especifica |
-| Status | Todos / Concluido / Em andamento / Atrasado | Filtra por status das entregas |
+**Arquivo**: `src/components/layout/AppSidebar.tsx`
 
-Visual: Select dropdowns inline, estilo clean com fundo bege
+Remover completamente o bloco de código hardcoded (linhas 439-471) que renderiza o menu "Squad" apontando para `/squad` (rota inexistente).
 
----
+### 2. Atualizar menu_config para Ambiente Skills
 
-## Bloco 2: KPIs Principais
-
-4 cards de metricas consolidadas (mesmo padrao atual):
-
-| KPI | Metrica | Calculo |
-|-----|---------|---------|
-| Horas Economizadas | Xh/sem | Soma de economia das entregas concluidas |
-| ROI Acumulado | X% | (Valor gerado / Investimento) x 100 |
-| Entregas Concluidas | X de Y | Total concluidas vs planejadas |
-| Performance Media | X% | Media das avaliacoes das entregas |
-
----
-
-## Bloco 3: Cronograma 12 Semanas
-
-Barra horizontal visual mostrando:
-- 3 fases: Fundacao (sem 1-4), Expansao (sem 5-8), Consolidacao (sem 9-12)
-- Marcador da semana atual
-- Cores: verde (concluido), primario (atual), cinza (futuro)
-
----
-
-## Bloco 4: Grafico Impacto vs ROI
-
-Grafico de area (AreaChart) com duas curvas:
-- Curva 1: ROI Projetado (baseado em prazos das entregas)
-- Curva 2: ROI Executado (baseado em entregas concluidas)
-- Eixo X: Semanas ou meses do programa
-- Eixo Y: Percentual de ROI
-
-Similar ao BusinessROIChart.tsx existente, adaptado para Squad.
-
----
-
-## Bloco 5: Grafico Evolucao de Maturidade IA
-
-Grafico de barras (BarChart) mostrando evolucao semanal:
-- Eixo X: Semanas do programa
-- Eixo Y: Indice de maturidade (0-100)
-- Metricas que compoem o indice:
-  - Processos automatizados (quantidade)
-  - Horas economizadas acumuladas
-  - Engajamento nas trilhas
-  - Entregas concluidas
-
-Calculo do indice de maturidade:
-```
-maturidade = (processos_auto * 20) + (horas_econ / meta_horas * 30) + 
-             (engajamento * 25) + (entregas / total_entregas * 25)
-```
-
----
-
-## Bloco 6: Ranking de Entregas por Colaborador
-
-Tabela analitica com ranking e indicadores de performance:
-
-| Coluna | Descricao |
-|--------|-----------|
-| Posicao | Ranking baseado em pontuacao |
-| Colaborador | Nome + avatar |
-| Entregas Concluidas | X de Y total |
-| Horas Economizadas | Total individual |
-| Performance | Nota media (0-5 estrelas ou percentual) |
-| Prazo | % entregas no prazo vs atrasadas |
-| Score | Pontuacao calculada |
-
-Logica de Score:
-```
-score = (entregas_concluidas * 30) + (horas_economizadas * 25) + 
-        (performance_media * 25) + (taxa_prazo * 20)
-```
-
-Ordenacao: Por score decrescente (melhor performance primeiro)
-
-Cores visuais:
-- Top 3: destaque verde
-- Abaixo da media: destaque amarelo
-
----
-
-## Bloco 7: Resumo de Impacto (ROI)
-
-Card consolidado com metricas financeiras:
-
-| Metrica | Calculo |
-|---------|---------|
-| Horas economizadas/semana | Soma das economias de entregas concluidas |
-| Processos automatizados | Contagem de entregas em producao |
-| Total economizado | horas_semana x semanas_desde_conclusao |
-| Valor gerado | total_economizado x custo_hora (R$60) |
-| Investimento | Valor do programa |
-| ROI | (valor_gerado / investimento) x 100 |
-
-Destaque visual para ROI positivo/negativo.
-
----
-
-## Estrutura Tecnica
-
-### Novas Tabelas Necessarias
-
-**squads** (nova tabela para o ambiente Academy Squad)
-
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | UUID | Chave primaria |
-| nome | TEXT | Nome do squad |
-| lider_id | UUID | Referencia ao profile do lider |
-| empresa_nome | TEXT | Nome da empresa |
-| setor | TEXT | Setor de atuacao |
-| data_inicio | DATE | Inicio do programa |
-| data_fim | DATE | Fim do programa |
-| investimento | NUMERIC | Valor investido (default 0) |
-| custo_hora_padrao | NUMERIC | Custo/hora para ROI (default 60) |
-| status | TEXT | ativo/inativo |
-
-**membros_squad**
-
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | UUID | Chave primaria |
-| squad_id | UUID | Referencia ao squad |
-| user_id | UUID | Referencia ao profile |
-| cargo | TEXT | Cargo do membro |
-| papel | TEXT | lider ou membro |
-| status | TEXT | ativo/inativo |
-
-**entregas_squad**
-
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | UUID | Chave primaria |
-| squad_id | UUID | Referencia ao squad |
-| responsavel_id | UUID | Profile responsavel |
-| titulo | TEXT | Nome da entrega |
-| descricao | TEXT | Descricao |
-| status | TEXT | pendente/em_andamento/concluido/atrasado |
-| progresso | INTEGER | 0-100 |
-| prazo | DATE | Data limite |
-| economia_horas_semana | NUMERIC | Horas economizadas por semana |
-| avaliacao_nota | NUMERIC | Nota de 0-5 |
-| avaliacao_comentario | TEXT | Feedback da avaliacao |
-| concluido_em | TIMESTAMPTZ | Data de conclusao |
-
-**metricas_squad** (para evolucao de maturidade)
-
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | UUID | Chave primaria |
-| squad_id | UUID | Referencia ao squad |
-| semana | INTEGER | Numero da semana (1-12) |
-| horas_economizadas | NUMERIC | Horas na semana |
-| processos_automatizados | INTEGER | Quantidade de processos |
-| entregas_concluidas | INTEGER | Entregas na semana |
-| engajamento_trilhas | NUMERIC | % de engajamento |
-| indice_maturidade | NUMERIC | Indice calculado (0-100) |
-
-**roadmap_squad**
-
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | UUID | Chave primaria |
-| squad_id | UUID | Referencia ao squad |
-| numero_fase | INTEGER | 1, 2 ou 3 |
-| nome_fase | TEXT | Fundacao/Expansao/Consolidacao |
-| semana_inicio | INTEGER | Semana de inicio |
-| semana_fim | INTEGER | Semana de fim |
-| status | TEXT | pendente/em_andamento/concluido |
-
----
-
-### Arquivos a Criar
-
-| Arquivo | Descricao |
-|---------|-----------|
-| src/pages/squad/SquadLiderPainel.tsx | Pagina principal do dashboard |
-| src/hooks/useSquadMembro.ts | Identificar squad e papel do usuario |
-| src/hooks/useSquadLider.ts | Buscar dados, calcular metricas e ranking |
-
-### Arquivos a Modificar
-
-| Arquivo | Alteracao |
-|---------|-----------|
-| src/App.tsx | Adicionar rota /squad/lider |
-| src/components/layout/AppSidebar.tsx | Transformar Squad em menu expansivel |
-
----
-
-## Componentes Visuais
-
-Todos renderizados diretamente na pagina:
-
-### Filtros
-- 4 Select dropdowns em linha
-- Estilo: bg-bege, rounded-full, gap-4
-
-### Graficos
-- AreaChart para Impacto vs ROI (2 curvas)
-- BarChart para Evolucao de Maturidade IA
-- Usando recharts (ja instalado)
-- ChartContainer do sistema
-
-### Tabela de Ranking
-- Table do shadcn/ui
-- Header escuro (#0D0D0D)
-- Linhas zebradas
-- Badges de posicao coloridos
-
----
-
-## Politicas RLS
+Atualizar os registros no banco para garantir que o menu Squad apareça **apenas no ambiente Skills**:
 
 ```sql
--- Lider ve seu squad
-CREATE POLICY "Lider ve seu squad" ON squads
-  FOR SELECT USING (lider_id = auth.uid());
+UPDATE menu_config 
+SET planos_permitidos = ARRAY['skills']
+WHERE menu_key IN ('squad', 'squad_lider');
+```
 
--- Membros do squad (lider ve todos, membro ve a si)
-CREATE POLICY "Membros do squad" ON membros_squad
-  FOR SELECT USING (
-    squad_id IN (SELECT id FROM squads WHERE lider_id = auth.uid())
-    OR user_id = auth.uid()
-  );
+### 3. Atualizar useMenuConfig para Filtrar Corretamente
 
--- Entregas do squad
-CREATE POLICY "Entregas do squad" ON entregas_squad
-  FOR SELECT USING (
-    squad_id IN (SELECT id FROM squads WHERE lider_id = auth.uid())
-    OR responsavel_id = auth.uid()
-  );
+**Arquivo**: `src/hooks/useMenuConfig.tsx`
 
--- Metricas do squad
-CREATE POLICY "Metricas do squad" ON metricas_squad
-  FOR SELECT USING (
-    squad_id IN (SELECT id FROM squads WHERE lider_id = auth.uid())
-  );
+Adicionar `squad` e `squad_lider` na lista de menus ocultos para ambientes que não são Skills (academy, business, business_iaplicada).
 
--- Roadmap do squad
-CREATE POLICY "Roadmap do squad" ON roadmap_squad
-  FOR SELECT USING (
-    squad_id IN (SELECT id FROM squads WHERE lider_id = auth.uid())
-  );
+### 4. Alterar Hooks para Usar Tabelas Skills
+
+**Arquivo**: `src/hooks/useSquadMembro.ts`
+
+Alterar para buscar dados das tabelas `equipes_skills` e `membros_equipe_skills` ao invés de `squads` e `membros_squad`.
+
+**Arquivo**: `src/hooks/useSquadLider.ts`
+
+Alterar para buscar dados das tabelas `equipes_skills`, `membros_equipe_skills`, `entregas_skills`, `metricas_skills` e `roadmap_skills`.
+
+### 5. Adicionar Campos Ausentes nas Tabelas Skills
+
+As tabelas `*_skills` existentes precisam de alguns campos adicionais para suportar o painel do líder:
+
+**equipes_skills** - adicionar:
+- `investimento` (numeric)
+- `custo_hora_padrao` (numeric)
+
+**entregas_skills** - adicionar:
+- `economia_horas_semana` (numeric)
+- `avaliacao_nota` (numeric)
+- `avaliacao_comentario` (text)
+- `concluido_em` (timestamptz)
+- `progresso` (integer)
+
+**metricas_skills** - adicionar:
+- `indice_maturidade` (numeric)
+
+### 6. Adicionar Aba "Entregas" no Admin Skills
+
+**Arquivo**: `src/pages/admin/mentoria/MentoriaSkillsPage.tsx`
+
+Adicionar nova aba "Entregas" com funcionalidades de CRUD similar ao `EntregasBusinessManager.tsx`.
+
+**Novo arquivo**: `src/components/admin/skills/EntregasSkillsTab.tsx`
+
+Componente para gerenciar entregas das equipes Skills, incluindo:
+- Lista de entregas por equipe
+- Criar/editar/excluir entregas
+- Definir responsável, prazo, economia de horas
+- Atribuir avaliação e nota
+
+### 7. Adicionar Aba "Métricas" no Admin Skills
+
+**Novo arquivo**: `src/components/admin/skills/MetricasSkillsTab.tsx`
+
+Componente para gerenciar métricas semanais:
+- Registrar horas economizadas por semana
+- Processos automatizados
+- Engajamento com trilhas
+- Índice de maturidade IA
+
+### 8. Atualizar Redirecionamento do Painel
+
+**Arquivo**: `src/pages/squad/SquadLiderPainel.tsx`
+
+Alterar redirecionamento de não-líderes de `/` para `/skills/equipe`.
+
+---
+
+## Estrutura Final
+
+### Admin Skills (MentoriaSkillsPage)
+
+| Aba | Funcionalidade |
+|-----|----------------|
+| Equipes | Listar/selecionar equipes (já existe) |
+| Diagnósticos | Ver diagnósticos (já existe) |
+| Conteúdos | Gerenciar conteúdos liberados (já existe) |
+| Roadmap | Gerenciar fases do programa (já existe) |
+| Entregas | CRUD de entregas projetadas (NOVO) |
+| Métricas | Registrar métricas semanais (NOVO) |
+| Análises IA | Análises automáticas (já existe) |
+
+### Painel do Líder (SquadLiderPainel)
+
+Dashboard analítico consolidado usando dados das tabelas `*_skills`:
+- KPIs (horas economizadas, ROI, entregas, performance)
+- Cronograma 12 semanas
+- Gráfico Impacto vs ROI
+- Gráfico Maturidade IA
+- Ranking de performance por colaborador
+- Resumo de impacto financeiro
+
+---
+
+## Arquivos a Modificar
+
+| Arquivo | Alteração |
+|---------|-----------|
+| src/components/layout/AppSidebar.tsx | Remover bloco hardcoded do menu Squad (linhas 439-471) |
+| src/hooks/useMenuConfig.tsx | Adicionar filtro de ambiente para squad/squad_lider |
+| src/hooks/useSquadMembro.ts | Usar tabelas equipes_skills/membros_equipe_skills |
+| src/hooks/useSquadLider.ts | Usar tabelas *_skills ao invés de *_squad |
+| src/pages/squad/SquadLiderPainel.tsx | Ajustar redirecionamento e manter lógica atual |
+| src/pages/admin/mentoria/MentoriaSkillsPage.tsx | Adicionar abas Entregas e Métricas |
+
+## Arquivos a Criar
+
+| Arquivo | Descrição |
+|---------|-----------|
+| src/components/admin/skills/EntregasSkillsTab.tsx | CRUD de entregas |
+| src/components/admin/skills/MetricasSkillsTab.tsx | Registro de métricas semanais |
+
+## Migrações de Banco
+
+1. Adicionar colunas em `equipes_skills`: `investimento`, `custo_hora_padrao`
+2. Adicionar colunas em `entregas_skills`: `economia_horas_semana`, `avaliacao_nota`, `avaliacao_comentario`, `concluido_em`, `progresso`
+3. Adicionar coluna em `metricas_skills`: `indice_maturidade`
+4. Atualizar `menu_config` para filtrar por ambiente
+5. (Opcional) Remover tabelas duplicadas: `squads`, `membros_squad`, `entregas_squad`, `metricas_squad`, `roadmap_squad`
+
+---
+
+## Fluxo de Dados Corrigido
+
+```text
+Admin cadastra equipe (equipes_skills)
+           |
+           v
+Admin adiciona membros no cadastro de usuários (membros_equipe_skills)
+           |
+           v
+Admin configura roadmap (roadmap_skills)
+           |
+           v
+Admin cria entregas projetadas (entregas_skills)
+           |
+           v
+Admin registra métricas semanais (metricas_skills)
+           |
+           v
+Líder acessa Painel (/squad/lider)
+           |
+           v
+Dashboard exibe dados consolidados das tabelas *_skills
 ```
 
 ---
 
-## Padroes Visuais
+## Resultado Esperado
 
-- Sem emojis na interface
-- Cores: #738925 (verde primario), #0D0D0D (preto), #F5F5DC (bege)
-- Cards brancos com border-gray-200
-- PageTitle com underline gradiente verde
-- Graficos com gradientes suaves
-- Layout responsivo: 2 colunas em desktop, 1 em mobile
-
----
-
-## Estados da Pagina
-
-| Estado | Comportamento |
-|--------|---------------|
-| Carregando | Skeletons em todos os blocos |
-| Sem squad | Mensagem orientando contato com suporte |
-| Usuario nao e lider | Redireciona para /squad |
-| Sem dados | Mensagens de "Nenhum dado disponivel" em cada secao |
-| Filtros aplicados | Dados filtrados em tempo real |
-
----
-
-## Fluxo de Dados
-
-1. Usuario acessa /squad/lider
-2. Hook useSquadMembro verifica se e lider
-3. Se nao for lider, redireciona para /squad
-4. Hook useSquadLider busca:
-   - Dados do squad
-   - Membros e suas entregas
-   - Metricas semanais
-   - Roadmap
-5. Calculos de ROI e ranking sao feitos no frontend
-6. Filtros alteram estado local e refiltram dados
-7. Graficos e tabela atualizam automaticamente
-
+- Menu "Squad" com subitem "Painel do Líder" aparece apenas no ambiente Skills
+- Sem duplicação de menus
+- Painel do Líder exibe dados reais das tabelas `*_skills`
+- Admin pode criar entregas, métricas e roadmap diretamente no painel Skills
+- Estrutura consistente com o padrão Business já existente
