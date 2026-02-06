@@ -1982,6 +1982,79 @@ export type Database = {
           },
         ]
       }
+      entregas_squad: {
+        Row: {
+          avaliacao_comentario: string | null
+          avaliacao_nota: number | null
+          concluido_em: string | null
+          created_at: string
+          descricao: string | null
+          economia_horas_semana: number | null
+          id: string
+          prazo: string | null
+          progresso: number | null
+          responsavel_id: string | null
+          squad_id: string
+          status: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          avaliacao_comentario?: string | null
+          avaliacao_nota?: number | null
+          concluido_em?: string | null
+          created_at?: string
+          descricao?: string | null
+          economia_horas_semana?: number | null
+          id?: string
+          prazo?: string | null
+          progresso?: number | null
+          responsavel_id?: string | null
+          squad_id: string
+          status?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          avaliacao_comentario?: string | null
+          avaliacao_nota?: number | null
+          concluido_em?: string | null
+          created_at?: string
+          descricao?: string | null
+          economia_horas_semana?: number | null
+          id?: string
+          prazo?: string | null
+          progresso?: number | null
+          responsavel_id?: string | null
+          squad_id?: string
+          status?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entregas_squad_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_squad_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "entregas_squad_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       equipes_skills: {
         Row: {
           created_at: string | null
@@ -3125,6 +3198,61 @@ export type Database = {
           },
         ]
       }
+      membros_squad: {
+        Row: {
+          cargo: string | null
+          created_at: string
+          id: string
+          papel: string
+          squad_id: string
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cargo?: string | null
+          created_at?: string
+          id?: string
+          papel?: string
+          squad_id: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cargo?: string | null
+          created_at?: string
+          id?: string
+          papel?: string
+          squad_id?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membros_squad_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "squads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membros_squad_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membros_squad_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       menu_config: {
         Row: {
           created_at: string | null
@@ -3258,6 +3386,50 @@ export type Database = {
             columns: ["equipe_id"]
             isOneToOne: false
             referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metricas_squad: {
+        Row: {
+          created_at: string
+          engajamento_trilhas: number | null
+          entregas_concluidas: number | null
+          horas_economizadas: number | null
+          id: string
+          indice_maturidade: number | null
+          processos_automatizados: number | null
+          semana: number
+          squad_id: string
+        }
+        Insert: {
+          created_at?: string
+          engajamento_trilhas?: number | null
+          entregas_concluidas?: number | null
+          horas_economizadas?: number | null
+          id?: string
+          indice_maturidade?: number | null
+          processos_automatizados?: number | null
+          semana: number
+          squad_id: string
+        }
+        Update: {
+          created_at?: string
+          engajamento_trilhas?: number | null
+          entregas_concluidas?: number | null
+          horas_economizadas?: number | null
+          id?: string
+          indice_maturidade?: number | null
+          processos_automatizados?: number | null
+          semana?: number
+          squad_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metricas_squad_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "squads"
             referencedColumns: ["id"]
           },
         ]
@@ -4375,6 +4547,50 @@ export type Database = {
           },
         ]
       }
+      roadmap_squad: {
+        Row: {
+          created_at: string
+          id: string
+          nome_fase: string
+          numero_fase: number
+          semana_fim: number
+          semana_inicio: number
+          squad_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome_fase: string
+          numero_fase: number
+          semana_fim: number
+          semana_inicio: number
+          squad_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome_fase?: string
+          numero_fase?: number
+          semana_fim?: number
+          semana_inicio?: number
+          squad_id?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmap_squad_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "squads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessoes_mentoria: {
         Row: {
           created_at: string
@@ -4466,6 +4682,66 @@ export type Database = {
           telefone?: string | null
         }
         Relationships: []
+      }
+      squads: {
+        Row: {
+          created_at: string
+          custo_hora_padrao: number | null
+          data_fim: string | null
+          data_inicio: string | null
+          empresa_nome: string | null
+          id: string
+          investimento: number | null
+          lider_id: string | null
+          nome: string
+          setor: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custo_hora_padrao?: number | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          empresa_nome?: string | null
+          id?: string
+          investimento?: number | null
+          lider_id?: string | null
+          nome: string
+          setor?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custo_hora_padrao?: number | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          empresa_nome?: string | null
+          id?: string
+          investimento?: number | null
+          lider_id?: string | null
+          nome?: string
+          setor?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "squads_lider_id_fkey"
+            columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "squads_lider_id_fkey"
+            columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       tarefas_mentoria: {
         Row: {
@@ -5130,6 +5406,7 @@ export type Database = {
         Returns: undefined
       }
       is_leader_of_skills_team: { Args: { team_id: string }; Returns: boolean }
+      is_leader_of_squad: { Args: { team_id: string }; Returns: boolean }
       is_member_of_skills_team: { Args: { team_id: string }; Returns: boolean }
       user_has_access_level: {
         Args: {
