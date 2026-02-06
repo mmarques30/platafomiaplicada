@@ -38,7 +38,7 @@ import SkillsBacklog from "./pages/skills/SkillsBacklog";
 import SkillsRoadmap from "./pages/skills/SkillsRoadmap";
 import SkillsEntregas from "./pages/skills/SkillsEntregas";
 import SkillsLiderDashboard from "./pages/skills/SkillsLiderDashboard";
-import SkillsTrilhas from "./pages/skills/SkillsTrilhas";
+
 import SkillsMeuProgresso from "./pages/skills/SkillsMeuProgresso";
 import ProjetoSkills from "./pages/skills/ProjetoSkills";
 // Squad removido - Painel do Líder agora em /skills/lider
@@ -164,7 +164,7 @@ function AppContent() {
             <Route path="/skills/roadmap" element={<SkillsRoadmap />} />
             <Route path="/skills/entregas" element={<SkillsEntregas />} />
             <Route path="/skills/lider" element={<SkillsLiderDashboard />} />
-            <Route path="/skills/trilhas" element={<SkillsTrilhas />} />
+            
             <Route path="/skills/progresso" element={<SkillsMeuProgresso />} />
             <Route path="/skills/projeto" element={<ProjetoSkills />} />
 
