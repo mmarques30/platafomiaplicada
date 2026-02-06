@@ -1,145 +1,72 @@
 
-# Plano: Correção do Painel do Líder Skills + Limpeza de Tabelas Duplicadas
+# Correção: Painel do Líder em Branco para Livia
 
-## Problemas Identificados
+## Causa Raiz Identificada
 
-### 1. Tabelas Duplicadas no Banco
-Existem 5 tabelas `*_squad` que duplicam a estrutura `*_skills`:
-- `squads` (duplica `equipes_skills`)
-- `membros_squad` (duplica `membros_equipe_skills`)
-- `entregas_squad` (duplica `entregas_skills`)
-- `metricas_squad` (duplica `metricas_skills`)
-- `roadmap_squad` (duplica `roadmap_skills`)
+O problema é uma **condição de corrida (race condition)** no carregamento dos dados de autenticação.
 
-### 2. Painel Não Exibe Estrutura Sem Dados
-O painel do líder está funcionando, mas mostra valores zerados porque:
-- `entregas_skills`: 0 registros
-- `roadmap_skills`: 0 registros
-- `metricas_skills`: 0 registros
+### Sequência do bug:
 
-O visual está correto, mas falta:
-- Roadmap padrão de 12 semanas (3 fases)
-- Estados visuais de "sem dados" mais claros
-- Permitir admin visualizar mesmo sem ser líder (modo simulação)
-
-### 3. Admin Não Consegue Visualizar em Simulação
-O hook `useSkillsLider` usa `enabled: !!equipeId && isLider` em todas as queries.
-Quando o admin simula um usuário que não é líder, o painel redireciona para `/skills/equipe`.
-
----
-
-## Solução Proposta
-
-### Fase 1: Remover Tabelas Duplicadas
-
-Migração SQL para excluir as tabelas `*_squad`:
-
-```sql
--- Remover tabelas duplicadas
-DROP TABLE IF EXISTS public.entregas_squad CASCADE;
-DROP TABLE IF EXISTS public.metricas_squad CASCADE;
-DROP TABLE IF EXISTS public.roadmap_squad CASCADE;
-DROP TABLE IF EXISTS public.membros_squad CASCADE;
-DROP TABLE IF EXISTS public.squads CASCADE;
+```text
+1. Página carrega
+2. useAuth() inicia → user = null, loading = true
+3. useSkillsMembro() → effectiveUserId = null → query DESABILITADA → isLoading = FALSE
+4. useSkillsLider() → membroLoading = false, isLider = false → isLoading = FALSE, canAccess = FALSE
+5. SquadLiderPainel → !isLoading && !canAccess → REDIRECIONA para /skills/equipe
+6. Auth termina de carregar, mas já é tarde: o usuário já foi redirecionado
 ```
 
-### Fase 2: Permitir Admin Visualizar Painel
+O hook `useSkillsMembro` usa `useAuth()` mas **não inclui o estado de loading da autenticação** no seu retorno. Quando a query do TanStack Query está desabilitada (`enabled: false`), o `isLoading` retornado é `false`, não `true`. Isso faz o painel pensar que os dados já carregaram e que o usuário não tem acesso.
 
-Modificar `useSkillsLider.ts` para permitir que admin visualize o painel mesmo sem ser líder:
+## Solução
+
+### 1. Corrigir `useSkillsMembro.ts`
+
+Incluir o loading da autenticação e do role no `isLoading` retornado:
 
 ```typescript
-// Antes
-enabled: !!equipeId && isLider
+const { user, loading: authLoading } = useAuth();
+const { isAdmin, isLoading: roleLoading } = useUserRole();
 
-// Depois - Permitir admin visualizar
-enabled: !!equipeId && (isLider || (isAdmin && isViewingAs))
+// ...
+
+return {
+  // ...
+  isLoading: isLoading || authLoading || roleLoading,
+};
 ```
 
-Arquivos a modificar:
-- `src/hooks/useSkillsLider.ts` - Adicionar verificação de admin em simulação
+Isso garante que enquanto a autenticação não terminar, `membroLoading` será `true`, impedindo o redirect prematuro.
 
-### Fase 3: Criar Roadmap Padrão Quando Vazio
+### 2. Verificar `useSkillsLider.ts`
 
-Modificar `SquadLiderPainel.tsx` para exibir roadmap padrão de 12 semanas quando não houver dados:
+Confirmar que `membroLoading` agora inclui o auth loading, e que `isLoading` geral continua correto. Nenhuma mudança adicional necessária aqui, pois o `membroLoading` já está na composição de `isLoading`.
 
-O código já tem fallback para cronograma vazio (linhas 277-300), mas precisa mostrar as 3 fases com nomes:
-- Fase 1: Fundação (semanas 1-4)
-- Fase 2: Expansão (semanas 5-8)
-- Fase 3: Consolidação (semanas 9-12)
+### 3. Melhorar `SquadLiderPainel.tsx`
 
-### Fase 4: Melhorar Estados Vazios
+Adicionar uma verificação extra de segurança no redirect:
 
-Adicionar mensagens visuais claras nos blocos sem dados:
-- Gráficos: "Adicione métricas semanais para visualizar evolução"
-- Ranking: "Nenhuma entrega atribuída ainda"
-- Resumo de Impacto: Manter valores zerados (já funciona)
+```typescript
+useEffect(() => {
+  // Só redirecionar se realmente temos certeza que não pode acessar
+  // (auth carregou, role carregou, membro carregou)
+  if (!isLoading && !canAccess) {
+    navigate("/skills/equipe");
+  }
+}, [isLoading, canAccess, navigate]);
+```
 
----
+Com o fix no `useSkillsMembro`, o `isLoading` agora será `true` até a autenticação terminar, então o redirect não vai disparar prematuramente.
 
 ## Arquivos a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/hooks/useSkillsLider.ts` | Permitir admin em simulação acessar dados |
-| `src/pages/squad/SquadLiderPainel.tsx` | Melhorar fallback do roadmap e estados vazios |
-| Migração SQL | Remover tabelas `*_squad` duplicadas |
-
----
-
-## Detalhes Técnicos
-
-### useSkillsLider.ts
-
-Adicionar imports e lógica de admin:
-
-```typescript
-import { useUserRole } from "./useUserRole";
-import { useAdminViewContext } from "@/contexts/AdminViewContext";
-
-export function useSkillsLider() {
-  const { equipeId, isLider, isLoading: membroLoading } = useSkillsMembro();
-  const { isAdmin } = useUserRole();
-  const { isViewingAs, viewAs } = useAdminViewContext();
-  
-  // Admin pode visualizar em modo Skills
-  const canAccess = isLider || (isAdmin && isViewingAs && viewAs === "skills");
-  
-  // Usar canAccess nas queries
-  enabled: !!equipeId && canAccess
-```
-
-### SquadLiderPainel.tsx
-
-Melhorar fallback do roadmap com fases nomeadas:
-
-```typescript
-// Roadmap padrão quando não há dados
-const defaultRoadmap = [
-  { id: "1", numeroFase: 1, nomeFase: "Fundação", semanaInicio: 1, semanaFim: 4, status: "pendente" },
-  { id: "2", numeroFase: 2, nomeFase: "Expansão", semanaInicio: 5, semanaFim: 8, status: "pendente" },
-  { id: "3", numeroFase: 3, nomeFase: "Consolidação", semanaInicio: 9, semanaFim: 12, status: "pendente" },
-];
-
-const roadmapDisplay = roadmap.length > 0 ? roadmap : defaultRoadmap;
-```
-
-Adicionar mensagens para gráficos vazios:
-
-```typescript
-// Se não há dados de métricas
-{maturidadeChartData.every(d => d.maturidade === 0) && (
-  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
-    Registre métricas semanais para visualizar a evolução
-  </div>
-)}
-```
-
----
+| `src/hooks/useSkillsMembro.ts` | Incluir `authLoading` e `roleLoading` no isLoading |
 
 ## Resultado Esperado
 
-1. Tabelas duplicadas removidas do banco
-2. Admin pode visualizar painel em simulação Skills
-3. Roadmap padrão de 12 semanas sempre visível
-4. Estados vazios com mensagens orientativas
-5. Estrutura visual completa exibida mesmo sem dados
+- Livia (e qualquer líder) verá o Painel do Líder completo em `/squad/lider`
+- O redirect para `/skills/equipe` só acontece APÓS confirmar que o usuário realmente não tem acesso
+- Admin em simulação continua funcionando
+- Estrutura do dashboard (KPIs, cronograma, gráficos, ranking, ROI) sempre visível com estados vazios informativos
