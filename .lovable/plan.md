@@ -1,72 +1,83 @@
 
-# Correção: Painel do Líder em Branco para Livia
+# Sub-aba "Performance" na pagina Projeto Skills
 
-## Causa Raiz Identificada
+## Resumo
+Transformar a pagina "Projeto Skills" (`/skills/projeto`) em uma pagina com abas (tabs), adicionando a sub-aba **Performance**. Essa aba tera um dashboard analitico completo com KPIs, cronograma de 12 semanas, graficos de ROI e Maturidade IA, e ranking de colaboradores -- tudo inicialmente com dados mockados para visualizacao. Acesso restrito a administradores e lideres.
 
-O problema é uma **condição de corrida (race condition)** no carregamento dos dados de autenticação.
+---
 
-### Sequência do bug:
+## Estrutura Visual
+
+A pagina Projeto Skills passara a ter um sistema de abas:
+- **Visao Geral** (aba padrao, conteudo atual placeholder)
+- **Performance** (novo dashboard analitico)
+
+A aba Performance tera os seguintes blocos:
+
+1. **Filtros Interativos** -- Periodo, Colaborador, Projeto, Status
+2. **4 KPIs** -- Horas Economizadas, ROI Acumulado, Entregas Concluidas, Performance Media
+3. **Cronograma 12 Semanas** -- 3 fases (Fundacao, Expansao, Consolidacao) com indicador de semana atual
+4. **2 Graficos lado a lado** -- Impacto vs ROI (AreaChart) e Evolucao Maturidade IA (BarChart)
+5. **Ranking de Colaboradores** -- Tabela com posicao, nome, entregas, horas economizadas, ROI, performance
+
+---
+
+## Controle de Acesso
+
+- Apenas **administradores** (`isAdmin`) e **lideres** (`isLider` via `useSkillsMembro`) verao a aba Performance
+- Colaboradores comuns verao apenas a aba "Visao Geral"
+- Os hooks `useUserRole` e `useSkillsMembro` ja existentes serao reutilizados
+
+---
+
+## Detalhes Tecnicos
+
+### Arquivos a Criar
+
+**`src/components/skills/ProjetoSkillsPerformance.tsx`**
+- Componente do dashboard de Performance com dados mockados
+- Usa componentes existentes: `Card`, `Select`, `Table`, `Badge`, `ChartContainer`
+- Segue estetica Executive-Tech (sem emojis, cores `#738925`/`#0D0D0D`/`#F5F5DC`, cards brancos limpos)
+- Dados mockados diretamente no componente:
+  - 7 entregas com colaboradores, projetos, horas, ROI, status, performance
+  - 8 semanas de dados ROI (projetado vs executado)
+  - 6 semanas de dados de maturidade
+  - Ranking calculado a partir das entregas mockadas
+
+### Arquivos a Modificar
+
+**`src/pages/skills/ProjetoSkills.tsx`**
+- Adicionar sistema de `Tabs` (Visao Geral | Performance)
+- Importar hooks de acesso (`useUserRole`, `useSkillsMembro`)
+- Renderizar aba Performance condicionalmente (admin ou lider)
+- Usar `PageTitle` com underline gradiente verde (padrao Skills)
+
+**`src/App.tsx`**
+- Sem alteracoes necessarias (rota `/skills/projeto` ja existe)
+
+### Dados Mockados (dentro do componente)
 
 ```text
-1. Página carrega
-2. useAuth() inicia → user = null, loading = true
-3. useSkillsMembro() → effectiveUserId = null → query DESABILITADA → isLoading = FALSE
-4. useSkillsLider() → membroLoading = false, isLider = false → isLoading = FALSE, canAccess = FALSE
-5. SquadLiderPainel → !isLoading && !canAccess → REDIRECIONA para /skills/equipe
-6. Auth termina de carregar, mas já é tarde: o usuário já foi redirecionado
+Entregas:
+- Ana Silva      | Automacao RPA        | 120h | ROI 250% | Concluido     | Perf 95
+- Ana Silva      | Dashboard BI         |  80h | ROI 180% | Concluido     | Perf 92
+- Carlos Santos  | Chatbot Atendimento  | 200h | ROI 320% | Concluido     | Perf 88
+- Carlos Santos  | Analise Preditiva    | 150h | ROI 280% | Em andamento  | Perf 85
+- Maria Costa    | OCR Documentos       | 180h | ROI 310% | Concluido     | Perf 90
+- Joao Oliveira  | API Integracao       |  90h | ROI 160% | Em andamento  | Perf 78
+- Beatriz Lima   | ML Classificacao     | 110h | ROI 220% | Atrasado      | Perf 65
+
+ROI Semanal: semanas 1-8 com projetado crescente e executado acompanhando
+Maturidade: semanas 1-6 com indice crescente (25 -> 78)
 ```
 
-O hook `useSkillsMembro` usa `useAuth()` mas **não inclui o estado de loading da autenticação** no seu retorno. Quando a query do TanStack Query está desabilitada (`enabled: false`), o `isLoading` retornado é `false`, não `true`. Isso faz o painel pensar que os dados já carregaram e que o usuário não tem acesso.
+### Bibliotecas Utilizadas (ja instaladas)
+- `recharts` (AreaChart, BarChart)
+- `@radix-ui/react-tabs` (sistema de abas)
+- `@radix-ui/react-select` (filtros)
+- `lucide-react` (icones)
 
-## Solução
-
-### 1. Corrigir `useSkillsMembro.ts`
-
-Incluir o loading da autenticação e do role no `isLoading` retornado:
-
-```typescript
-const { user, loading: authLoading } = useAuth();
-const { isAdmin, isLoading: roleLoading } = useUserRole();
-
-// ...
-
-return {
-  // ...
-  isLoading: isLoading || authLoading || roleLoading,
-};
-```
-
-Isso garante que enquanto a autenticação não terminar, `membroLoading` será `true`, impedindo o redirect prematuro.
-
-### 2. Verificar `useSkillsLider.ts`
-
-Confirmar que `membroLoading` agora inclui o auth loading, e que `isLoading` geral continua correto. Nenhuma mudança adicional necessária aqui, pois o `membroLoading` já está na composição de `isLoading`.
-
-### 3. Melhorar `SquadLiderPainel.tsx`
-
-Adicionar uma verificação extra de segurança no redirect:
-
-```typescript
-useEffect(() => {
-  // Só redirecionar se realmente temos certeza que não pode acessar
-  // (auth carregou, role carregou, membro carregou)
-  if (!isLoading && !canAccess) {
-    navigate("/skills/equipe");
-  }
-}, [isLoading, canAccess, navigate]);
-```
-
-Com o fix no `useSkillsMembro`, o `isLoading` agora será `true` até a autenticação terminar, então o redirect não vai disparar prematuramente.
-
-## Arquivos a Modificar
-
-| Arquivo | Alteração |
-|---------|-----------|
-| `src/hooks/useSkillsMembro.ts` | Incluir `authLoading` e `roleLoading` no isLoading |
-
-## Resultado Esperado
-
-- Livia (e qualquer líder) verá o Painel do Líder completo em `/squad/lider`
-- O redirect para `/skills/equipe` só acontece APÓS confirmar que o usuário realmente não tem acesso
-- Admin em simulação continua funcionando
-- Estrutura do dashboard (KPIs, cronograma, gráficos, ranking, ROI) sempre visível com estados vazios informativos
+### Sem Alteracoes no Banco de Dados
+- Nenhuma migracao necessaria neste momento
+- Dados 100% mockados no frontend
+- Futuramente, sera conectado ao `useSkillsLider` para dados reais
