@@ -62,30 +62,55 @@ interface RankingColaborador {
 }
 
 export function useSkillsLider() {
-  const { equipeId, isLider, isLoading: membroLoading } = useSkillsMembro();
+  const { equipeId: membroEquipeId, isLider, isLoading: membroLoading } = useSkillsMembro();
   const { isAdmin } = useUserRole();
-  const { isViewingAs, viewAs } = useAdminViewContext();
   const queryClient = useQueryClient();
+
+  let isViewingAs = false;
+  let viewAs: string | null = null;
+  try {
+    const context = useAdminViewContext();
+    isViewingAs = context.isViewingAs;
+    viewAs = context.viewAs;
+  } catch {
+    // Context not available
+  }
 
   // Admin pode visualizar em modo simulação Skills
   const canAccess = isLider || (isAdmin && isViewingAs && (viewAs === "skills" || viewAs === "business_iaplicada"));
+
+  // Fallback: admin em simulação sem equipeId busca primeira equipe disponível
+  const { data: adminFallbackEquipeId, isLoading: adminFallbackLoading } = useQuery({
+    queryKey: ["skills-admin-fallback-equipe"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("equipes_skills")
+        .select("id")
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data?.id ?? null;
+    },
+    enabled: isAdmin && !membroEquipeId && !membroLoading,
+  });
+
+  // Use equipeId do membro OU fallback do admin
+  const equipeId = membroEquipeId || (isAdmin ? adminFallbackEquipeId : null);
 
   // Buscar dados da equipe
   const { data: equipeData, isLoading: equipeLoading } = useQuery({
     queryKey: ["skills-equipe-lider", equipeId],
     queryFn: async () => {
       if (!equipeId) return null;
-      
       const { data, error } = await supabase
         .from("equipes_skills")
         .select("*")
         .eq("id", equipeId)
         .single();
-      
       if (error) throw error;
       return data;
     },
-    enabled: !!equipeId && canAccess,
+    enabled: !!equipeId,
   });
 
   // Buscar membros da equipe
@@ -93,7 +118,6 @@ export function useSkillsLider() {
     queryKey: ["skills-membros-lider", equipeId],
     queryFn: async () => {
       if (!equipeId) return [];
-      
       const { data, error } = await supabase
         .from("membros_equipe_skills")
         .select(`
@@ -110,9 +134,7 @@ export function useSkillsLider() {
         `)
         .eq("equipe_id", equipeId)
         .eq("status", "ativo");
-      
       if (error) throw error;
-      
       return (data || []).map((m: any) => ({
         id: m.id,
         userId: m.user_id,
@@ -123,7 +145,7 @@ export function useSkillsLider() {
         ultimoAcesso: m.profiles.ultimo_acesso,
       })) as Membro[];
     },
-    enabled: !!equipeId && canAccess,
+    enabled: !!equipeId,
   });
 
   // Buscar entregas da equipe
@@ -131,7 +153,6 @@ export function useSkillsLider() {
     queryKey: ["skills-entregas-lider", equipeId],
     queryFn: async () => {
       if (!equipeId) return [];
-      
       const { data, error } = await supabase
         .from("entregas_skills")
         .select(`
@@ -149,9 +170,7 @@ export function useSkillsLider() {
         `)
         .eq("equipe_id", equipeId)
         .order("created_at", { ascending: false });
-      
       if (error) throw error;
-      
       return (data || []).map((e: any) => ({
         id: e.id,
         titulo: e.titulo,
@@ -166,7 +185,7 @@ export function useSkillsLider() {
         responsavelNome: e.profiles?.nome_completo || null,
       })) as Entrega[];
     },
-    enabled: !!equipeId && canAccess,
+    enabled: !!equipeId,
   });
 
   // Buscar métricas semanais
@@ -174,15 +193,12 @@ export function useSkillsLider() {
     queryKey: ["skills-metricas-lider", equipeId],
     queryFn: async () => {
       if (!equipeId) return [];
-      
       const { data, error } = await supabase
         .from("metricas_skills")
         .select("*")
         .eq("equipe_id", equipeId)
         .order("semana", { ascending: true });
-      
       if (error) throw error;
-      
       return (data || []).map((m: any) => ({
         semana: m.semana,
         horasEconomizadas: m.horas_economizadas || 0,
@@ -192,7 +208,7 @@ export function useSkillsLider() {
         indiceMaturidade: m.indice_maturidade || 0,
       })) as MetricaSemanal[];
     },
-    enabled: !!equipeId && canAccess,
+    enabled: !!equipeId,
   });
 
   // Buscar roadmap
@@ -200,15 +216,12 @@ export function useSkillsLider() {
     queryKey: ["skills-roadmap-lider", equipeId],
     queryFn: async () => {
       if (!equipeId) return [];
-      
       const { data, error } = await supabase
         .from("roadmap_skills")
         .select("*")
         .eq("equipe_id", equipeId)
         .order("numero_fase", { ascending: true });
-      
       if (error) throw error;
-      
       return (data || []).map((r: any) => ({
         id: r.id,
         numeroFase: r.numero_fase,
@@ -218,10 +231,10 @@ export function useSkillsLider() {
         status: r.status,
       })) as RoadmapFase[];
     },
-    enabled: !!equipeId && canAccess,
+    enabled: !!equipeId,
   });
 
-  // Entregas aguardando validação (para alertas)
+  // Entregas aguardando validação
   const { data: entregasParaValidar } = useQuery({
     queryKey: ["entregas-validar", equipeId],
     queryFn: async () => {
@@ -235,7 +248,7 @@ export function useSkillsLider() {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!equipeId && canAccess,
+    enabled: !!equipeId,
   });
 
   // Alertas de atraso
@@ -254,7 +267,7 @@ export function useSkillsLider() {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!equipeId && canAccess,
+    enabled: !!equipeId,
   });
 
   // Mutation para aprovar entrega
@@ -302,13 +315,11 @@ export function useSkillsLider() {
     },
   });
 
-  // Progresso de cada membro (para compatibilidade com páginas existentes)
+  // Progresso de cada membro
   const { data: progressoMembros, isLoading: loadingProgresso } = useQuery({
     queryKey: ["progresso-membros", equipeId],
     queryFn: async () => {
       if (!equipeId) return [];
-      
-      // Buscar membros
       const { data: membrosData, error: membrosError } = await supabase
         .from("membros_equipe_skills")
         .select(`
@@ -320,27 +331,22 @@ export function useSkillsLider() {
         `)
         .eq("equipe_id", equipeId)
         .eq("status", "ativo");
-      
       if (membrosError) throw membrosError;
-      
-      // Buscar diagnósticos
+
       const { data: diagnosticosData } = await supabase
         .from("diagnosticos_skills")
         .select("user_id, completado")
         .eq("equipe_id", equipeId);
-      
-      // Buscar entregas por responsável
+
       const { data: entregasData } = await supabase
         .from("entregas_skills")
         .select("responsavel_id, status")
         .eq("equipe_id", equipeId);
-      
-      // Mapear progresso
+
       return membrosData?.map((m: any) => {
         const userEntregas = entregasData?.filter(e => e.responsavel_id === m.user_id) || [];
         const entregasConcluidas = userEntregas.filter(e => e.status === "aprovada" || e.status === "concluido").length;
         const totalEntregas = userEntregas.length;
-        
         return {
           id: m.id,
           user_id: m.user_id,
@@ -354,9 +360,8 @@ export function useSkillsLider() {
         };
       }) || [];
     },
-    enabled: !!equipeId && canAccess,
+    enabled: !!equipeId,
   });
-
 
   // Calcular semana atual do programa
   const dataInicio = equipeData?.data_inicio;
@@ -367,23 +372,22 @@ export function useSkillsLider() {
   // Calcular KPIs
   const investimento = equipeData?.investimento || 0;
   const custoHora = equipeData?.custo_hora_padrao || 60;
-  
+
   const entregasConcluidasList = (entregas || []).filter((e) => e.status === "concluido" || e.status === "aprovada");
   const totalEntregas = (entregas || []).length;
   const horasEconomizadasTotal = entregasConcluidasList.reduce(
     (acc, e) => acc + e.economiaHorasSemana,
     0
   );
-  
-  // Calcular valor gerado (horas * semanas desde conclusão * custo hora)
+
   const valorGerado = entregasConcluidasList.reduce((acc, e) => {
     if (!e.concluidoEm) return acc;
     const semanasConcluido = Math.max(1, differenceInWeeks(new Date(), parseISO(e.concluidoEm)));
     return acc + (e.economiaHorasSemana * semanasConcluido * custoHora);
   }, 0);
-  
+
   const roiAcumulado = investimento > 0 ? (valorGerado / investimento) * 100 : 0;
-  
+
   const performanceMedia = entregasConcluidasList.length > 0
     ? entregasConcluidasList.reduce((acc, e) => acc + (e.avaliacaoNota || 0), 0) / entregasConcluidasList.length
     : 0;
@@ -397,7 +401,7 @@ export function useSkillsLider() {
         if (!e.prazo || !e.concluidoEm) return true;
         return !isAfter(parseISO(e.concluidoEm), parseISO(e.prazo));
       });
-      
+
       const horasEcon = entregasConcluidasMembro.reduce((acc, e) => acc + e.economiaHorasSemana, 0);
       const perfMedia = entregasConcluidasMembro.length > 0
         ? entregasConcluidasMembro.reduce((acc, e) => acc + (e.avaliacaoNota || 0), 0) / entregasConcluidasMembro.length
@@ -405,13 +409,13 @@ export function useSkillsLider() {
       const taxaPrazo = entregasConcluidasMembro.length > 0
         ? (entregasNoPrazo.length / entregasConcluidasMembro.length) * 100
         : 0;
-      
-      const score = 
+
+      const score =
         (entregasConcluidasMembro.length * 30) +
         (horasEcon * 25) +
         (perfMedia * 5 * 25) +
         (taxaPrazo * 0.2);
-      
+
       return {
         posicao: 0,
         userId: m.userId,
@@ -432,13 +436,11 @@ export function useSkillsLider() {
   const roiChartData = Array.from({ length: 12 }, (_, i) => {
     const semana = i + 1;
     const roiProjetado = (semana / 12) * 100;
-    
     const horasAcumuladas = (metricas || [])
       .filter((m) => m.semana <= semana)
       .reduce((acc, m) => acc + m.horasEconomizadas, 0);
     const valorAcumulado = horasAcumuladas * custoHora;
     const roiExecutado = investimento > 0 ? (valorAcumulado / investimento) * 100 : 0;
-    
     return {
       semana: `Sem ${semana}`,
       projetado: Math.round(roiProjetado),
@@ -450,16 +452,15 @@ export function useSkillsLider() {
   const maturidadeChartData = Array.from({ length: 12 }, (_, i) => {
     const semana = i + 1;
     const metricaSemana = (metricas || []).find((m) => m.semana === semana);
-    
     return {
       semana: `Sem ${semana}`,
       maturidade: metricaSemana?.indiceMaturidade || 0,
     };
   });
 
-  const isLoading = membroLoading || equipeLoading || membrosLoading || entregasLoading || metricasLoading || roadmapLoading || loadingProgresso;
+  const isLoading = membroLoading || adminFallbackLoading || equipeLoading || membrosLoading || entregasLoading || metricasLoading || roadmapLoading || loadingProgresso;
 
-  // Métricas consolidadas (objeto simples para compatibilidade com páginas existentes)
+  // Métricas consolidadas
   const metricasConsolidadas = {
     totalEntregas,
     entregasAprovadas: entregasConcluidasList.length,
@@ -478,21 +479,22 @@ export function useSkillsLider() {
     investimento,
     custoHora,
     isLider,
-    canAccess,
-    
+    isAdmin,
+    canAccess: canAccess || isAdmin,
+
     // Dados
     membros: membros || [],
     entregas: entregas || [],
-    metricas: metricasConsolidadas, // Objeto consolidado para compatibilidade
-    metricasSemanais: metricas || [], // Array de métricas semanais para gráficos
+    metricas: metricasConsolidadas,
+    metricasSemanais: metricas || [],
     roadmap: roadmap || [],
     ranking,
     progressoMembros: progressoMembros || [],
-    
+
     // Alertas e validações
     entregasParaValidar: entregasParaValidar || [],
     alertasAtraso: alertasAtraso || [],
-    
+
     // KPIs calculados
     semanaAtual,
     horasEconomizadasTotal,
@@ -501,15 +503,15 @@ export function useSkillsLider() {
     performanceMedia,
     valorGerado,
     roiAcumulado,
-    
+
     // Dados de gráficos
     roiChartData,
     maturidadeChartData,
-    
+
     // Mutations
     aprovarEntrega,
     rejeitarEntrega,
-    
+
     // Loading state
     isLoading,
   };
