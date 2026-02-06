@@ -1,48 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./useAuth";
+import { useSkillsMembro } from "./useSkillsMembro";
 
 export function useSkillsEquipe() {
-  const { user } = useAuth();
-
-  // Buscar equipe do usuário
-  const { data: membroData, isLoading: membroLoading } = useQuery({
-    queryKey: ["membro-equipe-skills", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from("membros_equipe_skills")
-        .select("equipe_id, papel")
-        .eq("user_id", user.id)
-        .eq("status", "ativo")
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
+  const { equipeId, papel, isLoading: membroLoading } = useSkillsMembro();
 
   // Buscar dados da equipe
   const { data: equipe, isLoading: equipeLoading } = useQuery({
-    queryKey: ["equipe-skills", membroData?.equipe_id],
+    queryKey: ["equipe-skills", equipeId],
     queryFn: async () => {
-      if (!membroData?.equipe_id) return null;
+      if (!equipeId) return null;
       const { data, error } = await supabase
         .from("equipes_skills")
         .select("*")
-        .eq("id", membroData.equipe_id)
+        .eq("id", equipeId)
         .single();
       if (error) throw error;
       return data;
     },
-    enabled: !!membroData?.equipe_id,
+    enabled: !!equipeId,
   });
 
   // Buscar membros da equipe com status do diagnóstico
   const { data: membros, isLoading: membrosLoading } = useQuery({
-    queryKey: ["membros-equipe-skills", membroData?.equipe_id],
+    queryKey: ["membros-equipe-skills", equipeId],
     queryFn: async () => {
-      if (!membroData?.equipe_id) return [];
+      if (!equipeId) return [];
       
       // Buscar membros
       const { data: membrosData, error: membrosError } = await supabase
@@ -58,7 +41,7 @@ export function useSkillsEquipe() {
             avatar_url
           )
         `)
-        .eq("equipe_id", membroData.equipe_id)
+        .eq("equipe_id", equipeId)
         .eq("status", "ativo");
       
       if (membrosError) throw membrosError;
@@ -67,7 +50,7 @@ export function useSkillsEquipe() {
       const { data: diagnosticosData, error: diagError } = await supabase
         .from("diagnosticos_skills")
         .select("user_id, completado")
-        .eq("equipe_id", membroData.equipe_id);
+        .eq("equipe_id", equipeId);
       
       if (diagError) throw diagError;
       
@@ -82,30 +65,30 @@ export function useSkillsEquipe() {
         diagnostico_completo: diagnosticosData?.find(d => d.user_id === m.user_id)?.completado || false,
       })) || [];
     },
-    enabled: !!membroData?.equipe_id,
+    enabled: !!equipeId,
   });
 
   // Buscar diagnóstico consolidado
   const { data: consolidado, isLoading: consolidadoLoading } = useQuery({
-    queryKey: ["consolidado-skills", membroData?.equipe_id],
+    queryKey: ["consolidado-skills", equipeId],
     queryFn: async () => {
-      if (!membroData?.equipe_id) return null;
+      if (!equipeId) return null;
       const { data, error } = await supabase
         .from("diagnostico_consolidado_skills")
         .select("*")
-        .eq("equipe_id", membroData.equipe_id)
+        .eq("equipe_id", equipeId)
         .maybeSingle();
       if (error && error.code !== "PGRST116") throw error;
       return data;
     },
-    enabled: !!membroData?.equipe_id,
+    enabled: !!equipeId,
   });
 
   return {
     equipe,
     membros,
     consolidado,
-    isLider: membroData?.papel === "lider",
+    isLider: papel === "lider",
     isLoading: membroLoading || equipeLoading || membrosLoading || consolidadoLoading,
   };
 }

@@ -50,14 +50,14 @@ export function useMenuConfig() {
   // Menus a ocultar quando em ambiente específico
     const hiddenByEnvironment: Record<string, string[]> = {
       // Skills: oculta trilhas gerais (usa Trilhas Skills) e calendário
-      // NÃO ocultar evolucao, meu_diagnostico, minhas_duvidas - são necessários para Skills
+      // evolucao, meu_diagnostico, minhas_duvidas já são filtrados por planos_permitidos=[academy]
       skills: ['trilhas', 'calendario'],
       
       // Business Colaborativo: oculta menus Academy-only e Skills-only
       business: [
         'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
-        'trilhas_skills', 'skills_equipe', 'skills_backlog', 'skills_roadmap', 
-        'skills_entregas', 'skills_lider'
+        'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
+        'skills_entregas', 'skills_painel_lider'
       ],
       
       // Business IAplicada: versão mais restrita (cliente apenas acompanha)
@@ -65,7 +65,7 @@ export function useMenuConfig() {
       business_iaplicada: [
         'trilhas', 'trilhas_skills', 'calendario',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas', 'meu_progresso_conteudo',
-        'skills_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_lider',
+        'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
         'comunidade', 'comunidade_feed', 'comunidade_sala'
       ],
     };
