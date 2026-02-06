@@ -115,10 +115,10 @@ export function AppSidebar() {
       return [];
     }
     
-    // Filtrar menu "Painel do Líder" se não for líder Skills
+    // Filtrar menu "Painel do Líder" se não for líder Skills (e não for admin)
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
-      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider);
+      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin);
   };
 
   const toggleMenu = (menuKey: string) => {

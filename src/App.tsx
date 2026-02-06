@@ -40,7 +40,7 @@ import SkillsEntregas from "./pages/skills/SkillsEntregas";
 import SkillsLiderDashboard from "./pages/skills/SkillsLiderDashboard";
 import SkillsTrilhas from "./pages/skills/SkillsTrilhas";
 import SkillsMeuProgresso from "./pages/skills/SkillsMeuProgresso";
-import SquadLiderPainel from "./pages/squad/SquadLiderPainel";
+// Squad removido - Painel do Líder agora em /skills/lider
 
 import MentoriaSessoes from "./pages/MentoriaSessoes";
 import MentoriaRecursos from "./pages/MentoriaRecursos";
@@ -166,8 +166,8 @@ function AppContent() {
             <Route path="/skills/trilhas" element={<SkillsTrilhas />} />
             <Route path="/skills/progresso" element={<SkillsMeuProgresso />} />
 
-            {/* Squad routes */}
-            <Route path="/squad/lider" element={<SquadLiderPainel />} />
+            {/* Squad removido → redireciona para Skills */}
+            <Route path="/squad/lider" element={<Navigate to="/skills/lider" replace />} />
 
             {/* Aliases/redirects para evitar 404 por links antigos ou barra final */}
             <Route path="/skills/progresso/" element={<Navigate to="/skills/progresso" replace />} />
@@ -175,7 +175,7 @@ function AppContent() {
             <Route path="/skills/painel-lider" element={<Navigate to="/skills/progresso" replace />} />
             <Route path="/skills/painel-do-lider" element={<Navigate to="/skills/progresso" replace />} />
             <Route path="/skills/lider/" element={<Navigate to="/skills/lider" replace />} />
-            <Route path="/squad/lider/" element={<Navigate to="/squad/lider" replace />} />
+            <Route path="/squad/lider/" element={<Navigate to="/skills/lider" replace />} />
             
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/mentoria" element={<Mentoria />} />
