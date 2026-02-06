@@ -37,7 +37,7 @@ export default function SkillsDiagnostico() {
   };
 
   const handleFinish = async () => {
-    await saveDiagnostico();
+    await saveDiagnostico({});
     navigate("/skills/equipe");
   };
 

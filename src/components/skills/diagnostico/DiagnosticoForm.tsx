@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { ChevronLeft, ChevronRight, Send, Loader2 } from "lucide-react";
 
 const TOTAL_STEPS = 10;
 
@@ -54,10 +54,11 @@ const AREAS_AUTOMACAO = [
 ];
 
 interface DiagnosticoFormProps {
-  onSubmit: () => void;
+  onSubmit: (formData: Record<string, any>) => void;
+  isSaving?: boolean;
 }
 
-export default function DiagnosticoForm({ onSubmit }: DiagnosticoFormProps) {
+export default function DiagnosticoForm({ onSubmit, isSaving }: DiagnosticoFormProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<Record<string, any>>({
     ferramentas: [],
@@ -85,6 +86,10 @@ export default function DiagnosticoForm({ onSubmit }: DiagnosticoFormProps) {
           : [...arr, item],
       };
     });
+  };
+
+  const handleSubmit = () => {
+    onSubmit(formData);
   };
 
   const renderCheckboxGroup = (field: string, options: string[]) => (
@@ -426,7 +431,7 @@ export default function DiagnosticoForm({ onSubmit }: DiagnosticoFormProps) {
           <Button
             variant="outline"
             onClick={() => setStep((s) => Math.max(1, s - 1))}
-            disabled={step === 1}
+            disabled={step === 1 || isSaving}
           >
             <ChevronLeft className="h-4 w-4" />
             Anterior
@@ -438,11 +443,16 @@ export default function DiagnosticoForm({ onSubmit }: DiagnosticoFormProps) {
             </Button>
           ) : (
             <Button
-              onClick={onSubmit}
+              onClick={handleSubmit}
+              disabled={isSaving}
               className="bg-[hsl(72,50%,35%)] hover:bg-[hsl(72,50%,30%)] text-white"
             >
-              <Send className="h-4 w-4" />
-              Enviar Diagnóstico
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              {isSaving ? "Salvando..." : "Enviar Diagnóstico"}
             </Button>
           )}
         </div>

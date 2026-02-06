@@ -1535,64 +1535,166 @@ export type Database = {
       }
       diagnosticos_skills: {
         Row: {
+          apoio_lideranca: string | null
           area_atuacao: string | null
+          areas_automacao: Json | null
+          atividade_principal: string | null
+          automatizar_empresa: string | null
+          autonomia: string | null
+          barreiras: string | null
           cargo: string | null
           completado: boolean | null
           created_at: string | null
+          desafios: Json | null
+          economia_horas_semana: number | null
+          economia_valor_mensal: number | null
           equipe_id: string | null
           ferramentas_atuais: Json | null
+          ferramentas_automacao: Json | null
+          frequencia_atividade: string | null
           gargalos_identificados: Json | null
+          horas_repetitivas: string | null
+          horas_semana: string | null
           id: string
+          iniciativas_ia: string | null
+          insight_gerado_em: string | null
+          insight_ia: Json | null
           interesse_em_ia: string | null
           ja_usou_ia: string | null
+          maturidade_digital: string | null
+          melhor_horario: Json | null
+          nivel_tecnico: string | null
+          objetivo_programa: Json | null
+          objetivos_ia: Json | null
           onde_perde_mais_tempo: string | null
           onde_poderia_ser_mais_produtivo: string | null
+          preferencia_conteudo: string | null
+          processo_colaborativo: string | null
+          processos_analisados: Json | null
+          processos_detalhados: Json | null
           processos_mais_demorados: string | null
           processos_repetitivos: string | null
+          projeto_colaborativo: string | null
+          restricoes_ti: string | null
+          resultado_equipe: string | null
+          resultado_sucesso: string | null
+          sistemas_erp: Json | null
+          tamanho_area: string | null
           tarefas_manuais: Json | null
+          tempo_gasto: string | null
           tempo_na_empresa: string | null
+          trilha_sugerida: Json | null
           updated_at: string | null
           user_id: string
+          uso_ia: string | null
         }
         Insert: {
+          apoio_lideranca?: string | null
           area_atuacao?: string | null
+          areas_automacao?: Json | null
+          atividade_principal?: string | null
+          automatizar_empresa?: string | null
+          autonomia?: string | null
+          barreiras?: string | null
           cargo?: string | null
           completado?: boolean | null
           created_at?: string | null
+          desafios?: Json | null
+          economia_horas_semana?: number | null
+          economia_valor_mensal?: number | null
           equipe_id?: string | null
           ferramentas_atuais?: Json | null
+          ferramentas_automacao?: Json | null
+          frequencia_atividade?: string | null
           gargalos_identificados?: Json | null
+          horas_repetitivas?: string | null
+          horas_semana?: string | null
           id?: string
+          iniciativas_ia?: string | null
+          insight_gerado_em?: string | null
+          insight_ia?: Json | null
           interesse_em_ia?: string | null
           ja_usou_ia?: string | null
+          maturidade_digital?: string | null
+          melhor_horario?: Json | null
+          nivel_tecnico?: string | null
+          objetivo_programa?: Json | null
+          objetivos_ia?: Json | null
           onde_perde_mais_tempo?: string | null
           onde_poderia_ser_mais_produtivo?: string | null
+          preferencia_conteudo?: string | null
+          processo_colaborativo?: string | null
+          processos_analisados?: Json | null
+          processos_detalhados?: Json | null
           processos_mais_demorados?: string | null
           processos_repetitivos?: string | null
+          projeto_colaborativo?: string | null
+          restricoes_ti?: string | null
+          resultado_equipe?: string | null
+          resultado_sucesso?: string | null
+          sistemas_erp?: Json | null
+          tamanho_area?: string | null
           tarefas_manuais?: Json | null
+          tempo_gasto?: string | null
           tempo_na_empresa?: string | null
+          trilha_sugerida?: Json | null
           updated_at?: string | null
           user_id: string
+          uso_ia?: string | null
         }
         Update: {
+          apoio_lideranca?: string | null
           area_atuacao?: string | null
+          areas_automacao?: Json | null
+          atividade_principal?: string | null
+          automatizar_empresa?: string | null
+          autonomia?: string | null
+          barreiras?: string | null
           cargo?: string | null
           completado?: boolean | null
           created_at?: string | null
+          desafios?: Json | null
+          economia_horas_semana?: number | null
+          economia_valor_mensal?: number | null
           equipe_id?: string | null
           ferramentas_atuais?: Json | null
+          ferramentas_automacao?: Json | null
+          frequencia_atividade?: string | null
           gargalos_identificados?: Json | null
+          horas_repetitivas?: string | null
+          horas_semana?: string | null
           id?: string
+          iniciativas_ia?: string | null
+          insight_gerado_em?: string | null
+          insight_ia?: Json | null
           interesse_em_ia?: string | null
           ja_usou_ia?: string | null
+          maturidade_digital?: string | null
+          melhor_horario?: Json | null
+          nivel_tecnico?: string | null
+          objetivo_programa?: Json | null
+          objetivos_ia?: Json | null
           onde_perde_mais_tempo?: string | null
           onde_poderia_ser_mais_produtivo?: string | null
+          preferencia_conteudo?: string | null
+          processo_colaborativo?: string | null
+          processos_analisados?: Json | null
+          processos_detalhados?: Json | null
           processos_mais_demorados?: string | null
           processos_repetitivos?: string | null
+          projeto_colaborativo?: string | null
+          restricoes_ti?: string | null
+          resultado_equipe?: string | null
+          resultado_sucesso?: string | null
+          sistemas_erp?: Json | null
+          tamanho_area?: string | null
           tarefas_manuais?: Json | null
+          tempo_gasto?: string | null
           tempo_na_empresa?: string | null
+          trilha_sugerida?: Json | null
           updated_at?: string | null
           user_id?: string
+          uso_ia?: string | null
         }
         Relationships: [
           {
