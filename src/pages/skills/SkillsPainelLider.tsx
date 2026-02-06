@@ -89,7 +89,11 @@ export default function SkillsPainelLider() {
   const { 
     progressoMembros, 
     alertasAtraso, 
-    metricas, 
+    metricas,
+    horasEconomizadasTotal,
+    entregasConcluidas,
+    totalEntregas,
+    entregasParaValidar,
     isLoading 
   } = useSkillsLider();
   
@@ -143,9 +147,9 @@ export default function SkillsPainelLider() {
   ];
 
   // Calcular progresso geral
-  const totalEntregas = metricas?.totalEntregas || 0;
-  const entregasAprovadas = metricas?.entregasAprovadas || 0;
-  const progressoGeral = totalEntregas > 0 ? Math.round((entregasAprovadas / totalEntregas) * 100) : 0;
+  const totalEntregasCalc = metricas?.totalEntregas || totalEntregas || 0;
+  const entregasAprovadasCalc = metricas?.entregasAprovadas || entregasConcluidas || 0;
+  const progressoGeral = totalEntregasCalc > 0 ? Math.round((entregasAprovadasCalc / totalEntregasCalc) * 100) : 0;
   const membrosAtivos = membrosProcessados.filter((m: any) => m.status !== 'atrasado').length;
   const totalMembros = membrosProcessados.length;
 
@@ -178,7 +182,7 @@ export default function SkillsPainelLider() {
             <p className="text-xs text-gray-600">Horas Economizadas</p>
           </div>
           <p className="text-2xl font-bold" style={{ color: brandGreen }}>
-            {metricas?.horasEconomizadas || 0}h/sem
+            {metricas?.horasEconomizadas || horasEconomizadasTotal || 0}h/sem
           </p>
           <p className="text-xs text-gray-500 mt-1">Potencial calculado</p>
         </div>
@@ -189,10 +193,10 @@ export default function SkillsPainelLider() {
             <p className="text-xs text-gray-600">Entregas Concluídas</p>
           </div>
           <p className="text-2xl font-bold" style={{ color: brandGreen }}>
-            {entregasAprovadas} de {totalEntregas}
+            {entregasAprovadasCalc} de {totalEntregasCalc}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            {metricas?.entregasParaValidar || 0} aguardando validação
+            {metricas?.entregasParaValidar || entregasParaValidar?.length || 0} aguardando validação
           </p>
         </div>
 

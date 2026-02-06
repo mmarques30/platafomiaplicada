@@ -10,15 +10,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { Clock, TrendingUp, CheckCircle2, Star, Users, Zap, DollarSign } from "lucide-react";
-import { useSquadLider } from "@/hooks/useSquadLider";
+import { useSkillsLider } from "@/hooks/useSkillsLider";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export default function SquadLiderPainel() {
   const navigate = useNavigate();
   const {
-    squadId,
-    squadNome,
+    equipeId,
+    equipeNome,
     empresaNome,
     isLider,
     isLoading,
@@ -36,7 +36,7 @@ export default function SquadLiderPainel() {
     investimento,
     roiChartData,
     maturidadeChartData,
-  } = useSquadLider();
+  } = useSkillsLider();
 
   // Filtros
   const [filtroPeriodo, setFiltroPeriodo] = useState("todo");
@@ -47,7 +47,7 @@ export default function SquadLiderPainel() {
   // Redirecionar se não for líder
   useEffect(() => {
     if (!isLoading && !isLider) {
-      navigate("/");
+      navigate("/skills/equipe");
     }
   }, [isLoading, isLider, navigate]);
 
@@ -78,13 +78,13 @@ export default function SquadLiderPainel() {
     );
   }
 
-  if (!squadId) {
+  if (!equipeId) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center">
         <Users className="h-16 w-16 text-muted-foreground mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Nenhum Squad encontrado</h2>
+        <h2 className="text-xl font-semibold mb-2">Nenhuma Equipe encontrada</h2>
         <p className="text-muted-foreground">
-          Você não está associado a nenhum Squad. Entre em contato com o suporte.
+          Você não está associado a nenhuma equipe Skills. Entre em contato com o suporte.
         </p>
       </div>
     );
@@ -105,7 +105,7 @@ export default function SquadLiderPainel() {
         </h1>
         <div className="h-1 w-24 bg-gradient-to-r from-primary to-primary/50 rounded-full" />
         <p className="text-muted-foreground mt-2">
-          {squadNome} {empresaNome && `• ${empresaNome}`}
+          {equipeNome} {empresaNome && `• ${empresaNome}`}
         </p>
       </div>
 

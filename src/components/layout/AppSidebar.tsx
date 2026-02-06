@@ -436,38 +436,10 @@ export function AppSidebar() {
                   </Collapsible>
                 ) : null;
 
-                // Squad menu - logo após Bibliotecas (apenas para não-visitantes e não-Business)
-                const squadMenu = renderBibliotecasAfter && !isVisitante && !isBusiness ? (
-                  <SidebarMenuItem key="squad_menu">
-                    <SidebarMenuButton asChild className="group">
-                      <NavLink 
-                        to="/squad" 
-                        end
-                        className={cn(
-                          "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 flex items-center gap-3",
-                          location.pathname === '/squad'
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}
-                      >
-                        <span className={cn(
-                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                          location.pathname === '/squad'
-                            ? "bg-[#0D0D0D] opacity-100" 
-                            : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
-                        )} />
-                        <LucideIcons.UsersRound className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                        {!collapsed && <span className="text-sm">Squad</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ) : null;
-
                 return (
                   <>
                     {menuElement}
                     {bibliotecasMenu}
-                    {squadMenu}
                   </>
                 );
               })}

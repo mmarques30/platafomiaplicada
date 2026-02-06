@@ -26,6 +26,9 @@ export default function SkillsLiderDashboard() {
     progressoMembros, 
     alertasAtraso, 
     metricas,
+    horasEconomizadasTotal,
+    entregasConcluidas,
+    totalEntregas,
     isLoading,
     aprovarEntrega,
     rejeitarEntrega 
@@ -70,7 +73,7 @@ export default function SkillsLiderDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Para Validar</p>
-                <p className="text-2xl font-bold">{metricas?.entregasParaValidar || 0}</p>
+                <p className="text-2xl font-bold">{metricas?.entregasParaValidar || entregasParaValidar?.length || 0}</p>
               </div>
               <CheckSquare className="h-8 w-8 text-amber-500" />
             </div>
@@ -82,7 +85,7 @@ export default function SkillsLiderDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Aprovadas</p>
-                <p className="text-2xl font-bold">{metricas?.entregasAprovadas || 0}/{metricas?.totalEntregas || 0}</p>
+                <p className="text-2xl font-bold">{metricas?.entregasAprovadas || entregasConcluidas}/{metricas?.totalEntregas || totalEntregas}</p>
               </div>
               <CheckCircle2 className="h-8 w-8 text-green-500" />
             </div>
@@ -94,7 +97,7 @@ export default function SkillsLiderDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Horas Economizadas</p>
-                <p className="text-2xl font-bold">{metricas?.horasEconomizadas || 0}h</p>
+                <p className="text-2xl font-bold">{metricas?.horasEconomizadas || horasEconomizadasTotal}h</p>
               </div>
               <TrendingUp className="h-8 w-8 text-blue-500" />
             </div>

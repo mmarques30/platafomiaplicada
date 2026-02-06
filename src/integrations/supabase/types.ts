@@ -1882,13 +1882,18 @@ export type Database = {
         Row: {
           aprovado_em: string | null
           aprovado_por: string | null
+          avaliacao_comentario: string | null
+          avaliacao_nota: number | null
           backlog_item_id: string | null
+          concluido_em: string | null
           created_at: string | null
           descricao: string | null
+          economia_horas_semana: number | null
           equipe_id: string | null
           id: string
           instrucoes: string | null
           prazo: string | null
+          progresso: number | null
           prompts_recomendados: Json | null
           responsavel_id: string | null
           roadmap_fase_id: string | null
@@ -1899,13 +1904,18 @@ export type Database = {
         Insert: {
           aprovado_em?: string | null
           aprovado_por?: string | null
+          avaliacao_comentario?: string | null
+          avaliacao_nota?: number | null
           backlog_item_id?: string | null
+          concluido_em?: string | null
           created_at?: string | null
           descricao?: string | null
+          economia_horas_semana?: number | null
           equipe_id?: string | null
           id?: string
           instrucoes?: string | null
           prazo?: string | null
+          progresso?: number | null
           prompts_recomendados?: Json | null
           responsavel_id?: string | null
           roadmap_fase_id?: string | null
@@ -1916,13 +1926,18 @@ export type Database = {
         Update: {
           aprovado_em?: string | null
           aprovado_por?: string | null
+          avaliacao_comentario?: string | null
+          avaliacao_nota?: number | null
           backlog_item_id?: string | null
+          concluido_em?: string | null
           created_at?: string | null
           descricao?: string | null
+          economia_horas_semana?: number | null
           equipe_id?: string | null
           id?: string
           instrucoes?: string | null
           prazo?: string | null
+          progresso?: number | null
           prompts_recomendados?: Json | null
           responsavel_id?: string | null
           roadmap_fase_id?: string | null
@@ -2058,10 +2073,12 @@ export type Database = {
       equipes_skills: {
         Row: {
           created_at: string | null
+          custo_hora_padrao: number | null
           data_fim: string | null
           data_inicio: string | null
           empresa_nome: string | null
           id: string
+          investimento: number | null
           lider_id: string | null
           nome: string
           setor: string | null
@@ -2070,10 +2087,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          custo_hora_padrao?: number | null
           data_fim?: string | null
           data_inicio?: string | null
           empresa_nome?: string | null
           id?: string
+          investimento?: number | null
           lider_id?: string | null
           nome: string
           setor?: string | null
@@ -2082,10 +2101,12 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          custo_hora_padrao?: number | null
           data_fim?: string | null
           data_inicio?: string | null
           empresa_nome?: string | null
           id?: string
+          investimento?: number | null
           lider_id?: string | null
           nome?: string
           setor?: string | null
@@ -3355,6 +3376,7 @@ export type Database = {
           equipe_id: string | null
           horas_economizadas: number | null
           id: string
+          indice_maturidade: number | null
           processos_automatizados: number | null
           semana: number
         }
@@ -3366,6 +3388,7 @@ export type Database = {
           equipe_id?: string | null
           horas_economizadas?: number | null
           id?: string
+          indice_maturidade?: number | null
           processos_automatizados?: number | null
           semana: number
         }
@@ -3377,6 +3400,7 @@ export type Database = {
           equipe_id?: string | null
           horas_economizadas?: number | null
           id?: string
+          indice_maturidade?: number | null
           processos_automatizados?: number | null
           semana?: number
         }
