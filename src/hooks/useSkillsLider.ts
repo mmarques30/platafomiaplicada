@@ -24,6 +24,7 @@ interface Entrega {
   progresso: number;
   prazo: string | null;
   economiaHorasSemana: number;
+  roi: number;
   avaliacaoNota: number | null;
   concluidoEm: string | null;
   responsavelId: string | null;
@@ -37,6 +38,8 @@ interface MetricaSemanal {
   entregasConcluidas: number;
   engajamentoTrilhas: number;
   indiceMaturidade: number;
+  roiProjetado: number;
+  roiExecutado: number;
 }
 
 interface RoadmapFase {
@@ -163,6 +166,7 @@ export function useSkillsLider() {
           progresso,
           prazo,
           economia_horas_semana,
+          roi,
           avaliacao_nota,
           concluido_em,
           responsavel_id,
@@ -179,6 +183,7 @@ export function useSkillsLider() {
         progresso: e.progresso || 0,
         prazo: e.prazo,
         economiaHorasSemana: e.economia_horas_semana || 0,
+        roi: e.roi || 0,
         avaliacaoNota: e.avaliacao_nota,
         concluidoEm: e.concluido_em,
         responsavelId: e.responsavel_id,
@@ -206,6 +211,8 @@ export function useSkillsLider() {
         entregasConcluidas: m.entregas_concluidas || 0,
         engajamentoTrilhas: m.engajamento_trilhas || 0,
         indiceMaturidade: m.indice_maturidade || 0,
+        roiProjetado: m.roi_projetado || 0,
+        roiExecutado: m.roi_executado || 0,
       })) as MetricaSemanal[];
     },
     enabled: !!equipeId,
@@ -432,9 +439,18 @@ export function useSkillsLider() {
     .sort((a, b) => b.score - a.score)
     .map((r, i) => ({ ...r, posicao: i + 1 }));
 
-  // Dados para gráfico de ROI
+  // Dados para gráfico de ROI — usa roi_projetado/roi_executado das métricas quando disponível
   const roiChartData = Array.from({ length: 12 }, (_, i) => {
     const semana = i + 1;
+    const metricaSemana = (metricas || []).find((m) => m.semana === semana);
+    if (metricaSemana && (metricaSemana.roiProjetado || metricaSemana.roiExecutado)) {
+      return {
+        semana: `Sem ${semana}`,
+        projetado: Math.round(metricaSemana.roiProjetado),
+        executado: Math.round(metricaSemana.roiExecutado),
+      };
+    }
+    // Fallback: cálculo baseado em horas
     const roiProjetado = (semana / 12) * 100;
     const horasAcumuladas = (metricas || [])
       .filter((m) => m.semana <= semana)
