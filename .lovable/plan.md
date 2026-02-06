@@ -1,115 +1,148 @@
 
-# Plano: Painel do Líder com Sub-abas Internas
+# Plano: Corrigir Painel do Lider e Estrutura de Menus do Skills
 
-## Objetivo
-Criar o conteudo completo do componente `SkillsPainelLider.tsx` com 6 secoes organizadas em sub-abas internas para melhor visualizacao, seguindo rigorosamente o design system especificado.
+## Diagnostico do Problema
 
-## Estrutura do Componente
+O painel do lider sumiu porque:
+1. O menu "Meu Progresso" no ambiente Skills aponta para `/skills/progresso`, mas deveria apontar para `/skills/equipe`
+2. Faltam submenus essenciais do Skills no banco de dados (`menu_config`): Minha Equipe, Backlog, Roadmap, Entregas
+3. A pagina `SkillsPainelLider.tsx` usa dados mockados em vez de buscar dados reais do banco
+4. O usuario atual (Mariana) nao tem plano Skills nem pertence a nenhuma equipe - por isso nao ve o menu
 
-O componente tera:
-- Navegacao interna com 6 sub-abas (usando Radix Tabs)
-- Dados mock conforme especificado
-- Variaveis de cor da marca no topo
-- Padroes visuais obrigatorios aplicados
-
-### Sub-abas
+## Arquitetura Atual vs Desejada
 
 ```text
-+----------------+------------------+-----------+-------------+----------+------------+
-| Indicadores    | Status Equipe    | Entregas  | Cronograma  | Alertas  | Impacto    |
-+----------------+------------------+-----------+-------------+----------+------------+
+ATUAL (Problematico):
+Meu Progresso (parent)
+  └── Painel do Lider → /skills/progresso  [UNICO SUBMENU]
+
+DESEJADO:
+Meu Progresso → /skills/equipe (URL padrao para Skills)
+  ├── Minha Equipe → /skills/equipe
+  ├── Backlog → /skills/backlog
+  ├── Roadmap → /skills/roadmap
+  ├── Entregas → /skills/entregas
+  └── Painel do Lider → /skills/progresso  [APENAS LIDERES]
 ```
 
-## Secoes Detalhadas
+## Solucao em Etapas
 
-### 1. Indicadores Gerais (aba padrao)
-- Grid 4 colunas com KPI cards usando `border-l-4` e `brandGreen`
-- KPIs: Equipe Ativa (3 de 4), Horas Economizadas (31h/sem), Entregas Concluidas (4 de 7), Progresso Geral (57%)
-- Icones: Users, Clock, CheckCircle, TrendingUp
+### Etapa 1: Atualizar Banco de Dados (menu_config)
 
-### 2. Status da Equipe
-- Titulo com `border-l-4 pl-4` + subtitulo
-- Grid 2 colunas com cards por membro
-- Cada card: avatar (iniciais), nome, cargo, badge status, metricas em linha, barra progresso, ultimo acesso, atividade recente
-- Logica visual: atrasado = borda vermelha + bg-red-50
+Inserir novos itens de menu para o ambiente Skills:
 
-### 3. Entregas em Andamento
-- Titulo de secao padronizado
-- Tabela com header `brandBlack`
-- Colunas: Entrega, Responsavel, Status, Progresso, Prazo/Economia
-- Badges de status diferenciados por cor
+| menu_key | label | url | parent_key | planos_permitidos | ordem |
+|----------|-------|-----|------------|-------------------|-------|
+| skills_minha_equipe | Minha Equipe | /skills/equipe | meu_progresso | [skills] | 30 |
+| skills_backlog | Backlog | /skills/backlog | meu_progresso | [skills] | 31 |
+| skills_roadmap | Roadmap | /skills/roadmap | meu_progresso | [skills] | 32 |
+| skills_entregas | Entregas | /skills/entregas | meu_progresso | [skills] | 33 |
 
-### 4. Linha do Tempo (Cronograma)
-- Barra de progresso horizontal grande
-- Indicador "VOCE ESTA AQUI" na Semana 6
-- Marcos abaixo: Fundacao (1-4), Expansao (5-8), Consolidacao (9-12)
+E atualizar o item existente `skills_painel_lider` para ordem 34.
 
-### 5. Alertas e Acoes
-- Lista de alertas em vermelho (atrasados) e amarelo (atencao)
-- Card verde se nao houver alertas
+### Etapa 2: Ajustar Hook useMenuConfig
 
-### 6. Resumo de Impacto
-- Card destacado com `border-2` e `brandGreen`
-- Grid 4 colunas: 31h/sem, 4 entregas, 186h total, R$ 11.160
-- Rodape: Investimento vs ROI (148%)
-- Botoes: Exportar Relatorio e Compartilhar (decorativos)
+Adicionar filtro especial para ocultar "Painel do Lider" (`skills_painel_lider`) de usuarios que nao sao lideres Skills. O hook ja tem logica similar para `skills_lider` - precisa incluir `skills_painel_lider`.
 
-## Dados Mock
+Arquivo: `src/hooks/useMenuConfig.tsx`
+- Na funcao `getSubMenus` do `AppSidebar.tsx`, ja existe filtro para `skills_lider`
+- Estender para incluir `skills_painel_lider`
 
-Utilizarei os dados mock fornecidos:
-- `equipe[]` com 4 colaboradores
-- `entregas[]` com 7 itens
-- `semanaAtual = 6` e `totalSemanas = 12`
+### Etapa 3: Ajustar URL Padrao do Meu Progresso
 
-## Variaveis de Cor
-
-```typescript
-const brandGreen = '#738925';
-const brandGreenLight = '#AFC040';
-const brandBeigeAlt = '#F5F5DC';
-const brandBlack = '#0D0D0D';
+No `AppSidebar.tsx`, a funcao `getMenuUrl` ja trata o caso Skills:
+```tsx
+if (menu.menu_key === 'meu_progresso') {
+  if (effectivePlan === 'skills' || effectiveEnvironment === 'skills') {
+    return '/skills/progresso';  // ATUAL
+  }
+}
 ```
 
-## Arquivos a Modificar
+Alterar para retornar `/skills/equipe` conforme requisitado.
 
-| Arquivo | Acao |
-|---------|------|
-| `src/pages/skills/SkillsPainelLider.tsx` | Reescrever com conteudo completo |
+### Etapa 4: Refatorar SkillsPainelLider para Dados Reais
+
+Substituir os dados mockados pelos hooks existentes:
+- `useSkillsEquipe()` - membros e status
+- `useSkillsLider()` - entregas, alertas, metricas
+- `useSkillsEntregas()` - lista de entregas
+
+Manter a mesma estrutura visual (KPIs, Cronograma, Equipe, Entregas, Alertas).
+
+### Etapa 5: Proteger Rota /skills/progresso
+
+Na pagina `SkillsMeuProgresso.tsx`:
+1. Verificar se usuario e lider via `useSkillsMembro().isLider`
+2. Redirecionar nao-lideres para `/skills/equipe`
+
+---
 
 ## Detalhes Tecnicos
 
-- Importar componentes: `Tabs, TabsList, TabsTrigger, TabsContent` de `@/components/ui/tabs`
-- Importar icones do `lucide-react`: Users, Clock, CheckCircle, TrendingUp, AlertCircle
-- Usar `Table, TableHeader, TableBody, TableRow, TableHead, TableCell` de `@/components/ui/table`
-- Componente funcional com export default
-- Nao usar sombras pesadas, gradientes ou cores fora da paleta
-- Nao incluir emojis no codigo
+### Insercoes no Banco (menu_config)
 
-## Padroes Visuais Aplicados
+```sql
+INSERT INTO menu_config (menu_key, label, tipo, url, icon, visivel, editavel, ordem, parent_key, planos_permitidos)
+VALUES 
+  ('skills_minha_equipe', 'Minha Equipe', 'sidebar', '/skills/equipe', NULL, true, true, 30, 'meu_progresso', ARRAY['skills']),
+  ('skills_backlog', 'Backlog', 'sidebar', '/skills/backlog', NULL, true, true, 31, 'meu_progresso', ARRAY['skills']),
+  ('skills_roadmap', 'Roadmap', 'sidebar', '/skills/roadmap', NULL, true, true, 32, 'meu_progresso', ARRAY['skills']),
+  ('skills_entregas', 'Entregas', 'sidebar', '/skills/entregas', NULL, true, true, 33, 'meu_progresso', ARRAY['skills']);
 
-1. **Titulo de secao**: `border-l-4 pl-4` com `borderColor: brandGreen`
-2. **Card padrao**: `bg-white p-6 rounded-lg border border-gray-200`
-3. **KPI card**: `bg-white p-4 rounded-lg border-l-4` com `borderColor: brandGreen`
-4. **Barra progresso**: container `bg-gray-200 rounded-full h-2`, fill com `brandGreen`
-5. **Badges status**: Em dia (verde), Atencao (amarelo), Atrasado (vermelho)
-6. **Header tabela**: `backgroundColor: brandBlack, color: white`
-7. **Card destaque**: `border-2` com `borderColor: brandGreen`
-
-## Navegacao das Abas
-
-```typescript
-<Tabs defaultValue="indicadores" className="space-y-6">
-  <TabsList className="bg-white border border-gray-200 rounded-lg p-1 w-full grid grid-cols-6 gap-1">
-    <TabsTrigger value="indicadores">Indicadores</TabsTrigger>
-    <TabsTrigger value="equipe">Equipe</TabsTrigger>
-    <TabsTrigger value="entregas">Entregas</TabsTrigger>
-    <TabsTrigger value="cronograma">Cronograma</TabsTrigger>
-    <TabsTrigger value="alertas">Alertas</TabsTrigger>
-    <TabsTrigger value="impacto">Impacto</TabsTrigger>
-  </TabsList>
-  
-  <TabsContent value="indicadores">...</TabsContent>
-  <TabsContent value="equipe">...</TabsContent>
-  ...
-</Tabs>
+UPDATE menu_config 
+SET ordem = 34 
+WHERE menu_key = 'skills_painel_lider';
 ```
+
+### Arquivos a Modificar
+
+| Arquivo | Acao |
+|---------|------|
+| `src/components/layout/AppSidebar.tsx` | Alterar URL padrao de Skills para /skills/equipe; adicionar filtro para ocultar `skills_painel_lider` de nao-lideres |
+| `src/pages/skills/SkillsMeuProgresso.tsx` | Adicionar guard para redirecionar nao-lideres |
+| `src/pages/skills/SkillsPainelLider.tsx` | Substituir dados mockados por hooks reais (`useSkillsEquipe`, `useSkillsLider`); manter layout visual |
+
+### Fluxo de Navegacao Resultante
+
+```text
+Usuario Skills (Membro):
+  Meu Progresso → /skills/equipe
+    ├── Minha Equipe (ativa)
+    ├── Backlog
+    ├── Roadmap
+    └── Entregas
+    [Painel do Lider OCULTO]
+
+Usuario Skills (Lider):
+  Meu Progresso → /skills/equipe
+    ├── Minha Equipe
+    ├── Backlog
+    ├── Roadmap
+    ├── Entregas
+    └── Painel do Lider (visivel)
+
+Usuario Business com Skills Liberado (ambiente Skills):
+  Mesma estrutura do Skills
+```
+
+### Dependencias de Dados
+
+O `SkillsPainelLider` refatorado dependera de:
+1. `membros_equipe_skills` - lista de membros
+2. `entregas_skills` - projetos/entregas
+3. `diagnostico_consolidado_skills` - metricas de economia
+4. `roadmap_skills` - fases do cronograma
+
+Atualmente essas tabelas tem dados minimos (1 equipe, 2 membros, 0 entregas). O painel mostrara estados vazios apropriados.
+
+---
+
+## Resultado Esperado
+
+1. Menu "Meu Progresso" no Skills abre `/skills/equipe` (Minha Equipe)
+2. Submenus visiveis para todos Skills: Minha Equipe, Backlog, Roadmap, Entregas
+3. Submenu "Painel do Lider" visivel apenas para usuarios com `papel='lider'`
+4. Pagina `/skills/progresso` protegida - redireciona nao-lideres
+5. Painel do Lider exibe dados reais da equipe (nao mockados)
+6. Usuarios Business com `skills_liberado=true` veem menus Skills quando no ambiente Skills
