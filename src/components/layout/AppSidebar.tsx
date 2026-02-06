@@ -116,9 +116,11 @@ export function AppSidebar() {
     }
     
     // Filtrar menu "Painel do Líder" se não for líder Skills (e não for admin)
+    // Filtrar Performance e Diagnóstico do Projeto Skills para não-líderes/não-admins
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
-      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin);
+      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin)
+      .filter(menu => !['projeto_skills_performance', 'projeto_skills_diagnostico'].includes(menu.menu_key) || isSkillsLider || isAdmin);
   };
 
   const toggleMenu = (menuKey: string) => {
