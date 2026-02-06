@@ -458,7 +458,9 @@ export function useSkillsLider() {
     };
   });
 
-  const isLoading = membroLoading || adminFallbackLoading || equipeLoading || membrosLoading || entregasLoading || metricasLoading || roadmapLoading || loadingProgresso;
+  // Admin sem equipe própria mas com fallback pendente = ainda carregando
+  const adminWaitingForFallback = isAdmin && !membroEquipeId && !membroLoading && !adminFallbackEquipeId && !adminFallbackLoading;
+  const isLoading = membroLoading || adminFallbackLoading || adminWaitingForFallback || equipeLoading || membrosLoading || entregasLoading || metricasLoading || roadmapLoading || loadingProgresso;
 
   // Métricas consolidadas
   const metricasConsolidadas = {
