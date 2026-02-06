@@ -93,6 +93,7 @@ const menuGroups: MenuGroup[] = [
       { path: "/admin/mentoria/business", label: "Business" },
       { path: "/admin/mentoria/business-iaplicada", label: "Business iAplicada" },
       
+      { path: "/admin/mentoria/skills", label: "Skills" },
       { path: "/admin/mentoria/preview-paineis", label: "Preview Painéis" },
       { path: "/admin/formularios", label: "Diagnósticos" },
       { path: "/admin/duvidas", label: "Central de Dúvidas" },

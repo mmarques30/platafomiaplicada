@@ -1897,6 +1897,7 @@ export type Database = {
           prompts_recomendados: Json | null
           responsavel_id: string | null
           roadmap_fase_id: string | null
+          roi: number | null
           status: string | null
           titulo: string
           updated_at: string | null
@@ -1919,6 +1920,7 @@ export type Database = {
           prompts_recomendados?: Json | null
           responsavel_id?: string | null
           roadmap_fase_id?: string | null
+          roi?: number | null
           status?: string | null
           titulo: string
           updated_at?: string | null
@@ -1941,6 +1943,7 @@ export type Database = {
           prompts_recomendados?: Json | null
           responsavel_id?: string | null
           roadmap_fase_id?: string | null
+          roi?: number | null
           status?: string | null
           titulo?: string
           updated_at?: string | null
@@ -2008,6 +2011,7 @@ export type Database = {
           investimento: number | null
           lider_id: string | null
           nome: string
+          semana_atual: number | null
           setor: string | null
           status: string | null
           updated_at: string | null
@@ -2022,6 +2026,7 @@ export type Database = {
           investimento?: number | null
           lider_id?: string | null
           nome: string
+          semana_atual?: number | null
           setor?: string | null
           status?: string | null
           updated_at?: string | null
@@ -2036,6 +2041,7 @@ export type Database = {
           investimento?: number | null
           lider_id?: string | null
           nome?: string
+          semana_atual?: number | null
           setor?: string | null
           status?: string | null
           updated_at?: string | null
@@ -3250,6 +3256,8 @@ export type Database = {
           id: string
           indice_maturidade: number | null
           processos_automatizados: number | null
+          roi_executado: number | null
+          roi_projetado: number | null
           semana: number
         }
         Insert: {
@@ -3262,6 +3270,8 @@ export type Database = {
           id?: string
           indice_maturidade?: number | null
           processos_automatizados?: number | null
+          roi_executado?: number | null
+          roi_projetado?: number | null
           semana: number
         }
         Update: {
@@ -3274,6 +3284,8 @@ export type Database = {
           id?: string
           indice_maturidade?: number | null
           processos_automatizados?: number | null
+          roi_executado?: number | null
+          roi_projetado?: number | null
           semana?: number
         }
         Relationships: [
