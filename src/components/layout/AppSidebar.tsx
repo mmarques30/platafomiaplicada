@@ -118,7 +118,7 @@ export function AppSidebar() {
     // Filtrar menu "Painel do Líder" se não for líder Skills
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
-      .filter(menu => menu.menu_key !== 'skills_lider' || isSkillsLider);
+      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider);
   };
 
   const toggleMenu = (menuKey: string) => {
@@ -132,9 +132,9 @@ export function AppSidebar() {
   // Helper para determinar URL dinâmica baseada no plano
   const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
     if (menu.menu_key === 'meu_progresso') {
-      // Skills vai para /skills/progresso
+      // Skills vai para /skills/equipe (Minha Equipe)
       if (effectivePlan === 'skills' || effectiveEnvironment === 'skills') {
-        return '/skills/progresso';
+        return '/skills/equipe';
       }
       // Business vai para /mentoria (Visão Geral)
       if (effectivePlan === 'business' || effectivePlan === 'business_iaplicada') {
