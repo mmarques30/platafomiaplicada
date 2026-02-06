@@ -1,17 +1,52 @@
 import { Briefcase } from "lucide-react";
+import { PageTitle } from "@/components/shared/PageTitle";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useSkillsMembro } from "@/hooks/useSkillsMembro";
+import ProjetoSkillsPerformance from "@/components/skills/ProjetoSkillsPerformance";
 
 export default function ProjetoSkills() {
+  const { isAdmin } = useUserRole();
+  const { isLider } = useSkillsMembro();
+
+  const canSeePerformance = isAdmin || isLider;
+
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <Briefcase className="h-6 w-6 text-primary" />
-        <div>
-          <h1 className="text-2xl font-bold">Projeto Skills</h1>
-          <p className="text-muted-foreground mt-1">
-            Em breve: acompanhe o projeto Skills da sua equipe
-          </p>
-        </div>
-      </div>
+      <PageTitle
+        primary="Projeto"
+        secondary="Skills"
+        icon={<Briefcase className="h-7 w-7 text-[hsl(72,50%,35%)]" />}
+      />
+
+      {canSeePerformance ? (
+        <Tabs defaultValue="visao-geral" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="visao-geral">
+            <VisaoGeralPlaceholder />
+          </TabsContent>
+
+          <TabsContent value="performance">
+            <ProjetoSkillsPerformance />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <VisaoGeralPlaceholder />
+      )}
+    </div>
+  );
+}
+
+function VisaoGeralPlaceholder() {
+  return (
+    <div className="rounded-xl border border-border bg-card p-8 text-center">
+      <p className="text-muted-foreground">
+        Em breve: acompanhe o projeto Skills da sua equipe
+      </p>
     </div>
   );
 }
