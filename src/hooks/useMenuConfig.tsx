@@ -56,19 +56,26 @@ export function useMenuConfig() {
         'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider'
       ],
       
-      // Business Colaborativo: oculta menus Academy-only e Skills-only
+      // Business Colaborativo: oculta menus Academy-only e Skills-only + Squad
       business: [
         'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
-        'skills_entregas', 'skills_painel_lider'
+        'skills_entregas', 'skills_painel_lider',
+        'squad', 'squad_lider'
       ],
       
-      // Business IAplicada: versão mais restrita (cliente apenas acompanha)
+      // Business IAplicada: versão mais restrita (cliente apenas acompanha) + Squad
       business_iaplicada: [
         'trilhas', 'trilhas_skills', 'calendario',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas', 'meu_progresso_conteudo',
         'meu_progresso', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
-        'comunidade', 'comunidade_feed', 'comunidade_sala'
+        'comunidade', 'comunidade_feed', 'comunidade_sala',
+        'squad', 'squad_lider'
+      ],
+      
+      // Academy: ocultar Squad (apenas Skills)
+      academy: [
+        'squad', 'squad_lider'
       ],
     };
     
