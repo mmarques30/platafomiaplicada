@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DiagnosticoForm from "./diagnostico/DiagnosticoForm";
 import DiagnosticoProcessing from "./diagnostico/DiagnosticoProcessing";
 import DiagnosticoResults from "./diagnostico/DiagnosticoResults";
 import { useSkillsDiagnostico } from "@/hooks/useSkillsDiagnostico";
+import { Loader2 } from "lucide-react";
 
 type DiagnosticoState = "form" | "processing" | "results";
 
@@ -16,17 +17,17 @@ export default function ProjetoSkillsDiagnostico() {
     hasInsight,
   } = useSkillsDiagnostico();
 
-  // Determinar estado inicial: se já tem insight, mostra resultados
-  const [state, setState] = useState<DiagnosticoState>(
-    diagnostico?.completado && hasInsight ? "results" : "results" // default results com mocks
-  );
+  // Determinar estado inicial: mostra results (com mocks ou dados reais)
+  const [state, setState] = useState<DiagnosticoState>("results");
 
   // Atualizar estado quando diagnostico carregar do banco
-  useState(() => {
-    if (diagnostico?.completado && hasInsight) {
-      setState("results");
+  useEffect(() => {
+    if (!isLoading) {
+      if (diagnostico?.completado && hasInsight) {
+        setState("results");
+      }
     }
-  });
+  }, [isLoading, diagnostico, hasInsight]);
 
   const handleSubmit = async (formData: Record<string, any>) => {
     setState("processing");
@@ -41,6 +42,14 @@ export default function ProjetoSkillsDiagnostico() {
   const handleResetForm = () => {
     setState("form");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (state === "processing" || isProcessing) {
     return <DiagnosticoProcessing />;
