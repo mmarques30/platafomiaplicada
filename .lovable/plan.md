@@ -1,83 +1,110 @@
 
-# Sub-aba "Performance" na pagina Projeto Skills
+# Backend e Painel Admin para Skills Performance
 
 ## Resumo
-Transformar a pagina "Projeto Skills" (`/skills/projeto`) em uma pagina com abas (tabs), adicionando a sub-aba **Performance**. Essa aba tera um dashboard analitico completo com KPIs, cronograma de 12 semanas, graficos de ROI e Maturidade IA, e ranking de colaboradores -- tudo inicialmente com dados mockados para visualizacao. Acesso restrito a administradores e lideres.
+Criar a pagina de administracao **Mentoria > Skills** no painel admin para gerenciar os dados que alimentam o dashboard de Performance no frontend. As tabelas necessarias (entregas_skills, metricas_skills, roadmap_skills, equipes_skills) ja existem no banco com RLS configurado. Sera necessario adicionar colunas faltantes e criar o painel admin com CRUD completo.
 
 ---
 
-## Estrutura Visual
+## 1. Ajustes no Banco de Dados
 
-A pagina Projeto Skills passara a ter um sistema de abas:
-- **Visao Geral** (aba padrao, conteudo atual placeholder)
-- **Performance** (novo dashboard analitico)
+As tabelas ja existem mas precisam de ajustes para suportar os dados exibidos no dashboard de Performance:
 
-A aba Performance tera os seguintes blocos:
+**Tabela `entregas_skills`** -- Adicionar campo `roi`:
+- `roi numeric DEFAULT 0` -- percentual de ROI da entrega (campo exibido nos KPIs e ranking)
 
-1. **Filtros Interativos** -- Periodo, Colaborador, Projeto, Status
-2. **4 KPIs** -- Horas Economizadas, ROI Acumulado, Entregas Concluidas, Performance Media
-3. **Cronograma 12 Semanas** -- 3 fases (Fundacao, Expansao, Consolidacao) com indicador de semana atual
-4. **2 Graficos lado a lado** -- Impacto vs ROI (AreaChart) e Evolucao Maturidade IA (BarChart)
-5. **Ranking de Colaboradores** -- Tabela com posicao, nome, entregas, horas economizadas, ROI, performance
+**Tabela `metricas_skills`** -- Adicionar campo `roi_projetado`:
+- `roi_projetado numeric DEFAULT 0` -- ROI projetado para a semana (usado no grafico AreaChart)
+- `roi_executado numeric DEFAULT 0` -- ROI executado na semana (usado no grafico AreaChart)
+
+**Tabela `equipes_skills`** -- Adicionar campo `semana_atual`:
+- `semana_atual integer DEFAULT 1` -- semana corrente do programa (para o cronograma de 12 semanas)
+
+Nenhuma tabela nova precisa ser criada. As RLS policies ja cobrem acesso de admin (ALL) e membros (SELECT).
 
 ---
 
-## Controle de Acesso
+## 2. Pagina Admin: Mentoria > Skills
 
-- Apenas **administradores** (`isAdmin`) e **lideres** (`isLider` via `useSkillsMembro`) verao a aba Performance
-- Colaboradores comuns verao apenas a aba "Visao Geral"
-- Os hooks `useUserRole` e `useSkillsMembro` ja existentes serao reutilizados
+Nova pagina em `/admin/mentoria/skills` com 4 abas para gerenciar os dados:
+
+### Aba 1: Equipes
+- Seletor de equipe (dropdown com equipes ativas)
+- Cards com dados da equipe selecionada: nome, empresa, data inicio/fim, investimento, custo hora, semana atual
+- Botao para editar dados da equipe (inline ou modal)
+- Atualizar `semana_atual`, `investimento`, `custo_hora_padrao`, `data_inicio`, `data_fim`
+
+### Aba 2: Entregas
+- Tabela listando todas as entregas da equipe selecionada
+- Colunas: Titulo, Responsavel, Status, Horas Economizadas, ROI, Nota, Prazo
+- Botao "Nova Entrega" -- formulario com campos: titulo, descricao, responsavel (select de membros), economia_horas_semana, roi, prazo, status
+- Edicao inline ou modal para cada entrega
+- Exclusao com confirmacao
+
+### Aba 3: Metricas Semanais
+- Tabela com metricas por semana (1 a 12)
+- Colunas: Semana, Horas Economizadas, Processos Automatizados, Entregas Concluidas, Indice Maturidade, ROI Projetado, ROI Executado
+- Botao para adicionar/editar metricas de cada semana
+- Formulario com todos os campos numericos
+
+### Aba 4: Roadmap (Fases)
+- Lista de fases do roadmap com numero, titulo, semana inicio/fim, status
+- CRUD para criar/editar/excluir fases
+- Formulario: numero_fase, titulo, descricao, semana_inicio, semana_fim, status
+
+---
+
+## 3. Conexao Frontend (Dashboard Performance)
+
+Atualizar o componente `ProjetoSkillsPerformance.tsx` para usar dados reais do banco em vez de dados mockados:
+
+- Usar o hook `useSkillsLider` existente que ja busca: entregas, metricas, roadmap, ranking, KPIs
+- Mapear os dados retornados para os formatos dos graficos e tabelas
+- Manter fallback para dados mockados caso nao haja dados no banco
+
+---
+
+## 4. Navegacao
+
+**AdminSidebar.tsx** -- Adicionar link no grupo Mentoria:
+- `{ path: "/admin/mentoria/skills", label: "Skills" }`
+
+**App.tsx** -- Adicionar rota:
+- `<Route path="mentoria/skills" element={<MentoriaSkillsPage />} />`
 
 ---
 
 ## Detalhes Tecnicos
 
 ### Arquivos a Criar
-
-**`src/components/skills/ProjetoSkillsPerformance.tsx`**
-- Componente do dashboard de Performance com dados mockados
-- Usa componentes existentes: `Card`, `Select`, `Table`, `Badge`, `ChartContainer`
-- Segue estetica Executive-Tech (sem emojis, cores `#738925`/`#0D0D0D`/`#F5F5DC`, cards brancos limpos)
-- Dados mockados diretamente no componente:
-  - 7 entregas com colaboradores, projetos, horas, ROI, status, performance
-  - 8 semanas de dados ROI (projetado vs executado)
-  - 6 semanas de dados de maturidade
-  - Ranking calculado a partir das entregas mockadas
+- `src/pages/admin/mentoria/MentoriaSkillsPage.tsx` -- Pagina admin com 4 abas
+- `src/components/admin/skills/SkillsEquipesTab.tsx` -- Aba de gestao de equipes
+- `src/components/admin/skills/SkillsEntregasTab.tsx` -- Aba de gestao de entregas
+- `src/components/admin/skills/SkillsMetricasTab.tsx` -- Aba de gestao de metricas semanais
+- `src/components/admin/skills/SkillsRoadmapTab.tsx` -- Aba de gestao do roadmap
+- `src/hooks/admin/useSkillsPerformanceAdmin.ts` -- Hook admin para CRUD de entregas, metricas e roadmap
 
 ### Arquivos a Modificar
+- `src/App.tsx` -- Adicionar rota `/admin/mentoria/skills`
+- `src/components/admin/AdminSidebar.tsx` -- Adicionar link "Skills" no menu Mentoria
+- `src/components/skills/ProjetoSkillsPerformance.tsx` -- Substituir dados mockados por dados reais via `useSkillsLider`
 
-**`src/pages/skills/ProjetoSkills.tsx`**
-- Adicionar sistema de `Tabs` (Visao Geral | Performance)
-- Importar hooks de acesso (`useUserRole`, `useSkillsMembro`)
-- Renderizar aba Performance condicionalmente (admin ou lider)
-- Usar `PageTitle` com underline gradiente verde (padrao Skills)
-
-**`src/App.tsx`**
-- Sem alteracoes necessarias (rota `/skills/projeto` ja existe)
-
-### Dados Mockados (dentro do componente)
-
+### Migracao SQL
 ```text
-Entregas:
-- Ana Silva      | Automacao RPA        | 120h | ROI 250% | Concluido     | Perf 95
-- Ana Silva      | Dashboard BI         |  80h | ROI 180% | Concluido     | Perf 92
-- Carlos Santos  | Chatbot Atendimento  | 200h | ROI 320% | Concluido     | Perf 88
-- Carlos Santos  | Analise Preditiva    | 150h | ROI 280% | Em andamento  | Perf 85
-- Maria Costa    | OCR Documentos       | 180h | ROI 310% | Concluido     | Perf 90
-- Joao Oliveira  | API Integracao       |  90h | ROI 160% | Em andamento  | Perf 78
-- Beatriz Lima   | ML Classificacao     | 110h | ROI 220% | Atrasado      | Perf 65
-
-ROI Semanal: semanas 1-8 com projetado crescente e executado acompanhando
-Maturidade: semanas 1-6 com indice crescente (25 -> 78)
+ALTER TABLE entregas_skills ADD COLUMN roi numeric DEFAULT 0;
+ALTER TABLE metricas_skills ADD COLUMN roi_projetado numeric DEFAULT 0;
+ALTER TABLE metricas_skills ADD COLUMN roi_executado numeric DEFAULT 0;
+ALTER TABLE equipes_skills ADD COLUMN semana_atual integer DEFAULT 1;
 ```
 
-### Bibliotecas Utilizadas (ja instaladas)
-- `recharts` (AreaChart, BarChart)
-- `@radix-ui/react-tabs` (sistema de abas)
-- `@radix-ui/react-select` (filtros)
-- `lucide-react` (icones)
+### Padrao Visual
+- Usar `adminTheme` para consistencia com demais paginas admin
+- Seletor de equipe no topo (igual ao padrao Academy com seletor de usuario)
+- Tabs para separar as 4 areas de gestao
+- Formularios em Dialogs modais para criacao/edicao
+- Toasts de sucesso/erro via `sonner`
 
-### Sem Alteracoes no Banco de Dados
-- Nenhuma migracao necessaria neste momento
-- Dados 100% mockados no frontend
-- Futuramente, sera conectado ao `useSkillsLider` para dados reais
+### Hooks e Queries
+- Reutilizar `useEquipesSkillsAdmin` para listar equipes
+- Criar queries especificas para CRUD de entregas, metricas e roadmap com `equipe_id` como filtro
+- Invalidar queries relacionadas apos mutations para manter dados sincronizados
