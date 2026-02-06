@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.get-users-auth-providers]
 verify_jwt = true
+
+[functions.processar-diagnostico-skills]
+verify_jwt = false
