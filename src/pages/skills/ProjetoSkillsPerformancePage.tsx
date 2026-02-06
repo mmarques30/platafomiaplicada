@@ -1,16 +1,33 @@
-import { Briefcase } from "lucide-react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Briefcase, Loader2 } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
-import { Navigate } from "react-router-dom";
 import ProjetoSkillsPerformance from "@/components/skills/ProjetoSkillsPerformance";
 
 export default function ProjetoSkillsPerformancePage() {
-  const { isAdmin } = useUserRole();
-  const { isLider } = useSkillsMembro();
+  const navigate = useNavigate();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isLider, isLoading: membroLoading } = useSkillsMembro();
+  const isLoading = roleLoading || membroLoading;
+
+  useEffect(() => {
+    if (!isLoading && !isAdmin && !isLider) {
+      navigate("/skills/projeto", { replace: true });
+    }
+  }, [isLoading, isAdmin, isLider, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!isAdmin && !isLider) {
-    return <Navigate to="/skills/projeto" replace />;
+    return null;
   }
 
   return (
