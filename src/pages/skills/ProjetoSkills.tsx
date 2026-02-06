@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import ProjetoSkillsPerformance from "@/components/skills/ProjetoSkillsPerformance";
+import ProjetoSkillsDiagnostico from "@/components/skills/ProjetoSkillsDiagnostico";
 
 export default function ProjetoSkills() {
   const { isAdmin } = useUserRole();
@@ -24,6 +25,7 @@ export default function ProjetoSkills() {
           <TabsList>
             <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
           </TabsList>
 
           <TabsContent value="visao-geral">
@@ -32,6 +34,10 @@ export default function ProjetoSkills() {
 
           <TabsContent value="performance">
             <ProjetoSkillsPerformance />
+          </TabsContent>
+
+          <TabsContent value="diagnostico">
+            <ProjetoSkillsDiagnostico />
           </TabsContent>
         </Tabs>
       ) : (
