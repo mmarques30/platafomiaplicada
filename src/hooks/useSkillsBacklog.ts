@@ -1,38 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./useAuth";
+import { useSkillsMembro } from "./useSkillsMembro";
 
 export function useSkillsBacklog() {
-  const { user } = useAuth();
-
-  // Buscar equipe do usuário
-  const { data: membroData } = useQuery({
-    queryKey: ["membro-equipe-skills", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from("membros_equipe_skills")
-        .select("equipe_id")
-        .eq("user_id", user.id)
-        .eq("status", "ativo")
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
+  const { equipeId } = useSkillsMembro();
 
   // Buscar itens do backlog
   const { data: items, isLoading } = useQuery({
-    queryKey: ["backlog-skills", membroData?.equipe_id],
+    queryKey: ["backlog-skills", equipeId],
     queryFn: async () => {
-      if (!membroData?.equipe_id) return [];
+      if (!equipeId) return [];
       
       // Buscar backlog
       const { data: backlogData, error } = await supabase
         .from("backlog_skills")
         .select("*")
-        .eq("equipe_id", membroData.equipe_id)
+        .eq("equipe_id", equipeId)
         .order("ordem", { ascending: true });
       if (error) throw error;
       
@@ -60,7 +43,7 @@ export function useSkillsBacklog() {
         responsavel: item.responsavel_id ? responsaveis[item.responsavel_id] : null,
       })) || [];
     },
-    enabled: !!membroData?.equipe_id,
+    enabled: !!equipeId,
   });
 
   return {
