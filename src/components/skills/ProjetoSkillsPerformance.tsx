@@ -25,6 +25,10 @@ import {
 } from "@/components/ui/chart";
 import { TrendingUp, Target, Award, Clock, Loader2 } from "lucide-react";
 import { useSkillsLider } from "@/hooks/useSkillsLider";
+import { getMockPerformanceData } from "./performance/mockPerformanceData";
+import KPICard from "./performance/KPICard";
+import StatusBadge from "./performance/StatusBadge";
+import FilterSelect from "./performance/FilterSelect";
 
 // ── Chart configs ────────────────────────────────────────────────────────
 
@@ -37,64 +41,27 @@ const maturityChartConfig: ChartConfig = {
   maturidade: { label: "Maturidade IA", color: "hsl(72, 50%, 35%)" },
 };
 
-// ── KPI Card ─────────────────────────────────────────────────────────────
-
-function KPICard({ title, value, subtitle, icon, trend }: {
-  title: string; value: string; subtitle: string; icon: React.ReactNode; trend?: string;
-}) {
-  return (
-    <Card className="border-border bg-card">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <p className="text-sm font-medium text-muted-foreground">{title}</p>
-        <div className="text-muted-foreground">{icon}</div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-2xl font-bold">{value}</p>
-        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-        {trend && (
-          <div className="flex items-center gap-1 mt-2 text-xs text-[hsl(72,50%,35%)]">
-            <TrendingUp className="h-3 w-3" />
-            {trend}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-// ── Status Badge ─────────────────────────────────────────────────────────
-
-function StatusBadge({ status }: { status: string }) {
-  switch (status) {
-    case "concluido":
-    case "aprovada":
-      return <Badge className="bg-[hsl(72,50%,35%)] text-white border-transparent hover:bg-[hsl(72,50%,30%)]">Concluído</Badge>;
-    case "em_andamento":
-      return <Badge className="bg-[hsl(68,35%,73%)] text-[hsl(72,50%,25%)] border-transparent hover:bg-[hsl(68,35%,65%)]">Em andamento</Badge>;
-    case "atrasado":
-      return <Badge variant="destructive">Atrasado</Badge>;
-    default:
-      return <Badge variant="outline">Pendente</Badge>;
-  }
-}
-
 // ── Main component ───────────────────────────────────────────────────────
 
 export default function ProjetoSkillsPerformance() {
-  const {
-    entregas,
-    ranking,
-    semanaAtual,
-    horasEconomizadasTotal,
-    entregasConcluidas,
-    totalEntregas,
-    performanceMedia,
-    roiAcumulado,
-    roiChartData,
-    maturidadeChartData,
-    roadmap,
-    isLoading,
-  } = useSkillsLider();
+  const hook = useSkillsLider();
+
+  // Use mock data as fallback when DB is empty
+  const mock = useMemo(() => getMockPerformanceData(), []);
+  const hasRealData = hook.entregas.length > 0 || hook.ranking.length > 0;
+
+  const entregas = hasRealData ? hook.entregas : mock.entregas;
+  const ranking = hasRealData ? hook.ranking : mock.ranking;
+  const semanaAtual = hasRealData ? hook.semanaAtual : mock.semanaAtual;
+  const horasEconomizadasTotal = hasRealData ? hook.horasEconomizadasTotal : mock.horasEconomizadasTotal;
+  const entregasConcluidas = hasRealData ? hook.entregasConcluidas : mock.entregasConcluidas;
+  const totalEntregas = hasRealData ? hook.totalEntregas : mock.totalEntregas;
+  const performanceMedia = hasRealData ? hook.performanceMedia : mock.performanceMedia;
+  const roiAcumulado = hasRealData ? hook.roiAcumulado : mock.roiAcumulado;
+  const roiChartData = hasRealData ? hook.roiChartData : mock.roiChartData;
+  const maturidadeChartData = hasRealData ? hook.maturidadeChartData : mock.maturidadeChartData;
+  const roadmap = hasRealData ? hook.roadmap : mock.roadmap;
+  const isLoading = hook.isLoading;
 
   const [selectedCollaborator, setSelectedCollaborator] = useState("todos");
   const [selectedStatus, setSelectedStatus] = useState("todos");
@@ -139,6 +106,8 @@ export default function ProjetoSkillsPerformance() {
     );
   }
 
+  const isFiltered = selectedCollaborator !== "todos" || selectedStatus !== "todos";
+
   return (
     <div className="space-y-6">
       {/* ── Filtros ── */}
@@ -161,9 +130,9 @@ export default function ProjetoSkillsPerformance() {
 
       {/* ── KPIs ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard title="Horas Economizadas" value={`${selectedCollaborator !== "todos" || selectedStatus !== "todos" ? filteredHours : horasEconomizadasTotal}h`} subtitle="Total acumulado" icon={<Clock className="h-5 w-5" />} />
+        <KPICard title="Horas Economizadas" value={`${isFiltered ? filteredHours : horasEconomizadasTotal}h`} subtitle="Total acumulado" icon={<Clock className="h-5 w-5" />} />
         <KPICard title="ROI Acumulado" value={`${Math.round(roiAcumulado)}%`} subtitle="Retorno sobre investimento" icon={<TrendingUp className="h-5 w-5" />} />
-        <KPICard title="Entregas Concluídas" value={`${selectedCollaborator !== "todos" || selectedStatus !== "todos" ? filteredCompleted : entregasConcluidas}/${selectedCollaborator !== "todos" || selectedStatus !== "todos" ? filteredDeliveries.length : totalEntregas}`} subtitle="Taxa de conclusão" icon={<Target className="h-5 w-5" />} />
+        <KPICard title="Entregas Concluídas" value={`${isFiltered ? filteredCompleted : entregasConcluidas}/${isFiltered ? filteredDeliveries.length : totalEntregas}`} subtitle="Taxa de conclusão" icon={<Target className="h-5 w-5" />} />
         <KPICard title="Performance Média" value={`${Math.round(performanceMedia)}%`} subtitle="Índice da equipe" icon={<Award className="h-5 w-5" />} />
       </div>
 
@@ -287,26 +256,6 @@ export default function ProjetoSkillsPerformance() {
           </CardContent>
         </Card>
       )}
-    </div>
-  );
-}
-
-// ── Filter Select helper ─────────────────────────────────────────────────
-
-function FilterSelect({ label, value, onValueChange, options }: {
-  label: string; value: string; onValueChange: (v: string) => void; options: { value: string; label: string }[];
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-medium text-muted-foreground">{label}</label>
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-        <SelectContent>
-          {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
     </div>
   );
 }
