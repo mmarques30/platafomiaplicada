@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { Clock, TrendingUp, CheckCircle2, Star, Users, Zap, DollarSign, BarChart3, LineChart } from "lucide-react";
+import { Clock, TrendingUp, CheckCircle2, Star, Zap, DollarSign, BarChart3, LineChart, Info } from "lucide-react";
+import { PageTitle } from "@/components/shared/PageTitle";
 import { useSkillsLider } from "@/hooks/useSkillsLider";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 // Roadmap padrão de 12 semanas (3 fases)
@@ -20,6 +20,15 @@ const defaultRoadmap = [
   { id: "default-3", numeroFase: 3, nomeFase: "Consolidação", semanaInicio: 9, semanaFim: 12, status: "pendente" },
 ];
 
+const EmptyOverlay = ({ message }: { message: string }) => (
+  <div className="absolute inset-0 flex items-center justify-center bg-card/70 rounded-lg z-10">
+    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted/80 text-sm text-muted-foreground">
+      <Info className="h-4 w-4" />
+      {message}
+    </div>
+  </div>
+);
+
 export default function SquadLiderPainel() {
   const navigate = useNavigate();
   const {
@@ -27,6 +36,7 @@ export default function SquadLiderPainel() {
     equipeNome,
     empresaNome,
     isLider,
+    isAdmin,
     canAccess,
     isLoading,
     membros,
@@ -41,6 +51,7 @@ export default function SquadLiderPainel() {
     valorGerado,
     roiAcumulado,
     investimento,
+    custoHora,
     roiChartData,
     maturidadeChartData,
   } = useSkillsLider();
@@ -51,7 +62,7 @@ export default function SquadLiderPainel() {
   const [filtroProjeto, setFiltroProjeto] = useState("todos");
   const [filtroStatus, setFiltroStatus] = useState("todos");
 
-  // Redirecionar se não for líder NEM admin em simulação
+  // Redirecionar se não for líder NEM admin
   useEffect(() => {
     if (!isLoading && !canAccess) {
       navigate("/skills/equipe");
@@ -69,68 +80,60 @@ export default function SquadLiderPainel() {
   // Usar roadmap do banco ou padrão
   const roadmapDisplay = roadmap.length > 0 ? roadmap : defaultRoadmap;
 
-  // Verificar se há dados de métricas
+  // Verificar se há dados
   const hasMetricas = maturidadeChartData.some(d => d.maturidade > 0);
   const hasRoiData = roiChartData.some(d => d.executado > 0);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6 p-6">
-        <Skeleton className="h-10 w-64" />
-        <div className="grid grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-28" />
-          ))}
-        </div>
-        <Skeleton className="h-20" />
-        <div className="grid grid-cols-2 gap-6">
-          <Skeleton className="h-64" />
-          <Skeleton className="h-64" />
-        </div>
-        <Skeleton className="h-80" />
-      </div>
-    );
-  }
-
-  if (!equipeId) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-        <Users className="h-16 w-16 text-muted-foreground mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Nenhuma Equipe encontrada</h2>
-        <p className="text-muted-foreground">
-          Você não está associado a nenhuma equipe Skills. Entre em contato com o suporte.
-        </p>
-      </div>
-    );
-  }
+  const hasEntregas = totalEntregas > 0;
+  const hasMembros = membros.length > 0;
 
   const chartConfig = {
     projetado: { label: "ROI Projetado", color: "hsl(var(--muted-foreground))" },
-    executado: { label: "ROI Executado", color: "hsl(var(--primary))" },
-    maturidade: { label: "Maturidade IA", color: "hsl(var(--primary))" },
+    executado: { label: "ROI Executado", color: "hsl(78, 54%, 34%)" },
+    maturidade: { label: "Maturidade IA", color: "hsl(78, 54%, 34%)" },
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6 p-4 md:p-6">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-14 w-full" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-28" />)}
+        </div>
+        <Skeleton className="h-24" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-72" />
+          <Skeleton className="h-72" />
+        </div>
+        <Skeleton className="h-64" />
+        <Skeleton className="h-40" />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Painel do Líder
-        </h1>
-        <div className="h-1 w-24 bg-gradient-to-r from-primary to-primary/50 rounded-full" />
-        <p className="text-muted-foreground mt-2">
-          {equipeNome || "Equipe Skills"} {empresaNome && `• ${empresaNome}`}
-        </p>
+    <div className="space-y-6 p-4 md:p-6">
+      {/* HEADER */}
+      <div>
+        <PageTitle primary="Painel do Líder" secondary={equipeNome || "Equipe Skills"} />
+        {empresaNome && (
+          <p className="text-sm text-muted-foreground mt-1 ml-1">{empresaNome}</p>
+        )}
+        {isAdmin && !equipeId && (
+          <div className="mt-3 px-4 py-2 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
+            Modo administrador: nenhuma equipe Skills cadastrada. Cadastre uma equipe no painel administrativo para visualizar dados reais.
+          </div>
+        )}
       </div>
 
-      {/* Filtros */}
+      {/* BLOCO 1: FILTROS INTERATIVOS */}
       <Card className="border-border bg-card">
         <CardContent className="py-4">
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Período:</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Período</span>
               <Select value={filtroPeriodo} onValueChange={setFiltroPeriodo}>
-                <SelectTrigger className="w-40 bg-accent/50 border-0 rounded-full">
+                <SelectTrigger className="w-[150px] h-9 bg-[hsl(50,56%,91%)]/50 border-0 rounded-full text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -143,43 +146,39 @@ export default function SquadLiderPainel() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Colaborador:</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Colaborador</span>
               <Select value={filtroColaborador} onValueChange={setFiltroColaborador}>
-                <SelectTrigger className="w-40 bg-accent/50 border-0 rounded-full">
+                <SelectTrigger className="w-[150px] h-9 bg-[hsl(50,56%,91%)]/50 border-0 rounded-full text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos</SelectItem>
                   {membros.map((m) => (
-                    <SelectItem key={m.userId} value={m.userId}>
-                      {m.nome}
-                    </SelectItem>
+                    <SelectItem key={m.userId} value={m.userId}>{m.nome}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Projeto:</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Projeto</span>
               <Select value={filtroProjeto} onValueChange={setFiltroProjeto}>
-                <SelectTrigger className="w-40 bg-accent/50 border-0 rounded-full">
+                <SelectTrigger className="w-[150px] h-9 bg-[hsl(50,56%,91%)]/50 border-0 rounded-full text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos</SelectItem>
                   {entregas.map((e) => (
-                    <SelectItem key={e.id} value={e.id}>
-                      {e.titulo}
-                    </SelectItem>
+                    <SelectItem key={e.id} value={e.id}>{e.titulo}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Status:</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</span>
               <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                <SelectTrigger className="w-40 bg-accent/50 border-0 rounded-full">
+                <SelectTrigger className="w-[150px] h-9 bg-[hsl(50,56%,91%)]/50 border-0 rounded-full text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -195,14 +194,14 @@ export default function SquadLiderPainel() {
         </CardContent>
       </Card>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* BLOCO 2: KPIs PRINCIPAIS */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="border-border bg-card">
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Horas Economizadas</p>
-                <p className="text-2xl font-bold text-foreground">{horasEconomizadasTotal}h/sem</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas Economizadas</p>
+                <p className="text-2xl font-bold text-foreground mt-1">{horasEconomizadasTotal}h<span className="text-sm font-normal text-muted-foreground">/sem</span></p>
               </div>
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Clock className="h-5 w-5 text-primary" />
@@ -212,11 +211,16 @@ export default function SquadLiderPainel() {
         </Card>
 
         <Card className="border-border bg-card">
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">ROI Acumulado</p>
-                <p className="text-2xl font-bold text-foreground">{roiAcumulado.toFixed(0)}%</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">ROI Acumulado</p>
+                <p className={cn(
+                  "text-2xl font-bold mt-1",
+                  roiAcumulado >= 100 ? "text-green-600" : roiAcumulado > 0 ? "text-foreground" : "text-muted-foreground"
+                )}>
+                  {roiAcumulado.toFixed(0)}%
+                </p>
               </div>
               <div className="p-2 bg-primary/10 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-primary" />
@@ -226,12 +230,12 @@ export default function SquadLiderPainel() {
         </Card>
 
         <Card className="border-border bg-card">
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Entregas Concluídas</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {entregasConcluidas} <span className="text-muted-foreground text-base font-normal">de {totalEntregas}</span>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Entregas Concluídas</p>
+                <p className="text-2xl font-bold text-foreground mt-1">
+                  {entregasConcluidas} <span className="text-sm font-normal text-muted-foreground">de {totalEntregas}</span>
                 </p>
               </div>
               <div className="p-2 bg-primary/10 rounded-lg">
@@ -242,11 +246,13 @@ export default function SquadLiderPainel() {
         </Card>
 
         <Card className="border-border bg-card">
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Performance Média</p>
-                <p className="text-2xl font-bold text-foreground">{performanceMedia.toFixed(1)}/5</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Performance Média</p>
+                <p className="text-2xl font-bold text-foreground mt-1">
+                  {performanceMedia.toFixed(1)}<span className="text-sm font-normal text-muted-foreground">/5</span>
+                </p>
               </div>
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Star className="h-5 w-5 text-primary" />
@@ -256,16 +262,18 @@ export default function SquadLiderPainel() {
         </Card>
       </div>
 
-      {/* Cronograma 12 Semanas - Sempre com 3 fases */}
+      {/* BLOCO 3: CRONOGRAMA 12 SEMANAS */}
       <Card className="border-border bg-card">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-medium">Cronograma do Programa</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Cronograma do Programa
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-1">
             {roadmapDisplay.map((fase) => (
               <div key={fase.id} className="flex-1">
-                <div className="text-xs text-center text-muted-foreground mb-1">{fase.nomeFase}</div>
+                <div className="text-xs text-center font-medium text-muted-foreground mb-1.5">{fase.nomeFase}</div>
                 <div className="flex gap-0.5">
                   {Array.from({ length: fase.semanaFim - fase.semanaInicio + 1 }, (_, i) => {
                     const semana = fase.semanaInicio + i;
@@ -275,12 +283,12 @@ export default function SquadLiderPainel() {
                       <div
                         key={semana}
                         className={cn(
-                          "flex-1 h-3 rounded-sm transition-colors",
+                          "flex-1 h-3 rounded-sm transition-colors relative",
                           isPast && "bg-primary",
-                          isCurrent && "bg-primary ring-2 ring-primary ring-offset-2",
+                          isCurrent && "bg-primary ring-2 ring-primary ring-offset-1 ring-offset-background",
                           !isPast && !isCurrent && "bg-muted"
                         )}
-                        title={`Semana ${semana}`}
+                        title={`Semana ${semana}${isCurrent ? " (atual)" : ""}`}
                       />
                     );
                   })}
@@ -288,20 +296,20 @@ export default function SquadLiderPainel() {
               </div>
             ))}
           </div>
-          <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+          <div className="flex justify-between mt-3 text-xs text-muted-foreground">
             <span>Semana 1</span>
-            <span>Semana atual: {semanaAtual}</span>
+            <span className="font-medium text-primary">Semana atual: {semanaAtual}</span>
             <span>Semana 12</span>
           </div>
         </CardContent>
       </Card>
 
-      {/* Gráficos: Impacto vs ROI + Maturidade IA */}
+      {/* BLOCO 4 e 5: GRÁFICOS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Gráfico Impacto vs ROI */}
         <Card className="border-border bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
               <LineChart className="h-4 w-4 text-primary" />
               Impacto vs ROI
             </CardTitle>
@@ -311,7 +319,7 @@ export default function SquadLiderPainel() {
               <AreaChart data={roiChartData}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="semana" tick={{ fontSize: 10 }} className="text-muted-foreground" />
-                <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" />
+                <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" unit="%" />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Area
                   type="monotone"
@@ -319,32 +327,27 @@ export default function SquadLiderPainel() {
                   stackId="1"
                   stroke="hsl(var(--muted-foreground))"
                   fill="hsl(var(--muted-foreground))"
-                  fillOpacity={0.2}
+                  fillOpacity={0.15}
+                  strokeDasharray="5 5"
                 />
                 <Area
                   type="monotone"
                   dataKey="executado"
                   stackId="2"
-                  stroke="hsl(var(--primary))"
-                  fill="hsl(var(--primary))"
-                  fillOpacity={0.4}
+                  stroke="hsl(78, 54%, 34%)"
+                  fill="hsl(78, 54%, 34%)"
+                  fillOpacity={0.3}
                 />
               </AreaChart>
             </ChartContainer>
-            {!hasRoiData && (
-              <div className="absolute inset-0 flex items-center justify-center bg-card/60 rounded-lg">
-                <p className="text-sm text-muted-foreground text-center px-4">
-                  Adicione métricas semanais para visualizar o ROI executado
-                </p>
-              </div>
-            )}
+            {!hasRoiData && <EmptyOverlay message="Adicione métricas semanais para visualizar o ROI executado" />}
           </CardContent>
         </Card>
 
         {/* Gráfico Maturidade IA */}
         <Card className="border-border bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-primary" />
               Evolução de Maturidade IA
             </CardTitle>
@@ -356,148 +359,162 @@ export default function SquadLiderPainel() {
                 <XAxis dataKey="semana" tick={{ fontSize: 10 }} className="text-muted-foreground" />
                 <YAxis tick={{ fontSize: 10 }} domain={[0, 100]} className="text-muted-foreground" />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="maturidade" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="maturidade" fill="hsl(78, 54%, 34%)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ChartContainer>
-            {!hasMetricas && (
-              <div className="absolute inset-0 flex items-center justify-center bg-card/60 rounded-lg">
-                <p className="text-sm text-muted-foreground text-center px-4">
-                  Registre métricas semanais para visualizar a evolução da maturidade
-                </p>
-              </div>
-            )}
+            {!hasMetricas && <EmptyOverlay message="Registre métricas semanais para visualizar a evolução" />}
           </CardContent>
         </Card>
       </div>
 
-      {/* Ranking de Entregas por Colaborador */}
+      {/* BLOCO 6: RANKING DE ENTREGAS POR COLABORADOR */}
       <Card className="border-border bg-card">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-medium">Ranking de Performance por Colaborador</CardTitle>
+          <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Ranking de Performance por Colaborador
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-foreground/5 hover:bg-foreground/5">
-                <TableHead className="w-16 text-foreground">#</TableHead>
-                <TableHead className="text-foreground">Colaborador</TableHead>
-                <TableHead className="text-center text-foreground">Entregas</TableHead>
-                <TableHead className="text-center text-foreground">Horas Econ.</TableHead>
-                <TableHead className="text-center text-foreground">Performance</TableHead>
-                <TableHead className="text-center text-foreground">Prazo</TableHead>
-                <TableHead className="text-right text-foreground">Score</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {ranking.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    Nenhuma entrega atribuída ainda. Configure entregas no painel administrativo.
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-[hsl(0,0%,5%)] hover:bg-[hsl(0,0%,5%)]">
+                  <TableHead className="w-14 text-white font-semibold text-xs">#</TableHead>
+                  <TableHead className="text-white font-semibold text-xs">Colaborador</TableHead>
+                  <TableHead className="text-center text-white font-semibold text-xs">Entregas</TableHead>
+                  <TableHead className="text-center text-white font-semibold text-xs">Horas Econ.</TableHead>
+                  <TableHead className="text-center text-white font-semibold text-xs">Performance</TableHead>
+                  <TableHead className="text-center text-white font-semibold text-xs">Prazo</TableHead>
+                  <TableHead className="text-right text-white font-semibold text-xs">Score</TableHead>
                 </TableRow>
-              ) : (
-                ranking.map((r) => (
-                  <TableRow
-                    key={r.userId}
-                    className={cn(
-                      r.posicao <= 3 && "bg-primary/5"
-                    )}
-                  >
-                    <TableCell>
-                      <Badge
-                        variant={r.posicao <= 3 ? "default" : "secondary"}
-                        className={cn(
-                          "w-8 justify-center",
-                          r.posicao === 1 && "bg-yellow-500 text-yellow-950",
-                          r.posicao === 2 && "bg-gray-400 text-gray-950",
-                          r.posicao === 3 && "bg-amber-600 text-amber-950"
-                        )}
-                      >
-                        {r.posicao}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={r.avatar || undefined} />
-                          <AvatarFallback className="text-xs">
-                            {r.nome?.slice(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium">{r.nome}</span>
+              </TableHeader>
+              <TableBody>
+                {ranking.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
+                      <div className="flex flex-col items-center gap-2">
+                        <Info className="h-8 w-8 text-muted-foreground/50" />
+                        <span className="text-sm">
+                          {hasMembros
+                            ? "Nenhuma entrega atribuída ainda. Configure entregas no painel administrativo."
+                            : "Adicione membros à equipe para visualizar o ranking de performance."
+                          }
+                        </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">
-                      {r.entregasConcluidas}/{r.totalEntregas}
-                    </TableCell>
-                    <TableCell className="text-center">{r.horasEconomizadas}h</TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                        {r.performanceMedia.toFixed(1)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">{r.taxaPrazo.toFixed(0)}%</TableCell>
-                    <TableCell className="text-right font-bold">{r.score.toFixed(0)}</TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  ranking.map((r, index) => (
+                    <TableRow
+                      key={r.userId}
+                      className={cn(
+                        index % 2 === 0 ? "bg-card" : "bg-muted/30",
+                        r.posicao <= 3 && "bg-primary/5"
+                      )}
+                    >
+                      <TableCell>
+                        <Badge
+                          variant={r.posicao <= 3 ? "default" : "secondary"}
+                          className={cn(
+                            "w-8 justify-center text-xs",
+                            r.posicao === 1 && "bg-yellow-500 text-yellow-950 hover:bg-yellow-500",
+                            r.posicao === 2 && "bg-gray-400 text-gray-950 hover:bg-gray-400",
+                            r.posicao === 3 && "bg-amber-600 text-amber-950 hover:bg-amber-600"
+                          )}
+                        >
+                          {r.posicao}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-7 w-7">
+                            <AvatarImage src={r.avatar || undefined} />
+                            <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                              {r.nome?.slice(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium text-sm">{r.nome}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center text-sm">
+                        {r.entregasConcluidas}/{r.totalEntregas}
+                      </TableCell>
+                      <TableCell className="text-center text-sm">{r.horasEconomizadas}h</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1 text-sm">
+                          <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                          {r.performanceMedia.toFixed(1)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center text-sm">{r.taxaPrazo.toFixed(0)}%</TableCell>
+                      <TableCell className="text-right font-bold text-sm">{r.score.toFixed(0)}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Resumo de Impacto (ROI) */}
+      {/* BLOCO 7: RESUMO DE IMPACTO (ROI) */}
       <Card className="border-border bg-card">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-medium">Resumo de Impacto</CardTitle>
+          <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Resumo de Impacto
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className="text-center p-4 bg-accent/30 rounded-lg">
-              <Clock className="h-6 w-6 mx-auto mb-2 text-primary" />
-              <p className="text-2xl font-bold">{horasEconomizadasTotal}h</p>
-              <p className="text-xs text-muted-foreground">Horas/semana</p>
+            <div className="text-center p-4 bg-muted/40 rounded-lg">
+              <Clock className="h-5 w-5 mx-auto mb-2 text-primary" />
+              <p className="text-xl font-bold">{horasEconomizadasTotal}h</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Horas/semana</p>
             </div>
 
-            <div className="text-center p-4 bg-accent/30 rounded-lg">
-              <Zap className="h-6 w-6 mx-auto mb-2 text-primary" />
-              <p className="text-2xl font-bold">{entregasConcluidas}</p>
-              <p className="text-xs text-muted-foreground">Processos Automatizados</p>
+            <div className="text-center p-4 bg-muted/40 rounded-lg">
+              <Zap className="h-5 w-5 mx-auto mb-2 text-primary" />
+              <p className="text-xl font-bold">{entregasConcluidas}</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Processos Automatizados</p>
             </div>
 
-            <div className="text-center p-4 bg-accent/30 rounded-lg">
-              <Clock className="h-6 w-6 mx-auto mb-2 text-primary" />
-              <p className="text-2xl font-bold">{(horasEconomizadasTotal * semanaAtual).toFixed(0)}h</p>
-              <p className="text-xs text-muted-foreground">Total Economizado</p>
+            <div className="text-center p-4 bg-muted/40 rounded-lg">
+              <Clock className="h-5 w-5 mx-auto mb-2 text-primary" />
+              <p className="text-xl font-bold">{(horasEconomizadasTotal * semanaAtual).toFixed(0)}h</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Total Economizado</p>
             </div>
 
-            <div className="text-center p-4 bg-accent/30 rounded-lg">
-              <DollarSign className="h-6 w-6 mx-auto mb-2 text-primary" />
-              <p className="text-2xl font-bold">
+            <div className="text-center p-4 bg-muted/40 rounded-lg">
+              <DollarSign className="h-5 w-5 mx-auto mb-2 text-primary" />
+              <p className="text-xl font-bold">
                 R$ {valorGerado.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}
               </p>
-              <p className="text-xs text-muted-foreground">Valor Gerado</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Valor Gerado</p>
             </div>
 
-            <div className="text-center p-4 bg-accent/30 rounded-lg">
-              <DollarSign className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-2xl font-bold">
+            <div className="text-center p-4 bg-muted/40 rounded-lg">
+              <DollarSign className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+              <p className="text-xl font-bold">
                 R$ {(investimento || 0).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}
               </p>
-              <p className="text-xs text-muted-foreground">Investimento</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Investimento</p>
             </div>
 
             <div className={cn(
               "text-center p-4 rounded-lg",
-              roiAcumulado >= 100 ? "bg-green-500/20" : roiAcumulado >= 50 ? "bg-yellow-500/20" : "bg-accent/30"
+              roiAcumulado >= 100 ? "bg-green-500/15" : roiAcumulado >= 50 ? "bg-yellow-500/15" : "bg-muted/40"
             )}>
               <TrendingUp className={cn(
-                "h-6 w-6 mx-auto mb-2",
+                "h-5 w-5 mx-auto mb-2",
                 roiAcumulado >= 100 ? "text-green-600" : roiAcumulado >= 50 ? "text-yellow-600" : "text-primary"
               )} />
-              <p className="text-2xl font-bold">{roiAcumulado.toFixed(0)}%</p>
-              <p className="text-xs text-muted-foreground">ROI</p>
+              <p className={cn(
+                "text-xl font-bold",
+                roiAcumulado >= 100 ? "text-green-600" : roiAcumulado >= 50 ? "text-yellow-600" : ""
+              )}>
+                {roiAcumulado.toFixed(0)}%
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1">ROI</p>
             </div>
           </div>
         </CardContent>
