@@ -53,7 +53,8 @@ export function useMenuConfig() {
       skills: [
         'trilhas', 'calendario',
         'meu_progresso', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
-        'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider'
+        'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas',
+        'squad', 'squad_lider'
       ],
       
       // Business Colaborativo: oculta menus Academy-only e Skills-only + Squad
