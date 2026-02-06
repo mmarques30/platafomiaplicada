@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useAdminViewContext } from "@/contexts/AdminViewContext";
+import { useUserRole } from "./useUserRole";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -79,42 +81,60 @@ export interface DiagnosticoSkills {
 
 export function useSkillsDiagnostico() {
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const queryClient = useQueryClient();
   const [localData, setLocalData] = useState<DiagnosticoSkills>({});
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Obter contexto de simulação (admin visualizando como outro usuário)
+  let impersonatedUserId: string | null = null;
+  let isViewingAs = false;
+
+  try {
+    const context = useAdminViewContext();
+    impersonatedUserId = context.impersonatedUserId;
+    isViewingAs = context.isViewingAs;
+  } catch {
+    // Context não disponível
+  }
+
+  // Se admin está simulando outro usuário, usar o ID do usuário simulado
+  const effectiveUserId = (isAdmin && isViewingAs && impersonatedUserId)
+    ? impersonatedUserId
+    : user?.id;
+
   // Fetch equipe do usuário
   const { data: membroEquipe } = useQuery({
-    queryKey: ["membro-equipe-skills", user?.id],
+    queryKey: ["membro-equipe-skills", effectiveUserId],
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!effectiveUserId) return null;
       const { data, error } = await supabase
         .from("membros_equipe_skills")
         .select("equipe_id")
-        .eq("user_id", user.id)
+        .eq("user_id", effectiveUserId)
         .eq("status", "ativo")
         .maybeSingle();
       if (error) throw error;
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !!effectiveUserId,
   });
 
   // Fetch diagnóstico existente
   const { data: diagnostico, isLoading } = useQuery({
-    queryKey: ["diagnostico-skills", user?.id],
+    queryKey: ["diagnostico-skills", effectiveUserId],
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!effectiveUserId) return null;
       const { data, error } = await supabase
         .from("diagnosticos_skills")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", effectiveUserId)
         .maybeSingle();
       if (error && error.code !== "PGRST116") throw error;
       if (!data) return null;
       return mapDiagnosticoFromDB(data);
     },
-    enabled: !!user?.id,
+    enabled: !!effectiveUserId,
   });
 
   // Atualizar localData quando diagnostico carregar
@@ -131,7 +151,7 @@ export function useSkillsDiagnostico() {
   // Salvar diagnóstico no banco
   const saveMutation = useMutation({
     mutationFn: async (formData: Record<string, any>) => {
-      if (!user?.id) throw new Error("Usuário não autenticado");
+      if (!effectiveUserId) throw new Error("Usuário não autenticado");
 
       const processosDetalhados = [1, 2, 3]
         .map((n) => ({
@@ -149,7 +169,7 @@ export function useSkillsDiagnostico() {
         .filter(Boolean);
 
       const payload = {
-        user_id: user.id,
+        user_id: effectiveUserId,
         equipe_id: membroEquipe?.equipe_id || null,
         cargo: formData.cargo || null,
         area_atuacao: formData.area || null,
