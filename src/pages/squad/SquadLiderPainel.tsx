@@ -5,14 +5,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
-import { Clock, TrendingUp, CheckCircle2, Star, Users, Zap, DollarSign } from "lucide-react";
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { Clock, TrendingUp, CheckCircle2, Star, Users, Zap, DollarSign, BarChart3, LineChart } from "lucide-react";
 import { useSkillsLider } from "@/hooks/useSkillsLider";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+
+// Roadmap padrão de 12 semanas (3 fases)
+const defaultRoadmap = [
+  { id: "default-1", numeroFase: 1, nomeFase: "Fundação", semanaInicio: 1, semanaFim: 4, status: "pendente" },
+  { id: "default-2", numeroFase: 2, nomeFase: "Expansão", semanaInicio: 5, semanaFim: 8, status: "pendente" },
+  { id: "default-3", numeroFase: 3, nomeFase: "Consolidação", semanaInicio: 9, semanaFim: 12, status: "pendente" },
+];
 
 export default function SquadLiderPainel() {
   const navigate = useNavigate();
@@ -21,6 +27,7 @@ export default function SquadLiderPainel() {
     equipeNome,
     empresaNome,
     isLider,
+    canAccess,
     isLoading,
     membros,
     entregas,
@@ -44,12 +51,12 @@ export default function SquadLiderPainel() {
   const [filtroProjeto, setFiltroProjeto] = useState("todos");
   const [filtroStatus, setFiltroStatus] = useState("todos");
 
-  // Redirecionar se não for líder
+  // Redirecionar se não for líder NEM admin em simulação
   useEffect(() => {
-    if (!isLoading && !isLider) {
+    if (!isLoading && !canAccess) {
       navigate("/skills/equipe");
     }
-  }, [isLoading, isLider, navigate]);
+  }, [isLoading, canAccess, navigate]);
 
   // Filtrar entregas
   const entregasFiltradas = entregas.filter((e) => {
@@ -58,6 +65,13 @@ export default function SquadLiderPainel() {
     if (filtroStatus !== "todos" && e.status !== filtroStatus) return false;
     return true;
   });
+
+  // Usar roadmap do banco ou padrão
+  const roadmapDisplay = roadmap.length > 0 ? roadmap : defaultRoadmap;
+
+  // Verificar se há dados de métricas
+  const hasMetricas = maturidadeChartData.some(d => d.maturidade > 0);
+  const hasRoiData = roiChartData.some(d => d.executado > 0);
 
   if (isLoading) {
     return (
@@ -105,7 +119,7 @@ export default function SquadLiderPainel() {
         </h1>
         <div className="h-1 w-24 bg-gradient-to-r from-primary to-primary/50 rounded-full" />
         <p className="text-muted-foreground mt-2">
-          {equipeNome} {empresaNome && `• ${empresaNome}`}
+          {equipeNome || "Equipe Skills"} {empresaNome && `• ${empresaNome}`}
         </p>
       </div>
 
@@ -242,44 +256,19 @@ export default function SquadLiderPainel() {
         </Card>
       </div>
 
-      {/* Cronograma 12 Semanas */}
+      {/* Cronograma 12 Semanas - Sempre com 3 fases */}
       <Card className="border-border bg-card">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-medium">Cronograma do Programa</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-1">
-            {roadmap.length > 0 ? (
-              roadmap.map((fase) => (
-                <div key={fase.id} className="flex-1">
-                  <div className="text-xs text-center text-muted-foreground mb-1">{fase.nomeFase}</div>
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: fase.semanaFim - fase.semanaInicio + 1 }, (_, i) => {
-                      const semana = fase.semanaInicio + i;
-                      const isCurrent = semana === semanaAtual;
-                      const isPast = semana < semanaAtual;
-                      return (
-                        <div
-                          key={semana}
-                          className={cn(
-                            "flex-1 h-3 rounded-sm transition-colors",
-                            isPast && "bg-primary",
-                            isCurrent && "bg-primary ring-2 ring-primary ring-offset-2",
-                            !isPast && !isCurrent && "bg-muted"
-                          )}
-                          title={`Semana ${semana}`}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              ))
-            ) : (
-              // Fallback se não houver roadmap configurado
-              <div className="flex-1">
+            {roadmapDisplay.map((fase) => (
+              <div key={fase.id} className="flex-1">
+                <div className="text-xs text-center text-muted-foreground mb-1">{fase.nomeFase}</div>
                 <div className="flex gap-0.5">
-                  {Array.from({ length: 12 }, (_, i) => {
-                    const semana = i + 1;
+                  {Array.from({ length: fase.semanaFim - fase.semanaInicio + 1 }, (_, i) => {
+                    const semana = fase.semanaInicio + i;
                     const isCurrent = semana === semanaAtual;
                     const isPast = semana < semanaAtual;
                     return (
@@ -297,7 +286,7 @@ export default function SquadLiderPainel() {
                   })}
                 </div>
               </div>
-            )}
+            ))}
           </div>
           <div className="flex justify-between mt-2 text-xs text-muted-foreground">
             <span>Semana 1</span>
@@ -312,9 +301,12 @@ export default function SquadLiderPainel() {
         {/* Gráfico Impacto vs ROI */}
         <Card className="border-border bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Impacto vs ROI</CardTitle>
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <LineChart className="h-4 w-4 text-primary" />
+              Impacto vs ROI
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             <ChartContainer config={chartConfig} className="h-64 w-full">
               <AreaChart data={roiChartData}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -339,15 +331,25 @@ export default function SquadLiderPainel() {
                 />
               </AreaChart>
             </ChartContainer>
+            {!hasRoiData && (
+              <div className="absolute inset-0 flex items-center justify-center bg-card/60 rounded-lg">
+                <p className="text-sm text-muted-foreground text-center px-4">
+                  Adicione métricas semanais para visualizar o ROI executado
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Gráfico Maturidade IA */}
         <Card className="border-border bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Evolução de Maturidade IA</CardTitle>
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-primary" />
+              Evolução de Maturidade IA
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             <ChartContainer config={chartConfig} className="h-64 w-full">
               <BarChart data={maturidadeChartData}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -357,6 +359,13 @@ export default function SquadLiderPainel() {
                 <Bar dataKey="maturidade" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ChartContainer>
+            {!hasMetricas && (
+              <div className="absolute inset-0 flex items-center justify-center bg-card/60 rounded-lg">
+                <p className="text-sm text-muted-foreground text-center px-4">
+                  Registre métricas semanais para visualizar a evolução da maturidade
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -383,7 +392,7 @@ export default function SquadLiderPainel() {
               {ranking.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    Nenhum colaborador encontrado
+                    Nenhuma entrega atribuída ainda. Configure entregas no painel administrativo.
                   </TableCell>
                 </TableRow>
               ) : (

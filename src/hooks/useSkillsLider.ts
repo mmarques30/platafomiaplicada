@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSkillsMembro } from "./useSkillsMembro";
+import { useUserRole } from "./useUserRole";
+import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { toast } from "sonner";
 import { differenceInWeeks, parseISO, isAfter } from "date-fns";
 
@@ -61,7 +63,12 @@ interface RankingColaborador {
 
 export function useSkillsLider() {
   const { equipeId, isLider, isLoading: membroLoading } = useSkillsMembro();
+  const { isAdmin } = useUserRole();
+  const { isViewingAs, viewAs } = useAdminViewContext();
   const queryClient = useQueryClient();
+
+  // Admin pode visualizar em modo simulação Skills
+  const canAccess = isLider || (isAdmin && isViewingAs && (viewAs === "skills" || viewAs === "business_iaplicada"));
 
   // Buscar dados da equipe
   const { data: equipeData, isLoading: equipeLoading } = useQuery({
@@ -78,7 +85,7 @@ export function useSkillsLider() {
       if (error) throw error;
       return data;
     },
-    enabled: !!equipeId && isLider,
+    enabled: !!equipeId && canAccess,
   });
 
   // Buscar membros da equipe
@@ -116,7 +123,7 @@ export function useSkillsLider() {
         ultimoAcesso: m.profiles.ultimo_acesso,
       })) as Membro[];
     },
-    enabled: !!equipeId && isLider,
+    enabled: !!equipeId && canAccess,
   });
 
   // Buscar entregas da equipe
@@ -159,7 +166,7 @@ export function useSkillsLider() {
         responsavelNome: e.profiles?.nome_completo || null,
       })) as Entrega[];
     },
-    enabled: !!equipeId && isLider,
+    enabled: !!equipeId && canAccess,
   });
 
   // Buscar métricas semanais
@@ -185,7 +192,7 @@ export function useSkillsLider() {
         indiceMaturidade: m.indice_maturidade || 0,
       })) as MetricaSemanal[];
     },
-    enabled: !!equipeId && isLider,
+    enabled: !!equipeId && canAccess,
   });
 
   // Buscar roadmap
@@ -211,7 +218,7 @@ export function useSkillsLider() {
         status: r.status,
       })) as RoadmapFase[];
     },
-    enabled: !!equipeId && isLider,
+    enabled: !!equipeId && canAccess,
   });
 
   // Entregas aguardando validação (para alertas)
@@ -228,7 +235,7 @@ export function useSkillsLider() {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!equipeId && isLider,
+    enabled: !!equipeId && canAccess,
   });
 
   // Alertas de atraso
@@ -247,7 +254,7 @@ export function useSkillsLider() {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!equipeId && isLider,
+    enabled: !!equipeId && canAccess,
   });
 
   // Mutation para aprovar entrega
@@ -347,7 +354,7 @@ export function useSkillsLider() {
         };
       }) || [];
     },
-    enabled: !!equipeId && isLider,
+    enabled: !!equipeId && canAccess,
   });
 
 
@@ -471,6 +478,7 @@ export function useSkillsLider() {
     investimento,
     custoHora,
     isLider,
+    canAccess,
     
     // Dados
     membros: membros || [],
