@@ -1,95 +1,44 @@
 
 
-# Diagnostico do Erro e Prevencao Definitiva
+# Correção: "Projeto Skills" aparecendo nos ambientes Academy e Business
 
-## O que aconteceu (causa raiz)
+## Problema
 
-O ambiente Skills sofria de um problema critico chamado **race condition** (condicao de corrida) nas paginas de acesso restrito. O problema afetava TODAS as paginas que verificam se o usuario e admin ou lider antes de renderizar.
+O grupo de menus "Projeto Skills" (com submenus Visão Geral, Performance e Diagnóstico) está aparecendo no menu lateral para TODOS os ambientes e planos porque:
 
-### Como o erro funcionava
+1. **No banco de dados**: `planos_permitidos = NULL` (visível para todos)
+2. **No código**: as listas de exclusão por ambiente (`academy`, `business`, `business_iaplicada`) não incluem esses menus
 
-```text
-1. Usuario (admin) clica em "Projeto Skills > Diagnostico"
-2. A pagina carrega e executa dois hooks:
-   - useUserRole()     -> isAdmin = false (CARREGANDO...)
-   - useSkillsMembro() -> isLider = false (CARREGANDO...)
-3. O codigo antigo fazia:
-   if (!isAdmin && !isLider) {
-     return <Navigate to="/skills/projeto" />  // REDIRECIONA IMEDIATAMENTE!
-   }
-4. Como ambos sao FALSE durante o carregamento, a pagina redirecionava
-   ANTES de saber se o usuario realmente tinha acesso
-5. Resultado: pagina aparece vazia ou "nao encontrada"
-```
+Isso faz com que "Projeto Skills" apareça quando o admin simula um usuário Academy ou Business, ou quando um usuário real desses planos acessa a plataforma.
 
-Este mesmo padrao errado estava em:
-- `ProjetoSkillsDiagnosticoPage.tsx` (corrigido)
-- `ProjetoSkillsPerformancePage.tsx` (corrigido)
+## Solução (dupla proteção)
 
-### Problema secundario: "Meu Progresso" visivel no Skills
+### Parte 1: Corrigir no banco de dados
 
-O menu "Meu Progresso" era ocultado no ambiente Skills pelo seu `menu_key` principal (`meu_progresso`), mas seus 4 submenus filhos (`meu_progresso_visao_geral`, `meu_progresso_roadmap`, `meu_progresso_conteudo`, `meu_progresso_entregas`) NAO estavam na lista de exclusao, podendo vazar na interface.
+Atualizar `planos_permitidos` dos 4 registros de `menu_config` para restringir ao plano `skills`:
 
----
+- `projeto_skills` -> planos_permitidos = `['skills']`
+- `projeto_skills_visao_geral` -> planos_permitidos = `['skills']`
+- `projeto_skills_performance` -> planos_permitidos = `['skills']`
+- `projeto_skills_diagnostico` -> planos_permitidos = `['skills']`
 
-## O que ja foi corrigido
+### Parte 2: Adicionar às listas de exclusão no código
 
-1. **Race condition eliminada**: As paginas `ProjetoSkillsDiagnosticoPage` e `ProjetoSkillsPerformancePage` agora:
-   - Esperam o loading terminar antes de verificar acesso
-   - Mostram um spinner durante o carregamento
-   - So redirecionam via `useEffect` apos confirmacao de falta de acesso
+**Arquivo:** `src/hooks/useMenuConfig.tsx`
 
-2. **Menus filhos ocultados**: Todos os 4 filhos de `meu_progresso` foram adicionados a lista de exclusao do ambiente Skills
+Adicionar `projeto_skills`, `projeto_skills_visao_geral`, `projeto_skills_performance` e `projeto_skills_diagnostico` às listas de exclusão dos ambientes:
 
-3. **Rotas legadas redirecionadas**: `/skills/progresso` e variantes agora redirecionam para `/skills/projeto`
+- **academy**: adicionar os 4 menus
+- **business**: adicionar os 4 menus
+- **business_iaplicada**: adicionar os 4 menus
 
-4. **Protecao global**: Handler de `unhandledrejection` no `main.tsx` previne "tela branca" por erros asincronos
+Isso garante que, mesmo se o banco de dados tiver dados inconsistentes no futuro, o código impede a exibição.
 
----
+## Arquivos
 
-## Prevencao definitiva (o que falta fazer)
-
-### 1. Criar um wrapper reutilizavel para paginas Skills restritas
-
-Criar um componente `SkillsAdminGuard` que encapsula a logica de verificacao de acesso, evitando que qualquer nova pagina Skills repita o padrao errado.
-
-**Arquivo:** `src/components/skills/SkillsAdminGuard.tsx`
-
-```text
-// Wrapper que:
-// 1. Espera loading de useUserRole e useSkillsMembro
-// 2. Mostra spinner durante carregamento
-// 3. Redireciona para /skills/projeto se nao tem acesso
-// 4. Renderiza children apenas quando acesso confirmado
-
-<SkillsAdminGuard>
-  <ProjetoSkillsDiagnostico />
-</SkillsAdminGuard>
-```
-
-### 2. Refatorar as paginas existentes para usar o guard
-
-**Arquivos:**
-- `ProjetoSkillsDiagnosticoPage.tsx` - Substituir logica manual pelo `SkillsAdminGuard`
-- `ProjetoSkillsPerformancePage.tsx` - Substituir logica manual pelo `SkillsAdminGuard`
-
-Isso garante que qualquer futura pagina Skills que precise de acesso admin/lider use o mesmo componente centralizado, eliminando a possibilidade de alguem escrever o padrao errado novamente.
-
-### 3. Limpar codigo morto
-
-- Remover o arquivo `src/pages/skills/SkillsMeuProgresso.tsx` que nao e mais usado (o import ja foi removido do App.tsx, mas o arquivo ainda existe)
-
----
-
-## Resumo de arquivos
-
-### Criar
-- `src/components/skills/SkillsAdminGuard.tsx` - Wrapper reutilizavel de acesso
+### Migração SQL
+- Atualizar `planos_permitidos` na tabela `menu_config` para os 4 registros
 
 ### Modificar
-- `src/pages/skills/ProjetoSkillsDiagnosticoPage.tsx` - Usar SkillsAdminGuard
-- `src/pages/skills/ProjetoSkillsPerformancePage.tsx` - Usar SkillsAdminGuard
-
-### Remover
-- `src/pages/skills/SkillsMeuProgresso.tsx` - Codigo morto (nao mais importado)
+- `src/hooks/useMenuConfig.tsx` - Adicionar menus do Projeto Skills às listas de exclusão de `academy`, `business` e `business_iaplicada`
 
