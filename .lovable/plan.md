@@ -1,74 +1,95 @@
 
 
-# Correcao Definitiva: Race Condition no Ambiente Skills
+# Diagnostico do Erro e Prevencao Definitiva
 
-## Problema Identificado
+## O que aconteceu (causa raiz)
 
-O problema esta nas paginas `ProjetoSkillsDiagnosticoPage.tsx` e `ProjetoSkillsPerformancePage.tsx`. Ambas fazem uma verificacao de acesso **sincrona** sem esperar o carregamento dos dados:
+O ambiente Skills sofria de um problema critico chamado **race condition** (condicao de corrida) nas paginas de acesso restrito. O problema afetava TODAS as paginas que verificam se o usuario e admin ou lider antes de renderizar.
 
-```text
-const { isAdmin } = useUserRole();        // isAdmin = false durante loading
-const { isLider } = useSkillsMembro();    // isLider = false durante loading
-
-if (!isAdmin && !isLider) {
-  return <Navigate to="/skills/projeto" replace />;  // REDIRECIONA IMEDIATAMENTE!
-}
-```
-
-Enquanto os hooks `useUserRole` e `useSkillsMembro` estao carregando dados do banco, ambos retornam `false`. Isso causa um **redirecionamento instantaneo** de volta para `/skills/projeto` antes mesmo de saber se o usuario tem acesso.
-
-Esse e o mesmo padrao que ja esta **corretamente implementado** no `SkillsLiderDashboard.tsx`, que espera o loading terminar antes de verificar acesso.
-
-## Solucao (2 partes)
-
-### Parte 1: Corrigir as paginas com verificacao de loading
-
-**Arquivos:** `ProjetoSkillsDiagnosticoPage.tsx` e `ProjetoSkillsPerformancePage.tsx`
-
-Substituir o `<Navigate>` sincrono por:
-1. Extrair `isLoading` dos hooks `useSkillsMembro` e `useUserRole`
-2. Mostrar um skeleton/loader enquanto os dados carregam
-3. Usar `useEffect` para redirecionar apenas apos o carregamento completo (mesmo padrao do `SkillsLiderDashboard`)
-
-Padrao correto (igual ao SkillsLiderDashboard):
-```text
-const { isAdmin, isLoading: roleLoading } = useUserRole();
-const { isLider, isLoading: membroLoading } = useSkillsMembro();
-const isLoading = roleLoading || membroLoading;
-
-// Redirecionar SOMENTE quando loading terminar
-useEffect(() => {
-  if (!isLoading && !isAdmin && !isLider) {
-    navigate("/skills/projeto");
-  }
-}, [isLoading, isAdmin, isLider, navigate]);
-
-// Mostrar loader enquanto carrega
-if (isLoading) {
-  return <LoadingSpinner />;
-}
-```
-
-### Parte 2: Protecao global contra crashes (prevencao)
-
-**Arquivo:** `src/main.tsx`
-
-Adicionar um handler global para `unhandledrejection` que impede que erros asincronos nao tratados causem tela branca. Isso e uma rede de seguranca para qualquer erro futuro no ambiente Skills.
+### Como o erro funcionava
 
 ```text
-window.addEventListener("unhandledrejection", (event) => {
-  console.error("Unhandled promise rejection:", event.reason);
-  event.preventDefault();
-});
+1. Usuario (admin) clica em "Projeto Skills > Diagnostico"
+2. A pagina carrega e executa dois hooks:
+   - useUserRole()     -> isAdmin = false (CARREGANDO...)
+   - useSkillsMembro() -> isLider = false (CARREGANDO...)
+3. O codigo antigo fazia:
+   if (!isAdmin && !isLider) {
+     return <Navigate to="/skills/projeto" />  // REDIRECIONA IMEDIATAMENTE!
+   }
+4. Como ambos sao FALSE durante o carregamento, a pagina redirecionava
+   ANTES de saber se o usuario realmente tinha acesso
+5. Resultado: pagina aparece vazia ou "nao encontrada"
 ```
 
-## Resumo de Arquivos
+Este mesmo padrao errado estava em:
+- `ProjetoSkillsDiagnosticoPage.tsx` (corrigido)
+- `ProjetoSkillsPerformancePage.tsx` (corrigido)
+
+### Problema secundario: "Meu Progresso" visivel no Skills
+
+O menu "Meu Progresso" era ocultado no ambiente Skills pelo seu `menu_key` principal (`meu_progresso`), mas seus 4 submenus filhos (`meu_progresso_visao_geral`, `meu_progresso_roadmap`, `meu_progresso_conteudo`, `meu_progresso_entregas`) NAO estavam na lista de exclusao, podendo vazar na interface.
+
+---
+
+## O que ja foi corrigido
+
+1. **Race condition eliminada**: As paginas `ProjetoSkillsDiagnosticoPage` e `ProjetoSkillsPerformancePage` agora:
+   - Esperam o loading terminar antes de verificar acesso
+   - Mostram um spinner durante o carregamento
+   - So redirecionam via `useEffect` apos confirmacao de falta de acesso
+
+2. **Menus filhos ocultados**: Todos os 4 filhos de `meu_progresso` foram adicionados a lista de exclusao do ambiente Skills
+
+3. **Rotas legadas redirecionadas**: `/skills/progresso` e variantes agora redirecionam para `/skills/projeto`
+
+4. **Protecao global**: Handler de `unhandledrejection` no `main.tsx` previne "tela branca" por erros asincronos
+
+---
+
+## Prevencao definitiva (o que falta fazer)
+
+### 1. Criar um wrapper reutilizavel para paginas Skills restritas
+
+Criar um componente `SkillsAdminGuard` que encapsula a logica de verificacao de acesso, evitando que qualquer nova pagina Skills repita o padrao errado.
+
+**Arquivo:** `src/components/skills/SkillsAdminGuard.tsx`
+
+```text
+// Wrapper que:
+// 1. Espera loading de useUserRole e useSkillsMembro
+// 2. Mostra spinner durante carregamento
+// 3. Redireciona para /skills/projeto se nao tem acesso
+// 4. Renderiza children apenas quando acesso confirmado
+
+<SkillsAdminGuard>
+  <ProjetoSkillsDiagnostico />
+</SkillsAdminGuard>
+```
+
+### 2. Refatorar as paginas existentes para usar o guard
+
+**Arquivos:**
+- `ProjetoSkillsDiagnosticoPage.tsx` - Substituir logica manual pelo `SkillsAdminGuard`
+- `ProjetoSkillsPerformancePage.tsx` - Substituir logica manual pelo `SkillsAdminGuard`
+
+Isso garante que qualquer futura pagina Skills que precise de acesso admin/lider use o mesmo componente centralizado, eliminando a possibilidade de alguem escrever o padrao errado novamente.
+
+### 3. Limpar codigo morto
+
+- Remover o arquivo `src/pages/skills/SkillsMeuProgresso.tsx` que nao e mais usado (o import ja foi removido do App.tsx, mas o arquivo ainda existe)
+
+---
+
+## Resumo de arquivos
+
+### Criar
+- `src/components/skills/SkillsAdminGuard.tsx` - Wrapper reutilizavel de acesso
 
 ### Modificar
-- `src/pages/skills/ProjetoSkillsDiagnosticoPage.tsx` - Adicionar loading state + useEffect para redirect
-- `src/pages/skills/ProjetoSkillsPerformancePage.tsx` - Adicionar loading state + useEffect para redirect
-- `src/main.tsx` - Adicionar handler global de unhandled rejections
+- `src/pages/skills/ProjetoSkillsDiagnosticoPage.tsx` - Usar SkillsAdminGuard
+- `src/pages/skills/ProjetoSkillsPerformancePage.tsx` - Usar SkillsAdminGuard
 
-### Impacto
-Essa correcao resolve o problema generico que impede novas funcionalidades de aparecerem no ambiente Skills. Qualquer nova pagina que siga o padrao correto (esperar loading antes de verificar acesso) funcionara normalmente.
+### Remover
+- `src/pages/skills/SkillsMeuProgresso.tsx` - Codigo morto (nao mais importado)
 
