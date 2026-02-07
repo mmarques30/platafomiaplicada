@@ -52,7 +52,9 @@ export function useMenuConfig() {
       // Skills: oculta trilhas gerais, calendário e TODO o grupo "Meu Progresso" (não usado no Skills)
       skills: [
         'trilhas', 'calendario',
-        'meu_progresso', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap', 
+        'meu_progresso_conteudo', 'meu_progresso_entregas',
+        'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas',
         'squad', 'squad_lider'
       ],

@@ -39,7 +39,7 @@ import SkillsRoadmap from "./pages/skills/SkillsRoadmap";
 import SkillsEntregas from "./pages/skills/SkillsEntregas";
 import SkillsLiderDashboard from "./pages/skills/SkillsLiderDashboard";
 
-import SkillsMeuProgresso from "./pages/skills/SkillsMeuProgresso";
+// SkillsMeuProgresso removido - redirecionado para /skills/projeto
 import ProjetoSkills from "./pages/skills/ProjetoSkills";
 import ProjetoSkillsPerformancePage from "./pages/skills/ProjetoSkillsPerformancePage";
 import ProjetoSkillsDiagnosticoPage from "./pages/skills/ProjetoSkillsDiagnosticoPage";
@@ -168,7 +168,7 @@ function AppContent() {
             <Route path="/skills/entregas" element={<SkillsEntregas />} />
             <Route path="/skills/lider" element={<SkillsLiderDashboard />} />
             
-            <Route path="/skills/progresso" element={<SkillsMeuProgresso />} />
+            <Route path="/skills/progresso" element={<Navigate to="/skills/projeto" replace />} />
             <Route path="/skills/projeto" element={<ProjetoSkills />} />
             <Route path="/skills/projeto/performance" element={<ProjetoSkillsPerformancePage />} />
             <Route path="/skills/projeto/diagnostico" element={<ProjetoSkillsDiagnosticoPage />} />
@@ -177,10 +177,10 @@ function AppContent() {
             <Route path="/squad/lider" element={<Navigate to="/skills/lider" replace />} />
 
             {/* Aliases/redirects para evitar 404 por links antigos ou barra final */}
-            <Route path="/skills/progresso/" element={<Navigate to="/skills/progresso" replace />} />
-            <Route path="/skills/meu-progresso" element={<Navigate to="/skills/progresso" replace />} />
-            <Route path="/skills/painel-lider" element={<Navigate to="/skills/progresso" replace />} />
-            <Route path="/skills/painel-do-lider" element={<Navigate to="/skills/progresso" replace />} />
+            <Route path="/skills/progresso/" element={<Navigate to="/skills/projeto" replace />} />
+            <Route path="/skills/meu-progresso" element={<Navigate to="/skills/projeto" replace />} />
+            <Route path="/skills/painel-lider" element={<Navigate to="/skills/projeto" replace />} />
+            <Route path="/skills/painel-do-lider" element={<Navigate to="/skills/projeto" replace />} />
             <Route path="/skills/lider/" element={<Navigate to="/skills/lider" replace />} />
             <Route path="/squad/lider/" element={<Navigate to="/skills/lider" replace />} />
             
