@@ -59,25 +59,28 @@ export function useMenuConfig() {
         'squad', 'squad_lider'
       ],
       
-      // Business Colaborativo: oculta menus Academy-only e Skills-only + Squad
+      // Business Colaborativo: oculta menus Academy-only e Skills-only + Squad + Projeto Skills
       business: [
         'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
         'skills_entregas', 'skills_painel_lider',
+        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico',
         'squad', 'squad_lider'
       ],
       
-      // Business IAplicada: versão mais restrita (cliente apenas acompanha) + Squad
+      // Business IAplicada: versão mais restrita (cliente apenas acompanha) + Squad + Projeto Skills
       business_iaplicada: [
         'trilhas', 'trilhas_skills', 'calendario',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas', 'meu_progresso_conteudo',
         'meu_progresso', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
+        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico',
         'comunidade', 'comunidade_feed', 'comunidade_sala',
         'squad', 'squad_lider'
       ],
       
-      // Academy: ocultar Squad (apenas Skills)
+      // Academy: ocultar Squad e Projeto Skills (exclusivos do ambiente Skills)
       academy: [
+        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico',
         'squad', 'squad_lider'
       ],
     };
