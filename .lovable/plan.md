@@ -1,129 +1,210 @@
 
-# Backend estruturado para Projeto Skills: dados reais sem mocks
+# Reestruturar Admin Skills: Layout Business com Contrato, Diagnosticos, Projetos, Documentos e Reports
 
-## Objetivo
+## Contexto
 
-Transformar as 3 abas do Projeto Skills (Visao Geral, Performance, Diagnostico) para funcionar com dados reais do banco, removendo todos os dados mockados, e garantindo que as paginas continuem visiveis e funcionais mesmo quando nao ha dados.
+A pagina `MentoriaSkillsPage` sera reestruturada para seguir o mesmo layout da `MentoriaBusinessPage`, mas adaptada para o contexto B2B de equipes Skills. A diferenca fundamental:
 
-## Situacao atual
+- **Business**: seletor por usuario individual, "modulos contratados" sao servicos (CRM, Financeiro, etc.)
+- **Skills**: seletor por equipe, "projetos por trilhas de ensino" sao entregas vinculadas a trilhas de conteudo da plataforma (ex: Automacao, Planilhas com IA, etc.)
 
-- **Dados reais**: A equipe "Inovacao" tem 3 membros (Lucio, Livia, Antonio), 0 diagnosticos preenchidos, 0 entregas
-- **Performance**: Usa `getMockPerformanceData()` como fallback quando `hook.entregas.length === 0`
-- **Diagnostico**: O componente `DiagnosticoResults` usa constantes MOCK_* hardcoded (MOCK_PROFILE, MOCK_PROCESSOS, MOCK_ECONOMIA, etc.)
-- **Visao Geral** (`ProjetoSkills.tsx`): E apenas um placeholder com texto "Em breve"
-- **Edge function** `processar-diagnostico-skills`: Ja funciona com Lovable AI (Gemini) e salva resultados no banco
+## Estrutura de abas (8 abas)
 
-## Plano de alteracoes
-
-### 1. Visao Geral (`src/pages/skills/ProjetoSkills.tsx`) - REESCREVER
-
-Transformar de placeholder para um dashboard resumo com:
-
-**Secao A - Diagnostico da Equipe:**
-- Barra de progresso mostrando quantos membros ja preencheram o diagnostico (ex: "2 de 3 membros")
-- Lista dos membros com status (preenchido/pendente) usando icones de check/pendente
-- Botao "Preencher Meu Diagnostico" que leva para `/skills/projeto/diagnostico` (aparece apenas se o usuario logado ainda nao preencheu)
-- Mensagem de conclusao quando todos preencheram
-
-**Secao B - Resumo de Performance (cards simples):**
-- Total de horas economizadas
-- Entregas concluidas / total
-- ROI acumulado
-- Semana atual do programa
-- Quando nao ha dados: mostra "0" nos valores, sem mock
-
-**Secao C - Acesso rapido:**
-- Card linkando para Performance (`/skills/projeto/performance`)
-- Card linkando para Diagnostico (`/skills/projeto/diagnostico`)
-
-**Hook necessario**: Criar `useSkillsVisaoGeral.ts` que busca:
-- Membros da equipe + status de diagnostico de cada um
-- KPIs resumidos (reutilizando dados do `useSkillsLider`)
-
-### 2. Performance (`src/components/skills/ProjetoSkillsPerformance.tsx`) - REMOVER MOCKS
-
-**Remover**: `mockPerformanceData.ts` e toda referencia a mocks
-
-**Ajustar o componente para**:
-- Usar SOMENTE dados do hook `useSkillsLider`
-- Quando nao ha dados (entregas vazia, metricas zeradas): mostrar os mesmos cards e graficos, mas com valores zerados e mensagens tipo "Nenhuma entrega registrada ainda"
-- Ranking: quando vazio, mostrar um empty state em vez de ocultar
-- Graficos: mostrar eixos vazios (dados zerados) em vez de esconder
-
-### 3. Diagnostico (`src/components/skills/ProjetoSkillsDiagnostico.tsx`) - AJUSTAR FLUXO
-
-**Remover mocks de `DiagnosticoResults.tsx`**:
-- Eliminar MOCK_PROFILE, MOCK_PROCESSOS, MOCK_ECONOMIA, MOCK_TRILHA, MOCK_INSIGHTS, MOCK_EQUIPE
-- Quando `hasRealData = false`: mostrar um empty state clean dizendo "Preencha o diagnostico para ver seus resultados"
-- O botao de "Preencher Diagnostico" ja existe no fluxo
-
-**Ajustar fluxo de estado em `ProjetoSkillsDiagnostico.tsx`**:
-- Estado inicial deve ser `"form"` (nao `"results"`) quando usuario nao tem diagnostico preenchido
-- So mostrar results quando `diagnostico?.completado && hasInsight`
-
-**Banner "Aguardando Equipe" em `DiagnosticoResults.tsx`**:
-- Substituir MOCK_EQUIPE por dados reais: buscar membros da equipe e status de preenchimento
-- Mostrar barra de progresso real
-- Listar nomes reais dos que faltam preencher
-
-### 4. Hook novo: `useSkillsEquipeDiagnostico.ts`
-
-Hook dedicado para buscar o status de diagnostico de todos os membros da equipe:
-
-```typescript
-// Retorna:
-{
-  membros: Array<{
-    userId: string;
-    nome: string;
-    avatar: string | null;
-    completado: boolean;
-    hasInsight: boolean;
-  }>;
-  totalMembros: number;
-  diagnosticosCompletos: number;
-  todosPreencheram: boolean;
-  isLoading: boolean;
-  meuDiagnosticoCompleto: boolean;
-}
+```
+[Contrato] [Diagnosticos] [Secoes] [Projetos] [Entregas] [Metricas] [Documentos] [Reports]
 ```
 
-Consultas:
-- `membros_equipe_skills` JOIN `profiles` para nomes
-- `diagnosticos_skills` para status de cada membro
-- Filtrar pela equipe do usuario logado (via `useSkillsMembro`)
+### Aba 1: Contrato
+Contrato da equipe Skills com processamento IA. Secoes colapsaveis:
+- **Contratante**: empresa, CNPJ, representante, email
+- **Programa**: duracao (semanas), frequencia de encontros, reports (trimestral), data inicio/fim
+- **Projetos por Trilha**: em vez de "modulos contratados", um seletor de trilhas de ensino da plataforma (carregadas de `trilhas`), cada trilha com projetos associados. Ex: "Trilha Automacao > Projeto: Automatizar RH"
+- **Valores**: valor contrato, ROI projetado, custo/hora
+- Importacao com IA (reutiliza o padrao `ContratoImportSection`)
+- Botao "Limpar Tudo"
 
-### 5. Arquivo `mockPerformanceData.ts` - DELETAR
+### Aba 2: Diagnosticos
+Visao admin dos diagnosticos individuais dos membros:
+- Lista de membros com status (preenchido / pendente / processado por IA)
+- Expandir membro para ver resultado IA (insight_ia, processos_analisados, economia)
+- Botao "Processar com IA" para diagnosticos nao processados
+- Barra de progresso geral da equipe
 
-Remover completamente o arquivo de mocks.
+### Aba 3: Secoes (Trimestral)
+Gerenciamento das secoes trimestrais (T1-T4):
+- Cards por trimestre com status, datas, entregas planejadas
+- Dentro de cada trimestre: encontros agendados
+- Botao para gerar encontros automaticamente baseado no contrato
 
-## Arquivos
+### Aba 4: Projetos Mapeados
+Projetos gerados a partir dos diagnosticos + IA:
+- Botao "Gerar Projetos com IA" que analisa diagnosticos e sugere projetos
+- Lista de projetos com responsavel, trilha vinculada, ROI estimado
+- Vincula ao `backlog_skills` existente
 
-### Criar
-- `src/hooks/useSkillsEquipeDiagnostico.ts` - Hook para status de diagnostico da equipe
-- `src/components/skills/visao-geral/` - Pasta com componentes da Visao Geral:
-  - `DiagnosticoEquipeCard.tsx` - Card com barra de progresso e lista de membros
-  - `ResumoPerformanceCards.tsx` - KPIs resumidos
-  - `AcessoRapidoCards.tsx` - Links para Performance e Diagnostico
+### Aba 5: Entregas (existente, SkillsEntregasTab)
+Mantida.
 
-### Modificar
-- `src/pages/skills/ProjetoSkills.tsx` - De placeholder para dashboard real
-- `src/components/skills/ProjetoSkillsPerformance.tsx` - Remover fallback de mocks, usar empty states
-- `src/components/skills/ProjetoSkillsDiagnostico.tsx` - Corrigir estado inicial
-- `src/components/skills/diagnostico/DiagnosticoResults.tsx` - Remover mocks, usar dados reais para banner de equipe
+### Aba 6: Metricas (existente, SkillsMetricasTab)
+Mantida.
 
-### Deletar
-- `src/components/skills/performance/mockPerformanceData.ts`
+### Aba 7: Documentos
+Upload de documentos + links importantes (mesmo padrao do Business adaptado para equipe).
 
-## Regras de empty state
+### Aba 8: Reports
+Reports trimestrais com geracao via IA.
 
-Todas as abas devem continuar visiveis e navegaveis. Quando nao ha dados:
-- **KPIs**: Mostram "0h", "0%", "0/0" 
-- **Graficos**: Renderizam com eixos mas sem dados (barras/areas zeradas)
-- **Tabelas/Rankings**: Mostram mensagem "Nenhum dado disponivel ainda"
-- **Diagnostico sem preenchimento**: Mostra botao para preencher, nao os resultados mockados
-- **Nenhuma informacao some** — tudo e visivel, apenas sem valores fictcios
+## Banco de dados - 4 novas tabelas
 
-## Nenhuma alteracao de banco de dados necessaria
+### `contratos_skills`
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | uuid PK | |
+| equipe_id | uuid FK equipes_skills | 1 contrato por equipe |
+| empresa_nome | text | Razao social |
+| cnpj | text | |
+| representante_nome | text | |
+| representante_email | text | |
+| duracao_programa_semanas | integer (default 12) | |
+| frequencia_encontros | text | "semanal", "quinzenal" |
+| reports_frequencia | text (default "trimestral") | |
+| data_inicio | date | |
+| data_fim | date | |
+| valor_contrato | numeric | |
+| roi_projetado | numeric | |
+| projetos_por_trilha | jsonb | Array de {trilha_id, trilha_titulo, projetos: [{titulo, descricao}]} |
+| entregas_esperadas | jsonb | |
+| observacoes | text | |
+| status | text (default "ativo") | |
+| created_at, updated_at | timestamptz | |
 
-As tabelas `diagnosticos_skills`, `entregas_skills`, `metricas_skills`, `membros_equipe_skills` e `equipes_skills` ja possuem toda a estrutura necessaria. O hook `useSkillsLider` ja faz todas as queries. Apenas precisamos parar de usar mocks e mostrar dados reais (ou empty states).
+O campo `projetos_por_trilha` substitui `modulos_contratados` do Business. Armazena a relacao de projetos vinculados a trilhas de ensino.
+
+### `documentos_skills`
+| Coluna | Tipo |
+|--------|------|
+| id | uuid PK |
+| equipe_id | uuid FK |
+| titulo | text |
+| tipo | text ("contrato", "transcricao", "anexo", "solucao", "outro") |
+| arquivo_url | text |
+| para_processamento_ia | boolean (default false) |
+| created_at | timestamptz |
+
+### `reports_skills`
+| Coluna | Tipo |
+|--------|------|
+| id | uuid PK |
+| equipe_id | uuid FK |
+| contrato_id | uuid FK nullable |
+| titulo | text |
+| descricao | text |
+| periodo_referencia | text (ex: "T1 2026") |
+| trimestre | integer (1-4) |
+| data_envio | timestamptz |
+| arquivo_url | text |
+| conteudo_html | text |
+| resumo_executivo | text |
+| metricas | jsonb |
+| gerado_por_ia | boolean (default false) |
+| created_at | timestamptz |
+
+### `links_skills`
+| Coluna | Tipo |
+|--------|------|
+| id | uuid PK |
+| equipe_id | uuid FK |
+| titulo | text |
+| url | text |
+| descricao | text |
+| icone | text (default "link") |
+| ordem | integer (default 0) |
+| created_at | timestamptz |
+
+RLS: todas com `enable RLS` + policies para usuarios autenticados com role admin.
+
+## Edge Functions (3 novas)
+
+### `processar-contrato-skills`
+Similar ao `parse-contrato-texto` mas adaptado para Skills:
+- Extrai dados da contratante
+- Extrai dados do programa (semanas, frequencia)
+- Extrai **projetos por trilha de ensino** (em vez de modulos de servico)
+- Extrai valores
+- Usa Lovable AI (Gemini)
+
+### `gerar-projetos-skills`
+- Recebe equipe_id
+- Busca todos os `diagnosticos_skills` da equipe
+- Consolida processos e gargalos
+- Usa IA para sugerir projetos com trilha vinculada, responsavel, ROI
+- Salva no `backlog_skills`
+
+### `gerar-report-skills`
+- Recebe equipe_id e trimestre
+- Busca metricas, entregas, diagnosticos
+- Gera report HTML trimestral com KPIs
+- Salva em `reports_skills`
+
+## Hooks (5 novos)
+
+- `src/hooks/admin/useContratosSkills.ts` - CRUD contrato da equipe
+- `src/hooks/admin/useDocumentosSkills.ts` - CRUD documentos
+- `src/hooks/admin/useLinksSkills.ts` - CRUD links
+- `src/hooks/admin/useReportsSkills.ts` - CRUD reports
+- `src/hooks/admin/useDiagnosticosEquipeAdmin.ts` - Lista diagnosticos de todos os membros
+
+## Componentes (8 novos)
+
+- `src/components/admin/skills/ContratoSkillsManager.tsx` - Formulario com secoes colapsaveis
+- `src/components/admin/skills/ContratoSkillsImportSection.tsx` - Import com IA
+- `src/components/admin/skills/DiagnosticosSkillsTab.tsx` - Lista membros + status + expandir resultados
+- `src/components/admin/skills/SecoesTrimestraisTab.tsx` - Cards T1-T4 com encontros
+- `src/components/admin/skills/ProjetosMapeadosTab.tsx` - Projetos gerados por IA
+- `src/components/admin/skills/DocumentosSkillsManager.tsx` - Upload + links
+- `src/components/admin/skills/ReportsSkillsManager.tsx` - Reports trimestrais
+- `src/components/admin/skills/GerarReportSkillsModal.tsx` - Modal geracao IA
+
+## Pagina reescrita
+
+`src/pages/admin/mentoria/MentoriaSkillsPage.tsx` - De 4 abas para 8 abas, mantendo o seletor de equipe e as abas existentes (Entregas e Metricas), adicionando Contrato, Diagnosticos, Secoes, Projetos, Documentos e Reports.
+
+## Secao "Projetos por Trilha" (diferencial Skills)
+
+Na aba Contrato, a secao de "Projetos por Trilha" funciona assim:
+1. Dropdown para selecionar uma trilha (carregada de `trilhas` do banco)
+2. Ao selecionar, pode-se adicionar projetos vinculados aquela trilha
+3. Cada projeto tem titulo e descricao
+4. A IA do contrato pode extrair essa relacao automaticamente do texto importado
+5. Armazenado como JSON no campo `projetos_por_trilha`
+
+Exemplo de dado:
+```json
+[
+  {
+    "trilha_id": "39a7856f-...",
+    "trilha_titulo": "Planilhas e Dados com IA",
+    "projetos": [
+      {"titulo": "Automatizar relatorios mensais", "descricao": "..."},
+      {"titulo": "Dashboard de vendas", "descricao": "..."}
+    ]
+  },
+  {
+    "trilha_id": "8118b647-...",
+    "trilha_titulo": "Fundamentos de Automacao",
+    "projetos": [
+      {"titulo": "Automatizar onboarding RH", "descricao": "..."}
+    ]
+  }
+]
+```
+
+## Resumo
+
+- 4 tabelas novas + RLS
+- 3 edge functions novas
+- 5 hooks novos
+- 8 componentes novos
+- 1 pagina reescrita (MentoriaSkillsPage)
+- Nenhum arquivo existente deletado (abas Entregas e Metricas mantidas)
+- Storage bucket existente `contratos-business` pode ser reutilizado ou criar `documentos-skills`
