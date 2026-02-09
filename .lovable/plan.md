@@ -1,22 +1,98 @@
 
-# Remover icones dos titulos das paginas Projeto Skills
+# Novo submenu "Projetos" no Projeto Skills com Kanban Board
 
 ## Resumo
 
-Remover o icone de mala (Briefcase) dos tres arquivos de pagina que usam o componente `PageTitle` com `icon=`. Tambem remover o import de `Briefcase` de `lucide-react` em cada arquivo, ja que nao sera mais utilizado.
+Criar uma nova pagina `/skills/projeto/projetos` com um quadro Kanban conectado a tabela `entregas_skills`, e adicionar o submenu "Projetos" no menu lateral abaixo de "Diagnostico".
 
-## Arquivos a modificar
+## Estrutura
 
-### 1. `src/pages/skills/ProjetoSkills.tsx`
-- Remover `import { Briefcase } from "lucide-react"`
-- Remover a prop `icon={<Briefcase ... />}` do `PageTitle`
+```text
+Projeto Skills (menu)
+  ├── Visao Geral      (ordem 1)
+  ├── Performance      (ordem 2)
+  ├── Diagnostico      (ordem 3)
+  └── Projetos         (ordem 4)  <-- NOVO
+```
 
-### 2. `src/pages/skills/ProjetoSkillsPerformancePage.tsx`
-- Remover `import { Briefcase } from "lucide-react"`
-- Remover a prop `icon={<Briefcase ... />}` do `PageTitle`
+## Alteracoes
 
-### 3. `src/pages/skills/ProjetoSkillsDiagnosticoPage.tsx`
-- Remover `import { Briefcase } from "lucide-react"`
-- Remover a prop `icon={<Briefcase ... />}` do `PageTitle`
+### 1. Banco de dados (menu_config)
+Inserir novo registro na tabela `menu_config`:
+- menu_key: `projeto_skills_projetos`
+- label: `Projetos`
+- url: `/skills/projeto/projetos`
+- parent_key: `projeto_skills`
+- ordem: 4
+- planos_permitidos: `["skills"]`
+- tipo: `sidebar`
+- visivel: true
 
-Os KPI cards em `KPICard.tsx` continuam com seus icones (Clock, TrendingUp, Target, Award) pois sao icones contextuais dentro dos cards, nao no titulo da pagina.
+### 2. Nova pagina: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+- Wrapper com `PageTitle` (Projeto / Skills) e `SkillsAdminGuard`
+- Renderiza o componente Kanban
+
+### 3. Novo componente Kanban: `src/components/skills/ProjetoSkillsKanban.tsx`
+Quadro Kanban com 4 colunas baseadas no status das `entregas_skills`:
+
+| Coluna | Status | Cor |
+|--------|--------|-----|
+| Pendente | pendente | cinza |
+| Em Andamento | em_andamento | azul |
+| Aguardando Validacao | aguardando_validacao | amarelo |
+| Concluido/Aprovada | concluido, aprovada | verde marca |
+
+Cada card mostra:
+- Titulo da entrega
+- Responsavel (avatar + nome)
+- Prazo (badge com cor se atrasado)
+- Progresso (barra horizontal)
+- ROI / horas economizadas
+
+Funcionalidades:
+- Drag-and-drop entre colunas usando `@dnd-kit/core` e `@dnd-kit/sortable` (ja instalados)
+- Ao mover um card, atualiza o status via `useSkillsEntregas` mutation
+- Filtro por responsavel no topo
+- Responsivo: em mobile as colunas empilham verticalmente com scroll horizontal
+
+### 4. Rota no App.tsx
+Adicionar:
+```
+<Route path="/skills/projeto/projetos" element={<ProjetoSkillsProjetosPage />} />
+```
+
+### 5. Menu lateral (useMenuConfig + AppSidebar)
+- Adicionar `projeto_skills_projetos` na lista de menus restritos a lider/admin no `AppSidebar.tsx` (linha 123)
+- Adicionar `projeto_skills_projetos` nas listas de `hiddenByEnvironment` dos ambientes que nao sao Skills (business, business_iaplicada, academy, gratuito)
+
+### 6. Dados
+Usa o hook `useSkillsEntregas` existente que ja retorna todas as entregas da equipe para lideres. Adicionar uma mutation `atualizarStatus` no hook para suportar drag-and-drop.
+
+## Detalhes tecnicos do Kanban
+
+**Drag and Drop** (com @dnd-kit):
+```typescript
+<DndContext onDragEnd={handleDragEnd}>
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    {columns.map(col => (
+      <DroppableColumn key={col.status} column={col}>
+        <SortableContext items={col.items}>
+          {col.items.map(item => <DraggableCard key={item.id} entrega={item} />)}
+        </SortableContext>
+      </DroppableColumn>
+    ))}
+  </div>
+</DndContext>
+```
+
+**Card visual**:
+- Fundo branco com borda sutil
+- Badge de status colorido no topo
+- Nome do responsavel com avatar pequeno
+- Barra de progresso (mesma do WeeklyBarChart)
+- Prazo com indicador vermelho se vencido
+
+**Responsividade**:
+- Desktop: 4 colunas lado a lado
+- Tablet: 2 colunas
+- Mobile: scroll horizontal ou 1 coluna empilhada
