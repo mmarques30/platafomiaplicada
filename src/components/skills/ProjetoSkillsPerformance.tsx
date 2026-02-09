@@ -1,34 +1,13 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
 import { TrendingUp, Target, Award, Clock, Loader2 } from "lucide-react";
 import { useSkillsLider } from "@/hooks/useSkillsLider";
 import KPICard from "./performance/KPICard";
 import FilterSelect from "./performance/FilterSelect";
-
-const roiChartConfig: ChartConfig = {
-  projetado: { label: "ROI Projetado", color: "hsl(72, 30%, 55%)" },
-  executado: { label: "ROI Executado", color: "hsl(72, 50%, 35%)" },
-};
-
-const maturityChartConfig: ChartConfig = {
-  maturidade: { label: "Maturidade IA", color: "hsl(72, 50%, 35%)" },
-};
+import MemberDonutCharts from "./performance/MemberDonutCharts";
+import StatusPieChart from "./performance/StatusPieChart";
+import WeeklyBarChart from "./performance/WeeklyBarChart";
 
 export default function ProjetoSkillsPerformance() {
   const hook = useSkillsLider();
@@ -152,44 +131,13 @@ export default function ProjetoSkillsPerformance() {
         </CardContent>
       </Card>
 
-      {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle>Impacto vs ROI</CardTitle>
-            <CardDescription>ROI Projetado vs Executado</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={roiChartConfig} className="h-[280px] w-full">
-              <AreaChart data={roiChartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="semana" className="text-xs" />
-                <YAxis className="text-xs" />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area type="monotone" dataKey="projetado" stroke="hsl(72, 30%, 55%)" fill="hsl(72, 30%, 55%)" fillOpacity={0.15} strokeDasharray="5 5" />
-                <Area type="monotone" dataKey="executado" stroke="hsl(72, 50%, 35%)" fill="hsl(72, 50%, 35%)" fillOpacity={0.25} />
-              </AreaChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+      {/* Donut Charts por Membro */}
+      <MemberDonutCharts ranking={ranking} entregas={filteredDeliveries as any} />
 
-        <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle>Evolução Maturidade IA</CardTitle>
-            <CardDescription>Índice de maturidade por semana</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={maturityChartConfig} className="h-[280px] w-full">
-              <BarChart data={maturidadeChartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="semana" className="text-xs" />
-                <YAxis className="text-xs" />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="maturidade" fill="hsl(72, 50%, 35%)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+      {/* Pie + Bar Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <StatusPieChart entregas={filteredDeliveries} />
+        <WeeklyBarChart data={maturidadeChartData} />
       </div>
 
       {/* Ranking */}
