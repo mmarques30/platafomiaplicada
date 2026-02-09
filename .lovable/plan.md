@@ -1,210 +1,60 @@
 
-# Reestruturar Admin Skills: Layout Business com Contrato, Diagnosticos, Projetos, Documentos e Reports
 
-## Contexto
+# Substituir Acesso Rapido por Grafico de Area + Mini Calendario
 
-A pagina `MentoriaSkillsPage` sera reestruturada para seguir o mesmo layout da `MentoriaBusinessPage`, mas adaptada para o contexto B2B de equipes Skills. A diferenca fundamental:
+## O que muda
 
-- **Business**: seletor por usuario individual, "modulos contratados" sao servicos (CRM, Financeiro, etc.)
-- **Skills**: seletor por equipe, "projetos por trilhas de ensino" sao entregas vinculadas a trilhas de conteudo da plataforma (ex: Automacao, Planilhas com IA, etc.)
+Remover os dois botoes de "Performance" e "Diagnostico" da Visao Geral (componente `AcessoRapidoCards`), pois ja existem como submenus no dropdown "Projeto Skills". No lugar, adicionar uma secao visual com:
 
-## Estrutura de abas (8 abas)
+1. **Grafico de Area** (lado esquerdo, ~70% da largura): duas curvas sobrepostas com cores distintas — "ROI Projetado" (cinza/muted) e "ROI Executado" (verde marca). Dados vindos do `roiChartData` do hook `useSkillsLider`, que ja retorna 12 semanas com valores projetado/executado.
+
+2. **Mini Calendario** (lado direito, ~30%): calendario compacto mostrando o mes atual, com destaque visual nos dias que tem encontros/secoes agendados (se houver dados no roadmap). Quando o usuario clica em um dia com evento, pode ver detalhes. O calendario e o grafico "conversam" — ao passar o mouse em uma semana no grafico, o calendario pode destacar o periodo correspondente.
+
+## Alteracoes
+
+### Arquivo 1: `src/pages/skills/ProjetoSkills.tsx`
+- Remover import e uso do `AcessoRapidoCards`
+- Adicionar novo componente `GraficoCalendarioSection`
+
+### Arquivo 2: `src/components/skills/visao-geral/AcessoRapidoCards.tsx`
+- **Deletar** este arquivo (nao sera mais usado)
+
+### Arquivo 3 (novo): `src/components/skills/visao-geral/GraficoCalendarioSection.tsx`
+Componente com layout side-by-side:
 
 ```
-[Contrato] [Diagnosticos] [Secoes] [Projetos] [Entregas] [Metricas] [Documentos] [Reports]
++--------------------------------------------------+
+| [Grafico de Area - 2 curvas]  | [Mini Calendario] |
+| ROI Projetado (cinza)         |    Fev 2026       |
+| ROI Executado (verde)         |  D S T Q Q S S    |
+|                               |  ... dias ...     |
++--------------------------------------------------+
 ```
 
-### Aba 1: Contrato
-Contrato da equipe Skills com processamento IA. Secoes colapsaveis:
-- **Contratante**: empresa, CNPJ, representante, email
-- **Programa**: duracao (semanas), frequencia de encontros, reports (trimestral), data inicio/fim
-- **Projetos por Trilha**: em vez de "modulos contratados", um seletor de trilhas de ensino da plataforma (carregadas de `trilhas`), cada trilha com projetos associados. Ex: "Trilha Automacao > Projeto: Automatizar RH"
-- **Valores**: valor contrato, ROI projetado, custo/hora
-- Importacao com IA (reutiliza o padrao `ContratoImportSection`)
-- Botao "Limpar Tudo"
+**Grafico**: Usa `AreaChart` do recharts com `ChartContainer` do shadcn. Duas `Area` com `fillOpacity` para efeito visual similar ao anexo (areas preenchidas com gradiente). Legenda no topo esquerdo com bolinhas coloridas.
 
-### Aba 2: Diagnosticos
-Visao admin dos diagnosticos individuais dos membros:
-- Lista de membros com status (preenchido / pendente / processado por IA)
-- Expandir membro para ver resultado IA (insight_ia, processos_analisados, economia)
-- Botao "Processar com IA" para diagnosticos nao processados
-- Barra de progresso geral da equipe
+**Calendario**: Usa o componente `Calendar` do shadcn (react-day-picker) em modo compacto. Dias com entregas/encontros marcados com um ponto ou fundo colorido (laranja como no anexo de referencia). O dia atual destacado.
 
-### Aba 3: Secoes (Trimestral)
-Gerenciamento das secoes trimestrais (T1-T4):
-- Cards por trimestre com status, datas, entregas planejadas
-- Dentro de cada trimestre: encontros agendados
-- Botao para gerar encontros automaticamente baseado no contrato
+**Responsividade**: Em mobile, empilha verticalmente (grafico em cima, calendario embaixo).
 
-### Aba 4: Projetos Mapeados
-Projetos gerados a partir dos diagnosticos + IA:
-- Botao "Gerar Projetos com IA" que analisa diagnosticos e sugere projetos
-- Lista de projetos com responsavel, trilha vinculada, ROI estimado
-- Vincula ao `backlog_skills` existente
+**Dados**: Reutiliza `useSkillsLider()` para `roiChartData` e `entregas` (para marcar dias de prazo no calendario).
 
-### Aba 5: Entregas (existente, SkillsEntregasTab)
-Mantida.
+## Layout da pagina final
 
-### Aba 6: Metricas (existente, SkillsMetricasTab)
-Mantida.
-
-### Aba 7: Documentos
-Upload de documentos + links importantes (mesmo padrao do Business adaptado para equipe).
-
-### Aba 8: Reports
-Reports trimestrais com geracao via IA.
-
-## Banco de dados - 4 novas tabelas
-
-### `contratos_skills`
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | uuid PK | |
-| equipe_id | uuid FK equipes_skills | 1 contrato por equipe |
-| empresa_nome | text | Razao social |
-| cnpj | text | |
-| representante_nome | text | |
-| representante_email | text | |
-| duracao_programa_semanas | integer (default 12) | |
-| frequencia_encontros | text | "semanal", "quinzenal" |
-| reports_frequencia | text (default "trimestral") | |
-| data_inicio | date | |
-| data_fim | date | |
-| valor_contrato | numeric | |
-| roi_projetado | numeric | |
-| projetos_por_trilha | jsonb | Array de {trilha_id, trilha_titulo, projetos: [{titulo, descricao}]} |
-| entregas_esperadas | jsonb | |
-| observacoes | text | |
-| status | text (default "ativo") | |
-| created_at, updated_at | timestamptz | |
-
-O campo `projetos_por_trilha` substitui `modulos_contratados` do Business. Armazena a relacao de projetos vinculados a trilhas de ensino.
-
-### `documentos_skills`
-| Coluna | Tipo |
-|--------|------|
-| id | uuid PK |
-| equipe_id | uuid FK |
-| titulo | text |
-| tipo | text ("contrato", "transcricao", "anexo", "solucao", "outro") |
-| arquivo_url | text |
-| para_processamento_ia | boolean (default false) |
-| created_at | timestamptz |
-
-### `reports_skills`
-| Coluna | Tipo |
-|--------|------|
-| id | uuid PK |
-| equipe_id | uuid FK |
-| contrato_id | uuid FK nullable |
-| titulo | text |
-| descricao | text |
-| periodo_referencia | text (ex: "T1 2026") |
-| trimestre | integer (1-4) |
-| data_envio | timestamptz |
-| arquivo_url | text |
-| conteudo_html | text |
-| resumo_executivo | text |
-| metricas | jsonb |
-| gerado_por_ia | boolean (default false) |
-| created_at | timestamptz |
-
-### `links_skills`
-| Coluna | Tipo |
-|--------|------|
-| id | uuid PK |
-| equipe_id | uuid FK |
-| titulo | text |
-| url | text |
-| descricao | text |
-| icone | text (default "link") |
-| ordem | integer (default 0) |
-| created_at | timestamptz |
-
-RLS: todas com `enable RLS` + policies para usuarios autenticados com role admin.
-
-## Edge Functions (3 novas)
-
-### `processar-contrato-skills`
-Similar ao `parse-contrato-texto` mas adaptado para Skills:
-- Extrai dados da contratante
-- Extrai dados do programa (semanas, frequencia)
-- Extrai **projetos por trilha de ensino** (em vez de modulos de servico)
-- Extrai valores
-- Usa Lovable AI (Gemini)
-
-### `gerar-projetos-skills`
-- Recebe equipe_id
-- Busca todos os `diagnosticos_skills` da equipe
-- Consolida processos e gargalos
-- Usa IA para sugerir projetos com trilha vinculada, responsavel, ROI
-- Salva no `backlog_skills`
-
-### `gerar-report-skills`
-- Recebe equipe_id e trimestre
-- Busca metricas, entregas, diagnosticos
-- Gera report HTML trimestral com KPIs
-- Salva em `reports_skills`
-
-## Hooks (5 novos)
-
-- `src/hooks/admin/useContratosSkills.ts` - CRUD contrato da equipe
-- `src/hooks/admin/useDocumentosSkills.ts` - CRUD documentos
-- `src/hooks/admin/useLinksSkills.ts` - CRUD links
-- `src/hooks/admin/useReportsSkills.ts` - CRUD reports
-- `src/hooks/admin/useDiagnosticosEquipeAdmin.ts` - Lista diagnosticos de todos os membros
-
-## Componentes (8 novos)
-
-- `src/components/admin/skills/ContratoSkillsManager.tsx` - Formulario com secoes colapsaveis
-- `src/components/admin/skills/ContratoSkillsImportSection.tsx` - Import com IA
-- `src/components/admin/skills/DiagnosticosSkillsTab.tsx` - Lista membros + status + expandir resultados
-- `src/components/admin/skills/SecoesTrimestraisTab.tsx` - Cards T1-T4 com encontros
-- `src/components/admin/skills/ProjetosMapeadosTab.tsx` - Projetos gerados por IA
-- `src/components/admin/skills/DocumentosSkillsManager.tsx` - Upload + links
-- `src/components/admin/skills/ReportsSkillsManager.tsx` - Reports trimestrais
-- `src/components/admin/skills/GerarReportSkillsModal.tsx` - Modal geracao IA
-
-## Pagina reescrita
-
-`src/pages/admin/mentoria/MentoriaSkillsPage.tsx` - De 4 abas para 8 abas, mantendo o seletor de equipe e as abas existentes (Entregas e Metricas), adicionando Contrato, Diagnosticos, Secoes, Projetos, Documentos e Reports.
-
-## Secao "Projetos por Trilha" (diferencial Skills)
-
-Na aba Contrato, a secao de "Projetos por Trilha" funciona assim:
-1. Dropdown para selecionar uma trilha (carregada de `trilhas` do banco)
-2. Ao selecionar, pode-se adicionar projetos vinculados aquela trilha
-3. Cada projeto tem titulo e descricao
-4. A IA do contrato pode extrair essa relacao automaticamente do texto importado
-5. Armazenado como JSON no campo `projetos_por_trilha`
-
-Exemplo de dado:
-```json
-[
-  {
-    "trilha_id": "39a7856f-...",
-    "trilha_titulo": "Planilhas e Dados com IA",
-    "projetos": [
-      {"titulo": "Automatizar relatorios mensais", "descricao": "..."},
-      {"titulo": "Dashboard de vendas", "descricao": "..."}
-    ]
-  },
-  {
-    "trilha_id": "8118b647-...",
-    "trilha_titulo": "Fundamentos de Automacao",
-    "projetos": [
-      {"titulo": "Automatizar onboarding RH", "descricao": "..."}
-    ]
-  }
-]
+```
+Titulo: Projeto Skills
+-----
+Card: Diagnostico da Equipe (barra de progresso + membros + botao)
+-----
+Cards: KPIs (Horas Economizadas | ROI | Entregas | Semana)
+-----
+Card: Grafico de Area + Mini Calendario (lado a lado)
 ```
 
-## Resumo
+## Detalhes tecnicos
 
-- 4 tabelas novas + RLS
-- 3 edge functions novas
-- 5 hooks novos
-- 8 componentes novos
-- 1 pagina reescrita (MentoriaSkillsPage)
-- Nenhum arquivo existente deletado (abas Entregas e Metricas mantidas)
-- Storage bucket existente `contratos-business` pode ser reutilizado ou criar `documentos-skills`
+- Recharts: `AreaChart`, `Area`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip`
+- Cores das areas: verde marca `hsl(78, 54%, 34%)` para executado, cinza `hsl(var(--muted-foreground))` para projetado
+- Gradientes via `<defs><linearGradient>` para o efeito de preenchimento suave
+- Calendario: `Calendar` de `@/components/ui/calendar` com `modifiers` para dias com eventos
+- Dias com prazo de entrega marcados com estilo laranja/destaque
