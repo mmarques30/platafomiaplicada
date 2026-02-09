@@ -148,14 +148,17 @@ export function AppSidebar() {
     return menu.url || "/";
   };
 
-  // Auto-expandir menu quando rota ativa está em submenu
+  // Auto-expandir menu quando rota ativa está em submenu (incluindo 3º nível)
   useEffect(() => {
     const newExpanded: string[] = [];
     mainMenus.forEach(menu => {
       const subMenus = getSubMenus(menu.menu_key);
-      const isInSubRoute = subMenus.some(sub => 
-        sub.url && location.pathname.startsWith(sub.url)
-      );
+      const isInSubRoute = subMenus.some(sub => {
+        if (sub.url && location.pathname.startsWith(sub.url)) return true;
+        // Check 3rd-level children
+        const thirdLevel = getSubMenus(sub.menu_key);
+        return thirdLevel.some(child => child.url && location.pathname.startsWith(child.url));
+      });
       if (isInSubRoute) {
         newExpanded.push(menu.menu_key);
       }
@@ -241,23 +244,50 @@ export function AppSidebar() {
                           const subIsActive = location.pathname === subMenu.url;
                           const SubIconComponent = subMenu.icon ? getIconComponent(subMenu.icon) : null;
                           
+                          // Check for 3rd-level children (e.g. Painel Líder under Visão Geral)
+                          const thirdLevelMenus = getSubMenus(subMenu.menu_key);
+                          
                           return (
-                            <SidebarMenuItem key={subMenu.menu_key}>
-                              <SidebarMenuButton asChild className="group">
-                                <NavLink 
-                                  to={subMenu.url || "/"} 
-                                  end 
-                                  className={cn(
-                                    "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                    subIsActive 
-                                      ? "text-primary font-semibold" 
-                                      : "text-sidebar-foreground/70 hover:text-primary"
-                                  )}
-                                >
-                                  {!collapsed && <span>{subMenu.label}</span>}
-                                </NavLink>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            <div key={subMenu.menu_key}>
+                              <SidebarMenuItem>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink 
+                                    to={subMenu.url || "/"} 
+                                    end 
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                      subIsActive 
+                                        ? "text-primary font-semibold" 
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>{subMenu.label}</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                              {/* Render 3rd-level submenus */}
+                              {thirdLevelMenus.length > 0 && thirdLevelMenus.map((child) => {
+                                const childIsActive = location.pathname === child.url;
+                                return (
+                                  <SidebarMenuItem key={child.menu_key}>
+                                    <SidebarMenuButton asChild className="group">
+                                      <NavLink 
+                                        to={child.url || "/"} 
+                                        end 
+                                        className={cn(
+                                          "rounded-lg transition-all duration-200 font-medium pl-6 py-2 text-sm",
+                                          childIsActive 
+                                            ? "text-primary font-semibold" 
+                                            : "text-sidebar-foreground/70 hover:text-primary"
+                                        )}
+                                      >
+                                        {!collapsed && <span>{child.label}</span>}
+                                      </NavLink>
+                                    </SidebarMenuButton>
+                                  </SidebarMenuItem>
+                                );
+                              })}
+                            </div>
                           );
                         })}
                       </SidebarMenu>
