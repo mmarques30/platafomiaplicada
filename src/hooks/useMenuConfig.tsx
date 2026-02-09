@@ -58,7 +58,8 @@ export function useMenuConfig() {
         'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog',
         'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
-        'squad', 'squad_lider'
+        'squad', 'squad_lider',
+        'meu_sistema'
       ],
 
       // Skills: oculta trilhas gerais, calendário e TODO o grupo "Meu Progresso" (não usado no Skills)
@@ -68,7 +69,8 @@ export function useMenuConfig() {
         'meu_progresso_conteudo', 'meu_progresso_entregas',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas',
-        'squad', 'squad_lider'
+        'squad', 'squad_lider',
+        'meu_sistema'
       ],
       
       // Business Colaborativo: oculta menus Academy-only e Skills-only + Squad + Projeto Skills
@@ -77,7 +79,8 @@ export function useMenuConfig() {
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
         'skills_entregas', 'skills_painel_lider',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
-        'squad', 'squad_lider'
+        'squad', 'squad_lider',
+        'meu_sistema'
       ],
       
       // Business IAplicada: versão mais restrita (cliente apenas acompanha) + Squad + Projeto Skills
@@ -95,7 +98,8 @@ export function useMenuConfig() {
         'meu_progresso_visao_geral', 'meu_progresso_roadmap',
         'meu_progresso_conteudo', 'meu_progresso_entregas',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
-        'squad', 'squad_lider'
+        'squad', 'squad_lider',
+        'meu_sistema'
       ],
     };
     
