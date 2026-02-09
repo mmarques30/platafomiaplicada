@@ -1,7 +1,7 @@
 
 import { PageTitle } from "@/components/shared/PageTitle";
 import DiagnosticoEquipeCard from "@/components/skills/visao-geral/DiagnosticoEquipeCard";
-import ResumoPerformanceCards from "@/components/skills/visao-geral/ResumoPerformanceCards";
+import CronogramaPrograma from "@/components/skills/visao-geral/CronogramaPrograma";
 import GraficoCalendarioSection from "@/components/skills/visao-geral/GraficoCalendarioSection";
 
 export default function ProjetoSkills() {
@@ -15,8 +15,8 @@ export default function ProjetoSkills() {
       {/* Diagnóstico da equipe com barra de progresso */}
       <DiagnosticoEquipeCard />
 
-      {/* KPIs resumidos */}
-      <ResumoPerformanceCards />
+      {/* Cronograma do Programa */}
+      <CronogramaPrograma />
 
       {/* Gráfico de ROI + Mini Calendário */}
       <GraficoCalendarioSection />
