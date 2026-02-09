@@ -2,7 +2,7 @@ import { Briefcase } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
 import DiagnosticoEquipeCard from "@/components/skills/visao-geral/DiagnosticoEquipeCard";
 import ResumoPerformanceCards from "@/components/skills/visao-geral/ResumoPerformanceCards";
-import AcessoRapidoCards from "@/components/skills/visao-geral/AcessoRapidoCards";
+import GraficoCalendarioSection from "@/components/skills/visao-geral/GraficoCalendarioSection";
 
 export default function ProjetoSkills() {
   return (
@@ -19,8 +19,8 @@ export default function ProjetoSkills() {
       {/* KPIs resumidos */}
       <ResumoPerformanceCards />
 
-      {/* Acesso rápido */}
-      <AcessoRapidoCards />
+      {/* Gráfico de ROI + Mini Calendário */}
+      <GraficoCalendarioSection />
     </div>
   );
 }
