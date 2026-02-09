@@ -1,98 +1,103 @@
 
-# Novo submenu "Projetos" no Projeto Skills com Kanban Board
+# Redesign da pagina Projetos Skills conforme mockup
 
 ## Resumo
 
-Criar uma nova pagina `/skills/projeto/projetos` com um quadro Kanban conectado a tabela `entregas_skills`, e adicionar o submenu "Projetos" no menu lateral abaixo de "Diagnostico".
+Redesenhar a pagina de Projetos para incluir duas secoes: (1) **Visao Geral do Portfolio** com KPIs, barra de progresso geral e distribuicao por tipo; (2) **Backlog de Projetos** como Kanban com cards mais ricos, filtros avancados e dados do backlog_skills vinculado.
 
-## Estrutura
+## Alteracoes no banco de dados
+
+### Adicionar campos faltantes na tabela `entregas_skills`
+A tabela atual nao tem campo `tipo` (Individual/Colaborativo/Sistema) nem `prioridade` (P1/P2/P3). Esses dados existem parcialmente no `backlog_skills` vinculado (campo `prioridade` e `origem`), mas para simplificar a consulta e suportar o filtro, adicionar:
+- `tipo` (text, nullable, default 'individual') - valores: 'individual', 'colaborativo', 'sistema'
+- `prioridade` (text, nullable, default 'P3') - valores: 'P1', 'P2', 'P3'
+- `processos_resolvidos` (integer, nullable, default 0) - numero de processos que a entrega resolve
+
+## Secao 1: Visao Geral do Portfolio
+
+Novo componente `src/components/skills/kanban/PortfolioOverview.tsx`
+
+### KPIs (4 cards em grid)
+Calculados a partir dos dados de `entregas_skills`:
+- **Total de Projetos**: contagem total
+- **Em Producao**: status "concluido" ou "aprovada"
+- **Em Andamento**: status "em_andamento"
+- **Economia Total**: soma de `economia_horas_semana` (Xh por semana)
+
+### Barra de progresso geral
+- Barra unica mostrando percentual medio de progresso de todas as entregas
+- Legenda abaixo: "X concluidos | Y em andamento | Z no backlog"
+
+### Distribuicao por tipo
+- 3 cards: Individuais (contagem + %), Colaborativos (contagem + %), De Sistema (contagem + %)
+
+## Secao 2: Backlog de Projetos (Kanban redesenhado)
+
+### Colunas atualizadas
+Renomear para alinhar com o mockup:
+
+| Coluna | Status | Cor header |
+|--------|--------|------------|
+| BACKLOG | pendente | sem cor (neutro) |
+| EM ANDAMENTO | em_andamento | verde oliva claro |
+| EM VALIDACAO | aguardando_validacao | amarelo claro |
+| RODANDO | concluido, aprovada | sem cor (neutro) |
+
+### Filtros avancados
+Substituir o filtro atual (so por responsavel) por 4 dropdowns + toggle:
+- **Status**: Todos / Backlog / Em Andamento / Em Validacao / Rodando
+- **Tipo**: Todos / Individual / Colaborativo / Sistema
+- **Responsavel**: Todos / lista de membros
+- **Prioridade**: Todas / P1 / P2 / P3
+- **Toggle "Meus projetos"**: filtra apenas entregas do usuario logado
+
+Novo componente: `src/components/skills/kanban/KanbanFiltersAdvanced.tsx`
+
+### Cards redesenhados
+Atualizar `KanbanCard.tsx` para incluir:
 
 ```text
-Projeto Skills (menu)
-  ├── Visao Geral      (ordem 1)
-  ├── Performance      (ordem 2)
-  ├── Diagnostico      (ordem 3)
-  └── Projetos         (ordem 4)  <-- NOVO
++------------------------------------------+
+| Titulo do Projeto                        |
+|                   [Badge Tipo] [Badge Pn] |
+|                                          |
+| (!) Atrasado: Prazo era DD/MM  (se aplic)|
+|                                          |
+| [Avatar] Nome Responsavel                |
+|                                          |
+| Resolve: X processos                     |
+|                                          |
+| Progresso              XX%              |
+| [=========----------]                    |
+|                                          |
+| (clock) DD/MM      (trend) Xh/sem       |
+|                                          |
+| [Badge Status]                           |
++------------------------------------------+
 ```
 
-## Alteracoes
+Novos elementos no card:
+- **Badges de tipo e prioridade** no topo direito (tipo com icone colorido, prioridade com cor por nivel)
+- **Alerta de atraso** com texto "Atrasado: Prazo era DD/MM" em fundo vermelho claro
+- **"Resolve: X processos"** texto abaixo do responsavel
+- **Badge de status** no rodape do card
 
-### 1. Banco de dados (menu_config)
-Inserir novo registro na tabela `menu_config`:
-- menu_key: `projeto_skills_projetos`
-- label: `Projetos`
-- url: `/skills/projeto/projetos`
-- parent_key: `projeto_skills`
-- ordem: 4
-- planos_permitidos: `["skills"]`
-- tipo: `sidebar`
-- visivel: true
+### Estilo visual
+Seguir o mockup: bordas arredondadas com borda pontilhada sutil nos cards, cores de marca (#738925 para verde oliva), fundo bege claro nos cards de KPI.
 
-### 2. Nova pagina: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
-- Wrapper com `PageTitle` (Projeto / Skills) e `SkillsAdminGuard`
-- Renderiza o componente Kanban
+## Arquivos a criar/modificar
 
-### 3. Novo componente Kanban: `src/components/skills/ProjetoSkillsKanban.tsx`
-Quadro Kanban com 4 colunas baseadas no status das `entregas_skills`:
+| Arquivo | Acao |
+|---------|------|
+| `entregas_skills` (migration) | Adicionar colunas tipo, prioridade, processos_resolvidos |
+| `src/components/skills/kanban/PortfolioOverview.tsx` | CRIAR - secao de visao geral |
+| `src/components/skills/kanban/KanbanFiltersAdvanced.tsx` | CRIAR - filtros avancados |
+| `src/components/skills/kanban/KanbanCard.tsx` | MODIFICAR - card mais rico |
+| `src/components/skills/kanban/KanbanColumn.tsx` | MODIFICAR - estilo das colunas |
+| `src/components/skills/ProjetoSkillsKanban.tsx` | MODIFICAR - integrar overview, novos filtros, renomear colunas |
+| `src/pages/skills/ProjetoSkillsProjetosPage.tsx` | MODIFICAR - titulo "Backlog de Projetos" |
+| `src/hooks/useSkillsEntregas.ts` | MODIFICAR - buscar campos extras (tipo, prioridade, processos_resolvidos) |
 
-| Coluna | Status | Cor |
-|--------|--------|-----|
-| Pendente | pendente | cinza |
-| Em Andamento | em_andamento | azul |
-| Aguardando Validacao | aguardando_validacao | amarelo |
-| Concluido/Aprovada | concluido, aprovada | verde marca |
+## Fluxo de dados
 
-Cada card mostra:
-- Titulo da entrega
-- Responsavel (avatar + nome)
-- Prazo (badge com cor se atrasado)
-- Progresso (barra horizontal)
-- ROI / horas economizadas
-
-Funcionalidades:
-- Drag-and-drop entre colunas usando `@dnd-kit/core` e `@dnd-kit/sortable` (ja instalados)
-- Ao mover um card, atualiza o status via `useSkillsEntregas` mutation
-- Filtro por responsavel no topo
-- Responsivo: em mobile as colunas empilham verticalmente com scroll horizontal
-
-### 4. Rota no App.tsx
-Adicionar:
-```
-<Route path="/skills/projeto/projetos" element={<ProjetoSkillsProjetosPage />} />
-```
-
-### 5. Menu lateral (useMenuConfig + AppSidebar)
-- Adicionar `projeto_skills_projetos` na lista de menus restritos a lider/admin no `AppSidebar.tsx` (linha 123)
-- Adicionar `projeto_skills_projetos` nas listas de `hiddenByEnvironment` dos ambientes que nao sao Skills (business, business_iaplicada, academy, gratuito)
-
-### 6. Dados
-Usa o hook `useSkillsEntregas` existente que ja retorna todas as entregas da equipe para lideres. Adicionar uma mutation `atualizarStatus` no hook para suportar drag-and-drop.
-
-## Detalhes tecnicos do Kanban
-
-**Drag and Drop** (com @dnd-kit):
-```typescript
-<DndContext onDragEnd={handleDragEnd}>
-  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-    {columns.map(col => (
-      <DroppableColumn key={col.status} column={col}>
-        <SortableContext items={col.items}>
-          {col.items.map(item => <DraggableCard key={item.id} entrega={item} />)}
-        </SortableContext>
-      </DroppableColumn>
-    ))}
-  </div>
-</DndContext>
-```
-
-**Card visual**:
-- Fundo branco com borda sutil
-- Badge de status colorido no topo
-- Nome do responsavel com avatar pequeno
-- Barra de progresso (mesma do WeeklyBarChart)
-- Prazo com indicador vermelho se vencido
-
-**Responsividade**:
-- Desktop: 4 colunas lado a lado
-- Tablet: 2 colunas
-- Mobile: scroll horizontal ou 1 coluna empilhada
+O hook `useSkillsEntregas` ja busca entregas com responsavel. Sera atualizado para incluir os novos campos na query. O `PortfolioOverview` recebera a lista de entregas como prop e calculara os KPIs no frontend (useMemo). Os filtros avancados aplicarao filtros combinados (status + tipo + responsavel + prioridade) antes de distribuir nas colunas do Kanban.
