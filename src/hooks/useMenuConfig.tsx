@@ -92,7 +92,7 @@ export function useMenuConfig() {
       
       // Academy: usa evolução/diagnóstico/dúvidas soltos, NÃO o grupo "Meu Progresso"
       academy: [
-        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+        'meu_progresso_visao_geral', 'meu_progresso_roadmap',
         'meu_progresso_conteudo', 'meu_progresso_entregas',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
         'squad', 'squad_lider'
