@@ -1,44 +1,73 @@
 
 
-# Correção: "Projeto Skills" aparecendo nos ambientes Academy e Business
+# Correção: Meu Progresso diferente por ambiente + race condition Skills
 
-## Problema
+## Regra de negócio correta
 
-O grupo de menus "Projeto Skills" (com submenus Visão Geral, Performance e Diagnóstico) está aparecendo no menu lateral para TODOS os ambientes e planos porque:
+| Menu | Gratuito | Academy | Skills | Business | Business iAplicada |
+|------|----------|---------|--------|----------|-------------------|
+| Meu Progresso (grupo) | Oculto | Oculto | Oculto | Visível (Visão Geral, Roadmap, Conteúdo) | Visível (Visão Geral, Roadmap, Entregas) |
+| Evolução / Diagnóstico / Dúvidas (itens soltos) | Oculto | Visível | Oculto | Oculto | Oculto |
+| Projeto Skills | Oculto | Oculto | Visível | Oculto | Oculto |
 
-1. **No banco de dados**: `planos_permitidos = NULL` (visível para todos)
-2. **No código**: as listas de exclusão por ambiente (`academy`, `business`, `business_iaplicada`) não incluem esses menus
+O Academy NÃO usa o grupo "Meu Progresso" — ele usa itens individuais (Evolução, Diagnóstico, Dúvidas). O grupo expandível "Meu Progresso" é exclusivo do Business.
 
-Isso faz com que "Projeto Skills" apareça quando o admin simula um usuário Academy ou Business, ou quando um usuário real desses planos acessa a plataforma.
+## Problemas atuais
 
-## Solução (dupla proteção)
+1. **Gratuito**: não tem entrada em `hiddenByEnvironment`, então "Meu Progresso" (pai) aparece
+2. **Academy**: não oculta o grupo "Meu Progresso" (pai + 4 filhos), então aparece um grupo vazio ou com itens errados
+3. **Skills**: race condition no `useSkillsMembro` faz Projeto Skills sumir temporariamente para líderes
 
-### Parte 1: Corrigir no banco de dados
+## Alterações
 
-Atualizar `planos_permitidos` dos 4 registros de `menu_config` para restringir ao plano `skills`:
+### Arquivo 1: `src/hooks/useMenuConfig.tsx`
 
-- `projeto_skills` -> planos_permitidos = `['skills']`
-- `projeto_skills_visao_geral` -> planos_permitidos = `['skills']`
-- `projeto_skills_performance` -> planos_permitidos = `['skills']`
-- `projeto_skills_diagnostico` -> planos_permitidos = `['skills']`
+**Adicionar entrada `gratuito`** ao `hiddenByEnvironment`:
+```
+gratuito: [
+  'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+  'meu_progresso_conteudo', 'meu_progresso_entregas',
+  'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+  'projeto_skills', 'projeto_skills_visao_geral',
+  'projeto_skills_performance', 'projeto_skills_diagnostico',
+  'trilhas_skills', 'skills_minha_equipe', 'skills_backlog',
+  'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
+  'squad', 'squad_lider'
+],
+```
 
-### Parte 2: Adicionar às listas de exclusão no código
+**Adicionar ao `academy`** o grupo Meu Progresso (pai + 4 filhos) — Academy usa evolução/diagnóstico/dúvidas soltos, não o grupo:
+```
+academy: [
+  'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+  'meu_progresso_conteudo', 'meu_progresso_entregas',
+  'projeto_skills', 'projeto_skills_visao_geral',
+  'projeto_skills_performance', 'projeto_skills_diagnostico',
+  'squad', 'squad_lider'
+],
+```
 
-**Arquivo:** `src/hooks/useMenuConfig.tsx`
+As listas de `skills`, `business` e `business_iaplicada` permanecem como estão (já estão corretas).
 
-Adicionar `projeto_skills`, `projeto_skills_visao_geral`, `projeto_skills_performance` e `projeto_skills_diagnostico` às listas de exclusão dos ambientes:
+### Arquivo 2: `src/hooks/useSkillsMembro.ts`
 
-- **academy**: adicionar os 4 menus
-- **business**: adicionar os 4 menus
-- **business_iaplicada**: adicionar os 4 menus
+Trocar `isLoading` por `isPending` do React Query na linha 28. Isso corrige a race condition onde `isLider` retorna `false` prematuramente porque a query está habilitada mas ainda buscando dados:
 
-Isso garante que, mesmo se o banco de dados tiver dados inconsistentes no futuro, o código impede a exibição.
+```typescript
+// Antes
+const { data, isLoading } = useQuery({ ... });
 
-## Arquivos
+// Depois
+const { data, isPending } = useQuery({ ... });
+```
 
-### Migração SQL
-- Atualizar `planos_permitidos` na tabela `menu_config` para os 4 registros
+O retorno `isLoading` do hook continua usando `isPending || authLoading || roleLoading`, garantindo que o `SkillsAdminGuard` espere o dado real antes de redirecionar.
 
-### Modificar
-- `src/hooks/useMenuConfig.tsx` - Adicionar menus do Projeto Skills às listas de exclusão de `academy`, `business` e `business_iaplicada`
+## Resumo
+
+- 2 arquivos modificados, nenhuma alteração no banco de dados
+- "Meu Progresso" (grupo): visível apenas em Business e Business iAplicada
+- Evolução/Diagnóstico/Dúvidas (soltos): visíveis apenas no Academy
+- Gratuito: nenhum desses menus aparece
+- Projeto Skills para de sumir temporariamente para líderes
 
