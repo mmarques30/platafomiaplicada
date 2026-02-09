@@ -1,51 +1,50 @@
 
 
-# Corrigir "Meu Progresso" no ambiente Academy
+# Criar menu "Meu Sistema" para Business iAplicada
 
-## Problema
+## O que sera feito
 
-No banco de dados, os menus `evolucao`, `meu_diagnostico` e `minhas_duvidas` tem `parent_key: meu_progresso`. Porem, no codigo (`useMenuConfig.tsx`), o ambiente `academy` esconde `meu_progresso` (o pai do grupo). Como o pai esta oculto, a sidebar nunca renderiza os filhos, mesmo eles nao estando na lista de ocultos.
+Adicionar um novo item de menu grupo "Meu Sistema" no sidebar, visivel apenas no ambiente `business_iaplicada`, posicionado logo abaixo de "Aprender" (ordem 3).
 
-## Solucao
+## Alteracoes
 
-Remover `meu_progresso` da lista `hiddenByEnvironment` do ambiente `academy`. Os submenus que NAO pertencem ao Academy (`meu_progresso_visao_geral`, `meu_progresso_roadmap`, `meu_progresso_conteudo`, `meu_progresso_entregas`) continuam ocultos, e o filtro de `planos_permitidos` no banco ja garante que so aparecem para os planos corretos.
+### 1. Inserir registro no banco de dados (`menu_config`)
 
-### Alteracao em `src/hooks/useMenuConfig.tsx`
+Criar o menu pai "Meu Sistema" com:
+- `menu_key`: `meu_sistema`
+- `label`: Meu Sistema
+- `tipo`: sidebar
+- `icon`: Monitor (ou outro icone Lucide adequado)
+- `ordem`: 3 (entre Aprender=2 e Projeto Skills=3, ajustar Projeto Skills para 4)
+- `parent_key`: null (menu de nivel raiz)
+- `planos_permitidos`: `["business_iaplicada"]`
+- `visivel`: true
+- `url`: `/meu-sistema`
 
-Linha 93-99 - mudar de:
+Tambem ajustar a `ordem` dos menus seguintes (Projeto Skills, Meu Progresso, etc.) para abrir espaco.
 
-```typescript
-academy: [
-  'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
-  'meu_progresso_conteudo', 'meu_progresso_entregas',
-  ...
-],
-```
+### 2. Ocultar "Meu Sistema" nos outros ambientes (`useMenuConfig.tsx`)
 
-Para:
+Adicionar `meu_sistema` nas listas `hiddenByEnvironment` de todos os ambientes **exceto** `business_iaplicada`:
+- `gratuito`: adicionar `meu_sistema`
+- `skills`: adicionar `meu_sistema`
+- `business`: adicionar `meu_sistema`
+- `academy`: adicionar `meu_sistema`
 
-```typescript
-academy: [
-  'meu_progresso_visao_geral', 'meu_progresso_roadmap',
-  'meu_progresso_conteudo', 'meu_progresso_entregas',
-  ...
-],
-```
+Como o menu tera `planos_permitidos: ["business_iaplicada"]`, a filtragem por plano ja ajuda, mas a lista de exclusao por ambiente garante consistencia total.
 
-### Resultado esperado
+### 3. Criar pagina placeholder `/meu-sistema`
 
-No ambiente Academy, o menu lateral mostrara:
+Criar um componente basico em `src/pages/MeuSistema.tsx` com layout padrao (sidebar + header) para que a rota nao de 404.
 
-```
-Meu Progresso
-  ├── Minha Evolucao
-  ├── Meu Diagnostico
-  └── Minhas Duvidas
-```
+### 4. Registrar rota no `App.tsx`
 
-Os submenus Business (`Visao Geral`, `Roadmap`, `Conteudo`, `Entregas`) continuam ocultos tanto pela lista `hiddenByEnvironment` quanto pelo `planos_permitidos` no banco.
+Adicionar a rota `/meu-sistema` apontando para o novo componente, protegida por autenticacao.
 
-## Arquivo alterado
+## Arquivos alterados
 
-- `src/hooks/useMenuConfig.tsx` - remover `meu_progresso` da lista de ocultos do ambiente academy
+- **Banco de dados**: INSERT na tabela `menu_config` + UPDATE de ordem nos menus existentes
+- `src/hooks/useMenuConfig.tsx`: adicionar `meu_sistema` nas listas de exclusao dos ambientes que nao sao business_iaplicada
+- `src/pages/MeuSistema.tsx`: novo componente placeholder
+- `src/App.tsx`: nova rota `/meu-sistema`
 
