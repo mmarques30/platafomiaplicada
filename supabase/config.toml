@@ -56,3 +56,12 @@ verify_jwt = true
 
 [functions.processar-diagnostico-skills]
 verify_jwt = false
+
+[functions.processar-contrato-skills]
+verify_jwt = false
+
+[functions.gerar-projetos-skills]
+verify_jwt = false
+
+[functions.gerar-report-skills]
+verify_jwt = false
