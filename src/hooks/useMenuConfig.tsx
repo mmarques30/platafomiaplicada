@@ -124,6 +124,11 @@ export function useMenuConfig() {
       if (currentEnvironment && m.planos_permitidos.includes(currentEnvironment)) return true;
       // Fallback: verificar plano do usuário
       return m.planos_permitidos.includes(userPlan);
+    }).map(m => {
+      if (m.menu_key === 'meu_progresso' && currentEnvironment === 'business') {
+        return { ...m, label: 'Minha Trajetória' };
+      }
+      return m;
     }) || [];
   };
 
