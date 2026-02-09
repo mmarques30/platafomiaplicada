@@ -1,51 +1,51 @@
 
-# Correção definitiva: Projeto Skills 404 + Meu Progresso reaparecendo
 
-## Diagnóstico da causa raiz
+# Corrigir "Meu Progresso" no ambiente Academy
 
-A Livia tem `plano_mentoria = "business"` com `skills_liberado = true` e e lider em uma equipe Skills. O problema esta na logica de filtragem de menus no `useMenuConfig.tsx`:
+## Problema
 
-```
-// Filtro atual:
-return m.planos_permitidos.includes(userPlan);
-// userPlan = "business", planos_permitidos = ["skills"] → FALSE → menu oculto!
-```
-
-Os menus do Projeto Skills tem `planos_permitidos: ["skills"]` no banco de dados, mas o `effectivePlan` da Livia e "business" (seu plano real). Mesmo selecionando o ambiente "skills", o filtro usa o **plano do usuario** e nao o **ambiente selecionado**, escondendo todos os menus do Projeto Skills.
-
-Sem os menus do Projeto Skills, ela tenta acessar as URLs diretamente (ou via cache do navegador), e os componentes com `SkillsAdminGuard` a redirecionam para `/skills/projeto`, criando um loop que parece 404.
-
-O "Meu Progresso" reaparece porque e filtrado por ambiente (hidden no ambiente skills/business) - mas como os menus skills nao aparecem, o usuario pode acabar sem ambiente selecionado ou com ambiente incorreto, expondo o Meu Progresso (que tem `planos_permitidos: null`).
+No banco de dados, os menus `evolucao`, `meu_diagnostico` e `minhas_duvidas` tem `parent_key: meu_progresso`. Porem, no codigo (`useMenuConfig.tsx`), o ambiente `academy` esconde `meu_progresso` (o pai do grupo). Como o pai esta oculto, a sidebar nunca renderiza os filhos, mesmo eles nao estando na lista de ocultos.
 
 ## Solucao
 
-### 1. Corrigir filtro de planos no `useMenuConfig.tsx`
+Remover `meu_progresso` da lista `hiddenByEnvironment` do ambiente `academy`. Os submenus que NAO pertencem ao Academy (`meu_progresso_visao_geral`, `meu_progresso_roadmap`, `meu_progresso_conteudo`, `meu_progresso_entregas`) continuam ocultos, e o filtro de `planos_permitidos` no banco ja garante que so aparecem para os planos corretos.
 
-Modificar a funcao `getSidebarMenus` para considerar o ambiente selecionado no filtro de `planos_permitidos`. Se o usuario esta no ambiente "skills", menus com `planos_permitidos: ["skills"]` devem ser exibidos independente do plano base:
+### Alteracao em `src/hooks/useMenuConfig.tsx`
+
+Linha 93-99 - mudar de:
 
 ```typescript
-// ANTES (bugado):
-return m.planos_permitidos.includes(userPlan);
-
-// DEPOIS (corrigido):
-// Se o ambiente selecionado corresponde a um dos planos permitidos, mostrar o menu
-if (currentEnvironment && m.planos_permitidos.includes(currentEnvironment)) return true;
-// Fallback: verificar plano do usuario
-return m.planos_permitidos.includes(userPlan);
+academy: [
+  'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+  'meu_progresso_conteudo', 'meu_progresso_entregas',
+  ...
+],
 ```
 
-Isso resolve ambos os bugs:
-- Projeto Skills aparece quando ambiente = "skills", mesmo para usuarios business com skills_liberado
-- Meu Progresso continua oculto porque ja e filtrado pelo `hiddenByEnvironment` antes de chegar no filtro de plano
+Para:
 
-### 2. Nenhuma alteracao no banco de dados
+```typescript
+academy: [
+  'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+  'meu_progresso_conteudo', 'meu_progresso_entregas',
+  ...
+],
+```
 
-O `planos_permitidos: ["skills"]` no banco permanece correto - o fix e apenas na logica de filtragem do frontend.
+### Resultado esperado
 
-### 3. Nenhuma alteracao em rotas ou guards
+No ambiente Academy, o menu lateral mostrara:
 
-As rotas em `App.tsx` e o `SkillsAdminGuard` estao corretos. O problema e exclusivamente de visibilidade no menu.
+```
+Meu Progresso
+  ├── Minha Evolucao
+  ├── Meu Diagnostico
+  └── Minhas Duvidas
+```
 
-## Arquivos alterados
+Os submenus Business (`Visao Geral`, `Roadmap`, `Conteudo`, `Entregas`) continuam ocultos tanto pela lista `hiddenByEnvironment` quanto pelo `planos_permitidos` no banco.
 
-- `src/hooks/useMenuConfig.tsx` — ajustar filtro em `getSidebarMenus` para considerar o ambiente selecionado ao avaliar `planos_permitidos`
+## Arquivo alterado
+
+- `src/hooks/useMenuConfig.tsx` - remover `meu_progresso` da lista de ocultos do ambiente academy
+
