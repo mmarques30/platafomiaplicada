@@ -247,47 +247,79 @@ export function AppSidebar() {
                           // Check for 3rd-level children (e.g. Painel Líder under Visão Geral)
                           const thirdLevelMenus = getSubMenus(subMenu.menu_key);
                           
-                          return (
-                            <div key={subMenu.menu_key}>
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to={subMenu.url || "/"} 
-                                    end 
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      subIsActive 
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
-                                    )}
-                                  >
-                                    {!collapsed && <span>{subMenu.label}</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                              {/* Render 3rd-level submenus */}
-                              {thirdLevelMenus.length > 0 && thirdLevelMenus.map((child) => {
-                                const childIsActive = location.pathname === child.url;
-                                return (
-                                  <SidebarMenuItem key={child.menu_key}>
+                          if (thirdLevelMenus.length > 0) {
+                            const hasActiveChild = thirdLevelMenus.some(child => child.url && location.pathname.startsWith(child.url));
+                            return (
+                              <Collapsible key={subMenu.menu_key} defaultOpen={hasActiveChild || subIsActive}>
+                                <div className="flex items-center">
+                                  <SidebarMenuItem className="flex-1">
                                     <SidebarMenuButton asChild className="group">
                                       <NavLink 
-                                        to={child.url || "/"} 
+                                        to={subMenu.url || "/"} 
                                         end 
                                         className={cn(
-                                          "rounded-lg transition-all duration-200 font-medium pl-6 py-2 text-sm",
-                                          childIsActive 
+                                          "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                          subIsActive 
                                             ? "text-primary font-semibold" 
                                             : "text-sidebar-foreground/70 hover:text-primary"
                                         )}
                                       >
-                                        {!collapsed && <span>{child.label}</span>}
+                                        {!collapsed && <span>{subMenu.label}</span>}
                                       </NavLink>
                                     </SidebarMenuButton>
                                   </SidebarMenuItem>
-                                );
-                              })}
-                            </div>
+                                  {!collapsed && (
+                                    <CollapsibleTrigger asChild>
+                                      <button className="p-1 rounded hover:bg-muted/50 text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors">
+                                        <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 [[data-state=open]>button>&]:rotate-180" />
+                                      </button>
+                                    </CollapsibleTrigger>
+                                  )}
+                                </div>
+                                <CollapsibleContent>
+                                  {thirdLevelMenus.map((child) => {
+                                    const childIsActive = location.pathname === child.url;
+                                    return (
+                                      <SidebarMenuItem key={child.menu_key}>
+                                        <SidebarMenuButton asChild className="group">
+                                          <NavLink 
+                                            to={child.url || "/"} 
+                                            end 
+                                            className={cn(
+                                              "rounded-lg transition-all duration-200 font-medium pl-6 py-2 text-sm",
+                                              childIsActive 
+                                                ? "text-primary font-semibold" 
+                                                : "text-sidebar-foreground/70 hover:text-primary"
+                                            )}
+                                          >
+                                            {!collapsed && <span>{child.label}</span>}
+                                          </NavLink>
+                                        </SidebarMenuButton>
+                                      </SidebarMenuItem>
+                                    );
+                                  })}
+                                </CollapsibleContent>
+                              </Collapsible>
+                            );
+                          }
+
+                          return (
+                            <SidebarMenuItem key={subMenu.menu_key}>
+                              <SidebarMenuButton asChild className="group">
+                                <NavLink 
+                                  to={subMenu.url || "/"} 
+                                  end 
+                                  className={cn(
+                                    "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                    subIsActive 
+                                      ? "text-primary font-semibold" 
+                                      : "text-sidebar-foreground/70 hover:text-primary"
+                                  )}
+                                >
+                                  {!collapsed && <span>{subMenu.label}</span>}
+                                </NavLink>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
                           );
                         })}
                       </SidebarMenu>
