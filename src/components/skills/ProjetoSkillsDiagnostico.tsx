@@ -17,14 +17,16 @@ export default function ProjetoSkillsDiagnostico() {
     hasInsight,
   } = useSkillsDiagnostico();
 
-  // Determinar estado inicial: mostra results (com mocks ou dados reais)
-  const [state, setState] = useState<DiagnosticoState>("results");
+  // Estado inicial: "form" até saber se há dados reais
+  const [state, setState] = useState<DiagnosticoState>("form");
 
   // Atualizar estado quando diagnostico carregar do banco
   useEffect(() => {
     if (!isLoading) {
       if (diagnostico?.completado && hasInsight) {
         setState("results");
+      } else {
+        setState("form");
       }
     }
   }, [isLoading, diagnostico, hasInsight]);

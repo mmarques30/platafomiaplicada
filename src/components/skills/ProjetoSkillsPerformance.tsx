@@ -2,13 +2,6 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Area,
   AreaChart,
   Bar,
@@ -25,12 +18,8 @@ import {
 } from "@/components/ui/chart";
 import { TrendingUp, Target, Award, Clock, Loader2 } from "lucide-react";
 import { useSkillsLider } from "@/hooks/useSkillsLider";
-import { getMockPerformanceData } from "./performance/mockPerformanceData";
 import KPICard from "./performance/KPICard";
-import StatusBadge from "./performance/StatusBadge";
 import FilterSelect from "./performance/FilterSelect";
-
-// ── Chart configs ────────────────────────────────────────────────────────
 
 const roiChartConfig: ChartConfig = {
   projetado: { label: "ROI Projetado", color: "hsl(72, 30%, 55%)" },
@@ -41,27 +30,23 @@ const maturityChartConfig: ChartConfig = {
   maturidade: { label: "Maturidade IA", color: "hsl(72, 50%, 35%)" },
 };
 
-// ── Main component ───────────────────────────────────────────────────────
-
 export default function ProjetoSkillsPerformance() {
   const hook = useSkillsLider();
 
-  // Use mock data as fallback when DB is empty
-  const mock = useMemo(() => getMockPerformanceData(), []);
-  const hasRealData = hook.entregas.length > 0 || hook.ranking.length > 0;
-
-  const entregas = hasRealData ? hook.entregas : mock.entregas;
-  const ranking = hasRealData ? hook.ranking : mock.ranking;
-  const semanaAtual = hasRealData ? hook.semanaAtual : mock.semanaAtual;
-  const horasEconomizadasTotal = hasRealData ? hook.horasEconomizadasTotal : mock.horasEconomizadasTotal;
-  const entregasConcluidas = hasRealData ? hook.entregasConcluidas : mock.entregasConcluidas;
-  const totalEntregas = hasRealData ? hook.totalEntregas : mock.totalEntregas;
-  const performanceMedia = hasRealData ? hook.performanceMedia : mock.performanceMedia;
-  const roiAcumulado = hasRealData ? hook.roiAcumulado : mock.roiAcumulado;
-  const roiChartData = hasRealData ? hook.roiChartData : mock.roiChartData;
-  const maturidadeChartData = hasRealData ? hook.maturidadeChartData : mock.maturidadeChartData;
-  const roadmap = hasRealData ? hook.roadmap : mock.roadmap;
-  const isLoading = hook.isLoading;
+  const {
+    entregas,
+    ranking,
+    semanaAtual,
+    horasEconomizadasTotal,
+    entregasConcluidas,
+    totalEntregas,
+    performanceMedia,
+    roiAcumulado,
+    roiChartData,
+    maturidadeChartData,
+    roadmap,
+    isLoading,
+  } = hook;
 
   const [selectedCollaborator, setSelectedCollaborator] = useState("todos");
   const [selectedStatus, setSelectedStatus] = useState("todos");
@@ -82,7 +67,6 @@ export default function ProjetoSkillsPerformance() {
   const filteredHours = filteredDeliveries.reduce((a, d) => a + d.economiaHorasSemana, 0);
   const filteredCompleted = filteredDeliveries.filter((d) => d.status === "concluido" || d.status === "aprovada").length;
 
-  // Build phases from roadmap or fallback
   const phases = useMemo(() => {
     if (roadmap.length > 0) {
       return roadmap.map((r) => ({
@@ -110,7 +94,7 @@ export default function ProjetoSkillsPerformance() {
 
   return (
     <div className="space-y-6">
-      {/* ── Filtros ── */}
+      {/* Filtros */}
       <Card className="border-border bg-card">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -128,7 +112,7 @@ export default function ProjetoSkillsPerformance() {
         </CardContent>
       </Card>
 
-      {/* ── KPIs ── */}
+      {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard title="Horas Economizadas" value={`${isFiltered ? filteredHours : horasEconomizadasTotal}h`} subtitle="Total acumulado" icon={<Clock className="h-5 w-5" />} />
         <KPICard title="ROI Acumulado" value={`${Math.round(roiAcumulado)}%`} subtitle="Retorno sobre investimento" icon={<TrendingUp className="h-5 w-5" />} />
@@ -136,7 +120,7 @@ export default function ProjetoSkillsPerformance() {
         <KPICard title="Performance Média" value={`${Math.round(performanceMedia)}%`} subtitle="Índice da equipe" icon={<Award className="h-5 w-5" />} />
       </div>
 
-      {/* ── Cronograma 12 semanas ── */}
+      {/* Cronograma 12 semanas */}
       <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle>Cronograma do Programa — 12 Semanas</CardTitle>
@@ -168,7 +152,7 @@ export default function ProjetoSkillsPerformance() {
         </CardContent>
       </Card>
 
-      {/* ── Gráficos ── */}
+      {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="border-border bg-card">
           <CardHeader>
@@ -208,14 +192,18 @@ export default function ProjetoSkillsPerformance() {
         </Card>
       </div>
 
-      {/* ── Ranking ── */}
-      {ranking.length > 0 && (
-        <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle>Ranking de Entregas por Colaborador</CardTitle>
-            <CardDescription>Performance e indicadores individuais</CardDescription>
-          </CardHeader>
-          <CardContent>
+      {/* Ranking */}
+      <Card className="border-border bg-card">
+        <CardHeader>
+          <CardTitle>Ranking de Entregas por Colaborador</CardTitle>
+          <CardDescription>Performance e indicadores individuais</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {ranking.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              Nenhum dado disponível ainda. As entregas aparecerão aqui conforme forem registradas.
+            </p>
+          ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -253,9 +241,9 @@ export default function ProjetoSkillsPerformance() {
                 </tbody>
               </table>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
