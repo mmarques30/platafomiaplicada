@@ -1,60 +1,90 @@
 
-
-# Substituir Acesso Rapido por Grafico de Area + Mini Calendario
+# Reestruturar secao "Impacto vs ROI" com Donut Charts por Membro + Bar Chart + Pie Chart
 
 ## O que muda
 
-Remover os dois botoes de "Performance" e "Diagnostico" da Visao Geral (componente `AcessoRapidoCards`), pois ja existem como submenus no dropdown "Projeto Skills". No lugar, adicionar uma secao visual com:
+A secao de graficos em `ProjetoSkillsPerformance.tsx` (linhas 156-193) sera reescrita para seguir o layout do anexo de referencia:
 
-1. **Grafico de Area** (lado esquerdo, ~70% da largura): duas curvas sobrepostas com cores distintas — "ROI Projetado" (cinza/muted) e "ROI Executado" (verde marca). Dados vindos do `roiChartData` do hook `useSkillsLider`, que ja retorna 12 semanas com valores projetado/executado.
-
-2. **Mini Calendario** (lado direito, ~30%): calendario compacto mostrando o mes atual, com destaque visual nos dias que tem encontros/secoes agendados (se houver dados no roadmap). Quando o usuario clica em um dia com evento, pode ver detalhes. O calendario e o grafico "conversam" — ao passar o mouse em uma semana no grafico, o calendario pode destacar o periodo correspondente.
-
-## Alteracoes
-
-### Arquivo 1: `src/pages/skills/ProjetoSkills.tsx`
-- Remover import e uso do `AcessoRapidoCards`
-- Adicionar novo componente `GraficoCalendarioSection`
-
-### Arquivo 2: `src/components/skills/visao-geral/AcessoRapidoCards.tsx`
-- **Deletar** este arquivo (nao sera mais usado)
-
-### Arquivo 3 (novo): `src/components/skills/visao-geral/GraficoCalendarioSection.tsx`
-Componente com layout side-by-side:
+### Layout novo (similar ao "Traffic effectiveness")
 
 ```
-+--------------------------------------------------+
-| [Grafico de Area - 2 curvas]  | [Mini Calendario] |
-| ROI Projetado (cinza)         |    Fev 2026       |
-| ROI Executado (verde)         |  D S T Q Q S S    |
-|                               |  ... dias ...     |
-+--------------------------------------------------+
++---------------------------------------------------------------+
+| Impacto vs ROI                                        Filtros  |
+| (donut) Membro 1   (donut) Membro 2   (donut) Membro 3       |
+|   64%                 45%                26%                   |
+| Proj1 | Proj2 | Proj3  (3 projetos por membro, legenda)       |
++---------------------------------------------------------------+
+| Distribuicao por Status       |  Evolucao por Semana          |
+| (Pie chart - pizza)           |  (Bar chart - barras)         |
+| Concluido / Em andamento /   |  Sem1 Sem2 ... Sem12          |
+| Atrasado / Pendente           |  barras empilhadas            |
++---------------------------------------------------------------+
 ```
 
-**Grafico**: Usa `AreaChart` do recharts com `ChartContainer` do shadcn. Duas `Area` com `fillOpacity` para efeito visual similar ao anexo (areas preenchidas com gradiente). Legenda no topo esquerdo com bolinhas coloridas.
+### Secao superior: Donut Charts por Membro
 
-**Calendario**: Usa o componente `Calendar` do shadcn (react-day-picker) em modo compacto. Dias com entregas/encontros marcados com um ponto ou fundo colorido (laranja como no anexo de referencia). O dia atual destacado.
+- Para cada membro da equipe, um **donut chart** (RadialBarChart ou Pie com innerRadius) mostrando o progresso geral (% de entregas concluidas)
+- Abaixo de cada donut: ate 3 projetos/entregas vinculados aquele membro com indicador de progresso
+- Se nao ha membros/entregas: empty state "Nenhum dado disponivel"
+- Dados: `ranking` do hook (ja tem entregasConcluidas/totalEntregas por membro) + `entregas` filtradas por responsavelId
+- Responsivo: 3 colunas em desktop, 1 coluna em mobile (grid-cols-1 md:grid-cols-3)
 
-**Responsividade**: Em mobile, empilha verticalmente (grafico em cima, calendario embaixo).
+### Secao inferior esquerda: Pie Chart (distribuicao de status)
 
-**Dados**: Reutiliza `useSkillsLider()` para `roiChartData` e `entregas` (para marcar dias de prazo no calendario).
+- Substitui o AreaChart atual de "Impacto vs ROI"
+- Pizza/donut mostrando distribuicao das entregas por status: Concluido, Em andamento, Atrasado, Pendente
+- Dados calculados a partir de `entregas` agrupadas por status
+- Cores: verde (#9EB038) para concluido, amarelo para em andamento, vermelho para atrasado, cinza para pendente
 
-## Layout da pagina final
+### Secao inferior direita: Bar Chart (evolucao semanal)
 
-```
-Titulo: Projeto Skills
------
-Card: Diagnostico da Equipe (barra de progresso + membros + botao)
------
-Cards: KPIs (Horas Economizadas | ROI | Entregas | Semana)
------
-Card: Grafico de Area + Mini Calendario (lado a lado)
-```
+- Substitui o BarChart de "Maturidade IA"
+- Barras por semana (Sem 1 a Sem 12) com horas economizadas ou entregas concluidas
+- Dados de `maturidadeChartData` ou `metricas` semanais
+- Mantém as barras verticais com cores da marca
+
+### Filtros
+
+Os filtros existentes (Colaborador, Status) continuam funcionando e afetam os donuts e graficos abaixo.
+
+## Arquivos a modificar
+
+### `src/components/skills/ProjetoSkillsPerformance.tsx`
+- Reescrever secao de graficos (linhas 155-193) com:
+  1. Card "Impacto vs ROI" com donut charts por membro (ate 3 membros visiveis, scroll se mais)
+  2. Grid 2 colunas abaixo: Pie Chart (status) + Bar Chart (evolucao semanal)
+- Usar `PieChart`, `Pie`, `Cell` do recharts para donuts e pizza
+- Usar `BarChart`, `Bar` para barras semanais
+- Manter `ResponsiveContainer` em todos os graficos
+- Dados dos donuts: calcular % de conclusao por membro a partir de `ranking`
+- Cada donut mostra ate 3 entregas/projetos do membro como legenda abaixo
+
+### Nenhum arquivo novo necessario
+Tudo fica dentro do componente existente. Os dados ja estao disponiveis no hook `useSkillsLider` (ranking, entregas, metricas).
 
 ## Detalhes tecnicos
 
-- Recharts: `AreaChart`, `Area`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip`
-- Cores das areas: verde marca `hsl(78, 54%, 34%)` para executado, cinza `hsl(var(--muted-foreground))` para projetado
-- Gradientes via `<defs><linearGradient>` para o efeito de preenchimento suave
-- Calendario: `Calendar` de `@/components/ui/calendar` com `modifiers` para dias com eventos
-- Dias com prazo de entrega marcados com estilo laranja/destaque
+**Donut por membro** (recharts):
+```
+<PieChart>
+  <Pie data={[{value: completed}, {value: remaining}]}
+    innerRadius={30} outerRadius={45} startAngle={90} endAngle={-270}>
+    <Cell fill="#9EB038" />
+    <Cell fill="hsl(var(--muted))" />
+  </Pie>
+  <text x="50%" y="50%" textAnchor="middle">64%</text>
+</PieChart>
+```
+
+**Distribuicao de status (Pie)**:
+- Agrupamento: `entregas.reduce()` por status
+- 4 segmentos com cores fixas
+
+**Barras semanais**:
+- `maturidadeChartData` ou novo calculo de horas por semana
+- Cores da marca com gradiente
+
+**Responsividade**:
+- Donuts: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
+- Graficos inferiores: `grid-cols-1 lg:grid-cols-2`
+- Filtros: mantidos como estao (ja responsivos)
