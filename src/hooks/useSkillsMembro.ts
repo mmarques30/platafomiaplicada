@@ -25,7 +25,7 @@ export function useSkillsMembro() {
     ? impersonatedUserId 
     : user?.id;
 
-  const { data, isLoading } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["skills-membro", effectiveUserId],
     queryFn: async () => {
       if (!effectiveUserId) return null;
@@ -47,6 +47,6 @@ export function useSkillsMembro() {
     isLider: data?.papel === "lider",
     isMembro: data?.papel === "membro",
     cargo: data?.cargo ?? null,
-    isLoading: isLoading || authLoading || roleLoading,
+    isLoading: isPending || authLoading || roleLoading,
   };
 }
