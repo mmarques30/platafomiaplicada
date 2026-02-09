@@ -43,6 +43,7 @@ import SkillsLiderDashboard from "./pages/skills/SkillsLiderDashboard";
 import ProjetoSkills from "./pages/skills/ProjetoSkills";
 import ProjetoSkillsPerformancePage from "./pages/skills/ProjetoSkillsPerformancePage";
 import ProjetoSkillsDiagnosticoPage from "./pages/skills/ProjetoSkillsDiagnosticoPage";
+import ProjetoSkillsProjetosPage from "./pages/skills/ProjetoSkillsProjetosPage";
 // Squad removido - Painel do Líder agora em /skills/lider
 
 import MentoriaSessoes from "./pages/MentoriaSessoes";
@@ -172,6 +173,7 @@ function AppContent() {
             <Route path="/skills/projeto" element={<ProjetoSkills />} />
             <Route path="/skills/projeto/performance" element={<ProjetoSkillsPerformancePage />} />
             <Route path="/skills/projeto/diagnostico" element={<ProjetoSkillsDiagnosticoPage />} />
+            <Route path="/skills/projeto/projetos" element={<ProjetoSkillsProjetosPage />} />
 
             {/* Squad removido → redireciona para Skills */}
             <Route path="/squad/lider" element={<Navigate to="/skills/lider" replace />} />
