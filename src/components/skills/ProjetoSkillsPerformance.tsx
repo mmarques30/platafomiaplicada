@@ -99,37 +99,7 @@ export default function ProjetoSkillsPerformance() {
         <KPICard title="Performance Média" value={`${Math.round(performanceMedia)}%`} subtitle="Índice da equipe" icon={<Award className="h-5 w-5" />} />
       </div>
 
-      {/* Cronograma 12 semanas */}
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <CardTitle>Cronograma do Programa — 12 Semanas</CardTitle>
-          <CardDescription>Progresso através das fases de maturidade IA</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {phases.map((phase) => (
-              <div key={phase.name} className="space-y-2">
-                <p className="text-sm font-semibold">{phase.name}</p>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {phase.weeks.map((week) => {
-                    const isPast = week < semanaAtual;
-                    const isCurrent = week === semanaAtual;
-                    return (
-                      <div key={week} className={`rounded-md text-center py-2 text-xs font-medium transition-all ${
-                        isCurrent ? "bg-[hsl(72,50%,35%)] text-white ring-2 ring-[hsl(72,50%,35%)]/40"
-                          : isPast ? phase.color + " text-foreground"
-                          : "bg-muted text-muted-foreground"
-                      }`}>
-                        Sem {week}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Cronograma removido - agora está na Visão Geral */}
 
       {/* Donut Charts por Membro */}
       <MemberDonutCharts ranking={ranking} entregas={filteredDeliveries as any} />
