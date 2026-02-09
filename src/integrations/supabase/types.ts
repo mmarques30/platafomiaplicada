@@ -1355,6 +1355,80 @@ export type Database = {
           },
         ]
       }
+      contratos_skills: {
+        Row: {
+          cnpj: string | null
+          created_at: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          duracao_programa_semanas: number | null
+          empresa_nome: string | null
+          entregas_esperadas: Json | null
+          equipe_id: string
+          frequencia_encontros: string | null
+          id: string
+          observacoes: string | null
+          projetos_por_trilha: Json | null
+          reports_frequencia: string | null
+          representante_email: string | null
+          representante_nome: string | null
+          roi_projetado: number | null
+          status: string | null
+          updated_at: string | null
+          valor_contrato: number | null
+        }
+        Insert: {
+          cnpj?: string | null
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          duracao_programa_semanas?: number | null
+          empresa_nome?: string | null
+          entregas_esperadas?: Json | null
+          equipe_id: string
+          frequencia_encontros?: string | null
+          id?: string
+          observacoes?: string | null
+          projetos_por_trilha?: Json | null
+          reports_frequencia?: string | null
+          representante_email?: string | null
+          representante_nome?: string | null
+          roi_projetado?: number | null
+          status?: string | null
+          updated_at?: string | null
+          valor_contrato?: number | null
+        }
+        Update: {
+          cnpj?: string | null
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          duracao_programa_semanas?: number | null
+          empresa_nome?: string | null
+          entregas_esperadas?: Json | null
+          equipe_id?: string
+          frequencia_encontros?: string | null
+          id?: string
+          observacoes?: string | null
+          projetos_por_trilha?: Json | null
+          reports_frequencia?: string | null
+          representante_email?: string | null
+          representante_nome?: string | null
+          roi_projetado?: number | null
+          status?: string | null
+          updated_at?: string | null
+          valor_contrato?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cupons_visitantes: {
         Row: {
           ativo: boolean | null
@@ -1802,6 +1876,63 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      documentos_skills: {
+        Row: {
+          arquivo_url: string | null
+          conteudo_texto: string | null
+          contrato_id: string | null
+          created_at: string | null
+          equipe_id: string
+          id: string
+          para_processamento_ia: boolean | null
+          processado: boolean | null
+          resultado_ia: Json | null
+          tipo: string | null
+          titulo: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          conteudo_texto?: string | null
+          contrato_id?: string | null
+          created_at?: string | null
+          equipe_id: string
+          id?: string
+          para_processamento_ia?: boolean | null
+          processado?: boolean | null
+          resultado_ia?: Json | null
+          tipo?: string | null
+          titulo: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          conteudo_texto?: string | null
+          contrato_id?: string | null
+          created_at?: string | null
+          equipe_id?: string
+          id?: string
+          para_processamento_ia?: boolean | null
+          processado?: boolean | null
+          resultado_ia?: Json | null
+          tipo?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_skills_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       duvidas_mentoria: {
         Row: {
@@ -3058,6 +3189,47 @@ export type Database = {
             columns: ["contrato_id"]
             isOneToOne: false
             referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      links_skills: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          equipe_id: string
+          icone: string | null
+          id: string
+          ordem: number | null
+          titulo: string
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          equipe_id: string
+          icone?: string | null
+          id?: string
+          ordem?: number | null
+          titulo: string
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          equipe_id?: string
+          icone?: string | null
+          id?: string
+          ordem?: number | null
+          titulo?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "links_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
             referencedColumns: ["id"]
           },
         ]
@@ -4324,6 +4496,72 @@ export type Database = {
             columns: ["report_id"]
             isOneToOne: false
             referencedRelation: "reports_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports_skills: {
+        Row: {
+          arquivo_url: string | null
+          conteudo_html: string | null
+          contrato_id: string | null
+          created_at: string | null
+          data_envio: string | null
+          descricao: string | null
+          equipe_id: string
+          gerado_por_ia: boolean | null
+          id: string
+          metricas: Json | null
+          periodo_referencia: string | null
+          resumo_executivo: string | null
+          titulo: string
+          trimestre: number | null
+        }
+        Insert: {
+          arquivo_url?: string | null
+          conteudo_html?: string | null
+          contrato_id?: string | null
+          created_at?: string | null
+          data_envio?: string | null
+          descricao?: string | null
+          equipe_id: string
+          gerado_por_ia?: boolean | null
+          id?: string
+          metricas?: Json | null
+          periodo_referencia?: string | null
+          resumo_executivo?: string | null
+          titulo: string
+          trimestre?: number | null
+        }
+        Update: {
+          arquivo_url?: string | null
+          conteudo_html?: string | null
+          contrato_id?: string | null
+          created_at?: string | null
+          data_envio?: string | null
+          descricao?: string | null
+          equipe_id?: string
+          gerado_por_ia?: boolean | null
+          id?: string
+          metricas?: Json | null
+          periodo_referencia?: string | null
+          resumo_executivo?: string | null
+          titulo?: string
+          trimestre?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_skills_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
             referencedColumns: ["id"]
           },
         ]
