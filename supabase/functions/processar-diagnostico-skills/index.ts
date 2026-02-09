@@ -46,12 +46,11 @@ serve(async (req) => {
       });
     }
 
-    // Buscar diagnóstico
+    // Buscar diagnóstico SEM filtro de user_id (admin pode processar de qualquer membro)
     const { data: diagnostico, error: fetchError } = await supabase
       .from("diagnosticos_skills")
       .select("*")
       .eq("id", diagnostico_id)
-      .eq("user_id", user.id)
       .single();
 
     if (fetchError || !diagnostico) {
@@ -59,6 +58,24 @@ serve(async (req) => {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Verificar permissão: dono ou admin
+    const isOwner = diagnostico.user_id === user.id;
+    if (!isOwner) {
+      const { data: adminRole } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!adminRole) {
+        return new Response(JSON.stringify({ error: "Sem permissão para processar este diagnóstico" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     // Montar contexto para IA

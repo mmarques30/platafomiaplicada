@@ -7,8 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useDiagnosticosEquipeAdmin, MembroDiagnostico } from "@/hooks/admin/useDiagnosticosEquipeAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ChevronDown, ChevronUp, Sparkles, CheckCircle, Clock, Brain, Users } from "lucide-react";
+import { Loader2, ChevronDown, ChevronUp, Sparkles, CheckCircle, Clock, Brain, Users, FileText } from "lucide-react";
 import { toast } from "sonner";
+import DiagnosticoRespostasView from "./DiagnosticoRespostasView";
 
 interface Props { equipeId: string }
 
@@ -94,18 +95,33 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <CardContent className="pt-0 space-y-3">
-                    {!membro.completado ? (
+                    {!membro.completado && !membro.dadosBrutos ? (
                       <p className="text-sm text-muted-foreground">Diagnóstico ainda não preenchido pelo membro.</p>
-                    ) : !membro.hasInsight ? (
-                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                        <p className="text-sm">Diagnóstico preenchido, mas não processado por IA</p>
-                        <Button size="sm" onClick={() => handleProcessar(membro)} disabled={processingId === membro.userId}>
-                          {processingId === membro.userId ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                          Processar com IA
-                        </Button>
-                      </div>
                     ) : (
                       <div className="space-y-3">
+                        {/* Respostas brutas */}
+                        {membro.dadosBrutos && (
+                          <div className="p-3 bg-muted/30 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                              <p className="text-xs font-medium text-muted-foreground uppercase">Respostas do Diagnóstico</p>
+                            </div>
+                            <DiagnosticoRespostasView dados={membro.dadosBrutos} />
+                          </div>
+                        )}
+
+                        {/* Botão processar */}
+                        {membro.completado && !membro.hasInsight && (
+                          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                            <p className="text-sm">Diagnóstico preenchido, mas não processado por IA</p>
+                            <Button size="sm" onClick={() => handleProcessar(membro)} disabled={processingId === membro.userId}>
+                              {processingId === membro.userId ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                              Processar com IA
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Resultados IA */}
                         {membro.economia_horas_semana && (
                           <div className="grid grid-cols-2 gap-3">
                             <div className="p-3 bg-muted/50 rounded-lg">

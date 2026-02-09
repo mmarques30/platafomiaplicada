@@ -261,6 +261,85 @@ export function useSkillsDiagnostico() {
     }
   };
 
+  // Salvar rascunho (sem processar IA)
+  const saveRascunho = async (formData: Record<string, any>) => {
+    if (!effectiveUserId) return;
+
+    const processosDetalhados = [1, 2, 3]
+      .map((n) => ({
+        nome: formData[`processo${n}Nome`] || "",
+        passos: formData[`processo${n}Passos`] || "",
+        frequencia: formData[`processo${n}Freq`] || "",
+        tempo: formData[`processo${n}Tempo`] || "",
+        impacto: formData[`processo${n}Impacto`] || "",
+        tentouAutomatizar: formData[`processo${n}Automatizar`] || "",
+      }))
+      .filter((p) => p.nome);
+
+    const desafios = [1, 2, 3]
+      .map((n) => formData[`desafio${n}`] || "")
+      .filter(Boolean);
+
+    const payload: Record<string, any> = {
+      user_id: effectiveUserId,
+      equipe_id: membroEquipe?.equipe_id || null,
+      cargo: formData.cargo || null,
+      area_atuacao: formData.area || null,
+      tempo_na_empresa: formData.tempoFuncao || null,
+      ferramentas_atuais: (formData.ferramentas || []).map((f: string) => ({ nome: f, uso: "diário" })),
+      horas_repetitivas: formData.horasRepetitivas || null,
+      atividade_principal: formData.atividadePrincipal || null,
+      frequencia_atividade: formData.frequencia || null,
+      tempo_gasto: formData.tempoGasto || null,
+      processos_detalhados: processosDetalhados,
+      objetivos_ia: formData.objetivosIA || [],
+      resultado_sucesso: formData.resultadoSucesso || null,
+      autonomia: formData.autonomia || null,
+      nivel_tecnico: formData.nivelTecnico || null,
+      ferramentas_automacao: formData.ferramentasAutomacao || [],
+      uso_ia: formData.usoIA || null,
+      horas_semana: formData.horasSemana || null,
+      melhor_horario: formData.melhorHorario || [],
+      preferencia_conteudo: formData.preferenciaConteudo || null,
+      tamanho_area: formData.tamanhoArea || null,
+      sistemas_erp: formData.sistemasERP || [],
+      iniciativas_ia: formData.iniciativasIA || null,
+      maturidade_digital: formData.maturidadeDigital || null,
+      desafios: desafios,
+      processo_colaborativo: formData.processoColaborativo || null,
+      automatizar_empresa: formData.automatizarEmpresa || null,
+      apoio_lideranca: formData.apoioLideranca || null,
+      restricoes_ti: formData.restricoesTI || null,
+      objetivo_programa: formData.objetivoPrograma || [],
+      areas_automacao: formData.areasAutomacao || [],
+      resultado_equipe: formData.resultadoEquipe || null,
+      projeto_colaborativo: formData.projetoColaborativo || null,
+      barreiras: formData.barreiras || null,
+      completado: false,
+      updated_at: new Date().toISOString(),
+    };
+
+    try {
+      if (diagnostico?.id) {
+        await supabase
+          .from("diagnosticos_skills")
+          .update(payload)
+          .eq("id", diagnostico.id);
+      } else {
+        const { data } = await supabase
+          .from("diagnosticos_skills")
+          .insert(payload as any)
+          .select("id")
+          .single();
+        if (data) {
+          queryClient.invalidateQueries({ queryKey: ["diagnostico-skills"] });
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao salvar rascunho:", err);
+    }
+  };
+
   // Salvar e processar
   const saveAndProcess = async (formData: Record<string, any>) => {
     const id = await saveMutation.mutateAsync(formData);
@@ -275,6 +354,7 @@ export function useSkillsDiagnostico() {
     updateDiagnostico,
     saveDiagnostico: saveMutation.mutateAsync,
     saveAndProcess,
+    saveRascunho,
     hasInsight: !!localData.insight_ia,
   };
 }
