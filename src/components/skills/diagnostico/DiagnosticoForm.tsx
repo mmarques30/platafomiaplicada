@@ -55,20 +55,78 @@ const AREAS_AUTOMACAO = [
 
 interface DiagnosticoFormProps {
   onSubmit: (formData: Record<string, any>) => void;
+  onSaveRascunho?: (formData: Record<string, any>) => void;
   isSaving?: boolean;
+  initialData?: Record<string, any> | null;
 }
 
-export default function DiagnosticoForm({ onSubmit, isSaving }: DiagnosticoFormProps) {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<Record<string, any>>({
-    ferramentas: [],
-    objetivosIA: [],
-    ferramentasAutomacao: [],
-    melhorHorario: [],
-    sistemasERP: [],
-    objetivoPrograma: [],
-    areasAutomacao: [],
+function mapDbToForm(data: Record<string, any> | null | undefined): Record<string, any> {
+  if (!data) return {
+    ferramentas: [], objetivosIA: [], ferramentasAutomacao: [],
+    melhorHorario: [], sistemasERP: [], objetivoPrograma: [], areasAutomacao: [],
+  };
+
+  const ferramentas = Array.isArray(data.ferramentas_atuais)
+    ? data.ferramentas_atuais.map((f: any) => (typeof f === "string" ? f : f?.nome || "")).filter(Boolean)
+    : [];
+
+  const processos = Array.isArray(data.processos_detalhados) ? data.processos_detalhados : [];
+  const processosMap: Record<string, any> = {};
+  processos.forEach((p: any, i: number) => {
+    const n = i + 1;
+    processosMap[`processo${n}Nome`] = p.nome || "";
+    processosMap[`processo${n}Passos`] = p.passos || "";
+    processosMap[`processo${n}Freq`] = p.frequencia || "";
+    processosMap[`processo${n}Tempo`] = p.tempo || "";
+    processosMap[`processo${n}Impacto`] = p.impacto || "";
+    processosMap[`processo${n}Automatizar`] = p.tentouAutomatizar || "";
   });
+
+  const desafios = Array.isArray(data.desafios) ? data.desafios : [];
+  const desafiosMap: Record<string, any> = {};
+  desafios.forEach((d: string, i: number) => {
+    desafiosMap[`desafio${i + 1}`] = d;
+  });
+
+  return {
+    cargo: data.cargo || "",
+    area: data.area_atuacao || "",
+    tempoFuncao: data.tempo_na_empresa || "",
+    ferramentas,
+    horasRepetitivas: data.horas_repetitivas || "",
+    atividadePrincipal: data.atividade_principal || "",
+    frequencia: data.frequencia_atividade || "",
+    tempoGasto: data.tempo_gasto || "",
+    ...processosMap,
+    objetivosIA: Array.isArray(data.objetivos_ia) ? data.objetivos_ia : [],
+    resultadoSucesso: data.resultado_sucesso || "",
+    autonomia: data.autonomia || "",
+    nivelTecnico: data.nivel_tecnico || "",
+    ferramentasAutomacao: Array.isArray(data.ferramentas_automacao) ? data.ferramentas_automacao : [],
+    usoIA: data.uso_ia || "",
+    horasSemana: data.horas_semana || "",
+    melhorHorario: Array.isArray(data.melhor_horario) ? data.melhor_horario : [],
+    preferenciaConteudo: data.preferencia_conteudo || "",
+    tamanhoArea: data.tamanho_area || "",
+    sistemasERP: Array.isArray(data.sistemas_erp) ? data.sistemas_erp : [],
+    iniciativasIA: data.iniciativas_ia || "",
+    maturidadeDigital: data.maturidade_digital || "",
+    ...desafiosMap,
+    processoColaborativo: data.processo_colaborativo || "",
+    automatizarEmpresa: data.automatizar_empresa || "",
+    apoioLideranca: data.apoio_lideranca || "",
+    restricoesTI: data.restricoes_ti || "",
+    objetivoPrograma: Array.isArray(data.objetivo_programa) ? data.objetivo_programa : [],
+    areasAutomacao: Array.isArray(data.areas_automacao) ? data.areas_automacao : [],
+    resultadoEquipe: data.resultado_equipe || "",
+    projetoColaborativo: data.projeto_colaborativo || "",
+    barreiras: data.barreiras || "",
+  };
+}
+
+export default function DiagnosticoForm({ onSubmit, onSaveRascunho, isSaving, initialData }: DiagnosticoFormProps) {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState<Record<string, any>>(() => mapDbToForm(initialData));
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
 
@@ -437,7 +495,11 @@ export default function DiagnosticoForm({ onSubmit, isSaving }: DiagnosticoFormP
             Anterior
           </Button>
           {step < TOTAL_STEPS ? (
-            <Button onClick={() => setStep((s) => Math.min(TOTAL_STEPS, s + 1))}>
+            <Button onClick={() => {
+              const nextStep = Math.min(TOTAL_STEPS, step + 1);
+              setStep(nextStep);
+              onSaveRascunho?.(formData);
+            }}>
               Próximo
               <ChevronRight className="h-4 w-4" />
             </Button>

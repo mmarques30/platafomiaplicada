@@ -14,6 +14,7 @@ export default function ProjetoSkillsDiagnostico() {
     isProcessing,
     isSaving,
     saveAndProcess,
+    saveRascunho,
     hasInsight,
   } = useSkillsDiagnostico();
 
@@ -69,7 +70,9 @@ export default function ProjetoSkillsDiagnostico() {
   return (
     <DiagnosticoForm
       onSubmit={handleSubmit}
+      onSaveRascunho={saveRascunho}
       isSaving={isSaving || isProcessing}
+      initialData={diagnostico}
     />
   );
 }

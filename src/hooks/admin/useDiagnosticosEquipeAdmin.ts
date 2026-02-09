@@ -13,6 +13,8 @@ export interface MembroDiagnostico {
   processos_analisados: any;
   economia_horas_semana: number | null;
   economia_valor_mensal: number | null;
+  // Campos brutos do diagnóstico
+  dadosBrutos: Record<string, any> | null;
 }
 
 export function useDiagnosticosEquipeAdmin(equipeId?: string | null) {
@@ -60,6 +62,7 @@ export function useDiagnosticosEquipeAdmin(equipeId?: string | null) {
           processos_analisados: diag?.processos_analisados || null,
           economia_horas_semana: diag?.economia_horas_semana || null,
           economia_valor_mensal: diag?.economia_valor_mensal || null,
+          dadosBrutos: diag ? diag : null,
         } as MembroDiagnostico;
       });
     },
