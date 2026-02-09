@@ -137,7 +137,7 @@ export default function ProjetoSkillsPerformance() {
       {/* Pie + Bar Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <StatusPieChart entregas={filteredDeliveries} />
-        <WeeklyBarChart data={maturidadeChartData} />
+        <WeeklyBarChart ranking={ranking} entregas={filteredDeliveries} />
       </div>
 
       {/* Ranking */}
