@@ -114,6 +114,9 @@ export function useMenuConfig() {
       if (!userPlan) return false;
       
       // Verifica se o plano do usuário está na lista de permitidos
+      // Se o ambiente selecionado corresponde a um dos planos permitidos, mostrar o menu
+      if (currentEnvironment && m.planos_permitidos.includes(currentEnvironment)) return true;
+      // Fallback: verificar plano do usuário
       return m.planos_permitidos.includes(userPlan);
     }) || [];
   };
