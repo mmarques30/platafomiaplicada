@@ -49,6 +49,18 @@ export function useMenuConfig() {
   const getSidebarMenus = (userPlan?: string | null, currentEnvironment?: string | null) => {
   // Menus a ocultar quando em ambiente específico
     const hiddenByEnvironment: Record<string, string[]> = {
+      // Gratuito: oculta tudo de progresso, skills e projeto
+      gratuito: [
+        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+        'meu_progresso_conteudo', 'meu_progresso_entregas',
+        'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+        'projeto_skills', 'projeto_skills_visao_geral',
+        'projeto_skills_performance', 'projeto_skills_diagnostico',
+        'trilhas_skills', 'skills_minha_equipe', 'skills_backlog',
+        'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
+        'squad', 'squad_lider'
+      ],
+
       // Skills: oculta trilhas gerais, calendário e TODO o grupo "Meu Progresso" (não usado no Skills)
       skills: [
         'trilhas', 'calendario',
@@ -78,8 +90,10 @@ export function useMenuConfig() {
         'squad', 'squad_lider'
       ],
       
-      // Academy: ocultar Squad e Projeto Skills (exclusivos do ambiente Skills)
+      // Academy: usa evolução/diagnóstico/dúvidas soltos, NÃO o grupo "Meu Progresso"
       academy: [
+        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+        'meu_progresso_conteudo', 'meu_progresso_entregas',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico',
         'squad', 'squad_lider'
       ],
