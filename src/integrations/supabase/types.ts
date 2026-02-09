@@ -2126,12 +2126,15 @@ export type Database = {
           id: string
           instrucoes: string | null
           prazo: string | null
+          prioridade: string | null
+          processos_resolvidos: number | null
           progresso: number | null
           prompts_recomendados: Json | null
           responsavel_id: string | null
           roadmap_fase_id: string | null
           roi: number | null
           status: string | null
+          tipo: string | null
           titulo: string
           updated_at: string | null
         }
@@ -2149,12 +2152,15 @@ export type Database = {
           id?: string
           instrucoes?: string | null
           prazo?: string | null
+          prioridade?: string | null
+          processos_resolvidos?: number | null
           progresso?: number | null
           prompts_recomendados?: Json | null
           responsavel_id?: string | null
           roadmap_fase_id?: string | null
           roi?: number | null
           status?: string | null
+          tipo?: string | null
           titulo: string
           updated_at?: string | null
         }
@@ -2172,12 +2178,15 @@ export type Database = {
           id?: string
           instrucoes?: string | null
           prazo?: string | null
+          prioridade?: string | null
+          processos_resolvidos?: number | null
           progresso?: number | null
           prompts_recomendados?: Json | null
           responsavel_id?: string | null
           roadmap_fase_id?: string | null
           roi?: number | null
           status?: string | null
+          tipo?: string | null
           titulo?: string
           updated_at?: string | null
         }

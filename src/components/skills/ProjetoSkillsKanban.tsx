@@ -10,9 +10,11 @@ import {
   closestCorners,
 } from "@dnd-kit/core";
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
+import { useAuth } from "@/hooks/useAuth";
 import KanbanColumn from "./kanban/KanbanColumn";
 import KanbanCard from "./kanban/KanbanCard";
-import KanbanFilters from "./kanban/KanbanFilters";
+import KanbanFiltersAdvanced, { AdvancedFilters } from "./kanban/KanbanFiltersAdvanced";
+import PortfolioOverview from "./kanban/PortfolioOverview";
 import { Loader2 } from "lucide-react";
 
 export interface KanbanColumnDef {
@@ -20,19 +22,27 @@ export interface KanbanColumnDef {
   title: string;
   statuses: string[];
   color: string;
+  headerBg?: string;
 }
 
 const COLUMNS: KanbanColumnDef[] = [
-  { id: "pendente", title: "Pendente", statuses: ["pendente"], color: "hsl(var(--muted))" },
-  { id: "em_andamento", title: "Em Andamento", statuses: ["em_andamento"], color: "hsl(210 80% 55%)" },
-  { id: "aguardando_validacao", title: "Aguardando Validação", statuses: ["aguardando_validacao"], color: "hsl(45 90% 50%)" },
-  { id: "concluido", title: "Concluído", statuses: ["concluido", "aprovada"], color: "hsl(72 50% 35%)" },
+  { id: "pendente", title: "BACKLOG", statuses: ["pendente"], color: "hsl(var(--muted))" },
+  { id: "em_andamento", title: "EM ANDAMENTO", statuses: ["em_andamento"], color: "hsl(72 50% 35%)", headerBg: "hsl(72 40% 90%)" },
+  { id: "aguardando_validacao", title: "EM VALIDAÇÃO", statuses: ["aguardando_validacao"], color: "hsl(45 90% 50%)", headerBg: "hsl(45 80% 90%)" },
+  { id: "concluido", title: "RODANDO", statuses: ["concluido", "aprovada"], color: "hsl(var(--muted))" },
 ];
 
 export default function ProjetoSkillsKanban() {
   const { entregas, isLoading, atualizarStatus } = useSkillsEntregas();
+  const { user } = useAuth();
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [filtroResponsavel, setFiltroResponsavel] = useState<string | null>(null);
+  const [filters, setFilters] = useState<AdvancedFilters>({
+    status: null,
+    tipo: null,
+    responsavel: null,
+    prioridade: null,
+    meusProjetos: false,
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -55,9 +65,18 @@ export default function ProjetoSkillsKanban() {
 
   const filteredEntregas = useMemo(() => {
     if (!entregas) return [];
-    if (!filtroResponsavel) return entregas;
-    return entregas.filter((e: any) => e.responsavel_id === filtroResponsavel);
-  }, [entregas, filtroResponsavel]);
+    return entregas.filter((e: any) => {
+      if (filters.status) {
+        const col = COLUMNS.find((c) => c.id === filters.status);
+        if (col && !col.statuses.includes(e.status ?? "pendente")) return false;
+      }
+      if (filters.tipo && (e.tipo ?? "individual") !== filters.tipo) return false;
+      if (filters.responsavel && e.responsavel_id !== filters.responsavel) return false;
+      if (filters.prioridade && (e.prioridade ?? "P3") !== filters.prioridade) return false;
+      if (filters.meusProjetos && user && e.responsavel_id !== user.id) return false;
+      return true;
+    });
+  }, [entregas, filters, user]);
 
   const columnItems = useMemo(() => {
     const map: Record<string, any[]> = {};
@@ -91,7 +110,6 @@ export default function ProjetoSkillsKanban() {
     const entrega = filteredEntregas.find((e: any) => e.id === entregaId);
     if (!entrega) return;
 
-    // Don't update if already in that column
     if (targetColumn.statuses.includes(entrega.status || "pendente")) return;
 
     const newStatus = targetColumn.statuses[0];
@@ -107,33 +125,41 @@ export default function ProjetoSkillsKanban() {
   }
 
   return (
-    <div className="space-y-4">
-      <KanbanFilters
-        responsaveis={responsaveis}
-        filtroResponsavel={filtroResponsavel}
-        onFiltroChange={setFiltroResponsavel}
-      />
+    <div className="space-y-6">
+      {/* Seção 1: Visão Geral */}
+      <PortfolioOverview entregas={entregas ?? []} />
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto">
-          {COLUMNS.map((col) => (
-            <KanbanColumn key={col.id} column={col} items={columnItems[col.id] || []}>
-              {(columnItems[col.id] || []).map((entrega: any) => (
-                <KanbanCard key={entrega.id} entrega={entrega} />
-              ))}
-            </KanbanColumn>
-          ))}
-        </div>
+      {/* Seção 2: Backlog de Projetos */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Backlog de Projetos</h2>
 
-        <DragOverlay>
-          {activeEntrega ? <KanbanCard entrega={activeEntrega} isOverlay /> : null}
-        </DragOverlay>
-      </DndContext>
+        <KanbanFiltersAdvanced
+          filters={filters}
+          onChange={setFilters}
+          responsaveis={responsaveis}
+        />
+
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {COLUMNS.map((col) => (
+              <KanbanColumn key={col.id} column={col} items={columnItems[col.id] || []}>
+                {(columnItems[col.id] || []).map((entrega: any) => (
+                  <KanbanCard key={entrega.id} entrega={entrega} />
+                ))}
+              </KanbanColumn>
+            ))}
+          </div>
+
+          <DragOverlay>
+            {activeEntrega ? <KanbanCard entrega={activeEntrega} isOverlay /> : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
     </div>
   );
 }
