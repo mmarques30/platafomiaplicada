@@ -86,8 +86,10 @@ export function useMenuConfig() {
       // Business IAplicada: versão mais restrita (cliente apenas acompanha) + Squad + Projeto Skills
       business_iaplicada: [
         'trilhas', 'trilhas_skills', 'calendario',
-        'evolucao', 'meu_diagnostico', 'minhas_duvidas', 'meu_progresso_conteudo',
-        'meu_progresso', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
+        'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+        'meu_progresso_conteudo', 'meu_progresso_entregas',
+        'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
         'comunidade', 'comunidade_feed', 'comunidade_sala',
         'squad', 'squad_lider'
