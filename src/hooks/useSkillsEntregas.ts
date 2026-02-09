@@ -94,11 +94,29 @@ export function useSkillsEntregas() {
     },
   });
 
+  // Mutation para atualizar status (drag-and-drop Kanban)
+  const atualizarStatus = useMutation({
+    mutationFn: async ({ entregaId, novoStatus }: { entregaId: string; novoStatus: string }) => {
+      const { error } = await supabase
+        .from("entregas_skills")
+        .update({ status: novoStatus })
+        .eq("id", entregaId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["entregas-skills"] });
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar status");
+    },
+  });
+
   return {
     entregas,
     isLoading,
     isLider,
     submeterEntrega,
     iniciarEntrega,
+    atualizarStatus,
   };
 }
