@@ -1,45 +1,51 @@
 
-# Mover "Painel Líder" como submenu de "Visão Geral"
+# Correção definitiva: Projeto Skills 404 + Meu Progresso reaparecendo
 
-## Resumo
+## Diagnóstico da causa raiz
 
-Transformar "Painel Líder" em um submenu de "Visão Geral" (em vez de submenu direto de "Projeto Skills"), visível apenas para administradores e líderes do projeto.
+A Livia tem `plano_mentoria = "business"` com `skills_liberado = true` e e lider em uma equipe Skills. O problema esta na logica de filtragem de menus no `useMenuConfig.tsx`:
 
-## Alterações
-
-### 1. Banco de dados (menu_config)
-
-Atualizar o `parent_key` de `projeto_skills_performance` para apontar para `projeto_skills_visao_geral`:
-
-```sql
-UPDATE menu_config 
-SET parent_key = 'projeto_skills_visao_geral', ordem = 1
-WHERE menu_key = 'projeto_skills_performance';
+```
+// Filtro atual:
+return m.planos_permitidos.includes(userPlan);
+// userPlan = "business", planos_permitidos = ["skills"] → FALSE → menu oculto!
 ```
 
-Isso cria a hierarquia:
+Os menus do Projeto Skills tem `planos_permitidos: ["skills"]` no banco de dados, mas o `effectivePlan` da Livia e "business" (seu plano real). Mesmo selecionando o ambiente "skills", o filtro usa o **plano do usuario** e nao o **ambiente selecionado**, escondendo todos os menus do Projeto Skills.
+
+Sem os menus do Projeto Skills, ela tenta acessar as URLs diretamente (ou via cache do navegador), e os componentes com `SkillsAdminGuard` a redirecionam para `/skills/projeto`, criando um loop que parece 404.
+
+O "Meu Progresso" reaparece porque e filtrado por ambiente (hidden no ambiente skills/business) - mas como os menus skills nao aparecem, o usuario pode acabar sem ambiente selecionado ou com ambiente incorreto, expondo o Meu Progresso (que tem `planos_permitidos: null`).
+
+## Solucao
+
+### 1. Corrigir filtro de planos no `useMenuConfig.tsx`
+
+Modificar a funcao `getSidebarMenus` para considerar o ambiente selecionado no filtro de `planos_permitidos`. Se o usuario esta no ambiente "skills", menus com `planos_permitidos: ["skills"]` devem ser exibidos independente do plano base:
+
+```typescript
+// ANTES (bugado):
+return m.planos_permitidos.includes(userPlan);
+
+// DEPOIS (corrigido):
+// Se o ambiente selecionado corresponde a um dos planos permitidos, mostrar o menu
+if (currentEnvironment && m.planos_permitidos.includes(currentEnvironment)) return true;
+// Fallback: verificar plano do usuario
+return m.planos_permitidos.includes(userPlan);
 ```
-Projeto Skills
-  ├── Visão Geral (/skills/projeto)
-  │     └── Painel Líder (/skills/projeto/performance)  [admin/líder]
-  ├── Avaliação
-  └── Projetos
-```
 
-### 2. Sidebar (AppSidebar.tsx)
+Isso resolve ambos os bugs:
+- Projeto Skills aparece quando ambiente = "skills", mesmo para usuarios business com skills_liberado
+- Meu Progresso continua oculto porque ja e filtrado pelo `hiddenByEnvironment` antes de chegar no filtro de plano
 
-Atualizar o componente de sidebar para suportar submenus de terceiro nível (submenu dentro de submenu). Atualmente, a sidebar renderiza apenas dois níveis (pai > filho). Será necessário:
+### 2. Nenhuma alteracao no banco de dados
 
-- Permitir que "Visão Geral" tenha filhos renderizados abaixo dele
-- Manter o filtro de visibilidade existente que já restringe `projeto_skills_performance` a admin/líder (`isSkillsLider || isAdmin`)
-- Renderizar "Painel Líder" com recuo adicional (pl-12) abaixo de "Visão Geral"
+O `planos_permitidos: ["skills"]` no banco permanece correto - o fix e apenas na logica de filtragem do frontend.
 
-### 3. Nenhuma alteração em rotas ou componentes de página
+### 3. Nenhuma alteracao em rotas ou guards
 
-As rotas e componentes de Performance/Painel Líder permanecem inalterados - apenas a posição no menu muda.
+As rotas em `App.tsx` e o `SkillsAdminGuard` estao corretos. O problema e exclusivamente de visibilidade no menu.
 
-## Detalhes técnicos
+## Arquivos alterados
 
-- O filtro de acesso em `getSubMenus` já bloqueia `projeto_skills_performance` para não-líderes/não-admins
-- A lógica de auto-expansão do menu será ajustada para expandir "Visão Geral" quando a rota ativa for `/skills/projeto/performance`
-- O `useMenuConfig` não precisa de alteração pois já filtra por `parent_key` dinamicamente
+- `src/hooks/useMenuConfig.tsx` — ajustar filtro em `getSidebarMenus` para considerar o ambiente selecionado ao avaliar `planos_permitidos`
