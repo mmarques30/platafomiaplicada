@@ -1,91 +1,57 @@
 
-# Corrigir Processamento de Documento Multi-Projeto
+# Corrigir duplicacao de entregas como backlog
 
-## Problema Identificado
+## Problema
 
-O documento "Guia Business Livia Projetos" contém **3 projetos distintos**, cada um com suas próprias entregas numeradas:
+O documento da Julia Cruz tem:
+- Secao "Pos-MVP" com 5 itens (Hub SDS, Dashboard, Relatorios, etc.)
+- Secao "Melhorias Futuras" com 5 itens (Painel cliente, Kanban, etc.)
+- ENTREGAs 3, 4, 5 que sao exatamente os mesmos itens do Pos-MVP
 
-- **Projeto Family Office** (Seção 3): FASE 1-3, Entregas 1-4
-- **Projeto JOMIG** (Seção 4): Entregas 1-3 (numeração reinicia)
-- **Projeto Fotografia** (Seção 5): Módulos 1-4 (usa "Módulo" em vez de "Entrega")
+O parser cria:
+1. ENTREGAs 3, 4, 5 como entregas **ativas** (correto)
+2. Os mesmos itens como **backlog** (incorreto - duplicacao)
 
-O parser atual falha em 3 pontos:
+Resultado: itens que deveriam ser entregas ativas aparecem tambem como backlog, inflando a lista.
 
-1. **Deduplicação por número**: Linha 684 rejeita entregas com número duplicado. JOMIG tem Entrega 1, 2, 3 - iguais ao Family Office - então são descartadas.
-2. **"Módulo" não é reconhecido**: O regex só busca "ENTREGA", ignorando os 4 módulos do projeto Fotografia.
-3. **Sem detecção de projeto**: Trata tudo como um projeto só, sem criar etapas/fases para JOMIG e Fotografia.
+## Solucao
 
-## Solução
-
-Alterar a função `extrairAncorasLiterais` no edge function `processar-documentos-business` para:
-
-### 1. Detectar seções de projeto (PROJETO X)
-Adicionar regex para capturar "PROJETO FAMILY OFFICE", "PROJETO JOMIG", "PROJETO FOTOGRAFIA" como **fases/etapas** adicionais, cada uma representando um projeto.
-
-### 2. Reconhecer "Módulo" como entrega
-Expandir o regex de entregas (linha 663) de:
-```
-/ENTREGA\s*(\d+)/
-```
-para:
-```
-/(?:ENTREGA|MÓDULO|MODULO)\s*(\d+)/
-```
-
-### 3. Renumerar entregas globalmente
-Em vez de deduplicar por número, manter um contador global que incrementa para cada entrega encontrada, evitando colisão. Exemplo:
-- Family Office: Entregas 1-4
-- JOMIG: Entregas 5-7 (renumeradas)
-- Fotografia: Entregas 8-11 (renumeradas a partir dos módulos)
-
-### 4. Criar fases para cada projeto
-Detectar headers como "PROJETO FAMILY OFFICE", "PROJETO JOMIG", "PROJETO FOTOGRAFIA" e convertê-los em fases/etapas quando não há FASE explícita para aquele projeto.
-
-## Detalhes Técnicos
+No handler principal do edge function, apos extrair ancoras e antes de montar o resultado final, filtrar os itens de backlog que ja existem como entregas.
 
 ### Arquivo: `supabase/functions/processar-documentos-business/index.ts`
 
-**Alteração 1 - Detectar projetos** (antes da extração de fases, ~linha 635):
+**Alteracao unica** (~linha 1539, na montagem do `backlogLiteral`):
+
+Antes de criar o array `backlogLiteral`, comparar cada item do `ancoras.backlog` com os titulos das entregas ja extraidas. Se o titulo do backlog for similar a uma entrega existente, remover do backlog.
 
 ```typescript
-// 0. PROJETOS - Detectar seções de projeto como agrupadores
-const regexProjeto = /(?:^|\n)\s*#*\s*(?:\d+\.\s*)?PROJETO\s+(.+?)(?:\s*[-–]\s*(.+?))?(?=\n|$)/gi;
+// Filtrar backlog: remover itens que ja sao entregas ativas
+const titulosEntregas = resultado.entregas.map(e => e.titulo.toLowerCase());
+
+const backlogLiteral = ancoras.backlog
+  .filter(b => {
+    const tituloLower = b.titulo.toLowerCase();
+    // Remover se titulo do backlog contem ou esta contido em alguma entrega
+    const jaDuplicado = titulosEntregas.some(te => 
+      tituloLower.includes(te) || te.includes(tituloLower) ||
+      // Similaridade parcial (ex: "Hub de documentacao tecnica (SDS)" vs "Sistema de SDS")
+      tituloLower.split(' ').filter(w => w.length > 3).some(word => te.includes(word))
+    );
+    if (jaDuplicado) {
+      console.log(`  Backlog removido (duplica entrega): ${b.titulo}`);
+    }
+    return !jaDuplicado;
+  })
+  .map(b => ({
+    titulo: b.titulo,
+    descricao: '',
+    justificativa: b.secao
+  }));
 ```
 
-Cada projeto detectado se torna uma FASE adicional se não houver FASE explícita naquela seção.
+Isso mantem no backlog apenas itens genuinamente futuros (Painel cliente, Kanban, Pipeline, Agente IA, Integracao ERP) e remove os que ja estao mapeados como entregas (Hub SDS, Dashboard, Relatorios).
 
-**Alteração 2 - Expandir regex de entregas** (linha 663):
+## Resultado esperado
 
-```typescript
-const regexEntrega = /(?:^|\n)\s*(?:ENTREGA|MÓDULO|MODULO)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
-```
-
-**Alteração 3 - Remover deduplicação por número, usar contador global** (linha 684):
-
-```typescript
-// Antes: if (!ancoras.entregas.some(e => e.numero === numero))
-// Depois: usar numeração global
-let contadorEntrega = 1;
-// ...
-ancoras.entregas.push({
-  numero: contadorEntrega++, // número global único
-  titulo,
-  faseNumero: faseAtual,
-  numero_original: numero // manter original para referência
-});
-```
-
-**Alteração 4 - Vincular entregas ao projeto/fase correto**:
-
-Determinar a qual projeto/fase cada entrega pertence baseado na posição no texto, usando os boundaries dos projetos detectados.
-
-## Resultado Esperado
-
-O documento processará:
-- **3 fases/etapas** (uma por projeto)
-- **~11 entregas** (4 Family Office + 3 JOMIG + 4 Fotografia)
-- Todas as instruções/passos vinculados às entregas corretas
-- Checklists associados ao projeto correto
-
-## Arquivo alterado
-- `supabase/functions/processar-documentos-business/index.ts` - Função `extrairAncorasLiterais` (regex de fases, entregas, e lógica de numeração)
+- **Entregas ativas**: 5 (Upload Docs, Propostas, SDS, Dashboard, Relatorio Export) + MVP + Conjuntas
+- **Backlog**: ~5 itens genuinos de "Melhorias Futuras" (sem duplicatas do Pos-MVP)
