@@ -1,56 +1,91 @@
 
-# Corrigir erro no modal de edição + adicionar botão de transferência Ativa/Backlog
+# Corrigir Processamento de Documento Multi-Projeto
 
-## Problema identificado
+## Problema Identificado
 
-O erro no console é claro:
+O documento "Guia Business Livia Projetos" contém **3 projetos distintos**, cada um com suas próprias entregas numeradas:
+
+- **Projeto Family Office** (Seção 3): FASE 1-3, Entregas 1-4
+- **Projeto JOMIG** (Seção 4): Entregas 1-3 (numeração reinicia)
+- **Projeto Fotografia** (Seção 5): Módulos 1-4 (usa "Módulo" em vez de "Entrega")
+
+O parser atual falha em 3 pontos:
+
+1. **Deduplicação por número**: Linha 684 rejeita entregas com número duplicado. JOMIG tem Entrega 1, 2, 3 - iguais ao Family Office - então são descartadas.
+2. **"Módulo" não é reconhecido**: O regex só busca "ENTREGA", ignorando os 4 módulos do projeto Fotografia.
+3. **Sem detecção de projeto**: Trata tudo como um projeto só, sem criar etapas/fases para JOMIG e Fotografia.
+
+## Solução
+
+Alterar a função `extrairAncorasLiterais` no edge function `processar-documentos-business` para:
+
+### 1. Detectar seções de projeto (PROJETO X)
+Adicionar regex para capturar "PROJETO FAMILY OFFICE", "PROJETO JOMIG", "PROJETO FOTOGRAFIA" como **fases/etapas** adicionais, cada uma representando um projeto.
+
+### 2. Reconhecer "Módulo" como entrega
+Expandir o regex de entregas (linha 663) de:
 ```
-"invalid input syntax for type date: \"\""
+/ENTREGA\s*(\d+)/
+```
+para:
+```
+/(?:ENTREGA|MÓDULO|MODULO)\s*(\d+)/
 ```
 
-Quando o admin abre o modal para editar uma entrega, campos como `prazo_previsto` e `etapa_id` são inicializados com `""` (string vazia). Ao salvar, essas strings vazias são enviadas ao banco, que rejeita `""` como valor de data ou UUID.
+### 3. Renumerar entregas globalmente
+Em vez de deduplicar por número, manter um contador global que incrementa para cada entrega encontrada, evitando colisão. Exemplo:
+- Family Office: Entregas 1-4
+- JOMIG: Entregas 5-7 (renumeradas)
+- Fotografia: Entregas 8-11 (renumeradas a partir dos módulos)
 
-## Solução (2 ajustes no mesmo arquivo)
+### 4. Criar fases para cada projeto
+Detectar headers como "PROJETO FAMILY OFFICE", "PROJETO JOMIG", "PROJETO FOTOGRAFIA" e convertê-los em fases/etapas quando não há FASE explícita para aquele projeto.
 
-### Arquivo: `src/components/admin/business/EntregasBusinessManager.tsx`
+## Detalhes Técnicos
 
-**1. Sanitizar dados antes de enviar ao banco (handleSubmit)**
+### Arquivo: `supabase/functions/processar-documentos-business/index.ts`
 
-Converter strings vazias em `null` antes de chamar `updateEntrega.mutate` ou `createEntrega.mutate`:
+**Alteração 1 - Detectar projetos** (antes da extração de fases, ~linha 635):
 
 ```typescript
-const handleSubmit = () => {
-  if (!formData.titulo?.trim()) return;
-
-  // Sanitizar: converter strings vazias em null/undefined
-  const sanitized = {
-    ...formData,
-    prazo_previsto: formData.prazo_previsto || null,
-    etapa_id: formData.etapa_id || null,
-    modulo_relacionado: formData.modulo_relacionado || null,
-    descricao: formData.descricao || null,
-    justificativa_backlog: formData.justificativa_backlog || null,
-  };
-
-  if (editingEntrega) {
-    updateEntrega.mutate({ id: editingEntrega.id, ...sanitized });
-  } else {
-    createEntrega.mutate({ contrato_id: contratoId, ...sanitized } as EntregaInput);
-  }
-  setModalOpen(false);
-};
+// 0. PROJETOS - Detectar seções de projeto como agrupadores
+const regexProjeto = /(?:^|\n)\s*#*\s*(?:\d+\.\s*)?PROJETO\s+(.+?)(?:\s*[-–]\s*(.+?))?(?=\n|$)/gi;
 ```
 
-**2. Adicionar botão de transferência Ativa/Backlog no card**
+Cada projeto detectado se torna uma FASE adicional se não houver FASE explícita naquela seção.
 
-No `renderEntregaCard`, adicionar um botão ao lado do botão de editar que alterna o `tipo` entre `'ativa'` e `'backlog'`:
+**Alteração 2 - Expandir regex de entregas** (linha 663):
 
-- Importar icone `ArrowRightLeft` do lucide-react
-- Botão com tooltip visual (title) indicando "Mover para Backlog" ou "Mover para Ativas"
-- Ao clicar, chamar `updateEntrega.mutate({ id, tipo: novoTipo })`
-- A lista atualiza automaticamente pelo react-query
+```typescript
+const regexEntrega = /(?:^|\n)\s*(?:ENTREGA|MÓDULO|MODULO)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
+```
 
-## Resultado esperado
+**Alteração 3 - Remover deduplicação por número, usar contador global** (linha 684):
 
-1. Modal de edição funciona sem erro ao salvar (campos vazios viram `null`)
-2. Botão de transferência rápida em cada card permite mover entre Ativa e Backlog com um clique
+```typescript
+// Antes: if (!ancoras.entregas.some(e => e.numero === numero))
+// Depois: usar numeração global
+let contadorEntrega = 1;
+// ...
+ancoras.entregas.push({
+  numero: contadorEntrega++, // número global único
+  titulo,
+  faseNumero: faseAtual,
+  numero_original: numero // manter original para referência
+});
+```
+
+**Alteração 4 - Vincular entregas ao projeto/fase correto**:
+
+Determinar a qual projeto/fase cada entrega pertence baseado na posição no texto, usando os boundaries dos projetos detectados.
+
+## Resultado Esperado
+
+O documento processará:
+- **3 fases/etapas** (uma por projeto)
+- **~11 entregas** (4 Family Office + 3 JOMIG + 4 Fotografia)
+- Todas as instruções/passos vinculados às entregas corretas
+- Checklists associados ao projeto correto
+
+## Arquivo alterado
+- `supabase/functions/processar-documentos-business/index.ts` - Função `extrairAncorasLiterais` (regex de fases, entregas, e lógica de numeração)
