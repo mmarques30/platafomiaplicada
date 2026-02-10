@@ -1,0 +1,1 @@
+ALTER TABLE public.videos ALTER COLUMN youtube_id DROP NOT NULL;
