@@ -1,57 +1,51 @@
 
-# Corrigir duplicacao de entregas como backlog
+# Corrigir criação de vídeo com URL do Google Drive
 
 ## Problema
 
-O documento da Julia Cruz tem:
-- Secao "Pos-MVP" com 5 itens (Hub SDS, Dashboard, Relatorios, etc.)
-- Secao "Melhorias Futuras" com 5 itens (Painel cliente, Kanban, etc.)
-- ENTREGAs 3, 4, 5 que sao exatamente os mesmos itens do Pos-MVP
-
-O parser cria:
-1. ENTREGAs 3, 4, 5 como entregas **ativas** (correto)
-2. Os mesmos itens como **backlog** (incorreto - duplicacao)
-
-Resultado: itens que deveriam ser entregas ativas aparecem tambem como backlog, inflando a lista.
-
-## Solucao
-
-No handler principal do edge function, apos extrair ancoras e antes de montar o resultado final, filtrar os itens de backlog que ja existem como entregas.
-
-### Arquivo: `supabase/functions/processar-documentos-business/index.ts`
-
-**Alteracao unica** (~linha 1539, na montagem do `backlogLiteral`):
-
-Antes de criar o array `backlogLiteral`, comparar cada item do `ancoras.backlog` com os titulos das entregas ja extraidas. Se o titulo do backlog for similar a uma entrega existente, remover do backlog.
+No hook `useCreateVideo` (arquivo `src/hooks/admin/useContent.tsx`), linhas 231-232, o código **sempre** exige uma URL do YouTube válida:
 
 ```typescript
-// Filtrar backlog: remover itens que ja sao entregas ativas
-const titulosEntregas = resultado.entregas.map(e => e.titulo.toLowerCase());
-
-const backlogLiteral = ancoras.backlog
-  .filter(b => {
-    const tituloLower = b.titulo.toLowerCase();
-    // Remover se titulo do backlog contem ou esta contido em alguma entrega
-    const jaDuplicado = titulosEntregas.some(te => 
-      tituloLower.includes(te) || te.includes(tituloLower) ||
-      // Similaridade parcial (ex: "Hub de documentacao tecnica (SDS)" vs "Sistema de SDS")
-      tituloLower.split(' ').filter(w => w.length > 3).some(word => te.includes(word))
-    );
-    if (jaDuplicado) {
-      console.log(`  Backlog removido (duplica entrega): ${b.titulo}`);
-    }
-    return !jaDuplicado;
-  })
-  .map(b => ({
-    titulo: b.titulo,
-    descricao: '',
-    justificativa: b.secao
-  }));
+const youtubeId = extractYouTubeId(video.youtube_url);
+if (!youtubeId) throw new Error("URL do YouTube inválida");
 ```
 
-Isso mantem no backlog apenas itens genuinamente futuros (Painel cliente, Kanban, Pipeline, Agente IA, Integracao ERP) e remove os que ja estao mapeados como entregas (Hub SDS, Dashboard, Relatorios).
+Mesmo que o admin informe apenas a URL do Google Drive, o código tenta extrair o ID do YouTube de uma string vazia e lança o erro "URL do YouTube inválida".
 
-## Resultado esperado
+O `useUpdateVideo` já trata isso corretamente (linha 260: `if (video.youtube_url)`), mas o `useCreateVideo` não.
 
-- **Entregas ativas**: 5 (Upload Docs, Propostas, SDS, Dashboard, Relatorio Export) + MVP + Conjuntas
-- **Backlog**: ~5 itens genuinos de "Melhorias Futuras" (sem duplicatas do Pos-MVP)
+## Solução
+
+Alterar o `useCreateVideo` para tornar o YouTube ID condicional, da mesma forma que o `useUpdateVideo` já faz.
+
+### Arquivo: `src/hooks/admin/useContent.tsx`
+
+Substituir as linhas 230-238 de:
+
+```typescript
+mutationFn: async (video: any) => {
+  const youtubeId = extractYouTubeId(video.youtube_url);
+  if (!youtubeId) throw new Error("URL do YouTube inválida");
+
+  const videoData = {
+    ...video,
+    youtube_id: youtubeId,
+    thumbnail_url: getYouTubeThumbnail(youtubeId),
+  };
+```
+
+Para:
+
+```typescript
+mutationFn: async (video: any) => {
+  const videoData = { ...video };
+
+  if (video.youtube_url?.trim()) {
+    const youtubeId = extractYouTubeId(video.youtube_url);
+    if (!youtubeId) throw new Error("URL do YouTube inválida");
+    videoData.youtube_id = youtubeId;
+    videoData.thumbnail_url = getYouTubeThumbnail(youtubeId);
+  }
+```
+
+Isso permite criar vídeos usando apenas Google Drive, sem exigir YouTube.
