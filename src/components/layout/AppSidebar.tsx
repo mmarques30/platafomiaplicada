@@ -19,8 +19,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-// Usar caminho estático para garantir carregamento no PWA
-const logoSimbolo = "/logo-simbolo.png?v=10";
+import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";

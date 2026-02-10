@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import mariAvatar from "@/assets/mari-avatar-new.png";
+import mariAvatarFallback from "@/assets/mari-avatar.jpg";
 
 interface Message {
   role: "user" | "assistant";
@@ -279,6 +280,7 @@ const Chat = () => {
               src={mariAvatar}
               alt="Mari"
               className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full mb-4 object-cover"
+              onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
             />
             <h2 className="text-xl md:text-2xl font-bold mb-2">
               Sou a Mar<span className="text-primary">IA</span>na
@@ -307,6 +309,7 @@ const Chat = () => {
                       src={mariAvatar}
                       alt="Mari"
                       className="w-10 h-10 rounded-full flex-shrink-0"
+                      onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
                     />
                   )}
                   <div
@@ -344,6 +347,7 @@ const Chat = () => {
                     src={mariAvatar}
                     alt="Mari"
                     className="w-10 h-10 rounded-full flex-shrink-0"
+                    onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
                   />
                   <div className="bg-muted rounded-lg px-4 py-2 text-muted-foreground">
                     <span className="flex items-center gap-2">
