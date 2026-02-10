@@ -228,14 +228,14 @@ export function useCreateVideo() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (video: any) => {
-      const youtubeId = extractYouTubeId(video.youtube_url);
-      if (!youtubeId) throw new Error("URL do YouTube inválida");
+      const videoData = { ...video };
 
-      const videoData = {
-        ...video,
-        youtube_id: youtubeId,
-        thumbnail_url: getYouTubeThumbnail(youtubeId),
-      };
+      if (video.youtube_url?.trim()) {
+        const youtubeId = extractYouTubeId(video.youtube_url);
+        if (!youtubeId) throw new Error("URL do YouTube inválida");
+        videoData.youtube_id = youtubeId;
+        videoData.thumbnail_url = getYouTubeThumbnail(youtubeId);
+      }
 
       const { error } = await supabase.from("videos").insert(videoData);
       if (error) throw error;
