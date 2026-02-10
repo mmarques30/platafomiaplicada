@@ -5276,7 +5276,7 @@ export type Database = {
           visivel_apenas_pro: boolean | null
           visivel_mentorados: boolean | null
           visivel_visitantes: boolean | null
-          youtube_id: string
+          youtube_id: string | null
           youtube_url: string
         }
         Insert: {
@@ -5302,7 +5302,7 @@ export type Database = {
           visivel_apenas_pro?: boolean | null
           visivel_mentorados?: boolean | null
           visivel_visitantes?: boolean | null
-          youtube_id: string
+          youtube_id?: string | null
           youtube_url: string
         }
         Update: {
@@ -5328,7 +5328,7 @@ export type Database = {
           visivel_apenas_pro?: boolean | null
           visivel_mentorados?: boolean | null
           visivel_visitantes?: boolean | null
-          youtube_id?: string
+          youtube_id?: string | null
           youtube_url?: string
         }
         Relationships: [
