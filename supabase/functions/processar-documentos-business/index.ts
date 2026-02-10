@@ -632,6 +632,19 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
     backlog: [],
   };
   
+  // 0. PROJETOS - Detectar seções de projeto como agrupadores de fase
+  const regexProjeto = /(?:^|\n)\s*#*\s*(?:\d+\.\s*)?PROJETO\s+(.+?)(?:\s*[-–]\s*(.+?))?(?=\n|$)/gi;
+  const projetos: { nome: string; posicao: number; faseNumero: number }[] = [];
+  let matchProjeto;
+  while ((matchProjeto = regexProjeto.exec(texto)) !== null) {
+    const nome = (matchProjeto[1] + (matchProjeto[2] ? ' - ' + matchProjeto[2] : '')).trim()
+      .replace(/\*+/g, '').replace(/\(.*?\)/, '').trim();
+    if (nome.length > 2) {
+      projetos.push({ nome, posicao: matchProjeto.index, faseNumero: 0 });
+      console.log(`  PROJETO detectado: ${nome} (pos: ${matchProjeto.index})`);
+    }
+  }
+  
   // 1. FASES - Padrões: "FASE 1:", "FASE 1 -", "FASE 1.", "# FASE 1"
   const regexFase = /(?:^|\n)[\s#]*(?:FASE|ETAPA)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
   let matchFase;
@@ -643,7 +656,6 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
       .trim();
     
     if (titulo.length > 2 && !ancoras.fases.some(f => f.numero === numero)) {
-      // Encontrar conteúdo até próxima fase
       const startPos = matchFase.index;
       const nextFaseMatch = texto.substring(startPos + matchFase[0].length).match(/(?:^|\n)[\s#]*(?:FASE|ETAPA)\s*\d+\s*[:\-–.]/i);
       const endPos = nextFaseMatch 
@@ -659,35 +671,88 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
     }
   }
   
-  // 2. ENTREGAS - Padrões: "ENTREGA 1:", "Entrega 3 -"
-  const regexEntrega = /(?:^|\n)\s*(?:ENTREGA)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
+  // 1b. Criar fases para projetos que não têm FASE explícita
+  let nextFaseNumero = ancoras.fases.length > 0 
+    ? Math.max(...ancoras.fases.map(f => f.numero)) + 1 
+    : 1;
+  
+  for (const projeto of projetos) {
+    // Verificar se já existe uma FASE dentro da área deste projeto
+    const projetoTemFase = ancoras.fases.some(f => {
+      const fasePos = texto.indexOf(f.conteudo);
+      const nextProj = projetos.find(p => p.posicao > projeto.posicao);
+      const projetoEnd = nextProj ? nextProj.posicao : texto.length;
+      return fasePos >= projeto.posicao && fasePos < projetoEnd;
+    });
+    
+    if (!projetoTemFase) {
+      // Criar fase virtual para este projeto
+      const nextProj = projetos.find(p => p.posicao > projeto.posicao);
+      const projetoEnd = nextProj ? nextProj.posicao : texto.length;
+      const conteudo = texto.substring(projeto.posicao, projetoEnd);
+      
+      projeto.faseNumero = nextFaseNumero;
+      ancoras.fases.push({
+        numero: nextFaseNumero,
+        titulo: `Projeto ${projeto.nome}`,
+        conteudo
+      });
+      console.log(`  FASE ${nextFaseNumero} (auto-projeto): Projeto ${projeto.nome}`);
+      nextFaseNumero++;
+    } else {
+      // Associar o projeto à primeira fase encontrada na sua área
+      const faseAssociada = ancoras.fases.find(f => {
+        const fasePos = texto.indexOf(f.conteudo);
+        const nextProj = projetos.find(p => p.posicao > projeto.posicao);
+        const projetoEnd = nextProj ? nextProj.posicao : texto.length;
+        return fasePos >= projeto.posicao && fasePos < projetoEnd;
+      });
+      if (faseAssociada) projeto.faseNumero = faseAssociada.numero;
+    }
+  }
+  
+  // 2. ENTREGAS - Padrões expandidos: "ENTREGA 1:", "Módulo 3 -"
+  const regexEntrega = /(?:^|\n)\s*(?:ENTREGA|MÓDULO|MODULO)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
   let matchEntrega;
-  let ultimaFase = 1;
+  let contadorEntregaGlobal = 1;
   
   while ((matchEntrega = regexEntrega.exec(texto)) !== null) {
-    const numero = parseInt(matchEntrega[1]);
+    const numeroOriginal = parseInt(matchEntrega[1]);
     const titulo = matchEntrega[2].trim()
       .replace(/\*+/g, '')
       .trim();
     
-    // Determinar a qual fase pertence
+    // Determinar a qual fase pertence baseado na posição no texto
+    let faseNumero = 1;
     const posicaoEntrega = matchEntrega.index;
-    for (const fase of ancoras.fases) {
-      const faseStart = texto.indexOf(fase.conteudo);
-      const faseEnd = faseStart + fase.conteudo.length;
-      if (posicaoEntrega >= faseStart && posicaoEntrega < faseEnd) {
-        ultimaFase = fase.numero;
+    
+    // Primeiro: tentar vincular ao projeto correto
+    for (const projeto of [...projetos].reverse()) {
+      if (posicaoEntrega >= projeto.posicao) {
+        faseNumero = projeto.faseNumero;
         break;
       }
     }
     
-    if (titulo.length > 2 && !ancoras.entregas.some(e => e.numero === numero)) {
+    // Segundo: se há fases explícitas, usar a fase mais próxima
+    for (const fase of ancoras.fases) {
+      const faseStart = texto.indexOf(fase.conteudo);
+      const faseEnd = faseStart + fase.conteudo.length;
+      if (posicaoEntrega >= faseStart && posicaoEntrega < faseEnd) {
+        faseNumero = fase.numero;
+        break;
+      }
+    }
+    
+    if (titulo.length > 2) {
+      // Usar contador global em vez de deduplicar por número original
       ancoras.entregas.push({
-        numero,
+        numero: contadorEntregaGlobal,
         titulo,
-        faseNumero: ultimaFase
+        faseNumero
       });
-      console.log(`  ENTREGA ${numero}: ${titulo} (Fase ${ultimaFase})`);
+      console.log(`  ENTREGA ${contadorEntregaGlobal} (orig: ${numeroOriginal}): ${titulo} (Fase ${faseNumero})`);
+      contadorEntregaGlobal++;
     }
   }
   
@@ -695,9 +760,11 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
   console.log("  Extraindo PASSOS com conteúdo completo...");
   
   for (const entrega of ancoras.entregas) {
-    // Encontrar todo o texto da entrega até a próxima entrega
+    // Encontrar todo o texto da entrega até a próxima entrega ou módulo
+    // Usar título da entrega para localizar no texto (mais confiável que número original)
+    const tituloEscapado = entrega.titulo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').substring(0, 30);
     const regexEntregaConteudo = new RegExp(
-      `ENTREGA\\s*${entrega.numero}[\\s\\S]*?(?=ENTREGA\\s*${entrega.numero + 1}|ENTREGAS\\s+EM\\s+CONJUNTO|$)`, 
+      `(?:ENTREGA|MÓDULO|MODULO)\\s*\\d+[\\s\\S]*?${tituloEscapado}[\\s\\S]*?(?=(?:ENTREGA|MÓDULO|MODULO)\\s*\\d+\\s*[:\\-–.]|ENTREGAS\\s+EM\\s+CONJUNTO|$)`, 
       'i'
     );
     const entregaMatch = texto.match(regexEntregaConteudo);
@@ -706,7 +773,7 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
       const textoEntrega = entregaMatch[0];
       
       // Regex que captura PASSO + TODO conteúdo até próximo PASSO ou fim
-      const regexPassoCompleto = /PASSO\s*(\d{1,2})\s*[:\-–]\s*([\s\S]*?)(?=\nPASSO\s*\d{1,2}\s*[:\-–]|\nENTREGA\s*\d|☐|$)/gi;
+      const regexPassoCompleto = /PASSO\s*(\d{1,2})\s*[:\-–]\s*([\s\S]*?)(?=\nPASSO\s*\d{1,2}\s*[:\-–]|\n(?:ENTREGA|MÓDULO|MODULO)\s*\d|☐|$)/gi;
       
       let mp;
       while ((mp = regexPassoCompleto.exec(textoEntrega)) !== null) {
@@ -765,11 +832,12 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
       .replace(/\*+/g, '')
       .trim();
     
-    // Determinar entrega do checklist
+    // Determinar entrega do checklist pela posição
     const posicao = matchCheck.index;
     for (const entrega of ancoras.entregas.slice().reverse()) {
-      const entregaMatch = texto.indexOf(`ENTREGA ${entrega.numero}`);
-      if (entregaMatch !== -1 && posicao > entregaMatch) {
+      // Buscar posição da entrega pelo título no texto
+      const entregaTituloPos = texto.indexOf(entrega.titulo);
+      if (entregaTituloPos !== -1 && posicao > entregaTituloPos) {
         ultimaEntrega = entrega.numero;
         break;
       }
