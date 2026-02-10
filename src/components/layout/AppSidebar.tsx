@@ -39,7 +39,7 @@ export function AppSidebar() {
   const { isViewingAs, resetView, viewAs } = useAdminViewContext();
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
-  const { isLider: isSkillsLider } = useSkillsMembro();
+  const { isLider: isSkillsLider, isLoading: skillsMembroLoading } = useSkillsMembro();
   const { currentEnvironment } = useEnvironment();
   
   const collapsed = !open;
@@ -65,6 +65,14 @@ export function AppSidebar() {
       // Usuário real: se plano é business_iaplicada, usar esse ambiente
       if (effectivePlan === 'business_iaplicada') {
         return 'business_iaplicada';
+      }
+      // Fallback: se nenhum ambiente selecionado, inferir do plano
+      if (!currentEnvironment) {
+        if (effectivePlan === 'skills') return 'skills';
+        if (effectivePlan === 'business') return 'business';
+        if (effectivePlan === 'academy') return 'academy';
+        if (isVisitante) return 'gratuito';
+        return null;
       }
       return currentEnvironment;
     }
@@ -119,8 +127,8 @@ export function AppSidebar() {
     // Filtrar Performance e Diagnóstico do Projeto Skills para não-líderes/não-admins
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
-      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin)
-      .filter(menu => !['projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos'].includes(menu.menu_key) || isSkillsLider || isAdmin);
+      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading)
+      .filter(menu => !['projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading);
   };
 
   const toggleMenu = (menuKey: string) => {
