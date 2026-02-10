@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, Save, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const logoSimbol = "/logo-simbolo.png?v=10";
+import logoSimbol from "@/assets/logo-aplicada-simbolo.png";
 
 interface StepLabel {
   id: number;

@@ -15,8 +15,7 @@ import { useEnviarCandidatura, useCandidaturaDraft } from "@/hooks/useCandidatur
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
 
-// Usar caminho estático para evitar problemas de cache no PWA
-const logoSimbol = "/logo-simbolo.png?v=10";
+import logoSimbol from "@/assets/logo-aplicada-simbolo.png";
 
 const DRAFT_KEY = "candidatura_mentoria_draft";
 

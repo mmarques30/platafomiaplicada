@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const logoSimbolo = "/logo-simbolo.png?v=10";
+import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
 
 interface ProcessoRoadmapProps {
   userId: string;
