@@ -1536,11 +1536,28 @@ serve(async (req) => {
     
     // NÃO gerar backlog automaticamente - será manual via BacklogEditor
     // Apenas manter backlog que veio de âncoras literais do documento
-    const backlogLiteral = ancoras.backlog.map(b => ({
-      titulo: b.titulo,
-      descricao: '',
-      justificativa: b.secao
-    }));
+    // Filtrar backlog: remover itens que já são entregas ativas
+    const titulosEntregas = todasEntregas.map(e => e.titulo.toLowerCase());
+    
+    const backlogLiteral = ancoras.backlog
+      .filter(b => {
+        const tituloLower = b.titulo.toLowerCase();
+        // Remover se titulo do backlog contém ou está contido em alguma entrega
+        const jaDuplicado = titulosEntregas.some(te => 
+          tituloLower.includes(te) || te.includes(tituloLower) ||
+          // Similaridade parcial (ex: "Hub de documentação técnica (SDS)" vs "Sistema de SDS")
+          tituloLower.split(' ').filter(w => w.length > 3).some(word => te.includes(word))
+        );
+        if (jaDuplicado) {
+          console.log(`  Backlog removido (duplica entrega): ${b.titulo}`);
+        }
+        return !jaDuplicado;
+      })
+      .map(b => ({
+        titulo: b.titulo,
+        descricao: '',
+        justificativa: b.secao
+      }));
     
     // Resultado final
     console.log("\n═══════════════════════════════════════════════════════════════");
