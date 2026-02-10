@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Clock, AlertCircle, CheckCircle2, FolderKanban, CalendarDays, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Clock, AlertCircle, CheckCircle2, FolderKanban, CalendarDays, Loader2, ArrowRightLeft } from "lucide-react";
 import { useEntregasBusiness, EntregaBusiness, EntregaInput } from "@/hooks/useEntregasBusiness";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
@@ -129,12 +129,29 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
   const handleSubmit = () => {
     if (!formData.titulo?.trim()) return;
 
+    const sanitized = {
+      ...formData,
+      prazo_previsto: formData.prazo_previsto || null,
+      etapa_id: formData.etapa_id || null,
+      modulo_relacionado: formData.modulo_relacionado || null,
+      descricao: formData.descricao || null,
+      justificativa_backlog: formData.justificativa_backlog || null,
+    };
+
     if (editingEntrega) {
-      updateEntrega.mutate({ id: editingEntrega.id, ...formData });
+      updateEntrega.mutate({ id: editingEntrega.id, ...sanitized });
     } else {
-      createEntrega.mutate({ contrato_id: contratoId, ...formData } as EntregaInput);
+      createEntrega.mutate({ contrato_id: contratoId, ...sanitized } as EntregaInput);
     }
     setModalOpen(false);
+  };
+
+  const handleToggleTipo = (entrega: EntregaBusiness) => {
+    const novoTipo = entrega.tipo === 'ativa' ? 'backlog' : 'ativa';
+    updateEntrega.mutate(
+      { id: entrega.id, tipo: novoTipo },
+      { onSuccess: () => toast.success(`Entrega movida para ${novoTipo === 'ativa' ? 'Ativas' : 'Backlog'}`) }
+    );
   };
 
   const handleEntregasGeradas = () => {
@@ -209,6 +226,15 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
           </div>
           
           <div className="flex items-center gap-0.5 shrink-0">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-7 w-7" 
+              title={entrega.tipo === 'ativa' ? 'Mover para Backlog' : 'Mover para Ativas'}
+              onClick={() => handleToggleTipo(entrega)}
+            >
+              <ArrowRightLeft className="h-3.5 w-3.5" />
+            </Button>
             <Button 
               variant="ghost" 
               size="icon" 
