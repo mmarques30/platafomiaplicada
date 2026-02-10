@@ -1,51 +1,58 @@
 
-# Corrigir criação de vídeo com URL do Google Drive
+# Corrigir Imagens Quebradas: Logo do Sidebar e Avatar da MarIAna no Chat
 
-## Problema
+## Problema Identificado
 
-No hook `useCreateVideo` (arquivo `src/hooks/admin/useContent.tsx`), linhas 231-232, o código **sempre** exige uma URL do YouTube válida:
+Duas imagens estao quebradas:
 
+1. **Logo do sidebar** (`AppSidebar.tsx`): Usa caminho estatico `/logo-simbolo.png?v=10` referenciando o arquivo em `public/`. Este metodo e mais suscetivel a problemas de cache do PWA e pode falhar em builds de producao.
+
+2. **Avatar da MarIAna no chat** (`Chat.tsx`): Usa import ES6 `import mariAvatar from "@/assets/mari-avatar-new.png"`. O arquivo existe mas pode estar corrompido ou o build pode nao estar processando corretamente.
+
+## Solucao
+
+Converter ambas as referencias para imports ES6 conforme boas praticas do Vite, garantindo que o bundler processe e inclua as imagens no build corretamente.
+
+### Arquivo 1: `src/components/layout/AppSidebar.tsx`
+
+**Alteracao** (linha 23): Trocar de caminho estatico para import ES6.
+
+De:
 ```typescript
-const youtubeId = extractYouTubeId(video.youtube_url);
-if (!youtubeId) throw new Error("URL do YouTube inválida");
-```
-
-Mesmo que o admin informe apenas a URL do Google Drive, o código tenta extrair o ID do YouTube de uma string vazia e lança o erro "URL do YouTube inválida".
-
-O `useUpdateVideo` já trata isso corretamente (linha 260: `if (video.youtube_url)`), mas o `useCreateVideo` não.
-
-## Solução
-
-Alterar o `useCreateVideo` para tornar o YouTube ID condicional, da mesma forma que o `useUpdateVideo` já faz.
-
-### Arquivo: `src/hooks/admin/useContent.tsx`
-
-Substituir as linhas 230-238 de:
-
-```typescript
-mutationFn: async (video: any) => {
-  const youtubeId = extractYouTubeId(video.youtube_url);
-  if (!youtubeId) throw new Error("URL do YouTube inválida");
-
-  const videoData = {
-    ...video,
-    youtube_id: youtubeId,
-    thumbnail_url: getYouTubeThumbnail(youtubeId),
-  };
+const logoSimbolo = "/logo-simbolo.png?v=10";
 ```
 
 Para:
-
 ```typescript
-mutationFn: async (video: any) => {
-  const videoData = { ...video };
-
-  if (video.youtube_url?.trim()) {
-    const youtubeId = extractYouTubeId(video.youtube_url);
-    if (!youtubeId) throw new Error("URL do YouTube inválida");
-    videoData.youtube_id = youtubeId;
-    videoData.thumbnail_url = getYouTubeThumbnail(youtubeId);
-  }
+import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
 ```
 
-Isso permite criar vídeos usando apenas Google Drive, sem exigir YouTube.
+Usar o arquivo `logo-aplicada-simbolo.png` que ja existe em `src/assets/` (o `logo-simbolo.png` do `public/` pode estar com problema).
+
+### Arquivo 2: `src/pages/Chat.tsx`
+
+**Verificacao**: O import `import mariAvatar from "@/assets/mari-avatar-new.png"` ja esta correto. Se a imagem continua quebrada, o arquivo `mari-avatar-new.png` pode estar corrompido.
+
+**Fallback**: Adicionar fallback para o avatar antigo caso o novo falhe:
+
+```typescript
+import mariAvatar from "@/assets/mari-avatar-new.png";
+```
+
+Adicionar `onError` handler nas tags `<img>` do avatar para usar um fallback (icone ou imagem alternativa).
+
+### Outros arquivos afetados pelo mesmo padrao
+
+Converter tambem os outros componentes que usam `/logo-simbolo.png?v=10` estatico:
+- `src/components/shared/FormularioLayout.tsx` (linha 8)
+- `src/pages/Instalar.tsx` (linha 18)
+- `src/pages/CandidatarMentoria.tsx` (linha 19)
+- `src/components/admin/mentoria/ProcessoRoadmap.tsx` (linha 15)
+
+Todos serao atualizados para usar `import logoSimbolo from "@/assets/logo-aplicada-simbolo.png"`.
+
+## Resultado esperado
+
+- Logo do sidebar carrega corretamente via bundler do Vite
+- Avatar da MarIAna no chat exibe corretamente com fallback de seguranca
+- Consistencia: todos os componentes usam ES6 imports em vez de caminhos estaticos
