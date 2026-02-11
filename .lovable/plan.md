@@ -1,48 +1,44 @@
 
-# Correcoes no Modulo Skills Admin (3 itens)
 
-## Problema 1: Frequencia de Encontros sem opcao "Trimestral"
+# Adicionar Abas "Minha Analise" e "Analise da Equipe" nos Resultados do Diagnostico
 
-O select de "Frequencia Encontros" em `ContratoSkillsManager.tsx` (linha 155) so oferece 3 opcoes: Semanal, Quinzenal e Mensal. Falta a opcao **Trimestral**.
+## O que muda
 
-### Correcao
-Adicionar `<SelectItem value="trimestral">Trimestral</SelectItem>` ao SelectContent na linha 155.
+Apos preencher o diagnostico Skills e ver os resultados, a tela de analise passara a ter **duas abas**:
 
----
+1. **Minha Analise** - O diagnostico individual do usuario logado (conteudo atual do DiagnosticoResults)
+2. **Analise da Equipe** - O diagnostico consolidado de toda a equipe (dados da tabela `diagnostico_consolidado_skills`)
 
-## Problema 2: Sem visao consolidada dos diagnosticos na aba Diagnosticos
-
-A aba "Diagnosticos" em `DiagnosticosSkillsTab.tsx` mostra apenas os diagnosticos individuais de cada membro. Nao existe nenhum botao ou secao para gerar/visualizar o **diagnostico consolidado** da equipe (tabela `diagnostico_consolidado_skills`).
-
-### Correcao
-Adicionar ao topo da aba Diagnosticos:
-- Uma query para buscar o consolidado existente em `diagnostico_consolidado_skills`
-- Um botao "Consolidar Diagnosticos" que chama a IA para consolidar todos os diagnosticos completos da equipe e salvar na tabela `diagnostico_consolidado_skills`
-- Um card de visualizacao do consolidado quando existir (gargalos comuns, areas impactadas, projetos sugeridos)
-- Criar uma edge function `consolidar-diagnosticos-skills` que:
-  1. Busca todos os diagnosticos completos + insights da equipe
-  2. Envia para a IA com prompt para consolidar em visao unica de equipe
-  3. Salva/atualiza na tabela `diagnostico_consolidado_skills`
+A aba "Analise da Equipe" so aparece quando o admin tiver consolidado os diagnosticos no painel Mentoria Skills.
 
 ---
 
-## Problema 3: Projetos gerados pela IA nao visiveis
+## Detalhes tecnicos
 
-O botao "Gerar Projetos com IA" na aba Projetos existe e chama a edge function `gerar-projetos-skills`, que esta funcional. Os projetos sao salvos em `backlog_skills`. A listagem na aba tambem esta correta.
+### Arquivo 1: `src/components/skills/diagnostico/DiagnosticoResults.tsx`
 
-O problema provavel: a aba Projetos carrega, mas se nenhum diagnostico foi processado (`completado = true`), a edge function retorna erro "Nenhum diagnostico preenchido" e nenhum projeto e criado. Alem disso, nao ha feedback visual claro sobre o que deu errado.
+Refatorar para usar o componente `Tabs` do Radix:
+- Aba "Minha Analise": mantem todo o conteudo atual (perfil, processos, economia, insights, trilha)
+- Aba "Analise da Equipe": novo componente que exibe os dados consolidados
+- Usar o hook `useSkillsEquipe` (ja existente) para buscar o `consolidado`
+- Se nao houver consolidado, mostrar mensagem "Aguardando consolidacao pelo administrador"
 
-### Correcao
-- Melhorar feedback de erro na aba Projetos: mostrar mensagem explicita se a geracao falha por falta de diagnosticos
-- Adicionar um indicador de pre-requisito: mostrar quantos diagnosticos estao completos e alertar se nenhum esta preenchido antes de permitir gerar
+### Arquivo 2: `src/components/skills/diagnostico/EquipeConsolidadoView.tsx` (novo)
 
----
+Componente para renderizar os dados do diagnostico consolidado:
+- **Dores Comuns** (`dores_comuns` - JSON array)
+- **Processos com Maior Potencial** (`processos_maior_potencial` - JSON array)
+- **Sobreposicoes de Esforco** (`sobreposicoes_esforco` - JSON array)
+- **Recomendacoes** (`recomendacoes` - JSON array)
+- **Economia Total** (`total_horas_manuais_semana`, `potencial_economia_horas`)
+- **Insights IA** (`insights_ia` - texto)
+- Data de geracao (`gerado_em`)
 
-## Resumo tecnico das alteracoes
+Seguira o mesmo estilo visual do DiagnosticoResults (cards com icones verde Skills).
 
-| Arquivo | Alteracao |
-|---|---|
-| `src/components/admin/skills/ContratoSkillsManager.tsx` | Adicionar opcao "Trimestral" no select de frequencia |
-| `src/components/admin/skills/DiagnosticosSkillsTab.tsx` | Adicionar secao de diagnostico consolidado com botao de geracao e visualizacao |
-| `supabase/functions/consolidar-diagnosticos-skills/index.ts` | Nova edge function para consolidar diagnosticos via IA |
-| `src/components/admin/skills/ProjetosMapeadosTab.tsx` | Melhorar feedback de erro e mostrar pre-requisitos |
+### Logica de visibilidade
+
+- As abas so aparecem quando o diagnostico individual estiver completo (estado "results")
+- Se nao existir consolidado, a aba "Analise da Equipe" mostra estado vazio com mensagem informativa
+- O banner "Aguardando Equipe" que ja existe no final do DiagnosticoResults sera movido para dentro da aba "Analise da Equipe" quando nao houver consolidado
+
