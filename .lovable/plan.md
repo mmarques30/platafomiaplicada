@@ -1,39 +1,67 @@
 
-# Preview do Insight IA por Pessoa no Diagnostico Skills
 
-## O que sera feito
+# Corrigir Layout Antigo Persistente (Cache PWA)
 
-Criar um componente visual que renderiza o `insight_ia` de forma organizada e legivel, substituindo o bloco atual que mostra texto bruto/JSON.
+## Problema
 
-## Estrutura do Insight IA
+O arquivo `vite.config.ts` configura o cache de arquivos JS e CSS com a estratégia `StaleWhileRevalidate`. Essa estratégia entrega primeiro a versao do cache (antiga) e atualiza em segundo plano. Resultado: o usuario ve o layout antigo ate que o Service Worker termine de baixar e ativar a nova versao.
 
-O campo `insight_ia` contem um JSON rico com as seguintes secoes:
-- **Perfil**: cargo, area, nivel tecnico, disponibilidade
-- **Processos**: lista de processos com nome, frequencia, impacto, tempo e potencial de automacao
-- **Economia**: horas/semana economizadas e valor mensal
-- **Insights**: analise geral, oportunidades e primeiros passos
-- **Trilha**: modulos sugeridos com prioridade e tempo estimado
+## Causa Raiz
 
-## Alteracoes
+Linha 89 de `vite.config.ts`:
+```text
+handler: 'StaleWhileRevalidate'  // <-- serve cache antigo primeiro
+```
 
-### Novo componente: `src/components/admin/skills/InsightIAPreview.tsx`
+## Solucao
 
-Um componente que recebe o objeto `insight_ia` e renderiza cards organizados:
+Trocar a estrategia de cache dos assets JS/CSS de `StaleWhileRevalidate` para `NetworkFirst`, com um timeout de rede curto (3 segundos). Isso garante que:
 
-1. **Header com perfil** - cargo, area, nivel tecnico, disponibilidade (em badges)
-2. **Cards de economia** - horas/semana e valor mensal (ja existem, serao integrados)
-3. **Tabela de processos** - nome, frequencia, impacto, tempo, barra de potencial de automacao (%)
-4. **Secao de analise** - texto da analise com lista de oportunidades e primeiros passos
-5. **Trilha sugerida** - modulos com nome, descricao e badge de prioridade + tempo estimado
+- Se houver internet, busca a versao mais recente
+- Se a rede demorar mais de 3s, usa o cache como fallback
+- O usuario sempre ve o layout atual
 
-O componente usara os mesmos padroes visuais do projeto (Card, Badge, Progress).
+## Alteracao
 
-### Arquivo editado: `src/components/admin/skills/DiagnosticosSkillsTab.tsx`
+### Arquivo: `vite.config.ts` (linhas 88-96)
 
-Substituir o bloco atual de "Resultados IA" (linhas 124-146) pelo novo componente `InsightIAPreview`, passando `membro.insight_ia` como prop.
+De:
+```text
+{
+  urlPattern: /\.(js|css)$/,
+  handler: 'StaleWhileRevalidate',
+  options: {
+    cacheName: 'assets-cache-v10',
+    expiration: {
+      maxEntries: 100,
+      maxAgeSeconds: 86400
+    }
+  }
+}
+```
 
-Os cards de economia que ja existem serao movidos para dentro do novo componente para manter tudo coeso.
+Para:
+```text
+{
+  urlPattern: /\.(js|css)$/,
+  handler: 'NetworkFirst',
+  options: {
+    cacheName: 'assets-cache-v11',
+    networkTimeoutSeconds: 3,
+    expiration: {
+      maxEntries: 100,
+      maxAgeSeconds: 86400
+    }
+  }
+}
+```
+
+Mudancas:
+- `handler`: de `StaleWhileRevalidate` para `NetworkFirst`
+- `cacheName`: incrementado para `v11` para invalidar o cache antigo
+- `networkTimeoutSeconds: 3`: adicionado para fallback rapido se offline
 
 ## Resultado
 
-Ao expandir um membro processado, o admin vera um preview visual completo e organizado do insight da IA, em vez de texto bruto.
+O usuario sempre recebera o layout mais recente ao abrir a plataforma, sem precisar forcar atualizacao manual.
+
