@@ -1,58 +1,39 @@
 
-# Corrigir Imagens Quebradas: Logo do Sidebar e Avatar da MarIAna no Chat
+# Preview do Insight IA por Pessoa no Diagnostico Skills
 
-## Problema Identificado
+## O que sera feito
 
-Duas imagens estao quebradas:
+Criar um componente visual que renderiza o `insight_ia` de forma organizada e legivel, substituindo o bloco atual que mostra texto bruto/JSON.
 
-1. **Logo do sidebar** (`AppSidebar.tsx`): Usa caminho estatico `/logo-simbolo.png?v=10` referenciando o arquivo em `public/`. Este metodo e mais suscetivel a problemas de cache do PWA e pode falhar em builds de producao.
+## Estrutura do Insight IA
 
-2. **Avatar da MarIAna no chat** (`Chat.tsx`): Usa import ES6 `import mariAvatar from "@/assets/mari-avatar-new.png"`. O arquivo existe mas pode estar corrompido ou o build pode nao estar processando corretamente.
+O campo `insight_ia` contem um JSON rico com as seguintes secoes:
+- **Perfil**: cargo, area, nivel tecnico, disponibilidade
+- **Processos**: lista de processos com nome, frequencia, impacto, tempo e potencial de automacao
+- **Economia**: horas/semana economizadas e valor mensal
+- **Insights**: analise geral, oportunidades e primeiros passos
+- **Trilha**: modulos sugeridos com prioridade e tempo estimado
 
-## Solucao
+## Alteracoes
 
-Converter ambas as referencias para imports ES6 conforme boas praticas do Vite, garantindo que o bundler processe e inclua as imagens no build corretamente.
+### Novo componente: `src/components/admin/skills/InsightIAPreview.tsx`
 
-### Arquivo 1: `src/components/layout/AppSidebar.tsx`
+Um componente que recebe o objeto `insight_ia` e renderiza cards organizados:
 
-**Alteracao** (linha 23): Trocar de caminho estatico para import ES6.
+1. **Header com perfil** - cargo, area, nivel tecnico, disponibilidade (em badges)
+2. **Cards de economia** - horas/semana e valor mensal (ja existem, serao integrados)
+3. **Tabela de processos** - nome, frequencia, impacto, tempo, barra de potencial de automacao (%)
+4. **Secao de analise** - texto da analise com lista de oportunidades e primeiros passos
+5. **Trilha sugerida** - modulos com nome, descricao e badge de prioridade + tempo estimado
 
-De:
-```typescript
-const logoSimbolo = "/logo-simbolo.png?v=10";
-```
+O componente usara os mesmos padroes visuais do projeto (Card, Badge, Progress).
 
-Para:
-```typescript
-import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
-```
+### Arquivo editado: `src/components/admin/skills/DiagnosticosSkillsTab.tsx`
 
-Usar o arquivo `logo-aplicada-simbolo.png` que ja existe em `src/assets/` (o `logo-simbolo.png` do `public/` pode estar com problema).
+Substituir o bloco atual de "Resultados IA" (linhas 124-146) pelo novo componente `InsightIAPreview`, passando `membro.insight_ia` como prop.
 
-### Arquivo 2: `src/pages/Chat.tsx`
+Os cards de economia que ja existem serao movidos para dentro do novo componente para manter tudo coeso.
 
-**Verificacao**: O import `import mariAvatar from "@/assets/mari-avatar-new.png"` ja esta correto. Se a imagem continua quebrada, o arquivo `mari-avatar-new.png` pode estar corrompido.
+## Resultado
 
-**Fallback**: Adicionar fallback para o avatar antigo caso o novo falhe:
-
-```typescript
-import mariAvatar from "@/assets/mari-avatar-new.png";
-```
-
-Adicionar `onError` handler nas tags `<img>` do avatar para usar um fallback (icone ou imagem alternativa).
-
-### Outros arquivos afetados pelo mesmo padrao
-
-Converter tambem os outros componentes que usam `/logo-simbolo.png?v=10` estatico:
-- `src/components/shared/FormularioLayout.tsx` (linha 8)
-- `src/pages/Instalar.tsx` (linha 18)
-- `src/pages/CandidatarMentoria.tsx` (linha 19)
-- `src/components/admin/mentoria/ProcessoRoadmap.tsx` (linha 15)
-
-Todos serao atualizados para usar `import logoSimbolo from "@/assets/logo-aplicada-simbolo.png"`.
-
-## Resultado esperado
-
-- Logo do sidebar carrega corretamente via bundler do Vite
-- Avatar da MarIAna no chat exibe corretamente com fallback de seguranca
-- Consistencia: todos os componentes usam ES6 imports em vez de caminhos estaticos
+Ao expandir um membro processado, o admin vera um preview visual completo e organizado do insight da IA, em vez de texto bruto.
