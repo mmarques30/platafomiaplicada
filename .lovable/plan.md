@@ -1,39 +1,57 @@
 
-# Corrigir Simulacao Admin para Todos os Planos
+# Corrigir Navegacao entre Submenus Skills durante Simulacao
 
 ## Problema
 
-Quando o admin usa "Ver como..." para simular qualquer usuario, os filtros do menu lateral nas linhas 129 e 130 do `AppSidebar.tsx` verificam `isAdmin` diretamente. Como o admin continua sendo admin durante a simulacao, esses filtros sao ignorados e o admin ve menus que o usuario real nao veria (ex: Painel do Lider, Performance).
+Quando o admin simula um usuario (como Erich) e tenta navegar para "Avaliacao" ou "Projetos", a pagina trava e volta para "Visao Geral". Isso acontece porque:
 
-Isso afeta todos os planos, nao so Skills.
+1. O hook `useSkillsMembro` tem uma **condicao de corrida (race condition)**: enquanto `useUserRole` ainda esta carregando, `isAdmin` e `false`, entao `effectiveUserId` usa o ID do admin em vez do ID do Erich
+2. A query dispara com o ID do admin, que nao e membro de nenhuma equipe Skills, e retorna `null`
+3. `isPending` fica `false` (a query completou), mas `roleLoading` ainda e `true`, entao `isLoading` continua `true` -- ate aqui tudo bem
+4. Quando `roleLoading` vira `false`, `isAdmin` vira `true`, `effectiveUserId` muda para o ID do Erich, e uma **nova query** e disparada
+5. Porem, entre a primeira query completar e a segunda iniciar, ha um momento em que `isPending` e `false` e `roleLoading` e `false`, mas `data` ainda e `null` (resultado da query antiga com ID do admin)
+6. Nesse instante, `isLoading = false` e `equipeId = null`, ativando o redirect para `/skills/projeto`
 
 ## Solucao
 
-Substituir `isAdmin` por `(isAdmin && !isViewingAs)` nas duas linhas de filtro (129 e 130). A variavel `isViewingAs` ja esta disponivel no componente (linha 38).
+Modificar `useSkillsMembro` para **nao disparar a query enquanto as roles estao carregando e ha uma simulacao ativa**. Isso garante que `effectiveUserId` seja resolvido corretamente antes de qualquer consulta.
 
-### Arquivo: `src/components/layout/AppSidebar.tsx`
+### Arquivo: `src/hooks/useSkillsMembro.ts`
 
-**Linha 129** - Filtro de Painel do Lider:
-```text
-// De:
-.filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading)
+Adicionar a condicao `!roleLoading` ao `enabled` quando ha simulacao:
 
-// Para:
-.filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading)
+```typescript
+// A query so deve disparar quando:
+// 1. Temos um effectiveUserId valido
+// 2. Se ha simulacao ativa, as roles ja devem ter carregado
+const shouldQuery = !!effectiveUserId && (!isViewingAs || !roleLoading);
+
+const { data, isPending } = useQuery({
+  queryKey: ["skills-membro", effectiveUserId],
+  queryFn: async () => {
+    if (!effectiveUserId) return null;
+    const { data, error } = await supabase
+      .from("membros_equipe_skills")
+      .select("equipe_id, papel, cargo, status")
+      .eq("user_id", effectiveUserId)
+      .eq("status", "ativo")
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+  enabled: shouldQuery,
+});
 ```
 
-**Linha 130** - Filtro de Performance:
-```text
-// De:
-.filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading)
+## Detalhes Tecnicos
 
-// Para:
-.filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading)
-```
+- Quando `isViewingAs` e `true` e `roleLoading` e `true`, `enabled` sera `false`, impedindo a query prematura
+- Quando `roleLoading` resolver, `isAdmin` sera `true`, `effectiveUserId` sera o ID do Erich, e a query disparara com o ID correto
+- Quando nao ha simulacao (`isViewingAs = false`), o comportamento permanece identico ao atual
+- A RLS funciona corretamente pois o admin tem a policy "ALL" que permite ler qualquer registro
 
 ## Resultado
 
-- **Admin sem simulacao**: `isViewingAs` e `false`, entao `(isAdmin && !isViewingAs)` e `true` -- ve tudo normalmente
-- **Admin simulando qualquer usuario**: `isViewingAs` e `true`, entao `(isAdmin && !isViewingAs)` e `false` -- o menu respeita apenas os papeis do usuario simulado (via `isSkillsLider` que ja usa `impersonatedUserId`)
-- **Nenhum impacto** nos demais filtros de ambiente (`getSidebarMenus` ja usa `effectiveEnvironment` que respeita a simulacao)
-- Funciona para todos os planos: Academy, Skills, Business e Visitante
+- Admin simulando Erich: query espera as roles carregarem, usa o ID do Erich, retorna `equipeId` correto, permite navegar para Avaliacao/Projetos
+- Admin sem simulacao: comportamento inalterado
+- Membros normais: comportamento inalterado (nunca passam por `isViewingAs`)
