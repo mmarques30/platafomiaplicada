@@ -3,8 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import { forceFullAppReload } from "@/lib/pwaUpdate";
-import { RefreshCw } from "lucide-react";
 import { AnimatedBackground } from "@/components/auth/AnimatedBackground";
 import { AuthHeader } from "@/components/auth/AuthHeader";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -122,16 +120,6 @@ export default function Auth() {
             </a>
           </motion.p>
           
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.9 }}
-            onClick={() => forceFullAppReload()}
-            className="mt-4 flex items-center justify-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors mx-auto"
-          >
-            <RefreshCw size={12} />
-            Atualizar App
-          </motion.button>
         </motion.div>
       </main>
     </div>
