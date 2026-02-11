@@ -12,11 +12,11 @@ export function PWAUpdatePrompt() {
         registration = reg;
         
         if (registration) {
-          // Verificar atualizações a cada 1 minuto
+          // Verificar atualizações a cada 15 segundos
           setInterval(() => {
             console.log('[PWA] Verificando atualização (interval)...');
             registration?.update();
-          }, 60 * 1000);
+          }, 15 * 1000);
         }
       },
       onNeedRefresh() {
