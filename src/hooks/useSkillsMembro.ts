@@ -28,53 +28,54 @@ export function useSkillsMembro() {
   // A query só deve disparar quando:
   // 1. Temos um effectiveUserId válido
   // 2. Se há simulação ativa, as roles já devem ter carregado
-  const shouldQuery = !!effectiveUserId && (!isViewingAs || !roleLoading);
+  // 3. Roles devem ter carregado (para saber se é admin e precisa de fallback)
+  const shouldQuery = !!effectiveUserId && !roleLoading && (!isViewingAs || !roleLoading);
 
   const { data, isPending } = useQuery({
-    queryKey: ["skills-membro", effectiveUserId],
+    queryKey: ["skills-membro", effectiveUserId, isAdmin],
     queryFn: async () => {
-      if (!effectiveUserId) return null;
-      const { data, error } = await supabase
+      if (!effectiveUserId) return { member: null, fallbackEquipeId: null };
+
+      // 1. Buscar dados do membro
+      const { data: memberData, error } = await supabase
         .from("membros_equipe_skills")
         .select("equipe_id, papel, cargo, status")
         .eq("user_id", effectiveUserId)
         .eq("status", "ativo")
         .maybeSingle();
       if (error) throw error;
-      return data;
+
+      // 2. Se é admin e não tem equipe, buscar primeira equipe disponível (fallback)
+      if (!memberData?.equipe_id && isAdmin) {
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from("equipes_skills")
+          .select("id")
+          .limit(1)
+          .maybeSingle();
+        if (fallbackError) throw fallbackError;
+        return { member: memberData, fallbackEquipeId: fallbackData?.id ?? null };
+      }
+
+      return { member: memberData, fallbackEquipeId: null };
     },
     enabled: shouldQuery,
   });
 
-  // Fallback para admin: buscar primeira equipe disponível quando admin não é membro direto
-  const needsFallback = isAdmin && !roleLoading && !authLoading && !isPending && !data?.equipe_id;
-  
-  const { data: fallbackEquipeId, isPending: fallbackPending } = useQuery({
-    queryKey: ["skills-admin-fallback-equipe"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("equipes_skills")
-        .select("id")
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data?.id ?? null;
-    },
-    enabled: needsFallback,
-  });
+  const memberData = data?.member ?? null;
+  const fallbackEquipeId = data?.fallbackEquipeId ?? null;
 
   // equipeId final: do membro OU fallback admin
-  const finalEquipeId = data?.equipe_id ?? (isAdmin ? fallbackEquipeId : null) ?? null;
+  const finalEquipeId = memberData?.equipe_id ?? (isAdmin ? fallbackEquipeId : null) ?? null;
 
-  // isLoading inclui fallback quando admin sem equipe
-  const isLoading = isPending || authLoading || roleLoading || (needsFallback && fallbackPending);
+  // isLoading simples: query pendente ou auth/roles carregando
+  const isLoading = isPending || authLoading || roleLoading;
 
   return {
     equipeId: finalEquipeId,
-    papel: data?.papel as "lider" | "membro" | null,
-    isLider: data?.papel === "lider",
-    isMembro: data?.papel === "membro",
-    cargo: data?.cargo ?? null,
+    papel: memberData?.papel as "lider" | "membro" | null,
+    isLider: memberData?.papel === "lider",
+    isMembro: memberData?.papel === "membro",
+    cargo: memberData?.cargo ?? null,
     isLoading,
   };
 }
