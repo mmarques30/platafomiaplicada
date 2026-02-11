@@ -1,79 +1,63 @@
 
 
-# Corrigir Delay de 2 Minutos no Carregamento (Layout Antigo)
+# Corrigir Tela Preta no Celular
 
-## Diagnostico
+## Causa Raiz
 
-O problema tem 3 causas combinadas:
+O `useVersionCheck` esta limpando TODOS os caches do navegador (incluindo os caches do Service Worker com os assets JS/CSS/imagens) quando detecta uma mudanca de versao. Isso forca o app a recarregar sem nenhum cache disponivel. Em conexoes moveis lentas, o resultado e uma tela preta enquanto tudo e baixado novamente da rede.
 
-1. **Versao hardcoded desatualizada**: O `useVersionCheck.tsx` usa a versao `'2026-01-05-v10'` (de 5 de janeiro). Como nao muda a cada build, nunca detecta versoes novas e nunca limpa o cache automaticamente.
+O problema e que existem dois mecanismos competindo:
+- `PWAUpdatePrompt`: detecta novo SW, faz reload automatico (mecanismo correto)
+- `useVersionCheck`: detecta timestamp diferente, limpa TODOS os caches e faz reload (mecanismo destrutivo)
 
-2. **Service Worker antigo ainda ativo**: Usuarios que ja instalaram o PWA tem o SW antigo (com `StaleWhileRevalidate`) servindo assets do cache. A mudanca para `NetworkFirst` so toma efeito quando o novo SW e instalado e ativado - o que pode levar ate 60 segundos (intervalo de verificacao).
-
-3. **Fluxo de ativacao lento**: Mesmo com `skipWaiting` e `clientsClaim`, o ciclo completo e: detectar novo SW -> baixar -> instalar -> ativar -> recarregar. Durante esse tempo, o SW antigo continua servindo o layout antigo.
+Quando ambos disparam, os caches sao destruidos antes do novo conteudo estar pronto, resultando em tela preta.
 
 ## Solucao
 
-### 1. Versao automatica por build (`src/hooks/useVersionCheck.tsx`)
+Simplificar o `useVersionCheck` para que ele apenas registre a versao atual no localStorage, sem destruir caches e sem forcar reload. O Service Worker (via `PWAUpdatePrompt`) ja cuida de:
+- Detectar novas versoes (a cada 15s e ao voltar ao foco)
+- Ativar o novo SW com `skipWaiting` e `clientsClaim`
+- Recarregar a pagina automaticamente via `onNeedRefresh`
 
-Trocar a versao hardcoded por um hash gerado automaticamente pelo Vite a cada build, usando `import.meta.env.VITE_BUILD_TIME` ou a propria data de build. Dessa forma, cada deploy gera uma versao diferente e dispara a limpeza de cache imediatamente.
+A estrategia `NetworkFirst` no `vite.config.ts` ja garante que assets frescos sao buscados da rede primeiro.
+
+## Alteracao
+
+### Arquivo: `src/hooks/useVersionCheck.tsx`
+
+Remover toda a logica destrutiva de limpeza de cache e reload. Manter apenas o registro da versao para fins de log/debug:
 
 ```text
-// ANTES:
-const CURRENT_VERSION = '2026-01-05-v10';
+import { useEffect } from 'react';
 
-// DEPOIS:
-const CURRENT_VERSION = __BUILD_TIMESTAMP__;
-```
+const CURRENT_VERSION = typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : 'dev';
+const VERSION_KEY = 'app-version';
 
-Adicionar a definicao do timestamp no `vite.config.ts` via `define`:
-```text
-define: {
-  __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+export function useVersionCheck() {
+  useEffect(() => {
+    const storedVersion = localStorage.getItem(VERSION_KEY);
+
+    if (storedVersion && storedVersion !== CURRENT_VERSION) {
+      console.log('[Version] Nova versao detectada:', CURRENT_VERSION, '(anterior:', storedVersion, ')');
+    }
+
+    // Apenas registrar a versao atual - o SW cuida do resto
+    localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
+  }, []);
 }
 ```
 
-### 2. Forcar ativacao imediata do novo SW (`src/components/shared/PWAUpdatePrompt.tsx`)
-
-Reduzir o intervalo de verificacao de 60s para 15s e adicionar um mecanismo que forca o reload imediatamente quando o novo SW esta pronto, sem esperar o proximo ciclo de navegacao.
-
-```text
-// Intervalo mais curto para deteccao
-setInterval(() => {
-  registration?.update();
-}, 15 * 1000); // 15 segundos em vez de 60
-```
-
-### 3. Limpeza proativa no `useVersionCheck.tsx`
-
-Quando detectar versao diferente, alem de limpar caches, tambem forcar desregistro e re-registro do SW para garantir que o novo SW com `NetworkFirst` seja instalado:
-
-```text
-// Alem de limpar caches, forcar SW update
-if ('serviceWorker' in navigator) {
-  const registrations = await navigator.serviceWorker.getRegistrations();
-  for (const reg of registrations) {
-    await reg.update();
-  }
-}
-```
-
-### 4. Incrementar cacheName do HTML (`vite.config.ts`)
-
-Incrementar `html-cache-v10` para `html-cache-v11` para forcar invalidacao do cache HTML tambem, garantindo que o index.html com a referencia ao novo JS seja carregado.
-
-## Arquivos alterados
-
-| Arquivo | Alteracao |
-|---------|-----------|
-| `vite.config.ts` | Adicionar `define: { __BUILD_TIMESTAMP__ }` e incrementar `html-cache-v11` |
-| `src/hooks/useVersionCheck.tsx` | Usar `__BUILD_TIMESTAMP__` em vez de versao hardcoded; forcar SW update ao detectar mudanca |
-| `src/components/shared/PWAUpdatePrompt.tsx` | Reduzir intervalo de verificacao para 15s |
+Mudancas:
+- Removido: `caches.keys()` + `caches.delete()` (limpeza destrutiva de todos os caches)
+- Removido: `navigator.serviceWorker.getRegistrations()` + `reg.update()` (duplica o que PWAUpdatePrompt faz)
+- Removido: `window.location.reload()` (duplica o que onNeedRefresh faz)
+- Mantido: Log de versao e registro no localStorage
 
 ## Resultado
 
-- Cada novo deploy gera um timestamp unico
-- Ao abrir o app, `useVersionCheck` detecta a versao diferente imediatamente e limpa todos os caches
-- O SW verifica atualizacoes a cada 15s em vez de 60s
-- O usuario ve o layout correto na primeira carga, sem delay de 2 minutos
+- O app nunca mais tera seus caches destruidos abruptamente
+- O Service Worker continua atualizando normalmente via `PWAUpdatePrompt`
+- No celular, o app carrega instantaneamente do cache (NetworkFirst com fallback)
+- Quando o novo SW estiver pronto, faz reload automatico com os novos assets ja cacheados
+- Sem tela preta
 
