@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   CheckCircle2,
   Clock,
@@ -10,14 +11,14 @@ import {
   BookOpen,
   TrendingUp,
   Users,
-  AlertCircle,
   BarChart3,
   Award,
   RefreshCw,
   Sparkles,
 } from "lucide-react";
 import type { DiagnosticoSkills } from "@/hooks/useSkillsDiagnostico";
-import { useSkillsEquipeDiagnostico } from "@/hooks/useSkillsEquipeDiagnostico";
+import { useSkillsEquipe } from "@/hooks/useSkillsEquipe";
+import EquipeConsolidadoView from "./EquipeConsolidadoView";
 
 interface DiagnosticoResultsProps {
   onRefill?: () => void;
@@ -27,7 +28,7 @@ interface DiagnosticoResultsProps {
 export default function DiagnosticoResults({ onRefill, diagnostico }: DiagnosticoResultsProps) {
   const insight = diagnostico?.insight_ia;
   const hasRealData = !!insight;
-  const equipe = useSkillsEquipeDiagnostico();
+  const { consolidado, isLoading: equipeLoading } = useSkillsEquipe();
 
   if (!hasRealData) {
     return (
@@ -55,6 +56,68 @@ export default function DiagnosticoResults({ onRefill, diagnostico }: Diagnostic
     );
   }
 
+  return (
+    <Tabs defaultValue="minha-analise" className="w-full">
+      <TabsList className="w-full mb-4">
+        <TabsTrigger value="minha-analise" className="flex-1">Minha Análise</TabsTrigger>
+        <TabsTrigger value="equipe" className="flex-1">Análise da Equipe</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="minha-analise">
+        <MinhaAnaliseContent diagnostico={diagnostico} onRefill={onRefill} insight={insight} />
+      </TabsContent>
+
+      <TabsContent value="equipe">
+        {equipeLoading ? (
+          <Card className="border-border bg-card">
+            <CardContent className="flex items-center justify-center py-12">
+              <p className="text-sm text-muted-foreground">Carregando dados da equipe...</p>
+            </CardContent>
+          </Card>
+        ) : consolidado ? (
+          <EquipeConsolidadoView consolidado={consolidado} />
+        ) : (
+          <Card className="border-[hsl(68,35%,73%)] bg-[hsl(68,40%,88%)]">
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+              <Users className="h-12 w-12 text-muted-foreground" />
+              <div>
+                <p className="text-lg font-semibold text-foreground">Aguardando consolidação</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  O diagnóstico consolidado da equipe ainda não foi gerado pelo administrador.
+                </p>
+              </div>
+              <div className="text-left max-w-md">
+                <p className="mb-2 text-sm font-medium text-foreground">
+                  Quando disponível, você terá acesso a:
+                </p>
+                <ul className="space-y-2">
+                  {["Dores comuns da equipe", "Processos com maior potencial", "Recomendações consolidadas", "Economia total estimada"].map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-sm text-foreground">
+                      <CheckCircle2 className="h-4 w-4 text-[hsl(72,50%,35%)]" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </TabsContent>
+    </Tabs>
+  );
+}
+
+/* ── Conteúdo individual extraído ── */
+
+function MinhaAnaliseContent({
+  diagnostico,
+  onRefill,
+  insight,
+}: {
+  diagnostico?: DiagnosticoSkills;
+  onRefill?: () => void;
+  insight: any;
+}) {
   const perfil = insight.perfil || {};
   const processos = insight.processos || [];
   const economia = insight.economia || {};
@@ -233,47 +296,6 @@ export default function DiagnosticoResults({ onRefill, diagnostico }: Diagnostic
                   Refazer Diagnóstico
                 </Button>
               )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Banner Aguardando Equipe — dados reais */}
-      {!equipe.isLoading && equipe.totalMembros > 0 && !equipe.todosPreencheram && (
-        <Card className="border-[hsl(68,35%,73%)] bg-[hsl(68,40%,88%)]">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base text-foreground">
-              <Users className="h-5 w-5 text-[hsl(72,50%,35%)]" />
-              Aguardando Equipe
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-foreground">
-              Diagnóstico preenchido: {equipe.diagnosticosCompletos} de {equipe.totalMembros} membros
-            </p>
-            <Progress
-              value={(equipe.diagnosticosCompletos / equipe.totalMembros) * 100}
-              className="h-2"
-              indicatorClassName="bg-[hsl(72,50%,35%)]"
-            />
-            {equipe.membros.filter(m => !m.completado).length > 0 && (
-              <p className="text-sm text-muted-foreground">
-                Faltam: {equipe.membros.filter(m => !m.completado).map(m => m.nome).join(", ")}
-              </p>
-            )}
-            <Separator />
-            <div>
-              <p className="mb-2 text-sm font-medium text-foreground">
-                Quando todos preencherem, você terá acesso a:
-              </p>
-              <ul className="space-y-2">
-                {["Entregas priorizadas da equipe", "Projetos colaborativos", "Visão consolidada de impacto"].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-foreground">
-                    <CheckCircle2 className="h-4 w-4 text-[hsl(72,50%,35%)]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
           </CardContent>
         </Card>
