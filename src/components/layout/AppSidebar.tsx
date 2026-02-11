@@ -127,7 +127,7 @@ export function AppSidebar() {
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
       .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading)
-      .filter(menu => !['projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading);
+      .filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading);
   };
 
   const toggleMenu = (menuKey: string) => {
