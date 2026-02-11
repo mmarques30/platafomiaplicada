@@ -37,7 +37,7 @@ export function useSkillsEquipe() {
           user_id,
           profiles:user_id (
             id,
-            nome,
+            nome_completo,
             avatar_url
           )
         `)
@@ -60,7 +60,7 @@ export function useSkillsEquipe() {
         user_id: m.user_id,
         cargo: m.cargo,
         papel: m.papel,
-        nome: m.profiles?.nome || "Usuário",
+        nome: m.profiles?.nome_completo || "Usuário",
         avatar_url: m.profiles?.avatar_url,
         diagnostico_completo: diagnosticosData?.find(d => d.user_id === m.user_id)?.completado || false,
       })) || [];
