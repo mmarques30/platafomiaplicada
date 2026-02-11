@@ -126,8 +126,8 @@ export function AppSidebar() {
     // Filtrar Performance e Diagnóstico do Projeto Skills para não-líderes/não-admins
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
-      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading)
-      .filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading);
+      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading)
+      .filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading);
   };
 
   const toggleMenu = (menuKey: string) => {
