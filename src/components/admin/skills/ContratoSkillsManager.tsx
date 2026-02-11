@@ -152,7 +152,7 @@ export function ContratoSkillsManager({ equipeId, equipeName }: Props) {
               <div className="space-y-2"><Label>Frequência Encontros</Label>
                 <Select value={programa.frequencia_encontros} onValueChange={v => setPrograma(p => ({ ...p, frequencia_encontros: v }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent><SelectItem value="semanal">Semanal</SelectItem><SelectItem value="quinzenal">Quinzenal</SelectItem><SelectItem value="mensal">Mensal</SelectItem></SelectContent>
+                  <SelectContent><SelectItem value="semanal">Semanal</SelectItem><SelectItem value="quinzenal">Quinzenal</SelectItem><SelectItem value="mensal">Mensal</SelectItem><SelectItem value="trimestral">Trimestral</SelectItem></SelectContent>
                 </Select>
               </div>
               <div className="space-y-2"><Label>Data Início</Label><Input type="date" value={programa.data_inicio} onChange={e => setPrograma(p => ({ ...p, data_inicio: e.target.value }))} /></div>

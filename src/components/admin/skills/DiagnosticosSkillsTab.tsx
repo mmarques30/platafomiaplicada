@@ -7,17 +7,36 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useDiagnosticosEquipeAdmin, MembroDiagnostico } from "@/hooks/admin/useDiagnosticosEquipeAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ChevronDown, ChevronUp, Sparkles, CheckCircle, Clock, Brain, Users, FileText } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2, ChevronDown, ChevronUp, Sparkles, CheckCircle, Clock, Brain, Users, FileText, BarChart3, AlertTriangle, Lightbulb, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import DiagnosticoRespostasView from "./DiagnosticoRespostasView";
 import InsightIAPreview from "./InsightIAPreview";
+import ReactMarkdown from "react-markdown";
 
 interface Props { equipeId: string }
 
 export default function DiagnosticosSkillsTab({ equipeId }: Props) {
   const { data: membros = [], isLoading } = useDiagnosticosEquipeAdmin(equipeId);
+  const queryClient = useQueryClient();
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [isConsolidating, setIsConsolidating] = useState(false);
+
+  // Fetch consolidated diagnostic
+  const { data: consolidado, isLoading: isLoadingConsolidado } = useQuery({
+    queryKey: ["diagnostico-consolidado", equipeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("diagnostico_consolidado_skills")
+        .select("*")
+        .eq("equipe_id", equipeId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!equipeId,
+  });
 
   const completos = membros.filter(m => m.completado).length;
   const processados = membros.filter(m => m.hasInsight).length;
@@ -39,6 +58,27 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
     }
   };
 
+  const handleConsolidar = async () => {
+    if (completos === 0) {
+      toast.error("Nenhum diagnóstico preenchido para consolidar");
+      return;
+    }
+    setIsConsolidating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('consolidar-diagnosticos-skills', {
+        body: { equipe_id: equipeId }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Diagnóstico consolidado gerado!");
+      queryClient.invalidateQueries({ queryKey: ["diagnostico-consolidado", equipeId] });
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao consolidar diagnósticos");
+    } finally {
+      setIsConsolidating(false);
+    }
+  };
+
   if (isLoading) return <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
 
   return (
@@ -54,6 +94,95 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
             <span className="text-sm text-muted-foreground">{completos}/{membros.length} preenchidos · {processados} processados</span>
           </div>
           <Progress value={percentual} className="h-2" />
+        </CardContent>
+      </Card>
+
+      {/* Consolidated Diagnostic Section */}
+      <Card className="border-border/50">
+        <CardHeader className="py-3 px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Diagnóstico Consolidado</CardTitle>
+              {consolidado && <Badge variant="secondary" className="text-xs">v{consolidado.versao || 1}</Badge>}
+            </div>
+            <Button size="sm" onClick={handleConsolidar} disabled={isConsolidating || completos === 0}>
+              {isConsolidating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : consolidado ? <RefreshCw className="h-4 w-4 mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
+              {consolidado ? "Reconsolidar" : "Consolidar Diagnósticos"}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {completos === 0 ? (
+            <div className="flex items-center gap-2 p-3 bg-yellow-500/10 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-yellow-600 shrink-0" />
+              <p className="text-sm text-yellow-600">Nenhum diagnóstico preenchido. Os membros precisam preencher seus diagnósticos para gerar a consolidação.</p>
+            </div>
+          ) : !consolidado ? (
+            <p className="text-sm text-muted-foreground">Clique em "Consolidar Diagnósticos" para gerar a visão unificada da equipe com IA.</p>
+          ) : (
+            <div className="space-y-4">
+              {/* Insights IA */}
+              {consolidado.insights_ia && (
+                <div className="p-3 bg-muted/30 rounded-lg prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown>{consolidado.insights_ia as string}</ReactMarkdown>
+                </div>
+              )}
+
+              {/* Metrics row */}
+              <div className="grid grid-cols-2 gap-3">
+                {consolidado.total_horas_manuais_semana && (
+                  <div className="p-3 bg-muted/30 rounded-lg text-center">
+                    <p className="text-2xl font-bold">{consolidado.total_horas_manuais_semana}h</p>
+                    <p className="text-xs text-muted-foreground">Horas manuais/semana</p>
+                  </div>
+                )}
+                {consolidado.potencial_economia_horas && (
+                  <div className="p-3 bg-primary/10 rounded-lg text-center">
+                    <p className="text-2xl font-bold text-primary">{consolidado.potencial_economia_horas}h</p>
+                    <p className="text-xs text-muted-foreground">Potencial economia/semana</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Dores Comuns */}
+              {Array.isArray(consolidado.dores_comuns) && (consolidado.dores_comuns as any[]).length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase mb-2 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Dores Comuns</p>
+                  <div className="space-y-1.5">
+                    {(consolidado.dores_comuns as any[]).map((d: any, i: number) => (
+                      <div key={i} className="flex items-center justify-between p-2 bg-muted/30 rounded text-sm">
+                        <span>{d.dor}</span>
+                        <Badge variant="outline" className="text-xs">{d.membros_afetados} membros</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recomendações */}
+              {Array.isArray(consolidado.recomendacoes) && (consolidado.recomendacoes as any[]).length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase mb-2 flex items-center gap-1"><Lightbulb className="h-3 w-3" /> Recomendações</p>
+                  <div className="space-y-1.5">
+                    {(consolidado.recomendacoes as any[]).map((r: any, i: number) => (
+                      <div key={i} className="p-2 bg-muted/30 rounded">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{r.titulo}</span>
+                          {r.tipo && <Badge variant="secondary" className="text-xs">{r.tipo}</Badge>}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">{r.descricao}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {consolidado.gerado_em && (
+                <p className="text-xs text-muted-foreground text-right">Gerado em: {new Date(consolidado.gerado_em as string).toLocaleDateString("pt-BR")}</p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -100,7 +229,6 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
                       <p className="text-sm text-muted-foreground">Diagnóstico ainda não preenchido pelo membro.</p>
                     ) : (
                       <div className="space-y-3">
-                        {/* Respostas brutas */}
                         {membro.dadosBrutos && (
                           <div className="p-3 bg-muted/30 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
@@ -110,8 +238,6 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
                             <DiagnosticoRespostasView dados={membro.dadosBrutos} />
                           </div>
                         )}
-
-                        {/* Botão processar */}
                         {membro.completado && !membro.hasInsight && (
                           <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                             <p className="text-sm">Diagnóstico preenchido, mas não processado por IA</p>
@@ -121,8 +247,6 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
                             </Button>
                           </div>
                         )}
-
-                        {/* Resultados IA */}
                         {(membro.hasInsight || membro.economia_horas_semana) && (
                           <InsightIAPreview
                             insightIA={membro.insight_ia}
