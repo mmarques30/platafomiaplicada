@@ -1,65 +1,61 @@
 
-# Corrigir Acesso Admin e Membros a Todas as Abas do Skills
+# Corrigir Bug de Race Condition no Fallback Admin do Skills
 
-## Problema Raiz
+## Problema
 
-Todas as paginas de submenus Skills (Avaliacao, Projetos, Performance) dependem do hook `useSkillsMembro` para obter o `equipeId`. Quando o usuario nao e membro direto de uma equipe Skills (como o admin), `equipeId` retorna `null` e as paginas redirecionam para `/skills/projeto` (Visao Geral).
+Quando qualquer usuario (admin, membro, ou simulacao) tenta navegar para "Avaliacao", "Projetos" ou "Performance", a pagina redireciona de volta para "Visao Geral". O problema persiste apesar das correcoes anteriores.
 
-O hook `useSkillsLider` ja resolve isso com um "admin fallback" que busca a primeira equipe disponivel, mas as paginas de Diagnostico e Projetos nao usam esse hook — usam `useSkillsMembro` diretamente.
+## Causa Raiz
+
+Ha um bug sutil na query de fallback do `useSkillsMembro`. Quando `needsFallback` muda de `false` para `true` (no momento que as roles carregam), existe **um frame de renderizacao** onde:
+
+1. A query de fallback acaba de ser habilitada (`enabled` mudou para `true`)
+2. Mas o React Query ainda nao iniciou o fetch
+3. `isLoading` (que e `isPending && isFetching`) retorna `false` porque o fetch nao comecou
+4. `fallbackEquipeId` e `null` (sem dados ainda)
+5. Resultado: `isLoading = false` e `equipeId = null` por um frame
+6. O `useEffect` das paginas detecta `!isLoading && !equipeId` e redireciona
 
 ## Solucao
 
-Mover a logica de admin fallback para dentro do `useSkillsMembro`, eliminando o problema na raiz. Assim, TODAS as paginas que dependem desse hook funcionarao automaticamente para admins, membros e simulacoes.
+Trocar `isLoading` por `isPending` na query de fallback. No React Query v5:
+- `isLoading` = `isPending && isFetching` (false quando query esta desabilitada ou acabou de ser habilitada)
+- `isPending` = `true` sempre que nao ha dados em cache (inclusive em queries desabilitadas)
+
+Isso elimina o frame onde a query esta habilitada mas sem dados e sem estar "carregando".
 
 ### Arquivo: `src/hooks/useSkillsMembro.ts`
 
-Adicionar uma segunda query que busca a primeira equipe disponivel quando o usuario e admin e nao tem equipe propria:
+Alteracao na desestruturacao da query de fallback:
 
 ```typescript
-// Fallback para admin: buscar primeira equipe disponivel
-const { data: fallbackEquipe, isLoading: fallbackLoading } = useQuery({
-  queryKey: ["skills-admin-fallback-equipe"],
-  queryFn: async () => {
-    const { data, error } = await supabase
-      .from("equipes_skills")
-      .select("id")
-      .limit(1)
-      .maybeSingle();
-    if (error) throw error;
-    return data?.id ?? null;
-  },
-  enabled: isAdmin && !data?.equipe_id && !isPending && !authLoading && !roleLoading,
-});
+// ANTES:
+const { data: fallbackEquipeId, isLoading: fallbackLoading } = useQuery({...});
 
-// equipeId final: do membro OU fallback admin
-const finalEquipeId = data?.equipe_id ?? (isAdmin ? fallbackEquipe : null);
-
-// isLoading inclui fallback quando admin sem equipe
-const adminWaitingFallback = isAdmin && !data?.equipe_id && !isPending && !fallbackLoading === false;
-
-return {
-  equipeId: finalEquipeId,
-  // ... demais campos
-  isLoading: isPending || authLoading || roleLoading || (isAdmin && !data?.equipe_id && fallbackLoading),
-};
+// DEPOIS:
+const { data: fallbackEquipeId, isPending: fallbackPending } = useQuery({...});
 ```
 
-### Arquivo: `src/hooks/useSkillsLider.ts`
+E no calculo de isLoading:
 
-Remover a logica duplicada de admin fallback (linhas 86-101), pois agora `useSkillsMembro` ja fornece o `equipeId` correto para admins. Usar `membroEquipeId` diretamente em vez de `equipeId = membroEquipeId || adminFallbackEquipeId`.
+```typescript
+// ANTES:
+const isLoading = isPending || authLoading || roleLoading || (needsFallback && fallbackLoading);
 
-### Paginas afetadas (sem alteracao necessaria)
+// DEPOIS:
+const isLoading = isPending || authLoading || roleLoading || (needsFallback && fallbackPending);
+```
 
-Estas paginas continuam usando `useSkillsMembro` normalmente e funcionarao sem mudancas:
-- `ProjetoSkillsDiagnosticoPage.tsx` — usa `equipeId` de `useSkillsMembro`
-- `ProjetoSkillsProjetosPage.tsx` — usa `equipeId` de `useSkillsMembro`
-- `ProjetoSkillsPerformancePage.tsx` — usa `SkillsAdminGuard` + `useSkillsLider`
-- `SkillsAdminGuard.tsx` — usa `isAdmin` de `useUserRole` (sem mudanca)
+## Por que isso funciona
+
+- Quando `needsFallback` era `false` e muda para `true`: `isPending` ja e `true` (nao ha dados em cache), entao `isLoading` permanece `true` ate o fetch completar
+- Quando o fetch completa: `isPending` vira `false`, `fallbackEquipeId` tem o valor correto
+- Para membros normais: `needsFallback` e sempre `false`, sem impacto
+- Para simulacoes: a logica de `shouldQuery` e `effectiveUserId` continua funcionando normalmente
 
 ## Resultado
 
-- **Admin sem simulacao**: fallback busca primeira equipe, `equipeId` nao e null, paginas carregam normalmente
-- **Admin com simulacao**: `effectiveUserId` aponta para usuario simulado, query retorna equipe do usuario simulado, ou fallback se necessario
-- **Membros normais**: query retorna equipe propria, sem mudanca no comportamento
-- **Lideres**: idem membros, com papel "lider"
-- Elimina a logica duplicada em `useSkillsLider`
+- Nenhum frame intermediario com `isLoading = false` e `equipeId = null`
+- Admin sem simulacao: fallback completa antes de `isLoading = false`, paginas carregam
+- Admin com simulacao: query espera roles, usa ID correto
+- Membros: comportamento inalterado
