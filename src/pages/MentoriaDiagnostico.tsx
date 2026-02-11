@@ -26,16 +26,20 @@ export default function MentoriaDiagnostico() {
   // Verificar se admin quer explicitamente editar (via query param)
   const canEdit = new URLSearchParams(location.search).get("edit") === "1";
 
-  // Redirecionar visitantes - não devem acessar esta página
+  // Redirecionar visitantes e Skills - não devem acessar esta página
   useEffect(() => {
-    // Aguardar loading completo antes de decidir redirect
     if (planLoading) return;
     
     if (isVisitante) {
       toast.info("Esta funcionalidade requer um plano ativo");
       navigate("/trilhas", { replace: true });
+      return;
     }
-  }, [isVisitante, planLoading, navigate]);
+
+    if (effectivePlan === 'skills') {
+      navigate('/skills/projeto/diagnostico', { replace: true });
+    }
+  }, [isVisitante, effectivePlan, planLoading, navigate]);
 
   // GUARD DEFINITIVO: Admin REAL (não simulando) em /diagnostico/formulario SEM ?edit=1 => vai para painel
   useEffect(() => {
