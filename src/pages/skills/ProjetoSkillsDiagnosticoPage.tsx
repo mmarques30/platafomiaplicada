@@ -1,19 +1,11 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import ProjetoSkillsDiagnostico from "@/components/skills/ProjetoSkillsDiagnostico";
 
 export default function ProjetoSkillsDiagnosticoPage() {
-  const navigate = useNavigate();
   const { equipeId, isLoading } = useSkillsMembro();
-
-  useEffect(() => {
-    if (!isLoading && !equipeId) {
-      navigate("/skills/projeto", { replace: true });
-    }
-  }, [isLoading, equipeId, navigate]);
 
   if (isLoading) {
     return (
@@ -23,7 +15,7 @@ export default function ProjetoSkillsDiagnosticoPage() {
     );
   }
 
-  if (!equipeId) return null;
+  if (!equipeId) return <Navigate to="/skills/projeto" replace />;
 
   return (
     <div className="p-6 space-y-6">
