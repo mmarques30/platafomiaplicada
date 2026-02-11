@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 
-// @ts-ignore - injected by Vite define
 const CURRENT_VERSION = typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : 'dev';
 const VERSION_KEY = 'app-version';
 
