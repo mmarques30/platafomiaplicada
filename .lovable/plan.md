@@ -1,40 +1,39 @@
 
-
-# Corrigir Acesso de Membros Skills a Avaliacao e Projetos
+# Corrigir Simulacao Admin para Todos os Planos
 
 ## Problema
 
-Membros comuns da equipe Skills (como Erich) nao conseguem ver nem acessar as paginas de "Avaliacao" e "Projetos". Dois bloqueios impedem o acesso:
+Quando o admin usa "Ver como..." para simular qualquer usuario, os filtros do menu lateral nas linhas 129 e 130 do `AppSidebar.tsx` verificam `isAdmin` diretamente. Como o admin continua sendo admin durante a simulacao, esses filtros sao ignorados e o admin ve menus que o usuario real nao veria (ex: Painel do Lider, Performance).
 
-1. **Menu lateral (AppSidebar.tsx, linha 130)**: Os itens `projeto_skills_diagnostico` e `projeto_skills_projetos` sao filtrados para quem nao e lider ou admin -- o membro nem ve os links no menu.
-
-2. **Guard das paginas**: Ambas as paginas (`ProjetoSkillsDiagnosticoPage` e `ProjetoSkillsProjetosPage`) usam `SkillsAdminGuard`, que so permite acesso a admin/lider e redireciona qualquer outro usuario para `/skills/projeto`.
+Isso afeta todos os planos, nao so Skills.
 
 ## Solucao
 
-### 1. AppSidebar.tsx (linha 130)
+Substituir `isAdmin` por `(isAdmin && !isViewingAs)` nas duas linhas de filtro (129 e 130). A variavel `isViewingAs` ja esta disponivel no componente (linha 38).
 
-Remover `projeto_skills_diagnostico` e `projeto_skills_projetos` da lista de filtro. Manter apenas `projeto_skills_performance` como restrito a lider/admin:
+### Arquivo: `src/components/layout/AppSidebar.tsx`
 
+**Linha 129** - Filtro de Painel do Lider:
 ```text
-// ANTES:
-.filter(menu => !['projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos'].includes(menu.menu_key) || ...)
+// De:
+.filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading)
 
-// DEPOIS:
-.filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || ...)
+// Para:
+.filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading)
 ```
 
-### 2. ProjetoSkillsDiagnosticoPage.tsx
+**Linha 130** - Filtro de Performance:
+```text
+// De:
+.filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || isAdmin || skillsMembroLoading)
 
-Remover `SkillsAdminGuard`. Qualquer membro ativo da equipe Skills deve poder preencher seu diagnostico. Usar `useSkillsMembro` para verificar se o usuario e membro ativo, com redirect se nao for.
-
-### 3. ProjetoSkillsProjetosPage.tsx
-
-Remover `SkillsAdminGuard`. Todos os membros da equipe Skills precisam ver os projetos colaborativos. Mesmo tratamento: verificar se e membro ativo da equipe.
+// Para:
+.filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading)
+```
 
 ## Resultado
 
-- Membros comuns verao "Avaliacao" e "Projetos" no menu lateral
-- Conseguirao acessar ambas as paginas normalmente
-- Apenas "Performance" (Painel Lider) continua restrito a lider/admin
-
+- **Admin sem simulacao**: `isViewingAs` e `false`, entao `(isAdmin && !isViewingAs)` e `true` -- ve tudo normalmente
+- **Admin simulando qualquer usuario**: `isViewingAs` e `true`, entao `(isAdmin && !isViewingAs)` e `false` -- o menu respeita apenas os papeis do usuario simulado (via `isSkillsLider` que ja usa `impersonatedUserId`)
+- **Nenhum impacto** nos demais filtros de ambiente (`getSidebarMenus` ja usa `effectiveEnvironment` que respeita a simulacao)
+- Funciona para todos os planos: Academy, Skills, Business e Visitante
