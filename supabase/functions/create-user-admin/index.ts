@@ -58,7 +58,6 @@ Deno.serve(async (req) => {
       origemConsultoria, 
       empresaConsultoria, 
       skillsLiberado,
-      // New Skills team fields
       equipeId,
       novaEquipe,
       papelEquipe
@@ -77,7 +76,10 @@ Deno.serve(async (req) => {
       throw new Error('Para o plano Skills, é obrigatório informar uma equipe existente ou criar uma nova.')
     }
 
-    // 1. Criar usuário via Admin API
+    let userId: string;
+    let isExistingUser = false;
+
+    // 1. Tentar criar usuário via Admin API
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -85,34 +87,73 @@ Deno.serve(async (req) => {
       user_metadata: { nome_completo: nomeCompleto }
     })
 
-    if (userError) throw userError
-    if (!userData.user) throw new Error('Usuário não foi criado')
+    if (userError) {
+      // Verificar se é erro de email já existente
+      if ((userError as any).code === 'email_exists' || userError.message?.includes('already been registered')) {
+        console.log('Email já existe, tentando promover usuário existente:', email)
+        
+        // Buscar usuário existente
+        const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers()
+        if (listError) throw listError
+        
+        const existingUser = listData.users.find(u => u.email === email)
+        if (!existingUser) throw new Error('Email existe mas usuário não encontrado')
+        
+        userId = existingUser.id
+        isExistingUser = true
 
-    const userId = userData.user.id
-    console.log('User created:', userId)
+        // Verificar se já tem plano ativo (não é visitante) - proteger contra sobrescrita
+        const { data: existingProfile } = await supabaseAdmin
+          .from('profiles')
+          .select('plano_mentoria, is_visitante')
+          .eq('id', userId)
+          .single()
 
-    // 2. Aguardar e verificar que o profile foi criado (retry até 5x)
-    let profileExists = false
-    for (let i = 0; i < 5; i++) {
-      await new Promise(resolve => setTimeout(resolve, 200 * (i + 1))) // backoff exponencial
-      
-      const { data: profile } = await supabaseAdmin
-        .from('profiles')
-        .select('id')
-        .eq('id', userId)
-        .single()
-      
-      if (profile) {
-        profileExists = true
-        break
+        if (existingProfile && existingProfile.plano_mentoria && !existingProfile.is_visitante) {
+          throw new Error('Este usuário já possui um plano ativo. Edite o usuário existente em vez de criar um novo.')
+        }
+
+        // Atualizar senha
+        if (password) {
+          await supabaseAdmin.auth.admin.updateUserById(userId, { password })
+          console.log('Senha atualizada para usuário existente')
+        }
+
+        // Atualizar metadata
+        await supabaseAdmin.auth.admin.updateUserById(userId, {
+          user_metadata: { nome_completo: nomeCompleto }
+        })
+
+        console.log('Usuário existente encontrado, promovendo:', userId)
+      } else {
+        throw userError
       }
+    } else {
+      if (!userData.user) throw new Error('Usuário não foi criado')
+      userId = userData.user.id
+      console.log('Novo usuário criado:', userId)
     }
 
-    if (!profileExists) {
-      throw new Error('Profile não foi criado pelo trigger')
+    // 2. Aguardar profile (apenas para novos usuários)
+    if (!isExistingUser) {
+      let profileExists = false
+      for (let i = 0; i < 5; i++) {
+        await new Promise(resolve => setTimeout(resolve, 200 * (i + 1)))
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('id')
+          .eq('id', userId)
+          .single()
+        if (profile) {
+          profileExists = true
+          break
+        }
+      }
+      if (!profileExists) {
+        throw new Error('Profile não foi criado pelo trigger')
+      }
+      console.log('Profile confirmed')
     }
-
-    console.log('Profile confirmed')
 
     // 3. Atualizar profile com dados adicionais
     const updateData: Record<string, unknown> = {
@@ -124,6 +165,12 @@ Deno.serve(async (req) => {
     if (planoMentoria) {
       updateData.plano_mentoria = planoMentoria
     }
+
+    // Se estamos promovendo visitante, marcar como não-visitante
+    if (isExistingUser) {
+      updateData.is_visitante = false
+      updateData.nome_completo = nomeCompleto
+    }
     
     if (origemConsultoria !== undefined) {
       updateData.origem_consultoria = origemConsultoria
@@ -133,7 +180,6 @@ Deno.serve(async (req) => {
       updateData.empresa_consultoria = empresaConsultoria
     }
     
-    // Skills liberado só faz sentido para plano business
     if (planoMentoria === 'business') {
       updateData.skills_liberado = skillsLiberado ?? false
     }
@@ -146,9 +192,29 @@ Deno.serve(async (req) => {
     if (profileError) throw profileError
     console.log('Profile updated')
 
-    // 4. Inserir roles (pelo menos aluno_trilha se nenhuma for passada)
+    // 4. Para usuários existentes, remover role visitante antes de inserir novas
+    if (isExistingUser) {
+      await supabaseAdmin
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .eq('role', 'visitante')
+      console.log('Role visitante removida')
+    }
+
+    // 5. Inserir roles
     const rolesToInsert = userRoles && userRoles.length > 0 ? userRoles : ['aluno_trilha']
     
+    // Para usuários existentes, deletar roles antigas (exceto admin) antes de inserir
+    if (isExistingUser) {
+      await supabaseAdmin
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .neq('role', 'admin')
+      console.log('Roles antigas removidas')
+    }
+
     const { error: insertRolesError } = await supabaseAdmin
       .from('user_roles')
       .insert(rolesToInsert.map((role: string) => ({ user_id: userId, role })))
@@ -156,33 +222,28 @@ Deno.serve(async (req) => {
     if (insertRolesError) throw insertRolesError
     console.log('Roles inserted:', rolesToInsert)
 
-    // 5. Verificar que as roles foram inseridas (retry até 3x)
+    // 6. Verificar roles
     let rolesConfirmed = false
     for (let i = 0; i < 3; i++) {
       await new Promise(resolve => setTimeout(resolve, 100 * (i + 1)))
-      
       const { data: insertedRoles } = await supabaseAdmin
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
-      
-      if (insertedRoles && insertedRoles.length === rolesToInsert.length) {
+      if (insertedRoles && insertedRoles.length >= rolesToInsert.length) {
         rolesConfirmed = true
         break
       }
     }
-
     if (!rolesConfirmed) {
       throw new Error('Roles não foram confirmadas no banco')
     }
-
     console.log('Roles confirmed')
 
-    // 6. Handle Skills team association
+    // 7. Handle Skills team association
     if (planoMentoria === 'skills') {
       let targetEquipeId = equipeId;
 
-      // Create new team if needed
       if (novaEquipe && !equipeId) {
         const { data: newEquipe, error: equipeError } = await supabaseAdmin
           .from('equipes_skills')
@@ -204,25 +265,48 @@ Deno.serve(async (req) => {
         console.log('New team created:', targetEquipeId)
       }
 
-      // Link user to team
       if (targetEquipeId) {
-        const { error: membroError } = await supabaseAdmin
-          .from('membros_equipe_skills')
-          .insert({
-            equipe_id: targetEquipeId,
-            user_id: userId,
-            papel: papelEquipe || 'membro',
-            status: 'ativo'
-          });
+        // Para usuários existentes, verificar se já está na equipe
+        if (isExistingUser) {
+          const { data: existingMembro } = await supabaseAdmin
+            .from('membros_equipe_skills')
+            .select('id')
+            .eq('equipe_id', targetEquipeId)
+            .eq('user_id', userId)
+            .single()
 
-        if (membroError) {
-          console.error('Error linking user to team:', membroError)
-          throw new Error('Erro ao vincular usuário à equipe: ' + membroError.message)
+          if (existingMembro) {
+            // Atualizar membro existente
+            await supabaseAdmin
+              .from('membros_equipe_skills')
+              .update({ papel: papelEquipe || 'membro', status: 'ativo' })
+              .eq('id', existingMembro.id)
+            console.log('Membro existente atualizado na equipe')
+          } else {
+            const { error: membroError } = await supabaseAdmin
+              .from('membros_equipe_skills')
+              .insert({
+                equipe_id: targetEquipeId,
+                user_id: userId,
+                papel: papelEquipe || 'membro',
+                status: 'ativo'
+              });
+            if (membroError) throw new Error('Erro ao vincular usuário à equipe: ' + membroError.message)
+            console.log('User linked to team:', targetEquipeId)
+          }
+        } else {
+          const { error: membroError } = await supabaseAdmin
+            .from('membros_equipe_skills')
+            .insert({
+              equipe_id: targetEquipeId,
+              user_id: userId,
+              papel: papelEquipe || 'membro',
+              status: 'ativo'
+            });
+          if (membroError) throw new Error('Erro ao vincular usuário à equipe: ' + membroError.message)
+          console.log('User linked to team:', targetEquipeId)
         }
 
-        console.log('User linked to team:', targetEquipeId, 'as', papelEquipe || 'membro')
-
-        // If leader, update team's lider_id (in case of existing team)
         if (papelEquipe === 'lider' && equipeId) {
           await supabaseAdmin
             .from('equipes_skills')
@@ -233,13 +317,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log('User creation complete - Created by admin:', user.id)
+    const action = isExistingUser ? 'promovido de visitante' : 'criado'
+    console.log(`User ${action} complete - by admin:`, user.id)
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         userId,
-        message: 'Usuário criado com sucesso'
+        message: isExistingUser ? 'Visitante promovido com sucesso' : 'Usuário criado com sucesso'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
