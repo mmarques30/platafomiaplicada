@@ -86,9 +86,10 @@ export default defineConfig(({ mode }) => ({
           },
           {
             urlPattern: /\.(js|css)$/,
-            handler: 'StaleWhileRevalidate',
+            handler: 'NetworkFirst',
             options: {
-              cacheName: 'assets-cache-v10',
+              cacheName: 'assets-cache-v11',
+              networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 86400
