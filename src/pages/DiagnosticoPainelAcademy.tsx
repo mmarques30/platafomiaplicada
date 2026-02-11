@@ -17,18 +17,22 @@ export default function DiagnosticoPainelAcademy() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
-  const { isVisitante, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
+  const { effectivePlan, isVisitante, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
 
-  // Redirecionar visitantes
+  // Redirecionar visitantes e Skills
   useEffect(() => {
-    // Aguardar loading completo antes de decidir redirect
     if (planLoading) return;
     
     if (isVisitante) {
       toast.info("Esta funcionalidade requer um plano ativo");
       navigate("/trilhas", { replace: true });
+      return;
     }
-  }, [isVisitante, planLoading, navigate]);
+
+    if (effectivePlan === 'skills') {
+      navigate('/skills/projeto/diagnostico', { replace: true });
+    }
+  }, [isVisitante, effectivePlan, planLoading, navigate]);
 
   const isPageLoading = isLoading || planLoading;
   const isRealAdmin = isAdmin && !isSimulating;
