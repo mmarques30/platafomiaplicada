@@ -49,7 +49,7 @@ export function useSkillsMembro() {
   // Fallback para admin: buscar primeira equipe disponível quando admin não é membro direto
   const needsFallback = isAdmin && !roleLoading && !authLoading && !isPending && !data?.equipe_id;
   
-  const { data: fallbackEquipeId, isLoading: fallbackLoading } = useQuery({
+  const { data: fallbackEquipeId, isPending: fallbackPending } = useQuery({
     queryKey: ["skills-admin-fallback-equipe"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -67,7 +67,7 @@ export function useSkillsMembro() {
   const finalEquipeId = data?.equipe_id ?? (isAdmin ? fallbackEquipeId : null) ?? null;
 
   // isLoading inclui fallback quando admin sem equipe
-  const isLoading = isPending || authLoading || roleLoading || (needsFallback && fallbackLoading);
+  const isLoading = isPending || authLoading || roleLoading || (needsFallback && fallbackPending);
 
   return {
     equipeId: finalEquipeId,
