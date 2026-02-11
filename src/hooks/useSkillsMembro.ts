@@ -25,6 +25,11 @@ export function useSkillsMembro() {
     ? impersonatedUserId 
     : user?.id;
 
+  // A query só deve disparar quando:
+  // 1. Temos um effectiveUserId válido
+  // 2. Se há simulação ativa, as roles já devem ter carregado
+  const shouldQuery = !!effectiveUserId && (!isViewingAs || !roleLoading);
+
   const { data, isPending } = useQuery({
     queryKey: ["skills-membro", effectiveUserId],
     queryFn: async () => {
@@ -38,7 +43,7 @@ export function useSkillsMembro() {
       if (error) throw error;
       return data;
     },
-    enabled: !!effectiveUserId,
+    enabled: shouldQuery,
   });
 
   return {
