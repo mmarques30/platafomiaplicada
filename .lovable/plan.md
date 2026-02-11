@@ -1,43 +1,48 @@
 
+# Correcoes no Modulo Skills Admin (3 itens)
 
-# Corrigir Skills Travado em Producao - Solucao Definitiva
+## Problema 1: Frequencia de Encontros sem opcao "Trimestral"
 
-## Problema
+O select de "Frequencia Encontros" em `ContratoSkillsManager.tsx` (linha 155) so oferece 3 opcoes: Semanal, Quinzenal e Mensal. Falta a opcao **Trimestral**.
 
-Duas causas simultaneas:
+### Correcao
+Adicionar `<SelectItem value="trimestral">Trimestral</SelectItem>` ao SelectContent na linha 155.
 
-### 1. PWA Cache Desatualizado (causa principal em producao)
-As versoes de cache no `vite.config.ts` ainda sao `v11`. O Service Worker da producao continua servindo codigo antigo (com o bug `nome` ao inves de `nome_completo`) porque nenhuma versao de cache foi incrementada. Mesmo apos o fix e o deploy, o browser do usuario nao busca o codigo novo.
+---
 
-### 2. Race Condition no Redirecionamento das Sub-paginas
-Os componentes `ProjetoSkillsDiagnosticoPage` e `ProjetoSkillsProjetosPage` usam `useEffect` para redirecionar quando `equipeId` e null. No React Query v5, quando a query esta desabilitada (`enabled: false`), `isPending` retorna `true`, mas ha um breve instante durante a transicao onde `isLoading` pode ser `false` antes do `equipeId` resolver, causando redirect prematuro para `/skills/projeto`.
+## Problema 2: Sem visao consolidada dos diagnosticos na aba Diagnosticos
 
-## Solucao
+A aba "Diagnosticos" em `DiagnosticosSkillsTab.tsx` mostra apenas os diagnosticos individuais de cada membro. Nao existe nenhum botao ou secao para gerar/visualizar o **diagnostico consolidado** da equipe (tabela `diagnostico_consolidado_skills`).
 
-### Arquivo 1: `vite.config.ts`
-Incrementar TODAS as versoes de cache do PWA:
-- `html-cache-v11` para `html-cache-v12`
-- `assets-cache-v11` para `assets-cache-v12`
-- `images-cache-v11` para `images-cache-v12`
+### Correcao
+Adicionar ao topo da aba Diagnosticos:
+- Uma query para buscar o consolidado existente em `diagnostico_consolidado_skills`
+- Um botao "Consolidar Diagnosticos" que chama a IA para consolidar todos os diagnosticos completos da equipe e salvar na tabela `diagnostico_consolidado_skills`
+- Um card de visualizacao do consolidado quando existir (gargalos comuns, areas impactadas, projetos sugeridos)
+- Criar uma edge function `consolidar-diagnosticos-skills` que:
+  1. Busca todos os diagnosticos completos + insights da equipe
+  2. Envia para a IA com prompt para consolidar em visao unica de equipe
+  3. Salva/atualiza na tabela `diagnostico_consolidado_skills`
 
-Isso forca o Service Worker a descartar caches antigos e servir o codigo corrigido na proxima abertura do app.
+---
 
-### Arquivo 2: `src/pages/skills/ProjetoSkillsDiagnosticoPage.tsx`
-Substituir o padrao `useEffect` + `navigate()` por `Navigate` declarativo do React Router:
-- Remover imports de `useEffect` e `useNavigate`
-- Adicionar import de `Navigate`
-- Enquanto `isLoading`, mostrar spinner
-- Quando `!equipeId`, retornar `<Navigate to="/skills/projeto" replace />`
-- Senao, renderizar conteudo
+## Problema 3: Projetos gerados pela IA nao visiveis
 
-### Arquivo 3: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
-Mesma correcao: trocar `useEffect` + `navigate()` por `Navigate` declarativo.
+O botao "Gerar Projetos com IA" na aba Projetos existe e chama a edge function `gerar-projetos-skills`, que esta funcional. Os projetos sao salvos em `backlog_skills`. A listagem na aba tambem esta correta.
 
-## Resultado Esperado
-- Apos publicar, o app de producao servira o codigo corrigido (cache v12 invalida o v11)
-- As sub-paginas nao redirecionarao prematuramente durante o carregamento
-- O spinner aparece apenas enquanto dados estao carregando de verdade
+O problema provavel: a aba Projetos carrega, mas se nenhum diagnostico foi processado (`completado = true`), a edge function retorna erro "Nenhum diagnostico preenchido" e nenhum projeto e criado. Alem disso, nao ha feedback visual claro sobre o que deu errado.
 
-## Instrucao para o usuario
-Apos o deploy: feche completamente o app no celular/browser e reabra. A nova versao sera carregada automaticamente.
+### Correcao
+- Melhorar feedback de erro na aba Projetos: mostrar mensagem explicita se a geracao falha por falta de diagnosticos
+- Adicionar um indicador de pre-requisito: mostrar quantos diagnosticos estao completos e alertar se nenhum esta preenchido antes de permitir gerar
 
+---
+
+## Resumo tecnico das alteracoes
+
+| Arquivo | Alteracao |
+|---|---|
+| `src/components/admin/skills/ContratoSkillsManager.tsx` | Adicionar opcao "Trimestral" no select de frequencia |
+| `src/components/admin/skills/DiagnosticosSkillsTab.tsx` | Adicionar secao de diagnostico consolidado com botao de geracao e visualizacao |
+| `supabase/functions/consolidar-diagnosticos-skills/index.ts` | Nova edge function para consolidar diagnosticos via IA |
+| `src/components/admin/skills/ProjetosMapeadosTab.tsx` | Melhorar feedback de erro e mostrar pre-requisitos |
