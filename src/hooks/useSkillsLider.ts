@@ -82,23 +82,8 @@ export function useSkillsLider() {
   // Admin pode visualizar em modo simulação Skills
   const canAccess = isLider || (isAdmin && isViewingAs && (viewAs === "skills" || viewAs === "business_iaplicada"));
 
-  // Fallback: admin em simulação sem equipeId busca primeira equipe disponível
-  const { data: adminFallbackEquipeId, isLoading: adminFallbackLoading } = useQuery({
-    queryKey: ["skills-admin-fallback-equipe"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("equipes_skills")
-        .select("id")
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data?.id ?? null;
-    },
-    enabled: isAdmin && !membroEquipeId && !membroLoading,
-  });
-
-  // Use equipeId do membro OU fallback do admin
-  const equipeId = membroEquipeId || (isAdmin ? adminFallbackEquipeId : null);
+  // equipeId já vem resolvido do useSkillsMembro (inclui fallback admin)
+  const equipeId = membroEquipeId;
 
   // Buscar dados da equipe
   const { data: equipeData, isLoading: equipeLoading } = useQuery({
@@ -474,9 +459,8 @@ export function useSkillsLider() {
     };
   });
 
-  // Admin sem equipe própria mas com fallback pendente = ainda carregando
-  const adminWaitingForFallback = isAdmin && !membroEquipeId && !membroLoading && !adminFallbackEquipeId && !adminFallbackLoading;
-  const isLoading = membroLoading || adminFallbackLoading || adminWaitingForFallback || equipeLoading || membrosLoading || entregasLoading || metricasLoading || roadmapLoading || loadingProgresso;
+  // Loading state
+  const isLoading = membroLoading || equipeLoading || membrosLoading || entregasLoading || metricasLoading || roadmapLoading || loadingProgresso;
 
   // Métricas consolidadas
   const metricasConsolidadas = {
