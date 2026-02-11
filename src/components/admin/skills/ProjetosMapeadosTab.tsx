@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Sparkles, Target, Users, Clock } from "lucide-react";
+import { Loader2, Sparkles, Target, Users, Clock, AlertTriangle, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props { equipeId: string }
@@ -27,7 +27,27 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
     enabled: !!equipeId,
   });
 
+  // Check diagnostics status for pre-requisite feedback
+  const { data: diagStatus } = useQuery({
+    queryKey: ["diag-status-projetos", equipeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("diagnosticos_skills")
+        .select("id, completado")
+        .eq("equipe_id", equipeId);
+      if (error) throw error;
+      const total = data?.length || 0;
+      const completos = data?.filter(d => d.completado).length || 0;
+      return { total, completos };
+    },
+    enabled: !!equipeId,
+  });
+
   const handleGerarProjetos = async () => {
+    if (!diagStatus?.completos) {
+      toast.error("Nenhum diagnóstico preenchido. Os membros precisam preencher seus diagnósticos primeiro.");
+      return;
+    }
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('gerar-projetos-skills', { body: { equipe_id: equipeId } });
@@ -58,11 +78,28 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
           <h3 className="text-lg font-semibold">Projetos Mapeados</h3>
           <Badge variant="secondary" className="text-xs">{projetos.length}</Badge>
         </div>
-        <Button onClick={handleGerarProjetos} disabled={isGenerating} size="sm">
+        <Button onClick={handleGerarProjetos} disabled={isGenerating || !diagStatus?.completos} size="sm">
           {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
           Gerar Projetos com IA
         </Button>
       </div>
+
+      {/* Pre-requisite indicator */}
+      {diagStatus && (
+        <div className={`flex items-center gap-2 p-3 rounded-lg text-sm ${diagStatus.completos > 0 ? "bg-green-500/10" : "bg-yellow-500/10"}`}>
+          {diagStatus.completos > 0 ? (
+            <>
+              <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+              <span className="text-green-600">{diagStatus.completos}/{diagStatus.total} diagnósticos preenchidos — pronto para gerar projetos</span>
+            </>
+          ) : (
+            <>
+              <AlertTriangle className="h-4 w-4 text-yellow-600 shrink-0" />
+              <span className="text-yellow-600">Nenhum diagnóstico preenchido ({diagStatus.total} membros). Os membros precisam preencher o diagnóstico antes de gerar projetos.</span>
+            </>
+          )}
+        </div>
+      )}
 
       {projetos.length === 0 ? (
         <Card className="border-border/50"><CardContent className="py-12 text-center">
