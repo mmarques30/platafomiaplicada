@@ -6,6 +6,9 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  define: {
+    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+  },
   server: {
     host: "::",
     port: 8080,
@@ -76,7 +79,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.html$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'html-cache-v10',
+              cacheName: 'html-cache-v11',
               networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 10,
