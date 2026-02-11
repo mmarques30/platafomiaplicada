@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, ChevronDown, ChevronUp, Sparkles, CheckCircle, Clock, Brain, Users, FileText } from "lucide-react";
 import { toast } from "sonner";
 import DiagnosticoRespostasView from "./DiagnosticoRespostasView";
+import InsightIAPreview from "./InsightIAPreview";
 
 interface Props { equipeId: string }
 
@@ -122,27 +123,12 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
                         )}
 
                         {/* Resultados IA */}
-                        {membro.economia_horas_semana && (
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="p-3 bg-muted/50 rounded-lg">
-                              <p className="text-xs text-muted-foreground">Economia estimada</p>
-                              <p className="text-lg font-bold">{membro.economia_horas_semana}h/sem</p>
-                            </div>
-                            {membro.economia_valor_mensal && (
-                              <div className="p-3 bg-muted/50 rounded-lg">
-                                <p className="text-xs text-muted-foreground">Valor mensal</p>
-                                <p className="text-lg font-bold">R$ {membro.economia_valor_mensal?.toLocaleString()}</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {membro.insight_ia && (
-                          <div className="p-3 bg-primary/5 border border-primary/10 rounded-lg">
-                            <p className="text-xs font-medium text-primary mb-1">Insight IA</p>
-                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                              {typeof membro.insight_ia === 'string' ? membro.insight_ia : JSON.stringify(membro.insight_ia, null, 2)}
-                            </p>
-                          </div>
+                        {(membro.hasInsight || membro.economia_horas_semana) && (
+                          <InsightIAPreview
+                            insightIA={membro.insight_ia}
+                            economiaHoras={membro.economia_horas_semana}
+                            economiaValor={membro.economia_valor_mensal}
+                          />
                         )}
                       </div>
                     )}
