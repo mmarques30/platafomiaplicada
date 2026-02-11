@@ -125,7 +125,19 @@ export function useCreateUser() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Try to extract the actual error message from the response
+        const context = (error as any)?.context;
+        if (context && typeof context.json === 'function') {
+          try {
+            const body = await context.json();
+            if (body?.error) throw new Error(body.error);
+          } catch (parseErr) {
+            // If parsing fails, fall through to generic error
+          }
+        }
+        throw error;
+      }
       if (data?.error) throw new Error(data.error);
       
       return data;
@@ -135,8 +147,13 @@ export function useCreateUser() {
       queryClient.invalidateQueries({ queryKey: ["admin-equipes-skills"] });
       toast.success("Usuário criado com sucesso!");
     },
-    onError: (error) => {
-      toast.error("Erro ao criar usuário: " + error.message);
+    onError: (error: any) => {
+      const msg = error?.message || String(error);
+      if (msg.includes("already been registered") || msg.includes("email_exists")) {
+        toast.error("Este email já está cadastrado no sistema. Use outro email ou edite o usuário existente.");
+      } else {
+        toast.error("Erro ao criar usuário: " + msg);
+      }
     },
   });
 }
