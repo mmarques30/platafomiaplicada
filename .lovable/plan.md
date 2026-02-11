@@ -1,49 +1,43 @@
 
-# Corrigir Abas Skills Travadas - Causa Raiz Encontrada
 
-## Causa Raiz
+# Corrigir Skills Travado em Producao - Solucao Definitiva
 
-O hook `useSkillsEquipe.ts` faz uma query que referencia a coluna `profiles.nome`, que **nao existe** no banco de dados. A coluna correta e `nome_completo`. Isso causa o erro no Postgres: `column profiles_1.nome does not exist`.
+## Problema
 
-Esse erro faz com que a query falhe silenciosamente, mantendo a pagina `/skills/equipe` presa no spinner infinito. Como essa pagina e o ponto de entrada principal dos usuarios Skills (via redirecionamento da Mentoria e do menu lateral), o usuario fica travado.
+Duas causas simultaneas:
 
-## Arquivo afetado
+### 1. PWA Cache Desatualizado (causa principal em producao)
+As versoes de cache no `vite.config.ts` ainda sao `v11`. O Service Worker da producao continua servindo codigo antigo (com o bug `nome` ao inves de `nome_completo`) porque nenhuma versao de cache foi incrementada. Mesmo apos o fix e o deploy, o browser do usuario nao busca o codigo novo.
 
-### `src/hooks/useSkillsEquipe.ts`
+### 2. Race Condition no Redirecionamento das Sub-paginas
+Os componentes `ProjetoSkillsDiagnosticoPage` e `ProjetoSkillsProjetosPage` usam `useEffect` para redirecionar quando `equipeId` e null. No React Query v5, quando a query esta desabilitada (`enabled: false`), `isPending` retorna `true`, mas ha um breve instante durante a transicao onde `isLoading` pode ser `false` antes do `equipeId` resolver, causando redirect prematuro para `/skills/projeto`.
 
-**Linha 40** - Na query do Supabase, o campo `nome` esta errado:
-```
-profiles:user_id (
-  id,
-  nome,          <-- ERRADO
-  avatar_url
-)
-```
-Deve ser:
-```
-profiles:user_id (
-  id,
-  nome_completo,  <-- CORRETO
-  avatar_url
-)
-```
+## Solucao
 
-**Linha 63** - O mapeamento tambem referencia o campo errado:
-```
-nome: m.profiles?.nome || "Usuario"
-```
-Deve ser:
-```
-nome: m.profiles?.nome_completo || "Usuario"
-```
+### Arquivo 1: `vite.config.ts`
+Incrementar TODAS as versoes de cache do PWA:
+- `html-cache-v11` para `html-cache-v12`
+- `assets-cache-v11` para `assets-cache-v12`
+- `images-cache-v11` para `images-cache-v12`
 
-## Evidencia
+Isso forca o Service Worker a descartar caches antigos e servir o codigo corrigido na proxima abertura do app.
 
-Os logs do Postgres mostram exatamente esse erro no momento em que o usuario tenta acessar:
-```
-ERROR: column profiles_1.nome does not exist
-```
+### Arquivo 2: `src/pages/skills/ProjetoSkillsDiagnosticoPage.tsx`
+Substituir o padrao `useEffect` + `navigate()` por `Navigate` declarativo do React Router:
+- Remover imports de `useEffect` e `useNavigate`
+- Adicionar import de `Navigate`
+- Enquanto `isLoading`, mostrar spinner
+- Quando `!equipeId`, retornar `<Navigate to="/skills/projeto" replace />`
+- Senao, renderizar conteudo
 
-## Resultado esperado
+### Arquivo 3: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+Mesma correcao: trocar `useEffect` + `navigate()` por `Navigate` declarativo.
 
-Apos a correcao, a pagina `/skills/equipe` carregara normalmente, exibindo os membros da equipe com seus nomes corretos. Os usuarios Skills nao ficarao mais presos no spinner infinito ao acessar a plataforma.
+## Resultado Esperado
+- Apos publicar, o app de producao servira o codigo corrigido (cache v12 invalida o v11)
+- As sub-paginas nao redirecionarao prematuramente durante o carregamento
+- O spinner aparece apenas enquanto dados estao carregando de verdade
+
+## Instrucao para o usuario
+Apos o deploy: feche completamente o app no celular/browser e reabra. A nova versao sera carregada automaticamente.
+
