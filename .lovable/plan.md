@@ -1,78 +1,75 @@
 
-# Adicionar "Editar Dados" e "Limpar Dados" em cada aba do Mentoria Skills
+# Associar Projetos e Entregas aos Membros via IA
 
 ## Resumo
 
-Adicionar em cada aba do Mentoria Skills um menu de acoes com duas opcoes: **"Editar Dados"** (abre modal para edicao em massa ou redireciona para edicao inline existente) e **"Limpar Dados"** (apaga todos os dados daquela aba para a equipe selecionada, com confirmacao).
+Criar uma edge function que usa IA para associar projetos e entregas aos membros da equipe com base nos diagnosticos individuais. Atualizar as funcoes de geracao existentes para ja fazerem essa associacao automaticamente. Executar retroativamente para a equipe Inovacao (Engelmig).
 
-Sera criado um componente reutilizavel `TabActionsMenu` com um dropdown contendo as duas opcoes, usado em todas as abas.
+## Dados atuais da equipe Inovacao
 
-## O que muda para o usuario
+- **7 projetos** sem responsavel no `backlog_skills`
+- **14 entregas** sem responsavel no `entregas_skills`
+- **4 membros** com diagnosticos completos:
+  - Livia Pesso (Financeiro) - processos: DFC, Relatorio Mensal de Resultados
+  - Antonio (TI) - processos: RAIVs, Sinistros, Planejamento orcamentario frota
+  - Erich (TI) - processos: Planejamento Estrategico TI, Gestao Time TI, Gestao Fornecedores
+  - Lucio Torres (Operacoes) - processos: Falhas Power BI, Validacao dados AllStrategy, Formulas/ideias dashboards
 
-- Cada aba tera um botao de acoes (icone engrenagem ou "..." ) no canto superior direito
-- Ao clicar, aparece um dropdown com "Editar Dados" e "Limpar Dados"
-- "Limpar Dados" abre um AlertDialog de confirmacao antes de apagar
-- Apos limpar, os dados da aba sao removidos e a interface atualiza automaticamente
+## O que muda
+
+1. Ao gerar projetos ou entregas com IA, cada item ja sai com um membro responsavel atribuido
+2. O admin pode clicar "Associar Membros com IA" para atribuir responsaveis retroativamente
+3. A equipe Inovacao tera todos os 7 projetos e 14 entregas associados aos membros corretos
 
 ## Detalhes Tecnicos
 
-### 1. Componente reutilizavel: `SkillsTabActions.tsx`
+### 1. Nova edge function: `associar-membros-skills`
 
-**Arquivo novo:** `src/components/admin/skills/SkillsTabActions.tsx`
+Recebe `equipe_id`, busca projetos/entregas sem responsavel + diagnosticos individuais, envia para IA pedindo associacao membro-item, e atualiza `responsavel_id` nos registros existentes.
 
-Componente que recebe:
-- `onClear`: funcao async para limpar dados (com confirmacao interna via AlertDialog)
-- `onEdit?`: funcao opcional para acao de edicao (quando a aba nao tem edicao inline)
-- `clearLabel?`: texto customizado (default: "Limpar Dados")
-- `clearDescription?`: descricao do que sera apagado
-- `editLabel?`: texto customizado (default: "Editar Dados")
-- `hasData`: boolean que desabilita o botao limpar quando nao ha dados
+O prompt incluira:
+- Lista de membros com area, processos e gargalos de cada um
+- Lista de projetos e entregas sem responsavel
+- Instrucao para associar cada item ao membro mais relevante
 
-Renderiza um `DropdownMenu` com as opcoes.
+Schema de retorno via tool calling:
+```text
+associacoes: [
+  { item_id, item_tipo ("projeto" ou "entrega"), responsavel_nome }
+]
+```
 
-### 2. Logica de limpeza por aba
+Apos receber, mapeia `responsavel_nome` para `user_id` e faz UPDATE em `backlog_skills` e `entregas_skills`.
 
-Cada aba chama um DELETE no Supabase filtrando por `equipe_id`:
+### 2. Atualizar `gerar-projetos-skills`
 
-| Aba | Tabela(s) a limpar | Notas |
-|---|---|---|
-| Contrato | `contratos_skills` | Ja tem "Limpar Tudo" — sera mantido e integrado |
-| Diagnosticos | `diagnosticos_skills`, `diagnostico_consolidado_skills` | Limpa respostas e consolidado |
-| Secoes | Sem dados persistidos | Botao desabilitado ou oculto |
-| Projetos | `backlog_skills` | Limpa projetos mapeados |
-| Entregas | `entregas_skills` | Limpa entregas geradas |
-| Entregas Equipe | `entregas_equipe_skills` | Limpa dados da equipe |
-| Metricas | `metricas_skills` | Limpa metricas semanais |
-| Documentos | `documentos_skills`, `links_skills` | Limpa docs e links |
-| Reports | `reports_skills` | Limpa reports |
+- Buscar membros + diagnosticos individuais
+- Incluir no prompt: quem sao os membros, suas areas e processos
+- Adicionar `responsavel_nome` no schema de retorno
+- Mapear para `user_id` e preencher `responsavel_id` no insert de `backlog_skills` e `entregas_skills`
 
-### 3. Modificacoes por arquivo
+### 3. Atualizar `gerar-entregas-skills`
 
-**Cada aba recebe o componente `SkillsTabActions`** no header, ao lado do titulo:
+- Buscar diagnosticos individuais dos membros
+- Incluir no prompt detalhes de cada membro
+- Adicionar `responsavel_nome` no schema de retorno
+- Mapear para `user_id` e preencher `responsavel_id` no insert
 
-- `DiagnosticosSkillsTab.tsx` — adicionar dropdown com limpar diagnosticos + consolidado
-- `ProjetosMapeadosTab.tsx` — adicionar dropdown com limpar backlog
-- `SkillsEntregasTab.tsx` — adicionar dropdown com limpar entregas
-- `SkillsEntregasEquipeTab.tsx` — adicionar dropdown com limpar entregas equipe
-- `SkillsMetricasTab.tsx` — adicionar dropdown com limpar metricas
-- `DocumentosSkillsManager.tsx` — adicionar dropdown com limpar docs + links
-- `ReportsSkillsManager.tsx` — adicionar dropdown com limpar reports
-- `ContratoSkillsManager.tsx` — ja tem "Limpar Tudo", integrar no mesmo padrao
-- `SecoesTrimestraisTab.tsx` — sem dados para limpar, nao adicionar
+### 4. Botao "Associar Membros com IA" no admin
 
-A acao "Editar Dados" nas abas que ja possuem edicao inline (Entregas, Metricas, Contrato) abrira o formulario de edicao existente. Nas demais abas (Diagnosticos, Projetos), sera omitida pois nao faz sentido editar em massa.
+Adicionar botao no `SkillsEntregasTab.tsx` que chama a nova edge function. Visivel quando ha itens sem responsavel.
+
+### 5. Executar para equipe Inovacao
+
+Apos deploy da edge function, chamar automaticamente para a equipe `412b0ddd-a38a-4354-86e0-274e892ea9be`.
 
 ## Arquivos
 
-**Novo:**
-- `src/components/admin/skills/SkillsTabActions.tsx`
+**Novos:**
+- `supabase/functions/associar-membros-skills/index.ts`
 
 **Modificados:**
-- `src/components/admin/skills/DiagnosticosSkillsTab.tsx`
-- `src/components/admin/skills/ProjetosMapeadosTab.tsx`
-- `src/components/admin/skills/SkillsEntregasTab.tsx`
-- `src/components/admin/skills/SkillsEntregasEquipeTab.tsx`
-- `src/components/admin/skills/SkillsMetricasTab.tsx`
-- `src/components/admin/skills/DocumentosSkillsManager.tsx`
-- `src/components/admin/skills/ReportsSkillsManager.tsx`
-- `src/components/admin/skills/ContratoSkillsManager.tsx`
+- `supabase/functions/gerar-projetos-skills/index.ts` -- adicionar associacao de membros
+- `supabase/functions/gerar-entregas-skills/index.ts` -- adicionar associacao de membros
+- `src/components/admin/skills/SkillsEntregasTab.tsx` -- botao "Associar Membros com IA"
+- `supabase/config.toml` -- registrar nova function
