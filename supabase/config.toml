@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.associar-membros-skills]
 verify_jwt = false
+
+[functions.gerar-metricas-skills]
+verify_jwt = false
