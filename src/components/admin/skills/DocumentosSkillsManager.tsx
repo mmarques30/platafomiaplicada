@@ -15,6 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDocumentosSkills } from "@/hooks/admin/useDocumentosSkills";
 import { useLinksSkills, LinkSkills } from "@/hooks/admin/useLinksSkills";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import SkillsTabActions from "./SkillsTabActions";
 
 interface Props { equipeId: string; equipeName?: string }
 
@@ -35,6 +37,7 @@ const getIcon = (icone: string) => iconeOptions.find(o => o.value === icone)?.Ic
 export default function DocumentosSkillsManager({ equipeId, equipeName }: Props) {
   const { documentos, isLoading: loadDocs, createDocumento, deleteDocumento, uploadDocumento } = useDocumentosSkills(equipeId);
   const { links, isLoading: loadLinks, createLink, updateLink, deleteLink } = useLinksSkills(equipeId);
+  const queryClient = useQueryClient();
 
   const [uploadingFile, setUploadingFile] = useState(false);
   const [tipoUpload, setTipoUpload] = useState<string>("anexo");
@@ -81,7 +84,21 @@ export default function DocumentosSkillsManager({ equipeId, equipeName }: Props)
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2"><FolderOpen className="h-5 w-5 text-muted-foreground" /><h2 className="text-lg font-semibold">Documentos e Links</h2></div>
-        {equipeName && <Badge variant="outline" className="text-xs">{equipeName}</Badge>}
+        <div className="flex items-center gap-2">
+          {equipeName && <Badge variant="outline" className="text-xs">{equipeName}</Badge>}
+          <SkillsTabActions
+            onClear={async () => {
+              const { error: e1 } = await supabase.from("documentos_skills").delete().eq("equipe_id", equipeId);
+              if (e1) throw e1;
+              const { error: e2 } = await supabase.from("links_skills").delete().eq("equipe_id", equipeId);
+              if (e2) throw e2;
+              queryClient.invalidateQueries({ queryKey: ["documentos-skills", equipeId] });
+              queryClient.invalidateQueries({ queryKey: ["links-skills", equipeId] });
+            }}
+            hasData={documentos.length > 0 || links.length > 0}
+            clearDescription="Todos os documentos e links desta equipe serão removidos."
+          />
+        </div>
       </div>
 
       <Tabs defaultValue="documentos" className="space-y-4">

@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import SkillsTabActions from "./SkillsTabActions";
 
 interface Props {
   equipeId: string;
@@ -135,6 +136,15 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <h3 className="text-base font-semibold">Entregas</h3>
+          <SkillsTabActions
+            onClear={async () => {
+              const { error } = await supabase.from("entregas_skills").delete().eq("equipe_id", equipeId);
+              if (error) throw error;
+              queryClient.invalidateQueries({ queryKey: ["admin-entregas-skills", equipeId] });
+            }}
+            hasData={!!entregas?.length}
+            clearDescription="Todas as entregas desta equipe serão removidas."
+          />
           {(backlogCount ?? 0) > 0 && (
             <Badge variant="secondary" className="text-xs">{backlogCount} projeto(s) no backlog</Badge>
           )}

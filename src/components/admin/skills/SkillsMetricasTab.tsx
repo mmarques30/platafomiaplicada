@@ -8,6 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useMetricasSkillsAdmin, useUpsertMetricaSkills } from "@/hooks/admin/useSkillsPerformanceAdmin";
 import { adminTheme } from "@/components/admin/adminTheme";
 import { Plus, Pencil } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import SkillsTabActions from "./SkillsTabActions";
 
 interface Props {
   equipeId: string;
@@ -28,6 +31,7 @@ const emptyForm = {
 export default function SkillsMetricasTab({ equipeId }: Props) {
   const { data: metricas, isLoading } = useMetricasSkillsAdmin(equipeId);
   const upsertMutation = useUpsertMetricaSkills();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -67,7 +71,18 @@ export default function SkillsMetricasTab({ equipeId }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold">Métricas Semanais</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-base font-semibold">Métricas Semanais</h3>
+          <SkillsTabActions
+            onClear={async () => {
+              const { error } = await supabase.from("metricas_skills").delete().eq("equipe_id", equipeId);
+              if (error) throw error;
+              queryClient.invalidateQueries({ queryKey: ["admin-metricas-skills", equipeId] });
+            }}
+            hasData={!!metricas?.length}
+            clearDescription="Todas as métricas semanais desta equipe serão removidas."
+          />
+        </div>
         <Button size="sm" className={adminTheme.buttonSm} onClick={openNew}>
           <Plus className="h-3.5 w-3.5 mr-1.5" /> Nova Métrica
         </Button>
