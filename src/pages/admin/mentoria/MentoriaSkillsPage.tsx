@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEquipesSkillsAdmin } from "@/hooks/admin/useEquipesSkillsAdmin";
 import { adminTheme } from "@/components/admin/adminTheme";
-import { Users, FileText, Brain, CalendarDays, Target, Package, BarChart3, FolderOpen, FileBarChart } from "lucide-react";
+import { Users, FileText, Brain, CalendarDays, Target, Package, BarChart3, FolderOpen, FileBarChart, ClipboardList } from "lucide-react";
 import { ContratoSkillsManager } from "@/components/admin/skills/ContratoSkillsManager";
 import DiagnosticosSkillsTab from "@/components/admin/skills/DiagnosticosSkillsTab";
 import SecoesTrimestraisTab from "@/components/admin/skills/SecoesTrimestraisTab";
@@ -12,6 +12,7 @@ import SkillsEntregasTab from "@/components/admin/skills/SkillsEntregasTab";
 import SkillsMetricasTab from "@/components/admin/skills/SkillsMetricasTab";
 import DocumentosSkillsManager from "@/components/admin/skills/DocumentosSkillsManager";
 import ReportsSkillsManager from "@/components/admin/skills/ReportsSkillsManager";
+import SkillsEntregasEquipeTab from "@/components/admin/skills/SkillsEntregasEquipeTab";
 
 export default function MentoriaSkillsPage() {
   const { data: equipes, isLoading } = useEquipesSkillsAdmin();
@@ -66,6 +67,9 @@ export default function MentoriaSkillsPage() {
             <TabsTrigger value="entregas" className={adminTheme.tabsTrigger}>
               <Package className={adminTheme.tabsIcon} /> Entregas
             </TabsTrigger>
+            <TabsTrigger value="entregas_equipe" className={adminTheme.tabsTrigger}>
+              <ClipboardList className={adminTheme.tabsIcon} /> Entregas Equipe
+            </TabsTrigger>
             <TabsTrigger value="metricas" className={adminTheme.tabsTrigger}>
               <BarChart3 className={adminTheme.tabsIcon} /> Métricas
             </TabsTrigger>
@@ -91,6 +95,9 @@ export default function MentoriaSkillsPage() {
           </TabsContent>
           <TabsContent value="entregas" className={adminTheme.tabsContent}>
             <SkillsEntregasTab equipeId={selectedEquipeId} />
+          </TabsContent>
+          <TabsContent value="entregas_equipe" className={adminTheme.tabsContent}>
+            <SkillsEntregasEquipeTab equipeId={selectedEquipeId} />
           </TabsContent>
           <TabsContent value="metricas" className={adminTheme.tabsContent}>
             <SkillsMetricasTab equipeId={selectedEquipeId} />

@@ -55,7 +55,7 @@ export function useMenuConfig() {
         'meu_progresso_conteudo', 'meu_progresso_entregas',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'projeto_skills', 'projeto_skills_visao_geral',
-        'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
+        'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog',
         'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
         'squad', 'squad_lider',
@@ -78,7 +78,7 @@ export function useMenuConfig() {
         'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
         'skills_entregas', 'skills_painel_lider',
-        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
+        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
         'squad', 'squad_lider',
         'meu_sistema'
       ],
@@ -90,7 +90,7 @@ export function useMenuConfig() {
         'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
         'meu_progresso_conteudo', 'meu_progresso_entregas',
         'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
-        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
+        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
         'comunidade', 'comunidade_feed', 'comunidade_sala',
         'squad', 'squad_lider'
       ],
@@ -99,7 +99,7 @@ export function useMenuConfig() {
       academy: [
         'meu_progresso_visao_geral', 'meu_progresso_roadmap',
         'meu_progresso_conteudo', 'meu_progresso_entregas',
-        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos',
+        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
         'squad', 'squad_lider',
         'meu_sistema'
       ],

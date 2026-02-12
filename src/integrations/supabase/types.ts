@@ -2111,6 +2111,75 @@ export type Database = {
           },
         ]
       }
+      entregas_equipe_skills: {
+        Row: {
+          arquivos: Json | null
+          created_at: string
+          descricao_equipe: string | null
+          editado_por: string | null
+          entrega_id: string | null
+          equipe_id: string
+          id: string
+          notas: string | null
+          prazo_equipe: string | null
+          prioridade_equipe: string | null
+          progresso: number | null
+          responsavel_id: string | null
+          status_equipe: string
+          titulo_equipe: string
+          updated_at: string
+        }
+        Insert: {
+          arquivos?: Json | null
+          created_at?: string
+          descricao_equipe?: string | null
+          editado_por?: string | null
+          entrega_id?: string | null
+          equipe_id: string
+          id?: string
+          notas?: string | null
+          prazo_equipe?: string | null
+          prioridade_equipe?: string | null
+          progresso?: number | null
+          responsavel_id?: string | null
+          status_equipe?: string
+          titulo_equipe: string
+          updated_at?: string
+        }
+        Update: {
+          arquivos?: Json | null
+          created_at?: string
+          descricao_equipe?: string | null
+          editado_por?: string | null
+          entrega_id?: string | null
+          equipe_id?: string
+          id?: string
+          notas?: string | null
+          prazo_equipe?: string | null
+          prioridade_equipe?: string | null
+          progresso?: number | null
+          responsavel_id?: string | null
+          status_equipe?: string
+          titulo_equipe?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entregas_equipe_skills_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "entregas_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_equipe_skills_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       entregas_skills: {
         Row: {
           aprovado_em: string | null
