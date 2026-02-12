@@ -1,66 +1,110 @@
 
 
-# Corrigir Metricas: Projetos por Semana Real e ROI Exec Travado em 25%
+# Reformular Metricas: Sistema de Metas Padrao + Acompanhamento de Execucao
 
-## Problemas Identificados
+## Conceito
 
-### 1. Projetos nao refletem os dados reais
-A coluna "Projetos" mostra uma distribuicao artificial (1,1,1,1,1,1,1,1,0,0,0,0) que nao tem relacao com os projetos reais. O correto e: para cada semana, contar quantos projetos do backlog TEM ENTREGAS planejadas naquela semana (baseado nos prazos das entregas vinculadas via `backlog_item_id`).
+Em vez de tentar encaixar dados reais em formulas artificiais, o sistema vai funcionar em duas camadas:
 
-**Dados reais**: Os 8 projetos tem entregas entre semanas 3-5. Entao:
-- Semanas 1-2: 0 projetos
-- Semana 3: ~8 projetos (todos tem pelo menos 1 entrega nessa faixa)
-- Semana 4: ~8 projetos
-- Semana 5: ~6 projetos
-- Semanas 6-12: 0 projetos
+1. **METAS (o que deveria acontecer)** -- calculo padrao baseado no produto: 8 projetos, 48 entregas, 12 semanas
+2. **EXECUCAO (o que realmente aconteceu)** -- leitura dos dados reais de conclusao
 
-### 2. ROI Executado travado em 25% (bug matematico)
-A `economiaTotal` e calculada como `soma(economia_horas_semana) * 4` (multiplicando por 4 para estimar valor mensal), mas `horasRecorrentes` e a soma semanal simples. Quando investimento = 0, o ROI executado e `horasRecorrentes / economiaTotal`, que no maximo da `semanal / (semanal * 4) = 25%`.
+Isso permite comparar planejado vs realizado em todas as dimensoes.
 
-**Correcao**: Remover o multiplicador `* 4` da economiaTotal, ou usar a mesma base de comparacao. O correto e comparar horas recorrentes semanais com o total de horas semanais possiveis (sem multiplicar por 4).
+## Logica das Metas Padrao
 
-### 3. Entregas concentradas em 3 semanas
-As 48 entregas tem prazos entre 17/02 e 05/03 -- isso e correto pelos dados. O calculo por semana esta funcionando bem (26 na semana 3, 17 na semana 4, 5 na semana 5). Nao ha bug aqui, apenas reflete a realidade dos prazos gerados.
+### Entregas (meta vs real)
+- **Meta semanal**: 48 entregas / 12 semanas = **4 entregas/semana** (distribuicao uniforme)
+- **Real semanal**: contagem de entregas com `concluido_em` dentro da semana
+- Campo `entregas_planejadas` = 4 (meta fixa)
+- Campo `entregas_concluidas` = real (do banco)
 
-## Solucao
+### Projetos (meta vs real)
+- Cada projeto tem 6 entregas. Com meta de 4 entregas/semana, 1 projeto completa a cada ~1.5 semanas
+- **Meta**: distribuir 8 projetos uniformemente -- semanas 1,2,3,4,5,6,8,9 recebem 1 projeto cada
+- **Real**: projetos que tiveram TODAS as entregas concluidas ate aquela semana
+- Campo `projetos_concluidos` = meta de projetos que deveriam estar completos ATE esta semana (acumulado)
 
-### Arquivo: `supabase/functions/gerar-metricas-skills/index.ts`
+### Horas Economizadas (meta acumulativa)
+- Cada projeto tem um `horas_estimadas_economia` semanal (ex: Projeto 1 = 4h/sem, Projeto 2 = 4h/sem)
+- **Meta**: conforme cada projeto "deveria" ser concluido (pela meta), sua economia semanal se soma permanentemente
+- Semana 2 (1 projeto concluido): 4h/sem
+- Semana 3 (2 projetos concluidos): 8h/sem
+- Semana 12 (8 projetos): 20h/sem (soma de todos os `horas_estimadas_economia`)
+- **Real**: soma de `economia_horas_semana` das entregas efetivamente concluidas (recorrente)
 
-**Projetos por semana (baseado em entregas reais)**:
-Em vez de distribuir uniformemente, contar quantos projetos DISTINTOS do backlog tem pelo menos 1 entrega com prazo naquela semana.
+### ROI (meta vs real)
+- **ROI Projetado (meta)**: progressao linear ate o ROI alvo
+  - Se investimento > 0: `(economia_acumulada_meta * custo_hora) / investimento * 100`
+  - Se investimento = 0: progressao linear de 0% a 100% em 12 semanas
+- **ROI Executado (real)**: baseado na economia real das entregas concluidas
+  - `(economia_real_acumulada * custo_hora) / investimento * 100`
+
+### Indice de Maturidade
+- **Meta**: progressao linear de 20% (semana 1) a 90% (semana 12)
+- **Real**: ajustado pela taxa de conclusao de entregas. Se esta no ritmo da meta, acompanha. Se atrasado, fica abaixo.
+
+### Engajamento
+- Baseado na proporcao de entregas em andamento + concluidas vs total, ponderado pela semana
+
+## Exemplo com Dados Atuais (8 projetos, 48 entregas)
+
+Ordenando projetos por prioridade e economia:
+
+| Sem | Entregas Meta/Real | Proj Meta (acum) | Horas Meta | ROI Proj | ROI Exec |
+|-----|-------------------|------------------|------------|----------|----------|
+| 1   | 4 / 0             | 1                | 4.0        | 8.3%     | 0%       |
+| 2   | 4 / 0             | 1                | 4.0        | 16.7%    | 0%       |
+| 3   | 4 / 0             | 2                | 8.0        | 25.0%    | 0%       |
+| 4   | 4 / 0             | 3                | 11.0       | 33.3%    | 0%       |
+| 5   | 4 / 0             | 3                | 11.0       | 41.7%    | 0%       |
+| 6   | 4 / 0             | 4                | 15.0       | 50.0%    | 0%       |
+| 7   | 4 / 0             | 5                | 17.0       | 58.3%    | 0%       |
+| 8   | 4 / 0             | 5                | 17.0       | 66.7%    | 0%       |
+| 9   | 4 / 0             | 6                | 19.0       | 75.0%    | 0%       |
+| 10  | 4 / 0             | 7                | 19.5       | 83.3%    | 0%       |
+| 11  | 4 / 0             | 7                | 19.5       | 91.7%    | 0%       |
+| 12  | 4 / 0             | 8                | 20.0       | 100%     | 0%       |
+
+Conforme entregas forem concluidas, o ROI Executado sobe e se aproxima do Projetado.
+
+## Beneficios
+
+- **Metas sao fixas e previssiveis**: nao dependem das datas dos prazos das entregas (que podem estar concentradas)
+- **Execucao e real**: reflete o que de fato foi feito
+- **Se mudar datas**: as metas continuam as mesmas (sao padrao do produto), so a execucao muda
+- **Comparacao clara**: lider ve facilmente se esta adiantado ou atrasado vs meta
+
+## Detalhes Tecnicos
+
+### Arquivo modificado
+- `supabase/functions/gerar-metricas-skills/index.ts`
+
+### Logica principal
 
 ```text
-// Para cada semana, contar projetos distintos com entregas nesta semana
-const projetosIds = new Set(
-  entregas
-    .filter(e => {
-      if (!e.prazo || !e.backlog_item_id) return false;
-      const prazo = new Date(e.prazo);
-      return prazo >= inicioSemana && prazo < fimSemana;
-    })
-    .map(e => e.backlog_item_id)
-);
-const projetosNaSemana = projetosIds.size;
+// Metas padrao
+const entregasMetaSemana = Math.ceil(totalEntregas / 12); // 4/semana
+const projetosOrdenados = backlog ordenado por prioridade
+// Cada projeto completa quando suas 6 entregas cabem na timeline
+// Com 4 entregas/semana, projeto 1 completa ~semana 1.5, projeto 2 ~semana 3, etc.
+
+for (semana 1..12) {
+  // META: entregas planejadas = 4 (fixo)
+  // META: projetos acumulados = quantos projetos deveriam estar prontos ate esta semana
+  // META: horas = soma de horas_estimadas_economia dos projetos concluidos na meta
+  // META: ROI projetado = progressao linear
+
+  // REAL: entregas concluidas = count(concluido_em dentro da semana)
+  // REAL: horas = soma recorrente de economia das entregas concluidas
+  // REAL: ROI executado = economia real / investimento (ou economia total)
+}
 ```
 
-**ROI Executado (corrigir base de comparacao)**:
-Remover o `* 4` da economiaTotal para que a base de comparacao seja consistente (ambas semanais).
+### Distribuicao de projetos na meta
+Ordenar projetos por prioridade (alta > media > baixa), depois por economia (maior primeiro). Calcular em qual semana cada projeto "deveria" estar concluido se entregas forem uniformes (4/semana):
+- Projeto 1 (6 entregas): concluido na semana ceil(6/4) = semana 2
+- Projeto 2: concluido na semana ceil(12/4) = semana 3
+- Projeto 3: concluido na semana ceil(18/4) = semana 5
+- ...ate projeto 8 na semana ceil(48/4) = semana 12
 
-```text
-// ANTES (bug): economia semanal * 4 = mensal
-const economiaTotal = entregas.reduce((a, e) => a + (e.economia_horas_semana || 0) * 4, 0);
-
-// DEPOIS (correto): economia semanal total (sem multiplicador)
-const economiaTotal = entregas.reduce((a, e) => a + (e.economia_horas_semana || 0), 0);
-```
-
-## Resultado Esperado
-
-- **Projetos**: 0, 0, 8, 8, 6, 0, 0, 0, 0, 0, 0, 0 (projetos reais com entregas em cada semana)
-- **Horas**: 0, 0, 16.25, 32.3, 38.5, 38.5... (sem mudanca, ja esta correto)
-- **ROI Exec**: 0, 0, ~42%, ~84%, 100%, 100%... (corrigido, sem trava em 25%)
-- **Entregas**: 0/0, 0/0, 0/26, 0/17, 0/5... (sem mudanca, reflete dados reais)
-
-## Arquivo Modificado
-
-- `supabase/functions/gerar-metricas-skills/index.ts` -- projetos baseados em entregas reais por semana e correcao do calculo de ROI (remover multiplicador *4)
