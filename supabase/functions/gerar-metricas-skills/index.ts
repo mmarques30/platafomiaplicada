@@ -52,8 +52,11 @@ serve(async (req) => {
     const economiaTotal = entregas.reduce((a: number, e: any) => a + (e.economia_horas_semana || 0) * 4, 0);
     const economiaTotalReais = economiaTotal * custoHora;
 
+    // Distribuição uniforme de projetos: ex 8 projetos em 12 semanas
+    const projetosPorSemanaBase = Math.floor(totalProjetos / 12);
+    const projetosExtras = totalProjetos % 12;
+
     const rows = [];
-    let horasAcumuladas = 0;
 
     for (let semana = 1; semana <= 12; semana++) {
       const inicioSemana = addWeeks(dataInicio, semana - 1);
@@ -75,14 +78,15 @@ serve(async (req) => {
       });
       const concluidas = concluidasNaSemana.length;
 
-      // Horas economizadas NESTA semana (baseado nas entregas planejadas para esta semana)
-      const horasSemana = entregasDaSemana.reduce(
-        (acc: number, e: any) => acc + (e.economia_horas_semana || 0), 0
-      );
-      horasAcumuladas += horasSemana;
+      // Horas economizadas RECORRENTES: soma de TODAS as entregas com prazo até esta semana
+      // Uma vez implementada, a economia se repete toda semana a partir dali
+      const horasRecorrentes = entregas
+        .filter((e: any) => e.prazo && new Date(e.prazo) < fimSemana)
+        .reduce((acc: number, e: any) => acc + (e.economia_horas_semana || 0), 0);
 
-      // Projetos distribuídos progressivamente ao longo das 12 semanas
-      const projetosNaSemana = Math.round(totalProjetos * semana / 12);
+      // Projetos distribuídos uniformemente (não acumulado)
+      // Ex: 8 projetos / 12 semanas = semanas 1-8 recebem 1, semanas 9-12 recebem 0
+      const projetosNaSemana = projetosPorSemanaBase + (semana <= projetosExtras ? 1 : 0);
 
       // ROI projetado: distribuição progressiva
       let roiProjetado: number;
@@ -90,17 +94,15 @@ serve(async (req) => {
         const roiAlvo = (economiaTotalReais / investimento) * 100;
         roiProjetado = Math.round((roiAlvo * (semana / 12)) * 100) / 100;
       } else {
-        // Sem investimento: usar % da economia total estimada como referência
         roiProjetado = Math.round((semana / 12) * 100 * 100) / 100;
       }
 
-      // ROI executado: baseado em economia real acumulada
-      const economiaRealAcumulada = horasAcumuladas * custoHora;
+      // ROI executado: baseado em economia recorrente
+      const economiaRealAcumulada = horasRecorrentes * custoHora;
       let roiExecutado: number;
       if (investimento > 0) {
         roiExecutado = Math.round((economiaRealAcumulada / investimento) * 100 * 100) / 100;
       } else {
-        // Sem investimento: % da economia alcançada vs estimada
         roiExecutado = economiaTotalReais > 0
           ? Math.round((economiaRealAcumulada / economiaTotalReais) * 100 * 100) / 100
           : 0;
@@ -123,7 +125,7 @@ serve(async (req) => {
       rows.push({
         equipe_id,
         semana,
-        horas_economizadas: Math.round(horasSemana * 100) / 100,
+        horas_economizadas: Math.round(horasRecorrentes * 100) / 100,
         projetos_concluidos: projetosNaSemana,
         entregas_concluidas: concluidas,
         entregas_planejadas: planejadas,
