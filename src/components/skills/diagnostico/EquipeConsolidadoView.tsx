@@ -10,6 +10,8 @@ import {
   Users,
   Layers,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface EquipeConsolidadoViewProps {
   consolidado: {
@@ -85,7 +87,15 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
               {dores.map((dor: any, i: number) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-foreground">
                   <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-[hsl(72,50%,35%)]" />
-                  {typeof dor === "string" ? dor : dor.descricao || dor.nome || JSON.stringify(dor)}
+                  {typeof dor === "string" ? dor : (
+                    <div>
+                      <span className="font-medium">{dor.dor || dor.descricao || dor.nome}</span>
+                      {dor.impacto && <p className="text-xs text-muted-foreground mt-0.5">{dor.impacto}</p>}
+                      {dor.membros_afetados && (
+                        <span className="text-xs text-muted-foreground">{dor.membros_afetados} membro(s) afetado(s)</span>
+                      )}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -183,9 +193,11 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
-              {consolidado.insights_ia}
-            </p>
+            <div className="prose prose-sm max-w-none dark:prose-invert">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {consolidado.insights_ia}
+              </ReactMarkdown>
+            </div>
           </CardContent>
         </Card>
       )}

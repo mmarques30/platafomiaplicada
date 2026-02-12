@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Users, CheckCircle2, Clock, Brain, ArrowRight } from "lucide-react";
 import { useSkillsEquipe } from "@/hooks/useSkillsEquipe";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function SkillsEquipe() {
@@ -149,7 +151,11 @@ export default function SkillsEquipe() {
             {consolidado.insights_ia && (
               <div className="p-4 rounded-lg bg-muted/50">
                 <h4 className="font-medium mb-2">Insights</h4>
-                <p className="text-sm text-muted-foreground">{consolidado.insights_ia}</p>
+                <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {consolidado.insights_ia}
+                  </ReactMarkdown>
+                </div>
               </div>
             )}
 
