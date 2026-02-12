@@ -112,7 +112,7 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       toast.success(`${data.total} entregas geradas com sucesso!`);
-      queryClient.invalidateQueries({ queryKey: ["entregas-skills-admin", equipeId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-entregas-skills", equipeId] });
     } catch (err: any) {
       console.error("Erro ao gerar entregas:", err);
       toast.error(err.message || "Erro ao gerar entregas com IA");
