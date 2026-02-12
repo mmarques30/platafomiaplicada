@@ -121,7 +121,7 @@ export function useSkillsDiagnostico() {
   });
 
   // Fetch diagnóstico existente
-  const { data: diagnostico, isLoading } = useQuery({
+  const { data: diagnostico, isPending: queryPending } = useQuery({
     queryKey: ["diagnostico-skills", effectiveUserId],
     queryFn: async () => {
       if (!effectiveUserId) return null;
@@ -137,6 +137,8 @@ export function useSkillsDiagnostico() {
     enabled: !!effectiveUserId,
   });
 
+  // isLoading verdadeiro até ter usuário E dados carregados
+  const isLoading = queryPending || !effectiveUserId;
   // Atualizar localData quando diagnostico carregar
   useEffect(() => {
     if (diagnostico) {
@@ -355,7 +357,7 @@ export function useSkillsDiagnostico() {
     saveDiagnostico: saveMutation.mutateAsync,
     saveAndProcess,
     saveRascunho,
-    hasInsight: !!localData.insight_ia,
+    hasInsight: !!diagnostico?.insight_ia,
   };
 }
 
