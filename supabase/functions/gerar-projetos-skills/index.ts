@@ -54,15 +54,28 @@ serve(async (req) => {
     }));
 
     const membrosTexto = membrosInfo.map((m: any) =>
-      `- ${m.nome} (${m.cargo}, Área: ${m.area}) | Processos: ${JSON.stringify(m.processos)}`
+      `- ${m.nome} (${m.cargo}, Área: ${m.area})\n  Processos: ${JSON.stringify(m.processos)}\n  Gargalos: ${JSON.stringify(m.gargalos)}`
     ).join("\n");
+
+    const listaMembrosNomes = membrosInfo.map((m: any) => m.nome).join(", ");
 
     const systemPrompt = `Analise os diagnósticos de uma equipe e sugira projetos colaborativos de automação com IA. Retorne usando a função fornecida.
 
 MEMBROS DA EQUIPE:
 ${membrosTexto}
 
-Para cada projeto, atribua um responsavel_nome (nome EXATO de um dos membros acima) com base na relevância do projeto para a área e processos do membro.`;
+REGRAS OBRIGATÓRIAS:
+1. Gere pelo menos 1 projeto por membro da equipe. TODOS os membros devem ter pelo menos 1 projeto: ${listaMembrosNomes}.
+2. Para cada projeto, atribua um responsavel_nome (nome EXATO de um dos membros acima) com base na relevância do projeto para a área e processos do membro.
+3. PRIORIDADE MÁXIMA: Associe cada projeto ao DONO DO PROCESSO — o membro que EXECUTA aquela tarefa no dia a dia.
+4. NÃO concentre projetos em um único membro. Distribua proporcionalmente.
+5. Se um membro tem processos de natureza ESTRATÉGICA ou GESTÃO (ex: "Planejamento Estratégico", "Gestão de Time", "Gestão de Fornecedores") e NÃO tem gargalos operacionais claros:
+   - Sugira projetos de apoio à gestão com IA (ex: dashboards inteligentes, automação de reports, análise preditiva, assistente de decisão, etc.)
+   - Marque o campo "necessita_avaliacao" como true para esses projetos
+6. Se um membro tem processos operacionais com gargalos claros e repetitivos:
+   - Gere projetos de automação direta
+   - Marque "necessita_avaliacao" como false
+7. Ao final, confira: cada membro da lista (${listaMembrosNomes}) tem pelo menos 1 projeto? Se não, adicione.`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -78,7 +91,7 @@ Para cada projeto, atribua um responsavel_nome (nome EXATO de um dos membros aci
           type: "function",
           function: {
             name: "sugerir_projetos",
-            description: "Sugere projetos baseados nos diagnósticos",
+            description: "Sugere projetos baseados nos diagnósticos. DEVE incluir pelo menos 1 projeto por membro.",
             parameters: {
               type: "object",
               properties: {
@@ -92,9 +105,10 @@ Para cada projeto, atribua um responsavel_nome (nome EXATO de um dos membros aci
                       area_impactada: { type: "string" },
                       horas_estimadas_economia: { type: "number" },
                       prioridade: { type: "string", enum: ["alta", "media", "baixa"] },
-                      responsavel_nome: { type: "string" },
+                      responsavel_nome: { type: "string", description: "Nome EXATO do membro responsável" },
+                      necessita_avaliacao: { type: "boolean", description: "true se o projeto é sugerido para perfil estratégico/gestão sem gargalos operacionais claros" },
                     },
-                    required: ["titulo", "descricao", "prioridade", "responsavel_nome"]
+                    required: ["titulo", "descricao", "prioridade", "responsavel_nome", "necessita_avaliacao"]
                   }
                 }
               },
@@ -138,12 +152,13 @@ Para cada projeto, atribua um responsavel_nome (nome EXATO de um dos membros aci
       origem: "ia",
       ordem: i,
       responsavel_id: findUserId(p.responsavel_nome),
+      tags: p.necessita_avaliacao ? ["pendente_avaliacao"] : [],
     }));
 
     const { data: insertedProjetos, error: insertError } = await supabase
       .from("backlog_skills")
       .insert(inserts)
-      .select("id, titulo, descricao, prioridade, horas_estimadas_economia, responsavel_id");
+      .select("id, titulo, descricao, prioridade, horas_estimadas_economia, responsavel_id, tags");
     if (insertError) throw new Error("Erro ao salvar projetos: " + insertError.message);
 
     // Criar entregas automaticamente para cada projeto gerado
@@ -157,6 +172,7 @@ Para cada projeto, atribua um responsavel_nome (nome EXATO de um dos membros aci
         prioridade: mapPrioridade(p.prioridade || "media"),
         economia_horas_semana: p.horas_estimadas_economia || null,
         responsavel_id: p.responsavel_id || null,
+        tags: p.tags || [],
       }));
 
       const { error: entregasError } = await supabase
