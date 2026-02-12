@@ -6,6 +6,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function mapPrioridade(prioridade: string): string {
+  switch (prioridade) {
+    case "alta": return "P1";
+    case "media": return "P2";
+    case "baixa": return "P3";
+    default: return "P2";
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -85,10 +94,39 @@ serve(async (req) => {
       ordem: i,
     }));
 
-    const { error: insertError } = await supabase.from("backlog_skills").insert(inserts);
+    const { data: insertedProjetos, error: insertError } = await supabase
+      .from("backlog_skills")
+      .insert(inserts)
+      .select("id, titulo, descricao, prioridade, horas_estimadas_economia");
     if (insertError) throw new Error("Erro ao salvar projetos: " + insertError.message);
 
-    return new Response(JSON.stringify({ success: true, projetos_criados: inserts.length }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    // Criar entregas automaticamente para cada projeto gerado
+    if (insertedProjetos?.length) {
+      const entregasInserts = insertedProjetos.map((p: any) => ({
+        equipe_id,
+        backlog_item_id: p.id,
+        titulo: p.titulo,
+        descricao: p.descricao,
+        status: "pendente",
+        prioridade: mapPrioridade(p.prioridade || "media"),
+        economia_horas_semana: p.horas_estimadas_economia || null,
+      }));
+
+      const { error: entregasError } = await supabase
+        .from("entregas_skills")
+        .insert(entregasInserts);
+      
+      if (entregasError) {
+        console.error("Erro ao criar entregas automáticas:", entregasError.message);
+        // Não falha a operação principal, projetos já foram salvos
+      }
+    }
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      projetos_criados: inserts.length,
+      entregas_criadas: insertedProjetos?.length || 0
+    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("Error:", e);
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
