@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,8 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { useEntregasSkillsAdmin, useUpsertEntregaSkills, useDeleteEntregaSkills } from "@/hooks/admin/useSkillsPerformanceAdmin";
 import { useMembrosEquipeSkills } from "@/hooks/admin/useSkillsPerformanceAdmin";
 import { adminTheme } from "@/components/admin/adminTheme";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Sparkles, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface Props {
   equipeId: string;
@@ -42,10 +45,26 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
   const { data: membros } = useMembrosEquipeSkills(equipeId);
   const upsertMutation = useUpsertEntregaSkills();
   const deleteMutation = useDeleteEntregaSkills();
+  const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [generating, setGenerating] = useState(false);
+
+  // Check if backlog has projects
+  const { data: backlogCount } = useQuery({
+    queryKey: ["backlog-skills-count", equipeId],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("backlog_skills")
+        .select("id", { count: "exact", head: true })
+        .eq("equipe_id", equipeId);
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!equipeId,
+  });
 
   const openNew = () => {
     setEditId(null);
@@ -84,6 +103,24 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
     setOpen(false);
   };
 
+  const handleGerarEntregas = async () => {
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("gerar-entregas-skills", {
+        body: { equipe_id: equipeId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`${data.total} entregas geradas com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: ["entregas-skills-admin", equipeId] });
+    } catch (err: any) {
+      console.error("Erro ao gerar entregas:", err);
+      toast.error(err.message || "Erro ao gerar entregas com IA");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   const statusBadge = (status: string) => {
     switch (status) {
       case "concluido": return <Badge className="bg-emerald-100 text-emerald-700 border-transparent">Concluído</Badge>;
@@ -95,11 +132,28 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold">Entregas</h3>
-        <Button size="sm" className={adminTheme.buttonSm} onClick={openNew}>
-          <Plus className="h-3.5 w-3.5 mr-1.5" /> Nova Entrega
-        </Button>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <h3 className="text-base font-semibold">Entregas</h3>
+          {(backlogCount ?? 0) > 0 && (
+            <Badge variant="secondary" className="text-xs">{backlogCount} projeto(s) no backlog</Badge>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleGerarEntregas}
+            disabled={generating || !backlogCount}
+            className="gap-1.5"
+          >
+            {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {generating ? "Gerando..." : "Gerar Entregas com IA"}
+          </Button>
+          <Button size="sm" className={adminTheme.buttonSm} onClick={openNew}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" /> Nova Entrega
+          </Button>
+        </div>
       </div>
 
       <Card className={adminTheme.card}>

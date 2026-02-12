@@ -68,3 +68,6 @@ verify_jwt = false
 
 [functions.consolidar-diagnosticos-skills]
 verify_jwt = false
+
+[functions.gerar-entregas-skills]
+verify_jwt = false
