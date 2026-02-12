@@ -1,65 +1,66 @@
 
 
-# Corrigir Metricas: Projetos Acumulando, Horas em 3 Semanas e Entregas Concentradas
+# Corrigir Metricas: Projetos por Semana Real e ROI Exec Travado em 25%
 
 ## Problemas Identificados
 
-### 1. Projetos acumulando (1,1,2,3,3,4,5,5,6,7,7,8)
-A formula `Math.round(totalProjetos * semana / 12)` gera numeros crescentes. O correto e mostrar quantos projetos estao planejados **por semana individual**: com 8 projetos em 12 semanas, cada semana recebe 0 ou 1 projeto.
+### 1. Projetos nao refletem os dados reais
+A coluna "Projetos" mostra uma distribuicao artificial (1,1,1,1,1,1,1,1,0,0,0,0) que nao tem relacao com os projetos reais. O correto e: para cada semana, contar quantos projetos do backlog TEM ENTREGAS planejadas naquela semana (baseado nos prazos das entregas vinculadas via `backlog_item_id`).
 
-### 2. Horas economizadas somente em 3 semanas (semanas 3, 4, 5)
-O campo `economia_horas_semana` representa economia **recorrente** -- uma vez que a entrega e implementada, ela economiza X horas **toda semana** a partir dali. Atualmente, as horas so aparecem na semana do prazo. O correto e: a partir da semana em que o prazo cai, somar essas horas em TODAS as semanas seguintes.
+**Dados reais**: Os 8 projetos tem entregas entre semanas 3-5. Entao:
+- Semanas 1-2: 0 projetos
+- Semana 3: ~8 projetos (todos tem pelo menos 1 entrega nessa faixa)
+- Semana 4: ~8 projetos
+- Semana 5: ~6 projetos
+- Semanas 6-12: 0 projetos
 
-**Exemplo**: entrega com 1h/semana e prazo na semana 3 deve gerar 1h nas semanas 3, 4, 5, 6, 7, 8, 9, 10, 11 e 12.
+### 2. ROI Executado travado em 25% (bug matematico)
+A `economiaTotal` e calculada como `soma(economia_horas_semana) * 4` (multiplicando por 4 para estimar valor mensal), mas `horasRecorrentes` e a soma semanal simples. Quando investimento = 0, o ROI executado e `horasRecorrentes / economiaTotal`, que no maximo da `semanal / (semanal * 4) = 25%`.
+
+**Correcao**: Remover o multiplicador `* 4` da economiaTotal, ou usar a mesma base de comparacao. O correto e comparar horas recorrentes semanais com o total de horas semanais possiveis (sem multiplicar por 4).
 
 ### 3. Entregas concentradas em 3 semanas
-A IA gerou todos os prazos entre 17/02 e 05/03 (semanas 3-5). Isso e um problema na geracao, mas sera resolvido na metrica ao redistribuir as entregas. As entregas existentes nao precisam ser regeneradas -- o calculo das metricas que precisa tratar isso corretamente com horas recorrentes.
+As 48 entregas tem prazos entre 17/02 e 05/03 -- isso e correto pelos dados. O calculo por semana esta funcionando bem (26 na semana 3, 17 na semana 4, 5 na semana 5). Nao ha bug aqui, apenas reflete a realidade dos prazos gerados.
 
 ## Solucao
 
 ### Arquivo: `supabase/functions/gerar-metricas-skills/index.ts`
 
-**Projetos por semana (nao acumulado)**:
-- Distribuir uniformemente: `Math.floor(8/12) = 0` base + 8 semanas recebem 1 extra
-- Resultado: 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0
-
-**Horas recorrentes**:
-- Para cada semana, somar `economia_horas_semana` de TODAS as entregas cujo prazo ja passou (prazo < fimSemana)
-- Isso gera uma curva crescente natural: semana 3 = horas de 14 entregas, semana 5+ = horas de todas as 48 entregas
-- Resultado esperado: 0, 0, ~10, ~20, ~38.5, ~38.5, ~38.5... (crescente e depois estavel)
-
-**ROI executado**: Acompanha as horas recorrentes corretamente.
-
-## Detalhes Tecnicos
-
-### Projetos - distribuicao uniforme
+**Projetos por semana (baseado em entregas reais)**:
+Em vez de distribuir uniformemente, contar quantos projetos DISTINTOS do backlog tem pelo menos 1 entrega com prazo naquela semana.
 
 ```text
-const projetosPorSemana = Math.floor(totalProjetos / 12);
-const projetosExtras = totalProjetos % 12;
-// Semanas 1 ate projetosExtras recebem 1 extra
-const projetosNaSemana = projetosPorSemana + (semana <= projetosExtras ? 1 : 0);
+// Para cada semana, contar projetos distintos com entregas nesta semana
+const projetosIds = new Set(
+  entregas
+    .filter(e => {
+      if (!e.prazo || !e.backlog_item_id) return false;
+      const prazo = new Date(e.prazo);
+      return prazo >= inicioSemana && prazo < fimSemana;
+    })
+    .map(e => e.backlog_item_id)
+);
+const projetosNaSemana = projetosIds.size;
 ```
 
-### Horas - economia recorrente
+**ROI Executado (corrigir base de comparacao)**:
+Remover o `* 4` da economiaTotal para que a base de comparacao seja consistente (ambas semanais).
 
 ```text
-// Soma economia de TODAS as entregas com prazo ate esta semana (recorrente)
-const horasRecorrentes = entregas
-  .filter(e => e.prazo && new Date(e.prazo) < fimSemana)
-  .reduce((acc, e) => acc + (e.economia_horas_semana || 0), 0);
+// ANTES (bug): economia semanal * 4 = mensal
+const economiaTotal = entregas.reduce((a, e) => a + (e.economia_horas_semana || 0) * 4, 0);
+
+// DEPOIS (correto): economia semanal total (sem multiplicador)
+const economiaTotal = entregas.reduce((a, e) => a + (e.economia_horas_semana || 0), 0);
 ```
-
-### ROI executado com horas recorrentes
-
-O ROI executado agora usa as horas recorrentes (que crescem e se mantem), resultando em uma curva crescente natural ao inves de picos isolados.
-
-## Arquivo Modificado
-
-- `supabase/functions/gerar-metricas-skills/index.ts` -- projetos por semana (uniforme, nao acumulado) e horas com economia recorrente
 
 ## Resultado Esperado
 
-- **Projetos**: 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 (8 distribuidos uniformemente)
-- **Horas**: 0, 0, ~10, ~20, ~38.5, ~38.5, ~38.5... (crescente conforme entregas sao implementadas, depois estavel)
-- **ROI**: curva crescente e coerente com a economia real acumulada
+- **Projetos**: 0, 0, 8, 8, 6, 0, 0, 0, 0, 0, 0, 0 (projetos reais com entregas em cada semana)
+- **Horas**: 0, 0, 16.25, 32.3, 38.5, 38.5... (sem mudanca, ja esta correto)
+- **ROI Exec**: 0, 0, ~42%, ~84%, 100%, 100%... (corrigido, sem trava em 25%)
+- **Entregas**: 0/0, 0/0, 0/26, 0/17, 0/5... (sem mudanca, reflete dados reais)
+
+## Arquivo Modificado
+
+- `supabase/functions/gerar-metricas-skills/index.ts` -- projetos baseados em entregas reais por semana e correcao do calculo de ROI (remover multiplicador *4)
