@@ -18,7 +18,7 @@ serve(async (req) => {
     // Fetch all completed diagnostics with insights
     const { data: diagnosticos, error: diagError } = await supabase
       .from("diagnosticos_skills")
-      .select("*, profiles:user_id(nome_completo, cargo)")
+      .select("*, profiles:user_id(nome_completo)")
       .eq("equipe_id", equipe_id)
       .eq("completado", true);
 
