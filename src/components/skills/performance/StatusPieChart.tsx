@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { PieChart, Pie, Cell, Legend, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, Legend } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   ChartContainer,
@@ -12,8 +12,13 @@ interface Entrega {
   status: string;
 }
 
+interface Projeto {
+  status: string;
+}
+
 interface StatusPieChartProps {
   entregas: Entrega[];
+  projetos?: Projeto[];
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -22,6 +27,8 @@ const STATUS_COLORS: Record<string, string> = {
   em_andamento: "hsl(45, 90%, 55%)",
   atrasado: "hsl(0, 70%, 55%)",
   pendente: "hsl(var(--muted-foreground))",
+  levantado: "hsl(210, 50%, 60%)",
+  priorizado: "hsl(270, 50%, 60%)",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -30,6 +37,8 @@ const STATUS_LABELS: Record<string, string> = {
   em_andamento: "Em andamento",
   atrasado: "Atrasado",
   pendente: "Pendente",
+  levantado: "Levantado",
+  priorizado: "Priorizado",
 };
 
 const chartConfig: ChartConfig = {
@@ -37,13 +46,18 @@ const chartConfig: ChartConfig = {
   em_andamento: { label: "Em andamento", color: "hsl(45, 90%, 55%)" },
   atrasado: { label: "Atrasado", color: "hsl(0, 70%, 55%)" },
   pendente: { label: "Pendente", color: "hsl(var(--muted-foreground))" },
+  levantado: { label: "Levantado", color: "hsl(210, 50%, 60%)" },
+  priorizado: { label: "Priorizado", color: "hsl(270, 50%, 60%)" },
 };
 
-export default function StatusPieChart({ entregas }: StatusPieChartProps) {
+export default function StatusPieChart({ entregas, projetos = [] }: StatusPieChartProps) {
+  const hasEntregas = entregas.length > 0;
+  const sourceItems = hasEntregas ? entregas : projetos;
+
   const data = useMemo(() => {
     const counts: Record<string, number> = {};
-    entregas.forEach((e) => {
-      const key = e.status === "aprovada" ? "concluido" : e.status;
+    sourceItems.forEach((e) => {
+      const key = e.status === "aprovada" ? "concluido" : (e.status || "pendente");
       counts[key] = (counts[key] || 0) + 1;
     });
     return Object.entries(counts).map(([status, value]) => ({
@@ -51,13 +65,13 @@ export default function StatusPieChart({ entregas }: StatusPieChartProps) {
       value,
       status,
     }));
-  }, [entregas]);
+  }, [sourceItems]);
 
   return (
     <Card className="border-border bg-card">
       <CardHeader>
         <CardTitle>Distribuição por Status</CardTitle>
-        <CardDescription>Entregas agrupadas por status atual</CardDescription>
+        <CardDescription>{hasEntregas ? "Entregas agrupadas por status" : "Projetos agrupados por status"}</CardDescription>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (

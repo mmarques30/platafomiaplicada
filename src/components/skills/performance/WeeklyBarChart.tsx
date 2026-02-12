@@ -10,20 +10,29 @@ interface RankingItem {
   posicao: number;
 }
 
+interface Projeto {
+  responsavelId: string | null;
+  status: string;
+}
+
 interface WeeklyBarChartProps {
   ranking: RankingItem[];
   entregas: any[];
+  projetos?: Projeto[];
 }
 
-export default function WeeklyBarChart({ ranking }: WeeklyBarChartProps) {
-  const totalConcluidas = ranking.reduce((a, r) => a + r.entregasConcluidas, 0);
-  const totalEntregas = ranking.reduce((a, r) => a + r.totalEntregas, 0);
+export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: WeeklyBarChartProps) {
+  const hasEntregas = entregas.length > 0;
 
   return (
     <Card className="border-border bg-card">
       <CardHeader>
         <CardTitle>Evolução de Maturidade</CardTitle>
-        <CardDescription>Total Entregas: {totalEntregas}</CardDescription>
+        <CardDescription>
+          {hasEntregas
+            ? `Total Entregas: ${ranking.reduce((a, r) => a + r.totalEntregas, 0)}`
+            : `Total Projetos: ${projetos.length}`}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {ranking.length === 0 ? (
@@ -38,7 +47,9 @@ export default function WeeklyBarChart({ ranking }: WeeklyBarChartProps) {
                 <div key={member.userId} className="space-y-1.5">
                   <p className="text-sm font-medium">{member.nome}</p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{member.entregasConcluidas} / {member.totalEntregas} entregas</span>
+                    <span>
+                      {member.entregasConcluidas} / {member.totalEntregas} {hasEntregas ? "entregas" : "projetos"}
+                    </span>
                     <span className="font-semibold text-foreground">{pct}%</span>
                   </div>
                   <div className="bg-muted rounded-full h-3 w-full">

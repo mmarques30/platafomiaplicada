@@ -178,6 +178,30 @@ export function useSkillsLider() {
     enabled: !!equipeId,
   });
 
+  // Buscar projetos do backlog (para fallback quando entregas estão vazias)
+  const { data: projetos, isLoading: projetosLoading } = useQuery({
+    queryKey: ["skills-projetos-lider", equipeId],
+    queryFn: async () => {
+      if (!equipeId) return [];
+      const { data, error } = await supabase
+        .from("backlog_skills")
+        .select("id, titulo, status, responsavel_id, tags, horas_estimadas_economia, profiles:responsavel_id(nome_completo)")
+        .eq("equipe_id", equipeId)
+        .neq("status", "descartado");
+      if (error) throw error;
+      return (data || []).map((p: any) => ({
+        id: p.id,
+        titulo: p.titulo,
+        status: p.status || "levantado",
+        responsavelId: p.responsavel_id,
+        responsavelNome: p.profiles?.nome_completo || null,
+        tags: p.tags || [],
+        horasEstimadas: p.horas_estimadas_economia || 0,
+      }));
+    },
+    enabled: !!equipeId,
+  });
+
   // Buscar métricas semanais
   const { data: metricas, isLoading: metricasLoading } = useQuery({
     queryKey: ["skills-metricas-lider", equipeId],
@@ -384,7 +408,8 @@ export function useSkillsLider() {
     ? entregasConcluidasList.reduce((acc, e) => acc + (e.avaliacaoNota || 0), 0) / entregasConcluidasList.length
     : 0;
 
-  // Calcular ranking de colaboradores
+  // Calcular ranking de colaboradores (com fallback para projetos)
+  const hasEntregas = (entregas || []).length > 0;
   const ranking: RankingColaborador[] = (membros || [])
     .map((m) => {
       const entregasMembro = (entregas || []).filter((e) => e.responsavelId === m.userId);
@@ -394,7 +419,11 @@ export function useSkillsLider() {
         return !isAfter(parseISO(e.concluidoEm), parseISO(e.prazo));
       });
 
+      const projetosMembro = (projetos || []).filter((p) => p.responsavelId === m.userId);
+      const projetosEmAndamento = projetosMembro.filter((p) => p.status === "em_andamento").length;
+
       const horasEcon = entregasConcluidasMembro.reduce((acc, e) => acc + e.economiaHorasSemana, 0);
+      const horasEstimadasProjetos = projetosMembro.reduce((acc, p) => acc + p.horasEstimadas, 0);
       const perfMedia = entregasConcluidasMembro.length > 0
         ? entregasConcluidasMembro.reduce((acc, e) => acc + (e.avaliacaoNota || 0), 0) / entregasConcluidasMembro.length
         : 0;
@@ -402,20 +431,19 @@ export function useSkillsLider() {
         ? (entregasNoPrazo.length / entregasConcluidasMembro.length) * 100
         : 0;
 
-      const score =
-        (entregasConcluidasMembro.length * 30) +
-        (horasEcon * 25) +
-        (perfMedia * 5 * 25) +
-        (taxaPrazo * 0.2);
+      // Score: se não tem entregas, usa projetos atribuídos como base
+      const score = hasEntregas
+        ? (entregasConcluidasMembro.length * 30) + (horasEcon * 25) + (perfMedia * 5 * 25) + (taxaPrazo * 0.2)
+        : (projetosMembro.length * 20) + (projetosEmAndamento * 15) + (horasEstimadasProjetos * 5);
 
       return {
         posicao: 0,
         userId: m.userId,
         nome: m.nome,
         avatar: m.avatar,
-        entregasConcluidas: entregasConcluidasMembro.length,
-        totalEntregas: entregasMembro.length,
-        horasEconomizadas: horasEcon,
+        entregasConcluidas: hasEntregas ? entregasConcluidasMembro.length : projetosEmAndamento,
+        totalEntregas: hasEntregas ? entregasMembro.length : projetosMembro.length,
+        horasEconomizadas: hasEntregas ? horasEcon : horasEstimadasProjetos,
         performanceMedia: perfMedia,
         taxaPrazo,
         score,
@@ -460,7 +488,7 @@ export function useSkillsLider() {
   });
 
   // Loading state
-  const isLoading = membroLoading || equipeLoading || membrosLoading || entregasLoading || metricasLoading || roadmapLoading || loadingProgresso;
+  const isLoading = membroLoading || equipeLoading || membrosLoading || entregasLoading || projetosLoading || metricasLoading || roadmapLoading || loadingProgresso;
 
   // Métricas consolidadas
   const metricasConsolidadas = {
@@ -487,6 +515,7 @@ export function useSkillsLider() {
     // Dados
     membros: membros || [],
     entregas: entregas || [],
+    projetos: projetos || [],
     metricas: metricasConsolidadas,
     metricasSemanais: metricas || [],
     roadmap: roadmap || [],
