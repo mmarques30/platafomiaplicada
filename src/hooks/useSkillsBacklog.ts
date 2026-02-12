@@ -1,53 +1,86 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSkillsMembro } from "./useSkillsMembro";
+import { toast } from "sonner";
+
+export interface BacklogItem {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  area_impactada: string | null;
+  status: string | null;
+  prioridade: string | null;
+  responsavel_id: string | null;
+  horas_estimadas_economia: number | null;
+  tags: string[] | null;
+  origem: string | null;
+  ordem: number | null;
+  equipe_id: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  responsavel: { id: string; nome: string; avatar_url: string | null } | null;
+}
 
 export function useSkillsBacklog() {
   const { equipeId } = useSkillsMembro();
+  const queryClient = useQueryClient();
 
-  // Buscar itens do backlog
   const { data: items, isLoading } = useQuery({
     queryKey: ["backlog-skills", equipeId],
     queryFn: async () => {
       if (!equipeId) return [];
-      
-      // Buscar backlog
-      const { data: backlogData, error } = await supabase
+
+      const { data, error } = await supabase
         .from("backlog_skills")
         .select("*")
         .eq("equipe_id", equipeId)
         .order("ordem", { ascending: true });
       if (error) throw error;
-      
-      // Buscar responsáveis
-      const responsavelIds = backlogData?.map(b => b.responsavel_id).filter(Boolean) || [];
+
+      const responsavelIds = data?.map(b => b.responsavel_id).filter(Boolean) || [];
       let responsaveis: Record<string, any> = {};
-      
+
       if (responsavelIds.length > 0) {
         const { data: profilesData } = await supabase
           .from("profiles")
-          .select("id, nome, avatar_url")
+          .select("id, nome_completo, avatar_url")
           .in("id", responsavelIds as string[]);
-        
+
         if (profilesData) {
           responsaveis = profilesData.reduce((acc: Record<string, any>, p: any) => {
-            acc[p.id] = p;
+            acc[p.id] = { id: p.id, nome: p.nome_completo, avatar_url: p.avatar_url };
             return acc;
           }, {});
         }
       }
-      
-      // Combinar dados
-      return backlogData?.map(item => ({
+
+      return (data?.map(item => ({
         ...item,
-        responsavel: item.responsavel_id ? responsaveis[item.responsavel_id] : null,
-      })) || [];
+        responsavel: item.responsavel_id ? responsaveis[item.responsavel_id] || null : null,
+      })) || []) as BacklogItem[];
     },
     enabled: !!equipeId,
   });
 
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase
+        .from("backlog_skills")
+        .update({ status })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["backlog-skills"] });
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar status do projeto");
+    },
+  });
+
   return {
-    items,
+    items: items || [],
     isLoading,
+    updateStatus,
   };
 }
