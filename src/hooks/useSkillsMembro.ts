@@ -68,7 +68,7 @@ export function useSkillsMembro() {
   const finalEquipeId = memberData?.equipe_id ?? (isAdmin ? fallbackEquipeId : null) ?? null;
 
   // isLoading simples: query pendente ou auth/roles carregando
-  const isLoading = isPending || authLoading || roleLoading;
+  const isLoading = isPending || authLoading || roleLoading || (!data && !authLoading);
 
   return {
     equipeId: finalEquipeId,
