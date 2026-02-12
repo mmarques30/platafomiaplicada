@@ -2127,6 +2127,7 @@ export type Database = {
           prazo_equipe: string | null
           prioridade_equipe: string | null
           progresso: number | null
+          projeto_id: string | null
           responsavel_id: string | null
           status_equipe: string
           titulo_equipe: string
@@ -2144,6 +2145,7 @@ export type Database = {
           prazo_equipe?: string | null
           prioridade_equipe?: string | null
           progresso?: number | null
+          projeto_id?: string | null
           responsavel_id?: string | null
           status_equipe?: string
           titulo_equipe: string
@@ -2161,6 +2163,7 @@ export type Database = {
           prazo_equipe?: string | null
           prioridade_equipe?: string | null
           progresso?: number | null
+          projeto_id?: string | null
           responsavel_id?: string | null
           status_equipe?: string
           titulo_equipe?: string
@@ -2179,6 +2182,13 @@ export type Database = {
             columns: ["equipe_id"]
             isOneToOne: false
             referencedRelation: "equipes_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_equipe_skills_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_skills"
             referencedColumns: ["id"]
           },
         ]

@@ -59,6 +59,7 @@ export default function SkillsEntregasEquipeTab({ equipeId }: { equipeId: string
         <TableHeader>
           <TableRow>
             <TableHead>Título</TableHead>
+            <TableHead>Projeto</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Prioridade</TableHead>
             <TableHead>Responsável</TableHead>
@@ -75,6 +76,11 @@ export default function SkillsEntregasEquipeTab({ equipeId }: { equipeId: string
                   <span className="font-medium">{e.titulo_equipe}</span>
                   {e.notas && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{e.notas}</p>}
                 </div>
+              </TableCell>
+              <TableCell>
+                {e.projeto?.titulo ? (
+                  <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">{e.projeto.titulo}</Badge>
+                ) : "-"}
               </TableCell>
               <TableCell><Badge variant="outline" className={statusColors[e.status_equipe]}>{statusLabels[e.status_equipe] || e.status_equipe}</Badge></TableCell>
               <TableCell>{e.prioridade_equipe || "-"}</TableCell>
