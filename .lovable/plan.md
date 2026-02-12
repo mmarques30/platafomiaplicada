@@ -1,98 +1,76 @@
 
 
-# Corrigir Entregas: Regenerar entregas_skills e vincular entregas_equipe aos projetos
+# Ver Backlog de Projetos na Pagina de Projetos (Kanban + Tabela + Detalhamento)
 
-## Problema
+## Problema Atual
 
-1. A tabela `entregas_skills` esta **vazia** -- as entregas foram deletadas na correcao anterior e nunca foram regeneradas. Isso faz com que tanto a aba "Entregas" no admin quanto no painel do lider fiquem sem dados.
-2. A tabela `entregas_equipe_skills` tambem esta **vazia** -- essas sao as entregas que a equipe adiciona manualmente como complemento.
-3. O modal de "Nova Entrega" (equipe) so permite vincular a `entregas_skills` (via `entrega_id`), mas como essa tabela esta vazia, nao ha nada para vincular. Deveria tambem poder vincular aos **projetos** do backlog.
+A pagina de Projetos (`/skills/projeto/projetos`) mostra o Kanban das **entregas** (tabela `entregas_skills`), mas o usuario quer ver o **backlog de projetos** (tabela `backlog_skills`). Alem disso, ao clicar em um card/linha, deve abrir um modal com o detalhamento completo do projeto.
+
+## Dados Disponiveis no Backlog
+
+Cada projeto em `backlog_skills` tem:
+- titulo, descricao, area_impactada
+- status (levantado, em_andamento, concluido, descartado)
+- prioridade (alta, media, baixa)
+- responsavel_id (FK para profiles)
+- horas_estimadas_economia
+- tags (array), origem (ia/manual)
 
 ## Solucao
 
-### 1. Regenerar entregas_skills via IA
+### 1. Criar toggle Kanban / Tabela
 
-Primeiro, as entregas geradas por IA precisam ser regeneradas. O admin deve clicar em "Gerar Entregas com IA" na aba Entregas do admin. Porem, a edge function ja foi corrigida para gerar entregas como tarefas/atividades (nao copias de projetos). Basta clicar o botao.
+Adicionar botoes de alternancia (icones LayoutGrid e List) no topo da pagina para trocar entre visualizacao Kanban e Tabela.
 
-**Acao necessaria do admin**: Clicar "Gerar Entregas com IA" na aba Entregas.
+### 2. Criar componente `BacklogKanban`
 
-### 2. Adicionar campo `projeto_id` na tabela `entregas_equipe_skills`
+Novo Kanban alimentado por `backlog_skills` ao inves de `entregas_skills`:
+- Colunas: LEVANTADO, EM ANDAMENTO, CONCLUIDO
+- Cards mostram: titulo, descricao truncada, area_impactada, prioridade, responsavel, horas estimadas
+- Drag-and-drop para mudar status
+- Ao clicar no card, abre modal de detalhes
 
-Atualmente a tabela so tem `entrega_id` (FK para entregas_skills). Adicionar `projeto_id` (FK para backlog_skills) para que a equipe possa associar entregas diretamente aos projetos.
+### 3. Criar componente `BacklogTable`
 
-**Migration SQL:**
-```text
-ALTER TABLE entregas_equipe_skills 
-ADD COLUMN projeto_id UUID REFERENCES backlog_skills(id) ON DELETE SET NULL;
-```
+Tabela com as colunas: Titulo, Area, Status, Prioridade, Responsavel, Economia (h/sem)
+- Clique na linha abre o mesmo modal de detalhes
+- Ordenacao por colunas
 
-### 3. Atualizar o modal `EntregaEquipeModal`
+### 4. Criar componente `ProjetoDetailModal`
 
-- Adicionar um campo **"Projeto Vinculado"** (select com os projetos do backlog_skills)
-- Adicionar um campo opcional **"Entrega Vinculada"** (select com entregas da entregas_skills, filtrado pelo projeto selecionado)
-- Quando o usuario seleciona um projeto, as entregas daquele projeto aparecem como opcao
-- Salvar `projeto_id` junto com os dados
+Modal (Dialog) que exibe todos os campos do projeto:
+- Titulo e descricao completa
+- Area impactada, prioridade, status
+- Responsavel (avatar + nome)
+- Horas estimadas de economia
+- Tags
+- Origem (IA ou Manual)
+- Lista de entregas vinculadas (de `entregas_skills` filtradas pelo projeto)
 
-### 4. Atualizar o hook `useEntregasEquipe`
+### 5. Criar hook `useBacklogSkills`
 
-- Incluir `projeto_id` no select e no upsert
-- Fazer join com `backlog_skills:projeto_id(titulo)` para exibir o titulo do projeto vinculado
+Hook dedicado para buscar projetos do backlog com join de responsavel e mutation para atualizar status (drag-and-drop).
 
-### 5. Atualizar as views (cards e tabela)
+### 6. Atualizar `ProjetoSkillsProjetosPage`
 
-- `ProjetoSkillsEntregas.tsx` (painel da equipe): mostrar o nome do projeto vinculado em cada card de entrega
-- `SkillsEntregasEquipeTab.tsx` (admin): mostrar coluna "Projeto" na tabela
-
-### 6. Atualizar o `ProjetoSkillsPerformance.tsx` (dashboard lider)
-
-- Incluir dados de `entregas_equipe_skills` no hook ou nos componentes, para que entregas da equipe tambem aparecam nos dashboards
-
-## Detalhes Tecnicos
-
-### Migration
-
-```text
-ALTER TABLE entregas_equipe_skills 
-ADD COLUMN projeto_id UUID REFERENCES backlog_skills(id) ON DELETE SET NULL;
-```
-
-### Hook `useEntregasEquipe`
-
-```text
-// Adicionar ao select:
-backlog_skills:projeto_id (titulo)
-
-// Adicionar ao tipo EntregaEquipe:
-projeto_id: string | null;
-projeto?: { titulo: string } | null;
-```
-
-### Modal `EntregaEquipeModal`
-
-- Nova prop: `projetos: { id: string; titulo: string }[]`
-- Novo campo select "Projeto vinculado" que salva `projeto_id`
-- Buscar projetos do backlog no componente pai (`ProjetoSkillsEntregas.tsx`)
-
-### Cards e Tabela
-
-- Exibir badge com titulo do projeto em cada entrega da equipe
-- Filtro por projeto no painel da equipe
+Substituir o componente `ProjetoSkillsKanban` (que mostra entregas) pelo novo componente que mostra o backlog com toggle Kanban/Tabela.
 
 ## Arquivos
 
-**Novos:** Nenhum
+**Novos:**
+- `src/components/skills/backlog/BacklogKanban.tsx` -- Kanban board do backlog
+- `src/components/skills/backlog/BacklogTable.tsx` -- Tabela do backlog
+- `src/components/skills/backlog/BacklogCard.tsx` -- Card de projeto para Kanban
+- `src/components/skills/backlog/ProjetoDetailModal.tsx` -- Modal de detalhes do projeto
+- `src/components/skills/backlog/BacklogView.tsx` -- Container com toggle Kanban/Tabela
 
 **Modificados:**
-- `src/hooks/useEntregasEquipe.ts` -- adicionar projeto_id, join com backlog_skills
-- `src/components/skills/EntregaEquipeModal.tsx` -- campo select de projetos
-- `src/components/skills/ProjetoSkillsEntregas.tsx` -- passar projetos ao modal, exibir nome do projeto nos cards
-- `src/components/admin/skills/SkillsEntregasEquipeTab.tsx` -- coluna "Projeto" na tabela admin
-
-**Migration:** adicionar coluna `projeto_id` na tabela `entregas_equipe_skills`
+- `src/pages/skills/ProjetoSkillsProjetosPage.tsx` -- usar BacklogView ao inves de ProjetoSkillsKanban
+- `src/hooks/useSkillsBacklog.ts` -- adicionar mutation de status e buscar responsavel com join correto
 
 ## Resultado
 
-- Admin regenera entregas com IA (botao ja existente)
-- Equipe pode criar entregas vinculadas a projetos do backlog
-- Entregas aparecem corretamente tanto no admin quanto no painel
-- Dashboards refletem dados de entregas da equipe
+- Pagina de Projetos mostra os projetos do backlog (nao entregas)
+- Toggle entre Kanban e Tabela
+- Clicar em qualquer projeto abre modal com todos os detalhes
+- Drag-and-drop no Kanban atualiza status do projeto
