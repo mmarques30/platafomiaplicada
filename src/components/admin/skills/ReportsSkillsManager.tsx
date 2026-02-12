@@ -10,6 +10,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useReportsSkills, ReportSkills } from "@/hooks/admin/useReportsSkills";
 import { GerarReportSkillsModal } from "./GerarReportSkillsModal";
 import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning, Sparkles, Eye, TrendingUp, CheckCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import SkillsTabActions from "./SkillsTabActions";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -17,6 +20,7 @@ interface Props { equipeId: string; equipeName?: string }
 
 export default function ReportsSkillsManager({ equipeId, equipeName }: Props) {
   const { reports, isLoading, createReport, updateReport, deleteReport } = useReportsSkills(equipeId);
+  const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [gerarIAOpen, setGerarIAOpen] = useState(false);
   const [htmlPreviewOpen, setHtmlPreviewOpen] = useState(false);
@@ -50,6 +54,15 @@ export default function ReportsSkillsManager({ equipeId, equipeName }: Props) {
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => setGerarIAOpen(true)}><Sparkles className="h-4 w-4 mr-2" />Gerar via IA</Button>
               <Button size="sm" onClick={() => openModal()}><Plus className="h-4 w-4 mr-2" />Novo Report</Button>
+              <SkillsTabActions
+                onClear={async () => {
+                  const { error } = await supabase.from("reports_skills").delete().eq("equipe_id", equipeId);
+                  if (error) throw error;
+                  queryClient.invalidateQueries({ queryKey: ["reports-skills", equipeId] });
+                }}
+                hasData={reports.length > 0}
+                clearDescription="Todos os reports desta equipe serão removidos."
+              />
             </div>
           </div>
         </CardHeader>

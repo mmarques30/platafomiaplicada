@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Sparkles, Target, Users, Clock, AlertTriangle, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import SkillsTabActions from "./SkillsTabActions";
 
 interface Props { equipeId: string }
 
@@ -78,10 +79,21 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
           <h3 className="text-lg font-semibold">Projetos Mapeados</h3>
           <Badge variant="secondary" className="text-xs">{projetos.length}</Badge>
         </div>
+        <div className="flex items-center gap-2">
         <Button onClick={handleGerarProjetos} disabled={isGenerating || !diagStatus?.completos} size="sm">
           {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
           Gerar Projetos com IA
         </Button>
+        <SkillsTabActions
+          onClear={async () => {
+            const { error } = await supabase.from("backlog_skills").delete().eq("equipe_id", equipeId);
+            if (error) throw error;
+            queryClient.invalidateQueries({ queryKey: ["backlog-skills", equipeId] });
+          }}
+          hasData={projetos.length > 0}
+          clearDescription="Todos os projetos mapeados desta equipe serão removidos."
+        />
+        </div>
       </div>
 
       {/* Pre-requisite indicator */}

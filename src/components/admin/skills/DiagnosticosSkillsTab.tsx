@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import DiagnosticoRespostasView from "./DiagnosticoRespostasView";
 import InsightIAPreview from "./InsightIAPreview";
 import ReactMarkdown from "react-markdown";
+import SkillsTabActions from "./SkillsTabActions";
 
 interface Props { equipeId: string }
 
@@ -81,6 +82,15 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
 
   if (isLoading) return <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
 
+  const handleClearDiagnosticos = async () => {
+    const { error: e1 } = await supabase.from("diagnostico_consolidado_skills").delete().eq("equipe_id", equipeId);
+    if (e1) throw e1;
+    const { error: e2 } = await supabase.from("diagnosticos_skills").delete().eq("equipe_id", equipeId);
+    if (e2) throw e2;
+    queryClient.invalidateQueries({ queryKey: ["diagnostico-consolidado", equipeId] });
+    queryClient.invalidateQueries({ queryKey: ["diagnosticos-equipe-admin", equipeId] });
+  };
+
   return (
     <div className="space-y-4">
       {/* Progress */}
@@ -91,7 +101,14 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Progresso da Equipe</span>
             </div>
-            <span className="text-sm text-muted-foreground">{completos}/{membros.length} preenchidos · {processados} processados</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">{completos}/{membros.length} preenchidos · {processados} processados</span>
+              <SkillsTabActions
+                onClear={handleClearDiagnosticos}
+                hasData={membros.length > 0 || !!consolidado}
+                clearDescription="Todos os diagnósticos individuais e o diagnóstico consolidado desta equipe serão removidos."
+              />
+            </div>
           </div>
           <Progress value={percentual} className="h-2" />
         </CardContent>

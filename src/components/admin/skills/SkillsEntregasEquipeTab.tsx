@@ -4,6 +4,9 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
 import { Package, ExternalLink } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import SkillsTabActions from "./SkillsTabActions";
 
 const statusLabels: Record<string, string> = {
   pendente: "Pendente", em_andamento: "Em Andamento", concluido: "Concluído", bloqueado: "Bloqueado",
@@ -17,11 +20,23 @@ const statusColors: Record<string, string> = {
 
 export default function SkillsEntregasEquipeTab({ equipeId }: { equipeId: string }) {
   const { entregas, isLoading } = useEntregasEquipe(equipeId);
+  const queryClient = useQueryClient();
 
   if (isLoading) return <div className="flex justify-center py-8"><div className="animate-spin h-6 w-6 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
   if (!entregas.length) return (
     <div className="text-center py-12 text-muted-foreground">
+      <div className="flex justify-end mb-2">
+        <SkillsTabActions
+          onClear={async () => {
+            const { error } = await supabase.from("entregas_equipe_skills").delete().eq("equipe_id", equipeId);
+            if (error) throw error;
+            queryClient.invalidateQueries({ queryKey: ["entregas-equipe", equipeId] });
+          }}
+          hasData={false}
+          clearDescription="Todas as entregas da equipe serão removidas."
+        />
+      </div>
       <Package className="h-10 w-10 mx-auto mb-2 opacity-40" />
       <p>Nenhuma entrega registrada pela equipe ainda.</p>
     </div>
@@ -29,6 +44,17 @@ export default function SkillsEntregasEquipeTab({ equipeId }: { equipeId: string
 
   return (
     <div className="overflow-x-auto">
+      <div className="flex justify-end mb-2">
+        <SkillsTabActions
+          onClear={async () => {
+            const { error } = await supabase.from("entregas_equipe_skills").delete().eq("equipe_id", equipeId);
+            if (error) throw error;
+            queryClient.invalidateQueries({ queryKey: ["entregas-equipe", equipeId] });
+          }}
+          hasData={entregas.length > 0}
+          clearDescription="Todas as entregas da equipe serão removidas."
+        />
+      </div>
       <Table>
         <TableHeader>
           <TableRow>

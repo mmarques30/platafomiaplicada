@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { useContratosSkills, ProjetoPorTrilha } from "@/hooks/admin/useContratosSkills";
 import { ContratoSkillsImportSection } from "./ContratoSkillsImportSection";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import SkillsTabActions from "./SkillsTabActions";
 import { Save, Loader2, Building2, DollarSign, ChevronDown, ChevronUp, RotateCcw, Plus, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,6 +19,7 @@ interface Props { equipeId: string; equipeName?: string }
 
 export function ContratoSkillsManager({ equipeId, equipeName }: Props) {
   const { contrato, isLoading, createContrato, updateContrato } = useContratosSkills(equipeId);
+  const queryClient = useQueryClient();
 
   // Load trilhas for project-per-trail selector
   const { data: trilhas = [] } = useQuery({
@@ -105,9 +107,22 @@ export function ContratoSkillsManager({ equipeId, equipeName }: Props) {
       <ContratoSkillsImportSection onDataParsed={handleImportParsed} />
 
       <div className="flex justify-between items-center">
-        <Button variant="outline" size="sm" onClick={handleLimpar} className="text-destructive hover:text-destructive hover:bg-destructive/10">
-          <RotateCcw className="h-4 w-4 mr-2" /> Limpar Tudo
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleLimpar} className="text-destructive hover:text-destructive hover:bg-destructive/10">
+            <RotateCcw className="h-4 w-4 mr-2" /> Limpar Formulário
+          </Button>
+          <SkillsTabActions
+            onClear={async () => {
+              const { error } = await supabase.from("contratos_skills").delete().eq("equipe_id", equipeId);
+              if (error) throw error;
+              queryClient.invalidateQueries({ queryKey: ["contrato-skills", equipeId] });
+              handleLimpar();
+            }}
+            hasData={!!contrato}
+            clearLabel="Excluir Contrato"
+            clearDescription="O contrato desta equipe será excluído permanentemente do banco de dados."
+          />
+        </div>
         <Button variant="ghost" size="sm" onClick={toggleTodas}>
           {todasAbertas ? <><ChevronUp className="h-4 w-4 mr-2" /> Recolher</> : <><ChevronDown className="h-4 w-4 mr-2" /> Expandir</>}
         </Button>
