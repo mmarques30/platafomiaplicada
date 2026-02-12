@@ -8,7 +8,7 @@ export type UserRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "visi
 export function useUserRole() {
   const { user } = useAuth();
 
-  const { data: roles, isLoading } = useQuery({
+  const { data: roles, isPending } = useQuery({
     queryKey: ["user-roles", user?.id],
     queryFn: async () => {
       if (!user) return [];
@@ -67,6 +67,6 @@ export function useUserRole() {
     isVisitante: effectiveIsVisitante,
     realIsVisitante,
     hasAccess,
-    isLoading
+    isLoading: isPending
   };
 }
