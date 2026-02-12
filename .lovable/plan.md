@@ -1,92 +1,99 @@
 
 
-# Correcao Definitiva: Distribuicao de Entregas entre Membros
+# Corrigir Metricas: Renomear "Processos" para "Projetos" e Vincular Entregas
 
-## Causa Raiz
+## Problemas Identificados
 
-O problema persiste porque a logica de balanceamento atual depende da IA para atribuir nomes de responsaveis, e depois tenta corrigir com `balancearResponsaveis`. Mas:
+### 1. Campo "processos_automatizados" deveria ser "projetos"
+A coluna `processos_automatizados` na tabela `metricas_skills` armazena a contagem de projetos do backlog, nao de processos genericos. Todo o sistema (edge function, UI admin, hook do lider) usa o nome errado.
 
-1. A IA atribui quase tudo ao mesmo membro (Erich)
-2. O mapeamento nome-para-user_id falha para nomes nao reconhecidos (ficam NULL)
-3. A funcao de balanceamento roda, mas nao consegue corrigir adequadamente porque muitos itens ja chegam com o mesmo user_id
+### 2. Metricas geradas com valores zerados
+Os dados atuais mostram que TODAS as 12 semanas tem `entregas_concluidas = 0`, `entregas_planejadas = 0`, `horas_economizadas = 0` e `processos_automatizados = 0`. A IA nao esta usando os dados reais das entregas para calcular as metricas.
 
-**Dados atuais**: 23 entregas com Erich, 17 com NULL. Zero para Lucio, Livia e Antonio.
+**Dados reais disponiveis**: 20 entregas com prazos entre 17/02 e 02/03, cada uma com `economia_horas_semana` definida (0.1 a 2h). 8 projetos no backlog com `horas_estimadas_economia` definidas.
 
-## Solucao Definitiva
+### 3. Metricas nao refletem as entregas por semana
+As entregas tem prazos que deveriam definir em qual semana cada entrega e planejada. A edge function envia os dados para a IA mas a IA retorna valores zerados.
 
-Remover completamente a dependencia da IA para distribuicao. A IA gera o conteudo das entregas, mas a atribuicao de responsaveis e feita 100% em codigo, de forma deterministica e equilibrada.
+## Solucao
 
-### 1. Refatorar `gerar-entregas-skills/index.ts`
+### 1. Migration: Renomear coluna `processos_automatizados` para `projetos_concluidos`
 
-- Remover `responsavel_nome` do schema da IA (nao pedir mais para a IA atribuir membros)
-- Apos receber as entregas da IA, atribuir responsaveis usando round-robin simples entre todos os membros ativos
-- Logica: percorrer a lista de entregas e atribuir ciclicamente `membros[i % totalMembros]`
+Renomear a coluna no banco de dados para refletir corretamente o que ela representa.
 
-### 2. Refatorar `associar-membros-skills/index.ts`
+### 2. Refatorar edge function `gerar-metricas-skills`
 
-- Remover a chamada de IA completamente
-- Implementar redistribuicao deterministica:
-  - Buscar todos os projetos e entregas da equipe
-  - Distribuir em round-robin entre os membros ativos
-  - Quando `force=true`, redistribuir TUDO; caso contrario, so itens sem responsavel
+Ao inves de depender da IA para calcular os valores (que retorna zeros), calcular as metricas de forma deterministica em codigo:
 
-### 3. Corrigir dados existentes
+- **entregas_planejadas por semana**: contar entregas cujo `prazo` cai dentro de cada semana (baseado na `data_inicio` da equipe)
+- **entregas_concluidas por semana**: contar entregas com `concluido_em` dentro de cada semana
+- **horas_economizadas**: acumulado semanal de `economia_horas_semana` das entregas concluidas
+- **projetos_concluidos**: contagem incremental de projetos do backlog com status "concluido"
+- **roi_projetado**: calculado com formula (economia total estimada / investimento) distribuido nas 12 semanas
+- **roi_executado**: baseado nas entregas realmente concluidas
 
-- Executar UPDATE para limpar todos os `responsavel_id` das entregas e projetos
-- A redistribuicao sera feita ao clicar "Redistribuir Membros" no admin
+Manter a IA apenas para `indice_maturidade` e `engajamento_trilhas` (estimativas qualitativas).
+
+### 3. Atualizar UI e hooks
+
+Renomear todas as referencias de `processos_automatizados`/`processosAutomatizados` para `projetos_concluidos`/`projetosConcluidos`.
 
 ## Detalhes Tecnicos
 
-### Round-robin no `gerar-entregas-skills`
+### Migration SQL
 
 ```text
-// Apos receber entregas da IA, antes de inserir:
-const membrosIds = membrosInfo.map(m => m.user_id);
-entregasToInsert.forEach((entrega, index) => {
-  entrega.responsavel_id = membrosIds[index % membrosIds.length];
-});
+ALTER TABLE public.metricas_skills 
+RENAME COLUMN processos_automatizados TO projetos_concluidos;
 ```
 
-### `associar-membros-skills` sem IA
+### Edge Function: calculo deterministico
 
 ```text
-// Buscar todos os itens
-const projetos = await supabase.from("backlog_skills")...
-const entregas = await supabase.from("entregas_skills")...
+// Calcular data de inicio de cada semana
+const dataInicio = new Date(equipe.data_inicio || equipe.created_at);
 
-// Distribuir round-robin
-const membrosIds = membros.map(m => m.user_id);
-let idx = 0;
-
-for (const p of projetos) {
-  await supabase.from("backlog_skills")
-    .update({ responsavel_id: membrosIds[idx % membrosIds.length] })
-    .eq("id", p.id);
-  idx++;
-}
-
-for (const e of entregas) {
-  await supabase.from("entregas_skills")
-    .update({ responsavel_id: membrosIds[idx % membrosIds.length] })
-    .eq("id", e.id);
-  idx++;
+for (let semana = 1; semana <= 12; semana++) {
+  const inicioSemana = addWeeks(dataInicio, semana - 1);
+  const fimSemana = addWeeks(dataInicio, semana);
+  
+  // Entregas planejadas: prazo <= fimSemana (acumulado)
+  const planejadas = entregas.filter(e => new Date(e.prazo) <= fimSemana).length;
+  
+  // Entregas concluidas: concluido_em <= fimSemana (acumulado)
+  const concluidas = entregas.filter(e => e.concluido_em && new Date(e.concluido_em) <= fimSemana).length;
+  
+  // Horas economizadas: soma economia_horas_semana das concluidas
+  const horas = entregas
+    .filter(e => e.concluido_em && new Date(e.concluido_em) <= fimSemana)
+    .reduce((acc, e) => acc + (e.economia_horas_semana || 0), 0);
+  
+  // Projetos concluidos (do backlog)
+  const projetos = backlog.filter(p => p.status === 'concluido').length;
+  
+  // ROI projetado: distribuicao crescente do alvo
+  const economiaTotal = entregas.reduce((a, e) => a + (e.economia_horas_semana || 0) * 4, 0);
+  const roiAlvo = (economiaTotal * custoHora / investimento) * 100;
+  const roiProjetado = roiAlvo * (semana / 12);
+  
+  // ROI executado: baseado em entregas concluidas
+  const economiaReal = horas * custoHora;
+  const roiExecutado = (economiaReal / investimento) * 100;
 }
 ```
 
-### Limpeza de dados
+### Arquivos modificados
 
-Executar SQL para zerar responsaveis atuais, permitindo redistribuicao limpa.
-
-## Arquivos Modificados
-
-- `supabase/functions/gerar-entregas-skills/index.ts` -- remover responsavel_nome da IA, usar round-robin
-- `supabase/functions/associar-membros-skills/index.ts` -- remover chamada de IA, usar round-robin determinístico
-- `supabase/functions/gerar-projetos-skills/index.ts` -- mesma logica: remover dependencia da IA para distribuicao
+- **Migration SQL** -- renomear `processos_automatizados` para `projetos_concluidos`
+- `supabase/functions/gerar-metricas-skills/index.ts` -- calculo deterministico das metricas baseado nas entregas reais
+- `src/components/admin/skills/SkillsMetricasTab.tsx` -- renomear campo "Processos" para "Projetos"
+- `src/hooks/admin/useSkillsPerformanceAdmin.ts` -- renomear campo no mutation
+- `src/hooks/useSkillsLider.ts` -- renomear `processosAutomatizados` para `projetosConcluidos`
 
 ## Resultado
 
-- Entregas e projetos distribuidos de forma matematicamente equilibrada entre TODOS os membros
-- Sem dependencia da IA para distribuicao (a IA so gera conteudo)
-- Botao "Redistribuir Membros" funciona instantaneamente (sem custo de IA)
-- Com 4 membros e 40 entregas: cada um recebe exatamente 10
-
+- Coluna renomeada para "Projetos Concluidos" (reflete projetos do backlog, nao processos genericos)
+- Metricas calculadas com dados reais das entregas (prazos, economia de horas, status)
+- Entregas planejadas por semana baseadas nos prazos reais
+- ROI calculado deterministicamente com base na economia real vs investimento
+- IA usada apenas para estimativas qualitativas (maturidade e engajamento)
