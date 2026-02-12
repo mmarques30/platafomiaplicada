@@ -8,6 +8,7 @@ import { TrocarSenhaModal } from "./components/auth/TrocarSenhaModal";
 import { useAuth } from "./hooks/useAuth";
 import { useVersionCheck } from "./hooks/useVersionCheck";
 import { AdminViewProvider } from "./contexts/AdminViewContext";
+import { SkillsAdminTeamProvider } from "./contexts/SkillsAdminTeamContext";
 import { EnvironmentProvider } from "./contexts/EnvironmentContext";
 import Auth from "./pages/Auth";
 import Servicos from "./pages/Servicos";
@@ -171,10 +172,10 @@ function AppContent() {
             <Route path="/skills/lider" element={<SkillsLiderDashboard />} />
             
             <Route path="/skills/progresso" element={<Navigate to="/skills/projeto" replace />} />
-            <Route path="/skills/projeto" element={<ProjetoSkills />} />
-            <Route path="/skills/projeto/performance" element={<ProjetoSkillsPerformancePage />} />
-            <Route path="/skills/projeto/diagnostico" element={<ProjetoSkillsDiagnosticoPage />} />
-            <Route path="/skills/projeto/projetos" element={<ProjetoSkillsProjetosPage />} />
+            <Route path="/skills/projeto" element={<SkillsAdminTeamProvider><ProjetoSkills /></SkillsAdminTeamProvider>} />
+            <Route path="/skills/projeto/performance" element={<SkillsAdminTeamProvider><ProjetoSkillsPerformancePage /></SkillsAdminTeamProvider>} />
+            <Route path="/skills/projeto/diagnostico" element={<SkillsAdminTeamProvider><ProjetoSkillsDiagnosticoPage /></SkillsAdminTeamProvider>} />
+            <Route path="/skills/projeto/projetos" element={<SkillsAdminTeamProvider><ProjetoSkillsProjetosPage /></SkillsAdminTeamProvider>} />
 
             {/* Squad removido → redireciona para Skills */}
             <Route path="/squad/lider" element={<Navigate to="/skills/lider" replace />} />
