@@ -97,7 +97,7 @@ serve(async (req) => {
       `- [${i.item_tipo}] ID: ${i.item_id} | "${i.titulo}" | ${i.descricao}`
     ).join("\n");
 
-    const systemPrompt = `Você é um consultor de transformação digital. Associe cada projeto/entrega ao membro mais relevante da equipe, com base nos diagnósticos individuais (área, processos, gargalos).
+    const systemPrompt = `Você é um consultor de transformação digital. Associe cada projeto/entrega ao membro mais relevante da equipe, com base nos diagnósticos individuais.
 
 MEMBROS DA EQUIPE:
 ${membrosTexto}
@@ -105,11 +105,13 @@ ${membrosTexto}
 ITENS PARA ASSOCIAR:
 ${itensTexto}
 
-Regras:
-- Cada item deve ser associado a exatamente 1 membro
-- Use o nome EXATO do membro no campo responsavel_nome
-- Distribua os itens de forma equilibrada quando possível
-- Priorize a relevância (área, processos similares) sobre equilíbrio`;
+REGRAS CRÍTICAS (siga à risca):
+1. PRIORIDADE MÁXIMA: Associe cada item ao DONO DO PROCESSO — o membro que EXECUTA aquela tarefa no dia a dia, conforme listado em seus "Processos" no diagnóstico.
+2. Se o título do projeto/entrega menciona um processo específico (ex: "RAIVs", "Sinistros", "Power BI", "DFC"), encontre QUAL MEMBRO listou esse processo em seu diagnóstico e atribua a ele.
+3. NÃO associe tudo a uma mesma pessoa só porque ela é da área de TI ou tem cargo técnico. A área/cargo é secundária — o que importa é QUEM FAZ aquele processo.
+4. Distribua de forma justa: cada membro deve receber itens proporcionais aos seus processos.
+5. Cada item deve ser associado a exatamente 1 membro.
+6. Use o nome EXATO do membro no campo responsavel_nome.`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
