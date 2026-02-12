@@ -1,52 +1,73 @@
 
-
-# Corrigir Distribuição de Projetos e Entregas - Equipe Inovação
+# Melhorar IA para gerar projetos para TODOS os membros + tag "Pendente Avaliacao"
 
 ## Problema
 
-A IA associou 5 dos 7 projetos ao Erich (TI) e deixou Antonio e Lucio com zero itens, apesar de vários projetos serem diretamente dos processos deles.
+Quando um membro tem processos de natureza estrategica/gestao (ex: "Planejamento Estrategico TI", "Gestao Time", "Gestao Fornecedores"), a IA nao gera projetos para ele porque nao identifica tarefas operacionais claras para automatizar. Isso deixa membros sem nenhum projeto atribuido.
 
-## Distribuição Atual vs Correta
+## Solucao
 
-| Projeto | Atual | Correto | Motivo |
-|---------|-------|---------|--------|
-| Automação Abertura de RAIVs | Erich | **Antonio** | Processo diário dele |
-| Automação Abertura de Sinistros | Erich | **Antonio** | Processo semanal dele |
-| Planejamento Orçamentário Frota | Erich | **Antonio** | Processo mensal dele |
-| Monitoramento Falhas Power BI | Erich | **Lucio** | Processo diário dele |
-| Validação Dados AllStrategy para BI | Erich | **Lucio** | Processo semanal dele |
-| Análise/Gráficos DFC | Livia | Livia | OK |
-| Relatório Mensal de Resultados | Livia | Livia | OK |
+1. Ajustar o prompt da IA para que SEMPRE gere pelo menos 1 projeto por membro, mesmo que os processos sejam estrategicos/gestao
+2. Adicionar um campo `tags` na tabela `backlog_skills` e `entregas_skills` para marcar projetos que precisam de avaliacao
+3. Quando o processo do membro for estrategico/gestao (sem gargalos operacionais claros), a IA marca o projeto com a tag `pendente_avaliacao`
+4. Na interface, exibir visualmente os projetos com essa tag para o admin revisar
 
-## Correções por UPDATE direto
+## Detalhes Tecnicos
 
-Serão feitos UPDATEs nas tabelas `backlog_skills` e `entregas_skills` para:
+### 1. Migration: adicionar coluna `tags` nas tabelas
 
-**Para Antonio (338e43eb):**
-- 3 projetos: RAIVs, Sinistros, Planejamento Frota
-- Entregas vinculadas a esses projetos (Mapeamento RAIVs, Classificação E-mails, Análise Padrões Sinistro, Script Custos Históricos, Consolidação Bases CSV, OCR Fotos)
+Adicionar coluna `tags` (tipo `text[]`, default `'{}'`) nas tabelas:
+- `backlog_skills`
+- `entregas_skills`
 
-**Para Lucio (d068fff0):**
-- 2 projetos: Falhas Power BI, Validação AllStrategy
-- Entregas vinculadas (Inventário Painéis Power BI, Alertas Power BI, Divergência AllStrategy, Comparação Dados)
+Isso permite marcar projetos com tags como `pendente_avaliacao`, `estrategico`, `operacional`, etc.
 
-**Mantém Erich:** Nenhum projeto (seus processos são gestão estratégica/fornecedores, sem projeto específico gerado)
+### 2. Ajustar prompt em `gerar-projetos-skills/index.ts`
 
-**Mantém Livia:** 2 projetos + 4 entregas (DFC e Relatório Mensal)
+Modificar o prompt para:
+- Instruir a IA a gerar pelo menos 1 projeto por membro
+- Para membros com processos estrategicos/gestao (sem gargalos operacionais), gerar projetos sugeridos mas marcar com `necessita_avaliacao: true`
+- Adicionar campo `necessita_avaliacao` (boolean) no schema de retorno da tool call
+- No insert, converter `necessita_avaliacao: true` para a tag `pendente_avaliacao` no array `tags`
 
-## Ajuste na Edge Function
+Exemplo de logica no prompt:
+```text
+REGRAS:
+- Gere pelo menos 1 projeto por membro da equipe
+- Se um membro tem processos estrategicos/gestao sem gargalos operacionais claros,
+  sugira projetos de apoio a gestao com IA (dashboards, automacao de reports, etc.)
+  e marque necessita_avaliacao como true
+- Se um membro tem processos operacionais com gargalos claros,
+  marque necessita_avaliacao como false
+```
 
-Além da correção de dados, o prompt da edge function `associar-membros-skills` será ajustado para enfatizar que a IA deve priorizar o dono do processo (quem executa a tarefa no diagnóstico) e não apenas a área geral.
+### 3. Ajustar prompt em `associar-membros-skills/index.ts`
 
-## Arquivos Modificados
+Mesma logica: quando a IA nao consegue associar com confianca (processos estrategicos sem match direto), marcar com tag `pendente_avaliacao`.
 
-- `supabase/functions/associar-membros-skills/index.ts` -- ajustar prompt para distribuição mais precisa
-- Dados corrigidos via UPDATE direto nas tabelas `backlog_skills` e `entregas_skills`
+### 4. Ajustar UI em `ProjetosMapeadosTab.tsx`
 
-## Resultado
+- Exibir badge amarelo "Pendente Avaliacao" nos projetos que tiverem essa tag
+- Permitir que o admin remova a tag ao aprovar o projeto (clicando no badge)
 
-- Antonio: 3 projetos + 6 entregas
-- Lucio: 2 projetos + 4 entregas
-- Livia: 2 projetos + 4 entregas
-- Erich: 0 projetos + 0 entregas (processos dele são de gestão, sem projetos técnicos gerados)
+### 5. Ajustar UI em `SkillsEntregasTab.tsx`
 
+- Mesma logica: exibir badge nas entregas com tag `pendente_avaliacao`
+
+## Arquivos
+
+**Modificados:**
+- `supabase/functions/gerar-projetos-skills/index.ts` — prompt + logica de tags
+- `supabase/functions/associar-membros-skills/index.ts` — prompt + logica de tags
+- `src/components/admin/skills/ProjetosMapeadosTab.tsx` — exibir badge + acao de aprovar
+- `src/components/admin/skills/SkillsEntregasTab.tsx` — exibir badge nas entregas
+
+**Migration:**
+- Adicionar coluna `tags text[] default '{}'` em `backlog_skills` e `entregas_skills`
+
+## Resultado esperado
+
+- Todo membro recebe pelo menos 1 projeto
+- Projetos gerados para membros com perfil estrategico vem com badge "Pendente Avaliacao"
+- O admin pode revisar e aprovar esses projetos removendo a tag
+- Projetos operacionais continuam sendo gerados normalmente sem tag
