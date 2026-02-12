@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, Clock, Layers, TrendingUp } from "lucide-react";
+import { AlertTriangle, BookOpen, Clock, Layers, TrendingUp } from "lucide-react";
 import { format, isPast, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -96,15 +96,25 @@ export default function KanbanCard({ entrega, isOverlay }: KanbanCardProps) {
         </div>
       )}
 
-      {/* Processos resolvidos */}
-      {processos > 0 && (
-        <div className="flex items-center gap-1.5">
-          <Layers className="h-3 w-3 text-muted-foreground" />
-          <span className="text-[10px] text-muted-foreground">
-            Resolve: {processos} processo{processos > 1 ? "s" : ""}
-          </span>
-        </div>
-      )}
+      {/* Processos resolvidos + Conteúdo suporte */}
+      <div className="flex items-center gap-3">
+        {processos > 0 && (
+          <div className="flex items-center gap-1.5">
+            <Layers className="h-3 w-3 text-muted-foreground" />
+            <span className="text-[10px] text-muted-foreground">
+              Resolve: {processos} processo{processos > 1 ? "s" : ""}
+            </span>
+          </div>
+        )}
+        {Array.isArray(entrega.conteudo_suporte) && entrega.conteudo_suporte.length > 0 && (
+          <div className="flex items-center gap-1">
+            <BookOpen className="h-3 w-3 text-primary" />
+            <span className="text-[10px] text-primary font-medium">
+              {entrega.conteudo_suporte.length} trilha{entrega.conteudo_suporte.length > 1 ? "s" : ""}
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Progress */}
       <div>

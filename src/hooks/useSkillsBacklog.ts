@@ -18,6 +18,7 @@ export interface BacklogItem {
   equipe_id: string | null;
   created_at: string | null;
   updated_at: string | null;
+  trilhas_recomendadas: any[] | null;
   responsavel: { id: string; nome: string; avatar_url: string | null } | null;
 }
 

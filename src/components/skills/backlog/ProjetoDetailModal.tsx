@@ -1,7 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, Zap, Tag, User, BarChart3, Layers } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Clock, Zap, Tag, User, BarChart3, Layers, BookOpen, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
 const statusLabels: Record<string, string> = {
@@ -17,6 +19,11 @@ const prioridadeCores: Record<string, string> = {
   baixa: "bg-green-500/15 text-green-700 border-green-200",
 };
 
+const prioridadeTrilhaCores: Record<string, string> = {
+  essencial: "bg-primary/15 text-primary border-primary/30",
+  recomendado: "bg-blue-500/15 text-blue-700 border-blue-200",
+};
+
 interface ProjetoDetailModalProps {
   item: BacklogItem | null;
   open: boolean;
@@ -25,6 +32,8 @@ interface ProjetoDetailModalProps {
 
 export default function ProjetoDetailModal({ item, open, onOpenChange }: ProjetoDetailModalProps) {
   if (!item) return null;
+
+  const trilhas: any[] = Array.isArray(item.trilhas_recomendadas) ? item.trilhas_recomendadas : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -106,6 +115,54 @@ export default function ProjetoDetailModal({ item, open, onOpenChange }: Projeto
               <div className="flex flex-wrap gap-1">
                 {item.tags.map((tag, i) => (
                   <Badge key={i} variant="secondary" className="text-xs">{tag}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Trilhas Recomendadas */}
+          {trilhas.length > 0 && (
+            <div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <BookOpen className="h-4 w-4 text-primary" />
+                <h4 className="text-sm font-medium">Trilhas Recomendadas</h4>
+              </div>
+              <div className="space-y-2">
+                {trilhas.map((trilha, i) => (
+                  <div key={i} className="rounded-lg border bg-muted/30 p-3 space-y-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium leading-snug flex-1">
+                        {trilha.trilha_titulo || "Trilha"}
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className={prioridadeTrilhaCores[trilha.prioridade] || ""}
+                      >
+                        {trilha.prioridade === "essencial" ? "Essencial" : "Recomendado"}
+                      </Badge>
+                    </div>
+
+                    {trilha.modulos_prioritarios?.length > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        Módulos prioritários: {trilha.modulos_prioritarios.join(", ")}
+                      </p>
+                    )}
+
+                    {trilha.justificativa && (
+                      <p className="text-xs text-muted-foreground italic">
+                        {trilha.justificativa}
+                      </p>
+                    )}
+
+                    {trilha.trilha_id && (
+                      <Link to={`/trilhas/${trilha.trilha_id}`}>
+                        <Button variant="outline" size="sm" className="mt-1 h-7 text-xs gap-1.5">
+                          <ExternalLink className="h-3 w-3" />
+                          Assistir Trilha
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
