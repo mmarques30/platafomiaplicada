@@ -1,113 +1,98 @@
 
 
-# Corrigir Painel Lider: Dashboards desatualizados e dados incompletos
+# Corrigir Entregas: Regenerar entregas_skills e vincular entregas_equipe aos projetos
 
-## Problemas Identificados
+## Problema
 
-### 1. Tabela `entregas_skills` esta vazia
-As entregas antigas foram deletadas (durante a correcao de entregas = copias de projetos) e ainda nao foram regeneradas. Sem dados nessa tabela, TODOS os dashboards ficam zerados.
-
-### 2. Projetos atribuidos apenas ao Erich
-Na tabela `backlog_skills`, 8 dos 10 projetos estao atribuidos ao Erich (user_id `8cc7e7fa`). Lucio, Livia e Antonio nao tem nenhum projeto atribuido. Isso explica por que eles aparecem com "Sem entregas".
-
-### 3. Dashboard nao usa dados de `backlog_skills`
-O hook `useSkillsLider` busca dados APENAS de `entregas_skills` para alimentar KPIs, ranking, donut charts, pie chart e barras de maturidade. Ele nao busca dados de `backlog_skills` (projetos), entao mesmo com projetos ja gerados e atribuidos, o dashboard nao reflete isso.
-
-### 4. MemberDonutCharts mostra apenas 3 entregas com titulo truncado
-Nao mostra a quantidade total de entregas/projetos por membro, apenas lista ate 3 titulos.
+1. A tabela `entregas_skills` esta **vazia** -- as entregas foram deletadas na correcao anterior e nunca foram regeneradas. Isso faz com que tanto a aba "Entregas" no admin quanto no painel do lider fiquem sem dados.
+2. A tabela `entregas_equipe_skills` tambem esta **vazia** -- essas sao as entregas que a equipe adiciona manualmente como complemento.
+3. O modal de "Nova Entrega" (equipe) so permite vincular a `entregas_skills` (via `entrega_id`), mas como essa tabela esta vazia, nao ha nada para vincular. Deveria tambem poder vincular aos **projetos** do backlog.
 
 ## Solucao
 
-### 1. Incluir dados de `backlog_skills` no hook `useSkillsLider`
+### 1. Regenerar entregas_skills via IA
 
-Adicionar query para buscar projetos do backlog e incluir nos calculos:
-- Ranking: considerar projetos atribuidos quando nao ha entregas
-- KPIs: mostrar total de projetos alem de entregas
-- Donut Charts: mostrar projetos atribuidos ao membro quando nao ha entregas
+Primeiro, as entregas geradas por IA precisam ser regeneradas. O admin deve clicar em "Gerar Entregas com IA" na aba Entregas do admin. Porem, a edge function ja foi corrigida para gerar entregas como tarefas/atividades (nao copias de projetos). Basta clicar o botao.
 
-### 2. Atualizar MemberDonutCharts
+**Acao necessaria do admin**: Clicar "Gerar Entregas com IA" na aba Entregas.
 
-- Quando ha entregas: manter comportamento atual mas melhorar exibicao (mostrar contagem e descricao resumida)
-- Quando NAO ha entregas mas ha projetos atribuidos: mostrar os projetos do backlog com badge de status
-- Exibir contagem total (ex: "3 projetos | 0 entregas concluidas")
+### 2. Adicionar campo `projeto_id` na tabela `entregas_equipe_skills`
 
-### 3. Atualizar StatusPieChart
+Atualmente a tabela so tem `entrega_id` (FK para entregas_skills). Adicionar `projeto_id` (FK para backlog_skills) para que a equipe possa associar entregas diretamente aos projetos.
 
-- Quando entregas esta vazio, usar dados de backlog_skills para mostrar distribuicao por status dos projetos (levantado, em_andamento, etc.)
+**Migration SQL:**
+```text
+ALTER TABLE entregas_equipe_skills 
+ADD COLUMN projeto_id UUID REFERENCES backlog_skills(id) ON DELETE SET NULL;
+```
 
-### 4. Atualizar WeeklyBarChart (Evolucao de Maturidade)
+### 3. Atualizar o modal `EntregaEquipeModal`
 
-- Quando entregas esta vazio, usar projetos do backlog para calcular progresso por membro
-- Mostrar "projetos atribuidos" como metrica de base
+- Adicionar um campo **"Projeto Vinculado"** (select com os projetos do backlog_skills)
+- Adicionar um campo opcional **"Entrega Vinculada"** (select com entregas da entregas_skills, filtrado pelo projeto selecionado)
+- Quando o usuario seleciona um projeto, as entregas daquele projeto aparecem como opcao
+- Salvar `projeto_id` junto com os dados
 
-### 5. Atualizar KPI Cards
+### 4. Atualizar o hook `useEntregasEquipe`
 
-- Mostrar projetos mapeados como KPI quando entregas nao existem
-- Exemplo: "10 projetos mapeados" ao inves de "0h economizadas"
+- Incluir `projeto_id` no select e no upsert
+- Fazer join com `backlog_skills:projeto_id(titulo)` para exibir o titulo do projeto vinculado
 
-### 6. Ranking
+### 5. Atualizar as views (cards e tabela)
 
-- Incluir projetos atribuidos no calculo do score quando nao ha entregas concluidas
+- `ProjetoSkillsEntregas.tsx` (painel da equipe): mostrar o nome do projeto vinculado em cada card de entrega
+- `SkillsEntregasEquipeTab.tsx` (admin): mostrar coluna "Projeto" na tabela
+
+### 6. Atualizar o `ProjetoSkillsPerformance.tsx` (dashboard lider)
+
+- Incluir dados de `entregas_equipe_skills` no hook ou nos componentes, para que entregas da equipe tambem aparecam nos dashboards
 
 ## Detalhes Tecnicos
 
-### Arquivo: `src/hooks/useSkillsLider.ts`
-
-Adicionar nova query para `backlog_skills`:
+### Migration
 
 ```text
-const { data: projetos } = useQuery({
-  queryKey: ["skills-projetos-lider", equipeId],
-  queryFn: async () => {
-    const { data } = await supabase
-      .from("backlog_skills")
-      .select("id, titulo, status, responsavel_id, tags, economia_estimada, profiles:responsavel_id(nome_completo)")
-      .eq("equipe_id", equipeId)
-      .neq("status", "descartado");
-    return data || [];
-  },
-  enabled: !!equipeId,
-});
+ALTER TABLE entregas_equipe_skills 
+ADD COLUMN projeto_id UUID REFERENCES backlog_skills(id) ON DELETE SET NULL;
 ```
 
-Atualizar calculos de ranking e KPIs para considerar projetos quando entregas estao vazias.
+### Hook `useEntregasEquipe`
 
-Retornar `projetos` no hook.
+```text
+// Adicionar ao select:
+backlog_skills:projeto_id (titulo)
 
-### Arquivo: `src/components/skills/performance/MemberDonutCharts.tsx`
+// Adicionar ao tipo EntregaEquipe:
+projeto_id: string | null;
+projeto?: { titulo: string } | null;
+```
 
-- Receber nova prop `projetos` (do backlog_skills)
-- Para cada membro, mostrar projetos atribuidos quando nao ha entregas
-- Exibir contagem: "X projetos atribuidos"
-- Donut: usar total de projetos do membro vs projetos com entregas concluidas
+### Modal `EntregaEquipeModal`
 
-### Arquivo: `src/components/skills/performance/StatusPieChart.tsx`
+- Nova prop: `projetos: { id: string; titulo: string }[]`
+- Novo campo select "Projeto vinculado" que salva `projeto_id`
+- Buscar projetos do backlog no componente pai (`ProjetoSkillsEntregas.tsx`)
 
-- Receber prop `projetos` como fallback
-- Quando entregas vazio, exibir distribuicao de status dos projetos
+### Cards e Tabela
 
-### Arquivo: `src/components/skills/performance/WeeklyBarChart.tsx`
+- Exibir badge com titulo do projeto em cada entrega da equipe
+- Filtro por projeto no painel da equipe
 
-- Receber prop `projetos` como fallback
-- Quando entregas vazio, mostrar projetos atribuidos por membro como barra
+## Arquivos
 
-### Arquivo: `src/components/skills/ProjetoSkillsPerformance.tsx`
+**Novos:** Nenhum
 
-- Buscar `projetos` do hook e passar para os componentes filhos
-- Ajustar KPI cards para exibir dados de projetos quando entregas estao vazias
+**Modificados:**
+- `src/hooks/useEntregasEquipe.ts` -- adicionar projeto_id, join com backlog_skills
+- `src/components/skills/EntregaEquipeModal.tsx` -- campo select de projetos
+- `src/components/skills/ProjetoSkillsEntregas.tsx` -- passar projetos ao modal, exibir nome do projeto nos cards
+- `src/components/admin/skills/SkillsEntregasEquipeTab.tsx` -- coluna "Projeto" na tabela admin
 
-## Arquivos Modificados
-
-- `src/hooks/useSkillsLider.ts` -- adicionar query de backlog_skills e expor projetos
-- `src/components/skills/ProjetoSkillsPerformance.tsx` -- passar projetos para subcomponentes + KPIs fallback
-- `src/components/skills/performance/MemberDonutCharts.tsx` -- exibir projetos quando sem entregas
-- `src/components/skills/performance/StatusPieChart.tsx` -- fallback para projetos
-- `src/components/skills/performance/WeeklyBarChart.tsx` -- fallback para projetos
+**Migration:** adicionar coluna `projeto_id` na tabela `entregas_equipe_skills`
 
 ## Resultado
 
-- Dashboards mostram dados de projetos mapeados mesmo antes de gerar entregas
-- Erich aparece com seus 8 projetos atribuidos
-- Outros membros mostram "Sem projetos atribuidos" ao inves de "Sem entregas"
-- Quando entregas forem geradas, os dashboards automaticamente priorizam dados de entregas
-- KPIs, ranking, pie chart e barras de maturidade refletem os dados reais do sistema
+- Admin regenera entregas com IA (botao ja existente)
+- Equipe pode criar entregas vinculadas a projetos do backlog
+- Entregas aparecem corretamente tanto no admin quanto no painel
+- Dashboards refletem dados de entregas da equipe
