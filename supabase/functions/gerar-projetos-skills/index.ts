@@ -36,6 +36,23 @@ serve(async (req) => {
 
     const membrosIds = (membros || []).map((m: any) => m.user_id);
 
+    // Fetch available trilhas
+    const { data: trilhas } = await supabase
+      .from("trilhas")
+      .select("id, titulo, categoria, descricao")
+      .eq("ativo", true);
+
+    const trilhasDisponiveis = (trilhas || []).map((t: any) =>
+      `- [${t.id}] "${t.titulo}" (${t.categoria || "geral"})${t.descricao ? ' - ' + t.descricao : ''}`
+    ).join("\n");
+
+    // Build valid trilha IDs set for validation
+    const trilhaIdsValidos = new Set((trilhas || []).map((t: any) => t.id));
+    const trilhaTituloMap: Record<string, string> = {};
+    for (const t of (trilhas || [])) {
+      trilhaTituloMap[t.id] = t.titulo;
+    }
+
     const resumo = diagnosticos.map(d => ({
       processos: d.processos_detalhados || d.tarefas_manuais,
       gargalos: d.gargalos_identificados,
@@ -49,7 +66,13 @@ REGRAS:
 1. Gere projetos relevantes baseados nos diagnósticos da equipe.
 2. Cada projeto deve ter título, descrição, área impactada, economia estimada e prioridade.
 3. NÃO inclua responsável. A atribuição será feita automaticamente pelo sistema.
-4. Foque em projetos práticos e acionáveis de automação com IA.`;
+4. Foque em projetos práticos e acionáveis de automação com IA.
+5. Para cada projeto, indique quais trilhas da plataforma o membro deve assistir para executar o projeto, em ordem de prioridade ("essencial" ou "recomendado"), e quais módulos são prioritários (números de 1 a 10).
+
+TRILHAS DISPONÍVEIS NA PLATAFORMA:
+${trilhasDisponiveis}
+
+Se nenhuma trilha existente se aplicar perfeitamente, escolha a mais próxima. Use APENAS os IDs listados acima.`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -79,6 +102,19 @@ REGRAS:
                       area_impactada: { type: "string" },
                       horas_estimadas_economia: { type: "number" },
                       prioridade: { type: "string", enum: ["alta", "media", "baixa"] },
+                      trilhas_recomendadas: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            trilha_id: { type: "string" },
+                            prioridade: { type: "string", enum: ["essencial", "recomendado"] },
+                            modulos_prioritarios: { type: "array", items: { type: "number" } },
+                            justificativa: { type: "string" }
+                          },
+                          required: ["trilha_id", "prioridade", "justificativa"]
+                        }
+                      }
                     },
                     required: ["titulo", "descricao", "prioridade"]
                   }
@@ -99,6 +135,20 @@ REGRAS:
 
     const { projetos } = JSON.parse(toolCall.function.arguments);
 
+    // Validate trilha IDs and enrich with titles
+    const validarTrilhas = (trilhasRec: any[]) => {
+      if (!Array.isArray(trilhasRec)) return [];
+      return trilhasRec
+        .filter((tr: any) => trilhaIdsValidos.has(tr.trilha_id))
+        .map((tr: any) => ({
+          trilha_id: tr.trilha_id,
+          trilha_titulo: trilhaTituloMap[tr.trilha_id] || "",
+          prioridade: tr.prioridade || "recomendado",
+          modulos_prioritarios: Array.isArray(tr.modulos_prioritarios) ? tr.modulos_prioritarios : [],
+          justificativa: tr.justificativa || ""
+        }));
+    };
+
     // Round-robin assignment for projects
     const inserts = projetos.map((p: any, i: number) => ({
       equipe_id,
@@ -112,12 +162,13 @@ REGRAS:
       ordem: i,
       responsavel_id: membrosIds.length > 0 ? membrosIds[i % membrosIds.length] : null,
       tags: [],
+      trilhas_recomendadas: validarTrilhas(p.trilhas_recomendadas),
     }));
 
     const { data: insertedProjetos, error: insertError } = await supabase
       .from("backlog_skills")
       .insert(inserts)
-      .select("id, titulo, descricao, prioridade, horas_estimadas_economia, responsavel_id, tags");
+      .select("id, titulo, descricao, prioridade, horas_estimadas_economia, responsavel_id, tags, trilhas_recomendadas");
     if (insertError) throw new Error("Erro ao salvar projetos: " + insertError.message);
 
     // Create initial entregas for each project, also round-robin
