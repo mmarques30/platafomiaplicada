@@ -19,10 +19,10 @@ serve(async (req) => {
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    // Fetch backlog projects
+    // Fetch backlog projects WITH trilhas_recomendadas
     const { data: projetos, error: projError } = await supabase
       .from("backlog_skills")
-      .select("id, titulo, descricao, area_impactada, prioridade, horas_estimadas_economia, status")
+      .select("id, titulo, descricao, area_impactada, prioridade, horas_estimadas_economia, status, trilhas_recomendadas")
       .eq("equipe_id", equipe_id);
 
     if (projError) throw projError;
@@ -41,9 +41,13 @@ serve(async (req) => {
 
     const membrosIds = (membros || []).map((m: any) => m.user_id);
 
-    const projetosTexto = projetos.map((p: any) =>
-      `- "${p.titulo}" | ${p.descricao || "sem descrição"} | Área: ${p.area_impactada || "geral"} | Prioridade: ${p.prioridade || "média"} | Economia estimada: ${p.horas_estimadas_economia || 0}h/semana`
-    ).join("\n");
+    // Build project text including trilhas info
+    const projetosTexto = projetos.map((p: any) => {
+      const trilhasInfo = Array.isArray(p.trilhas_recomendadas) && p.trilhas_recomendadas.length > 0
+        ? `\n    Trilhas recomendadas: ${p.trilhas_recomendadas.map((t: any) => `"${t.trilha_titulo}" (${t.prioridade}, módulos ${(t.modulos_prioritarios || []).join(',')})`).join('; ')}`
+        : '';
+      return `- "${p.titulo}" | ${p.descricao || "sem descrição"} | Área: ${p.area_impactada || "geral"} | Prioridade: ${p.prioridade || "média"} | Economia estimada: ${p.horas_estimadas_economia || 0}h/semana${trilhasInfo}`;
+    }).join("\n");
 
     const systemPrompt = `Você é um consultor especialista em transformação digital e implementação de IA em equipes corporativas.
 
@@ -70,6 +74,11 @@ Para cada projeto, gere de 2 a 4 entregas que sejam PASSOS CONCRETOS de execuç�
 - economia_horas_semana: estimativa de horas economizadas por semana
 - prazo_dias: prazo sugerido em dias
 - projeto_titulo: título exato do projeto de origem
+- conteudo_suporte: array de conteúdos de apoio baseados nas trilhas recomendadas do projeto. Para cada item, indique:
+  - trilha_id: ID da trilha (use os IDs das trilhas recomendadas do projeto)
+  - trilha_titulo: título da trilha
+  - modulos: array de números dos módulos relevantes para ESTA entrega específica
+  - descricao: breve orientação de como o conteúdo ajuda na execução desta entrega
 
 NÃO inclua responsável. A atribuição será feita automaticamente pelo sistema.`;
 
@@ -106,6 +115,19 @@ NÃO inclua responsável. A atribuição será feita automaticamente pelo sistem
                       prioridade: { type: "string", enum: ["P1", "P2", "P3"] },
                       economia_horas_semana: { type: "number" },
                       prazo_dias: { type: "number" },
+                      conteudo_suporte: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            trilha_id: { type: "string" },
+                            trilha_titulo: { type: "string" },
+                            modulos: { type: "array", items: { type: "number" } },
+                            descricao: { type: "string" }
+                          },
+                          required: ["trilha_id", "trilha_titulo", "modulos", "descricao"]
+                        }
+                      }
                     },
                     required: ["projeto_titulo", "titulo", "descricao", "instrucoes", "tipo", "prioridade", "economia_horas_semana", "prazo_dias"],
                     additionalProperties: false,
@@ -135,6 +157,16 @@ NÃO inclua responsável. A atribuição será feita automaticamente pelo sistem
     const { entregas } = JSON.parse(toolCall.function.arguments);
     if (!entregas?.length) throw new Error("IA não gerou nenhuma entrega");
 
+    // Build valid trilha IDs from projects' trilhas_recomendadas
+    const validTrilhaIds = new Set<string>();
+    for (const p of projetos) {
+      if (Array.isArray(p.trilhas_recomendadas)) {
+        for (const tr of p.trilhas_recomendadas) {
+          if (tr.trilha_id) validTrilhaIds.add(tr.trilha_id);
+        }
+      }
+    }
+
     // Map projeto_titulo to backlog item id
     const projetoMap: Record<string, string> = {};
     for (const p of projetos) {
@@ -150,6 +182,11 @@ NÃO inclua responsável. A atribuição será feita automaticamente pelo sistem
       const prazoDate = new Date(now);
       prazoDate.setDate(prazoDate.getDate() + (e.prazo_dias || 14));
 
+      // Validate conteudo_suporte trilha IDs
+      const conteudoSuporte = Array.isArray(e.conteudo_suporte)
+        ? e.conteudo_suporte.filter((cs: any) => validTrilhaIds.has(cs.trilha_id))
+        : [];
+
       return {
         equipe_id,
         backlog_item_id: backlogItemId,
@@ -161,8 +198,8 @@ NÃO inclua responsável. A atribuição será feita automaticamente pelo sistem
         economia_horas_semana: e.economia_horas_semana || 0,
         prazo: prazoDate.toISOString().split("T")[0],
         status: "pendente",
-        // Round-robin: assign deterministically across all members
         responsavel_id: membrosIds.length > 0 ? membrosIds[index % membrosIds.length] : null,
+        conteudo_suporte: conteudoSuporte,
       };
     });
 

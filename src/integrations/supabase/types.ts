@@ -298,6 +298,7 @@ export type Database = {
           status: string | null
           tags: string[] | null
           titulo: string
+          trilhas_recomendadas: Json | null
           updated_at: string | null
         }
         Insert: {
@@ -314,6 +315,7 @@ export type Database = {
           status?: string | null
           tags?: string[] | null
           titulo: string
+          trilhas_recomendadas?: Json | null
           updated_at?: string | null
         }
         Update: {
@@ -330,6 +332,7 @@ export type Database = {
           status?: string | null
           tags?: string[] | null
           titulo?: string
+          trilhas_recomendadas?: Json | null
           updated_at?: string | null
         }
         Relationships: [
@@ -2215,6 +2218,7 @@ export type Database = {
           avaliacao_nota: number | null
           backlog_item_id: string | null
           concluido_em: string | null
+          conteudo_suporte: Json | null
           created_at: string | null
           descricao: string | null
           economia_horas_semana: number | null
@@ -2242,6 +2246,7 @@ export type Database = {
           avaliacao_nota?: number | null
           backlog_item_id?: string | null
           concluido_em?: string | null
+          conteudo_suporte?: Json | null
           created_at?: string | null
           descricao?: string | null
           economia_horas_semana?: number | null
@@ -2269,6 +2274,7 @@ export type Database = {
           avaliacao_nota?: number | null
           backlog_item_id?: string | null
           concluido_em?: string | null
+          conteudo_suporte?: Json | null
           created_at?: string | null
           descricao?: string | null
           economia_horas_semana?: number | null
