@@ -19,206 +19,76 @@ serve(async (req) => {
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    // 1. Buscar membros
+    // 1. Buscar membros ativos
     const { data: membros, error: membrosError } = await supabase
       .from("membros_equipe_skills")
-      .select("user_id, papel")
+      .select("user_id")
       .eq("equipe_id", equipe_id)
       .eq("status", "ativo");
 
+    if (membrosError) throw membrosError;
     if (!membros?.length) {
       return new Response(JSON.stringify({ error: "Nenhum membro ativo na equipe" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Fetch profiles for members
-    const userIds = membros.map((m: any) => m.user_id);
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, nome_completo, cargo")
-      .in("id", userIds);
+    const membrosIds = membros.map((m: any) => m.user_id);
 
-    const { data: diagnosticos } = await supabase
-      .from("diagnosticos_skills")
-      .select("user_id, area_atuacao, processos_detalhados, tarefas_manuais, gargalos_identificados, cargo")
-      .eq("equipe_id", equipe_id)
-      .eq("completado", true);
-
-    // Build member profiles with diagnostics
-    const membrosInfo = membros.map((m: any) => {
-      const profile = profiles?.find((p: any) => p.id === m.user_id);
-      const diag = diagnosticos?.find((d: any) => d.user_id === m.user_id);
-      return {
-        user_id: m.user_id,
-        nome: profile?.nome_completo || "Membro",
-        cargo: profile?.cargo || m.papel || "Colaborador",
-        area: diag?.area_atuacao || "",
-        processos: diag?.processos_detalhados || diag?.tarefas_manuais || [],
-        gargalos: diag?.gargalos_identificados || [],
-      };
-    });
-
-    // 2. Buscar projetos e entregas (todos se force=true, senão só sem responsável)
+    // 2. Buscar projetos e entregas
     let projetosQuery = supabase
       .from("backlog_skills")
-      .select("id, titulo, descricao, area_impactada")
+      .select("id")
       .eq("equipe_id", equipe_id);
     if (!force) projetosQuery = projetosQuery.is("responsavel_id", null);
     const { data: projetos } = await projetosQuery;
 
     let entregasQuery = supabase
       .from("entregas_skills")
-      .select("id, titulo, descricao")
+      .select("id")
       .eq("equipe_id", equipe_id);
     if (!force) entregasQuery = entregasQuery.is("responsavel_id", null);
     const { data: entregas } = await entregasQuery;
 
-    const totalItens = (projetos?.length || 0) + (entregas?.length || 0);
-    if (totalItens === 0) {
+    // Also check entregas_equipe_skills
+    let entregasEquipeQuery = supabase
+      .from("entregas_equipe_skills")
+      .select("id")
+      .eq("equipe_id", equipe_id);
+    if (!force) entregasEquipeQuery = entregasEquipeQuery.is("responsavel_id", null);
+    const { data: entregasEquipe } = await entregasEquipeQuery;
+
+    const allItems = [
+      ...(projetos || []).map((p: any) => ({ id: p.id, table: "backlog_skills" })),
+      ...(entregas || []).map((e: any) => ({ id: e.id, table: "entregas_skills" })),
+      ...(entregasEquipe || []).map((e: any) => ({ id: e.id, table: "entregas_equipe_skills" })),
+    ];
+
+    if (allItems.length === 0) {
       return new Response(JSON.stringify({ success: true, message: "Nenhum item para associar", associados: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // 3. Montar itens para IA
-    const itens = [
-      ...(projetos || []).map((p: any) => ({
-        item_id: p.id, item_tipo: "projeto", titulo: p.titulo, descricao: p.descricao || "", area: p.area_impactada || "",
-      })),
-      ...(entregas || []).map((e: any) => ({
-        item_id: e.id, item_tipo: "entrega", titulo: e.titulo, descricao: e.descricao || "",
-      })),
-    ];
-
-    const membrosTexto = membrosInfo.map((m: any) =>
-      `- ${m.nome} (${m.cargo}, Área: ${m.area})\n  Processos: ${JSON.stringify(m.processos)}\n  Gargalos: ${JSON.stringify(m.gargalos)}`
-    ).join("\n");
-
-    const itensTexto = itens.map((i: any) =>
-      `- [${i.item_tipo}] ID: ${i.item_id} | "${i.titulo}" | ${i.descricao}`
-    ).join("\n");
-
-    const systemPrompt = `Você é um consultor de transformação digital. Associe cada projeto/entrega ao membro mais relevante da equipe, com base nos diagnósticos individuais.
-
-MEMBROS DA EQUIPE:
-${membrosTexto}
-
-ITENS PARA ASSOCIAR:
-${itensTexto}
-
-REGRAS CRÍTICAS (siga à risca):
-1. PRIORIDADE MÁXIMA: Associe cada item ao DONO DO PROCESSO — o membro que EXECUTA aquela tarefa no dia a dia, conforme listado em seus "Processos" no diagnóstico.
-2. Se o título do projeto/entrega menciona um processo específico (ex: "RAIVs", "Sinistros", "Power BI", "DFC"), encontre QUAL MEMBRO listou esse processo em seu diagnóstico e atribua a ele.
-3. NÃO associe tudo a uma mesma pessoa só porque ela é da área de TI ou tem cargo técnico. A área/cargo é secundária — o que importa é QUEM FAZ aquele processo.
-4. Distribua de forma justa: cada membro deve receber itens proporcionais aos seus processos.
-5. Cada item deve ser associado a exatamente 1 membro.
-6. Use o nome EXATO do membro no campo responsavel_nome.
-7. Se o item NÃO tem relação direta com nenhum processo listado por nenhum membro (ex: projetos estratégicos genéricos), marque "confianca_baixa" como true. Caso contrário, false.`;
-
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
-
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: "Associe cada item ao membro mais adequado." },
-        ],
-        tools: [{
-          type: "function",
-          function: {
-            name: "associar_membros",
-            description: "Associa itens aos membros da equipe",
-            parameters: {
-              type: "object",
-              properties: {
-                associacoes: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      item_id: { type: "string" },
-                      item_tipo: { type: "string", enum: ["projeto", "entrega"] },
-                      responsavel_nome: { type: "string" },
-                      confianca_baixa: { type: "boolean", description: "true se a associação é incerta (processos estratégicos sem match direto)" },
-                    },
-                    required: ["item_id", "item_tipo", "responsavel_nome", "confianca_baixa"],
-                  },
-                },
-              },
-              required: ["associacoes"],
-            },
-          },
-        }],
-        tool_choice: { type: "function", function: { name: "associar_membros" } },
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      const status = aiResponse.status;
-      if (status === 429) return new Response(JSON.stringify({ error: "Rate limit excedido. Tente novamente." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (status === 402) return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error(`AI gateway error: ${status}`);
-    }
-
-    const aiData = await aiResponse.json();
-    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("IA não retornou associações");
-
-    const { associacoes } = JSON.parse(toolCall.function.arguments);
-
-    // 4. Mapear nomes para user_ids
-    const nomeToId: Record<string, string> = {};
-    for (const m of membrosInfo) {
-      nomeToId[m.nome.toLowerCase().trim()] = m.user_id;
-    }
-
+    // 3. Distribuir round-robin deterministicamente
     let atualizados = 0;
-    for (const assoc of associacoes) {
-      const matchKey = Object.keys(nomeToId).find(
-        (k) => assoc.responsavel_nome?.toLowerCase().trim().includes(k) || k.includes(assoc.responsavel_nome?.toLowerCase().trim())
-      );
-      const userId = matchKey ? nomeToId[matchKey] : null;
-      if (!userId) {
-        console.warn(`Membro não encontrado: ${assoc.responsavel_nome}`);
-        continue;
-      }
-
-      const table = assoc.item_tipo === "projeto" ? "backlog_skills" : "entregas_skills";
-      
-      // Build update payload - add pendente_avaliacao tag if low confidence
-      const updatePayload: any = { responsavel_id: userId };
-      if (assoc.confianca_baixa) {
-        // Fetch current tags and append
-        const { data: currentItem } = await supabase
-          .from(table)
-          .select("tags")
-          .eq("id", assoc.item_id)
-          .single();
-        
-        const currentTags: string[] = (currentItem as any)?.tags || [];
-        if (!currentTags.includes("pendente_avaliacao")) {
-          updatePayload.tags = [...currentTags, "pendente_avaliacao"];
-        }
-      }
+    for (let i = 0; i < allItems.length; i++) {
+      const item = allItems[i];
+      const responsavelId = membrosIds[i % membrosIds.length];
 
       const { error } = await supabase
-        .from(table)
-        .update(updatePayload)
-        .eq("id", assoc.item_id);
+        .from(item.table)
+        .update({ responsavel_id: responsavelId })
+        .eq("id", item.id);
 
       if (error) {
-        console.error(`Erro ao atualizar ${assoc.item_id}:`, error.message);
+        console.error(`Erro ao atualizar ${item.id} em ${item.table}:`, error.message);
       } else {
         atualizados++;
       }
     }
 
-    return new Response(JSON.stringify({ success: true, associados: atualizados, total: associacoes.length }), {
+    return new Response(JSON.stringify({ success: true, associados: atualizados, total: allItems.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
