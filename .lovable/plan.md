@@ -1,65 +1,92 @@
 
 
-# Corrigir Entregas Equipe no Admin e Tamanho dos Cards
+# Correcao Definitiva: Distribuicao de Entregas entre Membros
 
-## Problemas Identificados
+## Causa Raiz
 
-### 1. Entregas Equipe no Admin fica carregando para sempre
+O problema persiste porque a logica de balanceamento atual depende da IA para atribuir nomes de responsaveis, e depois tenta corrigir com `balancearResponsaveis`. Mas:
 
-A coluna `responsavel_id` na tabela `entregas_equipe_skills` **nao tem foreign key** para a tabela `profiles`. O hook `useEntregasEquipe` faz um join `profiles:responsavel_id (nome_completo, avatar_url)` que requer essa FK para funcionar. O PostgREST retorna erro porque nao consegue resolver o relacionamento, e o componente so verifica `isLoading` sem tratar o estado de erro -- resultado: spinner eterno.
+1. A IA atribui quase tudo ao mesmo membro (Erich)
+2. O mapeamento nome-para-user_id falha para nomes nao reconhecidos (ficam NULL)
+3. A funcao de balanceamento roda, mas nao consegue corrigir adequadamente porque muitos itens ja chegam com o mesmo user_id
 
-Da mesma forma, tambem falta FK para `editado_por` -> `profiles`, embora nao seja usada no select atual.
+**Dados atuais**: 23 entregas com Erich, 17 com NULL. Zero para Lucio, Livia e Antonio.
 
-**Solucao**: Criar migration adicionando a FK de `responsavel_id` para `profiles(id)` e tratar o estado de erro no componente.
+## Solucao Definitiva
 
-### 2. Cards muito grandes na view dos membros
+Remover completamente a dependencia da IA para distribuicao. A IA gera o conteudo das entregas, mas a atribuicao de responsaveis e feita 100% em codigo, de forma deterministica e equilibrada.
 
-Os cards de entregas em `ProjetoSkillsEntregas.tsx` usam layout `grid gap-3` em coluna unica, ocupando toda a largura da pagina. Isso faz com que cada card se estenda horizontalmente alem do necessario.
+### 1. Refatorar `gerar-entregas-skills/index.ts`
 
-**Solucao**: Alterar o grid para usar 2 colunas em telas medias e 3 em telas grandes, com cards mais compactos.
+- Remover `responsavel_nome` do schema da IA (nao pedir mais para a IA atribuir membros)
+- Apos receber as entregas da IA, atribuir responsaveis usando round-robin simples entre todos os membros ativos
+- Logica: percorrer a lista de entregas e atribuir ciclicamente `membros[i % totalMembros]`
+
+### 2. Refatorar `associar-membros-skills/index.ts`
+
+- Remover a chamada de IA completamente
+- Implementar redistribuicao deterministica:
+  - Buscar todos os projetos e entregas da equipe
+  - Distribuir em round-robin entre os membros ativos
+  - Quando `force=true`, redistribuir TUDO; caso contrario, so itens sem responsavel
+
+### 3. Corrigir dados existentes
+
+- Executar UPDATE para limpar todos os `responsavel_id` das entregas e projetos
+- A redistribuicao sera feita ao clicar "Redistribuir Membros" no admin
 
 ## Detalhes Tecnicos
 
-### Migration SQL
+### Round-robin no `gerar-entregas-skills`
 
 ```text
-ALTER TABLE public.entregas_equipe_skills
-ADD CONSTRAINT entregas_equipe_skills_responsavel_id_fkey
-FOREIGN KEY (responsavel_id) REFERENCES public.profiles(id) ON DELETE SET NULL;
+// Apos receber entregas da IA, antes de inserir:
+const membrosIds = membrosInfo.map(m => m.user_id);
+entregasToInsert.forEach((entrega, index) => {
+  entrega.responsavel_id = membrosIds[index % membrosIds.length];
+});
 ```
 
-### Tratar erro no componente `SkillsEntregasEquipeTab.tsx`
+### `associar-membros-skills` sem IA
 
-Adicionar verificacao de estado de erro alem de `isLoading` para exibir mensagem adequada ao inves de spinner infinito.
-
-### Tratar erro no hook `useEntregasEquipe.ts`
-
-Expor `isError` do useQuery para os componentes consumidores.
-
-### Layout dos cards em `ProjetoSkillsEntregas.tsx`
-
-Mudar de:
 ```text
-<div className="grid gap-3">
+// Buscar todos os itens
+const projetos = await supabase.from("backlog_skills")...
+const entregas = await supabase.from("entregas_skills")...
+
+// Distribuir round-robin
+const membrosIds = membros.map(m => m.user_id);
+let idx = 0;
+
+for (const p of projetos) {
+  await supabase.from("backlog_skills")
+    .update({ responsavel_id: membrosIds[idx % membrosIds.length] })
+    .eq("id", p.id);
+  idx++;
+}
+
+for (const e of entregas) {
+  await supabase.from("entregas_skills")
+    .update({ responsavel_id: membrosIds[idx % membrosIds.length] })
+    .eq("id", e.id);
+  idx++;
+}
 ```
 
-Para:
-```text
-<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-```
+### Limpeza de dados
 
-E ajustar o conteudo interno dos cards para funcionar bem em tamanhos menores (truncar textos, reduzir paddings).
+Executar SQL para zerar responsaveis atuais, permitindo redistribuicao limpa.
 
 ## Arquivos Modificados
 
-- **Migration SQL**: adicionar FK de `responsavel_id` para `profiles(id)`
-- `src/hooks/useEntregasEquipe.ts` -- expor `isError` do useQuery
-- `src/components/admin/skills/SkillsEntregasEquipeTab.tsx` -- tratar estado de erro
-- `src/components/skills/ProjetoSkillsEntregas.tsx` -- layout grid responsivo para cards menores
+- `supabase/functions/gerar-entregas-skills/index.ts` -- remover responsavel_nome da IA, usar round-robin
+- `supabase/functions/associar-membros-skills/index.ts` -- remover chamada de IA, usar round-robin determinístico
+- `supabase/functions/gerar-projetos-skills/index.ts` -- mesma logica: remover dependencia da IA para distribuicao
 
 ## Resultado
 
-- Aba "Entregas Equipe" no admin carrega corretamente (ou mostra mensagem vazia se nao houver dados)
-- Cards de entregas no painel dos membros ficam menores e organizados em grid responsivo
-- Erros de query sao tratados com mensagem amigavel ao inves de spinner infinito
+- Entregas e projetos distribuidos de forma matematicamente equilibrada entre TODOS os membros
+- Sem dependencia da IA para distribuicao (a IA so gera conteudo)
+- Botao "Redistribuir Membros" funciona instantaneamente (sem custo de IA)
+- Com 4 membros e 40 entregas: cada um recebe exatamente 10
 
