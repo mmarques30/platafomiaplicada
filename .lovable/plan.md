@@ -1,28 +1,36 @@
 
+# Corrigir Geracao de Projetos com IA (backlog_skills)
 
-# Corrigir Layout dos Graficos de Rosca (Donut Charts)
+## Problema Raiz
 
-## Problema
+A edge function `gerar-projetos-skills` insere projetos com `status: "backlog"`, mas a tabela `backlog_skills` tem uma constraint CHECK que so permite os valores: `levantado`, `priorizado`, `em_execucao`, `entregue`.
 
-Os graficos de rosca na secao "Impacto vs ROI" estao quebrando em 3+1 em vez de ficarem todos lado a lado na mesma linha.
+Resultado: o INSERT falha silenciosamente (o erro nao e verificado na linha 88), a funcao retorna `projetos_criados: 7` sem erro, mas nenhum dado e salvo no banco.
 
 ## Solucao
 
-### Arquivo: `src/components/skills/performance/MemberDonutCharts.tsx`
+### Arquivo: `supabase/functions/gerar-projetos-skills/index.ts`
 
-Alterar o grid da linha 113 para usar `grid-cols-2 md:grid-cols-4` em vez de `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`, permitindo que ate 4 membros fiquem na mesma linha. Para equipes maiores, usar `flex-wrap` com largura fixa por item para manter a consistencia:
+Duas correcoes:
+
+1. Mudar `status: "backlog"` para `status: "levantado"` (valor valido na constraint)
+2. Verificar o erro do INSERT para nao retornar sucesso falso
 
 ```typescript
-// ANTES (linha 113):
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+// ANTES (linha 83):
+status: "backlog",
 
 // DEPOIS:
-<div className="flex flex-wrap justify-center gap-6">
-```
+status: "levantado",
 
-Cada `MemberDonut` ja tem largura controlada (`max-w-[120px]` no nome), entao usar `flex-wrap` com `justify-center` garante que todos fiquem lado a lado enquanto couberem, e quebrem de forma natural apenas quando o espaco nao for suficiente.
+// ANTES (linha 88):
+await supabase.from("backlog_skills").insert(inserts);
+
+// DEPOIS:
+const { error: insertError } = await supabase.from("backlog_skills").insert(inserts);
+if (insertError) throw new Error("Erro ao salvar projetos: " + insertError.message);
+```
 
 ## Resultado
 
-Os 4 graficos de rosca (Lucio, Livia, Antonio, Erich) ficarao todos na mesma linha, centralizados, sem quebra desnecessaria.
-
+Os projetos gerados pela IA serao corretamente salvos na tabela `backlog_skills` com status `levantado` e aparecerao na lista de Projetos Mapeados.
