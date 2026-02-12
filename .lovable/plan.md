@@ -1,44 +1,64 @@
 
+# Corrigir Travamento na Pagina Avaliacao (Skills)
 
-# Adicionar Abas "Minha Analise" e "Analise da Equipe" nos Resultados do Diagnostico
+## Problema Identificado
 
-## O que muda
+Tres causas estao atuando juntas:
 
-Apos preencher o diagnostico Skills e ver os resultados, a tela de analise passara a ter **duas abas**:
+### 1. Race Condition no `useSkillsDiagnostico`
+O hook usa `isLoading` do React Query v5, que retorna `false` quando a query esta desabilitada (enquanto auth carrega). Isso faz o componente `ProjetoSkillsDiagnostico` achar que o carregamento terminou antes de ter dados, mostrando o formulario brevemente e potencialmente causando erros.
 
-1. **Minha Analise** - O diagnostico individual do usuario logado (conteudo atual do DiagnosticoResults)
-2. **Analise da Equipe** - O diagnostico consolidado de toda a equipe (dados da tabela `diagnostico_consolidado_skills`)
+### 2. `localData` desincronizado no `useSkillsDiagnostico`
+O hook retorna `localData` (inicializado como `{}`) em vez dos dados reais da query. O `hasInsight` fica `false` por um breve momento mesmo quando o diagnostico ja tem insight, porque o `useEffect` que sincroniza `localData` com os dados da query roda depois do render.
 
-A aba "Analise da Equipe" so aparece quando o admin tiver consolidado os diagnosticos no painel Mentoria Skills.
+### 3. Producao com codigo antigo
+O cache v12 ja foi configurado mas precisa ser publicado. A producao pode ainda estar servindo codigo com o bug da coluna `nome`.
 
----
+## Solucao
 
-## Detalhes tecnicos
+### Arquivo 1: `src/hooks/useSkillsDiagnostico.ts`
+Corrigir o `isLoading` para incluir auth loading e query pending:
+- Importar `isPending` da query de diagnostico
+- Retornar `isLoading` como `isPending || !effectiveUserId` (verdadeiro ate ter usuario E dados)
+- Mudar `hasInsight` para verificar os dados da query diretamente, nao o `localData`
 
-### Arquivo 1: `src/components/skills/diagnostico/DiagnosticoResults.tsx`
+Mudanca especifica:
+```typescript
+const { data: diagnostico, isLoading: queryLoading, isPending } = useQuery({...});
 
-Refatorar para usar o componente `Tabs` do Radix:
-- Aba "Minha Analise": mantem todo o conteudo atual (perfil, processos, economia, insights, trilha)
-- Aba "Analise da Equipe": novo componente que exibe os dados consolidados
-- Usar o hook `useSkillsEquipe` (ja existente) para buscar o `consolidado`
-- Se nao houver consolidado, mostrar mensagem "Aguardando consolidacao pelo administrador"
+// isLoading inclui auth loading
+const isLoading = isPending || !effectiveUserId;
 
-### Arquivo 2: `src/components/skills/diagnostico/EquipeConsolidadoView.tsx` (novo)
+// hasInsight baseado nos dados da query, nao no localData
+const hasInsight = !!diagnostico?.insight_ia;
+```
 
-Componente para renderizar os dados do diagnostico consolidado:
-- **Dores Comuns** (`dores_comuns` - JSON array)
-- **Processos com Maior Potencial** (`processos_maior_potencial` - JSON array)
-- **Sobreposicoes de Esforco** (`sobreposicoes_esforco` - JSON array)
-- **Recomendacoes** (`recomendacoes` - JSON array)
-- **Economia Total** (`total_horas_manuais_semana`, `potencial_economia_horas`)
-- **Insights IA** (`insights_ia` - texto)
-- Data de geracao (`gerado_em`)
+### Arquivo 2: `src/components/skills/ProjetoSkillsDiagnostico.tsx`
+Simplificar a logica de estado para evitar flashes:
+- Em vez de `useEffect` para definir o estado, calcular o estado diretamente dos dados
+- Se `isLoading` → spinner
+- Se `diagnostico.completado && hasInsight` → results (direto, sem useEffect)
+- Senao → form
 
-Seguira o mesmo estilo visual do DiagnosticoResults (cards com icones verde Skills).
+Mudanca especifica:
+```typescript
+// Remover useState/useEffect para state
+// Calcular estado derivado
+const currentView = isProcessing ? "processing" 
+  : (diagnostico?.completado && hasInsight) ? "results" 
+  : "form";
+```
 
-### Logica de visibilidade
+### Arquivo 3: `vite.config.ts`
+Incrementar cache para v13 para garantir que ESTA correcao chegue na producao apos publicar:
+- `html-cache-v12` → `html-cache-v13`
+- `assets-cache-v12` → `assets-cache-v13`
+- `images-cache-v12` → `images-cache-v13`
 
-- As abas so aparecem quando o diagnostico individual estiver completo (estado "results")
-- Se nao existir consolidado, a aba "Analise da Equipe" mostra estado vazio com mensagem informativa
-- O banner "Aguardando Equipe" que ja existe no final do DiagnosticoResults sera movido para dentro da aba "Analise da Equipe" quando nao houver consolidado
+## Resultado Esperado
+- A pagina "Avaliacao" nao ficara mais travada no spinner
+- O diagnostico de Erich (completo com insight) mostrara diretamente a tela de resultados com as abas "Minha Analise" e "Analise da Equipe"
+- Apos publicar, a producao carregara o codigo corrigido (cache v13)
 
+## Instrucao para o usuario
+Apos a implementacao: publique o app e peca ao Erich para fechar e reabrir o app completamente.
