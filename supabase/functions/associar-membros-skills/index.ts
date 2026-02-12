@@ -10,7 +10,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { equipe_id } = await req.json();
+    const { equipe_id, force } = await req.json();
     if (!equipe_id) {
       return new Response(JSON.stringify({ error: "equipe_id obrigatório" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -59,22 +59,24 @@ serve(async (req) => {
       };
     });
 
-    // 2. Buscar projetos e entregas sem responsável
-    const { data: projetos } = await supabase
+    // 2. Buscar projetos e entregas (todos se force=true, senão só sem responsável)
+    let projetosQuery = supabase
       .from("backlog_skills")
       .select("id, titulo, descricao, area_impactada")
-      .eq("equipe_id", equipe_id)
-      .is("responsavel_id", null);
+      .eq("equipe_id", equipe_id);
+    if (!force) projetosQuery = projetosQuery.is("responsavel_id", null);
+    const { data: projetos } = await projetosQuery;
 
-    const { data: entregas } = await supabase
+    let entregasQuery = supabase
       .from("entregas_skills")
       .select("id, titulo, descricao")
-      .eq("equipe_id", equipe_id)
-      .is("responsavel_id", null);
+      .eq("equipe_id", equipe_id);
+    if (!force) entregasQuery = entregasQuery.is("responsavel_id", null);
+    const { data: entregas } = await entregasQuery;
 
     const totalItens = (projetos?.length || 0) + (entregas?.length || 0);
     if (totalItens === 0) {
-      return new Response(JSON.stringify({ success: true, message: "Nenhum item sem responsável", associados: 0 }), {
+      return new Response(JSON.stringify({ success: true, message: "Nenhum item para associar", associados: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

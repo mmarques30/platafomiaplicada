@@ -6,6 +6,64 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function balancearResponsaveis(itens: any[], membrosInfo: any[]) {
+  const membrosIds = membrosInfo.map((m: any) => m.user_id);
+  if (membrosIds.length === 0) return itens;
+  
+  const maxPorMembro = Math.ceil(itens.length / membrosIds.length);
+  const contagem: Record<string, number> = {};
+  membrosIds.forEach((id: string) => contagem[id] = 0);
+
+  // Count current assignments
+  itens.forEach((item: any) => {
+    if (item.responsavel_id && contagem[item.responsavel_id] !== undefined) {
+      contagem[item.responsavel_id]++;
+    }
+  });
+
+  // Redistribute excess
+  for (const item of itens) {
+    if (item.responsavel_id && (contagem[item.responsavel_id] || 0) > maxPorMembro) {
+      const membroMenosOcupado = membrosIds
+        .filter((id: string) => (contagem[id] || 0) < maxPorMembro)
+        .sort((a: string, b: string) => (contagem[a] || 0) - (contagem[b] || 0))[0];
+      if (membroMenosOcupado) {
+        contagem[item.responsavel_id]--;
+        item.responsavel_id = membroMenosOcupado;
+        contagem[membroMenosOcupado] = (contagem[membroMenosOcupado] || 0) + 1;
+      }
+    }
+  }
+
+  // Ensure every member has at least 1 item
+  for (const id of membrosIds) {
+    if ((contagem[id] || 0) === 0) {
+      const membroMaisOcupado = [...membrosIds]
+        .sort((a: string, b: string) => (contagem[b] || 0) - (contagem[a] || 0))[0];
+      if ((contagem[membroMaisOcupado] || 0) > 1) {
+        const itemParaReatribuir = itens.find((i: any) => i.responsavel_id === membroMaisOcupado);
+        if (itemParaReatribuir) {
+          contagem[membroMaisOcupado]--;
+          itemParaReatribuir.responsavel_id = id;
+          contagem[id] = 1;
+        }
+      }
+    }
+  }
+
+  // Assign unassigned items to least busy member
+  for (const item of itens) {
+    if (!item.responsavel_id || !membrosIds.includes(item.responsavel_id)) {
+      const membroMenosOcupado = [...membrosIds]
+        .sort((a: string, b: string) => (contagem[a] || 0) - (contagem[b] || 0))[0];
+      item.responsavel_id = membroMenosOcupado;
+      contagem[membroMenosOcupado] = (contagem[membroMenosOcupado] || 0) + 1;
+    }
+  }
+
+  return itens;
+}
+
 function mapPrioridade(prioridade: string): string {
   switch (prioridade) {
     case "alta": return "P1";
@@ -141,7 +199,7 @@ REGRAS OBRIGATÓRIAS:
       return key ? nomeToId[key] : null;
     };
 
-    const inserts = projetos.map((p: any, i: number) => ({
+    let inserts = projetos.map((p: any, i: number) => ({
       equipe_id,
       titulo: p.titulo,
       descricao: p.descricao,
@@ -154,6 +212,9 @@ REGRAS OBRIGATÓRIAS:
       responsavel_id: findUserId(p.responsavel_nome),
       tags: p.necessita_avaliacao ? ["pendente_avaliacao"] : [],
     }));
+
+    // Balance distribution across all members
+    inserts = balancearResponsaveis(inserts, membrosInfo);
 
     const { data: insertedProjetos, error: insertError } = await supabase
       .from("backlog_skills")
