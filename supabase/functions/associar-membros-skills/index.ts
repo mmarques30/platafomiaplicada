@@ -111,7 +111,8 @@ REGRAS CRÍTICAS (siga à risca):
 3. NÃO associe tudo a uma mesma pessoa só porque ela é da área de TI ou tem cargo técnico. A área/cargo é secundária — o que importa é QUEM FAZ aquele processo.
 4. Distribua de forma justa: cada membro deve receber itens proporcionais aos seus processos.
 5. Cada item deve ser associado a exatamente 1 membro.
-6. Use o nome EXATO do membro no campo responsavel_nome.`;
+6. Use o nome EXATO do membro no campo responsavel_nome.
+7. Se o item NÃO tem relação direta com nenhum processo listado por nenhum membro (ex: projetos estratégicos genéricos), marque "confianca_baixa" como true. Caso contrário, false.`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -141,8 +142,9 @@ REGRAS CRÍTICAS (siga à risca):
                       item_id: { type: "string" },
                       item_tipo: { type: "string", enum: ["projeto", "entrega"] },
                       responsavel_nome: { type: "string" },
+                      confianca_baixa: { type: "boolean", description: "true se a associação é incerta (processos estratégicos sem match direto)" },
                     },
-                    required: ["item_id", "item_tipo", "responsavel_nome"],
+                    required: ["item_id", "item_tipo", "responsavel_nome", "confianca_baixa"],
                   },
                 },
               },
@@ -185,9 +187,26 @@ REGRAS CRÍTICAS (siga à risca):
       }
 
       const table = assoc.item_tipo === "projeto" ? "backlog_skills" : "entregas_skills";
+      
+      // Build update payload - add pendente_avaliacao tag if low confidence
+      const updatePayload: any = { responsavel_id: userId };
+      if (assoc.confianca_baixa) {
+        // Fetch current tags and append
+        const { data: currentItem } = await supabase
+          .from(table)
+          .select("tags")
+          .eq("id", assoc.item_id)
+          .single();
+        
+        const currentTags: string[] = (currentItem as any)?.tags || [];
+        if (!currentTags.includes("pendente_avaliacao")) {
+          updatePayload.tags = [...currentTags, "pendente_avaliacao"];
+        }
+      }
+
       const { error } = await supabase
         .from(table)
-        .update({ responsavel_id: userId })
+        .update(updatePayload)
         .eq("id", assoc.item_id);
 
       if (error) {

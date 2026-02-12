@@ -222,9 +222,40 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
                 ) : !entregas?.length ? (
                   <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhuma entrega cadastrada</TableCell></TableRow>
                 ) : (
-                  entregas.map((e: any) => (
+                  entregas.map((e: any) => {
+                    const tags: string[] = (e as any).tags || [];
+                    const isPendenteAvaliacao = tags.includes("pendente_avaliacao");
+                    
+                    const handleAprovarEntrega = async () => {
+                      const newTags = tags.filter(t => t !== "pendente_avaliacao");
+                      const { error } = await supabase
+                        .from("entregas_skills")
+                        .update({ tags: newTags } as any)
+                        .eq("id", e.id);
+                      if (error) {
+                        toast.error("Erro ao aprovar entrega");
+                        return;
+                      }
+                      toast.success("Entrega aprovada!");
+                      queryClient.invalidateQueries({ queryKey: ["admin-entregas-skills", equipeId] });
+                    };
+                    
+                    return (
                     <TableRow key={e.id} className={adminTheme.tableRow}>
-                      <TableCell className={adminTheme.tableCell + " font-medium"}>{e.titulo}</TableCell>
+                      <TableCell className={adminTheme.tableCell + " font-medium"}>
+                        <div className="flex items-center gap-2">
+                          {e.titulo}
+                          {isPendenteAvaliacao && (
+                            <Badge
+                              className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30 hover:bg-yellow-500/25 cursor-pointer text-xs shrink-0"
+                              onClick={handleAprovarEntrega}
+                              title="Clique para aprovar esta entrega"
+                            >
+                              ⚠ Pendente
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className={adminTheme.tableCell}>{(e.responsavel as any)?.nome_completo || "—"}</TableCell>
                       <TableCell className={adminTheme.tableCell}>{statusBadge(e.status)}</TableCell>
                       <TableCell className={adminTheme.tableCell}>{e.economia_horas_semana ?? 0}h</TableCell>
@@ -256,7 +287,9 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))
+                    );
+                  })
+
                 )}
               </TableBody>
             </Table>

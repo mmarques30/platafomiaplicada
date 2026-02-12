@@ -63,6 +63,27 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
     }
   };
 
+  const handleAprovarProjeto = async (projetoId: string, currentTags: string[]) => {
+    const newTags = (currentTags || []).filter(t => t !== "pendente_avaliacao");
+    const { error } = await supabase
+      .from("backlog_skills")
+      .update({ tags: newTags } as any)
+      .eq("id", projetoId);
+    if (error) {
+      toast.error("Erro ao aprovar projeto");
+      return;
+    }
+    // Also remove tag from linked entrega
+    await supabase
+      .from("entregas_skills")
+      .update({ tags: newTags } as any)
+      .eq("backlog_item_id", projetoId);
+    
+    toast.success("Projeto aprovado!");
+    queryClient.invalidateQueries({ queryKey: ["backlog-skills", equipeId] });
+    queryClient.invalidateQueries({ queryKey: ["admin-entregas-skills", equipeId] });
+  };
+
   const prioridadeColors: Record<string, string> = {
     alta: "bg-red-500/10 text-red-600 border-red-500/20",
     media: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
@@ -121,24 +142,40 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
         </CardContent></Card>
       ) : (
         <div className="space-y-3">
-          {projetos.map(proj => (
-            <Card key={proj.id} className="border-border/50 hover:shadow-sm transition-shadow">
-              <CardContent className="py-3 px-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm">{proj.titulo}</h4>
-                    {proj.descricao && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{proj.descricao}</p>}
-                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                      {proj.prioridade && <Badge variant="outline" className={`text-xs ${prioridadeColors[proj.prioridade] || ""}`}>{proj.prioridade}</Badge>}
-                      {(proj as any).profiles?.nome_completo && <span className="flex items-center gap-1"><Users className="h-3 w-3" />{(proj as any).profiles.nome_completo}</span>}
-                      {proj.horas_estimadas_economia && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{proj.horas_estimadas_economia}h economia</span>}
-                      {proj.status && <Badge variant="secondary" className="text-xs">{proj.status}</Badge>}
+          {projetos.map(proj => {
+            const tags: string[] = (proj as any).tags || [];
+            const isPendenteAvaliacao = tags.includes("pendente_avaliacao");
+            
+            return (
+              <Card key={proj.id} className={`border-border/50 hover:shadow-sm transition-shadow ${isPendenteAvaliacao ? "border-yellow-500/40" : ""}`}>
+                <CardContent className="py-3 px-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium text-sm">{proj.titulo}</h4>
+                        {isPendenteAvaliacao && (
+                          <Badge
+                            className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30 hover:bg-yellow-500/25 cursor-pointer text-xs"
+                            onClick={() => handleAprovarProjeto(proj.id, tags)}
+                            title="Clique para aprovar este projeto"
+                          >
+                            ⚠ Pendente Avaliação
+                          </Badge>
+                        )}
+                      </div>
+                      {proj.descricao && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{proj.descricao}</p>}
+                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                        {proj.prioridade && <Badge variant="outline" className={`text-xs ${prioridadeColors[proj.prioridade] || ""}`}>{proj.prioridade}</Badge>}
+                        {(proj as any).profiles?.nome_completo && <span className="flex items-center gap-1"><Users className="h-3 w-3" />{(proj as any).profiles.nome_completo}</span>}
+                        {proj.horas_estimadas_economia && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{proj.horas_estimadas_economia}h economia</span>}
+                        {proj.status && <Badge variant="secondary" className="text-xs">{proj.status}</Badge>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
