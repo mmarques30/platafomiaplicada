@@ -80,12 +80,13 @@ serve(async (req) => {
       area_impactada: p.area_impactada || null,
       horas_estimadas_economia: p.horas_estimadas_economia || null,
       prioridade: p.prioridade,
-      status: "backlog",
+      status: "levantado",
       origem: "ia",
       ordem: i,
     }));
 
-    await supabase.from("backlog_skills").insert(inserts);
+    const { error: insertError } = await supabase.from("backlog_skills").insert(inserts);
+    if (insertError) throw new Error("Erro ao salvar projetos: " + insertError.message);
 
     return new Response(JSON.stringify({ success: true, projetos_criados: inserts.length }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
