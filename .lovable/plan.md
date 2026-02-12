@@ -1,68 +1,65 @@
 
 
-# Corrigir Metricas: Projetos nao associados e numeros estranhos
+# Corrigir Metricas: Projetos Acumulando, Horas em 3 Semanas e Entregas Concentradas
 
 ## Problemas Identificados
 
-### 1. Projetos sempre zerados
-A coluna `projetos_concluidos` filtra por `status === "concluido"`, mas todos os 8 projetos tem status `levantado`. A metrica deveria mostrar o total de projetos existentes (nao apenas concluidos), distribuidos progressivamente ao longo das 12 semanas como planejamento.
+### 1. Projetos acumulando (1,1,2,3,3,4,5,5,6,7,7,8)
+A formula `Math.round(totalProjetos * semana / 12)` gera numeros crescentes. O correto e mostrar quantos projetos estao planejados **por semana individual**: com 8 projetos em 12 semanas, cada semana recebe 0 ou 1 projeto.
 
-### 2. Entregas com numeros estranhos (0, 0, 26, 43, 48, 48...)
-O calculo atual e **acumulativo** (todas as entregas com prazo ate a semana X), o que faz os numeros saltarem de 0 para 26 de uma semana para outra. O correto e mostrar quantas entregas estao **planejadas para cada semana individualmente**, nao acumulado.
+### 2. Horas economizadas somente em 3 semanas (semanas 3, 4, 5)
+O campo `economia_horas_semana` representa economia **recorrente** -- uma vez que a entrega e implementada, ela economiza X horas **toda semana** a partir dali. Atualmente, as horas so aparecem na semana do prazo. O correto e: a partir da semana em que o prazo cai, somar essas horas em TODAS as semanas seguintes.
 
-### 3. Dados da equipe
-- `data_inicio` e NULL, entao usa `created_at` (02/02)
-- `investimento` e 0, entao ROI fica distorcido
-- 48 entregas, todas com prazo entre 17/02 e 05/03
+**Exemplo**: entrega com 1h/semana e prazo na semana 3 deve gerar 1h nas semanas 3, 4, 5, 6, 7, 8, 9, 10, 11 e 12.
+
+### 3. Entregas concentradas em 3 semanas
+A IA gerou todos os prazos entre 17/02 e 05/03 (semanas 3-5). Isso e um problema na geracao, mas sera resolvido na metrica ao redistribuir as entregas. As entregas existentes nao precisam ser regeneradas -- o calculo das metricas que precisa tratar isso corretamente com horas recorrentes.
 
 ## Solucao
 
-### Refatorar `gerar-metricas-skills/index.ts`
+### Arquivo: `supabase/functions/gerar-metricas-skills/index.ts`
 
-**Entregas planejadas**: Contar entregas cujo `prazo` cai **dentro** de cada semana (nao acumulado). Isso distribui as 48 entregas entre as semanas de forma realista.
+**Projetos por semana (nao acumulado)**:
+- Distribuir uniformemente: `Math.floor(8/12) = 0` base + 8 semanas recebem 1 extra
+- Resultado: 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0
 
-**Entregas concluidas**: Contar entregas com `concluido_em` **dentro** de cada semana (nao acumulado).
+**Horas recorrentes**:
+- Para cada semana, somar `economia_horas_semana` de TODAS as entregas cujo prazo ja passou (prazo < fimSemana)
+- Isso gera uma curva crescente natural: semana 3 = horas de 14 entregas, semana 5+ = horas de todas as 48 entregas
+- Resultado esperado: 0, 0, ~10, ~20, ~38.5, ~38.5, ~38.5... (crescente e depois estavel)
 
-**Projetos (backlog)**: Distribuir os projetos do backlog ao longo das 12 semanas proporcionalmente. Ex: 8 projetos em 12 semanas = ~1 projeto a cada 1.5 semanas. Usar distribuicao progressiva para que todos os projetos aparecam ao longo do roadmap.
-
-**Horas economizadas**: Calcular por semana individual (nao acumulado), baseado nas entregas planejadas para aquela semana.
-
-**ROI**: Quando investimento = 0, usar a economia total estimada como referencia ao inves de dividir por zero.
+**ROI executado**: Acompanha as horas recorrentes corretamente.
 
 ## Detalhes Tecnicos
 
-### Logica de distribuicao por semana
+### Projetos - distribuicao uniforme
 
 ```text
-// Entregas POR semana (nao acumulado)
-const inicioSemana = addWeeks(dataInicio, semana - 1);
-const fimSemana = addWeeks(dataInicio, semana);
+const projetosPorSemana = Math.floor(totalProjetos / 12);
+const projetosExtras = totalProjetos % 12;
+// Semanas 1 ate projetosExtras recebem 1 extra
+const projetosNaSemana = projetosPorSemana + (semana <= projetosExtras ? 1 : 0);
+```
 
-const planejadas = entregas.filter(e => {
-  const prazo = new Date(e.prazo);
-  return prazo >= inicioSemana && prazo < fimSemana;
-}).length;
+### Horas - economia recorrente
 
-// Projetos distribuidos progressivamente
-const projetosPorSemana = Math.floor(totalProjetos * semana / 12);
-
-// Horas economizadas por semana (soma das entregas daquela semana)
-const horasSemana = entregasDaSemana
+```text
+// Soma economia de TODAS as entregas com prazo ate esta semana (recorrente)
+const horasRecorrentes = entregas
+  .filter(e => e.prazo && new Date(e.prazo) < fimSemana)
   .reduce((acc, e) => acc + (e.economia_horas_semana || 0), 0);
 ```
 
-### Tratamento de investimento zero
+### ROI executado com horas recorrentes
 
-Quando investimento = 0, calcular ROI como percentual de economia alcancada vs economia total estimada, ao inves de dividir por zero.
+O ROI executado agora usa as horas recorrentes (que crescem e se mantem), resultando em uma curva crescente natural ao inves de picos isolados.
 
-## Arquivos Modificados
+## Arquivo Modificado
 
-- `supabase/functions/gerar-metricas-skills/index.ts` -- corrigir calculo de entregas por semana (nao acumulado), distribuir projetos progressivamente, tratar investimento zero
+- `supabase/functions/gerar-metricas-skills/index.ts` -- projetos por semana (uniforme, nao acumulado) e horas com economia recorrente
 
-## Resultado
+## Resultado Esperado
 
-- Entregas planejadas mostram quantas sao esperadas **por semana** (ex: semana 3 = 14, semana 4 = 12)
-- Projetos aparecem distribuidos ao longo das 12 semanas (crescente)
-- Horas economizadas refletem a economia de cada semana individual
-- ROI funciona mesmo com investimento = 0
-
+- **Projetos**: 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 (8 distribuidos uniformemente)
+- **Horas**: 0, 0, ~10, ~20, ~38.5, ~38.5, ~38.5... (crescente conforme entregas sao implementadas, depois estavel)
+- **ROI**: curva crescente e coerente com a economia real acumulada
