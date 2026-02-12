@@ -19,10 +19,18 @@ const statusColors: Record<string, string> = {
 };
 
 export default function SkillsEntregasEquipeTab({ equipeId }: { equipeId: string }) {
-  const { entregas, isLoading } = useEntregasEquipe(equipeId);
+  const { entregas, isLoading, isError } = useEntregasEquipe(equipeId);
   const queryClient = useQueryClient();
 
   if (isLoading) return <div className="flex justify-center py-8"><div className="animate-spin h-6 w-6 border-4 border-primary border-t-transparent rounded-full" /></div>;
+
+  if (isError) return (
+    <div className="text-center py-12 text-muted-foreground">
+      <Package className="h-10 w-10 mx-auto mb-2 opacity-40" />
+      <p>Erro ao carregar entregas da equipe.</p>
+      <p className="text-xs mt-1">Tente recarregar a página.</p>
+    </div>
+  );
 
   if (!entregas.length) return (
     <div className="text-center py-12 text-muted-foreground">

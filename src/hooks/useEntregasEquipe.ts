@@ -33,7 +33,7 @@ export function useEntregasEquipe(equipeId: string | null) {
   const queryClient = useQueryClient();
   const queryKey = ["entregas-equipe-skills", equipeId];
 
-  const { data: entregas, isLoading } = useQuery({
+  const { data: entregas, isLoading, isError } = useQuery({
     queryKey,
     queryFn: async () => {
       if (!equipeId) return [];
@@ -113,5 +113,5 @@ export function useEntregasEquipe(equipeId: string | null) {
     return { nome: file.name, url: urlData.publicUrl, tipo: file.type, uploaded_at: new Date().toISOString() };
   };
 
-  return { entregas: entregas || [], isLoading, upsertMutation, deleteMutation, uploadFile };
+  return { entregas: entregas || [], isLoading, isError, upsertMutation, deleteMutation, uploadFile };
 }

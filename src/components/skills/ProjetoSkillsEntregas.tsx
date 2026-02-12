@@ -110,7 +110,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
           <p className="text-sm">Clique em "Nova Entrega" para adicionar.</p>
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map(e => (
             <Card key={e.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(e)}>
               <CardContent className="p-4">

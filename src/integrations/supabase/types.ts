@@ -2191,6 +2191,20 @@ export type Database = {
             referencedRelation: "backlog_skills"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "entregas_equipe_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_equipe_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       entregas_skills: {
