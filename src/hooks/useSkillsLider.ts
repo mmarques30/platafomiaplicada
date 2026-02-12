@@ -34,7 +34,7 @@ interface Entrega {
 interface MetricaSemanal {
   semana: number;
   horasEconomizadas: number;
-  processosAutomatizados: number;
+  projetosConcluidos: number;
   entregasConcluidas: number;
   engajamentoTrilhas: number;
   indiceMaturidade: number;
@@ -216,7 +216,7 @@ export function useSkillsLider() {
       return (data || []).map((m: any) => ({
         semana: m.semana,
         horasEconomizadas: m.horas_economizadas || 0,
-        processosAutomatizados: m.processos_automatizados || 0,
+        projetosConcluidos: m.projetos_concluidos || 0,
         entregasConcluidas: m.entregas_concluidas || 0,
         engajamentoTrilhas: m.engajamento_trilhas || 0,
         indiceMaturidade: m.indice_maturidade || 0,

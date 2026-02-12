@@ -1,0 +1,1 @@
+ALTER TABLE public.metricas_skills RENAME COLUMN processos_automatizados TO projetos_concluidos;

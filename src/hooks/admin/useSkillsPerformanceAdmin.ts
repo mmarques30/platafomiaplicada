@@ -95,7 +95,7 @@ export function useUpsertMetricaSkills() {
       equipe_id: string;
       semana: number;
       horas_economizadas?: number;
-      processos_automatizados?: number;
+      projetos_concluidos?: number;
       entregas_concluidas?: number;
       entregas_planejadas?: number;
       indice_maturidade?: number;

@@ -20,7 +20,7 @@ interface Props {
 const emptyForm = {
   semana: 1,
   horas_economizadas: 0,
-  processos_automatizados: 0,
+  projetos_concluidos: 0,
   entregas_concluidas: 0,
   entregas_planejadas: 0,
   indice_maturidade: 0,
@@ -68,7 +68,7 @@ export default function SkillsMetricasTab({ equipeId }: Props) {
     setForm({
       semana: metrica.semana,
       horas_economizadas: metrica.horas_economizadas ?? 0,
-      processos_automatizados: metrica.processos_automatizados ?? 0,
+      projetos_concluidos: metrica.projetos_concluidos ?? 0,
       entregas_concluidas: metrica.entregas_concluidas ?? 0,
       entregas_planejadas: metrica.entregas_planejadas ?? 0,
       indice_maturidade: metrica.indice_maturidade ?? 0,
@@ -122,7 +122,7 @@ export default function SkillsMetricasTab({ equipeId }: Props) {
                 <TableRow>
                   <TableHead className={adminTheme.tableHeaderCell}>Semana</TableHead>
                   <TableHead className={adminTheme.tableHeaderCell}>Horas Econ.</TableHead>
-                  <TableHead className={adminTheme.tableHeaderCell}>Processos</TableHead>
+                  <TableHead className={adminTheme.tableHeaderCell}>Projetos</TableHead>
                   <TableHead className={adminTheme.tableHeaderCell}>Entregas</TableHead>
                   <TableHead className={adminTheme.tableHeaderCell}>Maturidade</TableHead>
                   <TableHead className={adminTheme.tableHeaderCell}>ROI Proj.</TableHead>
@@ -140,7 +140,7 @@ export default function SkillsMetricasTab({ equipeId }: Props) {
                     <TableRow key={m.id} className={adminTheme.tableRow}>
                       <TableCell className={adminTheme.tableCell + " font-medium"}>Semana {m.semana}</TableCell>
                       <TableCell className={adminTheme.tableCell}>{m.horas_economizadas ?? 0}h</TableCell>
-                      <TableCell className={adminTheme.tableCell}>{m.processos_automatizados ?? 0}</TableCell>
+                      <TableCell className={adminTheme.tableCell}>{m.projetos_concluidos ?? 0}</TableCell>
                       <TableCell className={adminTheme.tableCell}>{m.entregas_concluidas ?? 0}/{m.entregas_planejadas ?? 0}</TableCell>
                       <TableCell className={adminTheme.tableCell}>{m.indice_maturidade ?? 0}%</TableCell>
                       <TableCell className={adminTheme.tableCell}>{m.roi_projetado ?? 0}%</TableCell>
@@ -177,8 +177,8 @@ export default function SkillsMetricasTab({ equipeId }: Props) {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Processos Automatizados</Label>
-                <Input type="number" value={form.processos_automatizados} onChange={(e) => setForm((f) => ({ ...f, processos_automatizados: Number(e.target.value) }))} />
+                <Label>Projetos Concluídos</Label>
+                <Input type="number" value={form.projetos_concluidos} onChange={(e) => setForm((f) => ({ ...f, projetos_concluidos: Number(e.target.value) }))} />
               </div>
               <div className="space-y-2">
                 <Label>Entregas Concluídas</Label>

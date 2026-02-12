@@ -3637,7 +3637,7 @@ export type Database = {
           horas_economizadas: number | null
           id: string
           indice_maturidade: number | null
-          processos_automatizados: number | null
+          projetos_concluidos: number | null
           roi_executado: number | null
           roi_projetado: number | null
           semana: number
@@ -3651,7 +3651,7 @@ export type Database = {
           horas_economizadas?: number | null
           id?: string
           indice_maturidade?: number | null
-          processos_automatizados?: number | null
+          projetos_concluidos?: number | null
           roi_executado?: number | null
           roi_projetado?: number | null
           semana: number
@@ -3665,7 +3665,7 @@ export type Database = {
           horas_economizadas?: number | null
           id?: string
           indice_maturidade?: number | null
-          processos_automatizados?: number | null
+          projetos_concluidos?: number | null
           roi_executado?: number | null
           roi_projetado?: number | null
           semana?: number
