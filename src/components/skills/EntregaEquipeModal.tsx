@@ -18,17 +18,19 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   entrega: EntregaEquipe | null;
   membros: { id: string; nome_completo: string }[];
+  projetos?: { id: string; titulo: string }[];
   onSave: (values: any) => void;
   onUploadFile: (file: File) => Promise<{ nome: string; url: string; tipo: string; uploaded_at: string }>;
   isSaving: boolean;
 }
 
-export function EntregaEquipeModal({ open, onOpenChange, entrega, membros, onSave, onUploadFile, isSaving }: Props) {
+export function EntregaEquipeModal({ open, onOpenChange, entrega, membros, projetos = [], onSave, onUploadFile, isSaving }: Props) {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [status, setStatus] = useState("pendente");
   const [prioridade, setPrioridade] = useState("P2");
   const [responsavelId, setResponsavelId] = useState<string | null>(null);
+  const [projetoId, setProjetoId] = useState<string | null>(null);
   const [prazo, setPrazo] = useState<Date | undefined>();
   const [progresso, setProgresso] = useState(0);
   const [notas, setNotas] = useState("");
@@ -42,13 +44,14 @@ export function EntregaEquipeModal({ open, onOpenChange, entrega, membros, onSav
       setStatus(entrega.status_equipe);
       setPrioridade(entrega.prioridade_equipe || "P2");
       setResponsavelId(entrega.responsavel_id);
+      setProjetoId(entrega.projeto_id);
       setPrazo(entrega.prazo_equipe ? new Date(entrega.prazo_equipe) : undefined);
       setProgresso(entrega.progresso);
       setNotas(entrega.notas || "");
       setArquivos(entrega.arquivos || []);
     } else {
       setTitulo(""); setDescricao(""); setStatus("pendente"); setPrioridade("P2");
-      setResponsavelId(null); setPrazo(undefined); setProgresso(0); setNotas(""); setArquivos([]);
+      setResponsavelId(null); setProjetoId(null); setPrazo(undefined); setProgresso(0); setNotas(""); setArquivos([]);
     }
   }, [entrega, open]);
 
@@ -74,6 +77,7 @@ export function EntregaEquipeModal({ open, onOpenChange, entrega, membros, onSav
       status_equipe: status,
       prioridade_equipe: prioridade,
       responsavel_id: responsavelId,
+      projeto_id: projetoId,
       prazo_equipe: prazo ? format(prazo, "yyyy-MM-dd") : null,
       progresso,
       notas: notas || null,
@@ -89,6 +93,18 @@ export function EntregaEquipeModal({ open, onOpenChange, entrega, membros, onSav
           <DialogTitle>{entrega?.id ? "Editar Entrega" : "Nova Entrega"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {projetos.length > 0 && (
+            <div>
+              <Label>Projeto Vinculado</Label>
+              <Select value={projetoId || "none"} onValueChange={v => setProjetoId(v === "none" ? null : v)}>
+                <SelectTrigger><SelectValue placeholder="Selecionar projeto" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Nenhum</SelectItem>
+                  {projetos.map(p => <SelectItem key={p.id} value={p.id}>{p.titulo}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div>
             <Label>Título *</Label>
             <Input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Nome da entrega" />

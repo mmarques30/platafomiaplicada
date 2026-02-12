@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Package, Calendar, User } from "lucide-react";
+import { Plus, Package, Calendar, User, FolderOpen } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -52,6 +52,21 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
         id: m.user_id,
         nome_completo: m.profiles?.nome_completo || "Sem nome",
       }));
+    },
+    enabled: !!equipeId,
+  });
+
+  // Projetos do backlog
+  const { data: projetos } = useQuery({
+    queryKey: ["projetos-backlog-skills", equipeId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("backlog_skills")
+        .select("id, titulo")
+        .eq("equipe_id", equipeId)
+        .neq("status", "descartado")
+        .order("titulo");
+      return (data || []) as { id: string; titulo: string }[];
     },
     enabled: !!equipeId,
   });
@@ -106,6 +121,12 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
                       <Badge variant="outline" className={statusColors[e.status_equipe]}>{statusLabels[e.status_equipe]}</Badge>
                       {e.prioridade_equipe && <Badge variant="outline" className={prioridadeColors[e.prioridade_equipe]}>{e.prioridade_equipe}</Badge>}
                     </div>
+                    {e.projeto && (
+                      <div className="flex items-center gap-1 text-xs text-primary mb-1">
+                        <FolderOpen className="h-3 w-3" />
+                        <span>{e.projeto.titulo}</span>
+                      </div>
+                    )}
                     {e.descricao_equipe && <p className="text-sm text-muted-foreground line-clamp-1">{e.descricao_equipe}</p>}
                     <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                       {e.responsavel && (
@@ -133,6 +154,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
         onOpenChange={setModalOpen}
         entrega={selected}
         membros={membros || []}
+        projetos={projetos || []}
         onSave={handleSave}
         onUploadFile={(file) => uploadFile(file, equipeId)}
         isSaving={upsertMutation.isPending}

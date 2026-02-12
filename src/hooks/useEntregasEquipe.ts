@@ -5,6 +5,7 @@ import { toast } from "sonner";
 export interface EntregaEquipe {
   id: string;
   entrega_id: string | null;
+  projeto_id: string | null;
   equipe_id: string;
   editado_por: string | null;
   titulo_equipe: string;
@@ -18,14 +19,13 @@ export interface EntregaEquipe {
   progresso: number;
   created_at: string;
   updated_at: string;
-  // joined from entregas_skills
   entrega_original?: {
     titulo: string;
     descricao: string | null;
     status: string;
     prioridade: string | null;
   } | null;
-  // joined profile
+  projeto?: { titulo: string } | null;
   responsavel?: { nome_completo: string; avatar_url: string | null } | null;
 }
 
@@ -42,6 +42,7 @@ export function useEntregasEquipe(equipeId: string | null) {
         .select(`
           *,
           entregas_skills:entrega_id (titulo, descricao, status, prioridade),
+          backlog_skills:projeto_id (titulo),
           profiles:responsavel_id (nome_completo, avatar_url)
         `)
         .eq("equipe_id", equipeId)
@@ -52,6 +53,7 @@ export function useEntregasEquipe(equipeId: string | null) {
         ...d,
         arquivos: d.arquivos || [],
         entrega_original: d.entregas_skills || null,
+        projeto: d.backlog_skills || null,
         responsavel: d.profiles || null,
       })) as EntregaEquipe[];
     },
@@ -64,8 +66,10 @@ export function useEntregasEquipe(equipeId: string | null) {
       const payload = { ...values, editado_por: userId };
       // remove joined fields
       delete (payload as any).entrega_original;
+      delete (payload as any).projeto;
       delete (payload as any).responsavel;
       delete (payload as any).entregas_skills;
+      delete (payload as any).backlog_skills;
       delete (payload as any).profiles;
 
       if (payload.id) {
