@@ -1,87 +1,67 @@
 
-# Gerar Metricas Semanais com IA
 
-## Resumo
+# Corrigir Entregas: Devem ser Atividades/Tarefas dos Projetos, Nao Copias
 
-Criar uma edge function que usa IA para gerar metricas semanais baseadas nos projetos e entregas validados da equipe, com foco em ROI e aderencia planejado vs executado. Adicionar botao "Gerar Metricas com IA" na tab de metricas do admin.
+## Problema Identificado
 
-## Como funciona
+As entregas geradas pela IA sao **copias identicas dos projetos** (mesmo titulo, 1 entrega por projeto). Isso esta errado.
 
-A IA recebe os projetos do backlog, entregas (com status, economia de horas, prazo, progresso), dados da equipe (investimento, custo hora, semana atual) e o roadmap. Com base nisso, distribui as metricas semana a semana:
+**Exemplo do erro atual:**
+- Projeto: "Automacao Inteligente de Abertura e Tratativa de RAIVs"
+- Entrega: "Automacao Inteligente de Abertura e Tratativa de RAIVs" (identico!)
 
-- **ROI Projetado**: calculo ideal baseado na economia total estimada das entregas vs investimento, distribuido pelas 12 semanas de forma incremental
-- **ROI Executado**: baseado nas entregas efetivamente concluidas e em andamento ate cada semana
-- **Entregas planejadas vs concluidas**: quantas deveriam estar prontas vs quantas estao
-- **Horas economizadas**: acumulo semanal com base nas entregas finalizadas
-- **Processos automatizados**: contagem incremental por semana
-- **Indice de maturidade**: evolucao percentual da equipe
-- **Engajamento trilhas**: estimativa baseada no progresso das entregas
+**Como deveria ser:**
+- Projeto: "Automacao Inteligente de Abertura e Tratativa de RAIVs"
+- Entrega 1: "Mapear fluxo atual de abertura de RAIVs no ERP"
+- Entrega 2: "Configurar modelo de OCR para leitura de fotos de RAIVs"
+- Entrega 3: "Criar script de integracao com API do ERP para abertura automatica"
 
-## Detalhes Tecnicos
+## Causa Raiz
 
-### 1. Nova edge function: `gerar-metricas-skills`
+O prompt da edge function `gerar-entregas-skills` nao enfatiza suficientemente que as entregas devem ser **tarefas/atividades menores** que compoem o projeto. A IA interpreta "entrega" como sinonimo de "projeto" e simplesmente replica o titulo.
 
-Recebe `equipe_id`. Busca:
-- `equipes_skills` (investimento, custo_hora_padrao, semana_atual)
-- `backlog_skills` (projetos com status != "descartado")
-- `entregas_skills` (entregas com status, economia_horas_semana, prazo, progresso, concluido_em)
-- `roadmap_skills` (fases com semana_inicio e semana_fim)
+## Solucao
 
-Envia para a IA via tool calling com schema:
+### 1. Corrigir o prompt na edge function `gerar-entregas-skills/index.ts`
 
-```text
-metricas: [
-  {
-    semana: number (1-12),
-    horas_economizadas: number,
-    processos_automatizados: number,
-    entregas_concluidas: number,
-    entregas_planejadas: number,
-    indice_maturidade: number (0-100),
-    roi_projetado: number (%),
-    roi_executado: number (%),
-    engajamento_trilhas: number (0-100)
-  }
-]
-```
+Ajustar o prompt para:
+- Deixar claro que entregas sao **etapas/tarefas/atividades** necessarias para completar o projeto
+- Proibir explicitamente que o titulo da entrega seja igual ao titulo do projeto
+- Exigir minimo de 2 entregas por projeto (antes era "1 a 3", agora sera "2 a 4")
+- Dar exemplos concretos de entregas vs projetos no prompt
 
-O prompt instrui a IA a:
-- Gerar metricas para as 12 semanas do programa
-- Calcular ROI projetado com base na economia total de horas estimada x custo hora x 4 semanas / investimento
-- Distribuir ROI de forma incremental (semana 1 baixo, semana 12 alvo total)
-- ROI executado baseado em entregas ja concluidas (status "concluida" ou "rodando")
-- Entregas planejadas baseadas no roadmap/prazos
-- Maturidade crescente de ~20% (semana 1) a ~80-100% (semana 12)
+### 2. Limpar os dados errados e regenerar
 
-Apos receber, faz DELETE das metricas existentes e INSERT das novas.
+- DELETE das entregas atuais da equipe Inovacao (Engelmig)
+- Os dados corretos serao gerados quando o admin clicar novamente em "Gerar Entregas com IA"
 
-### 2. Botao "Gerar Metricas com IA" no `SkillsMetricasTab.tsx`
+## Detalhe Tecnico do Prompt Corrigido
 
-Adicionar botao com icone `Sparkles` ao lado de "Nova Metrica". Ao clicar:
-- Chama a edge function `gerar-metricas-skills`
-- Mostra loading
-- Invalida query e atualiza tabela
-- Toast de sucesso/erro
-
-### 3. Registrar no `supabase/config.toml`
+O novo prompt vai incluir instrucoes como:
 
 ```text
-[functions.gerar-metricas-skills]
-verify_jwt = false
+REGRA CRITICA: Entregas NAO sao projetos. Entregas sao ETAPAS, TAREFAS e ATIVIDADES
+praticas que a equipe precisa executar para que o projeto seja concluido.
+
+PROIBIDO: O titulo da entrega NUNCA pode ser igual ou muito similar ao titulo do projeto.
+
+Exemplo correto:
+  Projeto: "Automacao de Analise e Geracao de Graficos para DFC"
+  Entregas:
+    1. "Mapear fontes de dados e KPIs da DFC atual"
+    2. "Criar template de prompts para analise automatica de desvios"
+    3. "Desenvolver script de geracao automatica de graficos contextuais"
+
+Para cada projeto, gere de 2 a 4 entregas que sejam passos concretos de execucao.
 ```
 
-## Arquivos
+## Arquivos Modificados
 
-**Novos:**
-- `supabase/functions/gerar-metricas-skills/index.ts`
-
-**Modificados:**
-- `src/components/admin/skills/SkillsMetricasTab.tsx` -- botao "Gerar Metricas com IA"
-- `supabase/config.toml` -- registrar nova function
+- `supabase/functions/gerar-entregas-skills/index.ts` -- corrigir prompt para gerar entregas como tarefas/atividades
+- Dados corrigidos via DELETE + regeneracao pelo admin
 
 ## Resultado
 
-- Admin clica "Gerar Metricas com IA"
-- IA analisa projetos, entregas e roadmap da equipe
-- Gera 12 semanas de metricas com ROI projetado vs executado
-- Metricas ficam visiveis na tabela e alimentam o dashboard de performance
+- Cada projeto tera 2-4 entregas que sao etapas concretas de implementacao
+- Titulos das entregas serao distintos dos titulos dos projetos
+- Entregas serao accionaveis e com passos claros para execucao
