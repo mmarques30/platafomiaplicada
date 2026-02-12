@@ -48,13 +48,11 @@ serve(async (req) => {
     // Total de projetos no backlog (todos, não apenas concluídos)
     const totalProjetos = backlog.length;
 
-    // Economia total estimada (para ROI quando investimento = 0)
-    const economiaTotal = entregas.reduce((a: number, e: any) => a + (e.economia_horas_semana || 0) * 4, 0);
+    // Economia total estimada semanal (para ROI quando investimento = 0)
+    const economiaTotal = entregas.reduce((a: number, e: any) => a + (e.economia_horas_semana || 0), 0);
     const economiaTotalReais = economiaTotal * custoHora;
 
-    // Distribuição uniforme de projetos: ex 8 projetos em 12 semanas
-    const projetosPorSemanaBase = Math.floor(totalProjetos / 12);
-    const projetosExtras = totalProjetos % 12;
+    // Não precisa mais de distribuição uniforme - projetos são contados por entregas reais
 
     const rows = [];
 
@@ -84,10 +82,15 @@ serve(async (req) => {
         .filter((e: any) => e.prazo && new Date(e.prazo) < fimSemana)
         .reduce((acc: number, e: any) => acc + (e.economia_horas_semana || 0), 0);
 
-      // Projetos distribuídos uniformemente (não acumulado)
-      // Ex: 8 projetos / 12 semanas = semanas 1-8 recebem 1, semanas 9-12 recebem 0
-      const projetosNaSemana = projetosPorSemanaBase + (semana <= projetosExtras ? 1 : 0);
-
+      // Projetos: contar projetos DISTINTOS do backlog com entregas nesta semana
+      const projetosIds = new Set(
+        entregas.filter((e: any) => {
+          if (!e.prazo || !e.backlog_item_id) return false;
+          const prazo = new Date(e.prazo);
+          return prazo >= inicioSemana && prazo < fimSemana;
+        }).map((e: any) => e.backlog_item_id)
+      );
+      const projetosNaSemana = projetosIds.size;
       // ROI projetado: distribuição progressiva
       let roiProjetado: number;
       if (investimento > 0) {
