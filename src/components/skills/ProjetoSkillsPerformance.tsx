@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Target, Award, Clock, Loader2 } from "lucide-react";
+import { TrendingUp, Target, Award, Clock, Loader2, FolderKanban } from "lucide-react";
 import { useSkillsLider } from "@/hooks/useSkillsLider";
 import KPICard from "./performance/KPICard";
 import FilterSelect from "./performance/FilterSelect";
@@ -14,6 +14,7 @@ export default function ProjetoSkillsPerformance() {
 
   const {
     entregas,
+    projetos,
     ranking,
     semanaAtual,
     horasEconomizadasTotal,
@@ -30,9 +31,19 @@ export default function ProjetoSkillsPerformance() {
   const [selectedCollaborator, setSelectedCollaborator] = useState("todos");
   const [selectedStatus, setSelectedStatus] = useState("todos");
 
+  const hasEntregas = entregas.length > 0;
+  const totalProjetos = projetos.length;
+  const projetosEmAndamento = projetos.filter(p => p.status === "em_andamento").length;
+  const horasEstimadasProjetos = projetos.reduce((a, p) => a + (p.horasEstimadas || 0), 0);
+
   const collaborators = useMemo(
-    () => Array.from(new Set(entregas.map((d) => d.responsavelNome).filter(Boolean))) as string[],
-    [entregas]
+    () => {
+      if (hasEntregas) {
+        return Array.from(new Set(entregas.map((d) => d.responsavelNome).filter(Boolean))) as string[];
+      }
+      return Array.from(new Set(projetos.map((p) => p.responsavelNome).filter(Boolean))) as string[];
+    },
+    [entregas, projetos, hasEntregas]
   );
 
   const filteredDeliveries = useMemo(() => {
@@ -42,6 +53,14 @@ export default function ProjetoSkillsPerformance() {
       return true;
     });
   }, [entregas, selectedCollaborator, selectedStatus]);
+
+  const filteredProjetos = useMemo(() => {
+    return projetos.filter((p) => {
+      if (selectedCollaborator !== "todos" && p.responsavelNome !== selectedCollaborator) return false;
+      if (selectedStatus !== "todos" && p.status !== selectedStatus) return false;
+      return true;
+    });
+  }, [projetos, selectedCollaborator, selectedStatus]);
 
   const filteredHours = filteredDeliveries.reduce((a, d) => a + d.economiaHorasSemana, 0);
   const filteredCompleted = filteredDeliveries.filter((d) => d.status === "concluido" || d.status === "aprovada").length;
@@ -71,6 +90,23 @@ export default function ProjetoSkillsPerformance() {
 
   const isFiltered = selectedCollaborator !== "todos" || selectedStatus !== "todos";
 
+  // Status options depend on whether we have entregas or projetos
+  const statusOptions = hasEntregas
+    ? [
+        { value: "todos", label: "Todos" },
+        { value: "concluido", label: "Concluído" },
+        { value: "em_andamento", label: "Em andamento" },
+        { value: "atrasado", label: "Atrasado" },
+        { value: "pendente", label: "Pendente" },
+      ]
+    : [
+        { value: "todos", label: "Todos" },
+        { value: "levantado", label: "Levantado" },
+        { value: "em_andamento", label: "Em andamento" },
+        { value: "priorizado", label: "Priorizado" },
+        { value: "concluido", label: "Concluído" },
+      ];
+
   return (
     <div className="space-y-6">
       {/* Filtros */}
@@ -80,46 +116,49 @@ export default function ProjetoSkillsPerformance() {
             <FilterSelect label="Colaborador" value={selectedCollaborator} onValueChange={setSelectedCollaborator}
               options={[{ value: "todos", label: "Todos" }, ...collaborators.map((c) => ({ value: c, label: c }))]} />
             <FilterSelect label="Status" value={selectedStatus} onValueChange={setSelectedStatus}
-              options={[
-                { value: "todos", label: "Todos" },
-                { value: "concluido", label: "Concluído" },
-                { value: "em_andamento", label: "Em andamento" },
-                { value: "atrasado", label: "Atrasado" },
-                { value: "pendente", label: "Pendente" },
-              ]} />
+              options={statusOptions} />
           </div>
         </CardContent>
       </Card>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard title="Horas Economizadas" value={`${isFiltered ? filteredHours : horasEconomizadasTotal}h`} subtitle="Total acumulado" icon={<Clock className="h-5 w-5" />} />
-        <KPICard title="ROI Acumulado" value={`${Math.round(roiAcumulado)}%`} subtitle="Retorno sobre investimento" icon={<TrendingUp className="h-5 w-5" />} />
-        <KPICard title="Entregas Concluídas" value={`${isFiltered ? filteredCompleted : entregasConcluidas}/${isFiltered ? filteredDeliveries.length : totalEntregas}`} subtitle="Taxa de conclusão" icon={<Target className="h-5 w-5" />} />
-        <KPICard title="Performance Média" value={`${Math.round(performanceMedia)}%`} subtitle="Índice da equipe" icon={<Award className="h-5 w-5" />} />
+        {hasEntregas ? (
+          <>
+            <KPICard title="Horas Economizadas" value={`${isFiltered ? filteredHours : horasEconomizadasTotal}h`} subtitle="Total acumulado" icon={<Clock className="h-5 w-5" />} />
+            <KPICard title="ROI Acumulado" value={`${Math.round(roiAcumulado)}%`} subtitle="Retorno sobre investimento" icon={<TrendingUp className="h-5 w-5" />} />
+            <KPICard title="Entregas Concluídas" value={`${isFiltered ? filteredCompleted : entregasConcluidas}/${isFiltered ? filteredDeliveries.length : totalEntregas}`} subtitle="Taxa de conclusão" icon={<Target className="h-5 w-5" />} />
+            <KPICard title="Performance Média" value={`${Math.round(performanceMedia)}%`} subtitle="Índice da equipe" icon={<Award className="h-5 w-5" />} />
+          </>
+        ) : (
+          <>
+            <KPICard title="Projetos Mapeados" value={`${isFiltered ? filteredProjetos.length : totalProjetos}`} subtitle="Total no backlog" icon={<FolderKanban className="h-5 w-5" />} />
+            <KPICard title="Em Andamento" value={`${isFiltered ? filteredProjetos.filter(p => p.status === "em_andamento").length : projetosEmAndamento}`} subtitle="Projetos ativos" icon={<TrendingUp className="h-5 w-5" />} />
+            <KPICard title="Economia Estimada" value={`${isFiltered ? filteredProjetos.reduce((a, p) => a + (p.horasEstimadas || 0), 0) : horasEstimadasProjetos}h`} subtitle="Horas/semana potenciais" icon={<Clock className="h-5 w-5" />} />
+            <KPICard title="Semana Atual" value={`${semanaAtual}`} subtitle="de 12 semanas" icon={<Award className="h-5 w-5" />} />
+          </>
+        )}
       </div>
 
-      {/* Cronograma removido - agora está na Visão Geral */}
-
       {/* Donut Charts por Membro */}
-      <MemberDonutCharts ranking={ranking} entregas={filteredDeliveries as any} />
+      <MemberDonutCharts ranking={ranking} entregas={filteredDeliveries as any} projetos={filteredProjetos} />
 
       {/* Pie + Bar Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <StatusPieChart entregas={filteredDeliveries} />
-        <WeeklyBarChart ranking={ranking} entregas={filteredDeliveries} />
+        <StatusPieChart entregas={filteredDeliveries} projetos={filteredProjetos} />
+        <WeeklyBarChart ranking={ranking} entregas={filteredDeliveries} projetos={filteredProjetos} />
       </div>
 
       {/* Ranking */}
       <Card className="border-border bg-card">
         <CardHeader>
-          <CardTitle>Ranking de Entregas por Colaborador</CardTitle>
-          <CardDescription>Performance e indicadores individuais</CardDescription>
+          <CardTitle>{hasEntregas ? "Ranking de Entregas por Colaborador" : "Projetos por Colaborador"}</CardTitle>
+          <CardDescription>{hasEntregas ? "Performance e indicadores individuais" : "Projetos atribuídos por membro"}</CardDescription>
         </CardHeader>
         <CardContent>
           {ranking.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Nenhum dado disponível ainda. As entregas aparecerão aqui conforme forem registradas.
+              Nenhum dado disponível ainda.
             </p>
           ) : (
             <div className="overflow-x-auto">
@@ -128,9 +167,9 @@ export default function ProjetoSkillsPerformance() {
                   <tr className="border-b border-border">
                     <th className="text-left py-3 px-2 font-medium text-muted-foreground">#</th>
                     <th className="text-left py-3 px-2 font-medium text-muted-foreground">Colaborador</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Entregas</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Horas Economizadas</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Performance</th>
+                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">{hasEntregas ? "Entregas" : "Projetos"}</th>
+                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">{hasEntregas ? "Horas Economizadas" : "Economia Estimada"}</th>
+                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">{hasEntregas ? "Performance" : "Status"}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -148,11 +187,17 @@ export default function ProjetoSkillsPerformance() {
                       <td className="py-3 px-2">{stat.entregasConcluidas}/{stat.totalEntregas}</td>
                       <td className="py-3 px-2">{stat.horasEconomizadas}h</td>
                       <td className="py-3 px-2">
-                        <Badge className={`border-transparent ${
-                          stat.performanceMedia >= 90 ? "bg-[hsl(72,50%,35%)] text-white"
-                            : stat.performanceMedia >= 75 ? "bg-[hsl(68,35%,73%)] text-[hsl(72,50%,25%)]"
-                            : "bg-[hsl(68,40%,88%)] text-[hsl(72,50%,25%)]"
-                        }`}>{Math.round(stat.performanceMedia)}%</Badge>
+                        {hasEntregas ? (
+                          <Badge className={`border-transparent ${
+                            stat.performanceMedia >= 90 ? "bg-[hsl(72,50%,35%)] text-white"
+                              : stat.performanceMedia >= 75 ? "bg-[hsl(68,35%,73%)] text-[hsl(72,50%,25%)]"
+                              : "bg-[hsl(68,40%,88%)] text-[hsl(72,50%,25%)]"
+                          }`}>{Math.round(stat.performanceMedia)}%</Badge>
+                        ) : (
+                          <Badge className="border-transparent bg-[hsl(68,40%,88%)] text-[hsl(72,50%,25%)]">
+                            {stat.totalEntregas > 0 ? "Atribuído" : "Sem projetos"}
+                          </Badge>
+                        )}
                       </td>
                     </tr>
                   ))}
