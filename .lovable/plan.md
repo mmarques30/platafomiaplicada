@@ -1,75 +1,52 @@
 
-# Associar Projetos e Entregas aos Membros via IA
 
-## Resumo
+# Corrigir Distribuição de Projetos e Entregas - Equipe Inovação
 
-Criar uma edge function que usa IA para associar projetos e entregas aos membros da equipe com base nos diagnosticos individuais. Atualizar as funcoes de geracao existentes para ja fazerem essa associacao automaticamente. Executar retroativamente para a equipe Inovacao (Engelmig).
+## Problema
 
-## Dados atuais da equipe Inovacao
+A IA associou 5 dos 7 projetos ao Erich (TI) e deixou Antonio e Lucio com zero itens, apesar de vários projetos serem diretamente dos processos deles.
 
-- **7 projetos** sem responsavel no `backlog_skills`
-- **14 entregas** sem responsavel no `entregas_skills`
-- **4 membros** com diagnosticos completos:
-  - Livia Pesso (Financeiro) - processos: DFC, Relatorio Mensal de Resultados
-  - Antonio (TI) - processos: RAIVs, Sinistros, Planejamento orcamentario frota
-  - Erich (TI) - processos: Planejamento Estrategico TI, Gestao Time TI, Gestao Fornecedores
-  - Lucio Torres (Operacoes) - processos: Falhas Power BI, Validacao dados AllStrategy, Formulas/ideias dashboards
+## Distribuição Atual vs Correta
 
-## O que muda
+| Projeto | Atual | Correto | Motivo |
+|---------|-------|---------|--------|
+| Automação Abertura de RAIVs | Erich | **Antonio** | Processo diário dele |
+| Automação Abertura de Sinistros | Erich | **Antonio** | Processo semanal dele |
+| Planejamento Orçamentário Frota | Erich | **Antonio** | Processo mensal dele |
+| Monitoramento Falhas Power BI | Erich | **Lucio** | Processo diário dele |
+| Validação Dados AllStrategy para BI | Erich | **Lucio** | Processo semanal dele |
+| Análise/Gráficos DFC | Livia | Livia | OK |
+| Relatório Mensal de Resultados | Livia | Livia | OK |
 
-1. Ao gerar projetos ou entregas com IA, cada item ja sai com um membro responsavel atribuido
-2. O admin pode clicar "Associar Membros com IA" para atribuir responsaveis retroativamente
-3. A equipe Inovacao tera todos os 7 projetos e 14 entregas associados aos membros corretos
+## Correções por UPDATE direto
 
-## Detalhes Tecnicos
+Serão feitos UPDATEs nas tabelas `backlog_skills` e `entregas_skills` para:
 
-### 1. Nova edge function: `associar-membros-skills`
+**Para Antonio (338e43eb):**
+- 3 projetos: RAIVs, Sinistros, Planejamento Frota
+- Entregas vinculadas a esses projetos (Mapeamento RAIVs, Classificação E-mails, Análise Padrões Sinistro, Script Custos Históricos, Consolidação Bases CSV, OCR Fotos)
 
-Recebe `equipe_id`, busca projetos/entregas sem responsavel + diagnosticos individuais, envia para IA pedindo associacao membro-item, e atualiza `responsavel_id` nos registros existentes.
+**Para Lucio (d068fff0):**
+- 2 projetos: Falhas Power BI, Validação AllStrategy
+- Entregas vinculadas (Inventário Painéis Power BI, Alertas Power BI, Divergência AllStrategy, Comparação Dados)
 
-O prompt incluira:
-- Lista de membros com area, processos e gargalos de cada um
-- Lista de projetos e entregas sem responsavel
-- Instrucao para associar cada item ao membro mais relevante
+**Mantém Erich:** Nenhum projeto (seus processos são gestão estratégica/fornecedores, sem projeto específico gerado)
 
-Schema de retorno via tool calling:
-```text
-associacoes: [
-  { item_id, item_tipo ("projeto" ou "entrega"), responsavel_nome }
-]
-```
+**Mantém Livia:** 2 projetos + 4 entregas (DFC e Relatório Mensal)
 
-Apos receber, mapeia `responsavel_nome` para `user_id` e faz UPDATE em `backlog_skills` e `entregas_skills`.
+## Ajuste na Edge Function
 
-### 2. Atualizar `gerar-projetos-skills`
+Além da correção de dados, o prompt da edge function `associar-membros-skills` será ajustado para enfatizar que a IA deve priorizar o dono do processo (quem executa a tarefa no diagnóstico) e não apenas a área geral.
 
-- Buscar membros + diagnosticos individuais
-- Incluir no prompt: quem sao os membros, suas areas e processos
-- Adicionar `responsavel_nome` no schema de retorno
-- Mapear para `user_id` e preencher `responsavel_id` no insert de `backlog_skills` e `entregas_skills`
+## Arquivos Modificados
 
-### 3. Atualizar `gerar-entregas-skills`
+- `supabase/functions/associar-membros-skills/index.ts` -- ajustar prompt para distribuição mais precisa
+- Dados corrigidos via UPDATE direto nas tabelas `backlog_skills` e `entregas_skills`
 
-- Buscar diagnosticos individuais dos membros
-- Incluir no prompt detalhes de cada membro
-- Adicionar `responsavel_nome` no schema de retorno
-- Mapear para `user_id` e preencher `responsavel_id` no insert
+## Resultado
 
-### 4. Botao "Associar Membros com IA" no admin
+- Antonio: 3 projetos + 6 entregas
+- Lucio: 2 projetos + 4 entregas
+- Livia: 2 projetos + 4 entregas
+- Erich: 0 projetos + 0 entregas (processos dele são de gestão, sem projetos técnicos gerados)
 
-Adicionar botao no `SkillsEntregasTab.tsx` que chama a nova edge function. Visivel quando ha itens sem responsavel.
-
-### 5. Executar para equipe Inovacao
-
-Apos deploy da edge function, chamar automaticamente para a equipe `412b0ddd-a38a-4354-86e0-274e892ea9be`.
-
-## Arquivos
-
-**Novos:**
-- `supabase/functions/associar-membros-skills/index.ts`
-
-**Modificados:**
-- `supabase/functions/gerar-projetos-skills/index.ts` -- adicionar associacao de membros
-- `supabase/functions/gerar-entregas-skills/index.ts` -- adicionar associacao de membros
-- `src/components/admin/skills/SkillsEntregasTab.tsx` -- botao "Associar Membros com IA"
-- `supabase/config.toml` -- registrar nova function
