@@ -1,73 +1,87 @@
 
-# Melhorar IA para gerar projetos para TODOS os membros + tag "Pendente Avaliacao"
+# Gerar Metricas Semanais com IA
 
-## Problema
+## Resumo
 
-Quando um membro tem processos de natureza estrategica/gestao (ex: "Planejamento Estrategico TI", "Gestao Time", "Gestao Fornecedores"), a IA nao gera projetos para ele porque nao identifica tarefas operacionais claras para automatizar. Isso deixa membros sem nenhum projeto atribuido.
+Criar uma edge function que usa IA para gerar metricas semanais baseadas nos projetos e entregas validados da equipe, com foco em ROI e aderencia planejado vs executado. Adicionar botao "Gerar Metricas com IA" na tab de metricas do admin.
 
-## Solucao
+## Como funciona
 
-1. Ajustar o prompt da IA para que SEMPRE gere pelo menos 1 projeto por membro, mesmo que os processos sejam estrategicos/gestao
-2. Adicionar um campo `tags` na tabela `backlog_skills` e `entregas_skills` para marcar projetos que precisam de avaliacao
-3. Quando o processo do membro for estrategico/gestao (sem gargalos operacionais claros), a IA marca o projeto com a tag `pendente_avaliacao`
-4. Na interface, exibir visualmente os projetos com essa tag para o admin revisar
+A IA recebe os projetos do backlog, entregas (com status, economia de horas, prazo, progresso), dados da equipe (investimento, custo hora, semana atual) e o roadmap. Com base nisso, distribui as metricas semana a semana:
+
+- **ROI Projetado**: calculo ideal baseado na economia total estimada das entregas vs investimento, distribuido pelas 12 semanas de forma incremental
+- **ROI Executado**: baseado nas entregas efetivamente concluidas e em andamento ate cada semana
+- **Entregas planejadas vs concluidas**: quantas deveriam estar prontas vs quantas estao
+- **Horas economizadas**: acumulo semanal com base nas entregas finalizadas
+- **Processos automatizados**: contagem incremental por semana
+- **Indice de maturidade**: evolucao percentual da equipe
+- **Engajamento trilhas**: estimativa baseada no progresso das entregas
 
 ## Detalhes Tecnicos
 
-### 1. Migration: adicionar coluna `tags` nas tabelas
+### 1. Nova edge function: `gerar-metricas-skills`
 
-Adicionar coluna `tags` (tipo `text[]`, default `'{}'`) nas tabelas:
-- `backlog_skills`
-- `entregas_skills`
+Recebe `equipe_id`. Busca:
+- `equipes_skills` (investimento, custo_hora_padrao, semana_atual)
+- `backlog_skills` (projetos com status != "descartado")
+- `entregas_skills` (entregas com status, economia_horas_semana, prazo, progresso, concluido_em)
+- `roadmap_skills` (fases com semana_inicio e semana_fim)
 
-Isso permite marcar projetos com tags como `pendente_avaliacao`, `estrategico`, `operacional`, etc.
+Envia para a IA via tool calling com schema:
 
-### 2. Ajustar prompt em `gerar-projetos-skills/index.ts`
-
-Modificar o prompt para:
-- Instruir a IA a gerar pelo menos 1 projeto por membro
-- Para membros com processos estrategicos/gestao (sem gargalos operacionais), gerar projetos sugeridos mas marcar com `necessita_avaliacao: true`
-- Adicionar campo `necessita_avaliacao` (boolean) no schema de retorno da tool call
-- No insert, converter `necessita_avaliacao: true` para a tag `pendente_avaliacao` no array `tags`
-
-Exemplo de logica no prompt:
 ```text
-REGRAS:
-- Gere pelo menos 1 projeto por membro da equipe
-- Se um membro tem processos estrategicos/gestao sem gargalos operacionais claros,
-  sugira projetos de apoio a gestao com IA (dashboards, automacao de reports, etc.)
-  e marque necessita_avaliacao como true
-- Se um membro tem processos operacionais com gargalos claros,
-  marque necessita_avaliacao como false
+metricas: [
+  {
+    semana: number (1-12),
+    horas_economizadas: number,
+    processos_automatizados: number,
+    entregas_concluidas: number,
+    entregas_planejadas: number,
+    indice_maturidade: number (0-100),
+    roi_projetado: number (%),
+    roi_executado: number (%),
+    engajamento_trilhas: number (0-100)
+  }
+]
 ```
 
-### 3. Ajustar prompt em `associar-membros-skills/index.ts`
+O prompt instrui a IA a:
+- Gerar metricas para as 12 semanas do programa
+- Calcular ROI projetado com base na economia total de horas estimada x custo hora x 4 semanas / investimento
+- Distribuir ROI de forma incremental (semana 1 baixo, semana 12 alvo total)
+- ROI executado baseado em entregas ja concluidas (status "concluida" ou "rodando")
+- Entregas planejadas baseadas no roadmap/prazos
+- Maturidade crescente de ~20% (semana 1) a ~80-100% (semana 12)
 
-Mesma logica: quando a IA nao consegue associar com confianca (processos estrategicos sem match direto), marcar com tag `pendente_avaliacao`.
+Apos receber, faz DELETE das metricas existentes e INSERT das novas.
 
-### 4. Ajustar UI em `ProjetosMapeadosTab.tsx`
+### 2. Botao "Gerar Metricas com IA" no `SkillsMetricasTab.tsx`
 
-- Exibir badge amarelo "Pendente Avaliacao" nos projetos que tiverem essa tag
-- Permitir que o admin remova a tag ao aprovar o projeto (clicando no badge)
+Adicionar botao com icone `Sparkles` ao lado de "Nova Metrica". Ao clicar:
+- Chama a edge function `gerar-metricas-skills`
+- Mostra loading
+- Invalida query e atualiza tabela
+- Toast de sucesso/erro
 
-### 5. Ajustar UI em `SkillsEntregasTab.tsx`
+### 3. Registrar no `supabase/config.toml`
 
-- Mesma logica: exibir badge nas entregas com tag `pendente_avaliacao`
+```text
+[functions.gerar-metricas-skills]
+verify_jwt = false
+```
 
 ## Arquivos
 
+**Novos:**
+- `supabase/functions/gerar-metricas-skills/index.ts`
+
 **Modificados:**
-- `supabase/functions/gerar-projetos-skills/index.ts` — prompt + logica de tags
-- `supabase/functions/associar-membros-skills/index.ts` — prompt + logica de tags
-- `src/components/admin/skills/ProjetosMapeadosTab.tsx` — exibir badge + acao de aprovar
-- `src/components/admin/skills/SkillsEntregasTab.tsx` — exibir badge nas entregas
+- `src/components/admin/skills/SkillsMetricasTab.tsx` -- botao "Gerar Metricas com IA"
+- `supabase/config.toml` -- registrar nova function
 
-**Migration:**
-- Adicionar coluna `tags text[] default '{}'` em `backlog_skills` e `entregas_skills`
+## Resultado
 
-## Resultado esperado
-
-- Todo membro recebe pelo menos 1 projeto
-- Projetos gerados para membros com perfil estrategico vem com badge "Pendente Avaliacao"
-- O admin pode revisar e aprovar esses projetos removendo a tag
-- Projetos operacionais continuam sendo gerados normalmente sem tag
+- Admin clica "Gerar Metricas com IA"
+- IA analisa projetos, entregas e roadmap da equipe
+- Gera 12 semanas de metricas com ROI projetado vs executado
+- Metricas ficam visiveis na tabela e alimentam o dashboard de performance
