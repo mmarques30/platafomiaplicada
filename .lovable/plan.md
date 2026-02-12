@@ -1,64 +1,104 @@
 
-# Corrigir Travamento na Pagina Avaliacao (Skills)
+# Correcao Definitiva dos Bugs do Ambiente Skills
 
-## Problema Identificado
+## Problema Raiz Identificado
 
-Tres causas estao atuando juntas:
+Ao navegar para "Avaliacao" ou "Projetos", o componente `ProjetoSkillsDiagnosticoPage` (e `ProjetoSkillsProjetosPage`) executa:
 
-### 1. Race Condition no `useSkillsDiagnostico`
-O hook usa `isLoading` do React Query v5, que retorna `false` quando a query esta desabilitada (enquanto auth carrega). Isso faz o componente `ProjetoSkillsDiagnostico` achar que o carregamento terminou antes de ter dados, mostrando o formulario brevemente e potencialmente causando erros.
-
-### 2. `localData` desincronizado no `useSkillsDiagnostico`
-O hook retorna `localData` (inicializado como `{}`) em vez dos dados reais da query. O `hasInsight` fica `false` por um breve momento mesmo quando o diagnostico ja tem insight, porque o `useEffect` que sincroniza `localData` com os dados da query roda depois do render.
-
-### 3. Producao com codigo antigo
-O cache v12 ja foi configurado mas precisa ser publicado. A producao pode ainda estar servindo codigo com o bug da coluna `nome`.
-
-## Solucao
-
-### Arquivo 1: `src/hooks/useSkillsDiagnostico.ts`
-Corrigir o `isLoading` para incluir auth loading e query pending:
-- Importar `isPending` da query de diagnostico
-- Retornar `isLoading` como `isPending || !effectiveUserId` (verdadeiro ate ter usuario E dados)
-- Mudar `hasInsight` para verificar os dados da query diretamente, nao o `localData`
-
-Mudanca especifica:
-```typescript
-const { data: diagnostico, isLoading: queryLoading, isPending } = useQuery({...});
-
-// isLoading inclui auth loading
-const isLoading = isPending || !effectiveUserId;
-
-// hasInsight baseado nos dados da query, nao no localData
-const hasInsight = !!diagnostico?.insight_ia;
+```text
+if (isLoading) -> spinner
+if (!equipeId) -> Navigate to /skills/projeto  <-- REDIRECT PREMATURO
 ```
 
-### Arquivo 2: `src/components/skills/ProjetoSkillsDiagnostico.tsx`
-Simplificar a logica de estado para evitar flashes:
-- Em vez de `useEffect` para definir o estado, calcular o estado diretamente dos dados
-- Se `isLoading` → spinner
-- Se `diagnostico.completado && hasInsight` → results (direto, sem useEffect)
-- Senao → form
+O problema esta em como `isLoading` e calculado no `useSkillsMembro`. Em React Query v5:
 
-Mudanca especifica:
+- `isLoading` (da query) = `isPending && isFetching` = FALSE quando a query esta desabilitada
+- `isPending` (da query) = TRUE quando a query esta desabilitada
+
+O hook `useUserRole` retorna `isLoading` (nao `isPending`), entao quando a query de roles esta desabilitada (user ainda null), `roleLoading` = false prematuramente. Combinado com o fato de que o query key muda quando `isAdmin` transita de false para true, ha um frame onde `isLoading` = false mas `equipeId` = null, disparando o `<Navigate>`.
+
+Alem disso, confirmei via rede que os dados retornam corretamente (equipes_skills retorna o ID da equipe no fallback admin), mas o redirect ja aconteceu antes.
+
+## Solucao em 3 Partes
+
+### 1. Corrigir `useUserRole` para retornar `isPending` em vez de `isLoading`
+
+**Arquivo:** `src/hooks/useUserRole.tsx`
+
+Mudar a desestruturacao da query para usar `isPending` em vez de `isLoading`, garantindo que o estado de carregamento seja true enquanto nao houver dados (mesmo com query desabilitada):
+
 ```typescript
-// Remover useState/useEffect para state
-// Calcular estado derivado
-const currentView = isProcessing ? "processing" 
-  : (diagnostico?.completado && hasInsight) ? "results" 
-  : "form";
+// ANTES:
+const { data: roles, isLoading } = useQuery({...});
+// ...
+return { ..., isLoading };
+
+// DEPOIS:
+const { data: roles, isPending } = useQuery({...});
+// ...
+return { ..., isLoading: isPending };
 ```
 
-### Arquivo 3: `vite.config.ts`
-Incrementar cache para v13 para garantir que ESTA correcao chegue na producao apos publicar:
-- `html-cache-v12` → `html-cache-v13`
-- `assets-cache-v12` → `assets-cache-v13`
-- `images-cache-v12` → `images-cache-v13`
+### 2. Proteger `useSkillsMembro` contra transicoes de query key
 
-## Resultado Esperado
-- A pagina "Avaliacao" nao ficara mais travada no spinner
-- O diagnostico de Erich (completo com insight) mostrara diretamente a tela de resultados com as abas "Minha Analise" e "Analise da Equipe"
-- Apos publicar, a producao carregara o codigo corrigido (cache v13)
+**Arquivo:** `src/hooks/useSkillsMembro.ts`
 
-## Instrucao para o usuario
-Apos a implementacao: publique o app e peca ao Erich para fechar e reabrir o app completamente.
+Adicionar uma verificacao extra no `isLoading` para cobrir o caso em que `isAdmin` pode mudar o query key:
+
+```typescript
+// ANTES:
+const isLoading = isPending || authLoading || roleLoading;
+
+// DEPOIS:
+const isLoading = isPending || authLoading || roleLoading || (!data && !authLoading);
+```
+
+A condicao `(!data && !authLoading)` garante que `isLoading` permaneca true ate que a query retorne dados, mesmo durante transicoes de query key.
+
+### 3. Substituir `Navigate` declarativo por redirecionamento imperativo com delay
+
+**Arquivos:** `src/pages/skills/ProjetoSkillsDiagnosticoPage.tsx` e `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+
+Trocar o `<Navigate>` declarativo (que dispara imediatamente no render) por `useEffect` + `navigate()` com uma verificacao dupla:
+
+```typescript
+// ANTES:
+if (!equipeId) return <Navigate to="/skills/projeto" replace />;
+
+// DEPOIS:
+useEffect(() => {
+  if (!isLoading && !equipeId) {
+    navigate("/skills/projeto", { replace: true });
+  }
+}, [isLoading, equipeId, navigate]);
+
+if (!equipeId) {
+  return <LoadingSpinner />;  // Mostra spinner enquanto aguarda redirect ou dados
+}
+```
+
+Isso garante que o componente nunca redirecione prematuramente - ele mostra um spinner e so redireciona quando tem certeza absoluta de que nao ha equipe disponivel.
+
+### 4. Incrementar cache PWA para v14
+
+**Arquivo:** `vite.config.ts`
+
+Incrementar as versoes de cache de v13 para v14 para garantir que a correcao chegue na producao apos publicar.
+
+## Resumo das alteracoes
+
+| Arquivo | Alteracao |
+|---|---|
+| `src/hooks/useUserRole.tsx` | Usar `isPending` em vez de `isLoading` da query |
+| `src/hooks/useSkillsMembro.ts` | Adicionar guard `(!data && !authLoading)` no isLoading |
+| `src/pages/skills/ProjetoSkillsDiagnosticoPage.tsx` | Trocar `Navigate` por `useEffect` + navigate com spinner fallback |
+| `src/pages/skills/ProjetoSkillsProjetosPage.tsx` | Mesma correcao do diagnostico |
+| `vite.config.ts` | Cache v13 para v14 |
+
+## Por que esta correcao e definitiva
+
+As tentativas anteriores focaram em `useSkillsDiagnostico` e no componente `ProjetoSkillsDiagnostico`. O problema real esta uma camada acima - nas PAGES que guardam o acesso (`ProjetoSkillsDiagnosticoPage` e `ProjetoSkillsProjetosPage`) e no `useUserRole` que retorna um estado de loading incorreto em React Query v5. Esta correcao ataca a causa raiz em vez dos sintomas.
+
+## Instrucao pos-implementacao
+
+Apos aprovar e implementar: publicar o app. Os usuarios precisarao fechar e reabrir o app para carregar o cache v14.
