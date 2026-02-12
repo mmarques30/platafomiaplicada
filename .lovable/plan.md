@@ -1,34 +1,28 @@
 
 
-# Corrigir Erro ao Consolidar Diagnosticos
+# Corrigir Layout dos Graficos de Rosca (Donut Charts)
 
 ## Problema
 
-A edge function `consolidar-diagnosticos-skills` faz esta query:
-
-```
-.select("*, profiles:user_id(nome_completo, cargo)")
-```
-
-A tabela `profiles` nao tem coluna `cargo`. O campo `cargo` ja existe na propria tabela `diagnosticos_skills` (preenchido no formulario), entao nao precisa buscar do profiles.
+Os graficos de rosca na secao "Impacto vs ROI" estao quebrando em 3+1 em vez de ficarem todos lado a lado na mesma linha.
 
 ## Solucao
 
-### Arquivo: `supabase/functions/consolidar-diagnosticos-skills/index.ts`
+### Arquivo: `src/components/skills/performance/MemberDonutCharts.tsx`
 
-Remover `cargo` do join com profiles:
+Alterar o grid da linha 113 para usar `grid-cols-2 md:grid-cols-4` em vez de `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`, permitindo que ate 4 membros fiquem na mesma linha. Para equipes maiores, usar `flex-wrap` com largura fixa por item para manter a consistencia:
 
 ```typescript
-// ANTES:
-.select("*, profiles:user_id(nome_completo, cargo)")
+// ANTES (linha 113):
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
 // DEPOIS:
-.select("*, profiles:user_id(nome_completo)")
+<div className="flex flex-wrap justify-center gap-6">
 ```
 
-O campo `cargo` ja e acessado corretamente via `d.cargo` no mapeamento do `resumoDiagnosticos` (linha que ja existe no codigo). Nenhuma outra alteracao necessaria.
+Cada `MemberDonut` ja tem largura controlada (`max-w-[120px]` no nome), entao usar `flex-wrap` com `justify-center` garante que todos fiquem lado a lado enquanto couberem, e quebrem de forma natural apenas quando o espaco nao for suficiente.
 
 ## Resultado
 
-O botao "Consolidar Diagnosticos" executara a edge function sem erro, gerando o diagnostico consolidado da equipe via IA.
+Os 4 graficos de rosca (Lucio, Livia, Antonio, Erich) ficarao todos na mesma linha, centralizados, sem quebra desnecessaria.
 
