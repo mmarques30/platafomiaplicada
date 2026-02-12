@@ -7,9 +7,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useMetricasSkillsAdmin, useUpsertMetricaSkills } from "@/hooks/admin/useSkillsPerformanceAdmin";
 import { adminTheme } from "@/components/admin/adminTheme";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/hooks/use-toast";
 import SkillsTabActions from "./SkillsTabActions";
 
 interface Props {
@@ -35,6 +36,25 @@ export default function SkillsMetricasTab({ equipeId }: Props) {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [gerandoIA, setGerandoIA] = useState(false);
+
+  const gerarMetricasIA = async () => {
+    setGerandoIA(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("gerar-metricas-skills", {
+        body: { equipe_id: equipeId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      queryClient.invalidateQueries({ queryKey: ["admin-metricas-skills", equipeId] });
+      toast({ title: "Métricas geradas com IA", description: `${data.total} semanas de métricas criadas com sucesso.` });
+    } catch (e: any) {
+      console.error("Erro ao gerar métricas:", e);
+      toast({ title: "Erro ao gerar métricas", description: e.message || "Tente novamente.", variant: "destructive" });
+    } finally {
+      setGerandoIA(false);
+    }
+  };
 
   const openNew = () => {
     setEditId(null);
@@ -83,9 +103,15 @@ export default function SkillsMetricasTab({ equipeId }: Props) {
             clearDescription="Todas as métricas semanais desta equipe serão removidas."
           />
         </div>
-        <Button size="sm" className={adminTheme.buttonSm} onClick={openNew}>
-          <Plus className="h-3.5 w-3.5 mr-1.5" /> Nova Métrica
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" className={adminTheme.buttonSm} onClick={gerarMetricasIA} disabled={gerandoIA}>
+            {gerandoIA ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 mr-1.5" />}
+            {gerandoIA ? "Gerando..." : "Gerar com IA"}
+          </Button>
+          <Button size="sm" className={adminTheme.buttonSm} onClick={openNew}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" /> Nova Métrica
+          </Button>
+        </div>
       </div>
 
       <Card className={adminTheme.card}>
