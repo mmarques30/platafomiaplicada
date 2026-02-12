@@ -11,11 +11,17 @@ import {
 } from "@dnd-kit/core";
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 import { useAuth } from "@/hooks/useAuth";
+import { useSkillsMembro } from "@/hooks/useSkillsMembro";
+import { useUserRole } from "@/hooks/useUserRole";
 import KanbanColumn from "./kanban/KanbanColumn";
 import KanbanCard from "./kanban/KanbanCard";
 import KanbanFiltersAdvanced, { AdvancedFilters } from "./kanban/KanbanFiltersAdvanced";
 import PortfolioOverview from "./kanban/PortfolioOverview";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export interface KanbanColumnDef {
   id: string;
@@ -35,7 +41,11 @@ const COLUMNS: KanbanColumnDef[] = [
 export default function ProjetoSkillsKanban() {
   const { entregas, isLoading, atualizarStatus } = useSkillsEntregas();
   const { user } = useAuth();
+  const { equipeId, isLider } = useSkillsMembro();
+  const { isAdmin } = useUserRole();
+  const queryClient = useQueryClient();
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
   const [filters, setFilters] = useState<AdvancedFilters>({
     status: null,
     tipo: null,
@@ -47,6 +57,39 @@ export default function ProjetoSkillsKanban() {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   );
+
+  // Check backlog for existing projects without entregas
+  const { data: backlogCount } = useQuery({
+    queryKey: ["backlog-skills-count", equipeId],
+    queryFn: async () => {
+      if (!equipeId) return 0;
+      const { count } = await supabase
+        .from("backlog_skills")
+        .select("id", { count: "exact", head: true })
+        .eq("equipe_id", equipeId);
+      return count || 0;
+    },
+    enabled: !!equipeId,
+  });
+
+  const canGenerateEntregas = (isAdmin || isLider) && backlogCount && backlogCount > 0 && (!entregas || entregas.length === 0);
+
+  async function handleGerarEntregas() {
+    if (!equipeId) return;
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("gerar-entregas-skills", {
+        body: { equipe_id: equipeId },
+      });
+      if (error) throw error;
+      toast.success(`${data.entregas_criadas || 0} entregas geradas com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: ["entregas-skills"] });
+    } catch (e: any) {
+      toast.error("Erro ao gerar entregas: " + (e.message || "Tente novamente"));
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   const responsaveis = useMemo(() => {
     if (!entregas) return [];
@@ -128,6 +171,32 @@ export default function ProjetoSkillsKanban() {
     <div className="space-y-6">
       {/* Seção 1: Visão Geral */}
       <PortfolioOverview entregas={entregas ?? []} />
+
+      {/* Botão para gerar entregas quando Kanban vazio mas backlog tem projetos */}
+      {canGenerateEntregas && (
+        <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-muted-foreground/30 rounded-xl bg-muted/30">
+          <Sparkles className="h-10 w-10 text-primary mb-3" />
+          <p className="text-sm text-muted-foreground mb-1">
+            Existem <strong>{backlogCount}</strong> projetos mapeados no backlog sem entregas vinculadas.
+          </p>
+          <p className="text-xs text-muted-foreground mb-4">
+            Gere entregas com IA para começar a executar os projetos no Kanban.
+          </p>
+          <Button onClick={handleGerarEntregas} disabled={generating}>
+            {generating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Gerando entregas...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Gerar Entregas com IA
+              </>
+            )}
+          </Button>
+        </div>
+      )}
 
       {/* Seção 2: Backlog de Projetos */}
       <div className="space-y-4">

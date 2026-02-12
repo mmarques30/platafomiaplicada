@@ -29,9 +29,9 @@ export function useSkillsEntregas() {
     ? impersonatedUserId 
     : user?.id;
 
-  // Buscar entregas - líder vê todas, membro vê apenas as suas
+  // Buscar entregas - admin/líder vê todas da equipe, membro vê as suas + sem responsável
   const { data: entregas, isLoading } = useQuery({
-    queryKey: ["entregas-skills", effectiveUserId, equipeId, isLider],
+    queryKey: ["entregas-skills", effectiveUserId, equipeId, isLider, isAdmin],
     queryFn: async () => {
       if (!effectiveUserId) return [];
       
@@ -43,11 +43,14 @@ export function useSkillsEntregas() {
         `)
         .order("prazo", { ascending: true, nullsFirst: false });
 
-      if (isLider && equipeId) {
-        // Líder vê todas as entregas da equipe
+      if ((isLider || isAdmin) && equipeId) {
+        // Admin ou Líder vê todas as entregas da equipe
         query = query.eq("equipe_id", equipeId);
+      } else if (equipeId) {
+        // Membro vê suas entregas + entregas sem responsável da equipe
+        query = query.eq("equipe_id", equipeId).or(`responsavel_id.eq.${effectiveUserId},responsavel_id.is.null`);
       } else {
-        // Membro vê apenas as próprias entregas
+        // Fallback: apenas as próprias
         query = query.eq("responsavel_id", effectiveUserId);
       }
 
