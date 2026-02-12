@@ -1,104 +1,140 @@
 
-# Conectar Projetos Mapeados ao Kanban do Skills
+# Submenu "Entregas" no Projeto Skills + Aba "Entregas Equipe" no Admin
 
-## Problema
+## Resumo
 
-Existem dois desconectamentos no fluxo atual:
+Criar uma nova pagina "Entregas" acessivel como submenu de "Projeto Skills" no sidebar, onde todos os membros da equipe podem visualizar, criar, editar entregas, definir prazos e fazer upload de arquivos. Simultaneamente, adicionar uma aba "Entregas Equipe" no hub admin de Skills para o administrador acompanhar todas as alteracoes feitas pela equipe.
 
-1. **Projetos gerados pela IA ficam apenas no `backlog_skills`** (tabela de projetos mapeados), mas o Kanban na pagina "Projetos" do usuario le apenas da tabela `entregas_skills` (que esta vazia).
+## O que muda para o usuario
 
-2. **Nao ha pipeline automatico**: gerar projetos com IA popula `backlog_skills`, mas nada cria automaticamente as entradas em `entregas_skills` que alimentam o Kanban.
+1. No menu lateral, dentro de "Projeto Skills", aparece um novo item **"Entregas"** (abaixo de "Projetos")
+2. Ao clicar, abre uma pagina com lista de entregas da equipe em formato de tabela/cards editaveis
+3. Cada membro pode:
+   - Ver todas as entregas da equipe (incluindo as geradas por IA)
+   - Criar novas entregas manualmente
+   - Editar titulo, descricao, prazo, status, responsavel
+   - Fazer upload de arquivos/evidencias vinculados a cada entrega
+   - Adicionar notas/comentarios
+4. O admin ve uma nova aba "Entregas Equipe" ao lado de "Entregas" no Mentoria Skills, com visao somente-leitura de tudo que a equipe preencheu/alterou
 
-3. **Filtro de visibilidade**: o hook `useSkillsEntregas` filtra por `responsavel_id` para membros comuns. Entregas geradas por IA nao tem responsavel, entao ficariam invisiveis.
+## Detalhes Tecnicos
 
-## Dados Atuais
+### 1. Nova tabela: `entregas_equipe_skills`
 
-- `backlog_skills`: 7 projetos gerados (status "levantado")
-- `entregas_skills`: 0 registros (vazio)
-- Kanban: vazio porque le de `entregas_skills`
+Tabela para armazenar os dados preenchidos/editados pela equipe, separados dos dados gerados pelo admin/IA em `entregas_skills`.
 
-## Solucao
+Campos:
+- `id` (uuid, PK)
+- `entrega_id` (uuid, FK -> entregas_skills) -- vinculo com a entrega original
+- `equipe_id` (uuid, FK -> equipes_skills)
+- `editado_por` (uuid) -- quem fez a ultima edicao
+- `titulo_equipe` (text) -- titulo customizado pela equipe (pode diferir do original)
+- `descricao_equipe` (text) -- descricao/notas da equipe
+- `status_equipe` (text) -- status gerenciado pela equipe (pendente, em_andamento, concluido, bloqueado)
+- `prazo_equipe` (date) -- prazo definido pela equipe
+- `responsavel_id` (uuid) -- membro responsavel
+- `prioridade_equipe` (text) -- P1, P2, P3
+- `notas` (text) -- anotacoes/comentarios livres
+- `arquivos` (jsonb) -- array de URLs de arquivos uploadados [{nome, url, tipo, uploaded_at}]
+- `progresso` (integer, default 0) -- 0-100
+- `created_at` (timestamptz)
+- `updated_at` (timestamptz)
 
-### 1. Kanban deve exibir AMBAS as fontes de dados
+RLS: membros ativos da equipe podem ler e escrever; admin pode ler tudo.
 
-O Kanban do "Projeto Skills > Projetos" passara a exibir os itens do `backlog_skills` integrados com as `entregas_skills`. Projetos do backlog aparecerao na coluna BACKLOG automaticamente, e entregas vinculadas aparecerao nas demais colunas.
+### 2. Storage bucket: `entregas-equipe-skills`
 
-**Arquivo:** `src/hooks/useSkillsEntregas.ts`
+Bucket privado para uploads de arquivos/evidencias das entregas da equipe.
 
-- Alem de buscar `entregas_skills`, buscar tambem `backlog_skills` da equipe
-- Projetos do backlog que ainda nao tem entregas vinculadas aparecem na coluna BACKLOG como cards
-- Quando um projeto tem entregas, as entregas sao exibidas normalmente nas colunas correspondentes
-- Para admin/lider: ver todos os itens da equipe
-- Para membro: ver itens onde e responsavel OU itens sem responsavel (para poder "pegar" tarefas)
+### 3. Nova rota: `/skills/projeto/entregas`
 
-### 2. Atualizar o Kanban para suportar itens do backlog
+**Arquivo novo:** `src/pages/skills/ProjetoSkillsEntregasPage.tsx`
 
-**Arquivo:** `src/components/skills/ProjetoSkillsKanban.tsx`
+Pagina com:
+- Lista de entregas (lidas de `entregas_skills` + join com `entregas_equipe_skills`)
+- Botao "Nova Entrega" para criar entregas manuais da equipe
+- Cada card/linha e clicavel para abrir modal de edicao
+- Modal com campos: titulo, descricao, responsavel, prazo, status, prioridade, notas, upload de arquivos
 
-- Incluir na coluna BACKLOG os projetos do `backlog_skills` que ainda nao tem entregas
-- Diferenciar visualmente projetos (backlog) de entregas com um badge "Projeto" vs "Entrega"
-- Ao arrastar um projeto do BACKLOG para EM ANDAMENTO, converter automaticamente em entrega no `entregas_skills`
+### 4. Componente principal: `ProjetoSkillsEntregas.tsx`
 
-### 3. Corrigir visibilidade para admin sem equipe
+**Arquivo novo:** `src/components/skills/ProjetoSkillsEntregas.tsx`
 
-**Arquivo:** `src/hooks/useSkillsEntregas.ts`
+Componente que exibe as entregas em formato de lista/cards com:
+- Filtros por status, responsavel, prioridade
+- Cards mostrando titulo, responsavel (avatar), status badge, prazo, progresso
+- Acao de clique para abrir edicao
+- Botao "+" para nova entrega
 
-- Admin com `equipeId` do contexto (seletor de equipe) deve ver todas as entregas da equipe, assim como o lider
-- Remover a restricao de `responsavel_id` quando o usuario e admin ou lider
+### 5. Modal de edicao: `EntregaEquipeModal.tsx`
 
-### 4. Automatizar geracao de entregas apos gerar projetos
+**Arquivo novo:** `src/components/skills/EntregaEquipeModal.tsx`
 
-**Arquivo:** `supabase/functions/gerar-projetos-skills/index.ts`
+Dialog com formulario:
+- Titulo, descricao, notas (textareas)
+- Responsavel (select com membros da equipe)
+- Status (select: pendente, em_andamento, concluido, bloqueado)
+- Prioridade (P1, P2, P3)
+- Prazo (date input)
+- Progresso (slider 0-100)
+- Upload de arquivos (multiplos, salvos no bucket)
+- Botao salvar que grava em `entregas_equipe_skills`
 
-- Apos gerar e salvar os projetos no `backlog_skills`, chamar automaticamente a funcao `gerar-entregas-skills` para criar as entregas correspondentes
-- Isso cria o pipeline completo: diagnostico -> projetos -> entregas, tudo em um clique
+### 6. Hook: `useEntregasEquipe.ts`
 
-### 5. Alternativa simplificada (recomendada)
+**Arquivo novo:** `src/hooks/useEntregasEquipe.ts`
 
-Em vez de manter duas tabelas paralelas no Kanban, a abordagem mais limpa e:
+- Busca entregas da equipe (join `entregas_skills` com `entregas_equipe_skills`)
+- Mutations para criar, atualizar e deletar registros em `entregas_equipe_skills`
+- Upload de arquivos para o bucket
 
-- Ao gerar projetos com IA, criar automaticamente uma entrega basica para cada projeto na `entregas_skills` com `backlog_item_id` preenchido
-- O Kanban continua lendo apenas de `entregas_skills`
-- Cada entrega ja aparece na coluna BACKLOG (status "pendente")
-- Isso elimina a necessidade de ler de duas tabelas
+### 7. Menu sidebar: inserir `projeto_skills_entregas`
 
-**Isso sera feito adicionando ao final da funcao `gerar-projetos-skills`** uma chamada para gerar entregas, ou inserindo entregas basicas diretamente.
+Inserir novo registro na tabela `menu_config`:
+- `menu_key`: `projeto_skills_entregas`
+- `label`: "Entregas"
+- `parent_key`: `projeto_skills`
+- `url`: `/skills/projeto/entregas`
+- `icon`: `Package`
+- `ordem`: 5 (apos Projetos que e 4)
+- `planos_permitidos`: `["skills"]`
 
-## Plano de Implementacao
+Atualizar `useMenuConfig.tsx` para incluir `projeto_skills_entregas` nas listas de menus ocultos por ambiente (business, academy, gratuito, business_iaplicada).
 
-### Passo 1 — Atualizar `gerar-projetos-skills` para criar entregas automaticamente
+### 8. Rota no App.tsx
 
-Apos inserir os projetos no `backlog_skills`, inserir tambem uma entrega basica em `entregas_skills` para cada projeto:
-
-```text
-Para cada projeto gerado:
-  -> Inserir em backlog_skills (como hoje)
-  -> Inserir em entregas_skills com:
-     - equipe_id
-     - backlog_item_id = projeto.id
-     - titulo = projeto.titulo
-     - descricao = projeto.descricao
-     - status = "pendente"
-     - prioridade = mapear alta->P1, media->P2, baixa->P3
-     - economia_horas_semana = projeto.horas_estimadas_economia
+Adicionar:
+```
+<Route path="/skills/projeto/entregas" element={<SkillsAdminTeamProvider><ProjetoSkillsEntregasPage /></SkillsAdminTeamProvider>} />
 ```
 
-### Passo 2 — Corrigir `useSkillsEntregas` para admin
+### 9. Aba "Entregas Equipe" no Admin
 
-Quando o usuario e admin com `equipeId` selecionado via contexto, buscar todas as entregas da equipe (mesmo comportamento do lider).
+**Arquivo novo:** `src/components/admin/skills/SkillsEntregasEquipeTab.tsx`
 
-### Passo 3 — Criar entregas para projetos ja existentes
+Componente read-only que exibe tudo que a equipe preencheu em `entregas_equipe_skills`:
+- Tabela com titulo, responsavel, status, prazo, progresso, notas, arquivos
+- Badges de status e prioridade
+- Links para download de arquivos
+- Sem edicao (somente visualizacao para o admin)
 
-Como ja existem 7 projetos no backlog sem entregas correspondentes, o botao "Gerar Entregas com IA" na aba Entregas do admin ja resolve isso. Porem, tambem adicionarei um botao direto no Kanban para o admin/lider poder regenerar.
+Atualizar `MentoriaSkillsPage.tsx` para adicionar a nova aba ao lado de "Entregas".
 
-## Arquivos Modificados
+## Arquivos
 
-- `supabase/functions/gerar-projetos-skills/index.ts` — adicionar criacao automatica de entregas apos gerar projetos
-- `src/hooks/useSkillsEntregas.ts` — corrigir query para admin com equipe selecionada
-- `src/components/skills/ProjetoSkillsKanban.tsx` — adicionar botao "Gerar Entregas" quando Kanban vazio e existem projetos no backlog
+**Novos:**
+- `src/pages/skills/ProjetoSkillsEntregasPage.tsx` -- pagina da rota
+- `src/components/skills/ProjetoSkillsEntregas.tsx` -- componente principal
+- `src/components/skills/EntregaEquipeModal.tsx` -- modal de edicao
+- `src/hooks/useEntregasEquipe.ts` -- hook de dados
+- `src/components/admin/skills/SkillsEntregasEquipeTab.tsx` -- aba admin
 
-## Resultado Esperado
+**Modificados:**
+- `src/App.tsx` -- nova rota
+- `src/hooks/useMenuConfig.tsx` -- incluir novo menu nas listas de ocultos
+- `src/pages/admin/mentoria/MentoriaSkillsPage.tsx` -- adicionar aba "Entregas Equipe"
 
-- Ao gerar projetos com IA, as entregas ja aparecem automaticamente no Kanban
-- Admin vendo uma equipe consegue ver todas as entregas no Kanban
-- Projetos existentes podem ser convertidos em entregas pelo botao "Gerar Entregas com IA"
+**Migracao SQL:**
+- Criar tabela `entregas_equipe_skills` com RLS
+- Criar bucket `entregas-equipe-skills`
+- Inserir registro em `menu_config` para o submenu
