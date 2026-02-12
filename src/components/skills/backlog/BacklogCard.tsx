@@ -1,0 +1,82 @@
+import { useDraggable } from "@dnd-kit/core";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Clock, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { BacklogItem } from "@/hooks/useSkillsBacklog";
+
+const prioridadeCores: Record<string, string> = {
+  alta: "bg-red-500/15 text-red-700 border-red-200",
+  media: "bg-yellow-500/15 text-yellow-700 border-yellow-200",
+  baixa: "bg-green-500/15 text-green-700 border-green-200",
+};
+
+interface BacklogCardProps {
+  item: BacklogItem;
+  onClick: () => void;
+}
+
+export default function BacklogCard({ item, onClick }: BacklogCardProps) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: item.id,
+  });
+
+  const style = transform
+    ? { transform: `translate(${transform.x}px, ${transform.y}px)`, zIndex: 50 }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      onClick={onClick}
+      className={cn(
+        "rounded-lg border bg-background p-3 cursor-pointer hover:shadow-md transition-shadow space-y-2",
+        isDragging && "opacity-60 shadow-lg"
+      )}
+    >
+      <h4 className="text-sm font-semibold leading-tight line-clamp-2">{item.titulo}</h4>
+
+      {item.descricao && (
+        <p className="text-xs text-muted-foreground line-clamp-2">{item.descricao}</p>
+      )}
+
+      <div className="flex flex-wrap gap-1.5">
+        {item.prioridade && (
+          <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", prioridadeCores[item.prioridade])}>
+            {item.prioridade.toUpperCase()}
+          </Badge>
+        )}
+        {item.area_impactada && (
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+            {item.area_impactada}
+          </Badge>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          {item.horas_estimadas_economia != null && (
+            <>
+              <Clock className="h-3 w-3" />
+              <span>{item.horas_estimadas_economia}h/sem</span>
+            </>
+          )}
+        </div>
+
+        {item.origem === "ia" && <Zap className="h-3 w-3 text-amber-500" />}
+
+        {item.responsavel && (
+          <Avatar className="h-5 w-5">
+            <AvatarImage src={item.responsavel.avatar_url || ""} />
+            <AvatarFallback className="text-[8px]">
+              {item.responsavel.nome?.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        )}
+      </div>
+    </div>
+  );
+}

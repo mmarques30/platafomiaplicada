@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
-import ProjetoSkillsKanban from "@/components/skills/ProjetoSkillsKanban";
+import BacklogView from "@/components/skills/backlog/BacklogView";
 
 export default function ProjetoSkillsProjetosPage() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function ProjetoSkillsProjetosPage() {
   return (
     <div className="space-y-6 p-4 md:p-6">
       <PageTitle primary="Projeto" secondary="Skills" />
-      <ProjetoSkillsKanban />
+      <BacklogView />
     </div>
   );
 }
