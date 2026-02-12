@@ -6,6 +6,60 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function balancearResponsaveis(itens: any[], membrosInfo: any[]) {
+  const membrosIds = membrosInfo.map((m: any) => m.user_id);
+  if (membrosIds.length === 0) return itens;
+  
+  const maxPorMembro = Math.ceil(itens.length / membrosIds.length);
+  const contagem: Record<string, number> = {};
+  membrosIds.forEach((id: string) => contagem[id] = 0);
+
+  itens.forEach((item: any) => {
+    if (item.responsavel_id && contagem[item.responsavel_id] !== undefined) {
+      contagem[item.responsavel_id]++;
+    }
+  });
+
+  for (const item of itens) {
+    if (item.responsavel_id && (contagem[item.responsavel_id] || 0) > maxPorMembro) {
+      const membroMenosOcupado = membrosIds
+        .filter((id: string) => (contagem[id] || 0) < maxPorMembro)
+        .sort((a: string, b: string) => (contagem[a] || 0) - (contagem[b] || 0))[0];
+      if (membroMenosOcupado) {
+        contagem[item.responsavel_id]--;
+        item.responsavel_id = membroMenosOcupado;
+        contagem[membroMenosOcupado] = (contagem[membroMenosOcupado] || 0) + 1;
+      }
+    }
+  }
+
+  for (const id of membrosIds) {
+    if ((contagem[id] || 0) === 0) {
+      const membroMaisOcupado = [...membrosIds]
+        .sort((a: string, b: string) => (contagem[b] || 0) - (contagem[a] || 0))[0];
+      if ((contagem[membroMaisOcupado] || 0) > 1) {
+        const itemParaReatribuir = itens.find((i: any) => i.responsavel_id === membroMaisOcupado);
+        if (itemParaReatribuir) {
+          contagem[membroMaisOcupado]--;
+          itemParaReatribuir.responsavel_id = id;
+          contagem[id] = 1;
+        }
+      }
+    }
+  }
+
+  for (const item of itens) {
+    if (!item.responsavel_id || !membrosIds.includes(item.responsavel_id)) {
+      const membroMenosOcupado = [...membrosIds]
+        .sort((a: string, b: string) => (contagem[a] || 0) - (contagem[b] || 0))[0];
+      item.responsavel_id = membroMenosOcupado;
+      contagem[membroMenosOcupado] = (contagem[membroMenosOcupado] || 0) + 1;
+    }
+  }
+
+  return itens;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -186,7 +240,7 @@ Foque em entregas práticas, granulares e acionáveis que representem etapas rea
     };
 
     const now = new Date();
-    const entregasToInsert = entregas.map((e: any) => {
+    let entregasToInsert = entregas.map((e: any) => {
       const matchKey = Object.keys(projetoMap).find(
         (k) => e.projeto_titulo?.toLowerCase().trim().includes(k) || k.includes(e.projeto_titulo?.toLowerCase().trim())
       );
@@ -208,6 +262,9 @@ Foque em entregas práticas, granulares e acionáveis que representem etapas rea
         responsavel_id: findUserId(e.responsavel_nome),
       };
     });
+
+    // Balance distribution across all members
+    entregasToInsert = balancearResponsaveis(entregasToInsert, membrosInfo);
 
     const { error: insertError } = await supabase.from("entregas_skills").insert(entregasToInsert);
     if (insertError) throw insertError;

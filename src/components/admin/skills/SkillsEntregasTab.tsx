@@ -53,6 +53,7 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
   const [form, setForm] = useState(emptyForm);
   const [generating, setGenerating] = useState(false);
   const [associating, setAssociating] = useState(false);
+  const [redistributing, setRedistributing] = useState(false);
 
   // Check if backlog has projects
   const { data: backlogCount } = useQuery({
@@ -144,6 +145,25 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
 
   const itensSemResponsavel = (entregas || []).filter((e: any) => !e.responsavel_id).length;
 
+  const handleRedistribuir = async () => {
+    setRedistributing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("associar-membros-skills", {
+        body: { equipe_id: equipeId, force: true },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`${data.associados} itens redistribuídos com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: ["admin-entregas-skills", equipeId] });
+      queryClient.invalidateQueries({ queryKey: ["backlog-skills", equipeId] });
+    } catch (err: any) {
+      console.error("Erro ao redistribuir:", err);
+      toast.error(err.message || "Erro ao redistribuir membros");
+    } finally {
+      setRedistributing(false);
+    }
+  };
+
   const statusBadge = (status: string) => {
     switch (status) {
       case "concluido": return <Badge className="bg-emerald-100 text-emerald-700 border-transparent">Concluído</Badge>;
@@ -172,6 +192,16 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
           )}
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleRedistribuir}
+            disabled={redistributing || !entregas?.length}
+            className="gap-1.5"
+          >
+            {redistributing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Users className="h-3.5 w-3.5" />}
+            {redistributing ? "Redistribuindo..." : "Redistribuir Membros"}
+          </Button>
           {itensSemResponsavel > 0 && (
             <Button
               size="sm"
