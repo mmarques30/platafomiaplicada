@@ -1,87 +1,104 @@
 
+# Conectar Projetos Mapeados ao Kanban do Skills
 
-# Gerar Entregas com IA a partir dos Projetos Mapeados
+## Problema
 
-## Objetivo
+Existem dois desconectamentos no fluxo atual:
 
-Criar um botao "Gerar Entregas com IA" na aba Entregas do Mentoria Skills que analisa os projetos do `backlog_skills` e gera automaticamente entregas detalhadas na tabela `entregas_skills`, permitindo que a equipe comece a executar os projetos imediatamente.
+1. **Projetos gerados pela IA ficam apenas no `backlog_skills`** (tabela de projetos mapeados), mas o Kanban na pagina "Projetos" do usuario le apenas da tabela `entregas_skills` (que esta vazia).
 
-## Como vai funcionar
+2. **Nao ha pipeline automatico**: gerar projetos com IA popula `backlog_skills`, mas nada cria automaticamente as entradas em `entregas_skills` que alimentam o Kanban.
 
-1. O admin seleciona uma equipe e vai na aba "Entregas"
-2. Clica em "Gerar Entregas com IA"
-3. A IA analisa todos os projetos mapeados (backlog_skills) da equipe
-4. Para cada projeto, a IA gera 1 a 3 entregas praticas com titulo, descricao, instrucoes, tipo, prioridade, economia estimada e prazo sugerido
-5. As entregas sao salvas na tabela `entregas_skills` vinculadas ao projeto de origem (`backlog_item_id`)
-6. A lista de entregas e atualizada automaticamente
+3. **Filtro de visibilidade**: o hook `useSkillsEntregas` filtra por `responsavel_id` para membros comuns. Entregas geradas por IA nao tem responsavel, entao ficariam invisiveis.
 
-## Solucao Tecnica
+## Dados Atuais
 
-### 1. Nova Edge Function: `gerar-entregas-skills`
+- `backlog_skills`: 7 projetos gerados (status "levantado")
+- `entregas_skills`: 0 registros (vazio)
+- Kanban: vazio porque le de `entregas_skills`
 
-**Arquivo:** `supabase/functions/gerar-entregas-skills/index.ts`
+## Solucao
 
-Logica:
-- Recebe `equipe_id`
-- Busca projetos do `backlog_skills` da equipe
-- Busca membros da equipe (`membros_equipe_skills`) para distribuir responsaveis
-- Envia para a IA (Lovable AI Gateway, modelo `google/gemini-2.5-flash`) pedindo entregas praticas
-- Usa tool calling para estruturar a resposta com campos: titulo, descricao, instrucoes, tipo (individual/colaborativo/sistema), prioridade (P1/P2/P3), economia_horas_semana, prazo_dias
-- Insere as entregas na tabela `entregas_skills` com `backlog_item_id` preenchido, status "pendente"
-- Retorna quantidade de entregas criadas
+### 1. Kanban deve exibir AMBAS as fontes de dados
 
-Campos da entrega gerada:
-- `equipe_id` — da equipe
-- `backlog_item_id` — vinculo com o projeto de origem
-- `titulo` — titulo da entrega
-- `descricao` — o que precisa ser feito
-- `instrucoes` — passo a passo detalhado
-- `tipo` — individual, colaborativo ou sistema
-- `prioridade` — P1, P2 ou P3
-- `economia_horas_semana` — estimativa de horas economizadas
-- `status` — "pendente"
-- `prazo` — data calculada (hoje + prazo_dias sugerido pela IA)
+O Kanban do "Projeto Skills > Projetos" passara a exibir os itens do `backlog_skills` integrados com as `entregas_skills`. Projetos do backlog aparecerao na coluna BACKLOG automaticamente, e entregas vinculadas aparecerao nas demais colunas.
 
-### 2. Atualizar `SkillsEntregasTab.tsx`
+**Arquivo:** `src/hooks/useSkillsEntregas.ts`
 
-**Arquivo:** `src/components/admin/skills/SkillsEntregasTab.tsx`
+- Alem de buscar `entregas_skills`, buscar tambem `backlog_skills` da equipe
+- Projetos do backlog que ainda nao tem entregas vinculadas aparecem na coluna BACKLOG como cards
+- Quando um projeto tem entregas, as entregas sao exibidas normalmente nas colunas correspondentes
+- Para admin/lider: ver todos os itens da equipe
+- Para membro: ver itens onde e responsavel OU itens sem responsavel (para poder "pegar" tarefas)
 
-Adicionar:
-- Botao "Gerar Entregas com IA" ao lado do "Nova Entrega"
-- Verificacao de pre-requisito: so habilitar se existirem projetos no backlog
-- Indicador de status (quantos projetos existem)
-- Estado de loading durante a geracao
-- Invalidacao do cache apos sucesso
+### 2. Atualizar o Kanban para suportar itens do backlog
 
-### 3. Registrar no `config.toml`
+**Arquivo:** `src/components/skills/ProjetoSkillsKanban.tsx`
 
-Adicionar a nova funcao `gerar-entregas-skills` com `verify_jwt = false`.
+- Incluir na coluna BACKLOG os projetos do `backlog_skills` que ainda nao tem entregas
+- Diferenciar visualmente projetos (backlog) de entregas com um badge "Projeto" vs "Entrega"
+- Ao arrastar um projeto do BACKLOG para EM ANDAMENTO, converter automaticamente em entrega no `entregas_skills`
 
-## Fluxo da IA
+### 3. Corrigir visibilidade para admin sem equipe
+
+**Arquivo:** `src/hooks/useSkillsEntregas.ts`
+
+- Admin com `equipeId` do contexto (seletor de equipe) deve ver todas as entregas da equipe, assim como o lider
+- Remover a restricao de `responsavel_id` quando o usuario e admin ou lider
+
+### 4. Automatizar geracao de entregas apos gerar projetos
+
+**Arquivo:** `supabase/functions/gerar-projetos-skills/index.ts`
+
+- Apos gerar e salvar os projetos no `backlog_skills`, chamar automaticamente a funcao `gerar-entregas-skills` para criar as entregas correspondentes
+- Isso cria o pipeline completo: diagnostico -> projetos -> entregas, tudo em um clique
+
+### 5. Alternativa simplificada (recomendada)
+
+Em vez de manter duas tabelas paralelas no Kanban, a abordagem mais limpa e:
+
+- Ao gerar projetos com IA, criar automaticamente uma entrega basica para cada projeto na `entregas_skills` com `backlog_item_id` preenchido
+- O Kanban continua lendo apenas de `entregas_skills`
+- Cada entrega ja aparece na coluna BACKLOG (status "pendente")
+- Isso elimina a necessidade de ler de duas tabelas
+
+**Isso sera feito adicionando ao final da funcao `gerar-projetos-skills`** uma chamada para gerar entregas, ou inserindo entregas basicas diretamente.
+
+## Plano de Implementacao
+
+### Passo 1 — Atualizar `gerar-projetos-skills` para criar entregas automaticamente
+
+Apos inserir os projetos no `backlog_skills`, inserir tambem uma entrega basica em `entregas_skills` para cada projeto:
 
 ```text
-Entrada para a IA:
-  - Lista de projetos (titulo, descricao, area_impactada, prioridade, horas_estimadas)
-  - Lista de membros da equipe (nome, cargo)
-
-Saida esperada (via tool calling):
-  - Array de entregas, cada uma com:
-    - projeto_titulo (para vincular)
-    - titulo da entrega
-    - descricao
-    - instrucoes (passo a passo)
-    - tipo: individual | colaborativo | sistema
-    - prioridade: P1 | P2 | P3
-    - economia_horas_semana: number
-    - prazo_dias: number (dias a partir de hoje)
+Para cada projeto gerado:
+  -> Inserir em backlog_skills (como hoje)
+  -> Inserir em entregas_skills com:
+     - equipe_id
+     - backlog_item_id = projeto.id
+     - titulo = projeto.titulo
+     - descricao = projeto.descricao
+     - status = "pendente"
+     - prioridade = mapear alta->P1, media->P2, baixa->P3
+     - economia_horas_semana = projeto.horas_estimadas_economia
 ```
 
-## Arquivos
+### Passo 2 — Corrigir `useSkillsEntregas` para admin
 
-**Novos:**
-- `supabase/functions/gerar-entregas-skills/index.ts`
+Quando o usuario e admin com `equipeId` selecionado via contexto, buscar todas as entregas da equipe (mesmo comportamento do lider).
 
-**Modificados:**
-- `src/components/admin/skills/SkillsEntregasTab.tsx` — botao + logica de geracao
-- `supabase/config.toml` — registrar nova funcao
+### Passo 3 — Criar entregas para projetos ja existentes
 
+Como ja existem 7 projetos no backlog sem entregas correspondentes, o botao "Gerar Entregas com IA" na aba Entregas do admin ja resolve isso. Porem, tambem adicionarei um botao direto no Kanban para o admin/lider poder regenerar.
+
+## Arquivos Modificados
+
+- `supabase/functions/gerar-projetos-skills/index.ts` — adicionar criacao automatica de entregas apos gerar projetos
+- `src/hooks/useSkillsEntregas.ts` — corrigir query para admin com equipe selecionada
+- `src/components/skills/ProjetoSkillsKanban.tsx` — adicionar botao "Gerar Entregas" quando Kanban vazio e existem projetos no backlog
+
+## Resultado Esperado
+
+- Ao gerar projetos com IA, as entregas ja aparecem automaticamente no Kanban
+- Admin vendo uma equipe consegue ver todas as entregas no Kanban
+- Projetos existentes podem ser convertidos em entregas pelo botao "Gerar Entregas com IA"
