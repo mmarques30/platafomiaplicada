@@ -23,7 +23,6 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Fetch all relevant data in parallel
     const [equipeRes, backlogRes, entregasRes] = await Promise.all([
       supabase.from("equipes_skills").select("*").eq("id", equipe_id).single(),
       supabase.from("backlog_skills").select("*").eq("equipe_id", equipe_id).neq("status", "descartado"),
@@ -40,74 +39,102 @@ serve(async (req) => {
     const custoHora = equipe.custo_hora_padrao || 60;
     const dataInicio = new Date(equipe.data_inicio || equipe.created_at);
 
-    // Helper: add weeks to a date
     const addWeeks = (date: Date, weeks: number): Date => {
       const result = new Date(date);
       result.setDate(result.getDate() + weeks * 7);
       return result;
     };
 
-    // Calculate total projected economy for ROI target
-    const economiaTotal = entregas.reduce((a: number, e: any) => a + (e.economia_horas_semana || 0) * 4, 0);
-    const roiAlvo = investimento > 0 ? (economiaTotal * custoHora / investimento) * 100 : 100;
+    // Total de projetos no backlog (todos, não apenas concluídos)
+    const totalProjetos = backlog.length;
 
-    // Build 12 weeks of deterministic metrics
+    // Economia total estimada (para ROI quando investimento = 0)
+    const economiaTotal = entregas.reduce((a: number, e: any) => a + (e.economia_horas_semana || 0) * 4, 0);
+    const economiaTotalReais = economiaTotal * custoHora;
+
     const rows = [];
+    let horasAcumuladas = 0;
+
     for (let semana = 1; semana <= 12; semana++) {
+      const inicioSemana = addWeeks(dataInicio, semana - 1);
       const fimSemana = addWeeks(dataInicio, semana);
 
-      // Entregas planejadas: those with prazo <= end of this week (cumulative)
-      const planejadas = entregas.filter((e: any) => {
+      // Entregas planejadas NESTA semana (não acumulado)
+      const entregasDaSemana = entregas.filter((e: any) => {
         if (!e.prazo) return false;
-        return new Date(e.prazo) <= fimSemana;
-      }).length;
+        const prazo = new Date(e.prazo);
+        return prazo >= inicioSemana && prazo < fimSemana;
+      });
+      const planejadas = entregasDaSemana.length;
 
-      // Entregas concluídas: those with concluido_em <= end of this week (cumulative)
-      const concluidas = entregas.filter((e: any) => {
+      // Entregas concluídas NESTA semana (não acumulado)
+      const concluidasNaSemana = entregas.filter((e: any) => {
         if (!e.concluido_em) return false;
-        return new Date(e.concluido_em) <= fimSemana;
-      }).length;
+        const concluido = new Date(e.concluido_em);
+        return concluido >= inicioSemana && concluido < fimSemana;
+      });
+      const concluidas = concluidasNaSemana.length;
 
-      // Horas economizadas: sum of economia_horas_semana for concluded deliveries (cumulative)
-      const horasEconomizadas = entregas
-        .filter((e: any) => e.concluido_em && new Date(e.concluido_em) <= fimSemana)
-        .reduce((acc: number, e: any) => acc + (e.economia_horas_semana || 0), 0);
+      // Horas economizadas NESTA semana (baseado nas entregas planejadas para esta semana)
+      const horasSemana = entregasDaSemana.reduce(
+        (acc: number, e: any) => acc + (e.economia_horas_semana || 0), 0
+      );
+      horasAcumuladas += horasSemana;
 
-      // Projetos concluídos from backlog (simple count, same across weeks for now)
-      const projetosConcluidos = backlog.filter((p: any) => p.status === "concluido").length;
+      // Projetos distribuídos progressivamente ao longo das 12 semanas
+      const projetosNaSemana = Math.round(totalProjetos * semana / 12);
 
-      // ROI projetado: progressive distribution toward target
-      const roiProjetado = Math.round((roiAlvo * (semana / 12)) * 100) / 100;
+      // ROI projetado: distribuição progressiva
+      let roiProjetado: number;
+      if (investimento > 0) {
+        const roiAlvo = (economiaTotalReais / investimento) * 100;
+        roiProjetado = Math.round((roiAlvo * (semana / 12)) * 100) / 100;
+      } else {
+        // Sem investimento: usar % da economia total estimada como referência
+        roiProjetado = Math.round((semana / 12) * 100 * 100) / 100;
+      }
 
-      // ROI executado: based on real concluded deliveries
-      const economiaReal = horasEconomizadas * custoHora;
-      const roiExecutado = investimento > 0 ? Math.round((economiaReal / investimento) * 100 * 100) / 100 : 0;
+      // ROI executado: baseado em economia real acumulada
+      const economiaRealAcumulada = horasAcumuladas * custoHora;
+      let roiExecutado: number;
+      if (investimento > 0) {
+        roiExecutado = Math.round((economiaRealAcumulada / investimento) * 100 * 100) / 100;
+      } else {
+        // Sem investimento: % da economia alcançada vs estimada
+        roiExecutado = economiaTotalReais > 0
+          ? Math.round((economiaRealAcumulada / economiaTotalReais) * 100 * 100) / 100
+          : 0;
+      }
 
-      // Índice de maturidade: progressive estimate (15% to 90%)
-      const indiceMaturidade = Math.round(15 + (75 * (semana / 12) * (0.5 + 0.5 * (concluidas / Math.max(planejadas, 1)))));
-
-      // Engajamento trilhas: based on delivery progress
+      // Índice de maturidade progressivo
       const totalEntregas = entregas.length;
+      const totalConcluidasAteAgora = entregas.filter((e: any) =>
+        e.concluido_em && new Date(e.concluido_em) < fimSemana
+      ).length;
+      const taxaConclusao = totalEntregas > 0 ? totalConcluidasAteAgora / totalEntregas : 0;
+      const indiceMaturidade = Math.round(15 + (75 * (semana / 12) * (0.5 + 0.5 * taxaConclusao)));
+
+      // Engajamento trilhas
       const entregasEmAndamento = entregas.filter((e: any) => e.status === "em_andamento").length;
       const engajamento = totalEntregas > 0
-        ? Math.round(((concluidas + entregasEmAndamento * 0.5) / totalEntregas) * 100 * (semana / 12))
+        ? Math.round(((totalConcluidasAteAgora + entregasEmAndamento * 0.5) / totalEntregas) * 100 * (semana / 12))
         : Math.round(20 + 60 * (semana / 12));
 
       rows.push({
         equipe_id,
         semana,
-        horas_economizadas: Math.round(horasEconomizadas * 100) / 100,
-        projetos_concluidos: projetosConcluidos,
+        horas_economizadas: Math.round(horasSemana * 100) / 100,
+        projetos_concluidos: projetosNaSemana,
         entregas_concluidas: concluidas,
         entregas_planejadas: planejadas,
         indice_maturidade: Math.min(indiceMaturidade, 100),
         roi_projetado: roiProjetado,
-        roi_executado: Math.min(roiExecutado, roiProjetado), // never exceed projected
+        roi_executado: Math.min(roiExecutado, roiProjetado),
         engajamento_trilhas: Math.min(engajamento, 100),
       });
     }
 
-    // Delete existing metrics and insert new ones
+    // Delete existing and insert new
     const { error: deleteError } = await supabase
       .from("metricas_skills")
       .delete()
