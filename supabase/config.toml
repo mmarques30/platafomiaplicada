@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.gerar-entregas-skills]
 verify_jwt = false
+
+[functions.associar-membros-skills]
+verify_jwt = false

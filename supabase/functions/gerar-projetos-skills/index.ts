@@ -27,12 +27,42 @@ serve(async (req) => {
     const { data: diagnosticos } = await supabase.from("diagnosticos_skills").select("*").eq("equipe_id", equipe_id).eq("completado", true);
     if (!diagnosticos?.length) return new Response(JSON.stringify({ error: "Nenhum diagnóstico preenchido" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
+    // Buscar membros para associação
+    const { data: membros } = await supabase
+      .from("membros_equipe_skills")
+      .select("user_id, papel, profiles(nome_completo, cargo)")
+      .eq("equipe_id", equipe_id)
+      .eq("status", "ativo");
+
+    const membrosInfo = (membros || []).map((m: any) => {
+      const diag = diagnosticos.find((d: any) => d.user_id === m.user_id);
+      return {
+        user_id: m.user_id,
+        nome: (m.profiles as any)?.nome_completo || "Membro",
+        cargo: (m.profiles as any)?.cargo || m.papel || "Colaborador",
+        area: diag?.area_atuacao || "",
+        processos: diag?.processos_detalhados || diag?.tarefas_manuais || [],
+        gargalos: diag?.gargalos_identificados || [],
+      };
+    });
+
     const resumo = diagnosticos.map(d => ({
       processos: d.processos_detalhados || d.tarefas_manuais,
       gargalos: d.gargalos_identificados,
       economia: d.economia_horas_semana,
       area: d.area_atuacao,
     }));
+
+    const membrosTexto = membrosInfo.map((m: any) =>
+      `- ${m.nome} (${m.cargo}, Área: ${m.area}) | Processos: ${JSON.stringify(m.processos)}`
+    ).join("\n");
+
+    const systemPrompt = `Analise os diagnósticos de uma equipe e sugira projetos colaborativos de automação com IA. Retorne usando a função fornecida.
+
+MEMBROS DA EQUIPE:
+${membrosTexto}
+
+Para cada projeto, atribua um responsavel_nome (nome EXATO de um dos membros acima) com base na relevância do projeto para a área e processos do membro.`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -41,7 +71,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "Analise os diagnósticos de uma equipe e sugira projetos colaborativos de automação com IA. Retorne usando a função fornecida." },
+          { role: "system", content: systemPrompt },
           { role: "user", content: JSON.stringify(resumo) }
         ],
         tools: [{
@@ -61,9 +91,10 @@ serve(async (req) => {
                       descricao: { type: "string" },
                       area_impactada: { type: "string" },
                       horas_estimadas_economia: { type: "number" },
-                      prioridade: { type: "string", enum: ["alta", "media", "baixa"] }
+                      prioridade: { type: "string", enum: ["alta", "media", "baixa"] },
+                      responsavel_nome: { type: "string" },
                     },
-                    required: ["titulo", "descricao", "prioridade"]
+                    required: ["titulo", "descricao", "prioridade", "responsavel_nome"]
                   }
                 }
               },
@@ -82,6 +113,20 @@ serve(async (req) => {
 
     const { projetos } = JSON.parse(toolCall.function.arguments);
 
+    // Mapear nomes para user_ids
+    const nomeToId: Record<string, string> = {};
+    for (const m of membrosInfo) {
+      nomeToId[m.nome.toLowerCase().trim()] = m.user_id;
+    }
+
+    const findUserId = (nome: string): string | null => {
+      if (!nome) return null;
+      const key = Object.keys(nomeToId).find(
+        (k) => nome.toLowerCase().trim().includes(k) || k.includes(nome.toLowerCase().trim())
+      );
+      return key ? nomeToId[key] : null;
+    };
+
     const inserts = projetos.map((p: any, i: number) => ({
       equipe_id,
       titulo: p.titulo,
@@ -92,12 +137,13 @@ serve(async (req) => {
       status: "levantado",
       origem: "ia",
       ordem: i,
+      responsavel_id: findUserId(p.responsavel_nome),
     }));
 
     const { data: insertedProjetos, error: insertError } = await supabase
       .from("backlog_skills")
       .insert(inserts)
-      .select("id, titulo, descricao, prioridade, horas_estimadas_economia");
+      .select("id, titulo, descricao, prioridade, horas_estimadas_economia, responsavel_id");
     if (insertError) throw new Error("Erro ao salvar projetos: " + insertError.message);
 
     // Criar entregas automaticamente para cada projeto gerado
@@ -110,6 +156,7 @@ serve(async (req) => {
         status: "pendente",
         prioridade: mapPrioridade(p.prioridade || "media"),
         economia_horas_semana: p.horas_estimadas_economia || null,
+        responsavel_id: p.responsavel_id || null,
       }));
 
       const { error: entregasError } = await supabase
@@ -118,7 +165,6 @@ serve(async (req) => {
       
       if (entregasError) {
         console.error("Erro ao criar entregas automáticas:", entregasError.message);
-        // Não falha a operação principal, projetos já foram salvos
       }
     }
 
