@@ -1,76 +1,127 @@
 
 
-# Ver Backlog de Projetos na Pagina de Projetos (Kanban + Tabela + Detalhamento)
+# Corrigir Distribuicao de Entregas e Projetos entre Membros
 
-## Problema Atual
+## Problema
 
-A pagina de Projetos (`/skills/projeto/projetos`) mostra o Kanban das **entregas** (tabela `entregas_skills`), mas o usuario quer ver o **backlog de projetos** (tabela `backlog_skills`). Alem disso, ao clicar em um card/linha, deve abrir um modal com o detalhamento completo do projeto.
+Todos os projetos (backlog_skills) e entregas (entregas_skills) estao atribuidos exclusivamente ao Erich. Os demais membros (Antonio, Livia, Lucio) nao tem nenhum projeto ou entrega atribuida, apesar de terem diagnosticos completos.
 
-## Dados Disponiveis no Backlog
-
-Cada projeto em `backlog_skills` tem:
-- titulo, descricao, area_impactada
-- status (levantado, em_andamento, concluido, descartado)
-- prioridade (alta, media, baixa)
-- responsavel_id (FK para profiles)
-- horas_estimadas_economia
-- tags (array), origem (ia/manual)
+**Causa raiz**: As edge functions `gerar-projetos-skills` e `gerar-entregas-skills` dependem da IA para distribuir responsaveis, mas a IA ignora as instrucoes de distribuicao e concentra tudo em um unico membro. Alem disso, a funcao `associar-membros-skills` so reatribui itens SEM responsavel (IS NULL), entao nao corrige itens ja atribuidos incorretamente.
 
 ## Solucao
 
-### 1. Criar toggle Kanban / Tabela
+### 1. Adicionar validacao pos-IA nas edge functions
 
-Adicionar botoes de alternancia (icones LayoutGrid e List) no topo da pagina para trocar entre visualizacao Kanban e Tabela.
+Apos receber a resposta da IA, ambas as functions (`gerar-projetos-skills` e `gerar-entregas-skills`) devem validar a distribuicao e redistribuir automaticamente se um membro tiver mais que sua cota justa.
 
-### 2. Criar componente `BacklogKanban`
+**Logica de redistribuicao**:
+- Calcular cota maxima por membro: `Math.ceil(totalItens / totalMembros)`
+- Se um membro exceder a cota, redistribuir o excesso para membros com menos atribuicoes
+- Priorizar membros cuja area/processos tenham relacao com o projeto
 
-Novo Kanban alimentado por `backlog_skills` ao inves de `entregas_skills`:
-- Colunas: LEVANTADO, EM ANDAMENTO, CONCLUIDO
-- Cards mostram: titulo, descricao truncada, area_impactada, prioridade, responsavel, horas estimadas
-- Drag-and-drop para mudar status
-- Ao clicar no card, abre modal de detalhes
+### 2. Corrigir `associar-membros-skills`
 
-### 3. Criar componente `BacklogTable`
+Remover o filtro `.is("responsavel_id", null)` e permitir que a funcao re-associe TODOS os itens, nao apenas os sem responsavel. Adicionar um parametro `force` para forcar redistribuicao.
 
-Tabela com as colunas: Titulo, Area, Status, Prioridade, Responsavel, Economia (h/sem)
-- Clique na linha abre o mesmo modal de detalhes
-- Ordenacao por colunas
+### 3. Corrigir dados atuais
 
-### 4. Criar componente `ProjetoDetailModal`
+Executar um SQL para limpar os responsaveis atuais dos projetos e entregas, para que a funcao de associacao possa redistribuir corretamente.
 
-Modal (Dialog) que exibe todos os campos do projeto:
-- Titulo e descricao completa
-- Area impactada, prioridade, status
-- Responsavel (avatar + nome)
-- Horas estimadas de economia
-- Tags
-- Origem (IA ou Manual)
-- Lista de entregas vinculadas (de `entregas_skills` filtradas pelo projeto)
+## Detalhes Tecnicos
 
-### 5. Criar hook `useBacklogSkills`
+### Edge Function: `gerar-projetos-skills/index.ts`
 
-Hook dedicado para buscar projetos do backlog com join de responsavel e mutation para atualizar status (drag-and-drop).
+Adicionar funcao de balanceamento apos receber resposta da IA:
 
-### 6. Atualizar `ProjetoSkillsProjetosPage`
+```text
+function balancearResponsaveis(projetos, membrosInfo) {
+  const membrosIds = membrosInfo.map(m => m.user_id);
+  const maxPorMembro = Math.ceil(projetos.length / membrosIds.length);
+  const contagem = {};
+  membrosIds.forEach(id => contagem[id] = 0);
+  
+  // Contar atribuicoes
+  projetos.forEach(p => {
+    if (p.responsavel_id) contagem[p.responsavel_id] = (contagem[p.responsavel_id] || 0) + 1;
+  });
+  
+  // Redistribuir excesso
+  for (const p of projetos) {
+    if (p.responsavel_id && contagem[p.responsavel_id] > maxPorMembro) {
+      // Encontrar membro com menos atribuicoes
+      const membroMenosOcupado = membrosIds
+        .filter(id => (contagem[id] || 0) < maxPorMembro)
+        .sort((a, b) => (contagem[a] || 0) - (contagem[b] || 0))[0];
+      
+      if (membroMenosOcupado) {
+        contagem[p.responsavel_id]--;
+        p.responsavel_id = membroMenosOcupado;
+        contagem[membroMenosOcupado] = (contagem[membroMenosOcupado] || 0) + 1;
+      }
+    }
+  }
+  
+  // Garantir que membros sem atribuicao recebam pelo menos 1
+  for (const id of membrosIds) {
+    if ((contagem[id] || 0) === 0) {
+      const membroMaisOcupado = membrosIds
+        .sort((a, b) => (contagem[b] || 0) - (contagem[a] || 0))[0];
+      if (contagem[membroMaisOcupado] > 1) {
+        const projetoParaReatribuir = projetos.find(p => p.responsavel_id === membroMaisOcupado);
+        if (projetoParaReatribuir) {
+          contagem[membroMaisOcupado]--;
+          projetoParaReatribuir.responsavel_id = id;
+          contagem[id] = 1;
+        }
+      }
+    }
+  }
+  
+  return projetos;
+}
+```
 
-Substituir o componente `ProjetoSkillsKanban` (que mostra entregas) pelo novo componente que mostra o backlog com toggle Kanban/Tabela.
+### Edge Function: `gerar-entregas-skills/index.ts`
 
-## Arquivos
+Mesma logica de balanceamento aplicada apos mapeamento de nomes para user_ids.
 
-**Novos:**
-- `src/components/skills/backlog/BacklogKanban.tsx` -- Kanban board do backlog
-- `src/components/skills/backlog/BacklogTable.tsx` -- Tabela do backlog
-- `src/components/skills/backlog/BacklogCard.tsx` -- Card de projeto para Kanban
-- `src/components/skills/backlog/ProjetoDetailModal.tsx` -- Modal de detalhes do projeto
-- `src/components/skills/backlog/BacklogView.tsx` -- Container com toggle Kanban/Tabela
+### Edge Function: `associar-membros-skills/index.ts`
 
-**Modificados:**
-- `src/pages/skills/ProjetoSkillsProjetosPage.tsx` -- usar BacklogView ao inves de ProjetoSkillsKanban
-- `src/hooks/useSkillsBacklog.ts` -- adicionar mutation de status e buscar responsavel com join correto
+- Adicionar parametro `force: boolean` no body
+- Quando `force = true`, buscar TODOS os itens (remover filtro `.is("responsavel_id", null)`)
+- Adicionar botao "Redistribuir Membros" no admin que chama com `force: true`
+
+### Admin UI: `SkillsEntregasTab.tsx`
+
+- Adicionar botao "Redistribuir" que chama `associar-membros-skills` com `{ force: true }`
+- Mostrar contagem de itens por membro para dar visibilidade
+
+### Correcao imediata dos dados
+
+Executar SQL para limpar responsaveis e permitir redistribuicao:
+
+```text
+-- Limpar responsaveis dos projetos para redistribuicao
+UPDATE backlog_skills SET responsavel_id = NULL WHERE equipe_id = (SELECT id FROM equipes_skills LIMIT 1);
+
+-- Limpar responsaveis das entregas para redistribuicao  
+UPDATE entregas_skills SET responsavel_id = NULL WHERE equipe_id = (SELECT id FROM equipes_skills LIMIT 1);
+```
+
+Depois, clicar "Associar Membros" no admin para redistribuir via IA.
+
+## Arquivos Modificados
+
+- `supabase/functions/gerar-projetos-skills/index.ts` -- adicionar balanceamento pos-IA
+- `supabase/functions/gerar-entregas-skills/index.ts` -- adicionar balanceamento pos-IA
+- `supabase/functions/associar-membros-skills/index.ts` -- suportar parametro `force` para redistribuir todos
+- `src/components/admin/skills/SkillsEntregasTab.tsx` -- botao "Redistribuir Membros"
 
 ## Resultado
 
-- Pagina de Projetos mostra os projetos do backlog (nao entregas)
-- Toggle entre Kanban e Tabela
-- Clicar em qualquer projeto abre modal com todos os detalhes
-- Drag-and-drop no Kanban atualiza status do projeto
+- Projetos e entregas serao distribuidos proporcionalmente entre TODOS os membros
+- Nenhum membro ficara sem atribuicoes
+- Funcao de balanceamento impede que a IA concentre tudo em um unico membro
+- Admin pode forcar redistribuicao a qualquer momento
+- Dados atuais serao corrigidos via limpeza + reassociacao
+
