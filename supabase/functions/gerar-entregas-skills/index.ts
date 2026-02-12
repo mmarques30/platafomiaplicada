@@ -7,22 +7,17 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const { equipe_id } = await req.json();
     if (!equipe_id) {
       return new Response(JSON.stringify({ error: "equipe_id obrigatório" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
     // Fetch backlog projects
     const { data: projetos, error: projError } = await supabase
@@ -31,32 +26,43 @@ serve(async (req) => {
       .eq("equipe_id", equipe_id);
 
     if (projError) throw projError;
-    if (!projetos || projetos.length === 0) {
+    if (!projetos?.length) {
       return new Response(JSON.stringify({ error: "Nenhum projeto encontrado no backlog" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Fetch team members
+    // Fetch team members with diagnostics
     const { data: membros } = await supabase
       .from("membros_equipe_skills")
       .select("user_id, papel, profiles(nome_completo, cargo)")
       .eq("equipe_id", equipe_id)
       .eq("status", "ativo");
 
-    const membrosInfo = (membros || []).map((m: any) => ({
-      nome: m.profiles?.nome_completo || "Membro",
-      cargo: m.profiles?.cargo || m.papel || "Colaborador",
-      user_id: m.user_id,
-    }));
+    const { data: diagnosticos } = await supabase
+      .from("diagnosticos_skills")
+      .select("user_id, area_atuacao, processos_detalhados, tarefas_manuais, gargalos_identificados")
+      .eq("equipe_id", equipe_id)
+      .eq("completado", true);
+
+    const membrosInfo = (membros || []).map((m: any) => {
+      const diag = diagnosticos?.find((d: any) => d.user_id === m.user_id);
+      return {
+        user_id: m.user_id,
+        nome: (m.profiles as any)?.nome_completo || "Membro",
+        cargo: (m.profiles as any)?.cargo || m.papel || "Colaborador",
+        area: diag?.area_atuacao || "",
+        processos: diag?.processos_detalhados || diag?.tarefas_manuais || [],
+        gargalos: diag?.gargalos_identificados || [],
+      };
+    });
 
     const projetosTexto = projetos.map((p: any) =>
       `- "${p.titulo}" | ${p.descricao || "sem descrição"} | Área: ${p.area_impactada || "geral"} | Prioridade: ${p.prioridade || "média"} | Economia estimada: ${p.horas_estimadas_economia || 0}h/semana`
     ).join("\n");
 
     const membrosTexto = membrosInfo.map((m: any) =>
-      `- ${m.nome} (${m.cargo})`
+      `- ${m.nome} (${m.cargo}, Área: ${m.area}) | Processos: ${JSON.stringify(m.processos)} | Gargalos: ${JSON.stringify(m.gargalos)}`
     ).join("\n");
 
     const systemPrompt = `Você é um consultor especialista em transformação digital e implementação de IA em equipes corporativas.
@@ -66,7 +72,7 @@ Analise os projetos mapeados abaixo e gere entregas práticas e acionáveis para
 PROJETOS DA EQUIPE:
 ${projetosTexto}
 
-MEMBROS DA EQUIPE:
+MEMBROS DA EQUIPE (com diagnósticos individuais):
 ${membrosTexto}
 
 Para cada projeto, gere de 1 a 3 entregas práticas. Cada entrega deve ter:
@@ -78,6 +84,7 @@ Para cada projeto, gere de 1 a 3 entregas práticas. Cada entrega deve ter:
 - economia_horas_semana: estimativa de horas economizadas por semana após implementação
 - prazo_dias: prazo sugerido em dias para conclusão
 - projeto_titulo: título exato do projeto de origem (para vinculação)
+- responsavel_nome: nome EXATO de um dos membros acima, baseado na relevância para a área e processos do membro
 
 Foque em entregas práticas que gerem resultados rápidos e mensuráveis.`;
 
@@ -86,70 +93,55 @@ Foque em entregas práticas que gerem resultados rápidos e mensuráveis.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: "Gere as entregas práticas para todos os projetos listados." },
         ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "registrar_entregas",
-              description: "Registra as entregas geradas para os projetos da equipe",
-              parameters: {
-                type: "object",
-                properties: {
-                  entregas: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        projeto_titulo: { type: "string" },
-                        titulo: { type: "string" },
-                        descricao: { type: "string" },
-                        instrucoes: { type: "string" },
-                        tipo: { type: "string", enum: ["individual", "colaborativo", "sistema"] },
-                        prioridade: { type: "string", enum: ["P1", "P2", "P3"] },
-                        economia_horas_semana: { type: "number" },
-                        prazo_dias: { type: "number" },
-                      },
-                      required: ["projeto_titulo", "titulo", "descricao", "instrucoes", "tipo", "prioridade", "economia_horas_semana", "prazo_dias"],
-                      additionalProperties: false,
+        tools: [{
+          type: "function",
+          function: {
+            name: "registrar_entregas",
+            description: "Registra as entregas geradas para os projetos da equipe",
+            parameters: {
+              type: "object",
+              properties: {
+                entregas: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      projeto_titulo: { type: "string" },
+                      titulo: { type: "string" },
+                      descricao: { type: "string" },
+                      instrucoes: { type: "string" },
+                      tipo: { type: "string", enum: ["individual", "colaborativo", "sistema"] },
+                      prioridade: { type: "string", enum: ["P1", "P2", "P3"] },
+                      economia_horas_semana: { type: "number" },
+                      prazo_dias: { type: "number" },
+                      responsavel_nome: { type: "string" },
                     },
+                    required: ["projeto_titulo", "titulo", "descricao", "instrucoes", "tipo", "prioridade", "economia_horas_semana", "prazo_dias", "responsavel_nome"],
+                    additionalProperties: false,
                   },
                 },
-                required: ["entregas"],
-                additionalProperties: false,
               },
+              required: ["entregas"],
+              additionalProperties: false,
             },
           },
-        ],
+        }],
         tool_choice: { type: "function", function: { name: "registrar_entregas" } },
       }),
     });
 
     if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error("AI error:", aiResponse.status, errorText);
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error(`AI gateway error: ${aiResponse.status}`);
+      const status = aiResponse.status;
+      if (status === 429) return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (status === 402) return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      throw new Error(`AI gateway error: ${status}`);
     }
 
     const aiData = await aiResponse.json();
@@ -157,9 +149,7 @@ Foque em entregas práticas que gerem resultados rápidos e mensuráveis.`;
     if (!toolCall) throw new Error("IA não retornou entregas estruturadas");
 
     const { entregas } = JSON.parse(toolCall.function.arguments);
-    if (!entregas || !Array.isArray(entregas) || entregas.length === 0) {
-      throw new Error("IA não gerou nenhuma entrega");
-    }
+    if (!entregas?.length) throw new Error("IA não gerou nenhuma entrega");
 
     // Map projeto_titulo to backlog item id
     const projetoMap: Record<string, string> = {};
@@ -167,14 +157,26 @@ Foque em entregas práticas que gerem resultados rápidos e mensuráveis.`;
       projetoMap[p.titulo.toLowerCase().trim()] = p.id;
     }
 
+    // Map nomes to user_ids
+    const nomeToId: Record<string, string> = {};
+    for (const m of membrosInfo) {
+      nomeToId[m.nome.toLowerCase().trim()] = m.user_id;
+    }
+
+    const findUserId = (nome: string): string | null => {
+      if (!nome) return null;
+      const key = Object.keys(nomeToId).find(
+        (k) => nome.toLowerCase().trim().includes(k) || k.includes(nome.toLowerCase().trim())
+      );
+      return key ? nomeToId[key] : null;
+    };
+
     const now = new Date();
     const entregasToInsert = entregas.map((e: any) => {
-      // Find matching project
       const matchKey = Object.keys(projetoMap).find(
         (k) => e.projeto_titulo?.toLowerCase().trim().includes(k) || k.includes(e.projeto_titulo?.toLowerCase().trim())
       );
       const backlogItemId = matchKey ? projetoMap[matchKey] : null;
-
       const prazoDate = new Date(now);
       prazoDate.setDate(prazoDate.getDate() + (e.prazo_dias || 14));
 
@@ -189,24 +191,20 @@ Foque em entregas práticas que gerem resultados rápidos e mensuráveis.`;
         economia_horas_semana: e.economia_horas_semana || 0,
         prazo: prazoDate.toISOString().split("T")[0],
         status: "pendente",
+        responsavel_id: findUserId(e.responsavel_nome),
       };
     });
 
-    const { error: insertError } = await supabase
-      .from("entregas_skills")
-      .insert(entregasToInsert);
-
+    const { error: insertError } = await supabase.from("entregas_skills").insert(entregasToInsert);
     if (insertError) throw insertError;
 
-    return new Response(
-      JSON.stringify({ success: true, total: entregasToInsert.length }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ success: true, total: entregasToInsert.length }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     console.error("Error:", e);
-    return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

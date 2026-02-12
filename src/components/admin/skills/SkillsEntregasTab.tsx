@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useEntregasSkillsAdmin, useUpsertEntregaSkills, useDeleteEntregaSkills } from "@/hooks/admin/useSkillsPerformanceAdmin";
 import { useMembrosEquipeSkills } from "@/hooks/admin/useSkillsPerformanceAdmin";
 import { adminTheme } from "@/components/admin/adminTheme";
-import { Plus, Pencil, Trash2, Sparkles, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Sparkles, Loader2, Users } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -52,6 +52,7 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [generating, setGenerating] = useState(false);
+  const [associating, setAssociating] = useState(false);
 
   // Check if backlog has projects
   const { data: backlogCount } = useQuery({
@@ -122,6 +123,27 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
     }
   };
 
+  const handleAssociarMembros = async () => {
+    setAssociating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("associar-membros-skills", {
+        body: { equipe_id: equipeId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`${data.associados} itens associados com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: ["admin-entregas-skills", equipeId] });
+      queryClient.invalidateQueries({ queryKey: ["backlog-skills", equipeId] });
+    } catch (err: any) {
+      console.error("Erro ao associar membros:", err);
+      toast.error(err.message || "Erro ao associar membros com IA");
+    } finally {
+      setAssociating(false);
+    }
+  };
+
+  const itensSemResponsavel = (entregas || []).filter((e: any) => !e.responsavel_id).length;
+
   const statusBadge = (status: string) => {
     switch (status) {
       case "concluido": return <Badge className="bg-emerald-100 text-emerald-700 border-transparent">Concluído</Badge>;
@@ -149,7 +171,19 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
             <Badge variant="secondary" className="text-xs">{backlogCount} projeto(s) no backlog</Badge>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {itensSemResponsavel > 0 && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleAssociarMembros}
+              disabled={associating}
+              className="gap-1.5"
+            >
+              {associating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Users className="h-3.5 w-3.5" />}
+              {associating ? "Associando..." : `Associar Membros (${itensSemResponsavel})`}
+            </Button>
+          )}
           <Button
             size="sm"
             variant="outline"
