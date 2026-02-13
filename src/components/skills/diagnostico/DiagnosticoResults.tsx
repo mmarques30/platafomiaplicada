@@ -61,6 +61,7 @@ export default function DiagnosticoResults({ onRefill, diagnostico }: Diagnostic
     <Tabs defaultValue="minha-analise" className="w-full">
       <TabsList className="skills-tabs-list mb-4">
         <TabsTrigger value="minha-analise" className="skills-tabs-trigger">Minha Análise</TabsTrigger>
+        <TabsTrigger value="equipe" className="skills-tabs-trigger">Análise da Equipe</TabsTrigger>
       </TabsList>
 
       <TabsContent value="minha-analise">
