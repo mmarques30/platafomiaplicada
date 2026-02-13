@@ -151,7 +151,7 @@ export default function ProjetoSkillsPerformance() {
 
       {/* Ranking */}
       <Card className="border-border bg-card overflow-hidden">
-        <CardHeader className="bg-[#0D0D0D] rounded-t-xl">
+        <CardHeader className="bg-[#0D0D0D] rounded-t-xl text-white">
           <CardTitle className="text-white">{hasEntregas ? "Ranking de Entregas por Colaborador" : "Projetos por Colaborador"}</CardTitle>
           <CardDescription className="text-white/50">{hasEntregas ? "Performance e indicadores individuais" : "Projetos atribuídos por membro"}</CardDescription>
         </CardHeader>
