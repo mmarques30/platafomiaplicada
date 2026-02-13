@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen, Trash2, Wrench } from "lucide-react";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -126,10 +126,7 @@ export default function MentoriaBusinessIAplicadaPage() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <Wrench className="h-5 w-5 text-amber-500" />
-            <h1 className="text-xl font-bold tracking-tight">Business iAplicada</h1>
-          </div>
+          <h1 className="text-xl font-bold tracking-tight">Business iAplicada</h1>
           <p className="text-sm text-muted-foreground">
             Acompanhamento de projeto - iAplicada constrói
           </p>
@@ -165,7 +162,7 @@ export default function MentoriaBusinessIAplicadaPage() {
       {users.length === 0 && (
         <Card className="border-border/50">
           <CardContent className="flex flex-col items-center justify-center py-10">
-            <Wrench className="h-10 w-10 text-muted-foreground mb-3" />
+            <FolderOpen className="h-10 w-10 text-muted-foreground mb-3" />
             <p className="font-medium">Nenhum cliente iAplicada</p>
             <p className="text-sm text-muted-foreground">
               Não há clientes com plano Business iAplicada cadastrados
