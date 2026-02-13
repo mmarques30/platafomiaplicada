@@ -47,12 +47,12 @@ export default function EntregasProjetadasVsExecutadasChart({ entregas, dataInic
         (e) => e.concluido_em && isSameMonth(new Date(e.concluido_em), month)
       ).length,
     }));
-  }, [entregas]);
+  }, [entregas, dataInicio]);
 
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-[#0D0D0D] rounded-t-xl pb-2">
-        <CardTitle className="text-base font-semibold !text-white">
+        <CardTitle className="text-base font-semibold" style={{ color: "#FFFFFF" }}>
           Entregas Projetadas vs Executadas
         </CardTitle>
       </CardHeader>
