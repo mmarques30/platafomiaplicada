@@ -65,9 +65,9 @@ export default function ProjetoSkillsProjetosPage() {
       <PageTitle primary="Projeto" secondary="Skills" />
 
       <Tabs defaultValue="acompanhamento" className="w-full">
-        <TabsList>
-          <TabsTrigger value="acompanhamento">Acompanhamento</TabsTrigger>
-          <TabsTrigger value="backlog">Backlog</TabsTrigger>
+        <TabsList className="skills-tabs-list">
+          <TabsTrigger value="acompanhamento" className="skills-tabs-trigger">Acompanhamento</TabsTrigger>
+          <TabsTrigger value="backlog" className="skills-tabs-trigger">Backlog</TabsTrigger>
         </TabsList>
 
         <TabsContent value="acompanhamento" className="space-y-6">
