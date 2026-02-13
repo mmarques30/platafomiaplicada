@@ -10,7 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { format, subMonths, isSameMonth, startOfMonth } from "date-fns";
+import { format, subMonths, isSameMonth, startOfMonth, differenceInMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { chartColors } from "@/lib/chartColors";
 
@@ -22,12 +22,21 @@ interface Entrega {
 
 interface Props {
   entregas: Entrega[];
+  dataInicio?: string | null;
 }
 
-export default function EntregasProjetadasVsExecutadasChart({ entregas }: Props) {
+export default function EntregasProjetadasVsExecutadasChart({ entregas, dataInicio }: Props) {
   const data = useMemo(() => {
     const now = new Date();
-    const months = Array.from({ length: 6 }, (_, i) => startOfMonth(subMonths(now, 5 - i)));
+    let months: Date[];
+
+    if (dataInicio) {
+      const start = startOfMonth(new Date(dataInicio));
+      const count = Math.min(differenceInMonths(now, start) + 1, 12);
+      months = Array.from({ length: count }, (_, i) => startOfMonth(subMonths(now, count - 1 - i)));
+    } else {
+      months = Array.from({ length: 6 }, (_, i) => startOfMonth(subMonths(now, 5 - i)));
+    }
 
     return months.map((month) => ({
       name: format(month, "MMM", { locale: ptBR }),
