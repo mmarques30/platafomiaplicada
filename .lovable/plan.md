@@ -1,26 +1,33 @@
 
-# Reordenar Menu Lateral Admin: Skills acima de Business
 
-## Mudanca
+# Separar Metricas e Kanban na aba Acompanhamento
 
-Alterar a ordem dos itens do submenu "Mentoria" no sidebar administrativo, movendo "Skills" para antes de "Business".
+## Problema
 
-**Ordem atual:** Bonus Globais, Academy, Business, Business iAplicada, Skills, ...
-**Nova ordem:** Bonus Globais, Academy, Skills, Business, Business iAplicada, ...
+A aba "Acompanhamento" esta renderizando `ProjetoSkillsKanban` inteiro, que inclui tanto o **PortfolioOverview** (metricas e KPIs) quanto o **kanban de entregas** (com DnD, filtros e colunas). O kanban de entregas nao deveria aparecer nessa aba -- somente os KPIs e metricas.
 
-## Detalhe Tecnico
+## Solucao
 
-### Arquivo: `src/components/admin/AdminSidebar.tsx` (linhas 90-96)
+Modificar a aba "Acompanhamento" para renderizar apenas os componentes de metricas, removendo o kanban de entregas dessa visao.
 
-Reordenar os itens do array `items` do grupo "Mentoria":
+### Arquivo: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+
+**Mudancas:**
+- Remover a importacao de `ProjetoSkillsKanban`
+- Importar `PortfolioOverview` diretamente de `@/components/skills/kanban/PortfolioOverview`
+- Importar o hook `useSkillsEntregas` para obter os dados de entregas necessarios pelo PortfolioOverview
+- Na aba "Acompanhamento", renderizar:
+  1. `ResumoPerformanceCards` (KPIs de horas, ROI, entregas, semana)
+  2. `PortfolioOverview` (total de projetos, em producao, em andamento, economia, progresso geral, distribuicao por tipo)
+- A aba "Backlog" permanece inalterada com o `BacklogView`
+
+### Resultado
 
 ```
-1. Bonus Globais
-2. Academy
-3. Skills          (sobe)
-4. Business        (desce)
-5. Business iAplicada (desce)
-6. Preview Paineis
-7. Diagnosticos
-8. Central de Duvidas
+Aba "Acompanhamento":
+  - ResumoPerformanceCards (4 KPIs)
+  - PortfolioOverview (KPIs do portfolio, barra de progresso, distribuicao por tipo)
+
+Aba "Backlog":
+  - BacklogView (kanban/tabela de projetos do backlog) -- sem alteracao
 ```
