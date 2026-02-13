@@ -5,6 +5,7 @@ import { PageTitle } from "@/components/shared/PageTitle";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PortfolioOverview from "@/components/skills/kanban/PortfolioOverview";
+import PortfolioSidebar from "@/components/skills/kanban/PortfolioSidebar";
 import BacklogView from "@/components/skills/backlog/BacklogView";
 import EntregasProjetadasVsExecutadasChart from "@/components/skills/charts/EntregasProjetadasVsExecutadasChart";
 import ProjetosFilterBar, { type ProjetosFilters } from "@/components/skills/filters/ProjetosFilterBar";
@@ -70,7 +71,7 @@ export default function ProjetoSkillsProjetosPage() {
           <TabsTrigger value="backlog" className="skills-tabs-trigger">Backlog</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="acompanhamento" className="space-y-6">
+        <TabsContent value="acompanhamento" className="space-y-5 mt-4">
           <ProjetosFilterBar
             entregas={entregas ?? []}
             membros={membros ?? []}
@@ -78,7 +79,12 @@ export default function ProjetoSkillsProjetosPage() {
             onFiltersChange={setFilters}
           />
           <PortfolioOverview entregas={filteredEntregas} />
-          <EntregasProjetadasVsExecutadasChart entregas={filteredEntregas} dataInicio={equipe?.data_inicio || equipe?.created_at} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div className="lg:col-span-2">
+              <EntregasProjetadasVsExecutadasChart entregas={filteredEntregas} dataInicio={equipe?.data_inicio || equipe?.created_at} />
+            </div>
+            <PortfolioSidebar entregas={filteredEntregas} />
+          </div>
         </TabsContent>
 
         <TabsContent value="backlog">
