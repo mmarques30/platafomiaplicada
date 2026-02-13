@@ -51,8 +51,8 @@ export default function EntregasProjetadasVsExecutadasChart({ entregas, dataInic
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="bg-[#0D0D0D] rounded-t-xl pb-2">
-        <CardTitle className="text-base font-semibold" style={{ color: "#FFFFFF" }}>
+      <CardHeader className="bg-[#0D0D0D] rounded-t-xl pb-2 dark-header">
+        <CardTitle className="text-base font-semibold">
           Entregas Projetadas vs Executadas
         </CardTitle>
       </CardHeader>
