@@ -61,16 +61,16 @@ export default function ProjetosFilterBar({
     });
 
   return (
-    <div className="rounded-xl border border-[#9EB038]/20 bg-[#9EB038]/15 border-l-4 border-l-[#9EB038] p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+    <div className="rounded-lg border border-[#9EB038]/20 bg-[#9EB038]/10 border-l-4 border-l-[#9EB038] px-4 py-2.5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-end">
         {/* Projeto */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-[#3a3a3a]">Projeto</label>
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-[#3a3a3a]/70">Projeto</label>
           <Select
             value={filters.projeto}
             onValueChange={(v) => onFiltersChange({ ...filters, projeto: v })}
           >
-            <SelectTrigger className="bg-card border-border">
+            <SelectTrigger className="bg-card border-border h-9 text-sm">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -85,13 +85,13 @@ export default function ProjetosFilterBar({
         </div>
 
         {/* Responsável */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-[#3a3a3a]">Responsável</label>
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-[#3a3a3a]/70">Responsável</label>
           <Select
             value={filters.responsavel}
             onValueChange={(v) => onFiltersChange({ ...filters, responsavel: v })}
           >
-            <SelectTrigger className="bg-card border-border">
+            <SelectTrigger className="bg-card border-border h-9 text-sm">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -106,14 +106,14 @@ export default function ProjetosFilterBar({
         </div>
 
         {/* Data início */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-[#3a3a3a]">Data Início</label>
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-[#3a3a3a]/70">Data Início</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-start text-left font-normal bg-card border-border",
+                  "w-full justify-start text-left font-normal bg-card border-border h-9 text-sm",
                   !filters.dataInicio && "text-muted-foreground"
                 )}
               >
@@ -136,14 +136,14 @@ export default function ProjetosFilterBar({
         </div>
 
         {/* Data fim */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-[#3a3a3a]">Data Fim</label>
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-[#3a3a3a]/70">Data Fim</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-start text-left font-normal bg-card border-border",
+                  "w-full justify-start text-left font-normal bg-card border-border h-9 text-sm",
                   !filters.dataFim && "text-muted-foreground"
                 )}
               >
