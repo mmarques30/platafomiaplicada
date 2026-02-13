@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import ResumoPerformanceCards from "@/components/skills/visao-geral/ResumoPerformanceCards";
+
 import PortfolioOverview from "@/components/skills/kanban/PortfolioOverview";
 import BacklogView from "@/components/skills/backlog/BacklogView";
 import EntregasProjetadasVsExecutadasChart from "@/components/skills/charts/EntregasProjetadasVsExecutadasChart";
@@ -42,7 +42,7 @@ export default function ProjetoSkillsProjetosPage() {
         </TabsList>
 
         <TabsContent value="acompanhamento" className="space-y-6">
-          <ResumoPerformanceCards />
+          
           <PortfolioOverview entregas={entregas ?? []} />
           <EntregasProjetadasVsExecutadasChart entregas={entregas ?? []} dataInicio={equipe?.data_inicio} />
         </TabsContent>
