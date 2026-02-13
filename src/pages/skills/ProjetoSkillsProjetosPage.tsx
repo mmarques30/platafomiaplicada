@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import ResumoPerformanceCards from "@/components/skills/visao-geral/ResumoPerformanceCards";
+import ProjetoSkillsKanban from "@/components/skills/ProjetoSkillsKanban";
 import BacklogView from "@/components/skills/backlog/BacklogView";
 
 export default function ProjetoSkillsProjetosPage() {
@@ -26,7 +29,22 @@ export default function ProjetoSkillsProjetosPage() {
   return (
     <div className="space-y-6 p-4 md:p-6">
       <PageTitle primary="Projeto" secondary="Skills" />
-      <BacklogView />
+
+      <Tabs defaultValue="acompanhamento" className="w-full">
+        <TabsList>
+          <TabsTrigger value="acompanhamento">Acompanhamento</TabsTrigger>
+          <TabsTrigger value="backlog">Backlog</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="acompanhamento" className="space-y-6">
+          <ResumoPerformanceCards />
+          <ProjetoSkillsKanban />
+        </TabsContent>
+
+        <TabsContent value="backlog">
+          <BacklogView />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
