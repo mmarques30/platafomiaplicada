@@ -68,7 +68,7 @@ export default function StatusPieChart({ entregas, projetos = [] }: StatusPieCha
   }, [sourceItems]);
 
   return (
-    <Card className="border-border bg-card">
+    <Card className="border-border bg-card border-l-4 border-l-[#9EB038]">
       <CardHeader>
         <CardTitle>Distribuição por Status</CardTitle>
         <CardDescription>{hasEntregas ? "Entregas agrupadas por status" : "Projetos agrupados por status"}</CardDescription>

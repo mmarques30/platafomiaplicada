@@ -34,11 +34,11 @@ interface MemberDonutChartsProps {
   projetos?: Projeto[];
 }
 
-const BRAND_GREEN = "hsl(72, 50%, 35%)";
+const BRAND_GREEN = "#9EB038";
 const MUTED_BG = "hsl(var(--muted))";
 
 const statusColor = (s: string) => {
-  if (s === "concluido" || s === "aprovada") return "bg-[hsl(72,50%,35%)]";
+  if (s === "concluido" || s === "aprovada") return "bg-[#9EB038]";
   if (s === "em_andamento") return "bg-amber-400";
   if (s === "atrasado") return "bg-red-400";
   if (s === "priorizado") return "bg-blue-400";
@@ -120,12 +120,12 @@ function MemberDonut({ member, entregas, projetos }: { member: RankingItem; entr
 export default function MemberDonutCharts({ ranking, entregas, projetos = [] }: MemberDonutChartsProps) {
   if (ranking.length === 0) {
     return (
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <CardTitle>Impacto vs ROI</CardTitle>
-          <CardDescription>Efetividade por membro da equipe</CardDescription>
+      <Card className="border-border bg-card overflow-hidden">
+        <CardHeader className="bg-[#0D0D0D] rounded-t-xl">
+          <CardTitle className="text-white">Impacto vs ROI</CardTitle>
+          <CardDescription className="text-white/50">Efetividade por membro da equipe</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground text-center py-8">
             Nenhum dado disponível ainda.
           </p>
@@ -135,12 +135,12 @@ export default function MemberDonutCharts({ ranking, entregas, projetos = [] }: 
   }
 
   return (
-    <Card className="border-border bg-card">
-      <CardHeader>
-        <CardTitle>Impacto vs ROI</CardTitle>
-        <CardDescription>Efetividade por membro da equipe</CardDescription>
+    <Card className="border-border bg-card overflow-hidden">
+      <CardHeader className="bg-[#0D0D0D] rounded-t-xl">
+        <CardTitle className="text-white">Impacto vs ROI</CardTitle>
+        <CardDescription className="text-white/50">Efetividade por membro da equipe</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div className="flex flex-wrap justify-center gap-6">
           {ranking.map((member) => (
             <MemberDonut key={member.userId} member={member} entregas={entregas} projetos={projetos} />

@@ -110,7 +110,7 @@ export default function ProjetoSkillsPerformance() {
   return (
     <div className="space-y-6">
       {/* Filtros */}
-      <Card className="border-border bg-card">
+      <Card className="bg-[#9EB038]/5 border-[#9EB038]/20 border-l-4 border-l-[#9EB038]">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <FilterSelect label="Colaborador" value={selectedCollaborator} onValueChange={setSelectedCollaborator}
@@ -125,17 +125,17 @@ export default function ProjetoSkillsPerformance() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {hasEntregas ? (
           <>
-            <KPICard title="Horas Economizadas" value={`${isFiltered ? filteredHours : horasEconomizadasTotal}h`} subtitle="Total acumulado" icon={<Clock className="h-5 w-5" />} />
-            <KPICard title="ROI Acumulado" value={`${Math.round(roiAcumulado)}%`} subtitle="Retorno sobre investimento" icon={<TrendingUp className="h-5 w-5" />} />
-            <KPICard title="Entregas Concluídas" value={`${isFiltered ? filteredCompleted : entregasConcluidas}/${isFiltered ? filteredDeliveries.length : totalEntregas}`} subtitle="Taxa de conclusão" icon={<Target className="h-5 w-5" />} />
-            <KPICard title="Performance Média" value={`${Math.round(performanceMedia)}%`} subtitle="Índice da equipe" icon={<Award className="h-5 w-5" />} />
+            <KPICard title="Horas Economizadas" value={`${isFiltered ? filteredHours : horasEconomizadasTotal}h`} subtitle="Total acumulado" icon={<Clock className="h-5 w-5" />} variant="dark" />
+            <KPICard title="ROI Acumulado" value={`${Math.round(roiAcumulado)}%`} subtitle="Retorno sobre investimento" icon={<TrendingUp className="h-5 w-5" />} variant="accent" />
+            <KPICard title="Entregas Concluídas" value={`${isFiltered ? filteredCompleted : entregasConcluidas}/${isFiltered ? filteredDeliveries.length : totalEntregas}`} subtitle="Taxa de conclusão" icon={<Target className="h-5 w-5" />} variant="dark" />
+            <KPICard title="Performance Média" value={`${Math.round(performanceMedia)}%`} subtitle="Índice da equipe" icon={<Award className="h-5 w-5" />} variant="accent" />
           </>
         ) : (
           <>
-            <KPICard title="Projetos Mapeados" value={`${isFiltered ? filteredProjetos.length : totalProjetos}`} subtitle="Total no backlog" icon={<FolderKanban className="h-5 w-5" />} />
-            <KPICard title="Em Andamento" value={`${isFiltered ? filteredProjetos.filter(p => p.status === "em_andamento").length : projetosEmAndamento}`} subtitle="Projetos ativos" icon={<TrendingUp className="h-5 w-5" />} />
-            <KPICard title="Economia Estimada" value={`${isFiltered ? filteredProjetos.reduce((a, p) => a + (p.horasEstimadas || 0), 0) : horasEstimadasProjetos}h`} subtitle="Horas/semana potenciais" icon={<Clock className="h-5 w-5" />} />
-            <KPICard title="Semana Atual" value={`${semanaAtual}`} subtitle="de 12 semanas" icon={<Award className="h-5 w-5" />} />
+            <KPICard title="Projetos Mapeados" value={`${isFiltered ? filteredProjetos.length : totalProjetos}`} subtitle="Total no backlog" icon={<FolderKanban className="h-5 w-5" />} variant="dark" />
+            <KPICard title="Em Andamento" value={`${isFiltered ? filteredProjetos.filter(p => p.status === "em_andamento").length : projetosEmAndamento}`} subtitle="Projetos ativos" icon={<TrendingUp className="h-5 w-5" />} variant="accent" />
+            <KPICard title="Economia Estimada" value={`${isFiltered ? filteredProjetos.reduce((a, p) => a + (p.horasEstimadas || 0), 0) : horasEstimadasProjetos}h`} subtitle="Horas/semana potenciais" icon={<Clock className="h-5 w-5" />} variant="dark" />
+            <KPICard title="Semana Atual" value={`${semanaAtual}`} subtitle="de 12 semanas" icon={<Award className="h-5 w-5" />} variant="accent" />
           </>
         )}
       </div>
@@ -150,10 +150,10 @@ export default function ProjetoSkillsPerformance() {
       </div>
 
       {/* Ranking */}
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <CardTitle>{hasEntregas ? "Ranking de Entregas por Colaborador" : "Projetos por Colaborador"}</CardTitle>
-          <CardDescription>{hasEntregas ? "Performance e indicadores individuais" : "Projetos atribuídos por membro"}</CardDescription>
+      <Card className="border-border bg-card overflow-hidden">
+        <CardHeader className="bg-[#0D0D0D] rounded-t-xl">
+          <CardTitle className="text-white">{hasEntregas ? "Ranking de Entregas por Colaborador" : "Projetos por Colaborador"}</CardTitle>
+          <CardDescription className="text-white/50">{hasEntregas ? "Performance e indicadores individuais" : "Projetos atribuídos por membro"}</CardDescription>
         </CardHeader>
         <CardContent>
           {ranking.length === 0 ? (
