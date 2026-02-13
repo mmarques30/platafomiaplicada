@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { format, subMonths, isSameMonth, startOfMonth, differenceInMonths } from "date-fns";
+import { format, addMonths, isSameMonth, startOfMonth, differenceInMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface Entrega {
@@ -21,6 +21,9 @@ interface Entrega {
 interface Props {
   entregas: Entrega[];
   dataInicio?: string | null;
+  dataFim?: string | null;
+  filtroDataInicio?: Date;
+  filtroDataFim?: Date;
 }
 
 const CustomLegend = () => (
@@ -36,21 +39,47 @@ const CustomLegend = () => (
   </div>
 );
 
-export default function EntregasProjetadasVsExecutadasChart({ entregas, dataInicio }: Props) {
+export default function EntregasProjetadasVsExecutadasChart({
+  entregas,
+  dataInicio,
+  dataFim,
+  filtroDataInicio,
+  filtroDataFim,
+}: Props) {
   const data = useMemo(() => {
-    const now = new Date();
-    let months: Date[];
+    // Determine the range start: filter > contract start > fallback to now
+    const contractStart = dataInicio
+      ? startOfMonth(new Date(dataInicio))
+      : startOfMonth(new Date());
 
-    if (dataInicio) {
-      const start = startOfMonth(new Date(dataInicio));
-      const count = Math.max(Math.min(differenceInMonths(now, start) + 1, 12), 6);
-      months = Array.from({ length: count }, (_, i) => startOfMonth(subMonths(now, count - 1 - i)));
-    } else {
-      months = Array.from({ length: 6 }, (_, i) => startOfMonth(subMonths(now, 5 - i)));
-    }
+    const contractEnd = dataFim
+      ? startOfMonth(new Date(dataFim))
+      : null;
+
+    // Use filter dates when provided, otherwise use contract dates
+    const rangeStart = filtroDataInicio
+      ? startOfMonth(filtroDataInicio)
+      : contractStart;
+
+    const now = new Date();
+    const defaultEnd = contractEnd
+      ? contractEnd
+      : startOfMonth(addMonths(contractStart, 5)); // 6 months forward by default
+
+    const rangeEnd = filtroDataFim
+      ? startOfMonth(filtroDataFim)
+      : (differenceInMonths(now, rangeStart) > 0
+          ? startOfMonth(now) > defaultEnd ? startOfMonth(now) : defaultEnd
+          : defaultEnd);
+
+    // Generate months forward from rangeStart to rangeEnd
+    const monthCount = Math.max(differenceInMonths(rangeEnd, rangeStart) + 1, 1);
+    const months = Array.from({ length: Math.min(monthCount, 24) }, (_, i) =>
+      startOfMonth(addMonths(rangeStart, i))
+    );
 
     return months.map((month) => ({
-      name: format(month, "MMM", { locale: ptBR }),
+      name: format(month, "MMM/yy", { locale: ptBR }),
       projetadas: entregas.filter(
         (e) => e.prazo && isSameMonth(new Date(e.prazo), month)
       ).length,
@@ -58,7 +87,7 @@ export default function EntregasProjetadasVsExecutadasChart({ entregas, dataInic
         (e) => e.concluido_em && isSameMonth(new Date(e.concluido_em), month)
       ).length,
     }));
-  }, [entregas, dataInicio]);
+  }, [entregas, dataInicio, dataFim, filtroDataInicio, filtroDataFim]);
 
   return (
     <Card className="overflow-hidden border-border rounded-2xl shadow-sm">
