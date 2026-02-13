@@ -5,12 +5,14 @@ import { PageTitle } from "@/components/shared/PageTitle";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ResumoPerformanceCards from "@/components/skills/visao-geral/ResumoPerformanceCards";
-import ProjetoSkillsKanban from "@/components/skills/ProjetoSkillsKanban";
+import PortfolioOverview from "@/components/skills/kanban/PortfolioOverview";
 import BacklogView from "@/components/skills/backlog/BacklogView";
+import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 
 export default function ProjetoSkillsProjetosPage() {
   const navigate = useNavigate();
   const { equipeId, isLoading } = useSkillsMembro();
+  const { entregas, isLoading: isLoadingEntregas } = useSkillsEntregas();
 
   useEffect(() => {
     if (!isLoading && !equipeId) {
@@ -38,7 +40,7 @@ export default function ProjetoSkillsProjetosPage() {
 
         <TabsContent value="acompanhamento" className="space-y-6">
           <ResumoPerformanceCards />
-          <ProjetoSkillsKanban />
+          <PortfolioOverview entregas={entregas ?? []} />
         </TabsContent>
 
         <TabsContent value="backlog">
