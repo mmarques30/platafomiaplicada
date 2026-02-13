@@ -61,118 +61,66 @@ export default function ProjetosFilterBar({
     });
 
   return (
-    <div className="rounded-lg border border-[#9EB038]/20 bg-[#9EB038]/10 border-l-4 border-l-[#9EB038] px-4 py-2.5">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-end">
-        {/* Projeto */}
-        <div className="space-y-1">
-          <label className="text-[11px] font-medium text-[#3a3a3a]/70">Projeto</label>
-          <Select
-            value={filters.projeto}
-            onValueChange={(v) => onFiltersChange({ ...filters, projeto: v })}
-          >
-            <SelectTrigger className="bg-card border-border h-9 text-sm">
-              <SelectValue placeholder="Todos" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
-              <SelectItem value="todos">Todos</SelectItem>
-              {projetos.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.titulo}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+    <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[#9EB038]/20 bg-[#9EB038]/8 border-l-3 border-l-[#9EB038] px-3 py-2">
+      <Select
+        value={filters.projeto}
+        onValueChange={(v) => onFiltersChange({ ...filters, projeto: v })}
+      >
+        <SelectTrigger className="bg-card border-border h-8 text-xs w-[140px]">
+          <SelectValue placeholder="Projeto" />
+        </SelectTrigger>
+        <SelectContent className="bg-card border-border z-50">
+          <SelectItem value="todos">Todos os projetos</SelectItem>
+          {projetos.map((p) => (
+            <SelectItem key={p.id} value={p.id}>{p.titulo}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        {/* Responsável */}
-        <div className="space-y-1">
-          <label className="text-[11px] font-medium text-[#3a3a3a]/70">Responsável</label>
-          <Select
-            value={filters.responsavel}
-            onValueChange={(v) => onFiltersChange({ ...filters, responsavel: v })}
-          >
-            <SelectTrigger className="bg-card border-border h-9 text-sm">
-              <SelectValue placeholder="Todos" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
-              <SelectItem value="todos">Todos</SelectItem>
-              {membros.map((m) => (
-                <SelectItem key={m.user_id} value={m.user_id}>
-                  {m.nome}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Select
+        value={filters.responsavel}
+        onValueChange={(v) => onFiltersChange({ ...filters, responsavel: v })}
+      >
+        <SelectTrigger className="bg-card border-border h-8 text-xs w-[140px]">
+          <SelectValue placeholder="Responsável" />
+        </SelectTrigger>
+        <SelectContent className="bg-card border-border z-50">
+          <SelectItem value="todos">Todos</SelectItem>
+          {membros.map((m) => (
+            <SelectItem key={m.user_id} value={m.user_id}>{m.nome}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        {/* Data início */}
-        <div className="space-y-1">
-          <label className="text-[11px] font-medium text-[#3a3a3a]/70">Data Início</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal bg-card border-border h-9 text-sm",
-                  !filters.dataInicio && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.dataInicio
-                  ? format(filters.dataInicio, "dd/MM/yyyy", { locale: ptBR })
-                  : "Selecionar"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50" align="start">
-              <Calendar
-                mode="single"
-                selected={filters.dataInicio}
-                onSelect={(d) => onFiltersChange({ ...filters, dataInicio: d })}
-                initialFocus
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className={cn("h-8 text-xs bg-card border-border px-2.5", !filters.dataInicio && "text-muted-foreground")}>
+            <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+            {filters.dataInicio ? format(filters.dataInicio, "dd/MM/yy", { locale: ptBR }) : "Início"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 z-50" align="start">
+          <Calendar mode="single" selected={filters.dataInicio} onSelect={(d) => onFiltersChange({ ...filters, dataInicio: d })} initialFocus className="p-3 pointer-events-auto" />
+        </PopoverContent>
+      </Popover>
 
-        {/* Data fim */}
-        <div className="space-y-1">
-          <label className="text-[11px] font-medium text-[#3a3a3a]/70">Data Fim</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal bg-card border-border h-9 text-sm",
-                  !filters.dataFim && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.dataFim
-                  ? format(filters.dataFim, "dd/MM/yyyy", { locale: ptBR })
-                  : "Selecionar"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50" align="start">
-              <Calendar
-                mode="single"
-                selected={filters.dataFim}
-                onSelect={(d) => onFiltersChange({ ...filters, dataFim: d })}
-                initialFocus
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className={cn("h-8 text-xs bg-card border-border px-2.5", !filters.dataFim && "text-muted-foreground")}>
+            <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+            {filters.dataFim ? format(filters.dataFim, "dd/MM/yy", { locale: ptBR }) : "Fim"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 z-50" align="start">
+          <Calendar mode="single" selected={filters.dataFim} onSelect={(d) => onFiltersChange({ ...filters, dataFim: d })} initialFocus className="p-3 pointer-events-auto" />
+        </PopoverContent>
+      </Popover>
 
       {hasFilters && (
-        <div className="mt-3 flex justify-end">
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-muted-foreground">
-            <X className="h-3 w-3 mr-1" />
-            Limpar filtros
-          </Button>
-        </div>
+        <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 text-[11px] text-muted-foreground px-2">
+          <X className="h-3 w-3 mr-1" />
+          Limpar
+        </Button>
       )}
     </div>
   );
