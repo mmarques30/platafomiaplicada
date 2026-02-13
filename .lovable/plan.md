@@ -1,103 +1,37 @@
 
-# Redesign Visual dos Cards no Painel Lider - Skills
 
-## Objetivo
+# Correcao de Contraste de Texto nos Cards do Painel Lider
 
-Aplicar um design mais sofisticado nos cards do Painel Lider (/skills/projeto/performance), inspirado na referencia visual compartilhada. O conceito mistura cards com fundos escuros (preto), cards com fundo verde transparente da marca, e cards claros, criando contraste visual e hierarquia de informacao.
+## Problema
 
-## Escopo
+No modo escuro da aplicacao, tanto os cards pretos quanto os cards com fundo verde transparente (accent) acabam tendo textos com baixo contraste. Os cards accent precisam de textos mais escuros (para parecerem cards "claros"), e os cards pretos precisam de textos mais brilhantes/claros.
 
-Ajustes puramente visuais (CSS/Tailwind) nos componentes do Painel Lider. Nenhuma mudanca de banco de dados ou logica de negocio.
+## Solucao
 
-## Componentes Afetados
+### Arquivo: `src/components/skills/performance/KPICard.tsx`
 
-### 1. KPICard (`src/components/skills/performance/KPICard.tsx`)
+Ajustar o objeto `variantStyles`:
 
-Adicionar uma prop `variant` para suportar 3 estilos visuais:
-- **dark**: fundo preto (#0D0D0D), texto branco, icone com fundo verde translucido
-- **accent**: fundo verde transparente (bg-[#9EB038]/10), borda esquerda verde, texto escuro
-- **default**: fundo card padrao (atual), mantido para compatibilidade
+**Cards `dark` (fundo preto):**
+- Titulo: manter `text-white/70` (ja claro)
+- Valor: manter `text-white` (ja claro)
+- Subtitulo: mudar de `text-white/50` para `text-white/60` (um pouco mais visivel)
+- Icone: manter `text-[#9EB038]` (verde vibrante)
 
-### 2. ProjetoSkillsPerformance (`src/components/skills/ProjetoSkillsPerformance.tsx`)
+**Cards `accent` (fundo verde transparente):**
+- Aumentar opacidade do fundo de `/10` para `/15` para que o card pareca mais "claro"
+- Titulo: mudar de `text-foreground/70` para `text-[#1a1a1a]` (escuro fixo, independente do tema)
+- Valor: mudar de `text-foreground` para `text-[#0D0D0D]` (preto fixo)
+- Subtitulo: mudar de `text-muted-foreground` para `text-[#3a3a3a]` (cinza escuro fixo)
+- Icone: mudar para `text-[#6B7A20]` (verde mais escuro para contraste no fundo claro)
+- Trend: ajustar para `text-[#5a6a1a]`
 
-Aplicar variantes nos KPIs do Painel Lider:
-- Card 1 (Horas Economizadas): variant `dark`
-- Card 2 (ROI Acumulado): variant `accent`
-- Card 3 (Entregas): variant `dark`
-- Card 4 (Performance/Semana): variant `accent`
+### Arquivo: `src/components/skills/ProjetoSkillsPerformance.tsx`
 
-Intercalar dark e accent para criar ritmo visual.
+**Card de Filtros (accent):**
+- Ajustar fundo de `bg-[#9EB038]/5` para `bg-[#9EB038]/15` para consistencia com os cards accent
 
-### 3. MemberDonutCharts (`src/components/skills/performance/MemberDonutCharts.tsx`)
+### Resultado esperado
 
-- Header do card com fundo escuro (#0D0D0D) e texto branco
-- Corpo mantem fundo claro para legibilidade dos graficos
-
-### 4. StatusPieChart (`src/components/skills/performance/StatusPieChart.tsx`)
-
-- Card com borda esquerda verde da marca (border-l-4 border-[#9EB038])
-- Fundo claro padrao mantido
-
-### 5. WeeklyBarChart (`src/components/skills/performance/WeeklyBarChart.tsx`)
-
-- Card com fundo escuro (#0D0D0D) para as barras de progresso
-- Texto e labels em branco/cinza claro
-- Barras de progresso mantendo o verde da marca
-
-### 6. Card do Ranking (inline em ProjetoSkillsPerformance.tsx)
-
-- Header com fundo escuro, corpo com fundo claro
-- Badges de posicao mais contrastantes
-
-### 7. Card de Filtros (inline em ProjetoSkillsPerformance.tsx)
-
-- Borda esquerda verde da marca
-- Fundo sutil verde transparente
-
-## Detalhes Tecnicos
-
-### KPICard - Nova interface:
-
-```tsx
-interface KPICardProps {
-  title: string;
-  value: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  trend?: string;
-  variant?: "default" | "dark" | "accent";
-}
-```
-
-Classes por variante:
-- `dark`: `bg-[#0D0D0D] border-[#0D0D0D] text-white`
-- `accent`: `bg-[#9EB038]/10 border-[#9EB038]/30 border-l-4 border-l-[#9EB038]`
-- `default`: `bg-card border-border` (atual)
-
-### Mapeamento de cores de texto por variante:
-- `dark`: titulo = `text-white/70`, valor = `text-white`, subtitulo = `text-white/50`
-- `accent`: titulo = `text-foreground/70`, valor = `text-foreground`, subtitulo = `text-muted-foreground`
-
-### Componentes com header escuro (MemberDonutCharts, Ranking):
-```tsx
-<CardHeader className="bg-[#0D0D0D] rounded-t-xl">
-  <CardTitle className="text-white">...</CardTitle>
-</CardHeader>
-```
-
-### WeeklyBarChart (todo escuro):
-```tsx
-<Card className="bg-[#0D0D0D] border-[#0D0D0D]">
-  // textos em text-white e text-white/60
-  // barra de fundo: bg-white/10
-  // barra de progresso: bg-[#9EB038]
-</Card>
-```
-
-## Arquivos Modificados
-
-1. `src/components/skills/performance/KPICard.tsx` - Adicionar prop variant e estilos
-2. `src/components/skills/ProjetoSkillsPerformance.tsx` - Aplicar variants nos KPIs, estilizar filtros e ranking
-3. `src/components/skills/performance/MemberDonutCharts.tsx` - Header escuro
-4. `src/components/skills/performance/StatusPieChart.tsx` - Borda esquerda verde
-5. `src/components/skills/performance/WeeklyBarChart.tsx` - Fundo escuro completo
+- Cards pretos: textos brancos brilhantes com boa legibilidade
+- Cards verdes (accent): fundo verde translucido mais visivel com textos escuros, criando contraste claro entre os dois tipos de card
