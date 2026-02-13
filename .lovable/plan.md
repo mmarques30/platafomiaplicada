@@ -1,50 +1,14 @@
 
+# Remover icone do titulo "Business iAplicada" no painel admin
 
-# Reestruturar Pagina de Projetos com Sub-abas Internas
+## Mudanca
 
-## Problema
+Remover o icone de chave inglesa (Wrench) que aparece antes do titulo "Business iAplicada" na pagina administrativa.
 
-A pagina "Projetos" (`ProjetoSkillsProjetosPage`) atualmente so exibe o `BacklogView` (kanban e tabela de projetos). Dados importantes de acompanhamento como KPIs, Portfolio Overview, progresso geral e o kanban de entregas vinculadas foram perdidos.
+## Detalhe Tecnico
 
-## Solucao
+### Arquivo: `src/pages/admin/mentoria/MentoriaBusinessIAplicadaPage.tsx`
 
-Adicionar **duas sub-abas internas** na pagina de Projetos:
-
-1. **Acompanhamento** -- visao geral com KPIs de performance, Portfolio Overview (entregas em producao, em andamento, economia total, progresso geral, distribuicao por tipo) e o kanban de entregas (`ProjetoSkillsKanban`)
-2. **Backlog** -- a view atual com kanban/tabela de projetos do backlog (`BacklogView`)
-
-## Estrutura Visual
-
-```text
-Projeto Skills
-+-----------------------------------------------+
-| [Acompanhamento]  [Backlog]                   |
-+-----------------------------------------------+
-
-Aba "Acompanhamento":
-  - KPIs: Horas Economizadas | ROI | Entregas | Semana
-  - Portfolio Overview (total, producao, andamento, economia)
-  - Progresso geral (barra)
-  - Kanban de Entregas (Backlog | Em Andamento | Validacao | Rodando)
-
-Aba "Backlog":
-  - Toggle Kanban/Tabela
-  - Cards dos projetos do backlog_skills
-```
-
-## Detalhes Tecnicos
-
-### Arquivo modificado: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
-
-Mudancas:
-- Importar `Tabs, TabsList, TabsTrigger, TabsContent`
-- Importar `ResumoPerformanceCards` (KPIs existentes)
-- Importar `ProjetoSkillsKanban` (kanban de entregas com PortfolioOverview integrado)
-- Importar `BacklogView` (ja existente)
-- Renderizar duas abas: "Acompanhamento" (default) com KPIs + ProjetoSkillsKanban, e "Backlog" com BacklogView
-- Nenhum componente novo precisa ser criado -- todos ja existem
-
-### Componentes reutilizados (sem alteracao)
-- `ResumoPerformanceCards` -- KPIs de horas, ROI, entregas, semana
-- `ProjetoSkillsKanban` -- Portfolio Overview + Kanban de entregas com DnD e filtros
-- `BacklogView` -- Kanban/Tabela do backlog de projetos
+- Linha 130: Remover `<Wrench className="h-5 w-5 text-amber-500" />`
+- Remover a import de `Wrench` de lucide-react (se nao for usada em outro lugar do arquivo)
+- O titulo "Business iAplicada" permanece como esta
