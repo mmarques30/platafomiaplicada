@@ -9,10 +9,12 @@ import PortfolioOverview from "@/components/skills/kanban/PortfolioOverview";
 import BacklogView from "@/components/skills/backlog/BacklogView";
 import EntregasProjetadasVsExecutadasChart from "@/components/skills/charts/EntregasProjetadasVsExecutadasChart";
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
+import { useSkillsEquipe } from "@/hooks/useSkillsEquipe";
 
 export default function ProjetoSkillsProjetosPage() {
   const navigate = useNavigate();
   const { equipeId, isLoading } = useSkillsMembro();
+  const { equipe } = useSkillsEquipe();
   const { entregas, isLoading: isLoadingEntregas } = useSkillsEntregas();
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export default function ProjetoSkillsProjetosPage() {
         <TabsContent value="acompanhamento" className="space-y-6">
           <ResumoPerformanceCards />
           <PortfolioOverview entregas={entregas ?? []} />
-          <EntregasProjetadasVsExecutadasChart entregas={entregas ?? []} />
+          <EntregasProjetadasVsExecutadasChart entregas={entregas ?? []} dataInicio={equipe?.data_inicio} />
         </TabsContent>
 
         <TabsContent value="backlog">
