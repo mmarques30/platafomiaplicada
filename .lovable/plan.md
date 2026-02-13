@@ -1,26 +1,40 @@
 
+# Correcao do Grafico "Entregas Projetadas vs Executadas"
 
-# Unificar Cards do PortfolioOverview para Estilo Verde (Accent)
+## Problemas Identificados
 
-## Problema
-
-Na aba "Acompanhamento" da pagina Projetos, os cards do PortfolioOverview alternam entre preto e verde. O usuario quer que todos usem o mesmo estilo verde (accent) para manter consistencia visual com o card de "Progresso Geral" ao lado.
+1. **Titulo ilegivel**: O titulo do card ainda aparece escuro sobre fundo escuro na pagina de Projetos
+2. **Meses vazios**: O grafico mostra 6 meses fixos (ultimos 6 meses), incluindo meses anteriores ao inicio do contrato onde nao havia dados
 
 ## Solucao
 
-No arquivo `src/components/skills/kanban/PortfolioOverview.tsx`:
+### Arquivo: `src/components/skills/charts/EntregasProjetadasVsExecutadasChart.tsx`
 
-1. **KPI cards (linhas 40-44)**: Mudar todos os `variant` de `"dark"` para `"accent"`
-2. **Distribuicao por tipo (linhas 47-51)**: Mudar todos os `variant` de `"dark"` para `"accent"`
-3. **Remover `darkCard`** (linha 53) ja que nao sera mais usado
+**1. Receber `dataInicio` como prop** - O componente passara a receber a data de inicio do contrato para calcular os meses corretos.
 
-Todos os cards passam a usar o estilo:
-- Fundo: `bg-[#9EB038]/15`
-- Borda: `border-[#9EB038]/30` com `border-l-4 border-l-[#9EB038]`
-- Label: `text-[#3a3a3a]`
-- Valor: `text-[#0D0D0D]`
+**2. Filtrar meses a partir do contrato** - Ao inves de sempre mostrar os ultimos 6 meses, o grafico calculara os meses desde `data_inicio` ate o mes atual, limitando a no maximo 12 meses.
 
-## Arquivo Modificado
+**3. Titulo legivel** - Garantir que o `CardTitle` use `!text-white` (ja aplicado, mas verificar se esta funcionando na pagina de Projetos).
 
-- `src/components/skills/kanban/PortfolioOverview.tsx`
+### Arquivo: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
 
+**4. Passar `dataInicio` ao grafico** - Usar o hook `useSkillsEquipe` para obter `equipe.data_inicio` e passar como prop ao componente do grafico.
+
+## Detalhes Tecnicos
+
+### Mudanca na interface do componente:
+```typescript
+interface Props {
+  entregas: Entrega[];
+  dataInicio?: string | null; // nova prop
+}
+```
+
+### Logica de calculo dos meses:
+- Se `dataInicio` existe: gerar meses desde essa data ate o mes atual
+- Se nao existe: manter comportamento atual (ultimos 6 meses)
+- Limitar a no maximo 12 meses para nao sobrecarregar o grafico
+
+### Arquivos modificados:
+- `src/components/skills/charts/EntregasProjetadasVsExecutadasChart.tsx`
+- `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
