@@ -43,7 +43,7 @@ export default function EntregasProjetadasVsExecutadasChart({ entregas, dataInic
 
     if (dataInicio) {
       const start = startOfMonth(new Date(dataInicio));
-      const count = Math.min(differenceInMonths(now, start) + 1, 12);
+      const count = Math.max(Math.min(differenceInMonths(now, start) + 1, 12), 6);
       months = Array.from({ length: count }, (_, i) => startOfMonth(subMonths(now, count - 1 - i)));
     } else {
       months = Array.from({ length: 6 }, (_, i) => startOfMonth(subMonths(now, 5 - i)));
