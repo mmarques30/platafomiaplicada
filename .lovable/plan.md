@@ -1,40 +1,41 @@
 
-# Correcao do Grafico "Entregas Projetadas vs Executadas"
 
-## Problemas Identificados
+# Correcao Definitiva das Cores dos Titulos no Painel Lider
 
-1. **Titulo ilegivel**: O titulo do card ainda aparece escuro sobre fundo escuro na pagina de Projetos
-2. **Meses vazios**: O grafico mostra 6 meses fixos (ultimos 6 meses), incluindo meses anteriores ao inicio do contrato onde nao havia dados
+## Problema
 
-## Solucao
+Os titulos "Impacto vs ROI" e "Ranking de Entregas por Colaborador" continuam invisiveis (cinza claro sobre fundo preto). A classe Tailwind `!text-white` esta sendo sobrescrita pela variavel CSS `text-card-foreground` definida no componente `Card` pai, que usa `@layer` com alta especificidade.
 
-### Arquivo: `src/components/skills/charts/EntregasProjetadasVsExecutadasChart.tsx`
+## Causa Raiz
 
-**1. Receber `dataInicio` como prop** - O componente passara a receber a data de inicio do contrato para calcular os meses corretos.
+O componente `Card` aplica `text-card-foreground` no elemento wrapper. Em modo claro, essa variavel resolve para uma cor escura, mas o `tailwind-merge` dentro de `cn()` pode estar removendo ou conflitando com `!text-white`. Mesmo com `!important`, a cascata CSS com variaveis customizadas do tema pode prevalecer.
 
-**2. Filtrar meses a partir do contrato** - Ao inves de sempre mostrar os ultimos 6 meses, o grafico calculara os meses desde `data_inicio` ate o mes atual, limitando a no maximo 12 meses.
+## Solucao Definitiva
 
-**3. Titulo legivel** - Garantir que o `CardTitle` use `!text-white` (ja aplicado, mas verificar se esta funcionando na pagina de Projetos).
+Usar `style={{ color: "#FFFFFF" }}` inline nos `CardTitle` e `style={{ color: "rgba(255,255,255,0.5)" }}` nos `CardDescription` dentro dos headers escuros. Inline styles tem a maior especificidade CSS possivel e nao podem ser sobrescritos por classes.
 
-### Arquivo: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+### Arquivos a modificar:
 
-**4. Passar `dataInicio` ao grafico** - Usar o hook `useSkillsEquipe` para obter `equipe.data_inicio` e passar como prop ao componente do grafico.
+1. **`src/components/skills/performance/MemberDonutCharts.tsx`** (linhas 125, 126, 140, 141)
+   - CardTitle: adicionar `style={{ color: "#FFFFFF" }}`
+   - CardDescription: adicionar `style={{ color: "rgba(255,255,255,0.5)" }}`
 
-## Detalhes Tecnicos
+2. **`src/components/skills/ProjetoSkillsPerformance.tsx`** (linhas 155, 156)
+   - CardTitle do Ranking: adicionar `style={{ color: "#FFFFFF" }}`
+   - CardDescription do Ranking: adicionar `style={{ color: "rgba(255,255,255,0.5)" }}`
 
-### Mudanca na interface do componente:
-```typescript
-interface Props {
-  entregas: Entrega[];
-  dataInicio?: string | null; // nova prop
-}
+### Exemplo da mudanca:
+
+Antes:
+```tsx
+<CardTitle className="!text-white">Impacto vs ROI</CardTitle>
+<CardDescription className="!text-white/50">Efetividade por membro</CardDescription>
 ```
 
-### Logica de calculo dos meses:
-- Se `dataInicio` existe: gerar meses desde essa data ate o mes atual
-- Se nao existe: manter comportamento atual (ultimos 6 meses)
-- Limitar a no maximo 12 meses para nao sobrecarregar o grafico
+Depois:
+```tsx
+<CardTitle style={{ color: "#FFFFFF" }}>Impacto vs ROI</CardTitle>
+<CardDescription style={{ color: "rgba(255,255,255,0.5)" }}>Efetividade por membro</CardDescription>
+```
 
-### Arquivos modificados:
-- `src/components/skills/charts/EntregasProjetadasVsExecutadasChart.tsx`
-- `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+Isso garante que nenhuma classe CSS, variavel de tema ou cascata possa sobrescrever a cor branca dos titulos sobre fundo escuro.
