@@ -34,18 +34,6 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
 
   return (
     <div className="space-y-6">
-      {/* Banner IA */}
-      <Card className="border-[hsl(72,50%,35%)] bg-[hsl(68,40%,88%)]">
-        <CardContent className="flex items-center gap-3 py-3">
-          <Sparkles className="h-5 w-5 text-[hsl(72,50%,35%)]" />
-          <p className="text-sm text-foreground">
-            Diagnóstico consolidado da equipe — gerado em{" "}
-            {consolidado.gerado_em
-              ? new Date(consolidado.gerado_em).toLocaleDateString("pt-BR")
-              : "data não disponível"}
-          </p>
-        </CardContent>
-      </Card>
 
       {/* Economia Total */}
       <Card className="border-border bg-card">
