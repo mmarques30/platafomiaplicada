@@ -121,9 +121,9 @@ export default function MemberDonutCharts({ ranking, entregas, projetos = [] }: 
   if (ranking.length === 0) {
     return (
       <Card className="border-border bg-card overflow-hidden">
-        <CardHeader className="bg-[#0D0D0D] rounded-t-xl">
-        <CardTitle style={{ color: "#FFFFFF" }}>Impacto vs ROI</CardTitle>
-          <CardDescription style={{ color: "rgba(255,255,255,0.5)" }}>Efetividade por membro da equipe</CardDescription>
+        <CardHeader className="bg-[#0D0D0D] rounded-t-xl dark-header">
+          <CardTitle>Impacto vs ROI</CardTitle>
+          <CardDescription>Efetividade por membro da equipe</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground text-center py-8">
@@ -136,9 +136,9 @@ export default function MemberDonutCharts({ ranking, entregas, projetos = [] }: 
 
   return (
     <Card className="border-border bg-card overflow-hidden">
-      <CardHeader className="bg-[#0D0D0D] rounded-t-xl">
-        <CardTitle style={{ color: "#FFFFFF" }}>Impacto vs ROI</CardTitle>
-        <CardDescription style={{ color: "rgba(255,255,255,0.5)" }}>Efetividade por membro da equipe</CardDescription>
+      <CardHeader className="bg-[#0D0D0D] rounded-t-xl dark-header">
+        <CardTitle>Impacto vs ROI</CardTitle>
+        <CardDescription>Efetividade por membro da equipe</CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
         <div className="flex flex-wrap justify-center gap-6">

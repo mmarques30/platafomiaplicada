@@ -463,6 +463,21 @@
     color: hsl(var(--card-foreground)) !important;
   }
 
+  /* Dark header override - must come AFTER the generic bg-card rules */
+  .dark-header,
+  .dark-header h1,
+  .dark-header h2,
+  .dark-header h3,
+  .dark-header h4,
+  .dark-header h5,
+  .dark-header h6 {
+    color: #FFFFFF !important;
+  }
+
+  .dark-header p {
+    color: rgba(255,255,255,0.5) !important;
+  }
+
   .bg-popover {
     color: hsl(var(--popover-foreground)) !important;
   }

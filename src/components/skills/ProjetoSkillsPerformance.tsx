@@ -151,9 +151,9 @@ export default function ProjetoSkillsPerformance() {
 
       {/* Ranking */}
       <Card className="border-border bg-card overflow-hidden">
-        <CardHeader className="bg-[#0D0D0D] rounded-t-xl">
-          <CardTitle style={{ color: "#FFFFFF" }}>{hasEntregas ? "Ranking de Entregas por Colaborador" : "Projetos por Colaborador"}</CardTitle>
-          <CardDescription style={{ color: "rgba(255,255,255,0.5)" }}>{hasEntregas ? "Performance e indicadores individuais" : "Projetos atribuídos por membro"}</CardDescription>
+        <CardHeader className="bg-[#0D0D0D] rounded-t-xl dark-header">
+          <CardTitle>{hasEntregas ? "Ranking de Entregas por Colaborador" : "Projetos por Colaborador"}</CardTitle>
+          <CardDescription>{hasEntregas ? "Performance e indicadores individuais" : "Projetos atribuídos por membro"}</CardDescription>
         </CardHeader>
         <CardContent>
           {ranking.length === 0 ? (
