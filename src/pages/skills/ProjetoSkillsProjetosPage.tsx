@@ -44,7 +44,7 @@ export default function ProjetoSkillsProjetosPage() {
         <TabsContent value="acompanhamento" className="space-y-6">
           
           <PortfolioOverview entregas={entregas ?? []} />
-          <EntregasProjetadasVsExecutadasChart entregas={entregas ?? []} dataInicio={equipe?.data_inicio} />
+          <EntregasProjetadasVsExecutadasChart entregas={entregas ?? []} dataInicio={equipe?.data_inicio || equipe?.created_at} />
         </TabsContent>
 
         <TabsContent value="backlog">
