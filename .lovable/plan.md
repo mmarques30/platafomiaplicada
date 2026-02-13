@@ -1,14 +1,26 @@
 
-# Remover icone do titulo "Business iAplicada" no painel admin
+# Reordenar Menu Lateral Admin: Skills acima de Business
 
 ## Mudanca
 
-Remover o icone de chave inglesa (Wrench) que aparece antes do titulo "Business iAplicada" na pagina administrativa.
+Alterar a ordem dos itens do submenu "Mentoria" no sidebar administrativo, movendo "Skills" para antes de "Business".
+
+**Ordem atual:** Bonus Globais, Academy, Business, Business iAplicada, Skills, ...
+**Nova ordem:** Bonus Globais, Academy, Skills, Business, Business iAplicada, ...
 
 ## Detalhe Tecnico
 
-### Arquivo: `src/pages/admin/mentoria/MentoriaBusinessIAplicadaPage.tsx`
+### Arquivo: `src/components/admin/AdminSidebar.tsx` (linhas 90-96)
 
-- Linha 130: Remover `<Wrench className="h-5 w-5 text-amber-500" />`
-- Remover a import de `Wrench` de lucide-react (se nao for usada em outro lugar do arquivo)
-- O titulo "Business iAplicada" permanece como esta
+Reordenar os itens do array `items` do grupo "Mentoria":
+
+```
+1. Bonus Globais
+2. Academy
+3. Skills          (sobe)
+4. Business        (desce)
+5. Business iAplicada (desce)
+6. Preview Paineis
+7. Diagnosticos
+8. Central de Duvidas
+```
