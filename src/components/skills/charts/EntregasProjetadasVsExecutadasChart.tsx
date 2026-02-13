@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3 } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -42,10 +41,9 @@ export default function EntregasProjetadasVsExecutadasChart({ entregas }: Props)
   }, [entregas]);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center gap-2 pb-2">
-        <BarChart3 className="h-5 w-5 text-muted-foreground" />
-        <CardTitle className="text-base font-semibold">
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-[#0D0D0D] rounded-t-xl pb-2">
+        <CardTitle className="text-base font-semibold text-white">
           Entregas Projetadas vs Executadas
         </CardTitle>
       </CardHeader>

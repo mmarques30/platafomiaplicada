@@ -43,12 +43,11 @@ export default function KPICard({ title, value, subtitle, icon, trend, variant =
 
   return (
     <Card className={cn("rounded-xl border", s.card)}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <p className={cn("text-sm font-medium", s.title)}>{title}</p>
-        <div className={cn(s.icon)}>{icon}</div>
+      <CardHeader className="pb-2">
+        <p className={cn("text-sm font-semibold", s.title)}>{title}</p>
       </CardHeader>
       <CardContent>
-        <p className={cn("text-2xl font-bold", s.value)}>{value}</p>
+        <p className={cn("text-2xl font-extrabold", s.value)}>{value}</p>
         <p className={cn("text-xs mt-1", s.subtitle)}>{subtitle}</p>
         {trend && (
           <div className={cn("flex items-center gap-1 mt-2 text-xs", s.trend)}>
