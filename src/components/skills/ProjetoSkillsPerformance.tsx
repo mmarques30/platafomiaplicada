@@ -110,7 +110,7 @@ export default function ProjetoSkillsPerformance() {
   return (
     <div className="space-y-6">
       {/* Filtros */}
-      <Card className="bg-[#9EB038]/5 border-[#9EB038]/20 border-l-4 border-l-[#9EB038]">
+      <Card className="bg-[#9EB038]/15 border-[#9EB038]/20 border-l-4 border-l-[#9EB038]">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <FilterSelect label="Colaborador" value={selectedCollaborator} onValueChange={setSelectedCollaborator}
