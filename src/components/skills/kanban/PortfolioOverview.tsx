@@ -54,7 +54,7 @@ export default function PortfolioOverview({ entregas }: PortfolioOverviewProps) 
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-foreground">Visão Geral do Portfólio</h2>
+      
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
