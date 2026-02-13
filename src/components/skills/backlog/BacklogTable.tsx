@@ -14,8 +14,8 @@ const statusLabels: Record<string, string> = {
 
 const prioridadeCores: Record<string, string> = {
   alta: "bg-red-500/15 text-red-700 border-red-200",
-  media: "bg-yellow-500/15 text-yellow-700 border-yellow-200",
-  baixa: "bg-green-500/15 text-green-700 border-green-200",
+  media: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
+  baixa: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
 };
 
 interface BacklogTableProps {
