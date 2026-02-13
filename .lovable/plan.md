@@ -1,33 +1,49 @@
 
+# Grafico de Barras: Entregas Projetadas vs Executadas por Mes
 
-# Separar Metricas e Kanban na aba Acompanhamento
+## Objetivo
 
-## Problema
+Adicionar um grafico de barras abaixo do `PortfolioOverview` na aba "Acompanhamento", comparando entregas projetadas (baseadas no campo `prazo`) vs executadas (baseadas no campo `concluido_em`) agrupadas por mes.
 
-A aba "Acompanhamento" esta renderizando `ProjetoSkillsKanban` inteiro, que inclui tanto o **PortfolioOverview** (metricas e KPIs) quanto o **kanban de entregas** (com DnD, filtros e colunas). O kanban de entregas nao deveria aparecer nessa aba -- somente os KPIs e metricas.
+## Logica de Dados
 
-## Solucao
+Usando os dados de `entregas` ja disponiveis no hook `useSkillsEntregas`:
 
-Modificar a aba "Acompanhamento" para renderizar apenas os componentes de metricas, removendo o kanban de entregas dessa visao.
+- **Projetadas por mes**: contar entregas cujo campo `prazo` cai em cada mes
+- **Executadas por mes**: contar entregas cujo campo `concluido_em` cai em cada mes
+- Agrupar os ultimos 6 meses (ou o range disponivel nos dados)
+- Formato de label: "Jan", "Fev", "Mar", etc.
 
-### Arquivo: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+## Implementacao
 
-**Mudancas:**
-- Remover a importacao de `ProjetoSkillsKanban`
-- Importar `PortfolioOverview` diretamente de `@/components/skills/kanban/PortfolioOverview`
-- Importar o hook `useSkillsEntregas` para obter os dados de entregas necessarios pelo PortfolioOverview
-- Na aba "Acompanhamento", renderizar:
-  1. `ResumoPerformanceCards` (KPIs de horas, ROI, entregas, semana)
-  2. `PortfolioOverview` (total de projetos, em producao, em andamento, economia, progresso geral, distribuicao por tipo)
-- A aba "Backlog" permanece inalterada com o `BacklogView`
+### 1. Novo componente: `src/components/skills/charts/EntregasProjetadasVsExecutadasChart.tsx`
 
-### Resultado
+- Recebe `entregas` como prop
+- Processa os dados agrupando por mes usando `date-fns` (ja instalado)
+- Renderiza um `BarChart` do Recharts com duas barras lado a lado:
+  - **Projetadas** (cor muted/cinza)
+  - **Executadas** (cor verde do branding `#9EB038`)
+- Usa `chartColors` do design system existente em `src/lib/chartColors.ts`
+- Encapsulado em um `Card` com titulo "Entregas Projetadas vs Executadas"
+- Tooltip customizado seguindo o padrao dos outros graficos do projeto
+
+### 2. Modificar: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+
+- Importar o novo componente
+- Renderizar abaixo do `PortfolioOverview` na aba "Acompanhamento":
 
 ```
-Aba "Acompanhamento":
-  - ResumoPerformanceCards (4 KPIs)
-  - PortfolioOverview (KPIs do portfolio, barra de progresso, distribuicao por tipo)
-
-Aba "Backlog":
-  - BacklogView (kanban/tabela de projetos do backlog) -- sem alteracao
+<TabsContent value="acompanhamento" className="space-y-6">
+  <ResumoPerformanceCards />
+  <PortfolioOverview entregas={entregas ?? []} />
+  <EntregasProjetadasVsExecutadasChart entregas={entregas ?? []} />
+</TabsContent>
 ```
+
+### Estrutura visual
+
+- Card com icone `BarChart3` e titulo "Entregas Projetadas vs Executadas"
+- Barras agrupadas por mes, duas cores (cinza para projetadas, verde para executadas)
+- Legenda inline abaixo do grafico
+- Altura do grafico: ~250px
+- Responsivo com `ResponsiveContainer`
