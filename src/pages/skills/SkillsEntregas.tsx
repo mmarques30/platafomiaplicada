@@ -90,14 +90,14 @@ export default function SkillsEntregas() {
 
       {/* Tabs */}
       <Tabs defaultValue="pendentes">
-        <TabsList>
-          <TabsTrigger value="pendentes">
+        <TabsList className="skills-tabs-list">
+          <TabsTrigger value="pendentes" className="skills-tabs-trigger">
             Pendentes ({entregasPendentes.length})
           </TabsTrigger>
-          <TabsTrigger value="aguardando">
+          <TabsTrigger value="aguardando" className="skills-tabs-trigger">
             Aguardando ({entregasAguardando.length})
           </TabsTrigger>
-          <TabsTrigger value="aprovadas">
+          <TabsTrigger value="aprovadas" className="skills-tabs-trigger">
             Aprovadas ({entregasAprovadas.length})
           </TabsTrigger>
         </TabsList>
