@@ -175,7 +175,7 @@
   }
   .skills-tabs-trigger[data-state="active"] {
     @apply bg-[#0D0D0D] shadow-sm;
-    color: #9EB038;
+    color: #9EB038 !important;
   }
 }
 
