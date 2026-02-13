@@ -27,8 +27,8 @@ export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: Wee
   return (
     <Card className="bg-[#0D0D0D] border-[#0D0D0D]">
       <CardHeader>
-        <CardTitle className="text-white">Evolução de Maturidade</CardTitle>
-        <CardDescription className="text-white/50">
+        <CardTitle className="!text-white">Evolução de Maturidade</CardTitle>
+        <CardDescription className="!text-white/50">
           {hasEntregas
             ? `Total Entregas: ${ranking.reduce((a, r) => a + r.totalEntregas, 0)}`
             : `Total Projetos: ${projetos.length}`}

@@ -42,8 +42,8 @@ export default function EntregasProjetadasVsExecutadasChart({ entregas }: Props)
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="bg-[#0D0D0D] rounded-t-xl pb-2" style={{ color: "white" }}>
-        <CardTitle className="text-base font-semibold" style={{ color: "white" }}>
+      <CardHeader className="bg-[#0D0D0D] rounded-t-xl pb-2">
+        <CardTitle className="text-base font-semibold !text-white">
           Entregas Projetadas vs Executadas
         </CardTitle>
       </CardHeader>
