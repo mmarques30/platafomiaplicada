@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
@@ -6,6 +6,7 @@ import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PortfolioOverview from "@/components/skills/kanban/PortfolioOverview";
 import PortfolioSidebar from "@/components/skills/kanban/PortfolioSidebar";
+import ProjetosResumoTable from "@/components/skills/kanban/ProjetosResumoTable";
 import BacklogView from "@/components/skills/backlog/BacklogView";
 import EntregasProjetadasVsExecutadasChart from "@/components/skills/charts/EntregasProjetadasVsExecutadasChart";
 import ProjetosFilterBar, { type ProjetosFilters } from "@/components/skills/filters/ProjetosFilterBar";
@@ -68,7 +69,7 @@ export default function ProjetoSkillsProjetosPage() {
       <Tabs defaultValue="acompanhamento" className="w-full">
         <TabsList className="skills-tabs-list">
           <TabsTrigger value="acompanhamento" className="skills-tabs-trigger">Acompanhamento</TabsTrigger>
-          <TabsTrigger value="backlog" className="skills-tabs-trigger">Backlog</TabsTrigger>
+          <TabsTrigger value="backlog" className="skills-tabs-trigger" id="backlog-tab">Backlog</TabsTrigger>
         </TabsList>
 
         <TabsContent value="acompanhamento" className="space-y-5 mt-4">
@@ -85,6 +86,13 @@ export default function ProjetoSkillsProjetosPage() {
             </div>
             <PortfolioSidebar entregas={filteredEntregas} />
           </div>
+          <ProjetosResumoTable
+            entregas={filteredEntregas}
+            onVerMais={() => {
+              const tab = document.getElementById("backlog-tab");
+              if (tab) tab.click();
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="backlog">
