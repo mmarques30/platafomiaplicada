@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ResumoPerformanceCards from "@/components/skills/visao-geral/ResumoPerformanceCards";
 import PortfolioOverview from "@/components/skills/kanban/PortfolioOverview";
 import BacklogView from "@/components/skills/backlog/BacklogView";
+import EntregasProjetadasVsExecutadasChart from "@/components/skills/charts/EntregasProjetadasVsExecutadasChart";
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 
 export default function ProjetoSkillsProjetosPage() {
@@ -41,6 +42,7 @@ export default function ProjetoSkillsProjetosPage() {
         <TabsContent value="acompanhamento" className="space-y-6">
           <ResumoPerformanceCards />
           <PortfolioOverview entregas={entregas ?? []} />
+          <EntregasProjetadasVsExecutadasChart entregas={entregas ?? []} />
         </TabsContent>
 
         <TabsContent value="backlog">
