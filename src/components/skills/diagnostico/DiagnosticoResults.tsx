@@ -14,11 +14,10 @@ import {
   BarChart3,
   Award,
   RefreshCw,
-  Sparkles,
 } from "lucide-react";
 import type { DiagnosticoSkills } from "@/hooks/useSkillsDiagnostico";
 import { useSkillsEquipe } from "@/hooks/useSkillsEquipe";
-import { useUserRole } from "@/hooks/useUserRole";
+
 import EquipeConsolidadoView from "./EquipeConsolidadoView";
 
 interface DiagnosticoResultsProps {
@@ -30,7 +29,7 @@ export default function DiagnosticoResults({ onRefill, diagnostico }: Diagnostic
   const insight = diagnostico?.insight_ia;
   const hasRealData = !!insight;
   const { consolidado, isLoading: equipeLoading } = useSkillsEquipe();
-  const { isAdmin } = useUserRole();
+  
 
   if (!hasRealData) {
     return (
@@ -66,7 +65,7 @@ export default function DiagnosticoResults({ onRefill, diagnostico }: Diagnostic
       </TabsList>
 
       <TabsContent value="minha-analise">
-        <MinhaAnaliseContent diagnostico={diagnostico} onRefill={onRefill} insight={insight} isAdmin={isAdmin} />
+        <MinhaAnaliseContent diagnostico={diagnostico} onRefill={onRefill} insight={insight} />
       </TabsContent>
 
       <TabsContent value="equipe">
@@ -115,12 +114,10 @@ function MinhaAnaliseContent({
   diagnostico,
   onRefill,
   insight,
-  isAdmin,
 }: {
   diagnostico?: DiagnosticoSkills;
   onRefill?: () => void;
   insight: any;
-  isAdmin: boolean;
 }) {
   const perfil = insight.perfil || {};
   const processos = insight.processos || [];
@@ -130,20 +127,6 @@ function MinhaAnaliseContent({
 
   return (
     <div className="space-y-6">
-      {/* Banner IA - apenas admin */}
-      {isAdmin && (
-        <Card className="border-[hsl(72,50%,35%)] bg-[hsl(68,40%,88%)]">
-          <CardContent className="flex items-center gap-3 py-3">
-            <Sparkles className="h-5 w-5 text-[hsl(72,50%,35%)]" />
-            <p className="text-sm text-foreground">
-              Análise gerada por IA em{" "}
-              {diagnostico?.insight_gerado_em
-                ? new Date(diagnostico.insight_gerado_em).toLocaleDateString("pt-BR")
-                : "data não disponível"}
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Perfil Mapeado */}
       <Card className="border-border bg-card">
@@ -229,43 +212,6 @@ function MinhaAnaliseContent({
         </CardContent>
       </Card>
 
-      {/* Insights da IA - apenas admin */}
-      {isAdmin && insights.analise && (
-        <Card className="border-border bg-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-5 w-5 text-[hsl(72,50%,35%)]" />
-              Insights Personalizados
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-foreground leading-relaxed">{insights.analise}</p>
-            {insights.oportunidades?.length > 0 && (
-              <div>
-                <p className="text-sm font-semibold text-foreground mb-2">Oportunidades:</p>
-                <ul className="space-y-1">
-                  {insights.oportunidades.map((opp: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-[hsl(72,50%,35%)]" />
-                      {opp}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {insights.primeirosPassos?.length > 0 && (
-              <div>
-                <p className="text-sm font-semibold text-foreground mb-2">Primeiros Passos:</p>
-                <ol className="space-y-1 list-decimal list-inside">
-                  {insights.primeirosPassos.map((passo: string, i: number) => (
-                    <li key={i} className="text-sm text-muted-foreground">{passo}</li>
-                  ))}
-                </ol>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
       {/* Trilha Personalizada */}
       {trilha.modulos?.length > 0 && (
