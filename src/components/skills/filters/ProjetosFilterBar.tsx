@@ -61,12 +61,12 @@ export default function ProjetosFilterBar({
     });
 
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[#9EB038]/20 bg-[#9EB038]/8 border-l-3 border-l-[#9EB038] px-3 py-2">
+    <div className="flex flex-wrap items-center gap-2 py-1">
       <Select
         value={filters.projeto}
         onValueChange={(v) => onFiltersChange({ ...filters, projeto: v })}
       >
-        <SelectTrigger className="bg-card border-border h-8 text-xs w-[140px]">
+          <SelectTrigger className="border-border/50 h-8 text-xs w-[140px] bg-transparent hover:bg-muted/50 transition-colors">
           <SelectValue placeholder="Projeto" />
         </SelectTrigger>
         <SelectContent className="bg-card border-border z-50">
@@ -81,7 +81,7 @@ export default function ProjetosFilterBar({
         value={filters.responsavel}
         onValueChange={(v) => onFiltersChange({ ...filters, responsavel: v })}
       >
-        <SelectTrigger className="bg-card border-border h-8 text-xs w-[140px]">
+        <SelectTrigger className="border-border/50 h-8 text-xs w-[140px] bg-transparent hover:bg-muted/50 transition-colors">
           <SelectValue placeholder="Responsável" />
         </SelectTrigger>
         <SelectContent className="bg-card border-border z-50">
@@ -94,7 +94,7 @@ export default function ProjetosFilterBar({
 
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" className={cn("h-8 text-xs bg-card border-border px-2.5", !filters.dataInicio && "text-muted-foreground")}>
+          <Button variant="outline" className={cn("h-8 text-xs border-border/50 bg-transparent hover:bg-muted/50 px-2.5", !filters.dataInicio && "text-muted-foreground")}>
             <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
             {filters.dataInicio ? format(filters.dataInicio, "dd/MM/yy", { locale: ptBR }) : "Início"}
           </Button>
@@ -106,7 +106,7 @@ export default function ProjetosFilterBar({
 
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" className={cn("h-8 text-xs bg-card border-border px-2.5", !filters.dataFim && "text-muted-foreground")}>
+          <Button variant="outline" className={cn("h-8 text-xs border-border/50 bg-transparent hover:bg-muted/50 px-2.5", !filters.dataFim && "text-muted-foreground")}>
             <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
             {filters.dataFim ? format(filters.dataFim, "dd/MM/yy", { locale: ptBR }) : "Fim"}
           </Button>
