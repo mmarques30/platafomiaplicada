@@ -82,7 +82,13 @@ export default function ProjetoSkillsProjetosPage() {
           <PortfolioOverview entregas={filteredEntregas} />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
-              <EntregasProjetadasVsExecutadasChart entregas={filteredEntregas} dataInicio={equipe?.data_inicio || equipe?.created_at} />
+              <EntregasProjetadasVsExecutadasChart
+                entregas={filteredEntregas}
+                dataInicio={equipe?.data_inicio || equipe?.created_at}
+                dataFim={equipe?.data_fim}
+                filtroDataInicio={filters.dataInicio}
+                filtroDataFim={filters.dataFim}
+              />
             </div>
             <PortfolioSidebar entregas={filteredEntregas} />
           </div>
