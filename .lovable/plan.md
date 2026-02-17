@@ -1,80 +1,73 @@
 
+# API REST para Dados de Visitantes
 
-## Redesign da Aba Acompanhamento - Estilo Dashboard Moderno
+## Objetivo
+Criar uma edge function que funcione como API REST pública (autenticada por API key) para que aplicações externas possam consultar dados de visitantes, top conteudos e engajamento.
 
-### Problema Atual
-- KPIs sem icones e sem indicadores de tendencia, visual plano e sem destaque
-- Grafico de barras quadrado sem gradientes ou curvas suaves
-- Sidebar com informacoes basicas sem visualizacao grafica atrativa
-- Cores apagadas, sem uso adequado da paleta verde da marca
+## Autenticacao
+A API sera protegida por uma **API key secreta** que voce define. A aplicacao externa envia essa key no header `x-api-key`. Isso evita que qualquer pessoa acesse os dados sem autorizacao.
 
-### Solucao Proposta
+## Endpoint Unico
 
-Redesenhar os 3 componentes da aba Acompanhamento seguindo o estilo do dashboard de referencia, mantendo todas as informacoes existentes e os filtros intactos.
+**`GET /api-visitantes`** com parametro `?type=` para selecionar o conjunto de dados:
 
----
+| Parametro | Retorno |
+|-----------|---------|
+| `?type=visitantes` | Lista completa de visitantes com nome, email, telefone, status, cupom, data de cadastro |
+| `?type=top-conteudos` | Top 10 conteudos mais acessados por visitantes (titulo, tipo, total de acessos) |
+| `?type=engajamento` | Todos os visitantes ordenados por engajamento (email, videos, materiais, total acessos, ultimo acesso, lista de conteudos) |
+| `?type=resumo` | Metricas gerais: total de acessos, visitantes unicos, acessos ultimos 7 dias, media por usuario |
+| sem parametro | Retorna tudo de uma vez (visitantes + top conteudos + engajamento + resumo) |
 
-### 1. KPIs com Icones e Tendencias (`PortfolioOverview.tsx`)
+## Detalhes Tecnicos
 
-**De:** Cards simples com apenas label + numero
-**Para:** Cards com icone verde, valor destacado, subtitulo descritivo e indicador de tendencia
+### 1. Criar secret para a API key
+- Sera solicitado que voce defina uma chave secreta (ex: `VISITANTES_API_KEY`) que sera usada para autenticar as chamadas externas.
 
-Cada KPI tera:
-- Icone Lucide com fundo verde suave (`bg-[#9EB038]/10`)
-- Valor grande em negrito
-- Subtitulo contextual
-- Seta de tendencia verde quando aplicavel
+### 2. Edge Function `api-visitantes/index.ts`
+- Valida o header `x-api-key` contra a secret armazenada
+- Usa o **service role key** para consultar as tabelas `profiles` e `content_access_logs` (bypass RLS)
+- Replica a mesma logica de agregacao que ja existe no hook `useContentAccessMetrics`
+- Retorna JSON formatado
 
-KPIs mantidos:
-- Total de Projetos (icone: FolderKanban)
-- Em Producao (icone: CheckCircle2)
-- Em Andamento (icone: Clock)
-- Economia Total (icone: TrendingUp)
+### 3. Configuracao no `config.toml`
+- `verify_jwt = false` (autenticacao feita via API key customizada, nao via JWT de usuario)
 
----
+### 4. Como usar na aplicacao externa
 
-### 2. Grafico de Area com Gradiente (`EntregasProjetadasVsExecutadasChart.tsx`)
+```
+GET https://ocwpsanqtfubixerjive.supabase.co/functions/v1/api-visitantes?type=visitantes
+Headers:
+  x-api-key: SUA_CHAVE_SECRETA
+```
 
-**De:** BarChart quadrado com cores neutras
-**Para:** AreaChart com curvas monotone, gradientes de preenchimento e bordas arredondadas no card
+### Resposta de exemplo (`?type=resumo`):
+```json
+{
+  "totalAccesses": 342,
+  "uniqueUsers": 45,
+  "accessesLast7Days": 67,
+  "averagePerUser": 7.6
+}
+```
 
-Mudancas tecnicas:
-- Trocar `BarChart` + `Bar` por `AreaChart` + `Area` (ja usado em outros componentes do projeto)
-- Adicionar `linearGradient` com verde da marca para a serie "executadas" e cinza suave para "projetadas"
-- `type="monotone"` para curvas suaves
-- Remover `CartesianGrid` pesado, usar linhas mais discretas
-- Card com `rounded-2xl` ao inves de cantos retos
-- Legenda customizada com bolinhas coloridas (mesmo padrao de `GraficoCalendarioSection.tsx`)
-- Aumentar altura do grafico de 250px para 280px
+### Resposta de exemplo (`?type=visitantes`):
+```json
+{
+  "visitantes": [
+    {
+      "nome": "Joao Silva",
+      "email": "joao@email.com",
+      "telefone": "11999...",
+      "created_at": "2026-01-15",
+      "conta_ativa": true,
+      "cupom": "Academy12"
+    }
+  ]
+}
+```
 
----
-
-### 3. Sidebar com Progresso Visual (`PortfolioSidebar.tsx`)
-
-**De:** Barra de progresso linear simples + lista de texto
-**Para:** Design mais rico com:
-
-- Card de Progresso Geral: manter a barra `Progress` mas adicionar um indicador circular/numerico com cor verde destaque e texto maior
-- Card de Distribuicao por Tipo: adicionar mini barras de progresso coloridas (verde em diferentes tons) ao lado de cada tipo, em vez de apenas numeros
-- Bordas `rounded-2xl` nos cards
-- Adicionar icones de cor aos tipos (bolinha colorida antes do label)
-
----
-
-### Arquivos a Modificar
-
-| Arquivo | Mudanca |
-|---|---|
-| `src/components/skills/kanban/PortfolioOverview.tsx` | Redesign com icones, tendencias e destaque verde |
-| `src/components/skills/charts/EntregasProjetadasVsExecutadasChart.tsx` | BarChart para AreaChart com gradientes |
-| `src/components/skills/kanban/PortfolioSidebar.tsx` | Progresso visual aprimorado com barras coloridas |
-
-### Detalhes Tecnicos
-
-- Usar `AreaChart`, `Area` do recharts (ja instalado e usado em `GraficoCalendarioSection.tsx`)
-- Gradientes: `linearGradient` com `#9EB038` (verde marca) e `hsl(var(--muted-foreground))` (neutro)
-- Icones: `FolderKanban`, `CheckCircle2`, `Clock`, `TrendingUp` do lucide-react
-- Cards com `rounded-2xl` e sombra sutil para profundidade
-- Todos os componentes usam as variaveis CSS do tema existente (sem cores hardcoded fora da paleta da marca)
-- Filtros (`ProjetosFilterBar`) e layout da pagina (`ProjetoSkillsProjetosPage.tsx`) permanecem inalterados
-
+## Arquivos a Criar/Modificar
+1. **Criar** `supabase/functions/api-visitantes/index.ts` -- a edge function completa
+2. **Modificar** `supabase/config.toml` -- adicionar `[functions.api-visitantes]` com `verify_jwt = false`
+3. **Criar secret** `VISITANTES_API_KEY` -- chave de autenticacao para a API
