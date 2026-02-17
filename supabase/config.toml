@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.gerar-metricas-skills]
 verify_jwt = false
+
+[functions.api-visitantes]
+verify_jwt = false
