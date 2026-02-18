@@ -5138,6 +5138,65 @@ export type Database = {
         }
         Relationships: []
       }
+      subtarefas_entregas_skills: {
+        Row: {
+          concluida: boolean
+          created_at: string
+          entrega_equipe_id: string
+          id: string
+          responsavel_id: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          concluida?: boolean
+          created_at?: string
+          entrega_equipe_id: string
+          id?: string
+          responsavel_id?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          concluida?: boolean
+          created_at?: string
+          entrega_equipe_id?: string
+          id?: string
+          responsavel_id?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subtarefas_entregas_skills_entrega_equipe_id_fkey"
+            columns: ["entrega_equipe_id"]
+            isOneToOne: false
+            referencedRelation: "entregas_equipe_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subtarefas_entregas_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subtarefas_entregas_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subtarefas_entregas_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       tarefas_mentoria: {
         Row: {
           arquivo_entrega_url: string | null
