@@ -1,38 +1,43 @@
 
 
-# Sincronizar Admin Skills com alteracoes do painel Skills
+# Integrar entregas cadastradas na aba de Entregas com edicao
 
-## Diagnostico
-Ao comparar o painel do usuario (Skills) com o painel administrativo (Mentoria > Skills), identifiquei duas lacunas onde as funcionalidades recentes nao estao refletidas:
+## Problema identificado
 
-### 1. Aba "Entregas Equipe" no admin
-- **Situacao atual**: mostra apenas campos basicos (titulo, projeto, status, prioridade, responsavel, prazo, progresso, arquivos)
-- **Falta**: contagem de subtarefas por entrega e possibilidade de expandir/visualizar as subtarefas
+Existem **duas tabelas** de entregas que nao estao conectadas na interface do usuario:
 
-### 2. Aba "Projetos" no admin
-- **Situacao atual**: lista projetos do backlog como cards individuais com status, prioridade e responsavel
-- **Falta**: contagem de entregas e subtarefas vinculadas a cada projeto (como fizemos na tabela do painel do usuario)
+1. **`entregas_skills`** (48 registros) — entregas geradas pela IA/admin, exibidas na pagina `/skills/entregas`
+2. **`entregas_equipe_skills`** (0 registros atualmente) — entregas criadas manualmente pela equipe em `/skills/projeto/entregas`
 
----
+A pagina `/skills/entregas` (componente `SkillsEntregas`) so le da tabela `entregas_skills` e exibe cards **somente leitura** — sem opcao de editar titulo, descricao, status, prazo, ou qualquer campo. As entregas ficam cadastradas no banco mas nao sao editaveis pela equipe.
 
-## Alteracoes propostas
+## Solucao
 
-### 1. `SkillsEntregasEquipeTab.tsx` — Adicionar coluna de subtarefas
-- Alterar a query do hook `useEntregasEquipe` (ou fazer query inline) para incluir `subtarefas_entregas_skills(*)` no select
-- Adicionar coluna "Subtarefas" na tabela mostrando `X/Y concluidas`
-- Opcionalmente: ao clicar na linha, expandir para mostrar a lista de subtarefas com checkbox (somente leitura no admin)
+Transformar a pagina `/skills/entregas` (`SkillsEntregas.tsx`) para:
 
-### 2. `ProjetosMapeadosTab.tsx` — Adicionar metricas de entregas/subtarefas
-- Buscar `entregas_equipe_skills` com `subtarefas_entregas_skills(*)` filtrando por `equipe_id`
-- Para cada projeto, mostrar badges com contagem de entregas vinculadas e total de subtarefas
-- Adicionar barra de progresso medio calculada das entregas (similar ao que fizemos no `ProjetosResumoTable`)
+1. **Exibir entregas de ambas as tabelas** — `entregas_skills` (geradas pela IA) e `entregas_equipe_skills` (criadas manualmente)
+2. **Tornar os cards editaveis** — ao clicar em uma entrega, abrir um modal de edicao que permite alterar status, descricao, notas, prazo, progresso e responsavel
+3. **Permitir criacao de novas entregas** pela equipe diretamente nesta aba
 
----
+## Alteracoes
+
+### 1. `src/pages/skills/SkillsEntregas.tsx`
+- Manter a busca de `entregas_skills` via `useSkillsEntregas` (entregas da IA)
+- Adicionar busca de `entregas_equipe_skills` via `useEntregasEquipe` (entregas manuais)
+- Combinar as duas listas em uma unica visualizacao, com badge indicando a origem (IA vs Manual)
+- Adicionar botao "Nova Entrega" para criar entregas manuais
+- Ao clicar em qualquer card, abrir modal de edicao:
+  - Para entregas de `entregas_skills`: permitir editar status (pendente, em_andamento, aguardando_validacao, aprovada)
+  - Para entregas de `entregas_equipe_skills`: edicao completa (titulo, descricao, status, prazo, responsavel, progresso, notas, arquivos)
+- Reutilizar o componente `EntregaEquipeModal` ja existente para as entregas manuais
+
+### 2. `src/hooks/useSkillsEntregas.ts`
+- Adicionar mutation para atualizar campos editaveis das entregas_skills (status, descricao)
 
 ## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| `src/components/admin/skills/SkillsEntregasEquipeTab.tsx` | Adicionar query com subtarefas; nova coluna "Subtarefas" na tabela mostrando contagem (concluidas/total) |
-| `src/components/admin/skills/ProjetosMapeadosTab.tsx` | Buscar entregas_equipe_skills com subtarefas; exibir badges de entregas e subtarefas em cada card de projeto; barra de progresso medio |
+| `src/pages/skills/SkillsEntregas.tsx` | Integrar ambas as tabelas; adicionar clique para editar; botao Nova Entrega; reutilizar EntregaEquipeModal |
+| `src/hooks/useSkillsEntregas.ts` | Adicionar mutation `atualizarEntrega` para update parcial em entregas_skills |
 
