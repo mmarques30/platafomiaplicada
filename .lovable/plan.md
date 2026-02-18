@@ -1,37 +1,36 @@
 
-# Adicionar campo de Observacoes nos Projetos do Backlog
 
-## Objetivo
-Permitir que os membros registrem observacoes/notas nos projetos, especialmente ao aprovar ou mudar de status.
+# Separacao Visual das Fases no Kanban
 
-## Alteracoes
+## Situacao atual
 
-### 1. Migracao no banco de dados
+O Kanban mostra 4 colunas lado a lado sem indicacao de qual fase cada uma pertence. O usuario nao consegue distinguir visualmente a **Fase 1 (Triagem)** da **Fase 2 (Execucao)**.
 
-Adicionar uma coluna `observacoes` (tipo `text`, nullable) na tabela `backlog_skills`:
+## Solucao
 
-```sql
-ALTER TABLE backlog_skills ADD COLUMN observacoes text;
+Adicionar labels de fase acima das colunas do Kanban, criando uma separacao visual clara:
+
+```text
+|--- TRIAGEM ---|------------ EXECUCAO --------------|
+| LEVANTADO     | PRIORIZADO | EM EXECUCAO | ENTREGUE |
 ```
 
-### 2. Hook `useSkillsBacklog.ts`
+### Alteracao em `BacklogKanban.tsx`
 
-Incluir `observacoes` no tipo `BacklogItem` para que o campo fique disponivel no frontend.
+- Adicionar uma linha de headers acima das colunas com dois grupos:
+  - **Triagem** (span 1 coluna): cobre a coluna "Levantado"
+  - **Execucao** (span 3 colunas): cobre "Priorizado", "Em Execucao", "Entregue"
+- Cada label tera um estilo sutil (texto pequeno, cor discreta, com um separador vertical entre as fases)
+- Tambem corrigir o erro de build do `mux-embed`
 
-### 3. Modal de detalhes `ProjetoDetailModal.tsx`
+### Correcao de build
 
-- Adicionar um campo `Textarea` editavel para observacoes, visivel para todos os status
-- O campo sera salvo automaticamente ao sair do foco (onBlur), chamando `onUpdate(item.id, { observacoes: valor })`
-- Ficar posicionado logo abaixo da descricao, com label "Observacoes"
-
-### 4. Card `BacklogCard.tsx`
-
-Nenhuma alteracao - observacoes sao informacao de detalhe, aparecem apenas no modal.
+Remover ou corrigir a referencia ao pacote `mux-embed` no `package.json` que esta causando o erro de workspace dependency.
 
 ## Resumo de arquivos
 
 | Arquivo | Alteracao |
 |---|---|
-| Migracao SQL | Nova coluna `observacoes` (text) |
-| `useSkillsBacklog.ts` | Adicionar `observacoes` ao tipo `BacklogItem` |
-| `ProjetoDetailModal.tsx` | Campo Textarea editavel para observacoes |
+| `BacklogKanban.tsx` | Labels de fase "Triagem" e "Execucao" acima das colunas |
+| `package.json` | Corrigir referencia ao `mux-embed` (se existir) |
+
