@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -50,6 +52,12 @@ interface ProjetoDetailModalProps {
 }
 
 export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusChange, onUpdate, equipeId }: ProjetoDetailModalProps) {
+  const [obsValue, setObsValue] = useState(item?.observacoes || "");
+
+  useEffect(() => {
+    setObsValue(item?.observacoes || "");
+  }, [item?.observacoes, item?.id]);
+
   const { data: membros } = useQuery({
     queryKey: ["membros-equipe-skills", equipeId],
     queryFn: async () => {
@@ -168,6 +176,28 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
               <p className="text-sm whitespace-pre-wrap">{item.descricao}</p>
             </div>
           )}
+
+          {/* Observações */}
+          <div>
+            <h4 className="text-sm font-medium text-muted-foreground mb-1">Observações</h4>
+            {onUpdate ? (
+              <Textarea
+                value={obsValue}
+                onChange={(e) => setObsValue(e.target.value)}
+                onBlur={() => {
+                  if (obsValue !== (item.observacoes || "")) {
+                    onUpdate(item.id, { observacoes: obsValue || null });
+                  }
+                }}
+                placeholder="Adicione observações sobre este projeto..."
+                className="min-h-[60px] text-sm"
+              />
+            ) : (
+              <p className="text-sm whitespace-pre-wrap text-muted-foreground">
+                {item.observacoes || "Nenhuma observação"}
+              </p>
+            )}
+          </div>
 
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3">

@@ -1,0 +1,1 @@
+ALTER TABLE backlog_skills ADD COLUMN observacoes text;

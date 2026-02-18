@@ -291,6 +291,7 @@ export type Database = {
           equipe_id: string | null
           horas_estimadas_economia: number | null
           id: string
+          observacoes: string | null
           ordem: number | null
           origem: string | null
           prioridade: string | null
@@ -308,6 +309,7 @@ export type Database = {
           equipe_id?: string | null
           horas_estimadas_economia?: number | null
           id?: string
+          observacoes?: string | null
           ordem?: number | null
           origem?: string | null
           prioridade?: string | null
@@ -325,6 +327,7 @@ export type Database = {
           equipe_id?: string | null
           horas_estimadas_economia?: number | null
           id?: string
+          observacoes?: string | null
           ordem?: number | null
           origem?: string | null
           prioridade?: string | null
