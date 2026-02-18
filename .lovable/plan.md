@@ -1,28 +1,45 @@
 
 
-# Integrar entregas da IA na pagina /skills/projeto/entregas
+# Converter entregas de cards para tabela com filtros completos
 
-## Problema
-A rota `/skills/projeto/entregas` (onde voce esta agora) usa o componente `ProjetoSkillsEntregas` que busca dados **somente** da tabela `entregas_equipe_skills` (entregas manuais da equipe). Essa tabela esta vazia, por isso nada aparece.
-
-As 48 entregas cadastradas estao na tabela `entregas_skills` (geradas pela IA/admin), que so e consultada na rota `/skills/entregas` (componente `SkillsEntregas`).
+## Problema atual
+As entregas estao exibidas em formato de cards (grid), o que dificulta a leitura e comparacao rapida. Alem disso, os filtros sao limitados (apenas status ou origem) e nao permitem filtrar por projeto, responsavel ou prazo.
 
 ## Solucao
-Aplicar a mesma logica de unificacao que fizemos no `SkillsEntregas` dentro do `ProjetoSkillsEntregas`, para que ambas as tabelas sejam exibidas nessa pagina.
 
-### Alteracoes em `src/components/skills/ProjetoSkillsEntregas.tsx`
-- Importar e usar `useSkillsEntregas` para buscar entregas da tabela `entregas_skills`
-- Combinar as duas listas (IA + manuais) em uma visualizacao unificada com badges de origem
-- Adicionar modal de edicao para entregas IA (reutilizar `EntregaSkillsEditModal`)
-- Manter o botao "Nova Entrega" para criacao de entregas manuais
-- Manter o modal `EntregaEquipeModal` para edicao de entregas manuais
+### 1. `src/components/skills/ProjetoSkillsEntregas.tsx` — Reformular para tabela com filtros
 
-### Alteracoes em `src/pages/skills/ProjetoSkillsEntregasPage.tsx`
-- Nenhuma alteracao necessaria, pois o componente filho ja recebe `equipeId`
+**Barra de filtros inline** (seguindo o padrao discreto ja usado em `ProjetosFilterBar`):
+- Filtro por Status (Select)
+- Filtro por Responsavel (Select, populado com membros da equipe)
+- Filtro por Origem (Todas / IA / Manual)
+- Filtro por Prioridade (P1/P2/P3)
+- Botao "Limpar" quando houver filtros ativos
+
+**Tabela com colunas**:
+| Titulo | Projeto | Status | Prioridade | Responsavel | Prazo | Progresso | Origem |
+|---|---|---|---|---|---|---|---|
+
+- Linhas clicaveis para abrir o modal de edicao (mesma logica atual)
+- Badges coloridos para status, prioridade e origem
+- Barra de progresso compacta na coluna Progresso
+- Manter botao "Nova Entrega" no topo
+
+### 2. `src/pages/skills/SkillsEntregas.tsx` — Mesma reformulacao
+
+**Barra de filtros inline** (mesmos filtros acima):
+- Filtro por Status
+- Filtro por Responsavel
+- Filtro por Origem
+- Botao "Limpar"
+
+**Tabela** substituindo o grid de cards, com as mesmas colunas e logica de clique.
+Manter os cards de KPI (Total, Pendentes, Aguardando, Concluidas) no topo.
 
 ## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| `src/components/skills/ProjetoSkillsEntregas.tsx` | Adicionar busca de `entregas_skills` via `useSkillsEntregas`; unificar listas; adicionar `EntregaSkillsEditModal` para edicao de entregas IA; badges de origem (IA/Manual) |
+| `src/components/skills/ProjetoSkillsEntregas.tsx` | Substituir grid de cards por Table; adicionar filtros por status, responsavel, origem e prioridade; manter modais e logica de edicao |
+| `src/pages/skills/SkillsEntregas.tsx` | Substituir grid de cards por Table; adicionar filtros por status, responsavel e origem; manter KPIs no topo e modais de edicao |
 
