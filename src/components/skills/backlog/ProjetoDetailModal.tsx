@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
 const statusLabels: Record<string, string> = {
@@ -40,9 +42,29 @@ interface ProjetoDetailModalProps {
   onOpenChange: (open: boolean) => void;
   onStatusChange?: (id: string, status: string) => void;
   onUpdate?: (id: string, fields: Record<string, any>) => void;
+  equipeId?: string | null;
 }
 
-export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusChange, onUpdate }: ProjetoDetailModalProps) {
+export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusChange, onUpdate, equipeId }: ProjetoDetailModalProps) {
+  const { data: membros } = useQuery({
+    queryKey: ["membros-equipe-skills", equipeId],
+    queryFn: async () => {
+      if (!equipeId) return [];
+      const { data, error } = await supabase
+        .from("membros_equipe_skills")
+        .select("user_id, profiles!membros_equipe_skills_user_id_fkey(id, nome_completo, avatar_url)")
+        .eq("equipe_id", equipeId)
+        .eq("status", "ativo");
+      if (error) throw error;
+      return (data || []).map((m: any) => ({
+        id: m.user_id,
+        nome: m.profiles?.nome_completo || "Sem nome",
+        avatar_url: m.profiles?.avatar_url || null,
+      }));
+    },
+    enabled: !!equipeId && open,
+  });
+
   if (!item) return null;
 
   const trilhas: any[] = Array.isArray(item.trilhas_recomendadas) ? item.trilhas_recomendadas : [];
@@ -140,17 +162,52 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
             )}
           </div>
 
-          {/* Responsável */}
-          {item.responsavel && (
-            <div className="flex items-center gap-2">
+          {/* Responsável - Editável */}
+          <div>
+            <div className="flex items-center gap-1.5 mb-1.5">
               <User className="h-4 w-4 text-muted-foreground" />
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={item.responsavel.avatar_url || ""} />
-                <AvatarFallback className="text-[9px]">{item.responsavel.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <span className="text-sm">{item.responsavel.nome}</span>
+              <span className="text-xs text-muted-foreground">Responsável</span>
             </div>
-          )}
+            {onUpdate && membros && membros.length > 0 ? (
+              <Select
+                value={item.responsavel_id || "__none__"}
+                onValueChange={(val) => {
+                  const newId = val === "__none__" ? null : val;
+                  onUpdate(item.id, { responsavel_id: newId });
+                }}
+              >
+                <SelectTrigger className="h-9 w-full text-sm">
+                  <SelectValue placeholder="Selecione um responsável" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">
+                    <span className="text-muted-foreground">Sem responsável</span>
+                  </SelectItem>
+                  {membros.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={m.avatar_url || ""} />
+                          <AvatarFallback className="text-[8px]">{m.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <span>{m.nome}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : item.responsavel ? (
+              <div className="flex items-center gap-2">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={item.responsavel.avatar_url || ""} />
+                  <AvatarFallback className="text-[9px]">{item.responsavel.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <span className="text-sm">{item.responsavel.nome}</span>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Nenhum responsável atribuído</p>
+            )}
+          </div>
 
           {/* Tags */}
           {item.tags && item.tags.length > 0 && (
