@@ -14,6 +14,7 @@ export interface BacklogItem {
   horas_estimadas_economia: number | null;
   tags: string[] | null;
   origem: string | null;
+  observacoes: string | null;
   ordem: number | null;
   equipe_id: string | null;
   created_at: string | null;
