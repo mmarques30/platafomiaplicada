@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle } from "lucide-react";
+import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,18 +11,22 @@ import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
 const statusLabels: Record<string, string> = {
   levantado: "Levantado",
+  aprovado: "Aprovado",
+  nao_aprovado: "Não Aprovado",
+  backlog: "Backlog",
   priorizado: "Priorizado",
   em_execucao: "Em Execução",
   entregue: "Entregue",
-  nao_aprovado: "Não Aprovado",
 };
 
 const statusColors: Record<string, string> = {
   levantado: "bg-muted text-muted-foreground",
+  aprovado: "bg-blue-500/15 text-blue-700 border-blue-200",
+  nao_aprovado: "bg-destructive/15 text-destructive border-destructive/30",
+  backlog: "bg-amber-500/15 text-amber-700 border-amber-200",
   priorizado: "bg-indigo-500/15 text-indigo-700 border-indigo-200",
   em_execucao: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
   entregue: "bg-emerald-500/15 text-emerald-700 border-emerald-200",
-  nao_aprovado: "bg-destructive/15 text-destructive border-destructive/30",
 };
 
 const prioridadeCores: Record<string, string> = {
@@ -99,23 +103,48 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
             )}
           </div>
 
-          {/* Ações rápidas de status */}
+          {/* Ações rápidas de status - contextuais */}
           {onStatusChange && (
             <div className="flex flex-wrap gap-2">
-              {currentStatus === "levantado" && (
+              {(currentStatus === "levantado" || currentStatus === "backlog") && (
                 <>
-                  <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "priorizado")}>
-                    <CheckCircle2 className="h-3.5 w-3.5 text-indigo-600" />
+                  <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "aprovado")}>
+                    <CheckCircle2 className="h-3.5 w-3.5 text-blue-600" />
                     Aprovar
                   </Button>
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "nao_aprovado")}>
                     <XCircle className="h-3.5 w-3.5 text-destructive" />
                     Não Aprovar
                   </Button>
+                  {currentStatus === "levantado" && (
+                    <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "backlog")}>
+                      <Archive className="h-3.5 w-3.5 text-amber-600" />
+                      Manter no Backlog
+                    </Button>
+                  )}
                 </>
+              )}
+              {currentStatus === "aprovado" && (
+                <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "priorizado")}>
+                  <ArrowRight className="h-3.5 w-3.5 text-indigo-600" />
+                  Priorizar
+                </Button>
+              )}
+              {currentStatus === "priorizado" && (
+                <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "em_execucao")}>
+                  <Play className="h-3.5 w-3.5 text-[#738925]" />
+                  Iniciar Execução
+                </Button>
+              )}
+              {currentStatus === "em_execucao" && (
+                <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "entregue")}>
+                  <PackageCheck className="h-3.5 w-3.5 text-emerald-600" />
+                  Marcar como Entregue
+                </Button>
               )}
               {currentStatus === "nao_aprovado" && (
                 <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "levantado")}>
+                  <RotateCcw className="h-3.5 w-3.5" />
                   Reabrir
                 </Button>
               )}
