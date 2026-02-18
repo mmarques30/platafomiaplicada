@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Sparkles, Target, Users, Clock, AlertTriangle, CheckCircle } from "lucide-react";
+import { Loader2, Sparkles, Target, Users, Clock, AlertTriangle, CheckCircle, ClipboardList, ListChecks } from "lucide-react";
 import { toast } from "sonner";
 import SkillsTabActions from "./SkillsTabActions";
 
@@ -28,7 +29,20 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
     enabled: !!equipeId,
   });
 
-  // Check diagnostics status for pre-requisite feedback
+  // Fetch entregas with subtarefas for metrics
+  const { data: entregasEquipe = [] } = useQuery({
+    queryKey: ["entregas-equipe-skills-projetos", equipeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("entregas_equipe_skills")
+        .select("*, subtarefas_entregas_skills(*)")
+        .eq("equipe_id", equipeId);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!equipeId,
+  });
+
   const { data: diagStatus } = useQuery({
     queryKey: ["diag-status-projetos", equipeId],
     queryFn: async () => {
@@ -73,7 +87,6 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
       toast.error("Erro ao aprovar projeto");
       return;
     }
-    // Also remove tag from linked entrega
     await supabase
       .from("entregas_skills")
       .update({ tags: newTags } as any)
@@ -90,6 +103,17 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
     baixa: "bg-green-500/10 text-green-600 border-green-500/20",
   };
 
+  // Helper to get metrics per project
+  const getProjetoMetrics = (projetoId: string) => {
+    const entregas = entregasEquipe.filter((e: any) => e.projeto_id === projetoId);
+    const subtarefasTotal = entregas.reduce((sum: number, e: any) => sum + ((e as any).subtarefas_entregas_skills?.length ?? 0), 0);
+    const subtarefasConcluidas = entregas.reduce((sum: number, e: any) => sum + ((e as any).subtarefas_entregas_skills?.filter((s: any) => s.concluida)?.length ?? 0), 0);
+    const progressoMedio = entregas.length > 0
+      ? Math.round(entregas.reduce((sum: number, e: any) => sum + (e.progresso ?? 0), 0) / entregas.length)
+      : 0;
+    return { entregasCount: entregas.length, subtarefasTotal, subtarefasConcluidas, progressoMedio };
+  };
+
   if (isLoading) return <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
 
   return (
@@ -101,23 +125,22 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
           <Badge variant="secondary" className="text-xs">{projetos.length}</Badge>
         </div>
         <div className="flex items-center gap-2">
-        <Button onClick={handleGerarProjetos} disabled={isGenerating || !diagStatus?.completos} size="sm">
-          {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-          Gerar Projetos com IA
-        </Button>
-        <SkillsTabActions
-          onClear={async () => {
-            const { error } = await supabase.from("backlog_skills").delete().eq("equipe_id", equipeId);
-            if (error) throw error;
-            queryClient.invalidateQueries({ queryKey: ["backlog-skills", equipeId] });
-          }}
-          hasData={projetos.length > 0}
-          clearDescription="Todos os projetos mapeados desta equipe serão removidos."
-        />
+          <Button onClick={handleGerarProjetos} disabled={isGenerating || !diagStatus?.completos} size="sm">
+            {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+            Gerar Projetos com IA
+          </Button>
+          <SkillsTabActions
+            onClear={async () => {
+              const { error } = await supabase.from("backlog_skills").delete().eq("equipe_id", equipeId);
+              if (error) throw error;
+              queryClient.invalidateQueries({ queryKey: ["backlog-skills", equipeId] });
+            }}
+            hasData={projetos.length > 0}
+            clearDescription="Todos os projetos mapeados desta equipe serão removidos."
+          />
         </div>
       </div>
 
-      {/* Pre-requisite indicator */}
       {diagStatus && (
         <div className={`flex items-center gap-2 p-3 rounded-lg text-sm ${diagStatus.completos > 0 ? "bg-green-500/10" : "bg-yellow-500/10"}`}>
           {diagStatus.completos > 0 ? (
@@ -145,6 +168,7 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
           {projetos.map(proj => {
             const tags: string[] = (proj as any).tags || [];
             const isPendenteAvaliacao = tags.includes("pendente_avaliacao");
+            const metrics = getProjetoMetrics(proj.id);
             
             return (
               <Card key={proj.id} className={`border-border/50 hover:shadow-sm transition-shadow ${isPendenteAvaliacao ? "border-yellow-500/40" : ""}`}>
@@ -164,12 +188,31 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
                         )}
                       </div>
                       {proj.descricao && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{proj.descricao}</p>}
-                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground flex-wrap">
                         {proj.prioridade && <Badge variant="outline" className={`text-xs ${prioridadeColors[proj.prioridade] || ""}`}>{proj.prioridade}</Badge>}
                         {(proj as any).profiles?.nome_completo && <span className="flex items-center gap-1"><Users className="h-3 w-3" />{(proj as any).profiles.nome_completo}</span>}
                         {proj.horas_estimadas_economia && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{proj.horas_estimadas_economia}h economia</span>}
                         {proj.status && <Badge variant="secondary" className="text-xs">{proj.status}</Badge>}
+                        
+                        {/* Entregas and Subtarefas badges */}
+                        <span className="flex items-center gap-1">
+                          <ClipboardList className="h-3 w-3" />
+                          {metrics.entregasCount} entrega{metrics.entregasCount !== 1 ? "s" : ""}
+                        </span>
+                        {metrics.subtarefasTotal > 0 && (
+                          <span className="flex items-center gap-1">
+                            <ListChecks className="h-3 w-3" />
+                            {metrics.subtarefasConcluidas}/{metrics.subtarefasTotal} subtarefas
+                          </span>
+                        )}
                       </div>
+                      {/* Progress bar based on average of entregas */}
+                      {metrics.entregasCount > 0 && (
+                        <div className="flex items-center gap-2 mt-2 max-w-[200px]">
+                          <Progress value={metrics.progressoMedio} className="h-2 flex-1" />
+                          <span className="text-xs text-muted-foreground">{metrics.progressoMedio}%</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
