@@ -6,12 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck, Sparkles, Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck, Sparkles, Loader2, Plus, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
+import { useEntregasEquipe, type EntregaEquipe } from "@/hooks/useEntregasEquipe";
+import { EntregaEquipeModal } from "@/components/skills/EntregaEquipeModal";
 
 const statusLabels: Record<string, string> = {
   levantado: "Levantado",
@@ -57,10 +60,40 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
   const [obsValue, setObsValue] = useState(item?.observacoes || "");
   const [areaValue, setAreaValue] = useState(item?.area_impactada || "");
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [entregaModalOpen, setEntregaModalOpen] = useState(false);
+  const [selectedEntrega, setSelectedEntrega] = useState<EntregaEquipe | null>(null);
+
   useEffect(() => {
     setObsValue(item?.observacoes || "");
     setAreaValue(item?.area_impactada || "");
   }, [item?.observacoes, item?.area_impactada, item?.id]);
+
+  // Query entregas vinculadas ao projeto
+  const { data: entregasProjeto, isLoading: loadingEntregas } = useQuery({
+    queryKey: ["entregas-projeto", item?.id],
+    queryFn: async () => {
+      if (!item?.id) return [];
+      const { data, error } = await supabase
+        .from("entregas_equipe_skills")
+        .select(`
+          *,
+          profiles:responsavel_id (nome_completo, avatar_url)
+        `)
+        .eq("projeto_id", item.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data || []).map((d: any) => ({
+        ...d,
+        arquivos: d.arquivos || [],
+        responsavel: d.profiles || null,
+      })) as EntregaEquipe[];
+    },
+    enabled: !!item?.id && open,
+  });
+
+  const queryClient = useQueryClient();
+
+  const { upsertMutation, uploadFile } = useEntregasEquipe(equipeId || null);
 
   const { data: membros } = useQuery({
     queryKey: ["membros-equipe-skills", equipeId],
@@ -424,7 +457,106 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
               </div>
             </div>
           )}
+          {/* Entregas do Projeto */}
+          <div className="border-t pt-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1.5">
+                <ClipboardList className="h-4 w-4 text-primary" />
+                <h4 className="text-sm font-medium">Entregas do Projeto</h4>
+                {entregasProjeto && entregasProjeto.length > 0 && (
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{entregasProjeto.length}</Badge>
+                )}
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs gap-1"
+                onClick={() => {
+                  setSelectedEntrega(null);
+                  setEntregaModalOpen(true);
+                }}
+              >
+                <Plus className="h-3 w-3" />
+                Nova Entrega
+              </Button>
+            </div>
+
+            {loadingEntregas ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            ) : entregasProjeto && entregasProjeto.length > 0 ? (
+              <div className="space-y-2">
+                {entregasProjeto.map((entrega) => {
+                  const statusEntregaColors: Record<string, string> = {
+                    pendente: "bg-muted text-muted-foreground",
+                    em_andamento: "bg-blue-500/15 text-blue-700",
+                    concluido: "bg-emerald-500/15 text-emerald-700",
+                    bloqueado: "bg-destructive/15 text-destructive",
+                  };
+                  const statusEntregaLabels: Record<string, string> = {
+                    pendente: "Pendente",
+                    em_andamento: "Em Andamento",
+                    concluido: "Concluído",
+                    bloqueado: "Bloqueado",
+                  };
+                  return (
+                    <button
+                      key={entrega.id}
+                      className="w-full text-left rounded-lg border bg-muted/30 p-3 hover:bg-muted/50 transition-colors"
+                      onClick={() => {
+                        setSelectedEntrega(entrega);
+                        setEntregaModalOpen(true);
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className="text-sm font-medium truncate flex-1">{entrega.titulo_equipe}</span>
+                        <Badge variant="outline" className={`text-[10px] ${statusEntregaColors[entrega.status_equipe] || ""}`}>
+                          {statusEntregaLabels[entrega.status_equipe] || entrega.status_equipe}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Progress value={entrega.progresso} className="h-1.5 flex-1" />
+                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">{entrega.progresso}%</span>
+                        {entrega.responsavel && (
+                          <Avatar className="h-5 w-5">
+                            <AvatarImage src={entrega.responsavel.avatar_url || ""} />
+                            <AvatarFallback className="text-[8px]">
+                              {entrega.responsavel.nome_completo?.substring(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground text-center py-3">Nenhuma entrega vinculada a este projeto</p>
+            )}
+          </div>
         </div>
+
+        {/* Modal de Entrega */}
+        <EntregaEquipeModal
+          open={entregaModalOpen}
+          onOpenChange={setEntregaModalOpen}
+          entrega={selectedEntrega}
+          membros={(membros || []).map(m => ({ id: m.id, nome_completo: m.nome }))}
+          onSave={(values) => {
+            upsertMutation.mutate(
+              { ...values, equipe_id: equipeId!, projeto_id: item.id },
+              {
+                onSuccess: () => {
+                  setEntregaModalOpen(false);
+                  queryClient.invalidateQueries({ queryKey: ["entregas-projeto", item.id] });
+                },
+              }
+            );
+          }}
+          onUploadFile={(file) => uploadFile(file, equipeId!)}
+          isSaving={upsertMutation.isPending}
+        />
       </DialogContent>
     </Dialog>
   );
