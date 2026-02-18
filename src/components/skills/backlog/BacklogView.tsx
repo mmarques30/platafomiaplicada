@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { LayoutGrid, List, Loader2, Plus } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useSkillsBacklog } from "@/hooks/useSkillsBacklog";
 import BacklogKanban from "./BacklogKanban";
 import BacklogTable from "./BacklogTable";
@@ -14,6 +21,33 @@ export default function BacklogView() {
   const [view, setView] = useState<string>("kanban");
   const [selectedItem, setSelectedItem] = useState<BacklogItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [filtroResponsavel, setFiltroResponsavel] = useState("todos");
+  const [filtroPrioridade, setFiltroPrioridade] = useState("todos");
+  const [filtroArea, setFiltroArea] = useState("todos");
+
+  const responsavelOptions = useMemo(() => {
+    const names = items.map(i => i.responsavel?.nome).filter(Boolean) as string[];
+    return [...new Set(names)].sort();
+  }, [items]);
+
+  const prioridadeOptions = useMemo(() => {
+    const vals = items.map(i => i.prioridade).filter(Boolean) as string[];
+    return [...new Set(vals)].sort();
+  }, [items]);
+
+  const areaOptions = useMemo(() => {
+    const vals = items.map(i => i.area_impactada).filter(Boolean) as string[];
+    return [...new Set(vals)].sort();
+  }, [items]);
+
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      if (filtroResponsavel !== "todos" && item.responsavel?.nome !== filtroResponsavel) return false;
+      if (filtroPrioridade !== "todos" && item.prioridade !== filtroPrioridade) return false;
+      if (filtroArea !== "todos" && item.area_impactada !== filtroArea) return false;
+      return true;
+    });
+  }, [items, filtroResponsavel, filtroPrioridade, filtroArea]);
 
   if (isLoading) {
     return (
@@ -43,14 +77,50 @@ export default function BacklogView() {
         </div>
       </div>
 
+      <div className="flex items-center gap-2">
+        <Select value={filtroResponsavel} onValueChange={setFiltroResponsavel}>
+          <SelectTrigger className="border-border/50 h-8 text-xs w-[160px] bg-transparent hover:bg-muted/50 transition-colors">
+            <SelectValue placeholder="Responsável" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos</SelectItem>
+            {responsavelOptions.map(r => (
+              <SelectItem key={r} value={r}>{r}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={filtroPrioridade} onValueChange={setFiltroPrioridade}>
+          <SelectTrigger className="border-border/50 h-8 text-xs w-[160px] bg-transparent hover:bg-muted/50 transition-colors">
+            <SelectValue placeholder="Prioridade" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todas</SelectItem>
+            {prioridadeOptions.map(p => (
+              <SelectItem key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={filtroArea} onValueChange={setFiltroArea}>
+          <SelectTrigger className="border-border/50 h-8 text-xs w-[160px] bg-transparent hover:bg-muted/50 transition-colors">
+            <SelectValue placeholder="Área" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todas</SelectItem>
+            {areaOptions.map(a => (
+              <SelectItem key={a} value={a}>{a}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {view === "kanban" ? (
         <BacklogKanban
-          items={items}
+          items={filteredItems}
           onStatusChange={(id, status) => updateStatus.mutate({ id, status })}
           onItemClick={setSelectedItem}
         />
       ) : (
-        <BacklogTable items={items} onItemClick={setSelectedItem} />
+        <BacklogTable items={filteredItems} onItemClick={setSelectedItem} />
       )}
 
       <ProjetoDetailModal
