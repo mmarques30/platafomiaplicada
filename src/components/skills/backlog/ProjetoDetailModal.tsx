@@ -2,15 +2,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Clock, Zap, Tag, User, BarChart3, Layers, BookOpen, ExternalLink } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
 const statusLabels: Record<string, string> = {
   levantado: "Levantado",
-  em_andamento: "Em Andamento",
-  concluido: "Concluído",
-  descartado: "Descartado",
+  priorizado: "Priorizado",
+  em_execucao: "Em Execução",
+  entregue: "Entregue",
+  nao_aprovado: "Não Aprovado",
+};
+
+const statusColors: Record<string, string> = {
+  levantado: "bg-muted text-muted-foreground",
+  priorizado: "bg-indigo-500/15 text-indigo-700 border-indigo-200",
+  em_execucao: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
+  entregue: "bg-emerald-500/15 text-emerald-700 border-emerald-200",
+  nao_aprovado: "bg-destructive/15 text-destructive border-destructive/30",
 };
 
 const prioridadeCores: Record<string, string> = {
@@ -28,12 +38,15 @@ interface ProjetoDetailModalProps {
   item: BacklogItem | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onStatusChange?: (id: string, status: string) => void;
+  onUpdate?: (id: string, fields: Record<string, any>) => void;
 }
 
-export default function ProjetoDetailModal({ item, open, onOpenChange }: ProjetoDetailModalProps) {
+export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusChange, onUpdate }: ProjetoDetailModalProps) {
   if (!item) return null;
 
   const trilhas: any[] = Array.isArray(item.trilhas_recomendadas) ? item.trilhas_recomendadas : [];
+  const currentStatus = item.status || "levantado";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -49,7 +62,9 @@ export default function ProjetoDetailModal({ item, open, onOpenChange }: Projeto
         <div className="space-y-4 pt-2">
           {/* Status + Prioridade */}
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline">{statusLabels[item.status || "levantado"]}</Badge>
+            <Badge variant="outline" className={statusColors[currentStatus]}>
+              {statusLabels[currentStatus] || currentStatus}
+            </Badge>
             {item.prioridade && (
               <Badge variant="outline" className={prioridadeCores[item.prioridade]}>
                 {item.prioridade.toUpperCase()}
@@ -61,6 +76,39 @@ export default function ProjetoDetailModal({ item, open, onOpenChange }: Projeto
               </Badge>
             )}
           </div>
+
+          {/* Ações rápidas de status */}
+          {onStatusChange && (
+            <div className="flex flex-wrap gap-2">
+              {currentStatus === "levantado" && (
+                <>
+                  <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "priorizado")}>
+                    <CheckCircle2 className="h-3.5 w-3.5 text-indigo-600" />
+                    Aprovar
+                  </Button>
+                  <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "nao_aprovado")}>
+                    <XCircle className="h-3.5 w-3.5 text-destructive" />
+                    Não Aprovar
+                  </Button>
+                </>
+              )}
+              {currentStatus === "nao_aprovado" && (
+                <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "levantado")}>
+                  Reabrir
+                </Button>
+              )}
+              <Select value={currentStatus} onValueChange={s => onStatusChange(item.id, s)}>
+                <SelectTrigger className="h-8 w-[160px] text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(statusLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Descrição */}
           {item.descricao && (
@@ -81,7 +129,6 @@ export default function ProjetoDetailModal({ item, open, onOpenChange }: Projeto
                 </div>
               </div>
             )}
-
             {item.horas_estimadas_economia != null && (
               <div className="flex items-start gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
@@ -134,26 +181,18 @@ export default function ProjetoDetailModal({ item, open, onOpenChange }: Projeto
                       <span className="text-sm font-medium leading-snug flex-1">
                         {trilha.trilha_titulo || "Trilha"}
                       </span>
-                      <Badge
-                        variant="outline"
-                        className={prioridadeTrilhaCores[trilha.prioridade] || ""}
-                      >
+                      <Badge variant="outline" className={prioridadeTrilhaCores[trilha.prioridade] || ""}>
                         {trilha.prioridade === "essencial" ? "Essencial" : "Recomendado"}
                       </Badge>
                     </div>
-
                     {trilha.modulos_prioritarios?.length > 0 && (
                       <p className="text-xs text-muted-foreground">
                         Módulos prioritários: {trilha.modulos_prioritarios.join(", ")}
                       </p>
                     )}
-
                     {trilha.justificativa && (
-                      <p className="text-xs text-muted-foreground italic">
-                        {trilha.justificativa}
-                      </p>
+                      <p className="text-xs text-muted-foreground italic">{trilha.justificativa}</p>
                     )}
-
                     {trilha.trilha_id && (
                       <Link to={`/trilhas/${trilha.trilha_id}`}>
                         <Button variant="outline" size="sm" className="mt-1 h-7 text-xs gap-1.5">

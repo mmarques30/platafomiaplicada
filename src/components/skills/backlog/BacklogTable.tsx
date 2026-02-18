@@ -7,9 +7,18 @@ import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
 const statusLabels: Record<string, string> = {
   levantado: "Levantado",
-  em_andamento: "Em Andamento",
-  concluido: "Concluído",
-  descartado: "Descartado",
+  priorizado: "Priorizado",
+  em_execucao: "Em Execução",
+  entregue: "Entregue",
+  nao_aprovado: "Não Aprovado",
+};
+
+const statusColors: Record<string, string> = {
+  levantado: "",
+  priorizado: "bg-indigo-500/15 text-indigo-700 border-indigo-200",
+  em_execucao: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
+  entregue: "bg-emerald-500/15 text-emerald-700 border-emerald-200",
+  nao_aprovado: "bg-destructive/15 text-destructive border-destructive/30",
 };
 
 const prioridadeCores: Record<string, string> = {
@@ -55,7 +64,9 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">{item.area_impactada || "—"}</TableCell>
               <TableCell>
-                <Badge variant="outline" className="text-xs">{statusLabels[item.status || "levantado"] || item.status}</Badge>
+                <Badge variant="outline" className={cn("text-xs", statusColors[item.status || "levantado"])}>
+                  {statusLabels[item.status || "levantado"] || item.status}
+                </Badge>
               </TableCell>
               <TableCell>
                 {item.prioridade && (
