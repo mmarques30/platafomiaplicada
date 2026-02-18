@@ -115,9 +115,9 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
               <Select value={prioridade} onValueChange={setPrioridade}>
                 <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="alta">Alta</SelectItem>
-                  <SelectItem value="media">Média</SelectItem>
-                  <SelectItem value="baixa">Baixa</SelectItem>
+                  <SelectItem value="p1">P1</SelectItem>
+                  <SelectItem value="p2">P2</SelectItem>
+                  <SelectItem value="p3">P3</SelectItem>
                 </SelectContent>
               </Select>
             </div>

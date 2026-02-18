@@ -101,7 +101,7 @@ export default function BacklogView() {
           <SelectContent>
             <SelectItem value="todos">Todas</SelectItem>
             {prioridadeOptions.map(p => (
-              <SelectItem key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</SelectItem>
+              <SelectItem key={p} value={p}>{p.toUpperCase()}</SelectItem>
             ))}
           </SelectContent>
         </Select>

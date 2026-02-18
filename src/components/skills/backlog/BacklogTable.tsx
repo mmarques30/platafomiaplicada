@@ -26,6 +26,9 @@ const statusColors: Record<string, string> = {
 };
 
 const prioridadeCores: Record<string, string> = {
+  p1: "bg-red-500/15 text-red-700 border-red-200",
+  p2: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
+  p3: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
   alta: "bg-red-500/15 text-red-700 border-red-200",
   media: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
   baixa: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
