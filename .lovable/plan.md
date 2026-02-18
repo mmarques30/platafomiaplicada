@@ -1,46 +1,94 @@
 
 
-# Editar Responsavel nos Projetos do Backlog
+# Fluxo Completo de Projetos no Backlog
 
-## Problema
-A secao "Responsavel" no modal de detalhes do projeto e somente leitura. Nao existe opcao para trocar ou atribuir um responsavel.
+## Entendimento
 
-## Solucao
+O ciclo de vida de um projeto no backlog tem duas fases:
 
-Trocar o display estatico do responsavel por um Select editavel, populado com os membros ativos da equipe. Qualquer membro pode alterar.
+```text
+FASE 1: TRIAGEM (avaliar o que fazer com o projeto)
 
-### Alteracoes
+  Projeto Levantado
+         |
+    [AVALIACAO]
+         |
+         +---> Aprovado -------> segue para Fase 2
+         +---> Nao Aprovado ---> rejeitado (secao separada)
+         +---> Manter Backlog --> aguarda reavaliacao futura
 
-**1. `src/components/skills/backlog/ProjetoDetailModal.tsx`**
+FASE 2: EXECUCAO (pipeline do projeto aprovado)
 
-- Adicionar uma query para buscar membros ativos da equipe usando `membros_equipe_skills` + `profiles`
-- Substituir a secao read-only do responsavel por um `Select` com avatar e nome de cada membro
-- Incluir opcao "Sem responsavel" para remover atribuicao
-- Ao selecionar, chamar `onUpdate(item.id, { responsavel_id: selectedId })` que ja esta conectado ao `updateItem` do hook
-
-**2. `src/hooks/useSkillsBacklog.ts`**
-
-- Nenhuma alteracao necessaria. O `updateItem` ja suporta atualizar qualquer campo, incluindo `responsavel_id`.
-
-### Detalhes tecnicos
-
-O modal recebera o `equipeId` como nova prop (vindo do `useSkillsMembro` no `BacklogView`). Com o `equipeId`, fara uma query:
-
-```typescript
-supabase
-  .from("membros_equipe_skills")
-  .select("user_id, profiles!membros_equipe_skills_user_id_fkey(id, nome_completo, avatar_url)")
-  .eq("equipe_id", equipeId)
-  .eq("status", "ativo")
+  Aprovado --> Priorizado --> Em Execucao --> Entregue
 ```
 
-O Select mostrara o avatar + nome de cada membro, e a opcao "Sem responsavel" (valor `null`).
+Os status completos no banco serao:
+- `levantado` - novo, aguardando triagem
+- `aprovado` - avaliado e aceito
+- `nao_aprovado` - rejeitado
+- `backlog` - mantido para depois
+- `priorizado` - aprovado e priorizado para execucao
+- `em_execucao` - em andamento
+- `entregue` - concluido/entregue
 
-### Arquivos alterados
+## Alteracoes
+
+### 1. Migracao no banco de dados
+
+Atualizar o check constraint para incluir todos os status:
+
+```sql
+ALTER TABLE backlog_skills DROP CONSTRAINT IF EXISTS backlog_skills_status_check;
+ALTER TABLE backlog_skills ADD CONSTRAINT backlog_skills_status_check
+  CHECK (status IN (
+    'levantado', 'aprovado', 'nao_aprovado', 'backlog',
+    'priorizado', 'em_execucao', 'entregue'
+  ));
+```
+
+Tambem corrigir o erro de build do `mux-embed` (workspace dependency nao encontrada).
+
+### 2. Kanban reorganizado (`BacklogKanban.tsx`)
+
+Manter as 4 colunas principais do pipeline de execucao, mas agora com o fluxo correto:
+
+| Coluna | Status incluidos | Significado |
+|---|---|---|
+| LEVANTADO | `levantado` + `backlog` | Projetos novos e mantidos para depois |
+| PRIORIZADO | `aprovado` + `priorizado` | Aprovados e priorizados |
+| EM EXECUCAO | `em_execucao` | Em andamento |
+| ENTREGUE | `entregue` | Concluidos |
+
+Projetos `nao_aprovado` continuam na secao separada abaixo.
+
+### 3. Modal de detalhes (`ProjetoDetailModal.tsx`)
+
+Mostrar botoes de acao **contextuais** conforme o status atual:
+
+- **Se `levantado` ou `backlog`**: Botoes "Aprovar", "Nao Aprovar", "Manter no Backlog"
+- **Se `aprovado`**: Botao "Priorizar" (muda para `priorizado`)
+- **Se `priorizado`**: Botao "Iniciar Execucao"
+- **Se `em_execucao`**: Botao "Marcar como Entregue"
+- **Se `nao_aprovado`**: Botao "Reabrir"
+
+Manter tambem o select manual com todos os status para flexibilidade.
+
+Atualizar os mapas de labels e cores para incluir os novos status (`aprovado`, `backlog`).
+
+### 4. Tabela (`BacklogTable.tsx`)
+
+Atualizar labels e cores para incluir os novos status.
+
+### 5. Filtros (`BacklogView.tsx`)
+
+Nenhuma alteracao necessaria nos filtros (ja filtram por responsavel, prioridade e area).
+
+## Resumo de arquivos
 
 | Arquivo | Alteracao |
 |---|---|
-| `ProjetoDetailModal.tsx` | Query de membros + Select editavel para responsavel |
-| `BacklogView.tsx` | Passar `equipeId` como prop para o modal |
+| Migracao SQL | Check constraint com 7 status + fix mux-embed |
+| `BacklogKanban.tsx` | Agrupar status nas 4 colunas corretas |
+| `ProjetoDetailModal.tsx` | Botoes contextuais por fase + labels/cores novos status |
+| `BacklogTable.tsx` | Labels e cores dos novos status |
 
-Nenhuma alteracao no banco de dados. A RLS ja permite que todos os membros atualizem o backlog.
