@@ -1,49 +1,35 @@
 
-# Subtarefas nas Entregas
+# Correcao da contagem de projetos no painel
 
-## O que sera feito
-Adicionar um sistema de **subtarefas** dentro de cada entrega, permitindo quebrar uma entrega em tarefas menores, atribuir responsaveis a cada uma, e calcular o progresso da entrega com base na conclusao das subtarefas.
+## Problema identificado
+A aba "Acompanhamento" da pagina de Projetos Skills esta mostrando **48 projetos** porque o componente `PortfolioOverview` recebe dados da tabela `entregas_skills` (entregas/tarefas individuais), mas exibe com o rotulo "Total de Projetos". Na realidade existem apenas **12 projetos** na tabela `backlog_skills`.
 
-## Fluxo do usuario
-1. Ao editar uma entrega no modal, uma secao "Subtarefas" aparece abaixo dos campos existentes
-2. O usuario clica em "Adicionar Subtarefa", preenche titulo e seleciona um responsavel
-3. Cada subtarefa tem um checkbox para marcar como concluida
-4. O progresso da entrega e recalculado automaticamente com base nas subtarefas concluidas (ex: 3 de 5 = 60%)
-5. Se nao houver subtarefas, o slider manual de progresso continua funcionando normalmente
+O fluxo atual e:
+- `ProjetoSkillsProjetosPage` busca dados via `useSkillsEntregas()` (tabela `entregas_skills` = 48 registros)
+- Passa esses dados para `PortfolioOverview` como `entregas`
+- `PortfolioOverview` conta `entregas.length` e exibe como "Total de Projetos"
 
-## Alteracoes
+## Solucao
+Separar corretamente o que sao **projetos** (backlog_skills) e **entregas** (entregas_skills) no painel de acompanhamento.
 
-### 1. Migracao de banco de dados
-Nova tabela `subtarefas_entregas_skills`:
+### 1. `PortfolioOverview.tsx`
+- Adicionar uma prop `projetos` (lista de itens do backlog) alem da prop `entregas` existente
+- O KPI "Total de Projetos" passa a contar `projetos.length` (dados do `backlog_skills`)
+- Os demais KPIs ("Em Producao", "Em Andamento", "Economia Total") continuam baseados nas entregas, pois sao metricas de execucao
+- Adicionar um KPI "Total de Entregas" para mostrar `entregas.length`
 
-| Coluna | Tipo | Descricao |
-|---|---|---|
-| id | UUID PK | Identificador |
-| entrega_equipe_id | UUID FK -> entregas_equipe_skills | Entrega pai |
-| titulo | TEXT NOT NULL | Nome da subtarefa |
-| responsavel_id | UUID FK -> profiles | Quem executa |
-| concluida | BOOLEAN DEFAULT false | Status |
-| created_at | TIMESTAMPTZ | Criacao |
-| updated_at | TIMESTAMPTZ | Atualizacao |
+### 2. `ProjetoSkillsProjetosPage.tsx`
+- Importar `useSkillsBacklog` para obter os projetos reais
+- Passar `items` do backlog como prop `projetos` para `PortfolioOverview`
 
-RLS: mesmas regras da tabela pai (membros da equipe e admins)
-
-### 2. `EntregaEquipeModal.tsx`
-- Adicionar secao "Subtarefas" com:
-  - Lista de subtarefas existentes (checkbox + titulo + avatar do responsavel + botao remover)
-  - Input inline para adicionar nova subtarefa (titulo + select de responsavel)
-  - Calculo automatico do progresso quando ha subtarefas (sobrescreve o slider manual)
-- Quando ha subtarefas, o slider de progresso fica desabilitado e mostra o valor calculado
-- Quando nao ha subtarefas, o slider manual continua funcionando
-
-### 3. Hook ou queries inline
-- Buscar subtarefas por `entrega_equipe_id` ao abrir o modal
-- CRUD de subtarefas (insert, update concluida, delete) com invalidacao de cache
-- Recalcular progresso da entrega pai ao alterar subtarefas
+### 3. Ajustes nos rotulos
+- "Total de Projetos" mostra a contagem real do backlog (12)
+- "Total de Entregas" mostra a contagem de entregas (48)
+- Demais KPIs permanecem inalterados
 
 ## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| Migracao SQL | Criar tabela `subtarefas_entregas_skills` com RLS |
-| `src/components/skills/EntregaEquipeModal.tsx` | Secao de subtarefas com CRUD inline e calculo de progresso |
+| `src/components/skills/kanban/PortfolioOverview.tsx` | Adicionar prop `projetos`, separar contagem de projetos vs entregas |
+| `src/pages/skills/ProjetoSkillsProjetosPage.tsx` | Importar `useSkillsBacklog`, passar `items` como `projetos` |
