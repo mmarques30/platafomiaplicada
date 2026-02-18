@@ -8,10 +8,10 @@ import { ReactNode } from "react";
 import { XCircle } from "lucide-react";
 
 const columns = [
-  { id: "levantado", title: "LEVANTADO", headerBg: "hsl(var(--muted))" },
-  { id: "priorizado", title: "PRIORIZADO", headerBg: "rgba(99, 102, 241, 0.12)" },
-  { id: "em_execucao", title: "EM EXECUÇÃO", headerBg: "rgba(158, 176, 56, 0.12)" },
-  { id: "entregue", title: "ENTREGUE", headerBg: "rgba(115, 137, 37, 0.15)" },
+  { id: "levantado", title: "LEVANTADO", headerBg: "hsl(var(--muted))", statuses: ["levantado", "backlog"] },
+  { id: "priorizado", title: "PRIORIZADO", headerBg: "rgba(99, 102, 241, 0.12)", statuses: ["aprovado", "priorizado"] },
+  { id: "em_execucao", title: "EM EXECUÇÃO", headerBg: "rgba(158, 176, 56, 0.12)", statuses: ["em_execucao"] },
+  { id: "entregue", title: "ENTREGUE", headerBg: "rgba(115, 137, 37, 0.15)", statuses: ["entregue"] },
 ];
 
 function Column({ id, title, headerBg, children, count }: { id: string; title: string; headerBg: string; children: ReactNode; count: number }) {
@@ -54,7 +54,7 @@ export default function BacklogKanban({ items, onStatusChange, onItemClick }: Ba
   const naoAprovados = items.filter(i => i.status === "nao_aprovado");
   const grouped = columns.map(col => ({
     ...col,
-    items: items.filter(i => (i.status || "levantado") === col.id),
+    items: items.filter(i => col.statuses.includes(i.status || "levantado")),
   }));
 
   return (
