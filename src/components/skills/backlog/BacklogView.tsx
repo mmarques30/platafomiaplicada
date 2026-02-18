@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useSkillsBacklog } from "@/hooks/useSkillsBacklog";
+import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import BacklogKanban from "./BacklogKanban";
 import BacklogTable from "./BacklogTable";
 import ProjetoDetailModal from "./ProjetoDetailModal";
@@ -18,6 +19,7 @@ import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
 export default function BacklogView() {
   const { items, isLoading, updateStatus, addItem, updateItem } = useSkillsBacklog();
+  const { equipeId } = useSkillsMembro();
   const [view, setView] = useState<string>("kanban");
   const [selectedItem, setSelectedItem] = useState<BacklogItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -133,8 +135,8 @@ export default function BacklogView() {
         }}
         onUpdate={(id, fields) => {
           updateItem.mutate({ id, ...fields });
-          setSelectedItem(null);
         }}
+        equipeId={equipeId}
       />
 
       <AddProjetoModal
