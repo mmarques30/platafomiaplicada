@@ -1,49 +1,46 @@
 
 
-# Separar "Aprovado" e "Priorizado" no Kanban
+# Botao de IA para Personalizar Projetos
 
-## Problema
-Hoje os status `aprovado` e `priorizado` caem na mesma coluna "PRIORIZADO", sem distinção visual. O usuário precisa saber quais projetos foram apenas aprovados e quais já foram priorizados para execução.
+## O que sera feito
+Adicionar um botao "Personalizar com IA" nos modais de criar e editar projetos. Ao clicar, a IA gera automaticamente uma descricao detalhada e uma solucao para o projeto com base no titulo, area impactada e contexto da equipe.
 
-## Solução
-Separar em 5 colunas no Kanban, adicionando a coluna "APROVADO" entre "LEVANTADO" e "PRIORIZADO".
+## Fluxo do usuario
+1. No modal de **criar projeto**: apos preencher o titulo (obrigatorio), o usuario clica no botao de IA ao lado do campo "Descricao" e a IA gera uma descricao personalizada
+2. No modal de **editar projeto** (ProjetoDetailModal): um botao de IA aparece ao lado da descricao para regenerar/personalizar o texto
 
-```text
-|--- TRIAGEM ---------|-------------- EXECUÇÃO ------------------|
-| LEVANTADO | APROVADO | PRIORIZADO | EM EXECUÇÃO |   ENTREGUE   |
-```
+## Alteracoes
 
-## Alterações
+### 1. Nova Edge Function: `personalizar-projeto-skills`
+- Recebe: `titulo`, `descricao_atual` (opcional), `area_impactada` (opcional), `contexto_equipe` (opcional)
+- Usa Lovable AI Gateway (`google/gemini-3-flash-preview`) para gerar uma descricao clara e objetiva do projeto, incluindo problema, solucao proposta e resultado esperado
+- Retorna: `descricao` gerada pela IA
 
-### `BacklogKanban.tsx`
+### 2. `AddProjetoModal.tsx`
+- Adicionar botao com icone de "varinha magica" (Sparkles) ao lado do label "Descricao"
+- Ao clicar, envia o titulo e area para a edge function e preenche o campo descricao com o resultado
+- Botao desabilitado se o titulo estiver vazio
+- Indicador de loading durante a geracao
 
-1. **Adicionar coluna "APROVADO"** no array `columns`:
-   - `{ id: "aprovado", title: "APROVADO", headerBg: "rgba(59, 130, 246, 0.10)", statuses: ["aprovado"] }`
-   - A coluna "PRIORIZADO" passa a ter apenas `statuses: ["priorizado"]`
+### 3. `ProjetoDetailModal.tsx`
+- Adicionar botao "Personalizar com IA" abaixo da descricao (quando `onUpdate` esta disponivel, ou seja, modo edicao)
+- Ao clicar, envia titulo + descricao atual + area para a IA regenerar
+- O resultado atualiza o campo descricao via `onUpdate`
+- Loading state no botao durante a geracao
 
-2. **Ajustar grid de 4 para 5 colunas**: `grid-cols-5`
+### 4. `supabase/config.toml`
+- Registrar a nova funcao `personalizar-projeto-skills` com `verify_jwt = false`
 
-3. **Ajustar headers de fase**:
-   - Fase 1 (Triagem): span 2 colunas (Levantado + Aprovado)
-   - Fase 2 (Execução): span 3 colunas (Priorizado + Em Execução + Entregue)
+### 5. Correcao de build
+- Remover o `bun.lock` corrompido que causa o erro do `mux-embed`
 
-4. **Ajustar seção "Não Aprovados"** para usar `grid-cols-5`
+## Detalhes tecnicos
 
-### `BacklogCard.tsx`
-
-5. **Adicionar badge de status** no card para distinguir visualmente "aprovado" vs "priorizado":
-   - Badge verde claro para "aprovado"
-   - Badge roxo/indigo para "priorizado"
-   - Aparece apenas para esses dois status (nos demais não é necessário pois a coluna já indica)
-
-### Correção de build
-
-6. Corrigir o erro do `mux-embed` workspace dependency que está impedindo o build
-
-## Resumo de arquivos
-
-| Arquivo | Alteração |
+| Arquivo | Acao |
 |---|---|
-| `BacklogKanban.tsx` | Nova coluna "Aprovado", grid 5 colunas, headers de fase ajustados |
-| `BacklogCard.tsx` | Badge de status para aprovado/priorizado |
+| `supabase/functions/personalizar-projeto-skills/index.ts` | Nova edge function usando Lovable AI Gateway |
+| `src/components/skills/backlog/AddProjetoModal.tsx` | Botao IA no campo descricao |
+| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Botao IA para personalizar descricao existente |
+| `supabase/config.toml` | Registrar nova funcao |
+| `bun.lock` | Deletar para corrigir build |
 
