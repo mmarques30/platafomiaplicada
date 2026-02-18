@@ -1,35 +1,38 @@
 
-# Entregas e Subtarefas por Projeto no Acompanhamento
 
-## O que sera feito
-Transformar a tabela "Visao Geral dos Projetos" na aba Acompanhamento para mostrar **projetos do backlog** com colunas adicionais de **quantidade de entregas** e **quantidade de subtarefas** vinculadas a cada projeto.
+# Sincronizar Admin Skills com alteracoes do painel Skills
 
-## Situacao atual
-- A `ProjetosResumoTable` recebe `entregas` (da tabela `entregas_skills`) e lista cada entrega como se fosse um projeto
-- Nao mostra contagem de entregas por projeto nem subtarefas
+## Diagnostico
+Ao comparar o painel do usuario (Skills) com o painel administrativo (Mentoria > Skills), identifiquei duas lacunas onde as funcionalidades recentes nao estao refletidas:
 
-## Solucao
+### 1. Aba "Entregas Equipe" no admin
+- **Situacao atual**: mostra apenas campos basicos (titulo, projeto, status, prioridade, responsavel, prazo, progresso, arquivos)
+- **Falta**: contagem de subtarefas por entrega e possibilidade de expandir/visualizar as subtarefas
 
-### 1. `ProjetoSkillsProjetosPage.tsx`
-- Buscar entregas da equipe (`entregas_equipe_skills`) com contagem de subtarefas usando query com join
-- Passar tanto `projetos` (backlog) quanto `entregasEquipe` (com subtarefas) para `ProjetosResumoTable`
+### 2. Aba "Projetos" no admin
+- **Situacao atual**: lista projetos do backlog como cards individuais com status, prioridade e responsavel
+- **Falta**: contagem de entregas e subtarefas vinculadas a cada projeto (como fizemos na tabela do painel do usuario)
 
-### 2. `ProjetosResumoTable.tsx`
-- Alterar a tabela para iterar sobre **projetos** (backlog_skills) em vez de entregas
-- Adicionar colunas "Entregas" e "Subtarefas" que mostram a contagem de entregas vinculadas a cada projeto e o total de subtarefas dessas entregas
-- Manter colunas existentes (Status, Prioridade, Progresso) baseadas no projeto do backlog
-- O progresso do projeto sera calculado como media do progresso das entregas vinculadas
+---
 
-### 3. Query adicional na pagina
-- Buscar `entregas_equipe_skills` agrupadas por `projeto_id` com contagem de subtarefas via query inline:
-```sql
-entregas_equipe_skills (*, subtarefas_entregas_skills(count))
-```
-- Agrupar os dados por projeto para montar as contagens
+## Alteracoes propostas
+
+### 1. `SkillsEntregasEquipeTab.tsx` — Adicionar coluna de subtarefas
+- Alterar a query do hook `useEntregasEquipe` (ou fazer query inline) para incluir `subtarefas_entregas_skills(*)` no select
+- Adicionar coluna "Subtarefas" na tabela mostrando `X/Y concluidas`
+- Opcionalmente: ao clicar na linha, expandir para mostrar a lista de subtarefas com checkbox (somente leitura no admin)
+
+### 2. `ProjetosMapeadosTab.tsx` — Adicionar metricas de entregas/subtarefas
+- Buscar `entregas_equipe_skills` com `subtarefas_entregas_skills(*)` filtrando por `equipe_id`
+- Para cada projeto, mostrar badges com contagem de entregas vinculadas e total de subtarefas
+- Adicionar barra de progresso medio calculada das entregas (similar ao que fizemos no `ProjetosResumoTable`)
+
+---
 
 ## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| `src/pages/skills/ProjetoSkillsProjetosPage.tsx` | Adicionar query para buscar entregas_equipe_skills com contagem de subtarefas; passar projetos e dados agregados para ProjetosResumoTable |
-| `src/components/skills/kanban/ProjetosResumoTable.tsx` | Refatorar para iterar projetos do backlog; adicionar colunas Entregas e Subtarefas com contagens; calcular progresso medio |
+| `src/components/admin/skills/SkillsEntregasEquipeTab.tsx` | Adicionar query com subtarefas; nova coluna "Subtarefas" na tabela mostrando contagem (concluidas/total) |
+| `src/components/admin/skills/ProjetosMapeadosTab.tsx` | Buscar entregas_equipe_skills com subtarefas; exibir badges de entregas e subtarefas em cada card de projeto; barra de progresso medio |
+
