@@ -1,35 +1,35 @@
 
-# Correcao da contagem de projetos no painel
+# Entregas e Subtarefas por Projeto no Acompanhamento
 
-## Problema identificado
-A aba "Acompanhamento" da pagina de Projetos Skills esta mostrando **48 projetos** porque o componente `PortfolioOverview` recebe dados da tabela `entregas_skills` (entregas/tarefas individuais), mas exibe com o rotulo "Total de Projetos". Na realidade existem apenas **12 projetos** na tabela `backlog_skills`.
+## O que sera feito
+Transformar a tabela "Visao Geral dos Projetos" na aba Acompanhamento para mostrar **projetos do backlog** com colunas adicionais de **quantidade de entregas** e **quantidade de subtarefas** vinculadas a cada projeto.
 
-O fluxo atual e:
-- `ProjetoSkillsProjetosPage` busca dados via `useSkillsEntregas()` (tabela `entregas_skills` = 48 registros)
-- Passa esses dados para `PortfolioOverview` como `entregas`
-- `PortfolioOverview` conta `entregas.length` e exibe como "Total de Projetos"
+## Situacao atual
+- A `ProjetosResumoTable` recebe `entregas` (da tabela `entregas_skills`) e lista cada entrega como se fosse um projeto
+- Nao mostra contagem de entregas por projeto nem subtarefas
 
 ## Solucao
-Separar corretamente o que sao **projetos** (backlog_skills) e **entregas** (entregas_skills) no painel de acompanhamento.
 
-### 1. `PortfolioOverview.tsx`
-- Adicionar uma prop `projetos` (lista de itens do backlog) alem da prop `entregas` existente
-- O KPI "Total de Projetos" passa a contar `projetos.length` (dados do `backlog_skills`)
-- Os demais KPIs ("Em Producao", "Em Andamento", "Economia Total") continuam baseados nas entregas, pois sao metricas de execucao
-- Adicionar um KPI "Total de Entregas" para mostrar `entregas.length`
+### 1. `ProjetoSkillsProjetosPage.tsx`
+- Buscar entregas da equipe (`entregas_equipe_skills`) com contagem de subtarefas usando query com join
+- Passar tanto `projetos` (backlog) quanto `entregasEquipe` (com subtarefas) para `ProjetosResumoTable`
 
-### 2. `ProjetoSkillsProjetosPage.tsx`
-- Importar `useSkillsBacklog` para obter os projetos reais
-- Passar `items` do backlog como prop `projetos` para `PortfolioOverview`
+### 2. `ProjetosResumoTable.tsx`
+- Alterar a tabela para iterar sobre **projetos** (backlog_skills) em vez de entregas
+- Adicionar colunas "Entregas" e "Subtarefas" que mostram a contagem de entregas vinculadas a cada projeto e o total de subtarefas dessas entregas
+- Manter colunas existentes (Status, Prioridade, Progresso) baseadas no projeto do backlog
+- O progresso do projeto sera calculado como media do progresso das entregas vinculadas
 
-### 3. Ajustes nos rotulos
-- "Total de Projetos" mostra a contagem real do backlog (12)
-- "Total de Entregas" mostra a contagem de entregas (48)
-- Demais KPIs permanecem inalterados
+### 3. Query adicional na pagina
+- Buscar `entregas_equipe_skills` agrupadas por `projeto_id` com contagem de subtarefas via query inline:
+```sql
+entregas_equipe_skills (*, subtarefas_entregas_skills(count))
+```
+- Agrupar os dados por projeto para montar as contagens
 
 ## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| `src/components/skills/kanban/PortfolioOverview.tsx` | Adicionar prop `projetos`, separar contagem de projetos vs entregas |
-| `src/pages/skills/ProjetoSkillsProjetosPage.tsx` | Importar `useSkillsBacklog`, passar `items` como `projetos` |
+| `src/pages/skills/ProjetoSkillsProjetosPage.tsx` | Adicionar query para buscar entregas_equipe_skills com contagem de subtarefas; passar projetos e dados agregados para ProjetosResumoTable |
+| `src/components/skills/kanban/ProjetosResumoTable.tsx` | Refatorar para iterar projetos do backlog; adicionar colunas Entregas e Subtarefas com contagens; calcular progresso medio |
