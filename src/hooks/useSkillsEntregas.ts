@@ -114,12 +114,33 @@ export function useSkillsEntregas() {
     },
   });
 
+  // Mutation para atualizar campos editáveis de entregas_skills
+  const atualizarEntrega = useMutation({
+    mutationFn: async ({ entregaId, dados }: { entregaId: string; dados: Partial<{ status: string; descricao: string; titulo: string }> }) => {
+      const { error } = await supabase
+        .from("entregas_skills")
+        .update(dados)
+        .eq("id", entregaId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Entrega atualizada!");
+      queryClient.invalidateQueries({ queryKey: ["entregas-skills"] });
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar entrega");
+    },
+  });
+
   return {
     entregas,
     isLoading,
     isLider,
+    equipeId,
+    effectiveUserId,
     submeterEntrega,
     iniciarEntrega,
     atualizarStatus,
+    atualizarEntrega,
   };
 }
