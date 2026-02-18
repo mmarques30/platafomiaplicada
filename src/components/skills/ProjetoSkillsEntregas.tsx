@@ -187,8 +187,15 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
   };
 
   const handleSaveEquipe = (values: any) => {
+    const isNew = !values.id;
     upsertMutation.mutate({ ...values, equipe_id: equipeId }, {
-      onSuccess: () => setModalEquipeOpen(false),
+      onSuccess: (data) => {
+        if (isNew && data) {
+          setSelectedEquipe(data);
+        } else {
+          setModalEquipeOpen(false);
+        }
+      },
     });
   };
 

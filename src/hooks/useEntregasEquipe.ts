@@ -78,12 +78,27 @@ export function useEntregasEquipe(equipeId: string | null) {
           .update(payload as any)
           .eq("id", payload.id);
         if (error) throw error;
+        return null;
       } else {
         delete (payload as any).id;
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("entregas_equipe_skills")
-          .insert(payload as any);
+          .insert(payload as any)
+          .select(`
+            *,
+            entregas_skills:entrega_id (titulo, descricao, status, prioridade),
+            backlog_skills:projeto_id (titulo),
+            profiles:responsavel_id (nome_completo, avatar_url)
+          `)
+          .single();
         if (error) throw error;
+        return {
+          ...data,
+          arquivos: (data.arquivos as any) || [],
+          entrega_original: data.entregas_skills || null,
+          projeto: data.backlog_skills || null,
+          responsavel: data.profiles || null,
+        } as unknown as EntregaEquipe;
       }
     },
     onSuccess: () => {
