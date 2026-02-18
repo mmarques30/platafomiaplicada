@@ -1,43 +1,28 @@
 
 
-# Integrar entregas cadastradas na aba de Entregas com edicao
+# Integrar entregas da IA na pagina /skills/projeto/entregas
 
-## Problema identificado
+## Problema
+A rota `/skills/projeto/entregas` (onde voce esta agora) usa o componente `ProjetoSkillsEntregas` que busca dados **somente** da tabela `entregas_equipe_skills` (entregas manuais da equipe). Essa tabela esta vazia, por isso nada aparece.
 
-Existem **duas tabelas** de entregas que nao estao conectadas na interface do usuario:
-
-1. **`entregas_skills`** (48 registros) — entregas geradas pela IA/admin, exibidas na pagina `/skills/entregas`
-2. **`entregas_equipe_skills`** (0 registros atualmente) — entregas criadas manualmente pela equipe em `/skills/projeto/entregas`
-
-A pagina `/skills/entregas` (componente `SkillsEntregas`) so le da tabela `entregas_skills` e exibe cards **somente leitura** — sem opcao de editar titulo, descricao, status, prazo, ou qualquer campo. As entregas ficam cadastradas no banco mas nao sao editaveis pela equipe.
+As 48 entregas cadastradas estao na tabela `entregas_skills` (geradas pela IA/admin), que so e consultada na rota `/skills/entregas` (componente `SkillsEntregas`).
 
 ## Solucao
+Aplicar a mesma logica de unificacao que fizemos no `SkillsEntregas` dentro do `ProjetoSkillsEntregas`, para que ambas as tabelas sejam exibidas nessa pagina.
 
-Transformar a pagina `/skills/entregas` (`SkillsEntregas.tsx`) para:
+### Alteracoes em `src/components/skills/ProjetoSkillsEntregas.tsx`
+- Importar e usar `useSkillsEntregas` para buscar entregas da tabela `entregas_skills`
+- Combinar as duas listas (IA + manuais) em uma visualizacao unificada com badges de origem
+- Adicionar modal de edicao para entregas IA (reutilizar `EntregaSkillsEditModal`)
+- Manter o botao "Nova Entrega" para criacao de entregas manuais
+- Manter o modal `EntregaEquipeModal` para edicao de entregas manuais
 
-1. **Exibir entregas de ambas as tabelas** — `entregas_skills` (geradas pela IA) e `entregas_equipe_skills` (criadas manualmente)
-2. **Tornar os cards editaveis** — ao clicar em uma entrega, abrir um modal de edicao que permite alterar status, descricao, notas, prazo, progresso e responsavel
-3. **Permitir criacao de novas entregas** pela equipe diretamente nesta aba
-
-## Alteracoes
-
-### 1. `src/pages/skills/SkillsEntregas.tsx`
-- Manter a busca de `entregas_skills` via `useSkillsEntregas` (entregas da IA)
-- Adicionar busca de `entregas_equipe_skills` via `useEntregasEquipe` (entregas manuais)
-- Combinar as duas listas em uma unica visualizacao, com badge indicando a origem (IA vs Manual)
-- Adicionar botao "Nova Entrega" para criar entregas manuais
-- Ao clicar em qualquer card, abrir modal de edicao:
-  - Para entregas de `entregas_skills`: permitir editar status (pendente, em_andamento, aguardando_validacao, aprovada)
-  - Para entregas de `entregas_equipe_skills`: edicao completa (titulo, descricao, status, prazo, responsavel, progresso, notas, arquivos)
-- Reutilizar o componente `EntregaEquipeModal` ja existente para as entregas manuais
-
-### 2. `src/hooks/useSkillsEntregas.ts`
-- Adicionar mutation para atualizar campos editaveis das entregas_skills (status, descricao)
+### Alteracoes em `src/pages/skills/ProjetoSkillsEntregasPage.tsx`
+- Nenhuma alteracao necessaria, pois o componente filho ja recebe `equipeId`
 
 ## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| `src/pages/skills/SkillsEntregas.tsx` | Integrar ambas as tabelas; adicionar clique para editar; botao Nova Entrega; reutilizar EntregaEquipeModal |
-| `src/hooks/useSkillsEntregas.ts` | Adicionar mutation `atualizarEntrega` para update parcial em entregas_skills |
+| `src/components/skills/ProjetoSkillsEntregas.tsx` | Adicionar busca de `entregas_skills` via `useSkillsEntregas`; unificar listas; adicionar `EntregaSkillsEditModal` para edicao de entregas IA; badges de origem (IA/Manual) |
 
