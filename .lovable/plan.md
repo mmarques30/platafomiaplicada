@@ -1,33 +1,49 @@
 
-# Entregas vinculadas aos Projetos
+# Subtarefas nas Entregas
 
 ## O que sera feito
-Adicionar uma secao "Entregas" dentro do modal de detalhes do projeto (`ProjetoDetailModal`), permitindo:
-1. Ver entregas ja vinculadas ao projeto (lista compacta com status, responsavel e progresso)
-2. Criar nova entrega diretamente pelo projeto (abre o modal `EntregaEquipeModal` com o `projeto_id` pre-preenchido)
-3. As entregas criadas aparecem automaticamente na aba Entregas principal, pois usam a mesma tabela `entregas_equipe_skills`
+Adicionar um sistema de **subtarefas** dentro de cada entrega, permitindo quebrar uma entrega em tarefas menores, atribuir responsaveis a cada uma, e calcular o progresso da entrega com base na conclusao das subtarefas.
 
 ## Fluxo do usuario
-1. Abre um projeto no modal de detalhes
-2. Na parte inferior, ve a secao "Entregas do Projeto" com a lista das entregas vinculadas
-3. Clica em "Nova Entrega" para abrir o modal de entrega com o projeto ja selecionado
-4. A entrega salva aparece tanto no projeto quanto na aba Entregas
+1. Ao editar uma entrega no modal, uma secao "Subtarefas" aparece abaixo dos campos existentes
+2. O usuario clica em "Adicionar Subtarefa", preenche titulo e seleciona um responsavel
+3. Cada subtarefa tem um checkbox para marcar como concluida
+4. O progresso da entrega e recalculado automaticamente com base nas subtarefas concluidas (ex: 3 de 5 = 60%)
+5. Se nao houver subtarefas, o slider manual de progresso continua funcionando normalmente
 
-## Alteracoes tecnicas
+## Alteracoes
 
-### 1. `ProjetoDetailModal.tsx`
-- Importar `useEntregasEquipe` e `EntregaEquipeModal`
-- Adicionar query para buscar entregas filtradas por `projeto_id = item.id`
-- Renderizar lista compacta de entregas (titulo, badge de status, progresso, responsavel)
-- Botao "Nova Entrega" que abre o `EntregaEquipeModal` com `projeto_id` pre-definido
-- Clicar em uma entrega existente abre o `EntregaEquipeModal` para edicao
+### 1. Migracao de banco de dados
+Nova tabela `subtarefas_entregas_skills`:
 
-### 2. Nenhuma migracao necessaria
-A tabela `entregas_equipe_skills` ja possui a coluna `projeto_id` com FK para `backlog_skills`. Nao e necessario alterar o banco.
+| Coluna | Tipo | Descricao |
+|---|---|---|
+| id | UUID PK | Identificador |
+| entrega_equipe_id | UUID FK -> entregas_equipe_skills | Entrega pai |
+| titulo | TEXT NOT NULL | Nome da subtarefa |
+| responsavel_id | UUID FK -> profiles | Quem executa |
+| concluida | BOOLEAN DEFAULT false | Status |
+| created_at | TIMESTAMPTZ | Criacao |
+| updated_at | TIMESTAMPTZ | Atualizacao |
 
-### 3. Nenhuma alteracao no hook `useEntregasEquipe`
-O hook ja suporta upsert com `projeto_id` e filtragem. A query de entregas por projeto sera feita inline no componente.
+RLS: mesmas regras da tabela pai (membros da equipe e admins)
+
+### 2. `EntregaEquipeModal.tsx`
+- Adicionar secao "Subtarefas" com:
+  - Lista de subtarefas existentes (checkbox + titulo + avatar do responsavel + botao remover)
+  - Input inline para adicionar nova subtarefa (titulo + select de responsavel)
+  - Calculo automatico do progresso quando ha subtarefas (sobrescreve o slider manual)
+- Quando ha subtarefas, o slider de progresso fica desabilitado e mostra o valor calculado
+- Quando nao ha subtarefas, o slider manual continua funcionando
+
+### 3. Hook ou queries inline
+- Buscar subtarefas por `entrega_equipe_id` ao abrir o modal
+- CRUD de subtarefas (insert, update concluida, delete) com invalidacao de cache
+- Recalcular progresso da entrega pai ao alterar subtarefas
+
+## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Adicionar secao de entregas com lista, botao de criar e modal de entrega inline |
+| Migracao SQL | Criar tabela `subtarefas_entregas_skills` com RLS |
+| `src/components/skills/EntregaEquipeModal.tsx` | Secao de subtarefas com CRUD inline e calculo de progresso |
