@@ -1,50 +1,33 @@
 
-# Adicionar Colaborador aos Projetos do Backlog
+# Entregas vinculadas aos Projetos
 
 ## O que sera feito
-Cada projeto passara a ter dois papeis: **Dono** (responsavel principal, ja existente) e **Colaborador** (novo campo). Isso permite distribuir melhor as responsabilidades dentro da equipe.
+Adicionar uma secao "Entregas" dentro do modal de detalhes do projeto (`ProjetoDetailModal`), permitindo:
+1. Ver entregas ja vinculadas ao projeto (lista compacta com status, responsavel e progresso)
+2. Criar nova entrega diretamente pelo projeto (abre o modal `EntregaEquipeModal` com o `projeto_id` pre-preenchido)
+3. As entregas criadas aparecem automaticamente na aba Entregas principal, pois usam a mesma tabela `entregas_equipe_skills`
 
-## Alteracoes
+## Fluxo do usuario
+1. Abre um projeto no modal de detalhes
+2. Na parte inferior, ve a secao "Entregas do Projeto" com a lista das entregas vinculadas
+3. Clica em "Nova Entrega" para abrir o modal de entrega com o projeto ja selecionado
+4. A entrega salva aparece tanto no projeto quanto na aba Entregas
 
-### 1. Migracao de banco de dados
-- Adicionar coluna `colaborador_id UUID` na tabela `backlog_skills`, com foreign key para `profiles(id)`
-- A coluna sera nullable (colaborador e opcional)
+## Alteracoes tecnicas
 
-### 2. Hook `useSkillsBacklog.ts`
-- Incluir `colaborador_id` no tipo `BacklogItem`
-- Adicionar campo `colaborador` (nome, avatar) similar ao `responsavel`
-- Buscar dados do colaborador junto com os do responsavel na query
+### 1. `ProjetoDetailModal.tsx`
+- Importar `useEntregasEquipe` e `EntregaEquipeModal`
+- Adicionar query para buscar entregas filtradas por `projeto_id = item.id`
+- Renderizar lista compacta de entregas (titulo, badge de status, progresso, responsavel)
+- Botao "Nova Entrega" que abre o `EntregaEquipeModal` com `projeto_id` pre-definido
+- Clicar em uma entrega existente abre o `EntregaEquipeModal` para edicao
 
-### 3. `ProjetoDetailModal.tsx`
-- Adicionar setor "Colaborador" abaixo do "Responsavel"
-- Usar o mesmo Select com membros da equipe
-- Salvamento automatico no onBlur (mesmo padrao do responsavel)
-- Filtrar o colaborador para nao permitir selecionar a mesma pessoa que e o dono
+### 2. Nenhuma migracao necessaria
+A tabela `entregas_equipe_skills` ja possui a coluna `projeto_id` com FK para `backlog_skills`. Nao e necessario alterar o banco.
 
-### 4. `AddProjetoModal.tsx`
-- Nenhuma alteracao necessaria - o colaborador pode ser atribuido depois, no modal de detalhes (mantendo o formulario de criacao simples)
-
-### 5. `BacklogCard.tsx`
-- Exibir segundo avatar ao lado do responsavel quando houver colaborador
-- Avatares empilhados (sobrepostos) para indicar visualmente que ha duas pessoas
-
-### 6. `BacklogTable.tsx`
-- Renomear coluna "Responsavel" para "Equipe" ou manter e mostrar ambos os avatares na mesma celula
-
-### 7. `BacklogView.tsx`
-- Adicionar filtro de Colaborador no filtro de responsavel (ou unificar para filtrar por "envolvidos")
-
-### 8. Correcao do build
-- Deletar `bun.lockb` para resolver o erro do `mux-embed`
-
-## Detalhes tecnicos
+### 3. Nenhuma alteracao no hook `useEntregasEquipe`
+O hook ja suporta upsert com `projeto_id` e filtragem. A query de entregas por projeto sera feita inline no componente.
 
 | Arquivo | Acao |
 |---|---|
-| Migracao SQL | `ALTER TABLE backlog_skills ADD COLUMN colaborador_id UUID REFERENCES profiles(id)` |
-| `src/hooks/useSkillsBacklog.ts` | Buscar dados do colaborador, atualizar tipo BacklogItem |
-| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Select para colaborador com salvamento automatico |
-| `src/components/skills/backlog/BacklogCard.tsx` | Avatares empilhados (dono + colaborador) |
-| `src/components/skills/backlog/BacklogTable.tsx` | Mostrar ambos avatares na celula |
-| `src/components/skills/backlog/BacklogView.tsx` | Filtro atualizado para considerar colaborador |
-| `bun.lockb` | Deletar para corrigir build |
+| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Adicionar secao de entregas com lista, botao de criar e modal de entrega inline |
