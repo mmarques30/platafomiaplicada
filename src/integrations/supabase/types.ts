@@ -5142,7 +5142,8 @@ export type Database = {
         Row: {
           concluida: boolean
           created_at: string
-          entrega_equipe_id: string
+          entrega_equipe_id: string | null
+          entrega_skills_id: string | null
           id: string
           responsavel_id: string | null
           titulo: string
@@ -5151,7 +5152,8 @@ export type Database = {
         Insert: {
           concluida?: boolean
           created_at?: string
-          entrega_equipe_id: string
+          entrega_equipe_id?: string | null
+          entrega_skills_id?: string | null
           id?: string
           responsavel_id?: string | null
           titulo: string
@@ -5160,7 +5162,8 @@ export type Database = {
         Update: {
           concluida?: boolean
           created_at?: string
-          entrega_equipe_id?: string
+          entrega_equipe_id?: string | null
+          entrega_skills_id?: string | null
           id?: string
           responsavel_id?: string | null
           titulo?: string
@@ -5172,6 +5175,13 @@ export type Database = {
             columns: ["entrega_equipe_id"]
             isOneToOne: false
             referencedRelation: "entregas_equipe_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subtarefas_entregas_skills_entrega_skills_id_fkey"
+            columns: ["entrega_skills_id"]
+            isOneToOne: false
+            referencedRelation: "entregas_skills"
             referencedColumns: ["id"]
           },
           {
