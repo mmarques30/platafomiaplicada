@@ -9,7 +9,8 @@ import { XCircle } from "lucide-react";
 
 const columns = [
   { id: "levantado", title: "LEVANTADO", headerBg: "hsl(var(--muted))", statuses: ["levantado", "backlog"] },
-  { id: "priorizado", title: "PRIORIZADO", headerBg: "rgba(99, 102, 241, 0.12)", statuses: ["aprovado", "priorizado"] },
+  { id: "aprovado", title: "APROVADO", headerBg: "rgba(59, 130, 246, 0.10)", statuses: ["aprovado"] },
+  { id: "priorizado", title: "PRIORIZADO", headerBg: "rgba(99, 102, 241, 0.12)", statuses: ["priorizado"] },
   { id: "em_execucao", title: "EM EXECUÇÃO", headerBg: "rgba(158, 176, 56, 0.12)", statuses: ["em_execucao"] },
   { id: "entregue", title: "ENTREGUE", headerBg: "rgba(115, 137, 37, 0.15)", statuses: ["entregue"] },
 ];
@@ -61,15 +62,15 @@ export default function BacklogKanban({ items, onStatusChange, onItemClick }: Ba
     <div className="space-y-4">
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {/* Phase headers */}
-        <div className="hidden md:grid grid-cols-4 gap-3 mb-1">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center py-1 border-b-2 border-muted-foreground/20">
+        <div className="hidden md:grid grid-cols-5 gap-3 mb-1">
+          <div className="col-span-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center py-1 border-b-2 border-muted-foreground/20">
             Fase 1 · Triagem
           </div>
           <div className="col-span-3 text-[10px] font-bold uppercase tracking-widest text-primary/60 text-center py-1 border-b-2 border-primary/30">
             Fase 2 · Execução
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           {grouped.map(col => (
             <Column key={col.id} id={col.id} title={col.title} headerBg={col.headerBg} count={col.items.length}>
               {col.items.map(item => (
@@ -87,7 +88,7 @@ export default function BacklogKanban({ items, onStatusChange, onItemClick }: Ba
             <h3 className="text-xs font-bold uppercase tracking-wider text-destructive">Não Aprovados</h3>
             <span className="ml-auto text-[10px] text-muted-foreground font-semibold bg-background/60 rounded-full px-2 py-0.5">{naoAprovados.length}</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-2">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-2 p-2">
             {naoAprovados.map(item => (
               <BacklogCard key={item.id} item={item} onClick={() => onItemClick(item)} />
             ))}
