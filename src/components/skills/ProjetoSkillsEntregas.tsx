@@ -396,6 +396,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
         onSave={handleSaveIA}
         isSaving={atualizarEntrega.isPending}
         isLider={true}
+        membros={membros || []}
       />
     </div>
   );
