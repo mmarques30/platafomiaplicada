@@ -60,6 +60,15 @@ export default function BacklogKanban({ items, onStatusChange, onItemClick }: Ba
   return (
     <div className="space-y-4">
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        {/* Phase headers */}
+        <div className="hidden md:grid grid-cols-4 gap-3 mb-1">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center py-1 border-b-2 border-muted-foreground/20">
+            Fase 1 · Triagem
+          </div>
+          <div className="col-span-3 text-[10px] font-bold uppercase tracking-widest text-primary/60 text-center py-1 border-b-2 border-primary/30">
+            Fase 2 · Execução
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {grouped.map(col => (
             <Column key={col.id} id={col.id} title={col.title} headerBg={col.headerBg} count={col.items.length}>
