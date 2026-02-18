@@ -1,94 +1,37 @@
 
+# Adicionar campo de Observacoes nos Projetos do Backlog
 
-# Fluxo Completo de Projetos no Backlog
-
-## Entendimento
-
-O ciclo de vida de um projeto no backlog tem duas fases:
-
-```text
-FASE 1: TRIAGEM (avaliar o que fazer com o projeto)
-
-  Projeto Levantado
-         |
-    [AVALIACAO]
-         |
-         +---> Aprovado -------> segue para Fase 2
-         +---> Nao Aprovado ---> rejeitado (secao separada)
-         +---> Manter Backlog --> aguarda reavaliacao futura
-
-FASE 2: EXECUCAO (pipeline do projeto aprovado)
-
-  Aprovado --> Priorizado --> Em Execucao --> Entregue
-```
-
-Os status completos no banco serao:
-- `levantado` - novo, aguardando triagem
-- `aprovado` - avaliado e aceito
-- `nao_aprovado` - rejeitado
-- `backlog` - mantido para depois
-- `priorizado` - aprovado e priorizado para execucao
-- `em_execucao` - em andamento
-- `entregue` - concluido/entregue
+## Objetivo
+Permitir que os membros registrem observacoes/notas nos projetos, especialmente ao aprovar ou mudar de status.
 
 ## Alteracoes
 
 ### 1. Migracao no banco de dados
 
-Atualizar o check constraint para incluir todos os status:
+Adicionar uma coluna `observacoes` (tipo `text`, nullable) na tabela `backlog_skills`:
 
 ```sql
-ALTER TABLE backlog_skills DROP CONSTRAINT IF EXISTS backlog_skills_status_check;
-ALTER TABLE backlog_skills ADD CONSTRAINT backlog_skills_status_check
-  CHECK (status IN (
-    'levantado', 'aprovado', 'nao_aprovado', 'backlog',
-    'priorizado', 'em_execucao', 'entregue'
-  ));
+ALTER TABLE backlog_skills ADD COLUMN observacoes text;
 ```
 
-Tambem corrigir o erro de build do `mux-embed` (workspace dependency nao encontrada).
+### 2. Hook `useSkillsBacklog.ts`
 
-### 2. Kanban reorganizado (`BacklogKanban.tsx`)
+Incluir `observacoes` no tipo `BacklogItem` para que o campo fique disponivel no frontend.
 
-Manter as 4 colunas principais do pipeline de execucao, mas agora com o fluxo correto:
+### 3. Modal de detalhes `ProjetoDetailModal.tsx`
 
-| Coluna | Status incluidos | Significado |
-|---|---|---|
-| LEVANTADO | `levantado` + `backlog` | Projetos novos e mantidos para depois |
-| PRIORIZADO | `aprovado` + `priorizado` | Aprovados e priorizados |
-| EM EXECUCAO | `em_execucao` | Em andamento |
-| ENTREGUE | `entregue` | Concluidos |
+- Adicionar um campo `Textarea` editavel para observacoes, visivel para todos os status
+- O campo sera salvo automaticamente ao sair do foco (onBlur), chamando `onUpdate(item.id, { observacoes: valor })`
+- Ficar posicionado logo abaixo da descricao, com label "Observacoes"
 
-Projetos `nao_aprovado` continuam na secao separada abaixo.
+### 4. Card `BacklogCard.tsx`
 
-### 3. Modal de detalhes (`ProjetoDetailModal.tsx`)
-
-Mostrar botoes de acao **contextuais** conforme o status atual:
-
-- **Se `levantado` ou `backlog`**: Botoes "Aprovar", "Nao Aprovar", "Manter no Backlog"
-- **Se `aprovado`**: Botao "Priorizar" (muda para `priorizado`)
-- **Se `priorizado`**: Botao "Iniciar Execucao"
-- **Se `em_execucao`**: Botao "Marcar como Entregue"
-- **Se `nao_aprovado`**: Botao "Reabrir"
-
-Manter tambem o select manual com todos os status para flexibilidade.
-
-Atualizar os mapas de labels e cores para incluir os novos status (`aprovado`, `backlog`).
-
-### 4. Tabela (`BacklogTable.tsx`)
-
-Atualizar labels e cores para incluir os novos status.
-
-### 5. Filtros (`BacklogView.tsx`)
-
-Nenhuma alteracao necessaria nos filtros (ja filtram por responsavel, prioridade e area).
+Nenhuma alteracao - observacoes sao informacao de detalhe, aparecem apenas no modal.
 
 ## Resumo de arquivos
 
 | Arquivo | Alteracao |
 |---|---|
-| Migracao SQL | Check constraint com 7 status + fix mux-embed |
-| `BacklogKanban.tsx` | Agrupar status nas 4 colunas corretas |
-| `ProjetoDetailModal.tsx` | Botoes contextuais por fase + labels/cores novos status |
-| `BacklogTable.tsx` | Labels e cores dos novos status |
-
+| Migracao SQL | Nova coluna `observacoes` (text) |
+| `useSkillsBacklog.ts` | Adicionar `observacoes` ao tipo `BacklogItem` |
+| `ProjetoDetailModal.tsx` | Campo Textarea editavel para observacoes |
