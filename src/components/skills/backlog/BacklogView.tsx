@@ -28,7 +28,10 @@ export default function BacklogView() {
   const [filtroArea, setFiltroArea] = useState("todos");
 
   const responsavelOptions = useMemo(() => {
-    const names = items.map(i => i.responsavel?.nome).filter(Boolean) as string[];
+    const names = [
+      ...items.map(i => i.responsavel?.nome),
+      ...items.map(i => i.colaborador?.nome),
+    ].filter(Boolean) as string[];
     return [...new Set(names)].sort();
   }, [items]);
 
@@ -44,7 +47,7 @@ export default function BacklogView() {
 
   const filteredItems = useMemo(() => {
     return items.filter(item => {
-      if (filtroResponsavel !== "todos" && item.responsavel?.nome !== filtroResponsavel) return false;
+      if (filtroResponsavel !== "todos" && item.responsavel?.nome !== filtroResponsavel && item.colaborador?.nome !== filtroResponsavel) return false;
       if (filtroPrioridade !== "todos" && item.prioridade !== filtroPrioridade) return false;
       if (filtroArea !== "todos" && item.area_impactada !== filtroArea) return false;
       return true;

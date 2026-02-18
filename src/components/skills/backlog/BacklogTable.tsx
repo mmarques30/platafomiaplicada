@@ -80,13 +80,25 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
                 )}
               </TableCell>
               <TableCell>
-                {item.responsavel ? (
+                {item.responsavel || item.colaborador ? (
                   <div className="flex items-center gap-1.5">
-                    <Avatar className="h-5 w-5">
-                      <AvatarImage src={item.responsavel.avatar_url || ""} />
-                      <AvatarFallback className="text-[8px]">{item.responsavel.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm truncate max-w-[120px]">{item.responsavel.nome}</span>
+                    <div className="flex -space-x-1.5">
+                      {item.responsavel && (
+                        <Avatar className="h-5 w-5 border-2 border-background">
+                          <AvatarImage src={item.responsavel.avatar_url || ""} />
+                          <AvatarFallback className="text-[8px]">{item.responsavel.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      )}
+                      {item.colaborador && (
+                        <Avatar className="h-5 w-5 border-2 border-background">
+                          <AvatarImage src={item.colaborador.avatar_url || ""} />
+                          <AvatarFallback className="text-[8px]">{item.colaborador.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      )}
+                    </div>
+                    <span className="text-sm truncate max-w-[120px]">
+                      {item.responsavel?.nome || ""}{item.responsavel && item.colaborador ? " + 1" : item.colaborador?.nome || ""}
+                    </span>
                   </div>
                 ) : (
                   <span className="text-muted-foreground text-sm">—</span>
