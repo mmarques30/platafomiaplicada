@@ -1,58 +1,31 @@
 
 
-# Corrigir fluxo de subtarefas nas entregas
+# Adicionar prioridades P1 / P2 / P3 nos projetos Skills
 
-## Problema identificado
-
-Existem dois problemas impedindo o uso de subtarefas:
-
-1. **Ao criar uma nova entrega**: O modal fecha imediatamente apos salvar (`onSuccess: () => setModalEquipeOpen(false)`). Como subtarefas precisam de um `entrega_equipe_id` para existir, a secao de subtarefas so aparece ao editar — mas o usuario nunca tem a oportunidade de continuar no modal apos a criacao.
-
-2. **Entregas de IA**: O modal `EntregaSkillsEditModal` nao possui nenhuma secao de subtarefas. A tabela `subtarefas_entregas_skills` referencia apenas `entrega_equipe_id`, portanto subtarefas sao estruturalmente limitadas a entregas manuais.
+## Problema atual
+O campo de prioridade dos projetos usa os valores "Alta / Media / Baixa", mas o usuario precisa de **P1 / P2 / P3** como sistema de priorizacao.
 
 ## Solucao
 
-### 1. Manter modal aberto apos criar entrega manual
+Alterar os valores armazenados e exibidos de prioridade em todos os componentes do modulo Skills (backlog) para usar `p1`, `p2`, `p3` em vez de `alta`, `media`, `baixa`.
 
-Nos dois arquivos que controlam o fluxo (`ProjetoSkillsEntregas.tsx` e `SkillsEntregas.tsx`):
+### Arquivos a alterar
 
-- Alterar `handleSaveEquipe`: apos o `upsertMutation` bem-sucedido para uma **nova** entrega (sem `id` no payload), em vez de fechar o modal, buscar o registro recem-criado e atualizar `selectedEquipe` com ele
-- Isso fara o modal recarregar com o `entregaId` preenchido, revelando a secao de subtarefas automaticamente
-- Manter o comportamento atual (fechar modal) para edicoes de entregas existentes
-
-Logica:
-```text
-handleSaveEquipe(values):
-  se values.id existe (edicao):
-    upsertMutation -> fechar modal
-  se values.id nao existe (criacao):
-    upsertMutation -> buscar entrega recem-criada -> setSelectedEquipe(nova) -> manter modal aberto
-```
-
-### 2. Hook `useEntregasEquipe` — retornar dados do insert
-
-- Alterar o `upsertMutation` para retornar os dados inseridos (usando `.select().single()` no insert), permitindo que o callback `onSuccess` receba o registro completo com o `id` gerado
-
-### 3. Adicionar subtarefas ao modal de entregas IA (opcional mas recomendado)
-
-- Adicionar a mesma secao de subtarefas do `EntregaEquipeModal` ao `EntregaSkillsEditModal`
-- Reutilizar a mesma tabela `subtarefas_entregas_skills`, adicionando um campo opcional `entrega_skills_id` (UUID, nullable) para vincular subtarefas a entregas IA
-- Isso requer uma migration para adicionar a coluna
-
-## Detalhes tecnicos
-
-| Arquivo | Acao |
+| Arquivo | O que muda |
 |---|---|
-| `src/hooks/useEntregasEquipe.ts` | Alterar insert para usar `.select().single()` e retornar o registro criado |
-| `src/components/skills/ProjetoSkillsEntregas.tsx` | Alterar `handleSaveEquipe` para manter modal aberto apos criacao, atualizando `selectedEquipe` com o registro retornado |
-| `src/pages/skills/SkillsEntregas.tsx` | Mesma alteracao do `handleSaveEquipe` |
-| `src/components/skills/EntregaSkillsEditModal.tsx` | Adicionar secao de subtarefas (reutilizando logica do `EntregaEquipeModal`) |
-| Migration SQL | Adicionar coluna `entrega_skills_id` (UUID nullable) na tabela `subtarefas_entregas_skills` |
+| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Select: trocar opcoes para P1, P2, P3. Atualizar mapa de cores `prioridadeCores` para usar `p1`, `p2`, `p3` |
+| `src/components/skills/backlog/BacklogCard.tsx` | Atualizar mapa `prioridadeCores` e label exibido para P1/P2/P3 |
+| `src/components/skills/backlog/BacklogTable.tsx` | Atualizar mapa `prioridadeCores` e label exibido para P1/P2/P3 |
+| `src/components/skills/backlog/AddProjetoModal.tsx` | Select de prioridade: trocar opcoes de Alta/Media/Baixa para P1/P2/P3 |
+| `src/components/skills/backlog/BacklogView.tsx` | Filtro de prioridade: ajustar label para exibir "P1/P2/P3" em vez de "Alta/Media/Baixa" |
 
-## Comportamento esperado
+### Detalhes
 
-- Ao criar uma nova entrega manual: o modal permanece aberto apos salvar, exibindo a secao de subtarefas para adicionar imediatamente
-- Ao editar uma entrega manual: subtarefas continuam funcionando normalmente (sem mudanca)
-- Ao editar uma entrega IA: nova secao de subtarefas disponivel no modal
-- Subtarefas de entregas IA usam o mesmo padrao visual e funcional das manuais
+- **Valores no banco**: `p1`, `p2`, `p3` (substituindo `alta`, `media`, `baixa`)
+- **Labels de exibicao**: "P1", "P2", "P3"
+- **Cores**: P1 = vermelho (mesmo da "alta"), P2 = amarelo/verde (mesmo da "media"), P3 = verde claro (mesmo da "baixa")
+- **Opcao "Sem prioridade"**: mantida como esta (valor `null`)
+- Dados existentes com valores antigos ("alta", "media", "baixa") continuarao exibindo corretamente se o mapa de cores incluir ambos os conjuntos como fallback
+
+Nenhuma alteracao de banco de dados necessaria — o campo `prioridade` e do tipo texto e aceita qualquer valor.
 
