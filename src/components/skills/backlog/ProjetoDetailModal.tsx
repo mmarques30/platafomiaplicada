@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -53,10 +54,11 @@ interface ProjetoDetailModalProps {
 
 export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusChange, onUpdate, equipeId }: ProjetoDetailModalProps) {
   const [obsValue, setObsValue] = useState(item?.observacoes || "");
-
+  const [areaValue, setAreaValue] = useState(item?.area_impactada || "");
   useEffect(() => {
     setObsValue(item?.observacoes || "");
-  }, [item?.observacoes, item?.id]);
+    setAreaValue(item?.area_impactada || "");
+  }, [item?.observacoes, item?.area_impactada, item?.id]);
 
   const { data: membros } = useQuery({
     queryKey: ["membros-equipe-skills", equipeId],
@@ -201,15 +203,27 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
 
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3">
-            {item.area_impactada && (
-              <div className="flex items-start gap-2">
-                <Layers className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Área Impactada</p>
-                  <p className="text-sm font-medium">{item.area_impactada}</p>
-                </div>
+            <div className="flex items-start gap-2">
+              <Layers className="h-4 w-4 text-muted-foreground mt-0.5" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">Área Impactada</p>
+                {onUpdate ? (
+                  <Input
+                    value={areaValue}
+                    onChange={(e) => setAreaValue(e.target.value)}
+                    onBlur={() => {
+                      if (areaValue !== (item.area_impactada || "")) {
+                        onUpdate(item.id, { area_impactada: areaValue || null });
+                      }
+                    }}
+                    placeholder="Ex: Financeiro, RH..."
+                    className="h-8 text-sm mt-0.5"
+                  />
+                ) : (
+                  <p className="text-sm font-medium">{item.area_impactada || "—"}</p>
+                )}
               </div>
-            )}
+            </div>
             {item.horas_estimadas_economia != null && (
               <div className="flex items-start gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
