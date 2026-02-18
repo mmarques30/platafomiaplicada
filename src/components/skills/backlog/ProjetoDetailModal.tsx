@@ -136,11 +136,29 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
             <Badge variant="outline" className={statusColors[currentStatus]}>
               {statusLabels[currentStatus] || currentStatus}
             </Badge>
-            {item.prioridade && (
+            {onUpdate ? (
+              <Select
+                value={item.prioridade || "__none__"}
+                onValueChange={(val) => {
+                  const newPrioridade = val === "__none__" ? null : val;
+                  onUpdate(item.id, { prioridade: newPrioridade });
+                }}
+              >
+                <SelectTrigger className="h-7 w-[130px] text-xs border-dashed">
+                  <SelectValue placeholder="Prioridade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Sem prioridade</SelectItem>
+                  <SelectItem value="alta">Alta</SelectItem>
+                  <SelectItem value="media">Média</SelectItem>
+                  <SelectItem value="baixa">Baixa</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : item.prioridade ? (
               <Badge variant="outline" className={prioridadeCores[item.prioridade]}>
                 {item.prioridade.toUpperCase()}
               </Badge>
-            )}
+            ) : null}
             {item.origem && (
               <Badge variant="secondary" className="text-xs">
                 {item.origem === "ia" ? "Gerado por IA" : "Manual"}
