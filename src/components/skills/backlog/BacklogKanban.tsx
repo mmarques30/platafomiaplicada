@@ -7,8 +7,8 @@ import { ReactNode } from "react";
 
 const columns = [
   { id: "levantado", title: "LEVANTADO", headerBg: "hsl(var(--muted))" },
-  { id: "em_andamento", title: "EM ANDAMENTO", headerBg: "rgba(158, 176, 56, 0.12)" },
-  { id: "concluido", title: "CONCLUÍDO", headerBg: "rgba(115, 137, 37, 0.15)" },
+  { id: "em_execucao", title: "EM ANDAMENTO", headerBg: "rgba(158, 176, 56, 0.12)" },
+  { id: "entregue", title: "CONCLUÍDO", headerBg: "rgba(115, 137, 37, 0.15)" },
 ];
 
 function Column({ id, title, headerBg, children, count }: { id: string; title: string; headerBg: string; children: ReactNode; count: number }) {
