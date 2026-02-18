@@ -3,11 +3,13 @@ import { FolderKanban, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 
 interface PortfolioOverviewProps {
   entregas: any[];
+  projetos?: any[];
 }
 
-export default function PortfolioOverview({ entregas }: PortfolioOverviewProps) {
+export default function PortfolioOverview({ entregas, projetos }: PortfolioOverviewProps) {
   const stats = useMemo(() => {
-    const total = entregas.length;
+    const totalProjetos = projetos ? projetos.length : 0;
+    const totalEntregas = entregas.length;
     const emProducao = entregas.filter((e) =>
       ["concluido", "aprovada"].includes(e.status)
     ).length;
@@ -17,21 +19,21 @@ export default function PortfolioOverview({ entregas }: PortfolioOverviewProps) 
       0
     );
 
-    return { total, emProducao, emAndamento, economiaTotal };
-  }, [entregas]);
+    return { totalProjetos, totalEntregas, emProducao, emAndamento, economiaTotal };
+  }, [entregas, projetos]);
 
   const kpis = [
     {
       label: "Total de Projetos",
-      value: stats.total,
-      subtitle: "projetos cadastrados",
+      value: stats.totalProjetos,
+      subtitle: "projetos no backlog",
       icon: FolderKanban,
       color: "#9EB038",
     },
     {
-      label: "Em Produção",
-      value: stats.emProducao,
-      subtitle: "concluídos ou aprovados",
+      label: "Total de Entregas",
+      value: stats.totalEntregas,
+      subtitle: "entregas cadastradas",
       icon: CheckCircle2,
       color: "#9EB038",
     },

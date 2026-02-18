@@ -12,6 +12,7 @@ import EntregasProjetadasVsExecutadasChart from "@/components/skills/charts/Entr
 import ProjetosFilterBar, { type ProjetosFilters } from "@/components/skills/filters/ProjetosFilterBar";
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 import { useSkillsEquipe } from "@/hooks/useSkillsEquipe";
+import { useSkillsBacklog } from "@/hooks/useSkillsBacklog";
 import { isAfter, isBefore, startOfDay, endOfDay } from "date-fns";
 
 export default function ProjetoSkillsProjetosPage() {
@@ -19,6 +20,7 @@ export default function ProjetoSkillsProjetosPage() {
   const { equipeId, isLoading } = useSkillsMembro();
   const { equipe, membros } = useSkillsEquipe();
   const { entregas, isLoading: isLoadingEntregas } = useSkillsEntregas();
+  const { items: projetos } = useSkillsBacklog();
 
   const [filters, setFilters] = useState<ProjetosFilters>({
     projeto: "todos",
@@ -79,7 +81,7 @@ export default function ProjetoSkillsProjetosPage() {
             filters={filters}
             onFiltersChange={setFilters}
           />
-          <PortfolioOverview entregas={filteredEntregas} />
+          <PortfolioOverview entregas={filteredEntregas} projetos={projetos} />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
               <EntregasProjetadasVsExecutadasChart
