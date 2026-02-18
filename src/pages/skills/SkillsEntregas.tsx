@@ -4,8 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckSquare, Clock, Send, CheckCircle2, Plus, Package, Bot, Users, X } from "lucide-react";
+import { CheckSquare, Clock, Send, CheckCircle2, Plus, Package, Bot, Users, X, Archive } from "lucide-react";
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 import { useEntregasEquipe, type EntregaEquipe } from "@/hooks/useEntregasEquipe";
 import { EntregaEquipeModal } from "@/components/skills/EntregaEquipeModal";
@@ -29,6 +30,8 @@ const prioridadeColors: Record<string, string> = {
   P3: "bg-green-500/10 text-green-700",
 };
 
+const ARCHIVED_PROJECT_STATUSES = ["nao_aprovado", "descartado"];
+
 interface UnifiedEntrega {
   id: string;
   titulo: string;
@@ -40,6 +43,7 @@ interface UnifiedEntrega {
   progresso?: number;
   prioridade?: string | null;
   projetoTitulo?: string | null;
+  projetoStatus?: string | null;
   raw: any;
 }
 
@@ -55,6 +59,8 @@ export default function SkillsEntregas() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterResponsavel, setFilterResponsavel] = useState("all");
   const [filterOrigem, setFilterOrigem] = useState("all");
+  const [filterProjeto, setFilterProjeto] = useState("all");
+  const [showArchived, setShowArchived] = useState(false);
 
   const { data: membros } = useQuery({
     queryKey: ["membros-equipe-skills", equipeId],
@@ -103,9 +109,20 @@ export default function SkillsEntregas() {
     status: e.status,
     prazo: e.prazo,
     origem: "ia" as const,
-    responsavelNome: e.responsavel?.nome_completo,
+    responsavelNome: e.responsavel?.nome_completo || null,
+    projetoTitulo: e.backlog_item?.titulo || null,
+    projetoStatus: e.backlog_item?.status || null,
     raw: e,
   }));
+
+  // Use backlog_item responsavel as fallback for IA entregas
+  for (const entry of unifiedIA) {
+    const raw = entry.raw;
+    if (!entry.responsavelNome && raw.backlog_item?.responsavel_id && membros) {
+      const membro = membros.find((m: any) => m.id === raw.backlog_item.responsavel_id);
+      if (membro) entry.responsavelNome = membro.nome_completo;
+    }
+  }
 
   const unifiedEquipe: UnifiedEntrega[] = (entregasEquipe || []).map((e) => ({
     id: e.id,
@@ -118,26 +135,34 @@ export default function SkillsEntregas() {
     progresso: e.progresso,
     prioridade: e.prioridade_equipe,
     projetoTitulo: e.projeto?.titulo,
+    projetoStatus: null,
     raw: e,
   }));
 
   const allEntregas = [...unifiedIA, ...unifiedEquipe];
 
   const filtered = allEntregas.filter(e => {
+    if (!showArchived && e.projetoStatus && ARCHIVED_PROJECT_STATUSES.includes(e.projetoStatus)) return false;
     if (filterStatus !== "all" && e.status !== filterStatus) return false;
     if (filterOrigem !== "all" && e.origem !== filterOrigem) return false;
     if (filterResponsavel !== "all" && (e.responsavelNome || "") !== filterResponsavel) return false;
+    if (filterProjeto !== "all" && (e.projetoTitulo || "") !== filterProjeto) return false;
     return true;
   });
 
-  const hasActiveFilters = filterStatus !== "all" || filterResponsavel !== "all" || filterOrigem !== "all";
-  const clearFilters = () => { setFilterStatus("all"); setFilterResponsavel("all"); setFilterOrigem("all"); };
+  const archivedCount = allEntregas.filter(e => e.projetoStatus && ARCHIVED_PROJECT_STATUSES.includes(e.projetoStatus)).length;
+
+  const hasActiveFilters = filterStatus !== "all" || filterResponsavel !== "all" || filterOrigem !== "all" || filterProjeto !== "all";
+  const clearFilters = () => { setFilterStatus("all"); setFilterResponsavel("all"); setFilterOrigem("all"); setFilterProjeto("all"); };
 
   const uniqueResponsaveis = Array.from(new Set(allEntregas.map(e => e.responsavelNome).filter(Boolean))) as string[];
+  const uniqueProjetos = Array.from(new Set(allEntregas.map(e => e.projetoTitulo).filter(Boolean))) as string[];
 
-  const pendentes = allEntregas.filter(e => e.status === "pendente" || e.status === "em_andamento");
-  const aguardando = allEntregas.filter(e => e.status === "aguardando_validacao");
-  const concluidas = allEntregas.filter(e => e.status === "aprovada" || e.status === "concluido");
+  // KPI stats exclude archived by default
+  const activeEntregas = allEntregas.filter(e => !(e.projetoStatus && ARCHIVED_PROJECT_STATUSES.includes(e.projetoStatus)));
+  const pendentes = activeEntregas.filter(e => e.status === "pendente" || e.status === "em_andamento");
+  const aguardando = activeEntregas.filter(e => e.status === "aguardando_validacao");
+  const concluidas = activeEntregas.filter(e => e.status === "aprovada" || e.status === "concluido");
 
   const handleClickEntrega = (item: UnifiedEntrega) => {
     if (item.origem === "manual") {
@@ -189,7 +214,7 @@ export default function SkillsEntregas() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{allEntregas.length}</p>
+                <p className="text-2xl font-bold">{activeEntregas.length}</p>
               </div>
               <Package className="h-8 w-8 text-muted-foreground/50" />
             </div>
@@ -259,6 +284,18 @@ export default function SkillsEntregas() {
           </SelectContent>
         </Select>
 
+        <Select value={filterProjeto} onValueChange={setFilterProjeto}>
+          <SelectTrigger className="border-border/50 h-8 text-xs w-[160px] bg-transparent hover:bg-muted/50 transition-colors">
+            <SelectValue placeholder="Projeto" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos projetos</SelectItem>
+            {uniqueProjetos.map(name => (
+              <SelectItem key={name} value={name}>{name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Select value={filterOrigem} onValueChange={setFilterOrigem}>
           <SelectTrigger className="border-border/50 h-8 text-xs w-[120px] bg-transparent hover:bg-muted/50 transition-colors">
             <SelectValue placeholder="Origem" />
@@ -279,6 +316,17 @@ export default function SkillsEntregas() {
         <span className="text-xs text-muted-foreground">{filtered.length} entrega(s)</span>
       </div>
 
+      {/* Archive toggle */}
+      {archivedCount > 0 && (
+        <div className="flex items-center gap-2">
+          <Switch checked={showArchived} onCheckedChange={setShowArchived} id="show-archived-main" />
+          <label htmlFor="show-archived-main" className="text-xs text-muted-foreground flex items-center gap-1 cursor-pointer">
+            <Archive className="h-3 w-3" />
+            Incluir projetos arquivados ({archivedCount})
+          </label>
+        </div>
+      )}
+
       {/* Table */}
       {filtered.length === 0 ? (
         <Card>
@@ -293,6 +341,7 @@ export default function SkillsEntregas() {
             <TableHeader>
               <TableRow>
                 <TableHead>Título</TableHead>
+                <TableHead>Projeto</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Prioridade</TableHead>
                 <TableHead>Responsável</TableHead>
@@ -302,52 +351,65 @@ export default function SkillsEntregas() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((item) => (
-                <TableRow
-                  key={`${item.origem}-${item.id}`}
-                  className="cursor-pointer"
-                  onClick={() => handleClickEntrega(item)}
-                >
-                  <TableCell className="font-medium max-w-[250px]">
-                    <span className="truncate block">{item.titulo}</span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`text-xs ${STATUS_CONFIG[item.status]?.color || ""}`}>
-                      {STATUS_CONFIG[item.status]?.label || item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {item.prioridade ? (
-                      <Badge variant="outline" className={`text-xs ${prioridadeColors[item.prioridade] || ""}`}>
-                        {item.prioridade}
-                      </Badge>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-xs">
-                    {item.responsavelNome || <span className="text-muted-foreground">—</span>}
-                  </TableCell>
-                  <TableCell className="text-xs">
-                    {item.prazo ? format(new Date(item.prazo), "dd/MM/yyyy") : <span className="text-muted-foreground">—</span>}
-                  </TableCell>
-                  <TableCell>
-                    {item.origem === "manual" ? (
-                      <div className="w-16">
-                        <div className="text-xs text-right mb-0.5">{item.progresso || 0}%</div>
-                        <Progress value={item.progresso || 0} className="h-1.5" />
+              {filtered.map((item) => {
+                const isArchived = item.projetoStatus && ARCHIVED_PROJECT_STATUSES.includes(item.projetoStatus);
+                return (
+                  <TableRow
+                    key={`${item.origem}-${item.id}`}
+                    className={`cursor-pointer ${isArchived ? "opacity-50" : ""}`}
+                    onClick={() => handleClickEntrega(item)}
+                  >
+                    <TableCell className="font-medium max-w-[250px]">
+                      <span className="truncate block">{item.titulo}</span>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        {item.projetoTitulo || "—"}
+                        {isArchived && (
+                          <Badge variant="outline" className="text-[10px] bg-red-500/10 text-red-600 border-red-500/30 ml-1">
+                            Arquivado
+                          </Badge>
+                        )}
                       </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`text-xs ${item.origem === "ia" ? "bg-purple-500/10 text-purple-700 border-purple-500/30" : "bg-sky-500/10 text-sky-700 border-sky-500/30"}`}>
-                      {item.origem === "ia" ? <><Bot className="h-3 w-3 mr-1" />IA</> : <><Users className="h-3 w-3 mr-1" />Manual</>}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`text-xs ${STATUS_CONFIG[item.status]?.color || ""}`}>
+                        {STATUS_CONFIG[item.status]?.label || item.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {item.prioridade ? (
+                        <Badge variant="outline" className={`text-xs ${prioridadeColors[item.prioridade] || ""}`}>
+                          {item.prioridade}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      {item.responsavelNome || <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      {item.prazo ? format(new Date(item.prazo), "dd/MM/yyyy") : <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell>
+                      {item.origem === "manual" ? (
+                        <div className="w-16">
+                          <div className="text-xs text-right mb-0.5">{item.progresso || 0}%</div>
+                          <Progress value={item.progresso || 0} className="h-1.5" />
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`text-xs ${item.origem === "ia" ? "bg-purple-500/10 text-purple-700 border-purple-500/30" : "bg-sky-500/10 text-sky-700 border-sky-500/30"}`}>
+                        {item.origem === "ia" ? <><Bot className="h-3 w-3 mr-1" />IA</> : <><Users className="h-3 w-3 mr-1" />Manual</>}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

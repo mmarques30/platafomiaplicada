@@ -39,7 +39,8 @@ export function useSkillsEntregas() {
         .from("entregas_skills")
         .select(`
           *,
-          responsavel:responsavel_id (id, nome_completo, avatar_url)
+          responsavel:responsavel_id (id, nome_completo, avatar_url),
+          backlog_item:backlog_item_id (id, titulo, status, responsavel_id)
         `)
         .order("prazo", { ascending: true, nullsFirst: false });
 
