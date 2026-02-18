@@ -1,44 +1,46 @@
 
 
-# Filtros no Backlog de Projetos
+# Editar Responsavel nos Projetos do Backlog
 
-## Objetivo
-Adicionar filtros inline (discretos, sem card de fundo) no BacklogView para filtrar projetos por **responsavel**, **prioridade** e **area impactada**. Seguindo o padrao visual ja existente em `FilterSelect.tsx`.
+## Problema
+A secao "Responsavel" no modal de detalhes do projeto e somente leitura. Nao existe opcao para trocar ou atribuir um responsavel.
 
-## Abordagem
+## Solucao
 
-Toda a filtragem sera feita no frontend (client-side), pois os dados ja estao carregados pelo hook. Nao requer mudancas no banco de dados.
+Trocar o display estatico do responsavel por um Select editavel, populado com os membros ativos da equipe. Qualquer membro pode alterar.
 
-### Alteracao em `BacklogView.tsx`
+### Alteracoes
 
-1. Adicionar 3 estados de filtro: `filtroResponsavel`, `filtroPrioridade`, `filtroArea`
-2. Extrair opcoes dinamicamente dos items carregados (valores unicos de responsavel, prioridade, area_impactada)
-3. Cada filtro tera uma opcao "Todos" para limpar
-4. Filtrar os items antes de passar para `BacklogKanban` e `BacklogTable`
-5. Renderizar os 3 selects inline abaixo do header, usando o mesmo estilo do `FilterSelect` (h-8, text-xs, bg-transparent, sem labels externos)
+**1. `src/components/skills/backlog/ProjetoDetailModal.tsx`**
 
-### Layout dos filtros
+- Adicionar uma query para buscar membros ativos da equipe usando `membros_equipe_skills` + `profiles`
+- Substituir a secao read-only do responsavel por um `Select` com avatar e nome de cada membro
+- Incluir opcao "Sem responsavel" para remover atribuicao
+- Ao selecionar, chamar `onUpdate(item.id, { responsavel_id: selectedId })` que ja esta conectado ao `updateItem` do hook
 
+**2. `src/hooks/useSkillsBacklog.ts`**
+
+- Nenhuma alteracao necessaria. O `updateItem` ja suporta atualizar qualquer campo, incluindo `responsavel_id`.
+
+### Detalhes tecnicos
+
+O modal recebera o `equipeId` como nova prop (vindo do `useSkillsMembro` no `BacklogView`). Com o `equipeId`, fara uma query:
+
+```typescript
+supabase
+  .from("membros_equipe_skills")
+  .select("user_id, profiles!membros_equipe_skills_user_id_fkey(id, nome_completo, avatar_url)")
+  .eq("equipe_id", equipeId)
+  .eq("status", "ativo")
 ```
-[Backlog de Projetos]                    [+ Novo Projeto] [Kanban|Tabela]
-[Responsavel v] [Prioridade v] [Area v]
-```
 
-Os filtros ficam em uma linha entre o header e o conteudo, compactos e discretos conforme o padrao do projeto.
+O Select mostrara o avatar + nome de cada membro, e a opcao "Sem responsavel" (valor `null`).
 
-## Detalhes tecnicos
+### Arquivos alterados
 
-**Arquivo modificado:** `src/components/skills/backlog/BacklogView.tsx`
+| Arquivo | Alteracao |
+|---|---|
+| `ProjetoDetailModal.tsx` | Query de membros + Select editavel para responsavel |
+| `BacklogView.tsx` | Passar `equipeId` como prop para o modal |
 
-- Importar `Select, SelectContent, SelectItem, SelectTrigger, SelectValue` de `@/components/ui/select`
-- Criar 3 estados com `useState<string>("todos")`
-- Calcular opcoes unicas com `useMemo` a partir de `items`:
-  - Responsaveis: nomes unicos dos items com responsavel
-  - Prioridades: valores unicos (alta, media, baixa)
-  - Areas: valores unicos de area_impactada
-- Criar `filteredItems` com `useMemo` aplicando os 3 filtros
-- Passar `filteredItems` para `BacklogKanban` e `BacklogTable` em vez de `items`
-- 3 selects inline com `w-[160px] h-8 text-xs bg-transparent border-border/50`
-
-Nenhum outro arquivo precisa ser alterado.
-
+Nenhuma alteracao no banco de dados. A RLS ja permite que todos os membros atualizem o backlog.
