@@ -2,35 +2,33 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { CheckSquare, Clock, FileText, Send, CheckCircle2, AlertCircle, Play, Plus, Package, User, Calendar, FolderOpen } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CheckSquare, Clock, Send, CheckCircle2, Plus, Package, Bot, Users, X } from "lucide-react";
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 import { useEntregasEquipe, type EntregaEquipe } from "@/hooks/useEntregasEquipe";
 import { EntregaEquipeModal } from "@/components/skills/EntregaEquipeModal";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { EntregaSkillsEditModal } from "@/components/skills/EntregaSkillsEditModal";
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
-  pendente: { label: "Pendente", color: "bg-slate-100 text-slate-700", icon: Clock },
-  em_andamento: { label: "Em Andamento", color: "bg-blue-100 text-blue-700", icon: FileText },
-  aguardando_validacao: { label: "Aguardando Validação", color: "bg-amber-100 text-amber-700", icon: Send },
-  aprovada: { label: "Aprovada", color: "bg-green-100 text-green-700", icon: CheckCircle2 },
-};
-
-const STATUS_EQUIPE_CONFIG: Record<string, { label: string; color: string }> = {
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pendente: { label: "Pendente", color: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30" },
   em_andamento: { label: "Em Andamento", color: "bg-blue-500/10 text-blue-700 border-blue-500/30" },
+  aguardando_validacao: { label: "Aguardando Validação", color: "bg-orange-500/10 text-orange-700 border-orange-500/30" },
+  aprovada: { label: "Aprovada", color: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30" },
   concluido: { label: "Concluído", color: "bg-green-500/10 text-green-700 border-green-500/30" },
   bloqueado: { label: "Bloqueado", color: "bg-red-500/10 text-red-700 border-red-500/30" },
 };
 
-// Unified item type for display
+const prioridadeColors: Record<string, string> = {
+  P1: "bg-red-500/10 text-red-700",
+  P2: "bg-yellow-500/10 text-yellow-700",
+  P3: "bg-green-500/10 text-green-700",
+};
+
 interface UnifiedEntrega {
   id: string;
   titulo: string;
@@ -38,9 +36,10 @@ interface UnifiedEntrega {
   status: string;
   prazo: string | null;
   origem: "ia" | "manual";
-  responsavel?: { nome_completo: string; avatar_url?: string | null } | null;
+  responsavelNome?: string | null;
   progresso?: number;
   prioridade?: string | null;
+  projetoTitulo?: string | null;
   raw: any;
 }
 
@@ -48,13 +47,15 @@ export default function SkillsEntregas() {
   const { entregas: entregasIA, isLoading: loadingIA, isLider, equipeId, submeterEntrega, iniciarEntrega, atualizarEntrega } = useSkillsEntregas();
   const { entregas: entregasEquipe, isLoading: loadingEquipe, upsertMutation, uploadFile } = useEntregasEquipe(equipeId);
 
-  const [tab, setTab] = useState("todas");
   const [modalEquipeOpen, setModalEquipeOpen] = useState(false);
   const [selectedEquipe, setSelectedEquipe] = useState<EntregaEquipe | null>(null);
   const [modalIAOpen, setModalIAOpen] = useState(false);
   const [selectedIA, setSelectedIA] = useState<any>(null);
 
-  // Membros da equipe
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterResponsavel, setFilterResponsavel] = useState("all");
+  const [filterOrigem, setFilterOrigem] = useState("all");
+
   const { data: membros } = useQuery({
     queryKey: ["membros-equipe-skills", equipeId],
     queryFn: async () => {
@@ -71,7 +72,6 @@ export default function SkillsEntregas() {
     enabled: !!equipeId,
   });
 
-  // Projetos do backlog
   const { data: projetos } = useQuery({
     queryKey: ["projetos-backlog-skills", equipeId],
     queryFn: async () => {
@@ -96,7 +96,6 @@ export default function SkillsEntregas() {
     );
   }
 
-  // Unify both sources
   const unifiedIA: UnifiedEntrega[] = (entregasIA || []).map((e: any) => ({
     id: e.id,
     titulo: e.titulo,
@@ -104,7 +103,7 @@ export default function SkillsEntregas() {
     status: e.status,
     prazo: e.prazo,
     origem: "ia" as const,
-    responsavel: e.responsavel,
+    responsavelNome: e.responsavel?.nome_completo,
     raw: e,
   }));
 
@@ -115,25 +114,30 @@ export default function SkillsEntregas() {
     status: e.status_equipe,
     prazo: e.prazo_equipe,
     origem: "manual" as const,
-    responsavel: e.responsavel,
+    responsavelNome: e.responsavel?.nome_completo,
     progresso: e.progresso,
     prioridade: e.prioridade_equipe,
+    projetoTitulo: e.projeto?.titulo,
     raw: e,
   }));
 
   const allEntregas = [...unifiedIA, ...unifiedEquipe];
 
-  const filterByTab = (items: UnifiedEntrega[]) => {
-    if (tab === "ia") return items.filter(e => e.origem === "ia");
-    if (tab === "manual") return items.filter(e => e.origem === "manual");
-    return items;
-  };
+  const filtered = allEntregas.filter(e => {
+    if (filterStatus !== "all" && e.status !== filterStatus) return false;
+    if (filterOrigem !== "all" && e.origem !== filterOrigem) return false;
+    if (filterResponsavel !== "all" && (e.responsavelNome || "") !== filterResponsavel) return false;
+    return true;
+  });
 
-  const filtered = filterByTab(allEntregas);
+  const hasActiveFilters = filterStatus !== "all" || filterResponsavel !== "all" || filterOrigem !== "all";
+  const clearFilters = () => { setFilterStatus("all"); setFilterResponsavel("all"); setFilterOrigem("all"); };
 
-  const pendentes = filtered.filter(e => e.status === "pendente" || e.status === "em_andamento");
-  const aguardando = filtered.filter(e => e.status === "aguardando_validacao");
-  const concluidas = filtered.filter(e => e.status === "aprovada" || e.status === "concluido");
+  const uniqueResponsaveis = Array.from(new Set(allEntregas.map(e => e.responsavelNome).filter(Boolean))) as string[];
+
+  const pendentes = allEntregas.filter(e => e.status === "pendente" || e.status === "em_andamento");
+  const aguardando = allEntregas.filter(e => e.status === "aguardando_validacao");
+  const concluidas = allEntregas.filter(e => e.status === "aprovada" || e.status === "concluido");
 
   const handleClickEntrega = (item: UnifiedEntrega) => {
     if (item.origem === "manual") {
@@ -226,29 +230,56 @@ export default function SkillsEntregas() {
         </Card>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-muted-foreground">Origem:</span>
-        <div className="flex gap-1">
-          {[
-            { value: "todas", label: "Todas" },
-            { value: "ia", label: "IA/Admin" },
-            { value: "manual", label: "Manuais" },
-          ].map(t => (
-            <Button
-              key={t.value}
-              size="sm"
-              variant={tab === t.value ? "default" : "outline"}
-              onClick={() => setTab(t.value)}
-            >
-              {t.label}
-            </Button>
-          ))}
-        </div>
-        <span className="text-sm text-muted-foreground ml-2">{filtered.length} entrega(s)</span>
+      {/* Filters */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="border-border/50 h-8 text-xs w-[150px] bg-transparent hover:bg-muted/50 transition-colors">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os status</SelectItem>
+            <SelectItem value="pendente">Pendente</SelectItem>
+            <SelectItem value="em_andamento">Em Andamento</SelectItem>
+            <SelectItem value="concluido">Concluído</SelectItem>
+            <SelectItem value="bloqueado">Bloqueado</SelectItem>
+            <SelectItem value="aguardando_validacao">Aguardando Validação</SelectItem>
+            <SelectItem value="aprovada">Aprovada</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={filterResponsavel} onValueChange={setFilterResponsavel}>
+          <SelectTrigger className="border-border/50 h-8 text-xs w-[160px] bg-transparent hover:bg-muted/50 transition-colors">
+            <SelectValue placeholder="Responsável" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos responsáveis</SelectItem>
+            {uniqueResponsaveis.map(name => (
+              <SelectItem key={name} value={name}>{name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={filterOrigem} onValueChange={setFilterOrigem}>
+          <SelectTrigger className="border-border/50 h-8 text-xs w-[120px] bg-transparent hover:bg-muted/50 transition-colors">
+            <SelectValue placeholder="Origem" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas origens</SelectItem>
+            <SelectItem value="ia">IA</SelectItem>
+            <SelectItem value="manual">Manual</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 text-xs text-muted-foreground">
+            <X className="h-3 w-3 mr-1" /> Limpar
+          </Button>
+        )}
+
+        <span className="text-xs text-muted-foreground">{filtered.length} entrega(s)</span>
       </div>
 
-      {/* List */}
+      {/* Table */}
       {filtered.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
@@ -257,21 +288,71 @@ export default function SkillsEntregas() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((item) => (
-            <EntregaUnifiedCard
-              key={`${item.origem}-${item.id}`}
-              item={item}
-              isLider={isLider}
-              onClick={() => handleClickEntrega(item)}
-              onIniciar={item.origem === "ia" && item.status === "pendente" ? () => iniciarEntrega.mutate(item.id) : undefined}
-              onSubmeter={item.origem === "ia" && item.status === "em_andamento" ? () => submeterEntrega.mutate(item.id) : undefined}
-            />
-          ))}
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Título</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Prioridade</TableHead>
+                <TableHead>Responsável</TableHead>
+                <TableHead>Prazo</TableHead>
+                <TableHead>Progresso</TableHead>
+                <TableHead>Origem</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((item) => (
+                <TableRow
+                  key={`${item.origem}-${item.id}`}
+                  className="cursor-pointer"
+                  onClick={() => handleClickEntrega(item)}
+                >
+                  <TableCell className="font-medium max-w-[250px]">
+                    <span className="truncate block">{item.titulo}</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={`text-xs ${STATUS_CONFIG[item.status]?.color || ""}`}>
+                      {STATUS_CONFIG[item.status]?.label || item.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {item.prioridade ? (
+                      <Badge variant="outline" className={`text-xs ${prioridadeColors[item.prioridade] || ""}`}>
+                        {item.prioridade}
+                      </Badge>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {item.responsavelNome || <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {item.prazo ? format(new Date(item.prazo), "dd/MM/yyyy") : <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell>
+                    {item.origem === "manual" ? (
+                      <div className="w-16">
+                        <div className="text-xs text-right mb-0.5">{item.progresso || 0}%</div>
+                        <Progress value={item.progresso || 0} className="h-1.5" />
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={`text-xs ${item.origem === "ia" ? "bg-purple-500/10 text-purple-700 border-purple-500/30" : "bg-sky-500/10 text-sky-700 border-sky-500/30"}`}>
+                      {item.origem === "ia" ? <><Bot className="h-3 w-3 mr-1" />IA</> : <><Users className="h-3 w-3 mr-1" />Manual</>}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
 
-      {/* Modal for manual entregas */}
       <EntregaEquipeModal
         open={modalEquipeOpen}
         onOpenChange={setModalEquipeOpen}
@@ -283,7 +364,6 @@ export default function SkillsEntregas() {
         isSaving={upsertMutation.isPending}
       />
 
-      {/* Modal for IA entregas (edit status) */}
       <EntregaSkillsEditModal
         open={modalIAOpen}
         onOpenChange={setModalIAOpen}
@@ -299,77 +379,5 @@ export default function SkillsEntregas() {
         isLider={isLider}
       />
     </div>
-  );
-}
-
-// Card component for unified entregas
-function EntregaUnifiedCard({ item, isLider, onClick, onIniciar, onSubmeter }: {
-  item: UnifiedEntrega;
-  isLider: boolean;
-  onClick: () => void;
-  onIniciar?: () => void;
-  onSubmeter?: () => void;
-}) {
-  const isAtrasada = item.prazo && new Date(item.prazo) < new Date() && item.status !== "aprovada" && item.status !== "concluido";
-  const statusConfig = item.origem === "ia"
-    ? STATUS_CONFIG[item.status]
-    : STATUS_EQUIPE_CONFIG[item.status];
-
-  return (
-    <Card
-      className={`cursor-pointer hover:shadow-md transition-shadow ${isAtrasada ? "border-red-200" : ""}`}
-      onClick={onClick}
-    >
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <h4 className="font-medium truncate">{item.titulo}</h4>
-              <Badge variant="outline" className={statusConfig?.color || ""}>
-                {statusConfig?.label || item.status}
-              </Badge>
-              <Badge variant="outline" className={item.origem === "ia" ? "bg-purple-500/10 text-purple-700 border-purple-500/30" : "bg-emerald-500/10 text-emerald-700 border-emerald-500/30"}>
-                {item.origem === "ia" ? "IA" : "Manual"}
-              </Badge>
-              {isAtrasada && (
-                <Badge variant="destructive" className="text-xs">
-                  <AlertCircle className="h-3 w-3 mr-1" /> Atrasada
-                </Badge>
-              )}
-            </div>
-            {item.descricao && <p className="text-sm text-muted-foreground line-clamp-1">{item.descricao}</p>}
-            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-              {item.responsavel && (
-                <span className="flex items-center gap-1"><User className="h-3 w-3" />{item.responsavel.nome_completo}</span>
-              )}
-              {item.prazo && (
-                <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{format(new Date(item.prazo), "dd/MM/yyyy", { locale: ptBR })}</span>
-              )}
-            </div>
-          </div>
-          {item.progresso !== undefined && (
-            <div className="w-16 flex-shrink-0">
-              <div className="text-xs text-right mb-1">{item.progresso}%</div>
-              <Progress value={item.progresso} className="h-2" />
-            </div>
-          )}
-        </div>
-        {/* Quick actions for IA entregas */}
-        {item.origem === "ia" && !isLider && (onIniciar || onSubmeter) && (
-          <div className="mt-3 flex gap-2" onClick={e => e.stopPropagation()}>
-            {onIniciar && (
-              <Button size="sm" variant="outline" onClick={onIniciar}>
-                <Play className="h-3 w-3 mr-1" /> Iniciar
-              </Button>
-            )}
-            {onSubmeter && (
-              <Button size="sm" variant="outline" onClick={onSubmeter}>
-                <Send className="h-3 w-3 mr-1" /> Enviar
-              </Button>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
   );
 }
