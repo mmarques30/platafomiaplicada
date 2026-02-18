@@ -1,36 +1,21 @@
 
+# Tornar "Área Impactada" editável no Modal de Detalhes
 
-# Separacao Visual das Fases no Kanban
+## Situação atual
+O campo "Área Impactada" é exibido como texto fixo no `ProjetoDetailModal.tsx`. Só pode ser definido na criação do projeto.
 
-## Situacao atual
+## Alteração
 
-O Kanban mostra 4 colunas lado a lado sem indicacao de qual fase cada uma pertence. O usuario nao consegue distinguir visualmente a **Fase 1 (Triagem)** da **Fase 2 (Execucao)**.
+### `ProjetoDetailModal.tsx`
+- Substituir o texto estático por um `Input` editável (similar ao campo de observações)
+- Usar estado local + auto-save no `onBlur` para persistir a alteração via `onUpdate(item.id, { area_impactada: valor })`
+- Quando `onUpdate` não estiver disponível (modo leitura), manter o texto estático atual
 
-## Solucao
+### Correção de build
+- Investigar e corrigir o erro `mux-embed` workspace dependency (não encontrado no `package.json` principal, pode estar em outro arquivo de configuração)
 
-Adicionar labels de fase acima das colunas do Kanban, criando uma separacao visual clara:
+## Resumo
 
-```text
-|--- TRIAGEM ---|------------ EXECUCAO --------------|
-| LEVANTADO     | PRIORIZADO | EM EXECUCAO | ENTREGUE |
-```
-
-### Alteracao em `BacklogKanban.tsx`
-
-- Adicionar uma linha de headers acima das colunas com dois grupos:
-  - **Triagem** (span 1 coluna): cobre a coluna "Levantado"
-  - **Execucao** (span 3 colunas): cobre "Priorizado", "Em Execucao", "Entregue"
-- Cada label tera um estilo sutil (texto pequeno, cor discreta, com um separador vertical entre as fases)
-- Tambem corrigir o erro de build do `mux-embed`
-
-### Correcao de build
-
-Remover ou corrigir a referencia ao pacote `mux-embed` no `package.json` que esta causando o erro de workspace dependency.
-
-## Resumo de arquivos
-
-| Arquivo | Alteracao |
+| Arquivo | Alteração |
 |---|---|
-| `BacklogKanban.tsx` | Labels de fase "Triagem" e "Execucao" acima das colunas |
-| `package.json` | Corrigir referencia ao `mux-embed` (se existir) |
-
+| `ProjetoDetailModal.tsx` | Campo `Input` editável para área impactada com auto-save |
