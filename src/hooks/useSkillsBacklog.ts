@@ -11,6 +11,7 @@ export interface BacklogItem {
   status: string | null;
   prioridade: string | null;
   responsavel_id: string | null;
+  colaborador_id: string | null;
   horas_estimadas_economia: number | null;
   tags: string[] | null;
   origem: string | null;
@@ -21,6 +22,7 @@ export interface BacklogItem {
   updated_at: string | null;
   trilhas_recomendadas: any[] | null;
   responsavel: { id: string; nome: string; avatar_url: string | null } | null;
+  colaborador: { id: string; nome: string; avatar_url: string | null } | null;
 }
 
 export function useSkillsBacklog() {
@@ -39,14 +41,18 @@ export function useSkillsBacklog() {
         .order("ordem", { ascending: true });
       if (error) throw error;
 
-      const responsavelIds = data?.map(b => b.responsavel_id).filter(Boolean) || [];
+      const allProfileIds = [
+        ...(data?.map(b => b.responsavel_id).filter(Boolean) || []),
+        ...(data?.map(b => b.colaborador_id).filter(Boolean) || []),
+      ];
+      const uniqueIds = [...new Set(allProfileIds)];
       let responsaveis: Record<string, any> = {};
 
-      if (responsavelIds.length > 0) {
+      if (uniqueIds.length > 0) {
         const { data: profilesData } = await supabase
           .from("profiles_community" as any)
           .select("id, nome_completo, avatar_url")
-          .in("id", responsavelIds as string[]);
+          .in("id", uniqueIds as string[]);
 
         if (profilesData) {
           responsaveis = profilesData.reduce((acc: Record<string, any>, p: any) => {
@@ -59,6 +65,7 @@ export function useSkillsBacklog() {
       return (data?.map(item => ({
         ...item,
         responsavel: item.responsavel_id ? responsaveis[item.responsavel_id] || null : null,
+        colaborador: item.colaborador_id ? responsaveis[item.colaborador_id] || null : null,
       })) || []) as BacklogItem[];
     },
     enabled: !!equipeId,

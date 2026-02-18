@@ -293,6 +293,7 @@ export type Database = {
       backlog_skills: {
         Row: {
           area_impactada: string | null
+          colaborador_id: string | null
           created_at: string | null
           descricao: string | null
           equipe_id: string | null
@@ -311,6 +312,7 @@ export type Database = {
         }
         Insert: {
           area_impactada?: string | null
+          colaborador_id?: string | null
           created_at?: string | null
           descricao?: string | null
           equipe_id?: string | null
@@ -329,6 +331,7 @@ export type Database = {
         }
         Update: {
           area_impactada?: string | null
+          colaborador_id?: string | null
           created_at?: string | null
           descricao?: string | null
           equipe_id?: string | null
@@ -346,6 +349,27 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "backlog_skills_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_skills_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_skills_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "backlog_skills_equipe_id_fkey"
             columns: ["equipe_id"]

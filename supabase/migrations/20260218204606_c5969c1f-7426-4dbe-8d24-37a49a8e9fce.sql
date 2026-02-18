@@ -1,0 +1,1 @@
+ALTER TABLE public.backlog_skills ADD COLUMN colaborador_id UUID REFERENCES public.profiles(id);

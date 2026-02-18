@@ -84,14 +84,24 @@ export default function BacklogCard({ item, onClick }: BacklogCardProps) {
 
         <div className="flex items-center gap-1.5">
           {item.origem === "ia" && <Zap className="h-3 w-3 text-amber-500" />}
-          {item.responsavel && (
-            <Avatar className="h-5 w-5">
-              <AvatarImage src={item.responsavel.avatar_url || ""} />
-              <AvatarFallback className="text-[8px]">
-                {item.responsavel.nome?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          )}
+          <div className="flex -space-x-1.5">
+            {item.responsavel && (
+              <Avatar className="h-5 w-5 border-2 border-background">
+                <AvatarImage src={item.responsavel.avatar_url || ""} />
+                <AvatarFallback className="text-[8px]">
+                  {item.responsavel.nome?.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            )}
+            {item.colaborador && (
+              <Avatar className="h-5 w-5 border-2 border-background">
+                <AvatarImage src={item.colaborador.avatar_url || ""} />
+                <AvatarFallback className="text-[8px]">
+                  {item.colaborador.nome?.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            )}
+          </div>
         </div>
       </div>
     </div>

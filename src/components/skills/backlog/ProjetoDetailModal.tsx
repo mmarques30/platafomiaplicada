@@ -323,6 +323,53 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
             )}
           </div>
 
+          {/* Colaborador - Editável */}
+          <div>
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <User className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Colaborador</span>
+            </div>
+            {onUpdate && membros && membros.length > 0 ? (
+              <Select
+                value={item.colaborador_id || "__none__"}
+                onValueChange={(val) => {
+                  const newId = val === "__none__" ? null : val;
+                  onUpdate(item.id, { colaborador_id: newId });
+                }}
+              >
+                <SelectTrigger className="h-9 w-full text-sm">
+                  <SelectValue placeholder="Selecione um colaborador" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">
+                    <span className="text-muted-foreground">Sem colaborador</span>
+                  </SelectItem>
+                  {membros.filter(m => m.id !== item.responsavel_id).map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={m.avatar_url || ""} />
+                          <AvatarFallback className="text-[8px]">{m.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <span>{m.nome}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : item.colaborador ? (
+              <div className="flex items-center gap-2">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={item.colaborador.avatar_url || ""} />
+                  <AvatarFallback className="text-[9px]">{item.colaborador.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <span className="text-sm">{item.colaborador.nome}</span>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Nenhum colaborador atribuído</p>
+            )}
+          </div>
+
           {/* Tags */}
           {item.tags && item.tags.length > 0 && (
             <div>
