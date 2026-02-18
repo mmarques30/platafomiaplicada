@@ -10,7 +10,7 @@ export function useCommunityStats() {
       try {
         // Total members
         const { count: totalMembers, error: totalError } = await supabase
-          .from("profiles")
+          .from("profiles_community" as any)
           .select("*", { count: "exact", head: true })
           .eq("conta_ativa", true);
 
@@ -21,7 +21,7 @@ export function useCommunityStats() {
         // Online members (active in last 5 minutes)
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
         const { count: onlineMembers, error: onlineError } = await supabase
-          .from("profiles")
+          .from("profiles_community" as any)
           .select("*", { count: "exact", head: true })
           .eq("conta_ativa", true)
           .gt("ultimo_acesso", fiveMinutesAgo);

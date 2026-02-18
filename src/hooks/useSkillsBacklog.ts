@@ -44,7 +44,7 @@ export function useSkillsBacklog() {
 
       if (responsavelIds.length > 0) {
         const { data: profilesData } = await supabase
-          .from("profiles")
+          .from("profiles_community" as any)
           .select("id, nome_completo, avatar_url")
           .in("id", responsavelIds as string[]);
 
