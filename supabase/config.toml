@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.api-visitantes]
 verify_jwt = false
+
+[functions.personalizar-projeto-skills]
+verify_jwt = false
