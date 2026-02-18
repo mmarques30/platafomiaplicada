@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck } from "lucide-react";
+import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck, Sparkles, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
 const statusLabels: Record<string, string> = {
@@ -55,6 +56,7 @@ interface ProjetoDetailModalProps {
 export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusChange, onUpdate, equipeId }: ProjetoDetailModalProps) {
   const [obsValue, setObsValue] = useState(item?.observacoes || "");
   const [areaValue, setAreaValue] = useState(item?.area_impactada || "");
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   useEffect(() => {
     setObsValue(item?.observacoes || "");
     setAreaValue(item?.area_impactada || "");
@@ -172,12 +174,51 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
           )}
 
           {/* Descrição */}
-          {item.descricao && (
-            <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-1">Descrição</h4>
-              <p className="text-sm whitespace-pre-wrap">{item.descricao}</p>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <h4 className="text-sm font-medium text-muted-foreground">Descrição</h4>
+              {onUpdate && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 gap-1.5 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                  disabled={isGeneratingAI}
+                  onClick={async () => {
+                    if (!item) return;
+                    setIsGeneratingAI(true);
+                    try {
+                      const { data, error } = await supabase.functions.invoke("personalizar-projeto-skills", {
+                        body: {
+                          titulo: item.titulo,
+                          descricao_atual: item.descricao || undefined,
+                          area_impactada: item.area_impactada || areaValue || undefined,
+                        },
+                      });
+                      if (error) throw error;
+                      if (data?.descricao) {
+                        onUpdate(item.id, { descricao: data.descricao });
+                        toast.success("Descrição atualizada com IA!");
+                      }
+                    } catch (e: any) {
+                      console.error(e);
+                      toast.error(e?.message || "Erro ao gerar descrição");
+                    } finally {
+                      setIsGeneratingAI(false);
+                    }
+                  }}
+                >
+                  {isGeneratingAI ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3.5 w-3.5" />
+                  )}
+                  {isGeneratingAI ? "Gerando..." : "Personalizar com IA"}
+                </Button>
+              )}
             </div>
-          )}
+            <p className="text-sm whitespace-pre-wrap">{item.descricao || "Sem descrição"}</p>
+          </div>
 
           {/* Observações */}
           <div>

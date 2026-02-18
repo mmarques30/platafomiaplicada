@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AddProjetoModalProps {
   open: boolean;
@@ -25,6 +28,31 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
   const [area, setArea] = useState("");
   const [prioridade, setPrioridade] = useState("");
   const [horas, setHoras] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerateAI = async () => {
+    if (!titulo.trim()) return;
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("personalizar-projeto-skills", {
+        body: {
+          titulo: titulo.trim(),
+          area_impactada: area.trim() || undefined,
+          descricao_atual: descricao.trim() || undefined,
+        },
+      });
+      if (error) throw error;
+      if (data?.descricao) {
+        setDescricao(data.descricao);
+        toast.success("Descrição gerada com IA!");
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || "Erro ao gerar descrição com IA");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +85,24 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
             <Input id="titulo" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex: Automação de relatórios" required />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="descricao">Descrição</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 gap-1.5 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                disabled={!titulo.trim() || isGenerating}
+                onClick={handleGenerateAI}
+              >
+                {isGenerating ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5" />
+                )}
+                {isGenerating ? "Gerando..." : "Gerar com IA"}
+              </Button>
+            </div>
             <Textarea id="descricao" value={descricao} onChange={e => setDescricao(e.target.value)} placeholder="Descreva o projeto..." rows={3} />
           </div>
           <div className="grid grid-cols-2 gap-3">
