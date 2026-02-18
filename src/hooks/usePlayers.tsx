@@ -37,9 +37,9 @@ export function usePlayers() {
       if (userIds.length === 0) return [];
 
       const { data: profiles } = await supabase
-        .from("profiles")
+        .from("profiles_community" as any)
         .select("id, nome_completo, avatar_url, linkedin, nivel_comunidade")
-        .in("id", userIds);
+        .in("id", userIds) as { data: Array<{ id: string; nome_completo: string; avatar_url: string | null; linkedin: string | null; nivel_comunidade: number }> | null };
 
       const profilesMap = new Map(profiles?.map((p) => [p.id, p]) || []);
 

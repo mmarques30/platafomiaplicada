@@ -213,6 +213,13 @@ export type Database = {
             foreignKeyName: "avaliacoes_materiais_comunidade_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_materiais_comunidade_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -351,6 +358,13 @@ export type Database = {
             columns: ["responsavel_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -507,6 +521,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bonus_usuarios_elegiveis_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -687,6 +708,13 @@ export type Database = {
             columns: ["admin_responsavel"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidaturas_mentoria_admin_responsavel_fkey"
+            columns: ["admin_responsavel"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -892,6 +920,13 @@ export type Database = {
             foreignKeyName: "community_comments_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -956,6 +991,13 @@ export type Database = {
             foreignKeyName: "community_posts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -1006,6 +1048,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -1123,6 +1172,13 @@ export type Database = {
             columns: ["criador_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conteudos_dashboard_criador_id_fkey"
+            columns: ["criador_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -1353,6 +1409,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_business_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -1798,6 +1861,13 @@ export type Database = {
             foreignKeyName: "diagnosticos_skills_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnosticos_skills_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -2029,6 +2099,13 @@ export type Database = {
             foreignKeyName: "duvidas_mentoria_respondida_por_fkey"
             columns: ["respondida_por"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duvidas_mentoria_respondida_por_fkey"
+            columns: ["respondida_por"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -2037,6 +2114,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duvidas_mentoria_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -2208,6 +2292,13 @@ export type Database = {
             foreignKeyName: "entregas_equipe_skills_responsavel_id_fkey"
             columns: ["responsavel_id"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_equipe_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -2310,6 +2401,13 @@ export type Database = {
             foreignKeyName: "entregas_skills_aprovado_por_fkey"
             columns: ["aprovado_por"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_skills_aprovado_por_fkey"
+            columns: ["aprovado_por"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -2332,6 +2430,13 @@ export type Database = {
             columns: ["responsavel_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_skills_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -2402,6 +2507,13 @@ export type Database = {
             columns: ["lider_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipes_skills_lider_id_fkey"
+            columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -3421,6 +3533,13 @@ export type Database = {
             foreignKeyName: "materiais_comunidade_adicionado_por_fkey"
             columns: ["adicionado_por"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materiais_comunidade_adicionado_por_fkey"
+            columns: ["adicionado_por"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -3429,6 +3548,13 @@ export type Database = {
             columns: ["criador_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materiais_comunidade_criador_id_fkey"
+            columns: ["criador_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -3532,6 +3658,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membros_equipe_skills_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -3883,6 +4016,13 @@ export type Database = {
             foreignKeyName: "password_reset_requests_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "password_reset_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -3922,6 +4062,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "password_reset_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -4102,6 +4249,13 @@ export type Database = {
             columns: ["vencedor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "premiacoes_comunidade_vencedor_id_fkey"
+            columns: ["vencedor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
             referencedColumns: ["id"]
           },
           {
@@ -5313,6 +5467,13 @@ export type Database = {
             foreignKeyName: "video_feedbacks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_feedbacks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -5493,6 +5654,13 @@ export type Database = {
             foreignKeyName: "visitor_expiration_notices_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visitor_expiration_notices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
           },
@@ -5510,6 +5678,51 @@ export type Database = {
           registro_id: string | null
           tabela: string | null
           usuario: string | null
+        }
+        Relationships: []
+      }
+      profiles_community: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          conta_ativa: boolean | null
+          created_at: string | null
+          id: string | null
+          is_visitante: boolean | null
+          linkedin: string | null
+          nivel_comunidade: number | null
+          nome_completo: string | null
+          plano_mentoria: Database["public"]["Enums"]["plano_mentoria"] | null
+          pontos_comunidade: number | null
+          ultimo_acesso: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          conta_ativa?: boolean | null
+          created_at?: string | null
+          id?: string | null
+          is_visitante?: boolean | null
+          linkedin?: string | null
+          nivel_comunidade?: number | null
+          nome_completo?: string | null
+          plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
+          pontos_comunidade?: number | null
+          ultimo_acesso?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          conta_ativa?: boolean | null
+          created_at?: string | null
+          id?: string | null
+          is_visitante?: boolean | null
+          linkedin?: string | null
+          nivel_comunidade?: number | null
+          nome_completo?: string | null
+          plano_mentoria?: Database["public"]["Enums"]["plano_mentoria"] | null
+          pontos_comunidade?: number | null
+          ultimo_acesso?: string | null
         }
         Relationships: []
       }
