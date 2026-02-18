@@ -79,9 +79,74 @@ export function useSkillsBacklog() {
     },
   });
 
+  const addItem = useMutation({
+    mutationFn: async (item: {
+      titulo: string;
+      descricao?: string;
+      area_impactada?: string;
+      prioridade?: string;
+      horas_estimadas_economia?: number;
+    }) => {
+      if (!equipeId) throw new Error("Equipe não encontrada");
+      const { error } = await supabase
+        .from("backlog_skills")
+        .insert({
+          ...item,
+          equipe_id: equipeId,
+          origem: "manual",
+          status: "levantado",
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["backlog-skills"] });
+      toast.success("Projeto adicionado ao backlog");
+    },
+    onError: () => {
+      toast.error("Erro ao adicionar projeto");
+    },
+  });
+
+  const updateItem = useMutation({
+    mutationFn: async ({ id, ...fields }: { id: string; [key: string]: any }) => {
+      const { error } = await supabase
+        .from("backlog_skills")
+        .update(fields)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["backlog-skills"] });
+      toast.success("Projeto atualizado");
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar projeto");
+    },
+  });
+
+  const deleteItem = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("backlog_skills")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["backlog-skills"] });
+      toast.success("Projeto removido");
+    },
+    onError: () => {
+      toast.error("Erro ao remover projeto");
+    },
+  });
+
   return {
     items: items || [],
     isLoading,
     updateStatus,
+    addItem,
+    updateItem,
+    deleteItem,
   };
 }

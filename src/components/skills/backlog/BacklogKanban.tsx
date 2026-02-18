@@ -1,14 +1,17 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import BacklogCard from "./BacklogCard";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 import { ReactNode } from "react";
+import { XCircle } from "lucide-react";
 
 const columns = [
   { id: "levantado", title: "LEVANTADO", headerBg: "hsl(var(--muted))" },
-  { id: "em_execucao", title: "EM ANDAMENTO", headerBg: "rgba(158, 176, 56, 0.12)" },
-  { id: "entregue", title: "CONCLUÍDO", headerBg: "rgba(115, 137, 37, 0.15)" },
+  { id: "priorizado", title: "PRIORIZADO", headerBg: "rgba(99, 102, 241, 0.12)" },
+  { id: "em_execucao", title: "EM EXECUÇÃO", headerBg: "rgba(158, 176, 56, 0.12)" },
+  { id: "entregue", title: "ENTREGUE", headerBg: "rgba(115, 137, 37, 0.15)" },
 ];
 
 function Column({ id, title, headerBg, children, count }: { id: string; title: string; headerBg: string; children: ReactNode; count: number }) {
@@ -48,22 +51,40 @@ export default function BacklogKanban({ items, onStatusChange, onItemClick }: Ba
     }
   };
 
+  const naoAprovados = items.filter(i => i.status === "nao_aprovado");
   const grouped = columns.map(col => ({
     ...col,
     items: items.filter(i => (i.status || "levantado") === col.id),
   }));
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {grouped.map(col => (
-          <Column key={col.id} id={col.id} title={col.title} headerBg={col.headerBg} count={col.items.length}>
-            {col.items.map(item => (
+    <div className="space-y-4">
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          {grouped.map(col => (
+            <Column key={col.id} id={col.id} title={col.title} headerBg={col.headerBg} count={col.items.length}>
+              {col.items.map(item => (
+                <BacklogCard key={item.id} item={item} onClick={() => onItemClick(item)} />
+              ))}
+            </Column>
+          ))}
+        </div>
+      </DndContext>
+
+      {naoAprovados.length > 0 && (
+        <div className="rounded-xl border bg-card">
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-t-xl border-b bg-destructive/10">
+            <XCircle className="h-3.5 w-3.5 text-destructive" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-destructive">Não Aprovados</h3>
+            <span className="ml-auto text-[10px] text-muted-foreground font-semibold bg-background/60 rounded-full px-2 py-0.5">{naoAprovados.length}</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-2">
+            {naoAprovados.map(item => (
               <BacklogCard key={item.id} item={item} onClick={() => onItemClick(item)} />
             ))}
-          </Column>
-        ))}
-      </div>
-    </DndContext>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
