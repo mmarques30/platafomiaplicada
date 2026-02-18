@@ -5,17 +5,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Clock, FileText, Send, CheckCircle2 } from "lucide-react";
+import { Loader2, Clock, FileText, Send, CheckCircle2, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entrega: any | null;
-  onSave: (dados: { status?: string; descricao?: string }) => void;
+  onSave: (dados: { status?: string; descricao?: string; prazo?: string | null; responsavel_id?: string | null }) => void;
   isSaving: boolean;
   isLider: boolean;
+  membros?: { id: string; nome_completo: string }[];
 }
 
 const STATUS_OPTIONS = [
@@ -25,25 +29,43 @@ const STATUS_OPTIONS = [
   { value: "aprovada", label: "Aprovada", icon: CheckCircle2 },
 ];
 
-export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, isSaving, isLider }: Props) {
+export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, isSaving, isLider, membros = [] }: Props) {
   const [status, setStatus] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [prazo, setPrazo] = useState<Date | undefined>(undefined);
+  const [responsavelId, setResponsavelId] = useState<string>("sem_responsavel");
 
   useEffect(() => {
     if (entrega) {
       setStatus(entrega.status || "pendente");
       setDescricao(entrega.descricao || "");
+      setPrazo(entrega.prazo ? new Date(entrega.prazo) : undefined);
+      setResponsavelId(entrega.responsavel_id || "sem_responsavel");
     }
   }, [entrega, open]);
 
   if (!entrega) return null;
 
-  const hasChanges = status !== entrega.status || descricao !== (entrega.descricao || "");
+  const originalPrazo = entrega.prazo ? new Date(entrega.prazo).toDateString() : undefined;
+  const currentPrazo = prazo?.toDateString();
+  const originalResponsavel = entrega.responsavel_id || "sem_responsavel";
+
+  const hasChanges =
+    status !== entrega.status ||
+    descricao !== (entrega.descricao || "") ||
+    currentPrazo !== originalPrazo ||
+    responsavelId !== originalResponsavel;
 
   const handleSave = () => {
     const dados: any = {};
     if (status !== entrega.status) dados.status = status;
     if (descricao !== (entrega.descricao || "")) dados.descricao = descricao || null;
+    if (currentPrazo !== originalPrazo) {
+      dados.prazo = prazo ? format(prazo, "yyyy-MM-dd") : null;
+    }
+    if (responsavelId !== originalResponsavel) {
+      dados.responsavel_id = responsavelId === "sem_responsavel" ? null : responsavelId;
+    }
     onSave(dados);
   };
 
@@ -62,19 +84,42 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
             <p className="font-medium">{entrega.titulo}</p>
           </div>
 
-          {entrega.responsavel && (
-            <div>
-              <Label className="text-muted-foreground text-xs">Responsável</Label>
-              <p className="text-sm">{entrega.responsavel.nome_completo}</p>
-            </div>
-          )}
+          <div>
+            <Label>Responsável</Label>
+            <Select value={responsavelId} onValueChange={setResponsavelId}>
+              <SelectTrigger><SelectValue placeholder="Selecionar responsável" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sem_responsavel">Sem responsável</SelectItem>
+                {membros.map(m => (
+                  <SelectItem key={m.id} value={m.id}>{m.nome_completo}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          {entrega.prazo && (
-            <div>
-              <Label className="text-muted-foreground text-xs">Prazo</Label>
-              <p className="text-sm">{format(new Date(entrega.prazo), "dd/MM/yyyy", { locale: ptBR })}</p>
-            </div>
-          )}
+          <div>
+            <Label>Prazo</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn("w-full justify-start text-left font-normal", !prazo && "text-muted-foreground")}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {prazo ? format(prazo, "dd/MM/yyyy", { locale: ptBR }) : "Selecionar prazo"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={prazo}
+                  onSelect={setPrazo}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
           <div>
             <Label>Status</Label>

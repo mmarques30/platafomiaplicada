@@ -439,6 +439,7 @@ export default function SkillsEntregas() {
         }}
         isSaving={atualizarEntrega.isPending}
         isLider={isLider}
+        membros={membros || []}
       />
     </div>
   );
