@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useEntregasEquipe, EntregaEquipe } from "@/hooks/useEntregasEquipe";
+import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 import { EntregaEquipeModal } from "./EntregaEquipeModal";
+import { EntregaSkillsEditModal } from "./EntregaSkillsEditModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Package, Calendar, User, FolderOpen } from "lucide-react";
+import { Plus, Package, Calendar, User, FolderOpen, Bot, Users } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -16,12 +18,16 @@ const statusLabels: Record<string, string> = {
   em_andamento: "Em Andamento",
   concluido: "Concluído",
   bloqueado: "Bloqueado",
+  aguardando_validacao: "Aguardando Validação",
+  aprovada: "Aprovada",
 };
 const statusColors: Record<string, string> = {
   pendente: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30",
   em_andamento: "bg-blue-500/10 text-blue-700 border-blue-500/30",
   concluido: "bg-green-500/10 text-green-700 border-green-500/30",
   bloqueado: "bg-red-500/10 text-red-700 border-red-500/30",
+  aguardando_validacao: "bg-orange-500/10 text-orange-700 border-orange-500/30",
+  aprovada: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
 };
 const prioridadeColors: Record<string, string> = {
   P1: "bg-red-500/10 text-red-700",
@@ -29,14 +35,33 @@ const prioridadeColors: Record<string, string> = {
   P3: "bg-green-500/10 text-green-700",
 };
 
+interface UnifiedEntrega {
+  id: string;
+  titulo: string;
+  descricao?: string | null;
+  status: string;
+  prazo?: string | null;
+  responsavelNome?: string | null;
+  prioridade?: string | null;
+  progresso?: number;
+  origem: "ia" | "manual";
+  projetoTitulo?: string | null;
+  arquivosCount?: number;
+  raw: any;
+}
+
 interface Props {
   equipeId: string;
 }
 
 export default function ProjetoSkillsEntregas({ equipeId }: Props) {
-  const { entregas, isLoading, upsertMutation, uploadFile } = useEntregasEquipe(equipeId);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selected, setSelected] = useState<EntregaEquipe | null>(null);
+  const { entregas: entregasEquipe, isLoading: loadingEquipe, upsertMutation, uploadFile } = useEntregasEquipe(equipeId);
+  const { entregas: entregasIA, isLoading: loadingIA, atualizarEntrega } = useSkillsEntregas();
+
+  const [modalEquipeOpen, setModalEquipeOpen] = useState(false);
+  const [modalIAOpen, setModalIAOpen] = useState(false);
+  const [selectedEquipe, setSelectedEquipe] = useState<EntregaEquipe | null>(null);
+  const [selectedIA, setSelectedIA] = useState<any>(null);
   const [filterStatus, setFilterStatus] = useState("all");
 
   // Membros da equipe
@@ -71,14 +96,64 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
     enabled: !!equipeId,
   });
 
-  const filtered = filterStatus === "all" ? entregas : entregas.filter(e => e.status_equipe === filterStatus);
+  // Unificar entregas
+  const unifiedIA: UnifiedEntrega[] = (entregasIA || []).map((e: any) => ({
+    id: e.id,
+    titulo: e.titulo,
+    descricao: e.descricao,
+    status: e.status || "pendente",
+    prazo: e.prazo,
+    responsavelNome: e.responsavel?.nome_completo,
+    prioridade: null,
+    progresso: 0,
+    origem: "ia" as const,
+    projetoTitulo: null,
+    arquivosCount: 0,
+    raw: e,
+  }));
 
-  const openNew = () => { setSelected(null); setModalOpen(true); };
-  const openEdit = (e: EntregaEquipe) => { setSelected(e); setModalOpen(true); };
+  const unifiedEquipe: UnifiedEntrega[] = (entregasEquipe || []).map(e => ({
+    id: e.id,
+    titulo: e.titulo_equipe,
+    descricao: e.descricao_equipe,
+    status: e.status_equipe,
+    prazo: e.prazo_equipe,
+    responsavelNome: e.responsavel?.nome_completo,
+    prioridade: e.prioridade_equipe,
+    progresso: e.progresso,
+    origem: "manual" as const,
+    projetoTitulo: e.projeto?.titulo,
+    arquivosCount: e.arquivos?.length || 0,
+    raw: e,
+  }));
 
-  const handleSave = (values: any) => {
+  const allEntregas = [...unifiedIA, ...unifiedEquipe];
+  const filtered = filterStatus === "all" ? allEntregas : allEntregas.filter(e => e.status === filterStatus);
+
+  const isLoading = loadingEquipe || loadingIA;
+
+  const openNew = () => { setSelectedEquipe(null); setModalEquipeOpen(true); };
+
+  const openEdit = (item: UnifiedEntrega) => {
+    if (item.origem === "ia") {
+      setSelectedIA(item.raw);
+      setModalIAOpen(true);
+    } else {
+      setSelectedEquipe(item.raw);
+      setModalEquipeOpen(true);
+    }
+  };
+
+  const handleSaveEquipe = (values: any) => {
     upsertMutation.mutate({ ...values, equipe_id: equipeId }, {
-      onSuccess: () => setModalOpen(false),
+      onSuccess: () => setModalEquipeOpen(false),
+    });
+  };
+
+  const handleSaveIA = (dados: { status?: string; descricao?: string }) => {
+    if (!selectedIA) return;
+    atualizarEntrega.mutate({ entregaId: selectedIA.id, dados }, {
+      onSuccess: () => setModalIAOpen(false),
     });
   };
 
@@ -96,6 +171,8 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
               <SelectItem value="em_andamento">Em Andamento</SelectItem>
               <SelectItem value="concluido">Concluído</SelectItem>
               <SelectItem value="bloqueado">Bloqueado</SelectItem>
+              <SelectItem value="aguardando_validacao">Aguardando Validação</SelectItem>
+              <SelectItem value="aprovada">Aprovada</SelectItem>
             </SelectContent>
           </Select>
           <span className="text-sm text-muted-foreground">{filtered.length} entrega(s)</span>
@@ -112,36 +189,41 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map(e => (
-            <Card key={e.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(e)}>
+            <Card key={`${e.origem}-${e.id}`} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(e)}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <h4 className="font-medium truncate">{e.titulo_equipe}</h4>
-                      <Badge variant="outline" className={statusColors[e.status_equipe]}>{statusLabels[e.status_equipe]}</Badge>
-                      {e.prioridade_equipe && <Badge variant="outline" className={prioridadeColors[e.prioridade_equipe]}>{e.prioridade_equipe}</Badge>}
+                      <h4 className="font-medium truncate">{e.titulo}</h4>
+                      <Badge variant="outline" className={statusColors[e.status] || ""}>{statusLabels[e.status] || e.status}</Badge>
+                      {e.prioridade && <Badge variant="outline" className={prioridadeColors[e.prioridade]}>{e.prioridade}</Badge>}
+                      <Badge variant="outline" className={e.origem === "ia" ? "bg-purple-500/10 text-purple-700 border-purple-500/30" : "bg-sky-500/10 text-sky-700 border-sky-500/30"}>
+                        {e.origem === "ia" ? <><Bot className="h-3 w-3 mr-1" />IA</> : <><Users className="h-3 w-3 mr-1" />Manual</>}
+                      </Badge>
                     </div>
-                    {e.projeto && (
+                    {e.projetoTitulo && (
                       <div className="flex items-center gap-1 text-xs text-primary mb-1">
                         <FolderOpen className="h-3 w-3" />
-                        <span>{e.projeto.titulo}</span>
+                        <span>{e.projetoTitulo}</span>
                       </div>
                     )}
-                    {e.descricao_equipe && <p className="text-sm text-muted-foreground line-clamp-1">{e.descricao_equipe}</p>}
+                    {e.descricao && <p className="text-sm text-muted-foreground line-clamp-1">{e.descricao}</p>}
                     <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                      {e.responsavel && (
-                        <span className="flex items-center gap-1"><User className="h-3 w-3" />{e.responsavel.nome_completo}</span>
+                      {e.responsavelNome && (
+                        <span className="flex items-center gap-1"><User className="h-3 w-3" />{e.responsavelNome}</span>
                       )}
-                      {e.prazo_equipe && (
-                        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{format(new Date(e.prazo_equipe), "dd/MM/yyyy")}</span>
+                      {e.prazo && (
+                        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{format(new Date(e.prazo), "dd/MM/yyyy")}</span>
                       )}
-                      {e.arquivos.length > 0 && <span>{e.arquivos.length} arquivo(s)</span>}
+                      {(e.arquivosCount || 0) > 0 && <span>{e.arquivosCount} arquivo(s)</span>}
                     </div>
                   </div>
-                  <div className="w-20 flex-shrink-0">
-                    <div className="text-xs text-right mb-1">{e.progresso}%</div>
-                    <Progress value={e.progresso} className="h-2" />
-                  </div>
+                  {e.origem === "manual" && (
+                    <div className="w-20 flex-shrink-0">
+                      <div className="text-xs text-right mb-1">{e.progresso || 0}%</div>
+                      <Progress value={e.progresso || 0} className="h-2" />
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -150,14 +232,23 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
       )}
 
       <EntregaEquipeModal
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-        entrega={selected}
+        open={modalEquipeOpen}
+        onOpenChange={setModalEquipeOpen}
+        entrega={selectedEquipe}
         membros={membros || []}
         projetos={projetos || []}
-        onSave={handleSave}
+        onSave={handleSaveEquipe}
         onUploadFile={(file) => uploadFile(file, equipeId)}
         isSaving={upsertMutation.isPending}
+      />
+
+      <EntregaSkillsEditModal
+        open={modalIAOpen}
+        onOpenChange={setModalIAOpen}
+        entrega={selectedIA}
+        onSave={handleSaveIA}
+        isSaving={atualizarEntrega.isPending}
+        isLider={true}
       />
     </div>
   );
