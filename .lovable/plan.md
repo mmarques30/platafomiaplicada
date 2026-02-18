@@ -1,35 +1,46 @@
 
 
-# Correcao de RLS na tabela `entregas_equipe_skills`
+# Correcao de status do Backlog Skills
 
 ## Problema
-As policies de **INSERT** e **UPDATE** na tabela `entregas_equipe_skills` nao incluem acesso para administradores. Apenas membros da equipe conseguem inserir/atualizar. Quando um admin tenta criar uma entrega, o RLS bloqueia.
+O Kanban do backlog define 3 colunas com os status:
+- `levantado`
+- `em_andamento`
+- `concluido`
 
-## Policies atuais
+Porem o banco de dados tem um CHECK constraint que so aceita:
+- `levantado`
+- `priorizado`
+- `em_execucao`
+- `entregue`
 
-| Operacao | Regra |
-|----------|-------|
-| SELECT | Membro da equipe **OU** admin |
-| INSERT | Apenas membro da equipe |
-| UPDATE | Apenas membro da equipe |
-| DELETE | Membro da equipe **OU** admin |
+Quando voce arrasta um projeto para "EM ANDAMENTO" ou "CONCLUIDO", o banco rejeita porque `em_andamento` e `concluido` nao existem no constraint.
 
-## Correcao
-Atualizar as policies de **INSERT** e **UPDATE** para incluir admins, alinhando com SELECT e DELETE:
+O log do banco confirma: `new row for relation "backlog_skills" violates check constraint "backlog_skills_status_check"`
 
-```sql
--- INSERT: adicionar admin
-DROP POLICY "Members can insert team entregas" ON entregas_equipe_skills;
-CREATE POLICY "Members can insert team entregas"
-  ON entregas_equipe_skills FOR INSERT
-  WITH CHECK (is_member_of_skills_team(equipe_id) OR has_role(auth.uid(), 'admin'));
+## Solucao
 
--- UPDATE: adicionar admin
-DROP POLICY "Members can update team entregas" ON entregas_equipe_skills;
-CREATE POLICY "Members can update team entregas"
-  ON entregas_equipe_skills FOR UPDATE
-  USING (is_member_of_skills_team(equipe_id) OR has_role(auth.uid(), 'admin'));
+Alinhar o frontend com os valores do banco. Alterar o componente `BacklogKanban.tsx` para usar os status corretos:
+
+| Coluna no Kanban | Status atual (errado) | Status correto (banco) |
+|---|---|---|
+| LEVANTADO | `levantado` | `levantado` (ok) |
+| EM ANDAMENTO | `em_andamento` | `em_execucao` |
+| CONCLUIDO | `concluido` | `entregue` |
+
+## Alteracao
+
+**Arquivo: `src/components/skills/backlog/BacklogKanban.tsx`**
+
+Atualizar a definicao das colunas:
+
+```typescript
+const columns = [
+  { id: "levantado", title: "LEVANTADO", headerBg: "hsl(var(--muted))" },
+  { id: "em_execucao", title: "EM ANDAMENTO", headerBg: "rgba(158, 176, 56, 0.12)" },
+  { id: "entregue", title: "CONCLUIDO", headerBg: "rgba(115, 137, 37, 0.15)" },
+];
 ```
 
-Isso resolve o erro sem alterar nenhum codigo frontend.
+Isso e uma mudanca de 2 linhas, sem impacto em nenhum outro componente. O `BacklogView.tsx` ja passa `updateStatus.mutate({ id, status })` com o ID da coluna, entao ao corrigir os IDs das colunas tudo funciona automaticamente.
 
