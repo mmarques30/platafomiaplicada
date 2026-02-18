@@ -1,46 +1,50 @@
 
-
-# Botao de IA para Personalizar Projetos
+# Adicionar Colaborador aos Projetos do Backlog
 
 ## O que sera feito
-Adicionar um botao "Personalizar com IA" nos modais de criar e editar projetos. Ao clicar, a IA gera automaticamente uma descricao detalhada e uma solucao para o projeto com base no titulo, area impactada e contexto da equipe.
-
-## Fluxo do usuario
-1. No modal de **criar projeto**: apos preencher o titulo (obrigatorio), o usuario clica no botao de IA ao lado do campo "Descricao" e a IA gera uma descricao personalizada
-2. No modal de **editar projeto** (ProjetoDetailModal): um botao de IA aparece ao lado da descricao para regenerar/personalizar o texto
+Cada projeto passara a ter dois papeis: **Dono** (responsavel principal, ja existente) e **Colaborador** (novo campo). Isso permite distribuir melhor as responsabilidades dentro da equipe.
 
 ## Alteracoes
 
-### 1. Nova Edge Function: `personalizar-projeto-skills`
-- Recebe: `titulo`, `descricao_atual` (opcional), `area_impactada` (opcional), `contexto_equipe` (opcional)
-- Usa Lovable AI Gateway (`google/gemini-3-flash-preview`) para gerar uma descricao clara e objetiva do projeto, incluindo problema, solucao proposta e resultado esperado
-- Retorna: `descricao` gerada pela IA
+### 1. Migracao de banco de dados
+- Adicionar coluna `colaborador_id UUID` na tabela `backlog_skills`, com foreign key para `profiles(id)`
+- A coluna sera nullable (colaborador e opcional)
 
-### 2. `AddProjetoModal.tsx`
-- Adicionar botao com icone de "varinha magica" (Sparkles) ao lado do label "Descricao"
-- Ao clicar, envia o titulo e area para a edge function e preenche o campo descricao com o resultado
-- Botao desabilitado se o titulo estiver vazio
-- Indicador de loading durante a geracao
+### 2. Hook `useSkillsBacklog.ts`
+- Incluir `colaborador_id` no tipo `BacklogItem`
+- Adicionar campo `colaborador` (nome, avatar) similar ao `responsavel`
+- Buscar dados do colaborador junto com os do responsavel na query
 
 ### 3. `ProjetoDetailModal.tsx`
-- Adicionar botao "Personalizar com IA" abaixo da descricao (quando `onUpdate` esta disponivel, ou seja, modo edicao)
-- Ao clicar, envia titulo + descricao atual + area para a IA regenerar
-- O resultado atualiza o campo descricao via `onUpdate`
-- Loading state no botao durante a geracao
+- Adicionar setor "Colaborador" abaixo do "Responsavel"
+- Usar o mesmo Select com membros da equipe
+- Salvamento automatico no onBlur (mesmo padrao do responsavel)
+- Filtrar o colaborador para nao permitir selecionar a mesma pessoa que e o dono
 
-### 4. `supabase/config.toml`
-- Registrar a nova funcao `personalizar-projeto-skills` com `verify_jwt = false`
+### 4. `AddProjetoModal.tsx`
+- Nenhuma alteracao necessaria - o colaborador pode ser atribuido depois, no modal de detalhes (mantendo o formulario de criacao simples)
 
-### 5. Correcao de build
-- Remover o `bun.lock` corrompido que causa o erro do `mux-embed`
+### 5. `BacklogCard.tsx`
+- Exibir segundo avatar ao lado do responsavel quando houver colaborador
+- Avatares empilhados (sobrepostos) para indicar visualmente que ha duas pessoas
+
+### 6. `BacklogTable.tsx`
+- Renomear coluna "Responsavel" para "Equipe" ou manter e mostrar ambos os avatares na mesma celula
+
+### 7. `BacklogView.tsx`
+- Adicionar filtro de Colaborador no filtro de responsavel (ou unificar para filtrar por "envolvidos")
+
+### 8. Correcao do build
+- Deletar `bun.lockb` para resolver o erro do `mux-embed`
 
 ## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| `supabase/functions/personalizar-projeto-skills/index.ts` | Nova edge function usando Lovable AI Gateway |
-| `src/components/skills/backlog/AddProjetoModal.tsx` | Botao IA no campo descricao |
-| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Botao IA para personalizar descricao existente |
-| `supabase/config.toml` | Registrar nova funcao |
-| `bun.lock` | Deletar para corrigir build |
-
+| Migracao SQL | `ALTER TABLE backlog_skills ADD COLUMN colaborador_id UUID REFERENCES profiles(id)` |
+| `src/hooks/useSkillsBacklog.ts` | Buscar dados do colaborador, atualizar tipo BacklogItem |
+| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Select para colaborador com salvamento automatico |
+| `src/components/skills/backlog/BacklogCard.tsx` | Avatares empilhados (dono + colaborador) |
+| `src/components/skills/backlog/BacklogTable.tsx` | Mostrar ambos avatares na celula |
+| `src/components/skills/backlog/BacklogView.tsx` | Filtro atualizado para considerar colaborador |
+| `bun.lockb` | Deletar para corrigir build |
