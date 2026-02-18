@@ -1,20 +1,34 @@
+import { useMemo } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
+interface ProjetoAggregated {
+  id: string;
+  titulo: string;
+  status: string | null;
+  prioridade: string | null;
+  entregasCount: number;
+  subtarefasCount: number;
+  progressoMedio: number;
+}
+
 interface ProjetosResumoTableProps {
-  entregas: any[];
+  projetos: any[];
+  entregasEquipe: any[];
   onVerMais: () => void;
   maxRows?: number;
 }
 
 const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
-  pendente: { label: "Backlog", variant: "outline" },
-  em_andamento: { label: "Em Andamento", variant: "default" },
-  aguardando_validacao: { label: "Validação", variant: "secondary" },
-  concluido: { label: "Concluído", variant: "default" },
-  aprovada: { label: "Aprovado", variant: "default" },
+  levantado: { label: "Levantado", variant: "outline" },
+  backlog: { label: "Backlog", variant: "outline" },
+  aprovado: { label: "Aprovado", variant: "default" },
+  nao_aprovado: { label: "Não Aprovado", variant: "destructive" },
+  priorizado: { label: "Priorizado", variant: "secondary" },
+  em_execucao: { label: "Em Execução", variant: "default" },
+  entregue: { label: "Entregue", variant: "default" },
 };
 
 const prioridadeMap: Record<string, { label: string; color: string }> = {
@@ -23,19 +37,41 @@ const prioridadeMap: Record<string, { label: string; color: string }> = {
   baixa: { label: "P3", color: "#9EB038" },
 };
 
-export default function ProjetosResumoTable({ entregas, onVerMais, maxRows = 5 }: ProjetosResumoTableProps) {
-  const visibleEntregas = entregas.slice(0, maxRows);
-  const hasMore = entregas.length > maxRows;
+export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMais, maxRows = 5 }: ProjetosResumoTableProps) {
+  const aggregated = useMemo<ProjetoAggregated[]>(() => {
+    return projetos.map((p: any) => {
+      const entregas = entregasEquipe.filter((e: any) => e.projeto_id === p.id);
+      const subtarefasCount = entregas.reduce(
+        (sum: number, e: any) => sum + (e.subtarefas_entregas_skills?.length ?? 0),
+        0
+      );
+      const progressoMedio =
+        entregas.length > 0
+          ? Math.round(entregas.reduce((sum: number, e: any) => sum + (e.progresso ?? 0), 0) / entregas.length)
+          : 0;
 
-  if (entregas.length === 0) {
-    return null;
-  }
+      return {
+        id: p.id,
+        titulo: p.titulo,
+        status: p.status,
+        prioridade: p.prioridade,
+        entregasCount: entregas.length,
+        subtarefasCount,
+        progressoMedio,
+      };
+    });
+  }, [projetos, entregasEquipe]);
+
+  const visible = aggregated.slice(0, maxRows);
+  const hasMore = aggregated.length > maxRows;
+
+  if (aggregated.length === 0) return null;
 
   return (
     <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
       <div className="px-5 py-3 border-b border-border flex items-center justify-between">
         <span className="text-sm font-semibold text-foreground">Visão Geral dos Projetos</span>
-        <span className="text-[11px] text-muted-foreground">{entregas.length} projeto{entregas.length !== 1 ? "s" : ""}</span>
+        <span className="text-[11px] text-muted-foreground">{aggregated.length} projeto{aggregated.length !== 1 ? "s" : ""}</span>
       </div>
       <Table>
         <TableHeader>
@@ -43,20 +79,20 @@ export default function ProjetosResumoTable({ entregas, onVerMais, maxRows = 5 }
             <TableHead className="text-[11px] font-medium text-muted-foreground">Projeto</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground">Status</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground">Prioridade</TableHead>
-            <TableHead className="text-[11px] font-medium text-muted-foreground">Tipo</TableHead>
+            <TableHead className="text-[11px] font-medium text-muted-foreground text-center">Entregas</TableHead>
+            <TableHead className="text-[11px] font-medium text-muted-foreground text-center">Subtarefas</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground text-right">Progresso</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {visibleEntregas.map((e: any) => {
-            const status = statusMap[e.status] || { label: e.status, variant: "outline" as const };
-            const prioridade = prioridadeMap[e.prioridade] || { label: e.prioridade || "—", color: "#a1a1aa" };
-            const tipo = e.tipo ?? "individual";
+          {visible.map((p) => {
+            const status = statusMap[p.status ?? ""] || { label: p.status ?? "—", variant: "outline" as const };
+            const prioridade = prioridadeMap[p.prioridade ?? ""] || { label: p.prioridade || "—", color: "#a1a1aa" };
 
             return (
-              <TableRow key={e.id} className="group">
+              <TableRow key={p.id} className="group">
                 <TableCell className="text-sm font-medium text-foreground max-w-[220px] truncate">
-                  {e.titulo}
+                  {p.titulo}
                 </TableCell>
                 <TableCell>
                   <Badge variant={status.variant} className="text-[10px] font-medium">
@@ -64,19 +100,19 @@ export default function ProjetosResumoTable({ entregas, onVerMais, maxRows = 5 }
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <span
-                    className="inline-flex items-center gap-1 text-[10px] font-bold"
-                    style={{ color: prioridade.color }}
-                  >
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold" style={{ color: prioridade.color }}>
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: prioridade.color }} />
                     {prioridade.label}
                   </span>
                 </TableCell>
-                <TableCell>
-                  <span className="text-xs text-muted-foreground capitalize">{tipo}</span>
+                <TableCell className="text-center">
+                  <span className="text-xs font-semibold text-foreground">{p.entregasCount}</span>
+                </TableCell>
+                <TableCell className="text-center">
+                  <span className="text-xs font-semibold text-foreground">{p.subtarefasCount}</span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <span className="text-xs font-semibold text-foreground">{e.progresso ?? 0}%</span>
+                  <span className="text-xs font-semibold text-foreground">{p.progressoMedio}%</span>
                 </TableCell>
               </TableRow>
             );
@@ -85,12 +121,7 @@ export default function ProjetosResumoTable({ entregas, onVerMais, maxRows = 5 }
       </Table>
       {hasMore && (
         <div className="px-5 py-3 border-t border-border flex justify-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onVerMais}
-            className="text-xs gap-1.5 hover:text-[#9EB038]"
-          >
+          <Button variant="ghost" size="sm" onClick={onVerMais} className="text-xs gap-1.5 hover:text-[#9EB038]">
             Ver todos os projetos
             <ArrowRight size={14} />
           </Button>

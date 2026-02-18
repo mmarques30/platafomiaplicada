@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
@@ -13,6 +13,8 @@ import ProjetosFilterBar, { type ProjetosFilters } from "@/components/skills/fil
 import { useSkillsEntregas } from "@/hooks/useSkillsEntregas";
 import { useSkillsEquipe } from "@/hooks/useSkillsEquipe";
 import { useSkillsBacklog } from "@/hooks/useSkillsBacklog";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { isAfter, isBefore, startOfDay, endOfDay } from "date-fns";
 
 export default function ProjetoSkillsProjetosPage() {
@@ -21,6 +23,21 @@ export default function ProjetoSkillsProjetosPage() {
   const { equipe, membros } = useSkillsEquipe();
   const { entregas, isLoading: isLoadingEntregas } = useSkillsEntregas();
   const { items: projetos } = useSkillsBacklog();
+
+  // Buscar entregas_equipe_skills com subtarefas para agregar por projeto
+  const { data: entregasEquipe } = useQuery({
+    queryKey: ["entregas-equipe-resumo", equipeId],
+    queryFn: async () => {
+      if (!equipeId) return [];
+      const { data, error } = await supabase
+        .from("entregas_equipe_skills")
+        .select("*, subtarefas_entregas_skills(*)")
+        .eq("equipe_id", equipeId);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!equipeId,
+  });
 
   const [filters, setFilters] = useState<ProjetosFilters>({
     projeto: "todos",
@@ -95,7 +112,8 @@ export default function ProjetoSkillsProjetosPage() {
             <PortfolioSidebar entregas={filteredEntregas} />
           </div>
           <ProjetosResumoTable
-            entregas={filteredEntregas}
+            projetos={projetos}
+            entregasEquipe={entregasEquipe ?? []}
             onVerMais={() => {
               const tab = document.getElementById("backlog-tab");
               if (tab) tab.click();
