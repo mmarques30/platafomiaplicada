@@ -1,30 +1,35 @@
 
 
-# Implementacao da API REST para Visitantes
+# Correcao de RLS na tabela `entregas_equipe_skills`
 
-## API Key
-Vou gerar uma chave aleatoria segura e configurar como secret automaticamente. Voce recebera a chave gerada para usar na aplicacao externa.
+## Problema
+As policies de **INSERT** e **UPDATE** na tabela `entregas_equipe_skills` nao incluem acesso para administradores. Apenas membros da equipe conseguem inserir/atualizar. Quando um admin tenta criar uma entrega, o RLS bloqueia.
 
-## O que sera feito
+## Policies atuais
 
-### 1. Configurar secret `VISITANTES_API_KEY`
-- Gerar uma chave aleatoria segura (UUID ou string hex de 32 caracteres)
-- Armazenar como secret do projeto
+| Operacao | Regra |
+|----------|-------|
+| SELECT | Membro da equipe **OU** admin |
+| INSERT | Apenas membro da equipe |
+| UPDATE | Apenas membro da equipe |
+| DELETE | Membro da equipe **OU** admin |
 
-### 2. Criar `supabase/functions/api-visitantes/index.ts`
-- Validar header `x-api-key`
-- Consultar `profiles` (visitantes) e `content_access_logs` usando service role key
-- Suportar parametro `?type=` com opcoes: `visitantes`, `top-conteudos`, `engajamento`, `resumo`
-- Sem parametro retorna tudo junto
+## Correcao
+Atualizar as policies de **INSERT** e **UPDATE** para incluir admins, alinhando com SELECT e DELETE:
 
-### 3. Atualizar `supabase/config.toml`
-- Adicionar `[functions.api-visitantes]` com `verify_jwt = false`
+```sql
+-- INSERT: adicionar admin
+DROP POLICY "Members can insert team entregas" ON entregas_equipe_skills;
+CREATE POLICY "Members can insert team entregas"
+  ON entregas_equipe_skills FOR INSERT
+  WITH CHECK (is_member_of_skills_team(equipe_id) OR has_role(auth.uid(), 'admin'));
 
-## Como usar depois
-
+-- UPDATE: adicionar admin
+DROP POLICY "Members can update team entregas" ON entregas_equipe_skills;
+CREATE POLICY "Members can update team entregas"
+  ON entregas_equipe_skills FOR UPDATE
+  USING (is_member_of_skills_team(equipe_id) OR has_role(auth.uid(), 'admin'));
 ```
-GET https://ocwpsanqtfubixerjive.supabase.co/functions/v1/api-visitantes?type=resumo
-Headers:
-  x-api-key: [chave que sera gerada]
-```
+
+Isso resolve o erro sem alterar nenhum codigo frontend.
 
