@@ -10,7 +10,7 @@ interface ProjetoAggregated {
   status: string | null;
   entregasCount: number;
   subtarefasCount: number;
-  progressoMedio: number;
+  
 }
 
 interface ProjetosResumoTableProps {
@@ -39,18 +39,12 @@ export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMai
         (sum: number, e: any) => sum + (e.subtarefas_entregas_skills?.length ?? 0),
         0
       );
-      const progressoMedio =
-        entregas.length > 0
-          ? Math.round(entregas.reduce((sum: number, e: any) => sum + (e.progresso ?? 0), 0) / entregas.length)
-          : 0;
-
       return {
         id: p.id,
         titulo: p.titulo,
         status: p.status,
         entregasCount: entregas.length,
         subtarefasCount,
-        progressoMedio,
       };
     });
   }, [projetos, entregasEquipe]);
@@ -72,9 +66,7 @@ export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMai
             <TableHead className="text-[11px] font-medium text-muted-foreground">Projeto</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground">Status</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground text-center">Entregas</TableHead>
-            <TableHead className="text-[11px] font-medium text-muted-foreground text-center">Entregas</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground text-center">Subtarefas</TableHead>
-            <TableHead className="text-[11px] font-medium text-muted-foreground text-right">Progresso</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -96,9 +88,6 @@ export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMai
                 </TableCell>
                 <TableCell className="text-center">
                   <span className="text-xs font-semibold text-foreground">{p.subtarefasCount}</span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <span className="text-xs font-semibold text-foreground">{p.progressoMedio}%</span>
                 </TableCell>
               </TableRow>
             );
