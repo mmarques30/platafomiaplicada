@@ -1,30 +1,48 @@
 
-
-# Corrigir Edicao de Categoria da Trilha
+# Agrupar Modulos por Trilha no Dropdown de Videos
 
 ## Problema
-O campo de categoria usa o componente `CommandInput` do cmdk com `value` e `onValueChange` controlados. Isso causa conflito com o filtro interno do cmdk, impedindo a selecao de categorias existentes e a digitacao de novas.
+Ao adicionar ou editar um video, o dropdown de modulos exibe uma lista plana com "Trilha -- Modulo", dificultando a navegacao quando ha muitos modulos. O ideal e agrupar os modulos por trilha, com a trilha como cabecalho visual.
 
 ## Solucao
-Substituir o combobox complexo (Command/Popover) por um `Select` simples com opcoes pre-definidas, mais um campo de texto para categoria customizada. Isso garante que:
-- As categorias existentes no banco aparecem como opcoes selecionaveis
-- E possivel digitar uma categoria nova
-- Funciona tanto na criacao quanto na edicao
+Modificar o `SelectContent` no componente `VideoModal.tsx` para agrupar os modulos por trilha usando `SelectGroup` e `SelectLabel` do Radix UI.
 
 ## Detalhes tecnicos
 
-### Arquivo: `src/components/admin/content/TrilhaModal.tsx`
+### Arquivo: `src/components/admin/content/VideoModal.tsx`
 
-**Remover**: o bloco Popover/Command (linhas 240-302) que usa cmdk para o campo de categoria.
+**O que muda (linhas 296-303)**:
 
-**Substituir por**: um `Select` padrao do Radix com as categorias carregadas do banco, mais uma opcao "Outra..." que revela um `Input` de texto para digitar uma nova categoria.
+Substituir a listagem plana:
+```tsx
+{modulos?.map((modulo: any) => (
+  <SelectItem key={modulo.id} value={modulo.id}>
+    {modulo.trilha?.titulo} — {modulo.titulo}
+  </SelectItem>
+))}
+```
 
-Logica:
-1. Se o usuario seleciona uma categoria existente no `Select`, o valor e aplicado diretamente
-2. Se seleciona "Outra...", aparece um `Input` para digitar o nome da nova categoria
-3. Na edicao, o `Select` mostra a categoria atual (se existir na lista) ou mostra "Outra..." com o input preenchido
+Por uma listagem agrupada:
+```tsx
+{Object.entries(
+  (modulos || []).reduce((groups, modulo) => {
+    const trilhaTitulo = modulo.trilha?.titulo || "Sem Trilha";
+    if (!groups[trilhaTitulo]) groups[trilhaTitulo] = [];
+    groups[trilhaTitulo].push(modulo);
+    return groups;
+  }, {} as Record<string, any[]>)
+).map(([trilhaTitulo, modulosDaTrilha]) => (
+  <SelectGroup key={trilhaTitulo}>
+    <SelectLabel>{trilhaTitulo}</SelectLabel>
+    {modulosDaTrilha.map((modulo) => (
+      <SelectItem key={modulo.id} value={modulo.id}>
+        {modulo.titulo}
+      </SelectItem>
+    ))}
+  </SelectGroup>
+))}
+```
 
-**Remover imports nao mais necessarios**: `Command`, `CommandEmpty`, `CommandGroup`, `CommandInput`, `CommandItem`, `ChevronsUpDown`, `cn` (se nao usado em outro lugar).
+**Imports**: Adicionar `SelectGroup` e `SelectLabel` ao import existente do `@/components/ui/select`.
 
-**Manter**: o state `selectedCategoria`, `categorias`, `loadingCategorias` e a funcao `fetchCategorias` -- apenas mudar como sao usados no JSX.
-
+Nenhuma mudanca no hook `useModulos` -- os dados ja vem com a trilha associada e ordenados por `ordem`.
