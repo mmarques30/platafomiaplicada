@@ -11,6 +11,7 @@ interface GratuitoStats {
 export function useCommunityStatsGratuito() {
   return useQuery({
     queryKey: ["community-stats-gratuito"],
+    refetchInterval: 60000,
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_gratuito_stats');
       
