@@ -171,23 +171,21 @@ function MinhaAnaliseContent({
     <div className="space-y-6">
 
       {/* Perfil Mapeado */}
-      <Card className="border-border bg-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <CheckCircle2 className="h-5 w-5 text-[hsl(72,50%,35%)]" />
-            Seu Perfil Mapeado
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">Diagnóstico individual concluído</p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <ProfileItem label="Cargo" value={perfil.cargo || "—"} />
-            <ProfileItem label="Área" value={perfil.area || "—"} />
-            <ProfileItem label="Nível Técnico" value={perfil.nivelTecnico || "—"} />
-            <ProfileItem label="Disponibilidade" value={perfil.disponibilidade || "—"} />
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <CheckCircle2 className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+          <div>
+            <p className="text-base font-medium text-foreground">Seu Perfil Mapeado</p>
+            <p className="text-sm text-muted-foreground">Diagnóstico individual concluído</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <ProfileItem label="Cargo" value={perfil.cargo || "—"} />
+          <ProfileItem label="Área" value={perfil.area || "—"} />
+          <ProfileItem label="Nível Técnico" value={perfil.nivelTecnico || "—"} />
+          <ProfileItem label="Disponibilidade" value={perfil.disponibilidade || "—"} />
+        </div>
+      </div>
 
       {/* Processos Identificados */}
       {processos.length > 0 && (
@@ -224,35 +222,31 @@ function MinhaAnaliseContent({
       )}
 
       {/* Economia Potencial */}
-      <Card className="border-border bg-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <TrendingUp className="h-5 w-5 text-[hsl(72,50%,35%)]" />
-            Sua Economia Potencial
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <p className="text-xs text-muted-foreground">Horas economizadas/semana</p>
-              <p className="mt-1 text-xl font-bold text-foreground">{economia.horasSemana || 0}h</p>
-            </div>
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <p className="text-xs text-muted-foreground">Economia estimada</p>
-              <p className="mt-1 text-xl font-bold text-[hsl(72,50%,35%)]">
-                {economia.economiaEstimada || `${economia.horasSemana || 0}h/sem`}
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <p className="text-xs text-muted-foreground">Valor potencial mensal</p>
-              <p className="mt-1 text-xl font-bold text-foreground">
-                R$ {(economia.valorMensal || 0).toLocaleString("pt-BR")}
-              </p>
-              <p className="text-xs text-muted-foreground">a R$60/h</p>
-            </div>
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+          <p className="text-base font-medium text-foreground">Sua Economia Potencial</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
+            <p className="text-xs text-muted-foreground">Horas economizadas/semana</p>
+            <p className="mt-1 text-xl font-bold text-foreground">{economia.horasSemana || 0}h</p>
           </div>
-        </CardContent>
-      </Card>
+          <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
+            <p className="text-xs text-muted-foreground">Economia estimada</p>
+            <p className="mt-1 text-xl font-bold text-[hsl(72,50%,35%)]">
+              {economia.economiaEstimada || `${economia.horasSemana || 0}h/sem`}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
+            <p className="text-xs text-muted-foreground">Valor potencial mensal</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              R$ {(economia.valorMensal || 0).toLocaleString("pt-BR")}
+            </p>
+            <p className="text-xs text-muted-foreground">a R$60/h</p>
+          </div>
+        </div>
+      </div>
 
       {/* Trilha Personalizada */}
       {trilha.modulos?.length > 0 && (

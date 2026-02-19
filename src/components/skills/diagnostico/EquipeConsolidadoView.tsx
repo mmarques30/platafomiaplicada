@@ -36,30 +36,26 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
     <div className="space-y-6">
 
       {/* Economia Total */}
-      <Card className="border-border bg-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <TrendingUp className="h-5 w-5 text-[hsl(72,50%,35%)]" />
-            Economia da Equipe
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <p className="text-xs text-muted-foreground">Total horas manuais/semana</p>
-              <p className="mt-1 text-xl font-bold text-foreground">
-                {consolidado.total_horas_manuais_semana ?? 0}h
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <p className="text-xs text-muted-foreground">Potencial de economia</p>
-              <p className="mt-1 text-xl font-bold text-[hsl(72,50%,35%)]">
-                {consolidado.potencial_economia_horas ?? 0}h
-              </p>
-            </div>
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+          <p className="text-base font-medium text-foreground">Economia da Equipe</p>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
+            <p className="text-xs text-muted-foreground">Total horas manuais/semana</p>
+            <p className="mt-1 text-xl font-bold text-foreground">
+              {consolidado.total_horas_manuais_semana ?? 0}h
+            </p>
           </div>
-        </CardContent>
-      </Card>
+          <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
+            <p className="text-xs text-muted-foreground">Potencial de economia</p>
+            <p className="mt-1 text-xl font-bold text-[hsl(72,50%,35%)]">
+              {consolidado.potencial_economia_horas ?? 0}h
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Dores Comuns */}
       {dores.length > 0 && (
