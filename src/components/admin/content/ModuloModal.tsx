@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCreateModulo, useUpdateModulo, useTrilhas } from "@/hooks/admin/useContent";
+import { useNextOrdem } from "@/hooks/admin/useNextOrdem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
@@ -35,6 +36,13 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+
+  const trilhaId = watch("trilha_id");
+  const { data: nextOrdem } = useNextOrdem(
+    "modulos",
+    { campo: "trilha_id", valor: trilhaId || null },
+    open && !modulo
+  );
 
   // Buscar trilha do módulo selecionado para validação
   const { data: trilha } = useQuery({
@@ -74,7 +82,7 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
         descricao: "", 
         trilha_id: "", 
         categoria: "",
-        ordem: 0, 
+        ordem: nextOrdem ?? 1, 
         ativo: true,
         visivel_mentorados: false,
         visivel_visitantes: false,
@@ -86,6 +94,13 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
       setImageFile(null);
     }
   }, [modulo, reset, open, trilhas]);
+
+  // Atualizar ordem quando nextOrdem mudar (ao trocar trilha)
+  useEffect(() => {
+    if (!modulo && nextOrdem !== undefined) {
+      setValue("ordem", nextOrdem);
+    }
+  }, [nextOrdem, modulo, setValue]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useCreatePrompt, useUpdatePrompt } from "@/hooks/admin/useBibliotecas";
+import { useNextOrdem } from "@/hooks/admin/useNextOrdem";
 import { Badge } from "@/components/ui/badge";
 import { X, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -55,6 +56,7 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
   const [tagInput, setTagInput] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
+  const { data: nextOrdem } = useNextOrdem("biblioteca_prompts", undefined, open && !prompt);
 
   useEffect(() => {
     if (prompt) {
@@ -70,11 +72,19 @@ export function PromptModal({ open, onOpenChange, prompt }: PromptModalProps) {
         tags: [],
         ferramentas_recomendadas: [],
         ativo: true,
+        ordem: nextOrdem ?? 1,
       });
       setTags([]);
       setFerramentasRecomendadas([]);
     }
-  }, [prompt, reset]);
+  }, [prompt, reset, open]);
+
+  // Atualizar ordem quando nextOrdem mudar
+  useEffect(() => {
+    if (!prompt && nextOrdem !== undefined) {
+      setValue("ordem", nextOrdem);
+    }
+  }, [nextOrdem, prompt, setValue]);
 
   const addTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {

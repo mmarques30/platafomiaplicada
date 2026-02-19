@@ -12,6 +12,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useCreateTrilha, useUpdateTrilha } from "@/hooks/admin/useContent";
+import { useNextOrdem } from "@/hooks/admin/useNextOrdem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, X, Check, ChevronsUpDown, AlertCircle } from "lucide-react";
@@ -33,6 +34,8 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
   const [openCategoria, setOpenCategoria] = useState(false);
   const [categorias, setCategorias] = useState<string[]>([]);
   const [loadingCategorias, setLoadingCategorias] = useState(false);
+
+  const { data: nextOrdem } = useNextOrdem("trilhas", undefined, open && !trilha);
   
   const { register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: {
@@ -71,7 +74,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         descricao: "",
         nivel: "iniciante",
         categoria: "núcleo",
-        ordem: 0,
+        ordem: nextOrdem ?? 1,
         ativo: true,
         visivel_mentorados: false,
         visivel_apenas_pro: false,
@@ -85,6 +88,13 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       setImageFile(null);
     }
   }, [trilha, reset, open]);
+
+  // Atualizar ordem quando nextOrdem mudar
+  useEffect(() => {
+    if (!trilha && nextOrdem !== undefined) {
+      setValue("ordem", nextOrdem);
+    }
+  }, [nextOrdem, trilha, setValue]);
 
   const fetchCategorias = async () => {
     setLoadingCategorias(true);
