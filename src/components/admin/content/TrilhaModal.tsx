@@ -8,15 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useCreateTrilha, useUpdateTrilha } from "@/hooks/admin/useContent";
 import { useNextOrdem } from "@/hooks/admin/useNextOrdem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, X, Check, ChevronsUpDown, AlertCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Upload, X, AlertCircle } from "lucide-react";
 
 interface TrilhaModalProps {
   open: boolean;
@@ -31,7 +28,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [selectedCategoria, setSelectedCategoria] = useState<string>("núcleo");
-  const [openCategoria, setOpenCategoria] = useState(false);
+  const [showCustomCategoria, setShowCustomCategoria] = useState(false);
   const [categorias, setCategorias] = useState<string[]>([]);
   const [loadingCategorias, setLoadingCategorias] = useState(false);
 
@@ -62,7 +59,10 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
     
     if (trilha) {
       reset(trilha);
-      setSelectedCategoria(trilha.categoria || "núcleo");
+      const cat = trilha.categoria || "núcleo";
+      setSelectedCategoria(cat);
+      // Show custom input if category isn't in the loaded list
+      setShowCustomCategoria(categorias.length > 0 && !categorias.includes(cat));
       setImagePreview(trilha.imagem_url || "");
       setImageFile(null);
       setValue("visivel_mentorados", trilha.visivel_mentorados ?? false);
@@ -86,6 +86,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         cohost_nome: "",
       });
       setSelectedCategoria("núcleo");
+      setShowCustomCategoria(false);
       setImagePreview("");
       setImageFile(null);
     }
@@ -239,63 +240,48 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
 
           <div className="space-y-2">
             <Label>Categoria da Trilha</Label>
-            <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={openCategoria}
-                  className="w-full justify-between"
-                >
-                  {selectedCategoria || "Selecione ou digite uma categoria..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput 
-                    placeholder="Buscar ou criar categoria..." 
-                    value={selectedCategoria}
-                    onValueChange={(value) => {
-                      setSelectedCategoria(value);
-                      setValue("categoria", value);
-                    }}
-                  />
-                  <CommandEmpty>
-                    <div className="p-2 text-sm">
-                      Pressione Enter para criar "{selectedCategoria}"
-                    </div>
-                  </CommandEmpty>
-                  <CommandGroup>
-                    {loadingCategorias ? (
-                      <div className="p-2 text-sm text-muted-foreground">Carregando...</div>
-                    ) : (
-                      categorias.map((categoria) => (
-                        <CommandItem
-                          key={categoria}
-                          value={categoria}
-                          onSelect={(currentValue) => {
-                            setSelectedCategoria(currentValue);
-                            setValue("categoria", currentValue);
-                            setOpenCategoria(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              selectedCategoria === categoria ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {categoria}
-                        </CommandItem>
-                      ))
-                    )}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <Select
+              value={showCustomCategoria ? "__custom__" : selectedCategoria}
+              onValueChange={(value) => {
+                if (value === "__custom__") {
+                  setShowCustomCategoria(true);
+                  setSelectedCategoria("");
+                  setValue("categoria", "");
+                } else {
+                  setShowCustomCategoria(false);
+                  setSelectedCategoria(value);
+                  setValue("categoria", value);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma categoria..." />
+              </SelectTrigger>
+              <SelectContent>
+                {loadingCategorias ? (
+                  <SelectItem value="__loading__" disabled>Carregando...</SelectItem>
+                ) : (
+                  categorias.map((categoria) => (
+                    <SelectItem key={categoria} value={categoria}>
+                      {categoria}
+                    </SelectItem>
+                  ))
+                )}
+                <SelectItem value="__custom__">Outra...</SelectItem>
+              </SelectContent>
+            </Select>
+            {showCustomCategoria && (
+              <Input
+                placeholder="Digite o nome da nova categoria"
+                value={selectedCategoria}
+                onChange={(e) => {
+                  setSelectedCategoria(e.target.value);
+                  setValue("categoria", e.target.value);
+                }}
+              />
+            )}
             <p className="text-xs text-muted-foreground">
-              Selecione uma categoria existente ou digite uma nova
+              Selecione uma categoria existente ou escolha "Outra..." para criar uma nova
             </p>
           </div>
 
