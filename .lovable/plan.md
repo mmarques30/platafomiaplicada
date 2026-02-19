@@ -1,58 +1,49 @@
 
-# Corrigir Atribuicao de Projetos por Diagnostico de Origem
+
+# Remover Card externo duplicado das secoes de metricas
 
 ## Problema
-A edge function `gerar-projetos-skills` tem dois problemas criticos:
-
-1. **O resumo enviado a IA nao identifica quem reportou cada dor** - os diagnosticos sao enviados como lista anonima, sem `user_id` ou nome do membro
-2. **A atribuicao e round-robin cega** - projetos sao distribuidos na ordem `membrosIds[0], membrosIds[1], membrosIds[0]...` sem relacao com quem relatou o problema
-
-Resultado: um membro que relatou "gargalo no financeiro" pode receber um projeto de "automacao de RH" que veio do diagnostico de outro membro.
+As secoes "Perfil Mapeado", "Economia Potencial" e "Economia da Equipe" tem um `Card` externo envolvendo mini-cards internos, criando um efeito de "card dentro de card" visualmente redundante.
 
 ## Solucao
+Remover o `Card`/`CardHeader`/`CardContent` externo e manter apenas os mini-cards internos, adicionando o titulo como texto simples acima do grid.
 
-Alterar a edge function para:
+## Mudancas
 
-1. Incluir a identificacao do membro (user_id + nome) em cada diagnostico enviado a IA
-2. Pedir a IA que indique quais membros sao os mais adequados para cada projeto (baseado em quem relatou a dor)
-3. Usar a sugestao da IA para atribuir o `responsavel_id`, em vez de round-robin
+### 1. DiagnosticoResults.tsx - Perfil Mapeado (linhas 174-190)
+- Remover `Card`, `CardHeader`, `CardContent` que envolvem os ProfileItems
+- Manter o titulo com icone como um `div` com `flex items-center gap-2` e subtitulo
+- Manter o grid de ProfileItems (que ja sao mini-cards)
 
-## Mudancas na Edge Function `gerar-projetos-skills/index.ts`
+### 2. DiagnosticoResults.tsx - Economia Potencial (linhas 227-255)
+- Remover `Card`, `CardHeader`, `CardContent` que envolvem os 3 mini-cards de economia
+- Manter o titulo com icone como texto simples
+- Manter o grid com os 3 mini-cards internos
 
-### 1. Buscar nomes dos membros
-Apos buscar os membros ativos, buscar tambem os nomes na tabela `profiles`:
+### 3. EquipeConsolidadoView.tsx - Economia da Equipe (linhas 39-62)
+- Remover `Card`, `CardHeader`, `CardContent` que envolvem os 2 mini-cards
+- Manter o titulo com icone como texto simples
+- Manter o grid com os 2 mini-cards internos
+
+## Estrutura resultante (exemplo)
 ```text
-membros_equipe_skills (user_id) -> profiles (nome_completo)
+Antes:
+  Card (borda externa)
+    CardHeader -> Titulo
+    CardContent
+      div.grid
+        div.rounded-lg.border (mini-card 1)
+        div.rounded-lg.border (mini-card 2)
+
+Depois:
+  div
+    div -> Titulo (com icone)
+    div.grid
+      div.rounded-lg.border (mini-card 1)
+      div.rounded-lg.border (mini-card 2)
 ```
 
-### 2. Enriquecer o resumo com identificacao
-O resumo enviado a IA passara a incluir um identificador por membro:
-```text
-Antes:  { processos, gargalos, economia, area }
-Depois: { membro_id, nome, processos, gargalos, economia, area }
-```
+## Arquivos modificados
+1. `src/components/skills/diagnostico/DiagnosticoResults.tsx` - secoes Perfil Mapeado e Economia Potencial
+2. `src/components/skills/diagnostico/EquipeConsolidadoView.tsx` - secao Economia da Equipe
 
-### 3. Alterar o prompt da IA
-Adicionar instrucao para que a IA sugira o `membro_id` mais adequado para cada projeto, baseado em quem reportou as dores relacionadas:
-
-```text
-REGRA NOVA: Para cada projeto, indique o "membro_id" do membro que
-reportou a dor mais relacionada ao projeto. Se o projeto combina dores
-de multiplos membros, escolha o que tem maior afinidade com a area.
-```
-
-### 4. Alterar o schema da tool call
-Adicionar campo `responsavel_membro_id` (string) ao schema do projeto retornado pela IA.
-
-### 5. Substituir round-robin por atribuicao inteligente
-Na montagem dos inserts:
-```text
-Antes:  responsavel_id: membrosIds[i % membrosIds.length]
-Depois: responsavel_id: projetoIA.responsavel_membro_id (validado contra membrosIds)
-         fallback: membrosIds[0] se o ID sugerido nao for valido
-```
-
-A mesma logica se aplica a criacao automatica de entregas.
-
-## Arquivos Modificados
-1. `supabase/functions/gerar-projetos-skills/index.ts` - toda a logica descrita acima
