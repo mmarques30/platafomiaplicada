@@ -3,6 +3,7 @@ import { PageTitle } from "@/components/shared/PageTitle";
 import DiagnosticoEquipeCard from "@/components/skills/visao-geral/DiagnosticoEquipeCard";
 import CronogramaPrograma from "@/components/skills/visao-geral/CronogramaPrograma";
 import GraficoCalendarioSection from "@/components/skills/visao-geral/GraficoCalendarioSection";
+import DocumentosRecursosCard from "@/components/skills/visao-geral/DocumentosRecursosCard";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import AdminTeamSelector from "@/components/skills/AdminTeamSelector";
 import { Loader2 } from "lucide-react";
@@ -42,6 +43,9 @@ export default function ProjetoSkills() {
 
       {/* Gráfico de ROI + Mini Calendário */}
       <GraficoCalendarioSection />
+
+      {/* Documentos e Recursos */}
+      <DocumentosRecursosCard />
     </div>
   );
 }
