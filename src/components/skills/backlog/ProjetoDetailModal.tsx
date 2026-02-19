@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 import { useEntregasEquipe, type EntregaEquipe } from "@/hooks/useEntregasEquipe";
 import { EntregaEquipeModal } from "@/components/skills/EntregaEquipeModal";
@@ -282,28 +283,6 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
             <p className="text-sm whitespace-pre-wrap">{item.descricao || "Sem descrição"}</p>
           </div>
 
-          {/* Observações */}
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-1">Observações</h4>
-            {onUpdate ? (
-              <Textarea
-                value={obsValue}
-                onChange={(e) => setObsValue(e.target.value)}
-                onBlur={() => {
-                  if (obsValue !== (item.observacoes || "")) {
-                    onUpdate(item.id, { observacoes: obsValue || null });
-                  }
-                }}
-                placeholder="Adicione observações sobre este projeto..."
-                className="min-h-[60px] text-sm"
-              />
-            ) : (
-              <p className="text-sm whitespace-pre-wrap text-muted-foreground">
-                {item.observacoes || "Nenhuma observação"}
-              </p>
-            )}
-          </div>
-
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex items-start gap-2">
@@ -486,6 +465,31 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
               </div>
             </div>
           )}
+
+          <Separator />
+
+          {/* Observações */}
+          <div>
+            <h4 className="text-sm font-medium text-muted-foreground mb-1">Observações</h4>
+            {onUpdate ? (
+              <Textarea
+                value={obsValue}
+                onChange={(e) => setObsValue(e.target.value)}
+                onBlur={() => {
+                  if (obsValue !== (item.observacoes || "")) {
+                    onUpdate(item.id, { observacoes: obsValue || null });
+                  }
+                }}
+                placeholder="Adicione observações sobre este projeto..."
+                className="min-h-[60px] text-sm"
+              />
+            ) : (
+              <p className="text-sm whitespace-pre-wrap text-muted-foreground">
+                {item.observacoes || "Nenhuma observação"}
+              </p>
+            )}
+          </div>
+
           {/* Entregas do Projeto */}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-3">
