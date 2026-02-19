@@ -68,7 +68,7 @@ serve(async (req) => {
         .eq("user_id", user.id),
       supabaseClient
         .from("trilhas")
-        .select("titulo, descricao, nivel")
+        .select("id, titulo, descricao, nivel")
         .eq("ativo", true)
         .order("ordem"),
       supabaseClient
@@ -99,9 +99,9 @@ serve(async (req) => {
       supabaseClient
         .from("videos")
         .select(`
-          id, titulo, descricao,
+          id, titulo, descricao, trilha_id,
           modulos!inner(titulo, categoria),
-          trilhas!inner(titulo)
+          trilhas!inner(id, titulo)
         `)
         .eq("ativo", true)
         .order("created_at", { ascending: false })
@@ -462,10 +462,10 @@ ${objetivos.data.map((obj: any) => `- ${obj.objetivo} (${obj.progresso}% conclu�
       systemPrompt += `\n\n✱ Usuário tem acesso completo à plataforma de mentoria com trilhas personalizadas.`;
     }
 
-    // Adicionar trilhas disponíveis
+    // Adicionar trilhas disponíveis (com links Markdown)
     if (trilhas.data && trilhas.data.length > 0) {
       systemPrompt += `\n\n## 🛤️ Trilhas Disponíveis na Plataforma:
-${trilhas.data.map((t: any) => `- **${t.titulo}** (${t.nivel}): ${t.descricao}`).join("\n")}`;
+${trilhas.data.map((t: any) => `- [${t.titulo}](/trilhas/${t.id}) (${t.nivel}): ${t.descricao}`).join("\n")}`;
     }
 
     // Adicionar cursos disponíveis
@@ -530,15 +530,17 @@ ${metodos.data.map((m: any) => `- **${m.titulo}** (${m.categoria}): ${m.descrica
 ✅ "Temos um template pronto pra isso em **Métodos para Aplicar**"`;
     }
 
-    // Adicionar vídeos recomendados
+    // Adicionar vídeos recomendados (com links Markdown)
     if (videos.data && videos.data.length > 0) {
       systemPrompt += `\n\n## 🎬 Vídeos Relevantes para Recomendação:
-Sugira vídeos específicos quando o tema coincidir:
+Sugira vídeos específicos quando o tema coincidir. Use SEMPRE os links Markdown fornecidos:
 
 ${videos.data.slice(0, 15).map((v: any) => {
+  const trilhaId = v.trilha_id || (Array.isArray(v.trilhas) ? v.trilhas[0]?.id : v.trilhas?.id);
   const trilhaTitulo = Array.isArray(v.trilhas) ? v.trilhas[0]?.titulo : v.trilhas?.titulo;
   const moduloTitulo = Array.isArray(v.modulos) ? v.modulos[0]?.titulo : v.modulos?.titulo;
-  return `- **${v.titulo}**
+  const videoLink = trilhaId ? `[${v.titulo}](/trilhas/${trilhaId}?video=${v.id})` : `**${v.titulo}**`;
+  return `- ${videoLink}
   Trilha: ${trilhaTitulo || "N/A"}
   Módulo: ${moduloTitulo || "N/A"}
   ${v.descricao ? `Sobre: ${v.descricao.slice(0, 100)}...` : ""}`;
@@ -546,14 +548,14 @@ ${videos.data.slice(0, 15).map((v: any) => {
 
 **Como recomendar vídeos:**
 ✅ Quando o tema coincidir com conteúdo específico
-✅ "Sobre isso, tem um vídeo muito bom na plataforma que explica passo a passo"
-✅ Sempre mencione trilha + título do vídeo para facilitar navegação`;
+✅ Use SEMPRE o link Markdown fornecido acima para que o usuário possa clicar e ir direto ao vídeo
+✅ Exemplo: "Sobre isso, assista [Nome do Vídeo](/trilhas/xxx?video=yyy)"`;
     }
 
-    // Adicionar módulos disponíveis
+    // Adicionar módulos disponíveis (com links Markdown)
     if (modulos.data && modulos.data.length > 0) {
       systemPrompt += `\n\n## 📚 Módulos Disponíveis:
-${modulos.data.map((m: any) => `- **${m.titulo}** (${m.categoria}): ${m.descricao}`).join("\n")}`;
+${modulos.data.map((m: any) => `- [${m.titulo}](/trilhas/${m.trilha_id}) (${m.categoria}): ${m.descricao}`).join("\n")}`;
     }
 
     // Instruções finais de recomendação
@@ -561,11 +563,16 @@ ${modulos.data.map((m: any) => `- **${m.titulo}** (${m.categoria}): ${m.descrica
 
 **REGRAS FUNDAMENTAIS:**
 ✅ SEMPRE que existir conteúdo relevante na plataforma, MENCIONE naturalmente
-✅ Use os nomes EXATOS dos conteúdos para facilitar busca
-✅ Indique o caminho de navegação quando possível
-✅ NÃO invente conteúdos - só recomende o que existe nas listas acima
+✅ Use os links Markdown fornecidos nas listas acima para que o usuário possa CLICAR e navegar direto
+✅ NÃO invente conteúdos ou links - só recomende o que existe nas listas acima
 ✅ Priorize conteúdos específicos sobre recomendações genéricas
 ✅ Integre recomendações naturalmente na conversa (não liste tudo de uma vez)
+
+**FORMATO OBRIGATÓRIO DE LINKS:**
+SEMPRE use links Markdown clicáveis ao mencionar conteúdos da plataforma:
+- Trilhas: [Nome da Trilha](/trilhas/{id_da_trilha})
+- Vídeos: [Nome do Vídeo](/trilhas/{id_da_trilha}?video={id_do_video})
+- Módulos: [Nome do Módulo](/trilhas/{id_da_trilha})
 
 **QUANDO RECOMENDAR:**
 
@@ -576,16 +583,10 @@ ${modulos.data.map((m: any) => `- **${m.titulo}** (${m.categoria}): ${m.descrica
 → "Inclusive, tem análise completa do [ferramenta] na nossa biblioteca com nota e opinião"
 
 **Vídeos**: Tema coincide com conteúdo específico
-→ "Sobre isso, tem um vídeo muito bom: **[Título]** na trilha **[Nome da Trilha]**"
+→ "Sobre isso, assista [Nome do Vídeo](/trilhas/xxx?video=yyy) — explica passo a passo"
 
 **Trilhas/Módulos**: Direcionamento geral de aprendizado
-→ "Pra se aprofundar, recomendo a trilha **[Nome]** - é exatamente sobre isso"
-
-**FORMATO DE LINKS INTERNOS:**
-Use referências textuais claras que o usuário pode buscar:
-- "Acesse em **Biblioteca > Prompts > Email Profissional Express**"
-- "Veja na trilha **Fundamentos de IA** o vídeo **Setup Claude**"
-- "Na **Biblioteca > Ferramentas** tem nossa análise do Gemini"
+→ "Pra se aprofundar, recomendo a trilha [Nome da Trilha](/trilhas/xxx)"
 
 ## 🧠 Personalização por Contexto:
 - SEMPRE use o nome do usuário quando disponível
