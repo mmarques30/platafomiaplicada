@@ -42,10 +42,11 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
         },
       });
       if (error) throw error;
-      if (data?.descricao) {
-        setDescricao(data.descricao);
-        toast.success("Descrição gerada com IA!");
-      }
+      if (data?.descricao) setDescricao(data.descricao);
+      if (data?.area_impactada) setArea(data.area_impactada);
+      if (data?.prioridade) setPrioridade(data.prioridade);
+      if (data?.horas_estimadas_economia) setHoras(String(data.horas_estimadas_economia));
+      toast.success("Projeto preenchido com IA!");
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || "Erro ao gerar descrição com IA");
