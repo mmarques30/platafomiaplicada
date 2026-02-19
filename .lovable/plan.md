@@ -1,27 +1,51 @@
 
 
-# Alterar FK de biblioteca_prompts.modulo_id para ON DELETE SET NULL
+# Explorar Todas as Trilhas com Filtros
 
-## Problema
-A constraint atual em `biblioteca_prompts.modulo_id` usa `ON DELETE NO ACTION`, o que impede a exclusao de modulos que possuem prompts vinculados. Isso bloqueia operacoes administrativas de limpeza e reorganizacao.
+## Problema atual
+A pagina `/trilhas` mostra apenas as **3 trilhas mais recentes** com no maximo 20 videos. Existem **5 trilhas ativas** com **46 videos** no total, mas o mentorado nao consegue acessar trilhas mais antigas.
 
 ## Solucao
-Uma unica migracao SQL que:
-1. Remove a constraint de FK existente
-2. Recria com `ON DELETE SET NULL`
 
-## Migracao
+Reestruturar a pagina `/trilhas` para ter **duas secoes**:
 
-```text
-ALTER TABLE biblioteca_prompts
-  DROP CONSTRAINT biblioteca_prompts_modulo_id_fkey,
-  ADD CONSTRAINT biblioteca_prompts_modulo_id_fkey
-    FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE SET NULL;
-```
+### 1. Secao "Ultimos conteudos" (topo)
+Manter o comportamento atual como preview -- os 3 carrosseis mais recentes com os cards no formato Reels (aspecto 9/16), sem alterar tamanhos.
 
-## Resultado
-- Deletar um modulo nao gera mais erro de FK
-- Prompts vinculados ao modulo deletado terao `modulo_id` definido como `NULL` automaticamente
-- Os prompts continuam acessiveis normalmente, apenas sem vinculo a um modulo
-- Nenhuma alteracao de codigo frontend necessaria
+### 2. Nova secao "Todas as Trilhas" (abaixo)
+Uma grade com **todas as 5 trilhas ativas**, cada uma como um card visual (usando imagem da trilha) com:
+- Nome da trilha
+- Categoria (nucleo, profissao, aulas semanais)
+- Numero da trilha na ordem (Trilha 1, 2, 3...)
+- Quantidade de videos
+- Link para acessar a trilha completa
+
+### 3. Barra de filtros
+Acima da grade "Todas as Trilhas", incluir filtros simples:
+- **Ordenar por**: Mais recentes / Mais antigos / Ordem padrao
+- **Filtrar por categoria**: Todas / nucleo / profissao / aulas semanais
+
+## Detalhes tecnicos
+
+### Arquivo: `src/pages/Trilhas.tsx`
+- Adicionar a secao "Todas as Trilhas" abaixo do componente `UltimosConteudos`
+- Importar o novo componente `TodasAsTrilhas`
+
+### Novo arquivo: `src/components/dashboard/TodasAsTrilhas.tsx`
+- Query: buscar todas as trilhas ativas com `visivel_mentorados = true`, incluindo contagem de videos
+- Filtros locais (useState) para ordenacao e categoria
+- Renderizar usando o componente `TrilhaCard` existente (que ja tem o visual com imagem e aspect ratio grande)
+- Exibir label "Trilha N" baseado no campo `ordem`
+- Grid responsivo: 1 coluna mobile, 2 tablet, 3-4 desktop
+
+### Componentes mantidos sem alteracao
+- `VideoCardVertical` -- formato Reels preservado
+- `TrilhaCarousel` -- carrosseis preservados
+- `UltimosConteudos` -- secao de recentes inalterada
+- `TrilhaCard` -- card visual reutilizado na grade
+
+### O que NAO muda
+- Nenhum card tera seu tamanho reduzido
+- O formato Reels (9/16) dos video cards continua identico
+- Os carrosseis existentes continuam funcionando normalmente
 
