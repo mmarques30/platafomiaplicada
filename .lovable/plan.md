@@ -1,59 +1,39 @@
 
-# Correcoes no Painel do Lider - Cores e Filtros de Projetos Ativos
+# Clarear cores dos cards escuros na Performance
 
-## Problemas identificados
+## Problema
 
-### 1. Filtro de 48 entregas persiste
-O filtro adicionado no `filteredEntregas` esta correto, mas outros componentes recebem dados **nao filtrados**:
-- `PortfolioOverview` recebe `projetos` (todos os 12, incluindo inativos)
-- `ProjetosResumoTable` recebe `projetos` e `entregasEquipe` sem filtro
-- O KPI "Total de Projetos" conta todos os projetos do backlog
+Os cards "Evolucao de Maturidade", "Impacto vs ROI" e "Ranking por Colaborador" usam fundo verde escuro solido (`#4A5516`) que destoa da identidade visual clean da marca. Devem usar fundo claro com acentos suaves de verde.
 
-Dados reais do banco:
-- 48 entregas totais: 20 de projetos aprovados, 12 de priorizados, **16 de nao_aprovados**
-- Projetos: 5 aprovados, 3 priorizados, **4 nao_aprovados**
+## Abordagem
 
-### 2. Verde muito escuro nos KPIs
-Os cards usam cores como `#9EB038` (ok) e `#738925` (escuro demais). Precisa um verde mais clean e claro.
+Substituir o fundo escuro solido por fundo claro (`bg-card`) com header usando verde transparente (`bg-[#9EB038]/10`), mantendo textos em cores padrao do sistema. Isso segue o mesmo padrao "accent" ja usado nos KPI cards.
 
 ## Alteracoes
 
-### Arquivo 1: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+### 1. `src/components/skills/performance/WeeklyBarChart.tsx`
 
-- Filtrar `projetos` para remover os inativos antes de passar para `PortfolioOverview` e `ProjetosResumoTable`
-- Filtrar `entregasEquipe` para excluir entregas de projetos inativos na tabela de resumo
+- Card: `bg-[#4A5516]` -> `bg-card border-border`
+- Remover classe `dark-header`
+- Textos brancos -> cores do sistema (`text-foreground`, `text-muted-foreground`)
+- Barra de progresso background: `bg-white/10` -> `bg-muted`
+- Header: adicionar `bg-[#9EB038]/10 rounded-t-xl`
 
-```typescript
-// Novo: projetos ativos apenas
-const projetosAtivos = useMemo(() => {
-  const statusInativos = ["nao_aprovado", "levantado", "backlog"];
-  return (projetos || []).filter(p => !statusInativos.includes(p.status));
-}, [projetos]);
+### 2. `src/components/skills/performance/MemberDonutCharts.tsx`
 
-// Novo: entregas equipe filtradas
-const entregasEquipeAtivas = useMemo(() => {
-  if (!entregasEquipe || !projetosAtivos) return [];
-  const idsAtivos = new Set(projetosAtivos.map(p => p.id));
-  return entregasEquipe.filter(e => !e.projeto_id || idsAtivos.has(e.projeto_id));
-}, [entregasEquipe, projetosAtivos]);
-```
+- Headers: `bg-[#4A5516]` -> `bg-[#9EB038]/10`
+- Remover classe `dark-header`
 
-- Passar `projetosAtivos` em vez de `projetos` para `PortfolioOverview` e `ProjetosResumoTable`
-- Passar `entregasEquipeAtivas` para `ProjetosResumoTable`
+### 3. `src/components/skills/ProjetoSkillsPerformance.tsx`
 
-### Arquivo 2: `src/components/skills/kanban/PortfolioOverview.tsx`
+- Header do Ranking: `bg-[#4A5516]` -> `bg-[#9EB038]/10`
+- Remover classe `dark-header`
 
-- Substituir verde escuro `#738925` por `#B8CC5A` (verde mais claro/clean)
-- Atualizar background dos icones para tons mais suaves
+### 4. `src/components/skills/performance/KPICard.tsx`
 
-### Arquivo 3: `src/components/skills/kanban/PortfolioSidebar.tsx`
+- Variante `dark`: atualizar de `bg-[#4A5516]/80` para `bg-[#9EB038]/15 border-[#9EB038]/30`
+- Textos da variante dark: de brancos para cores do sistema
 
-- Substituir `#738925` por `#B8CC5A` para consistencia visual
+## Resultado
 
-## Resultado esperado
-
-| Metrica | Antes | Depois |
-|---|---|---|
-| Total de Projetos | 12 (todos) | 8 (apenas ativos) |
-| Total de Entregas | 48 | 32 (apenas de projetos ativos) |
-| Verde dos cards | #738925 (escuro) | #B8CC5A (claro/clean) |
+Todos os cards passam a ter fundo claro com header em verde suave transparente, alinhados com a estetica clean e leve da marca.
