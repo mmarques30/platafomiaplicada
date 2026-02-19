@@ -1,60 +1,62 @@
 
-# Historico Persistente no Drawer da MarIAna
+# MarIAna avalia e confirma a fase do mentorado
 
-## Problema atual
+## Problema
+Atualmente, a MarIAna recebe os dados das fases do mentorado no prompt, mas a instrucao apenas diz "guie o usuario pelo processo". Isso faz com que ela pergunte genericamente "em que fase voce esta?" em vez de analisar os dados e afirmar: "Pelo que vejo, voce esta na Fase 3 - Projeto 1. Confere?"
 
-1. O drawer inicia sempre vazio (`useState<Message[]>([])`) -- nenhum historico e carregado
-2. O bloco de salvamento (linha 182-193) salva TODAS as mensagens do array a cada troca, causando duplicatas massivas na tabela `chat_messages`
-3. Ao fechar e reabrir o drawer, a conversa se perde completamente
+## Alteracao
 
-## Alteracoes
+### Edge Function: `supabase/functions/ai-chat-user/index.ts`
 
-### `src/components/shared/MarIAnaChatDrawer.tsx`
+Reescrever os blocos de instrucao de personalizacao (linhas ~359-420) para que o prompt:
 
-#### 1. Carregar historico ao abrir (useEffect)
+1. **Declare a fase atual com confianca** em vez de perguntar:
+   - Se ha fase "em_andamento": "O usuario esta na Fase X - Nome. Confirme isso e oriente sobre os proximos passos dessa fase."
+   - Se todas as fases estao "pendente": "O usuario ainda nao iniciou o processo. Oriente-o a comecar pela Fase 1 - Diagnostico."
+   - Se ha fases "concluida" e nenhuma "em_andamento": "O usuario concluiu ate a Fase X. Sugira iniciar a proxima fase."
 
-Adicionar um `useEffect` que roda quando o componente monta (e `user` esta disponivel):
+2. **Inclua um resumo executivo do status** no prompt que a IA deve usar ao responder perguntas sobre progresso:
+   - Diagnostico: completo/pendente
+   - Quantidade de projetos ativos vs concluidos
+   - Videos assistidos
+   - Entregas pendentes (se Skills)
 
-- Query: `supabase.from("chat_messages").select("role, content, created_at").eq("user_id", user.id).order("created_at", { ascending: true }).limit(50)`
-- Carregar as ultimas 50 mensagens no state `messages`
-- Adicionar estado `isLoadingHistory` para mostrar um spinner enquanto carrega
+3. **Adicione instrucao explicita** ao modelo:
+   - "Quando o mentorado perguntar sobre seu progresso ou proximos passos, NUNCA pergunte em que fase ele esta. Voce JA SABE. Afirme com confianca: 'Pelo que vejo nos seus dados, voce esta na fase X...' e peca confirmacao."
+   - "Se os dados indicarem claramente a fase, use linguagem assertiva: 'Voce esta em...' seguido de 'Isso confere?' para validar."
+   - "Se os dados forem ambiguos (ex: nenhuma fase em andamento mas algumas concluidas), faca uma deducao logica e apresente como hipotese: 'Pelos seus dados, parece que voce concluiu a fase X e esta pronto pra Y. Bora?'"
 
-#### 2. Corrigir salvamento duplicado
+### Detalhes tecnicos
 
-O bloco atual (linhas 182-193) salva o array inteiro de mensagens a cada resposta. Corrigir para salvar APENAS as 2 novas mensagens (a do usuario e a da assistente):
+O bloco de personalizacao (linha ~359) sera expandido para construir um `statusResumo` antes de injetar no prompt:
 
 ```
-// Antes (ERRADO - salva tudo de novo):
-const finalMessages = [...messagesToSend, { role: "assistant", ... }];
-await Promise.all(finalMessages.map(...));
+// Calcular status resumido
+const fasesCompletas = fases.filter(f => f.status === "concluida").length;
+const projetosAtivos = projetos.filter(p => p.status === "em_andamento").length;
+const projetosConcluidos = projetos.filter(p => p.status === "concluido").length;
 
-// Depois (CORRETO - salva so as novas):
-await supabase.from("chat_messages").insert([
-  { user_id: user.id, role: "user", content: messageToSend },
-  { user_id: user.id, role: "assistant", content: assistantContent },
-]);
+let avaliacaoFase = "";
+if (faseAtual) {
+  avaliacaoFase = `FASE ATUAL CONFIRMADA: ${faseAtual.nome_fase} (Fase ${faseAtual.fase_numero}). O usuario ESTA nessa fase.`;
+} else if (fasesCompletas > 0 && proximaFase) {
+  avaliacaoFase = `Fases 1-${fasesCompletas} concluidas. PROXIMO PASSO: ${proximaFase.nome_fase} (Fase ${proximaFase.fase_numero}).`;
+} else if (fasesCompletas === 0) {
+  avaliacaoFase = `Nenhuma fase iniciada. O usuario precisa comecar pela Fase 1 - Diagnostico.`;
+}
 ```
 
-#### 3. Botao "Nova conversa"
+Esse `avaliacaoFase` sera injetado no prompt com instrucao de usar assertivamente.
 
-Adicionar um botao no header (ao lado do botao de maximizar) que:
-- Limpa o state `messages` para `[]`
-- Nao apaga mensagens do banco (historico persiste)
-- Mostra as sugestoes iniciais novamente
+A instrucao final no bloco Academy (linha ~420) sera substituida de:
+```
+"INSTRUCAO ACADEMY: Guie o usuario pelo processo de mentoria..."
+```
+Para:
+```
+"INSTRUCAO ACADEMY: Voce TEM os dados do mentorado. NUNCA pergunte em que fase ele esta - voce ja sabe.
+Ao falar sobre progresso, AFIRME a fase com confianca e peca confirmacao.
+Use: 'Pelo que vejo, voce esta na [fase]. Confere?' em vez de 'Em que fase voce esta?'"
+```
 
-#### 4. Estado de carregamento
-
-Enquanto o historico carrega, exibir um skeleton/spinner em vez da tela vazia com sugestoes. Apos carregar:
-- Se tem mensagens: exibe o historico
-- Se nao tem: exibe as sugestoes normalmente
-
-### Limpeza de duplicatas (opcional)
-
-Rodar uma query SQL para limpar as duplicatas existentes na tabela `chat_messages`, mantendo apenas a primeira ocorrencia de cada mensagem por usuario.
-
-## Resultado
-
-- O drawer abre com a conversa anterior restaurada
-- Novas mensagens sao salvas sem duplicacao
-- O usuario pode iniciar uma nova conversa limpa quando quiser
-- A pagina `/chat` completa tambem pode se beneficiar desse mesmo historico
+A mesma logica sera aplicada aos blocos Skills e Business para consistencia.
