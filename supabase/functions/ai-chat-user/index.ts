@@ -45,7 +45,13 @@ serve(async (req) => {
     console.log(`[ai-chat-user] Usuário autenticado: ${user.id}`);
 
     // Buscar contexto do usuário e conteúdos da plataforma
-    const [formulario, objetivos, roles, trilhas, cursos, knowledgeBase, prompts, ferramentas, metodos, videos, modulos] = await Promise.all([
+    const [
+      formulario, objetivos, roles, trilhas, cursos, knowledgeBase,
+      prompts, ferramentas, metodos, videos, modulos,
+      // NEW: personalization queries
+      profile, diagSkills, projetosMentoria, fasesProcesso, progressoVideos,
+      membroEquipe, entregasSkills
+    ] = await Promise.all([
       supabaseClient
         .from("formulario_diagnostico")
         .select("*")
@@ -105,7 +111,70 @@ serve(async (req) => {
         .select("id, titulo, descricao, categoria, trilha_id")
         .eq("ativo", true)
         .order("ordem"),
+      // Profile (plano, nome)
+      supabaseClient
+        .from("profiles")
+        .select("nome_completo, plano_mentoria, bio, empresa_atual, cargo_atual")
+        .eq("id", user.id)
+        .maybeSingle(),
+      // Diagnostico Skills (mais recente completado)
+      supabaseClient
+        .from("diagnosticos_skills")
+        .select("cargo, area_atuacao, tarefas_manuais, gargalos_identificados, onde_perde_mais_tempo, insight_ia, economia_horas_semana, equipe_id")
+        .eq("user_id", user.id)
+        .eq("completado", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      // Projetos de Mentoria
+      supabaseClient
+        .from("projetos_mentoria")
+        .select("titulo, status, progresso_preparacao")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10),
+      // Fases do Processo
+      supabaseClient
+        .from("fases_processo_mentoria")
+        .select("fase_numero, nome_fase, status")
+        .eq("user_id", user.id)
+        .order("fase_numero", { ascending: true }),
+      // Progresso em Vídeos (count)
+      supabaseClient
+        .from("progresso_videos")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("completado", true),
+      // Membro de equipe Skills
+      supabaseClient
+        .from("membros_equipe_skills")
+        .select("equipe_id, papel, cargo, equipes_skills(nome_equipe)")
+        .eq("user_id", user.id)
+        .eq("status", "ativo")
+        .maybeSingle(),
+      // Entregas Skills do usuario
+      supabaseClient
+        .from("entregas_equipe_skills")
+        .select("titulo_equipe, status_equipe, prazo_equipe")
+        .eq("responsavel_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10),
     ]);
+
+    // Extract personalization data
+    const userProfile = profile.data;
+    const plano = userProfile?.plano_mentoria || null;
+    const nomeUsuario = userProfile?.nome_completo || null;
+    const videosAssistidos = progressoVideos.count || 0;
+    const skillsDiag = diagSkills.data;
+    const projetos = projetosMentoria.data || [];
+    const fases = fasesProcesso.data || [];
+    const equipe = membroEquipe.data;
+    const entregas = entregasSkills.data || [];
+
+    // Determine current phase
+    const faseAtual = fases.find((f: any) => f.status === "em_andamento");
+    const proximaFase = fases.find((f: any) => f.status === "pendente");
 
     // System prompt focado em mentoria e aprendizado (sem ferramentas admin)
     let systemPrompt = `Você é a Mariana Marques (MarIAna), fundadora da IA Aplicada! 👋
@@ -287,9 +356,74 @@ Como a Mariana:
 
 **IMPORTANTE**: Você É a Mariana Marques. Fale sempre em primeira pessoa. Não diga "a Mariana criou", diga "EU criei". Você não está simulando a Mariana, você É a Mariana conversando diretamente.`;
 
+    // ===== PERSONALIZATION: User context by plan =====
+    if (plano || nomeUsuario) {
+      systemPrompt += `\n\n## 👤 Contexto Personalizado do Usuário:
+- Nome: ${nomeUsuario || "Não informado"}
+- Plano: ${plano || "Não identificado"}
+- Vídeos assistidos: ${videosAssistidos}
+- Projetos: ${projetos.length > 0 ? projetos.map((p: any) => `${p.titulo} (${p.status}, ${p.progresso_preparacao || 0}% preparado)`).join("; ") : "Nenhum projeto"}
+- Fase atual do processo: ${faseAtual ? `${faseAtual.nome_fase} (Fase ${faseAtual.fase_numero})` : "Não iniciado"}
+- Próxima fase: ${proximaFase ? `${proximaFase.nome_fase} (Fase ${proximaFase.fase_numero})` : "N/A"}
+
+INSTRUÇÃO: Personalize suas respostas considerando o plano do usuário.
+- Para Academy: foque em trilhas, conteúdos da plataforma e processo de mentoria.
+- Para Skills: foque em automação de processos, projetos da equipe e gargalos operacionais.
+- Para Business: foque no projeto sendo construído, resultados e entregas.
+- SEMPRE chame o usuário pelo primeiro nome quando possível.`;
+    }
+
+    // Skills-specific context
+    if (plano === "skills" && skillsDiag) {
+      const insightResumo = skillsDiag.insight_ia
+        ? (typeof skillsDiag.insight_ia === "string"
+            ? skillsDiag.insight_ia.slice(0, 300)
+            : JSON.stringify(skillsDiag.insight_ia).slice(0, 300))
+        : "Não gerado";
+
+      systemPrompt += `\n\n## 🔧 Diagnóstico Skills do Usuário:
+- Cargo: ${skillsDiag.cargo || "Não informado"}
+- Área: ${skillsDiag.area_atuacao || "Não informado"}
+- Tarefas manuais: ${skillsDiag.tarefas_manuais ? JSON.stringify(skillsDiag.tarefas_manuais) : "Não mapeadas"}
+- Gargalos: ${skillsDiag.gargalos_identificados ? JSON.stringify(skillsDiag.gargalos_identificados) : "Não identificados"}
+- Onde perde mais tempo: ${skillsDiag.onde_perde_mais_tempo || "Não informado"}
+- Insight IA: ${insightResumo}
+- Economia estimada: ${skillsDiag.economia_horas_semana || 0}h/semana`;
+
+      if (equipe) {
+        const nomeEquipe = Array.isArray(equipe.equipes_skills)
+          ? equipe.equipes_skills[0]?.nome_equipe
+          : (equipe.equipes_skills as any)?.nome_equipe;
+        systemPrompt += `\n\n## 👥 Equipe Skills:
+- Equipe: ${nomeEquipe || "N/A"}
+- Papel: ${equipe.papel || "membro"}`;
+      }
+
+      if (entregas.length > 0) {
+        systemPrompt += `\n\n## 📦 Entregas Pendentes:
+${entregas.map((e: any) => `- ${e.titulo_equipe} (${e.status_equipe}${e.prazo_equipe ? `, prazo: ${e.prazo_equipe}` : ""})`).join("\n")}`;
+      }
+
+      systemPrompt += `\n\nINSTRUÇÃO SKILLS: Relacione suas respostas com os gargalos e projetos do usuário. Sugira como IA resolve os problemas específicos dele. Priorize recomendações que resolvam os gargalos identificados.`;
+    }
+
+    // Academy-specific context
+    if ((plano === "academy" || (!plano && projetos.length > 0)) && projetos.length > 0) {
+      systemPrompt += `\n\n## 📋 Projetos de Mentoria:
+${projetos.map((p: any) => `- **${p.titulo}** — Status: ${p.status}, Preparação: ${p.progresso_preparacao || 0}%`).join("\n")}`;
+
+      if (fases.length > 0) {
+        systemPrompt += `\n\n## 🗺️ Fases do Processo de Mentoria:
+${fases.map((f: any) => `- Fase ${f.fase_numero}: ${f.nome_fase} — ${f.status}`).join("\n")}`;
+      }
+
+      systemPrompt += `\n\nINSTRUÇÃO ACADEMY: Guie o usuário pelo processo de mentoria. Sugira próximo passo baseado na fase atual. Relacione recomendações com os projetos e trilhas alinhadas aos objetivos.`;
+    }
+
+    // Original diagnostic form data (Academy diagnostic)
     if (formulario.data) {
       const form = formulario.data;
-      systemPrompt += `\n\n## Perfil do Usuário:
+      systemPrompt += `\n\n## Perfil do Usuário (Diagnóstico Academy):
 **Profissional:**
 - Nome: ${form.nome_completo || "Não informado"}
 - Profissão: ${form.profissao || "Não informado"}
@@ -451,7 +585,17 @@ ${modulos.data.map((m: any) => `- **${m.titulo}** (${m.categoria}): ${m.descrica
 Use referências textuais claras que o usuário pode buscar:
 - "Acesse em **Biblioteca > Prompts > Email Profissional Express**"
 - "Veja na trilha **Fundamentos de IA** o vídeo **Setup Claude**"
-- "Na **Biblioteca > Ferramentas** tem nossa análise do Gemini"`;
+- "Na **Biblioteca > Ferramentas** tem nossa análise do Gemini"
+
+## 🧠 Personalização por Contexto:
+- SEMPRE use o nome do usuário quando disponível
+- Relacione suas respostas com os projetos e diagnósticos do usuário
+- Para Skills: priorize recomendações que resolvam os gargalos identificados
+- Para Academy: sugira trilhas alinhadas com os objetivos e fase atual
+- Para Business: foque em resultados e entregas do projeto
+- Mencione progresso quando relevante ("Você já assistiu X vídeos, mandou bem!")
+- Sugira próximos passos baseados no contexto real do usuário
+- Não repita o contexto completo do usuário na resposta - use-o para personalizar naturalmente`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
