@@ -83,3 +83,6 @@ verify_jwt = false
 
 [functions.personalizar-projeto-skills]
 verify_jwt = false
+
+[functions.regenerar-instrucoes-entrega]
+verify_jwt = false
