@@ -1,39 +1,49 @@
 
-# Clarear cores dos cards escuros na Performance
+# Chat inline com a MarIAna (sem navegar para /chat)
 
-## Problema
+## Objetivo
 
-Os cards "Evolucao de Maturidade", "Impacto vs ROI" e "Ranking por Colaborador" usam fundo verde escuro solido (`#4A5516`) que destoa da identidade visual clean da marca. Devem usar fundo claro com acentos suaves de verde.
+Transformar o botao flutuante da MarIAna em um chat popup/drawer que abre na propria pagina, sem redirecionar para `/chat`. O usuario podera conversar com a IA de qualquer tela da aplicacao.
 
 ## Abordagem
 
-Substituir o fundo escuro solido por fundo claro (`bg-card`) com header usando verde transparente (`bg-[#9EB038]/10`), mantendo textos em cores padrao do sistema. Isso segue o mesmo padrao "accent" ja usado nos KPI cards.
+Criar um componente de chat inline (drawer/popover) que abre ao clicar no botao flutuante, reutilizando a mesma logica de streaming ja existente em `Chat.tsx`.
 
 ## Alteracoes
 
-### 1. `src/components/skills/performance/WeeklyBarChart.tsx`
+### 1. Novo componente: `src/components/shared/MarIAnaChatDrawer.tsx`
 
-- Card: `bg-[#4A5516]` -> `bg-card border-border`
-- Remover classe `dark-header`
-- Textos brancos -> cores do sistema (`text-foreground`, `text-muted-foreground`)
-- Barra de progresso background: `bg-white/10` -> `bg-muted`
-- Header: adicionar `bg-[#9EB038]/10 rounded-t-xl`
+Componente de chat em formato de painel lateral (drawer) que:
+- Abre/fecha com animacao suave (slide up) no canto inferior direito
+- Contem header com avatar, nome "MarIAna" e botao de fechar
+- Area de mensagens com scroll e suporte a markdown (ReactMarkdown)
+- Input de texto com botao de enviar
+- Link "Abrir chat completo" que navega para `/chat` caso o usuario queira a tela cheia
+- Reutiliza toda a logica de streaming SSE (fetch ao edge function `ai-chat-user`, parsing line-by-line, flushSync)
+- Dimensoes: ~380px largura x ~500px altura no desktop, tela quase cheia no mobile
 
-### 2. `src/components/skills/performance/MemberDonutCharts.tsx`
+### 2. Atualizar `src/components/shared/MarIAnaFloatingButton.tsx`
 
-- Headers: `bg-[#4A5516]` -> `bg-[#9EB038]/10`
-- Remover classe `dark-header`
+- Remover `useNavigate` e a navegacao para `/chat`
+- Adicionar estado `isOpen` para controlar a abertura do drawer
+- Ao clicar no botao, abrir/fechar o `MarIAnaChatDrawer`
+- Renderizar o drawer junto ao botao flutuante
+- Esconder o botao quando o drawer estiver aberto
 
-### 3. `src/components/skills/ProjetoSkillsPerformance.tsx`
+### 3. Sem alteracoes em `MainLayout.tsx`
 
-- Header do Ranking: `bg-[#4A5516]` -> `bg-[#9EB038]/10`
-- Remover classe `dark-header`
+O `MarIAnaFloatingButton` continua sendo renderizado no mesmo lugar; a mudanca e interna ao componente.
 
-### 4. `src/components/skills/performance/KPICard.tsx`
+## Detalhes tecnicos
 
-- Variante `dark`: atualizar de `bg-[#4A5516]/80` para `bg-[#9EB038]/15 border-[#9EB038]/30`
-- Textos da variante dark: de brancos para cores do sistema
+- O chat drawer usa `framer-motion` (ja instalado) para animacao de entrada/saida
+- Mensagens do assistente renderizadas com `ReactMarkdown` + `remarkGfm`
+- Streaming SSE identico ao `Chat.tsx`: fetch para `ai-chat-user`, parse line-by-line, flushSync para atualizacao progressiva
+- Sessao do Supabase obtida via `supabase.auth.getSession()` para autenticacao
+- Historico de mensagens mantido apenas em estado local (reset ao fechar)
+- AbortController para cancelar requisicoes longas (timeout 120s)
+- Tratamento de erros 429 (rate limit) e 402 (creditos) com toast
 
 ## Resultado
 
-Todos os cards passam a ter fundo claro com header em verde suave transparente, alinhados com a estetica clean e leve da marca.
+O usuario podera conversar com a MarIAna de qualquer pagina sem sair do contexto atual. A pagina `/chat` continua funcionando normalmente para quem preferir a experiencia em tela cheia.
