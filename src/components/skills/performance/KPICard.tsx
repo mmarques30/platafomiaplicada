@@ -21,7 +21,7 @@ const variantStyles = {
     trend: "text-[hsl(72,50%,35%)]",
   },
   dark: {
-    card: "bg-[#9EB038]/15 border-[#9EB038]/30",
+    card: "bg-[#9EB038]/25 border-[#9EB038]/40",
     title: "text-muted-foreground",
     value: "text-foreground",
     subtitle: "text-muted-foreground",

@@ -113,7 +113,7 @@ export default function MemberDonutCharts({ ranking, entregas, projetos = [] }: 
   if (ranking.length === 0) {
     return (
       <Card className="border-border bg-card overflow-hidden">
-        <CardHeader className="bg-[#9EB038]/10 rounded-t-xl">
+      <CardHeader className="bg-[#9EB038]/25 rounded-t-xl">
           <CardTitle>Impacto vs ROI</CardTitle>
           <CardDescription>Efetividade por membro da equipe</CardDescription>
         </CardHeader>
