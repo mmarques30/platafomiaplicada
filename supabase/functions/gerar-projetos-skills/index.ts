@@ -36,6 +36,18 @@ serve(async (req) => {
 
     const membrosIds = (membros || []).map((m: any) => m.user_id);
 
+    // Fetch member names from profiles
+    const membrosIdsSet = new Set(membrosIds);
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, nome_completo")
+      .in("id", membrosIds);
+
+    const membroNomeMap: Record<string, string> = {};
+    for (const p of (profiles || [])) {
+      membroNomeMap[p.id] = p.nome_completo || "Sem nome";
+    }
+
     // Fetch available trilhas
     const { data: trilhas } = await supabase
       .from("trilhas")
@@ -46,28 +58,40 @@ serve(async (req) => {
       `- [${t.id}] "${t.titulo}" (${t.categoria || "geral"})${t.descricao ? ' - ' + t.descricao : ''}`
     ).join("\n");
 
-    // Build valid trilha IDs set for validation
     const trilhaIdsValidos = new Set((trilhas || []).map((t: any) => t.id));
     const trilhaTituloMap: Record<string, string> = {};
     for (const t of (trilhas || [])) {
       trilhaTituloMap[t.id] = t.titulo;
     }
 
+    // Build enriched summary with member identification
     const resumo = diagnosticos.map(d => ({
+      membro_id: d.user_id,
+      nome: membroNomeMap[d.user_id] || "Desconhecido",
       processos: d.processos_detalhados || d.tarefas_manuais,
       gargalos: d.gargalos_identificados,
       economia: d.economia_horas_semana,
       area: d.area_atuacao,
     }));
 
+    // Build members list for the prompt
+    const membrosListaPrompt = membrosIds.map((id: string) =>
+      `- membro_id: "${id}" | Nome: "${membroNomeMap[id] || 'Desconhecido'}"`
+    ).join("\n");
+
     const systemPrompt = `Analise os diagnósticos de uma equipe e sugira projetos colaborativos de automação com IA. Retorne usando a função fornecida.
 
 REGRAS:
 1. Gere projetos relevantes baseados nos diagnósticos da equipe.
 2. Cada projeto deve ter título, descrição, área impactada, economia estimada e prioridade.
-3. NÃO inclua responsável. A atribuição será feita automaticamente pelo sistema.
+3. Para cada projeto, indique o "responsavel_membro_id" do membro que reportou a dor mais relacionada ao projeto. Se o projeto combina dores de múltiplos membros, escolha o que tem maior afinidade com a área impactada.
 4. Foque em projetos práticos e acionáveis de automação com IA.
 5. Para cada projeto, indique quais trilhas da plataforma o membro deve assistir para executar o projeto, em ordem de prioridade ("essencial" ou "recomendado"), e quais módulos são prioritários (números de 1 a 10).
+
+MEMBROS DA EQUIPE:
+${membrosListaPrompt}
+
+IMPORTANTE: Cada diagnóstico abaixo inclui o "membro_id" e "nome" de quem reportou. Use essa informação para atribuir o responsável mais adequado a cada projeto.
 
 TRILHAS DISPONÍVEIS NA PLATAFORMA:
 ${trilhasDisponiveis}
@@ -102,6 +126,7 @@ Se nenhuma trilha existente se aplicar perfeitamente, escolha a mais próxima. U
                       area_impactada: { type: "string" },
                       horas_estimadas_economia: { type: "number" },
                       prioridade: { type: "string", enum: ["alta", "media", "baixa"] },
+                      responsavel_membro_id: { type: "string", description: "O membro_id do membro mais adequado para este projeto, baseado em quem reportou a dor relacionada." },
                       trilhas_recomendadas: {
                         type: "array",
                         items: {
@@ -116,7 +141,7 @@ Se nenhuma trilha existente se aplicar perfeitamente, escolha a mais próxima. U
                         }
                       }
                     },
-                    required: ["titulo", "descricao", "prioridade"]
+                    required: ["titulo", "descricao", "prioridade", "responsavel_membro_id"]
                   }
                 }
               },
@@ -149,21 +174,26 @@ Se nenhuma trilha existente se aplicar perfeitamente, escolha a mais próxima. U
         }));
     };
 
-    // Round-robin assignment for projects
-    const inserts = projetos.map((p: any, i: number) => ({
-      equipe_id,
-      titulo: p.titulo,
-      descricao: p.descricao,
-      area_impactada: p.area_impactada || null,
-      horas_estimadas_economia: p.horas_estimadas_economia || null,
-      prioridade: p.prioridade,
-      status: "levantado",
-      origem: "ia",
-      ordem: i,
-      responsavel_id: membrosIds.length > 0 ? membrosIds[i % membrosIds.length] : null,
-      tags: [],
-      trilhas_recomendadas: validarTrilhas(p.trilhas_recomendadas),
-    }));
+    // Intelligent assignment: use AI suggestion validated against active members
+    const inserts = projetos.map((p: any, i: number) => {
+      const sugeridoId = p.responsavel_membro_id;
+      const responsavelId = membrosIdsSet.has(sugeridoId) ? sugeridoId : (membrosIds[0] || null);
+
+      return {
+        equipe_id,
+        titulo: p.titulo,
+        descricao: p.descricao,
+        area_impactada: p.area_impactada || null,
+        horas_estimadas_economia: p.horas_estimadas_economia || null,
+        prioridade: p.prioridade,
+        status: "levantado",
+        origem: "ia",
+        ordem: i,
+        responsavel_id: responsavelId,
+        tags: [],
+        trilhas_recomendadas: validarTrilhas(p.trilhas_recomendadas),
+      };
+    });
 
     const { data: insertedProjetos, error: insertError } = await supabase
       .from("backlog_skills")
@@ -171,9 +201,9 @@ Se nenhuma trilha existente se aplicar perfeitamente, escolha a mais próxima. U
       .select("id, titulo, descricao, prioridade, horas_estimadas_economia, responsavel_id, tags, trilhas_recomendadas");
     if (insertError) throw new Error("Erro ao salvar projetos: " + insertError.message);
 
-    // Create initial entregas for each project, also round-robin
+    // Create initial entregas using same intelligent assignment
     if (insertedProjetos?.length) {
-      const entregasInserts = insertedProjetos.map((p: any, i: number) => ({
+      const entregasInserts = insertedProjetos.map((p: any) => ({
         equipe_id,
         backlog_item_id: p.id,
         titulo: p.titulo,
@@ -181,7 +211,7 @@ Se nenhuma trilha existente se aplicar perfeitamente, escolha a mais próxima. U
         status: "pendente",
         prioridade: mapPrioridade(p.prioridade || "media"),
         economia_horas_semana: p.horas_estimadas_economia || null,
-        responsavel_id: membrosIds.length > 0 ? membrosIds[i % membrosIds.length] : null,
+        responsavel_id: p.responsavel_id,
         tags: [],
       }));
 
