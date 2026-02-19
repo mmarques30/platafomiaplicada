@@ -9,7 +9,7 @@ import remarkGfm from "remark-gfm";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import mariAvatar from "@/assets/mari-avatar-new.png";
+import mariAvatar from "@/assets/mariana-avatar.png";
 import mariAvatarFallback from "@/assets/mari-avatar.jpg";
 
 interface Message {

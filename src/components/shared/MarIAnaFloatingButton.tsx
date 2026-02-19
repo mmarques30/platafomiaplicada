@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AnimatePresence } from "framer-motion";
 import { MarIAnaChatDrawer } from "./MarIAnaChatDrawer";
-import logoMariana from "@/assets/mariana-avatar.png";
+
+const logoMariana = "/logo-mariana.png?v=10";
 
 export function MarIAnaFloatingButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +32,7 @@ export function MarIAnaFloatingButton() {
                   <img
                     src={logoMariana}
                     alt="MarIAna"
-                    className="w-full h-full object-cover rounded-full"
+                    className="w-full h-full object-contain"
                     onError={() => setLogoError(true)}
                   />
                 )}
