@@ -161,9 +161,9 @@ export default function ProjetoSkillsPerformance() {
                     <tr key={stat.userId} className="border-b border-border last:border-0">
                       <td className="py-3 px-2">
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                          stat.posicao === 1 ? "bg-[hsl(72,50%,35%)] text-white"
-                            : stat.posicao === 2 ? "bg-[hsl(68,35%,73%)] text-[hsl(72,50%,25%)]"
-                            : stat.posicao === 3 ? "bg-[hsl(68,40%,88%)] text-[hsl(72,50%,25%)]"
+                          stat.posicao === 1 ? "bg-[#9EB038] text-white"
+                            : stat.posicao === 2 ? "bg-[#B8CC5A] text-white"
+                            : stat.posicao === 3 ? "bg-[#D4E68A] text-[#4A5516]"
                             : "bg-muted text-muted-foreground"
                         }`}>{stat.posicao}</span>
                       </td>
