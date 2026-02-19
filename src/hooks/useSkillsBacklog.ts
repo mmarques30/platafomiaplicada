@@ -13,6 +13,9 @@ export interface BacklogItem {
   responsavel_id: string | null;
   colaborador_id: string | null;
   horas_estimadas_economia: number | null;
+  tempo_atual_horas: number | null;
+  cargo_executor: string | null;
+  custo_hora_executor: number | null;
   tags: string[] | null;
   origem: string | null;
   observacoes: string | null;
@@ -94,6 +97,9 @@ export function useSkillsBacklog() {
       area_impactada?: string;
       prioridade?: string;
       horas_estimadas_economia?: number;
+      tempo_atual_horas?: number;
+      cargo_executor?: string;
+      custo_hora_executor?: number;
     }) => {
       if (!equipeId) throw new Error("Equipe não encontrada");
       const { error } = await supabase

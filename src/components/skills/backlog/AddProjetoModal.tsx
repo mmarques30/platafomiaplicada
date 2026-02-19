@@ -18,6 +18,9 @@ interface AddProjetoModalProps {
     area_impactada?: string;
     prioridade?: string;
     horas_estimadas_economia?: number;
+    tempo_atual_horas?: number;
+    cargo_executor?: string;
+    custo_hora_executor?: number;
   }) => void;
   isLoading?: boolean;
 }
@@ -28,6 +31,9 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
   const [area, setArea] = useState("");
   const [prioridade, setPrioridade] = useState("");
   const [horas, setHoras] = useState("");
+  const [tempoAtual, setTempoAtual] = useState("");
+  const [cargoExecutor, setCargoExecutor] = useState("");
+  const [custoHora, setCustoHora] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerateAI = async () => {
@@ -46,6 +52,9 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
       if (data?.area_impactada) setArea(data.area_impactada);
       if (data?.prioridade) setPrioridade(data.prioridade);
       if (data?.horas_estimadas_economia) setHoras(String(data.horas_estimadas_economia));
+      if (data?.tempo_atual_horas) setTempoAtual(String(data.tempo_atual_horas));
+      if (data?.cargo_executor) setCargoExecutor(data.cargo_executor);
+      if (data?.custo_hora_executor) setCustoHora(String(data.custo_hora_executor));
       toast.success("Projeto preenchido com IA!");
     } catch (e: any) {
       console.error(e);
@@ -64,12 +73,18 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
       area_impactada: area.trim() || undefined,
       prioridade: prioridade || undefined,
       horas_estimadas_economia: horas ? Number(horas) : undefined,
+      tempo_atual_horas: tempoAtual ? Number(tempoAtual) : undefined,
+      cargo_executor: cargoExecutor.trim() || undefined,
+      custo_hora_executor: custoHora ? Number(custoHora) : undefined,
     });
     setTitulo("");
     setDescricao("");
     setArea("");
     setPrioridade("");
     setHoras("");
+    setTempoAtual("");
+    setCargoExecutor("");
+    setCustoHora("");
     onOpenChange(false);
   };
 
@@ -123,9 +138,29 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
               </Select>
             </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="horas">Economia Estimada (h/semana)</Label>
-            <Input id="horas" type="number" min={0} step={0.5} value={horas} onChange={e => setHoras(e.target.value)} placeholder="Ex: 5" />
+          {/* Situação Atual - ROI */}
+          <div className="rounded-lg border border-dashed border-muted-foreground/30 p-3 space-y-3">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Situação Atual (para cálculo de ROI)</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="tempoAtual">Tempo gasto atual (h/semana)</Label>
+                <Input id="tempoAtual" type="number" min={0} step={0.5} value={tempoAtual} onChange={e => setTempoAtual(e.target.value)} placeholder="Ex: 10" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="horas">Economia Estimada (h/semana)</Label>
+                <Input id="horas" type="number" min={0} step={0.5} value={horas} onChange={e => setHoras(e.target.value)} placeholder="Ex: 5" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="cargoExecutor">Cargo de quem executa</Label>
+                <Input id="cargoExecutor" value={cargoExecutor} onChange={e => setCargoExecutor(e.target.value)} placeholder="Ex: Analista Financeiro" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="custoHora">Custo/hora (R$)</Label>
+                <Input id="custoHora" type="number" min={0} step={1} value={custoHora} onChange={e => setCustoHora(e.target.value)} placeholder="Ex: 45" />
+              </div>
+            </div>
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>

@@ -38,7 +38,10 @@ Regras:
 - A descrição deve ter 3 parágrafos curtos (problema, solução, resultado esperado), máximo 150 palavras, texto puro sem markdown
 - A área impactada deve ser um departamento ou função (ex: Financeiro, RH, Operações, Comercial, TI, Marketing, Jurídico, Atendimento)
 - A prioridade deve ser p1 (urgente/alto impacto), p2 (importante/médio impacto) ou p3 (desejável/baixo impacto)
-- As horas de economia estimadas devem ser um número realista entre 1 e 40 horas por semana`;
+- As horas de economia estimadas devem ser um número realista entre 1 e 40 horas por semana
+- O tempo atual gasto no processo deve ser realista (maior que a economia estimada)
+- O cargo executor deve ser o cargo típico de quem executa esse processo na empresa
+- O custo/hora deve ser uma estimativa realista do mercado brasileiro (salário mensal / 160h)`;
 
     let userPrompt = `Analise o projeto: "${sanitizedTitulo}"`;
     if (sanitizedArea) userPrompt += `\nÁrea impactada informada: ${sanitizedArea}`;
@@ -82,8 +85,20 @@ Regras:
                     type: "number",
                     description: "Estimativa de horas economizadas por semana (entre 1 e 40)",
                   },
+                  tempo_atual_horas: {
+                    type: "number",
+                    description: "Tempo gasto atualmente no processo por semana em horas (entre 1 e 60). Deve ser maior que horas_estimadas_economia.",
+                  },
+                  cargo_executor: {
+                    type: "string",
+                    description: "Cargo ou função de quem executa o processo hoje (ex: Analista Financeiro, Gerente de RH, Assistente Administrativo)",
+                  },
+                  custo_hora_executor: {
+                    type: "number",
+                    description: "Custo estimado por hora do executor em reais (entre 20 e 300). Base: salário mensal / 160h.",
+                  },
                 },
-                required: ["descricao", "area_impactada", "prioridade", "horas_estimadas_economia"],
+                required: ["descricao", "area_impactada", "prioridade", "horas_estimadas_economia", "tempo_atual_horas", "cargo_executor", "custo_hora_executor"],
                 additionalProperties: false,
               },
             },
@@ -132,6 +147,9 @@ Regras:
         area_impactada: result.area_impactada || "",
         prioridade: result.prioridade || "p2",
         horas_estimadas_economia: result.horas_estimadas_economia || 0,
+        tempo_atual_horas: result.tempo_atual_horas || 0,
+        cargo_executor: result.cargo_executor || "",
+        custo_hora_executor: result.custo_hora_executor || 0,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

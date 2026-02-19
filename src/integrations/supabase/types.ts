@@ -293,8 +293,10 @@ export type Database = {
       backlog_skills: {
         Row: {
           area_impactada: string | null
+          cargo_executor: string | null
           colaborador_id: string | null
           created_at: string | null
+          custo_hora_executor: number | null
           descricao: string | null
           equipe_id: string | null
           horas_estimadas_economia: number | null
@@ -306,14 +308,17 @@ export type Database = {
           responsavel_id: string | null
           status: string | null
           tags: string[] | null
+          tempo_atual_horas: number | null
           titulo: string
           trilhas_recomendadas: Json | null
           updated_at: string | null
         }
         Insert: {
           area_impactada?: string | null
+          cargo_executor?: string | null
           colaborador_id?: string | null
           created_at?: string | null
+          custo_hora_executor?: number | null
           descricao?: string | null
           equipe_id?: string | null
           horas_estimadas_economia?: number | null
@@ -325,14 +330,17 @@ export type Database = {
           responsavel_id?: string | null
           status?: string | null
           tags?: string[] | null
+          tempo_atual_horas?: number | null
           titulo: string
           trilhas_recomendadas?: Json | null
           updated_at?: string | null
         }
         Update: {
           area_impactada?: string | null
+          cargo_executor?: string | null
           colaborador_id?: string | null
           created_at?: string | null
+          custo_hora_executor?: number | null
           descricao?: string | null
           equipe_id?: string | null
           horas_estimadas_economia?: number | null
@@ -344,6 +352,7 @@ export type Database = {
           responsavel_id?: string | null
           status?: string | null
           tags?: string[] | null
+          tempo_atual_horas?: number | null
           titulo?: string
           trilhas_recomendadas?: Json | null
           updated_at?: string | null
