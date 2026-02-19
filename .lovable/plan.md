@@ -1,49 +1,49 @@
 
 
-# Remover Card externo duplicado das secoes de metricas
+# Auto-preencher campo "Ordem" ao adicionar conteudo
 
 ## Problema
-As secoes "Perfil Mapeado", "Economia Potencial" e "Economia da Equipe" tem um `Card` externo envolvendo mini-cards internos, criando um efeito de "card dentro de card" visualmente redundante.
+Ao criar novos itens (trilhas, modulos, videos, prompts da biblioteca), o campo "ordem" inicia em 0, exigindo preenchimento manual e causando conflitos de ordenacao.
 
 ## Solucao
-Remover o `Card`/`CardHeader`/`CardContent` externo e manter apenas os mini-cards internos, adicionando o titulo como texto simples acima do grid.
+Calcular automaticamente a proxima ordem disponivel ao abrir o modal de criacao, consultando o maior valor atual e somando 1.
 
 ## Mudancas
 
-### 1. DiagnosticoResults.tsx - Perfil Mapeado (linhas 174-190)
-- Remover `Card`, `CardHeader`, `CardContent` que envolvem os ProfileItems
-- Manter o titulo com icone como um `div` com `flex items-center gap-2` e subtitulo
-- Manter o grid de ProfileItems (que ja sao mini-cards)
+### 1. Videos (`VideoModal.tsx`)
+- Ao abrir modal para criar (sem `video`), buscar `max(ordem)` dos videos do mesmo modulo selecionado
+- Preencher o campo ordem com `maxOrdem + 1`
+- Atualizar quando o modulo mudar no select
 
-### 2. DiagnosticoResults.tsx - Economia Potencial (linhas 227-255)
-- Remover `Card`, `CardHeader`, `CardContent` que envolvem os 3 mini-cards de economia
-- Manter o titulo com icone como texto simples
-- Manter o grid com os 3 mini-cards internos
+### 2. Trilhas (`TrilhaModal.tsx`)
+- Ao abrir modal para criar (sem `trilha`), buscar `max(ordem)` de todas as trilhas
+- Preencher o campo ordem com `maxOrdem + 1`
 
-### 3. EquipeConsolidadoView.tsx - Economia da Equipe (linhas 39-62)
-- Remover `Card`, `CardHeader`, `CardContent` que envolvem os 2 mini-cards
-- Manter o titulo com icone como texto simples
-- Manter o grid com os 2 mini-cards internos
+### 3. Modulos (`ModuloModal.tsx`)
+- Ao abrir modal para criar (sem `modulo`), buscar `max(ordem)` dos modulos da trilha selecionada
+- Preencher o campo ordem com `maxOrdem + 1`
+- Atualizar quando a trilha mudar no select
 
-## Estrutura resultante (exemplo)
+### 4. Biblioteca de Prompts (`useBibliotecas.tsx` / modal de prompts)
+- `biblioteca_prompts` tem coluna `ordem` - aplicar a mesma logica: buscar max e preencher +1 antes do insert
+
+## Detalhes Tecnicos
+
+### Hook utilitario `useNextOrdem`
+Criar um hook generico reutilizavel (ja existe um similar em `useConteudosDashboardAdmin.tsx`):
+
 ```text
-Antes:
-  Card (borda externa)
-    CardHeader -> Titulo
-    CardContent
-      div.grid
-        div.rounded-lg.border (mini-card 1)
-        div.rounded-lg.border (mini-card 2)
-
-Depois:
-  div
-    div -> Titulo (com icone)
-    div.grid
-      div.rounded-lg.border (mini-card 1)
-      div.rounded-lg.border (mini-card 2)
+function useNextOrdem(tabela, filtro?)
+  -> query: SELECT ordem FROM tabela [WHERE filtro] ORDER BY ordem DESC LIMIT 1
+  -> retorna (maxOrdem ?? 0) + 1
 ```
 
-## Arquivos modificados
-1. `src/components/skills/diagnostico/DiagnosticoResults.tsx` - secoes Perfil Mapeado e Economia Potencial
-2. `src/components/skills/diagnostico/EquipeConsolidadoView.tsx` - secao Economia da Equipe
+### Arquivos modificados
+1. `src/components/admin/content/VideoModal.tsx` - buscar max ordem do modulo ao criar, e ao trocar modulo
+2. `src/components/admin/content/TrilhaModal.tsx` - buscar max ordem global ao criar
+3. `src/components/admin/content/ModuloModal.tsx` - buscar max ordem da trilha ao criar, e ao trocar trilha
+4. `src/hooks/admin/useContent.tsx` - adicionar hooks `useNextVideoOrdem(moduloId)`, `useNextTrilhaOrdem()`, `useNextModuloOrdem(trilhaId)`
+
+### Tabelas sem coluna `ordem`
+- `ferramentas_ia`, `ia_copie_use`, `metodos_aplicar` nao possuem coluna `ordem` no banco, portanto nao serao alteradas neste escopo
 
