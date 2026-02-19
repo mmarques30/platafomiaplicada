@@ -1,32 +1,99 @@
 
 
-# Estilizar filtros de Trilhas com visual discreto na cor verde da marca
+# Icones Animados por Classificacao nas Trilhas de Aprendizado
 
-## Problema
+## Contexto
 
-Os filtros de ordenacao e classificacao em "Trilhas de Aprendizado" usam o estilo padrao dos selects (borda cinza, fundo branco), sem integracao visual com a identidade verde da marca. O usuario quer filtros discretos, elegantes, com a cor primaria (verde) aplicada de forma sutil.
+As trilhas atualmente nao possuem classificacoes preenchidas (campo `classificacao` existe mas esta NULL). Vamos:
+1. Definir e atribuir classificacoes a todas as 22 trilhas
+2. Criar um componente de icones animados horizontais abaixo do carrossel de cards
+3. Ao clicar, o filtro de classificacao e ativado automaticamente
 
-## Solucao
+## Classificacoes Sugeridas (5 grupos)
 
-Estilizar os dois `SelectTrigger` e `SelectContent` com tons suaves de verde (usando `primary/10`, `primary/20`, `primary` do design system), mantendo-os compactos e discretos.
+| Classificacao | Icone Animado | Trilhas |
+|---|---|---|
+| Aprendizado Inicial | Livro com brilho pulsante | Como Usar a Plataforma, Fundamentos de IA |
+| Produtividade | Raio com pulso energetico | Planilhas (x2), Comunicacao com IA, Claude Avancado, Dashboard/BI, Manus, Apresentacoes (Gamma) |
+| Automacao | Engrenagem com rotacao continua | Fundamentos de Automacao, Zapier, Make, Apps Web sem Codigo |
+| Carreira | Foguete com animacao de subida | IA para Carreira, Recolocacao, Vendas, Marketing, RH, Gestao de Projetos, Financas |
+| Rotina | Relogio com ponteiro animado | Gravacoes Aulas Semanais, Conteudos BONUS |
 
 ## Alteracoes
 
-### Arquivo: `src/components/dashboard/TodasAsTrilhas.tsx`
+### 1. Banco de Dados -- Atribuir classificacoes (operacao de dados, nao migracao)
 
-**SelectTrigger (linhas 118 e 129):**
-- Aplicar fundo `bg-primary/5` com borda `border-primary/20`
-- Texto em `text-primary/80` para manter discreto
-- Hover com `hover:bg-primary/10 hover:border-primary/30`
-- Reduzir altura para `h-9` e texto para `text-xs` para ficarem mais compactos
-- Adicionar `rounded-full` para visual de pill/badge
+Executar UPDATE nas 22 trilhas para preencher o campo `classificacao`:
 
-**SelectContent (linhas 121 e 132):**
-- Fundo solido `bg-background` com borda `border-primary/20`
-- Items com `focus:bg-primary/10 focus:text-primary` no hover
+```sql
+UPDATE trilhas SET classificacao = 'Aprendizado Inicial' WHERE titulo IN ('Como Usar a Plataforma IAplicada', 'Fundamentos de IA');
+UPDATE trilhas SET classificacao = 'Produtividade' WHERE titulo IN ('Planilhas - Limpeza e Organização', 'Planilhas - Análise e Insights', 'Comunicação com IA', 'Claude Avançado', 'Dashboard e Business Intelligence', 'Manus - Dashboards Profissionais', 'Apresentações Executivas (Gamma)');
+UPDATE trilhas SET classificacao = 'Automação' WHERE titulo IN ('Fundamentos de Automação', 'Zapier do Zero ao Avançado', 'Make do Zero ao Avançado', 'Apps Web sem Código');
+UPDATE trilhas SET classificacao = 'Carreira' WHERE titulo IN ('IA para Carreira e Liderança', 'IA para Recolocação e Posicionamento', 'IA para Vendas', 'IA para Marketing', 'IA para RH e Pessoas', 'IA para Gestão de Projetos', 'IA para Finanças');
+UPDATE trilhas SET classificacao = 'Rotina' WHERE titulo IN ('Gravações Aulas Semanais', 'Conteúdos BÔNUS');
+```
 
-**Resultado visual:**
-- Filtros aparecem como pills verdes sutis, integrados ao branding
-- Ao abrir, o dropdown mostra opcoes com highlight verde discreto
-- Compactos e nao competem visualmente com os cards de trilha
+### 2. Novo Componente: `ClassificacaoIcons`
+
+Arquivo: `src/components/dashboard/ClassificacaoIcons.tsx`
+
+- Linha horizontal unica com 5 icones animados usando `framer-motion` (ja instalado)
+- Cada icone: SVG customizado com animacao continua (sem hover -- sempre animando, como no exemplo de referencia)
+- Cores da marca (verde primario em tons variados: `primary`, `primary/70`, `primary/40`)
+- Label discreto abaixo de cada icone (nome da classificacao)
+- Ao clicar: chama callback `onSelectClassificacao(nome)` que ativa o filtro
+
+Animacoes por icone:
+- **Aprendizado Inicial**: Icone `BookOpen` do Lucide com sparkles pulsantes ao redor (scale + opacity loop)
+- **Produtividade**: Icone `Zap` com pulso de energia (scale bounce infinito)
+- **Automacao**: Icone `Cog` com rotacao continua suave (rotate 360 loop)
+- **Carreira**: Icone `Rocket` com movimento sutil de subida (translateY oscilante)
+- **Rotina**: Icone `Clock` com ponteiro girando (rotate interno)
+
+### 3. Integracao no `TodasAsTrilhas.tsx`
+
+- Adicionar o componente `ClassificacaoIcons` logo apos o fechamento do carrossel (abaixo dos cards)
+- Passar `classificacaoFiltro` e `setClassificacaoFiltro` como props
+- O icone ativo tera destaque visual (fundo `primary/15` com borda `primary/30`)
+- Clicar no icone ja ativo desativa o filtro (volta para "todas")
+
+Layout final da pagina:
+```
+[Filtros (pills verdes)]
+[Carrossel de Cards 9:16]
+[Faixa horizontal de icones animados]  <-- NOVO
+```
+
+## Secao Tecnica
+
+### Estrutura do componente
+
+```text
+ClassificacaoIcons
+  props: {
+    classificacoes: string[]           // lista dinamica do banco
+    activeFilter: string               // "todas" | nome da classificacao
+    onSelect: (cls: string) => void    // callback para setClassificacaoFiltro
+  }
+```
+
+Mapeamento icone-classificacao via objeto constante:
+```text
+ICON_MAP = {
+  "Aprendizado Inicial": { icon: BookOpen, animation: sparkle-pulse },
+  "Produtividade":       { icon: Zap,      animation: energy-bounce },
+  "Automação":           { icon: Cog,      animation: rotate-360 },
+  "Carreira":            { icon: Rocket,   animation: float-up },
+  "Rotina":              { icon: Clock,    animation: tick-rotate },
+}
+```
+
+Classificacoes nao mapeadas receberao um icone generico (`Sparkles`) com animacao de pulso.
+
+### Arquivos modificados
+- `src/components/dashboard/TodasAsTrilhas.tsx` -- adicionar ClassificacaoIcons apos carrossel
+- Novo: `src/components/dashboard/ClassificacaoIcons.tsx` -- componente dos icones animados
+
+### Dados atualizados
+- 22 registros em `trilhas` terao campo `classificacao` preenchido
 
