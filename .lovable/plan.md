@@ -1,42 +1,60 @@
 
 
-# Ajustes no Formulario de IA Copie e Use (Admin)
+# Sincronizar Titulos de Trilhas/Modulos nos JSONB de projetos_mentoria
 
-## Resumo
-Duas alteracoes no modal de criacao/edicao de itens "IA Copie e Use":
+## Problema
+Quando uma trilha ou modulo e renomeado no admin, os campos JSONB `trilhas_recomendadas` e `modulos_obrigatorios` da tabela `projetos_mentoria` mantem o titulo antigo (snapshot). Atualmente 37 projetos tem trilhas e 28 tem modulos armazenados como JSONB.
 
-1. **Remover o campo "IA Recomendada (opcional)"** - e redundante com o seletor de "Ferramentas Recomendadas" que ja existe logo abaixo.
-2. **Transformar o campo "Categoria" de texto livre para dropdown com categorias fixas.**
+### Estrutura atual dos JSONB
+```text
+trilhas_recomendadas: [
+  { "trilha_id": "uuid", "titulo": "Nome antigo", "prioridade": "essencial" }
+]
+
+modulos_obrigatorios: [
+  { "modulo_id": "uuid", "titulo": "Nome antigo", "trilha_id": "uuid", "video_ids": [...] }
+]
+```
+
+## Solucao: Triggers de sincronizacao no banco
+
+Criar 2 triggers (um para `trilhas`, outro para `modulos`) que, ao detectar UPDATE no campo `titulo`, percorrem todos os registros de `projetos_mentoria` e atualizam o titulo correspondente dentro do JSONB.
 
 ## Alteracoes
 
-### Arquivo: `src/components/admin/bibliotecas/IACopieUseModal.tsx`
+### 1. Funcao `sync_trilha_titulo_projetos()`
+- Trigger: `AFTER UPDATE OF titulo ON trilhas`
+- Logica: Busca todos os `projetos_mentoria` cujo `trilhas_recomendadas` contenha o `trilha_id` alterado e atualiza o campo `titulo` dentro de cada elemento do array JSONB
+- Tambem atualiza `trilha_titulo` nos `modulos_obrigatorios` que referenciem essa trilha
 
-**1. Remover campo "IA Recomendada"**
-- Remover as linhas 247-249 (label + input do campo `ia_recomendada`)
-- Remover `ia_recomendada: ""` do reset do formulario (linha 90)
+### 2. Funcao `sync_modulo_titulo_projetos()`
+- Trigger: `AFTER UPDATE OF titulo ON modulos`
+- Logica: Busca todos os `projetos_mentoria` cujo `modulos_obrigatorios` contenha o `modulo_id` alterado e atualiza o campo `titulo` dentro de cada elemento do array JSONB
 
-**2. Substituir Input de Categoria por Select dropdown**
-- Importar `Select, SelectContent, SelectItem, SelectTrigger, SelectValue` do componente UI
-- Substituir o `<Input>` de categoria (linhas 243-245) por um `<Select>` com opcoes fixas
-- Categorias fixas baseadas nas existentes + categorias uteis:
-  - Automacao
-  - Comunicacao
-  - Criacao de Conteudo
-  - Financas
-  - Gestao de Projetos
-  - Marketing
-  - Produtividade
-  - Templates / Carreira / Coaching
-  - Vendas
-  - Analise de Dados
-  - Atendimento ao Cliente
-  - Recursos Humanos
+### 3. Migracao SQL (resumo)
 
-### Arquivo novo: `src/lib/iaCopieUseCategories.ts`
-- Criar arquivo com a lista de categorias fixas exportada como constante (mesmo padrao do `src/lib/metodosCategories.ts` ja existente)
+```text
+-- Funcao para trilhas
+CREATE FUNCTION sync_trilha_titulo_projetos() RETURNS trigger
+  Para cada projeto com trilhas_recomendadas contendo OLD.id:
+    Substituir titulo antigo pelo NEW.titulo no array JSONB
+    Tambem atualizar trilha_titulo em modulos_obrigatorios
+
+-- Funcao para modulos  
+CREATE FUNCTION sync_modulo_titulo_projetos() RETURNS trigger
+  Para cada projeto com modulos_obrigatorios contendo OLD.id:
+    Substituir titulo antigo pelo NEW.titulo no array JSONB
+
+-- Triggers
+CREATE TRIGGER on_trilha_rename AFTER UPDATE OF titulo ON trilhas
+CREATE TRIGGER on_modulo_rename AFTER UPDATE OF titulo ON modulos
+```
+
+### 4. Sync inicial (one-time)
+Executar um UPDATE em lote para corrigir titulos desatualizados que ja existam hoje, garantindo que os dados atuais fiquem consistentes antes dos triggers entrarem em vigor.
 
 ## Resultado
-- Formulario mais limpo sem campo redundante
-- Categorias padronizadas via dropdown, evitando inconsistencias de digitacao
+- Qualquer rename de trilha ou modulo no admin se propaga automaticamente para todos os projetos Business
+- Zero mudanca no frontend - tudo acontece no banco
+- Nenhum arquivo de codigo precisa ser alterado
 
