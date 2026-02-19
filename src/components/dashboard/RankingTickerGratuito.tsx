@@ -41,21 +41,21 @@ export function RankingTickerGratuito() {
         {/* Separador */}
         <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />
 
-        {/* Conteúdos Gratuitos */}
+        {/* Vídeos Assistidos */}
         <StatItem
-          icon={FileText}
-          label="Conteúdos grátis"
-          value={data?.total_conteudos_gratuitos ?? 0}
+          icon={Video}
+          label="Vídeos assistidos"
+          value={data?.total_videos_assistidos ?? 0}
         />
 
         {/* Separador */}
         <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />
 
-        {/* Materiais */}
+        {/* Materiais Baixados */}
         <StatItem
-          icon={Video}
-          label="Materiais"
-          value={data?.total_materiais_gratuitos ?? 0}
+          icon={FileText}
+          label="Downloads"
+          value={data?.total_materiais_baixados ?? 0}
         />
       </div>
     </section>

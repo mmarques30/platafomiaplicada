@@ -6,6 +6,8 @@ interface GratuitoStats {
   online_visitantes: number;
   total_conteudos_gratuitos: number;
   total_materiais_gratuitos: number;
+  total_videos_assistidos: number;
+  total_materiais_baixados: number;
 }
 
 export function useCommunityStatsGratuito() {
@@ -25,6 +27,8 @@ export function useCommunityStatsGratuito() {
         online_visitantes: Number(stats?.online_visitantes ?? 0),
         total_conteudos_gratuitos: Number(stats?.total_conteudos_gratuitos ?? 0),
         total_materiais_gratuitos: Number(stats?.total_materiais_gratuitos ?? 0),
+        total_videos_assistidos: Number(stats?.total_videos_assistidos ?? 0),
+        total_materiais_baixados: Number(stats?.total_materiais_baixados ?? 0),
       } as GratuitoStats;
     },
   });
