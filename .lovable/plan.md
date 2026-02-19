@@ -1,27 +1,28 @@
 
 
-# Mover filtros para abaixo do titulo em Trilhas de Aprendizado
+# Adicionar alternancia entre visao Cards e Tabela na pagina IA Copie e Use
 
-## Problema
-Os filtros (Ordenar e Classificacao) estao alinhados a direita (`justify-end`), ao lado do titulo. O usuario quer que fiquem abaixo do titulo.
+## O que sera feito
 
-## Solucao
+Adicionar dois botoes de alternancia (Cards / Tabela) ao lado dos filtros existentes, permitindo trocar a visualizacao dos itens entre o layout de cards atual e uma visao de tabela usando o componente `IACopieUseRow` que ja existe no projeto.
 
-### Arquivo: `src/pages/Trilhas.tsx`
+## Alteracoes
 
-Mover o componente `TodasAsTrilhas` para ficar apos o titulo, sem alteracoes.
+### Arquivo: `src/pages/IACopieUse.tsx`
 
-### Arquivo: `src/components/dashboard/TodasAsTrilhas.tsx` (linha ~103)
+1. Importar os icones `LayoutGrid` e `List` do lucide-react para os botoes de alternancia
+2. Importar o componente `IACopieUseRow` ja existente
+3. Adicionar estado `viewMode` (`"cards"` ou `"tabela"`)
+4. Adicionar botoes de alternancia ao lado do contador de resultados (ou junto aos filtros)
+5. Renderizar condicionalmente:
+   - Quando `viewMode === "cards"`: manter o grid de cards atual
+   - Quando `viewMode === "tabela"`: renderizar os itens usando `IACopieUseRow` dentro de um container com borda arredondada
 
-Alterar a div dos filtros de `justify-end` para `justify-start`, alinhando-os a esquerda abaixo do titulo:
+### Detalhes tecnicos
 
-```tsx
-// Antes
-<div className="flex flex-wrap gap-3 justify-end">
-
-// Depois
-<div className="flex flex-wrap gap-3">
-```
-
-Isso remove o alinhamento a direita, fazendo os selects ficarem a esquerda, naturalmente abaixo do titulo "Trilhas de Aprendizado" que ja esta acima no layout da pagina.
+- Estado: `const [viewMode, setViewMode] = useState<"cards" | "tabela">("cards");`
+- Botoes usando `Button` com `variant="outline"` ou `variant="ghost"`, destacando o ativo com `variant="default"`
+- Na visao tabela, os itens serao renderizados dentro de um `Card` com `IACopieUseRow` para cada item, reaproveitando o componente ja existente
+- A paginacao "Ver mais" continua funcionando em ambas as visoes
+- Os skeletons de loading tambem se adaptam a visao selecionada
 
