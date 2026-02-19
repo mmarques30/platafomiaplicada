@@ -107,39 +107,32 @@ export function TodasAsTrilhas() {
 
   return (
     <div className="space-y-5">
-      {/* Header + Filtros */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
-          <SlidersHorizontal className="h-5 w-5 text-primary" />
-          Todas as Trilhas
-        </h2>
+      {/* Filtros */}
+      <div className="flex flex-wrap gap-3 justify-end">
+        <Select value={ordenar} onValueChange={setOrdenar}>
+          <SelectTrigger className="w-[170px]">
+            <SelectValue placeholder="Ordenar por" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ordem">Ordem padrão</SelectItem>
+            <SelectItem value="recentes">Mais recentes</SelectItem>
+            <SelectItem value="antigos">Mais antigos</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <div className="flex flex-wrap gap-3">
-          <Select value={ordenar} onValueChange={setOrdenar}>
-            <SelectTrigger className="w-[170px]">
-              <SelectValue placeholder="Ordenar por" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ordem">Ordem padrão</SelectItem>
-              <SelectItem value="recentes">Mais recentes</SelectItem>
-              <SelectItem value="antigos">Mais antigos</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={categoriaFiltro} onValueChange={setCategoriaFiltro}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todas as categorias</SelectItem>
-              {categorias.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select value={categoriaFiltro} onValueChange={setCategoriaFiltro}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Categoria" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas as categorias</SelectItem>
+            {categorias.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Grid */}

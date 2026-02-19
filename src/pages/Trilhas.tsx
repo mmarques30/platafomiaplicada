@@ -1,4 +1,3 @@
-import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
 import { TodasAsTrilhas } from "@/components/dashboard/TodasAsTrilhas";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
@@ -7,7 +6,6 @@ import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
-import { Skeleton } from "@/components/ui/skeleton";
 import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Trilhas() {
@@ -49,20 +47,7 @@ export default function Trilhas() {
               <PageTitle primary="Trilhas" secondary="de Aprendizado" />
             </div>
             
-            {showLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-[400px] rounded-xl" />
-                ))}
-              </div>
-            ) : (
-              <UltimosConteudos />
-            )}
-
-            {/* Seção: Todas as Trilhas */}
-            <div className="mt-10">
-              <TodasAsTrilhas />
-            </div>
+            <TodasAsTrilhas />
           </>
         )}
       </main>
