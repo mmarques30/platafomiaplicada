@@ -1,4 +1,5 @@
 import { UltimosConteudos } from "@/components/dashboard/UltimosConteudos";
+import { TodasAsTrilhas } from "@/components/dashboard/TodasAsTrilhas";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
@@ -57,6 +58,11 @@ export default function Trilhas() {
             ) : (
               <UltimosConteudos />
             )}
+
+            {/* Seção: Todas as Trilhas */}
+            <div className="mt-10">
+              <TodasAsTrilhas />
+            </div>
           </>
         )}
       </main>
