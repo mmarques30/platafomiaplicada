@@ -24,8 +24,8 @@ interface WeeklyBarChartProps {
 
 export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: WeeklyBarChartProps) {
   return (
-    <Card className="bg-[#4A5516] border-[#4A5516] dark-header">
-      <CardHeader>
+    <Card className="bg-card border-border overflow-hidden">
+      <CardHeader className="bg-[#9EB038]/10 rounded-t-xl">
         <CardTitle>Evolução de Maturidade</CardTitle>
         <CardDescription>
           {`${projetos.length} projetos · ${entregas.length} entregas`}
@@ -33,7 +33,7 @@ export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: Wee
       </CardHeader>
       <CardContent>
         {ranking.length === 0 ? (
-          <p className="text-sm text-white/40 text-center py-8">Sem dados</p>
+          <p className="text-sm text-muted-foreground text-center py-8">Sem dados</p>
         ) : (
           <div className="space-y-5">
             {ranking.map((member) => {
@@ -42,14 +42,14 @@ export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: Wee
               const pct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
               return (
                 <div key={member.userId} className="space-y-1.5">
-                  <p className="text-sm font-medium text-white">{member.nome}</p>
-                  <div className="flex items-center justify-between text-xs text-white/60">
+                  <p className="text-sm font-medium text-foreground">{member.nome}</p>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>
                       {member.entregasConcluidas} entregas · {member.totalProjetos || 0} projetos · {member.horasEconomizadas}h
                     </span>
-                    <span className="font-semibold text-white">{pct}%</span>
+                    <span className="font-semibold text-foreground">{pct}%</span>
                   </div>
-                  <div className="bg-white/10 rounded-full h-3 w-full">
+                  <div className="bg-muted rounded-full h-3 w-full">
                     <div
                       className="bg-[#9EB038] rounded-full h-3 transition-all"
                       style={{ width: `${pct}%` }}
