@@ -45,13 +45,13 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
+            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
               <p className="text-xs text-muted-foreground">Total horas manuais/semana</p>
               <p className="mt-1 text-xl font-bold text-foreground">
                 {consolidado.total_horas_manuais_semana ?? 0}h
               </p>
             </div>
-            <div className="text-center">
+            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
               <p className="text-xs text-muted-foreground">Potencial de economia</p>
               <p className="mt-1 text-xl font-bold text-[hsl(72,50%,35%)]">
                 {consolidado.potencial_economia_horas ?? 0}h
