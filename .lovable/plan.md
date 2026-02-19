@@ -1,20 +1,28 @@
 
+# Aumentar tamanho dos cards de video na visao gratuita (formato Reels)
 
-# Remover aba Players e card de Premiacao Mensal da Comunidade
+## Problema
 
-## Alteracoes
+Os cards de video em `VideosVisitante` estao muito pequenos porque o grid usa ate 6 colunas (`grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6`), tornando cada card estreito.
 
-### 1. Pagina `src/pages/Comunidade.tsx`
+## Solucao
 
-- Remover o `TabsTrigger` com `value="players"`
-- Remover o `TabsContent` com `value="players"`
-- Remover o import de `PlayersList`
-- Ajustar o grid de tabs de `grid-cols-4` para `grid-cols-3`
+Reduzir o numero de colunas no grid de `VideosVisitante.tsx` para que cada card fique maior, simulando o formato Reels. O aspect ratio 9/16 ja esta correto no `VideoCardVertical`, entao basta ajustar o grid.
 
-### 2. Sidebar `src/components/comunidade/CommunitySidebar.tsx`
+### Alteracao em `src/components/dashboard/VideosVisitante.tsx`
 
-- Remover o card inteiro de "Premiacao Mensal" (bloco com icone Gift)
-- Remover o import de `Gift` do lucide-react
+Trocar o grid de:
+```
+grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6
+```
 
-Os componentes `PlayersList.tsx` e `PlayerCard.tsx` permanecem no codigo para uso futuro. Nenhuma alteracao no banco de dados.
+Para:
+```
+grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4
+```
 
+Isso se aplica tanto no grid principal (linha 49) quanto no skeleton de loading (linha 30). Com menos colunas, cada card ocupa mais espaco e fica visualmente no formato Reels.
+
+Ajustar tambem a altura do skeleton para refletir o novo tamanho: `h-[240px] sm:h-[320px] md:h-[400px]`.
+
+Nenhuma alteracao no `VideoCardVertical` -- o componente ja usa `aspect-[9/16]`, que e exatamente o formato Reels.
