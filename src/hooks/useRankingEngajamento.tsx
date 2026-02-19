@@ -10,6 +10,7 @@ export interface RankingEngajamentoItem {
   total_videos_assistidos: number;
   total_materiais_baixados: number;
   total_aulas_presentes: number;
+  total_videos_reassistidos: number;
 }
 
 export function useRankingEngajamento() {
