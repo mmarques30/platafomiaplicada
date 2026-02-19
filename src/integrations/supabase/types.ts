@@ -5913,6 +5913,7 @@ export type Database = {
           total_materiais_baixados: number
           total_pontos: number
           total_videos_assistidos: number
+          total_videos_reassistidos: number
           user_id: string
         }[]
       }
