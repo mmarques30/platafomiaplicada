@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Clock, FileText, Send, CheckCircle2, CalendarIcon, Plus, Trash2 } from "lucide-react";
+import { Loader2, Clock, FileText, Send, CheckCircle2, CalendarIcon, Plus, Trash2, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -20,7 +20,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entrega: any | null;
-  onSave: (dados: { titulo?: string; status?: string; descricao?: string; prazo?: string | null; responsavel_id?: string | null }) => void;
+  onSave: (dados: { titulo?: string; status?: string; descricao?: string; prazo?: string | null; responsavel_id?: string | null; instrucoes?: string | null }) => void;
   isSaving: boolean;
   isLider: boolean;
   membros?: { id: string; nome_completo: string }[];
@@ -44,6 +44,8 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
   // Subtarefa inline form
   const [novaSub, setNovaSub] = useState("");
   const [novaSubResp, setNovaSubResp] = useState<string | null>(null);
+  const [instrucoes, setInstrucoes] = useState("");
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   const entregaId = entrega?.id;
 
@@ -54,10 +56,33 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
       setDescricao(entrega.descricao || "");
       setPrazo(entrega.prazo ? new Date(entrega.prazo) : undefined);
       setResponsavelId(entrega.responsavel_id || "sem_responsavel");
+      setInstrucoes(entrega.instrucoes || "");
     }
     setNovaSub("");
     setNovaSubResp(null);
   }, [entrega, open]);
+
+  const handleRegenerarInstrucoes = async () => {
+    setIsRegenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("regenerar-instrucoes-entrega", {
+        body: {
+          titulo: tituloValue,
+          descricao,
+          projeto_titulo: entrega?.backlog_item?.titulo || null,
+        },
+      });
+      if (error) throw error;
+      if (data?.instrucoes) {
+        setInstrucoes(data.instrucoes);
+        toast.success("Instruções regeneradas com IA!");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao regenerar instruções");
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
 
   // Fetch subtarefas for this AI entrega
   const { data: subtarefas = [] } = useQuery({
@@ -121,7 +146,8 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
     status !== entrega.status ||
     descricao !== (entrega.descricao || "") ||
     currentPrazo !== originalPrazo ||
-    responsavelId !== originalResponsavel;
+    responsavelId !== originalResponsavel ||
+    instrucoes !== (entrega.instrucoes || "");
 
   const handleSave = () => {
     const dados: any = {};
@@ -133,6 +159,9 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
     }
     if (responsavelId !== originalResponsavel) {
       dados.responsavel_id = responsavelId === "sem_responsavel" ? null : responsavelId;
+    }
+    if (instrucoes !== (entrega.instrucoes || "")) {
+      dados.instrucoes = instrucoes || null;
     }
     onSave(dados);
   };
@@ -210,12 +239,29 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
             <Textarea value={descricao} onChange={e => setDescricao(e.target.value)} rows={3} placeholder="Adicionar descrição..." />
           </div>
 
-          {entrega.instrucoes && (
-            <div>
-              <Label className="text-muted-foreground text-xs">Instruções</Label>
-              <p className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-md">{entrega.instrucoes}</p>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label>Instruções</Label>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs gap-1"
+                disabled={isRegenerating}
+                onClick={handleRegenerarInstrucoes}
+              >
+                {isRegenerating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                Regenerar com IA
+              </Button>
             </div>
-          )}
+            <Textarea
+              value={instrucoes}
+              onChange={e => setInstrucoes(e.target.value)}
+              rows={4}
+              placeholder="Instruções serão geradas pela IA..."
+              className="text-sm"
+            />
+          </div>
 
           {/* Subtarefas */}
           {entregaId && (

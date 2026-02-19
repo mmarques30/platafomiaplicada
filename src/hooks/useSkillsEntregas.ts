@@ -117,7 +117,7 @@ export function useSkillsEntregas() {
 
   // Mutation para atualizar campos editáveis de entregas_skills
   const atualizarEntrega = useMutation({
-    mutationFn: async ({ entregaId, dados }: { entregaId: string; dados: Partial<{ status: string; descricao: string; titulo: string; prazo: string | null; responsavel_id: string | null }> }) => {
+    mutationFn: async ({ entregaId, dados }: { entregaId: string; dados: Partial<{ status: string; descricao: string; titulo: string; prazo: string | null; responsavel_id: string | null; instrucoes: string | null }> }) => {
       const { error } = await supabase
         .from("entregas_skills")
         .update(dados)
