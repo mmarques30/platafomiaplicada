@@ -1,19 +1,27 @@
 
-# Aumentar altura dos cards nas Trilhas de Aprendizado
+
+# Mover filtros para abaixo do titulo em Trilhas de Aprendizado
 
 ## Problema
-A largura dos cards foi aumentada (de `xl:basis-1/4` para `xl:basis-[28%]`), mas a altura permaneceu igual, deixando os cards desproporcionais.
+Os filtros (Ordenar e Classificacao) estao alinhados a direita (`justify-end`), ao lado do titulo. O usuario quer que fiquem abaixo do titulo.
 
 ## Solucao
 
-### Arquivo: `src/components/shared/TrilhaCard.tsx` (linha 19)
+### Arquivo: `src/pages/Trilhas.tsx`
 
-Aumentar levemente a altura em cada breakpoint para acompanhar a largura, mantendo a proporcao visual:
+Mover o componente `TodasAsTrilhas` para ficar apos o titulo, sem alteracoes.
 
-| Breakpoint | Antes | Depois |
-|---|---|---|
-| Mobile | `h-[280px]` | `h-[300px]` |
-| sm | `h-[320px]` | `h-[350px]` |
-| md+ | `h-[400px]` | `h-[440px]` |
+### Arquivo: `src/components/dashboard/TodasAsTrilhas.tsx` (linha ~103)
 
-A alteracao e apenas nos valores de altura do container principal do card. A imagem, overlay, badges e demais elementos continuam funcionando normalmente pois usam `h-full`, `inset-0` e posicionamento absoluto.
+Alterar a div dos filtros de `justify-end` para `justify-start`, alinhando-os a esquerda abaixo do titulo:
+
+```tsx
+// Antes
+<div className="flex flex-wrap gap-3 justify-end">
+
+// Depois
+<div className="flex flex-wrap gap-3">
+```
+
+Isso remove o alinhamento a direita, fazendo os selects ficarem a esquerda, naturalmente abaixo do titulo "Trilhas de Aprendizado" que ja esta acima no layout da pagina.
+
