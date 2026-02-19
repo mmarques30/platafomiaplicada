@@ -1,49 +1,102 @@
 
-# Chat inline com a MarIAna (sem navegar para /chat)
+# Personalizar a MarIAna por usuario logado
 
-## Objetivo
+## Problema
 
-Transformar o botao flutuante da MarIAna em um chat popup/drawer que abre na propria pagina, sem redirecionar para `/chat`. O usuario podera conversar com a IA de qualquer tela da aplicacao.
+A edge function `ai-chat-user` ja busca o diagnostico Academy (`formulario_diagnostico`) e objetivos, mas ignora completamente:
+- **Plano do usuario** (academy, skills, business)
+- **Diagnostico Skills** (tarefas manuais, gargalos, insight IA)
+- **Projetos de mentoria** (status, titulo, progresso)
+- **Fases do processo** (em qual fase esta)
+- **Progresso nas trilhas** (videos assistidos)
+- **Equipe Skills** (backlog, entregas)
+
+Resultado: a MarIAna responde de forma generica, sem considerar o contexto real do usuario.
 
 ## Abordagem
 
-Criar um componente de chat inline (drawer/popover) que abre ao clicar no botao flutuante, reutilizando a mesma logica de streaming ja existente em `Chat.tsx`.
+Expandir as queries paralelas na edge function para buscar dados adicionais do usuario e injetar no system prompt de forma contextualizada por plano.
 
 ## Alteracoes
 
-### 1. Novo componente: `src/components/shared/MarIAnaChatDrawer.tsx`
+### `supabase/functions/ai-chat-user/index.ts`
 
-Componente de chat em formato de painel lateral (drawer) que:
-- Abre/fecha com animacao suave (slide up) no canto inferior direito
-- Contem header com avatar, nome "MarIAna" e botao de fechar
-- Area de mensagens com scroll e suporte a markdown (ReactMarkdown)
-- Input de texto com botao de enviar
-- Link "Abrir chat completo" que navega para `/chat` caso o usuario queira a tela cheia
-- Reutiliza toda a logica de streaming SSE (fetch ao edge function `ai-chat-user`, parsing line-by-line, flushSync)
-- Dimensoes: ~380px largura x ~500px altura no desktop, tela quase cheia no mobile
+#### 1. Novas queries no bloco `Promise.all` (linha ~48)
 
-### 2. Atualizar `src/components/shared/MarIAnaFloatingButton.tsx`
+Adicionar ao bloco paralelo existente:
 
-- Remover `useNavigate` e a navegacao para `/chat`
-- Adicionar estado `isOpen` para controlar a abertura do drawer
-- Ao clicar no botao, abrir/fechar o `MarIAnaChatDrawer`
-- Renderizar o drawer junto ao botao flutuante
-- Esconder o botao quando o drawer estiver aberto
+- **Profile** (plano_mentoria, nome_completo): `profiles` filtrado por `user.id`
+- **Diagnostico Skills**: `diagnosticos_skills` filtrado por `user_id`, pegar o mais recente com `completado = true`
+- **Projetos de Mentoria**: `projetos_mentoria` filtrado por `user_id`, selecionar titulo, status, progresso_preparacao, trilhas_recomendadas
+- **Fases do Processo**: `fases_processo_mentoria` filtrado por `user_id`, ordenado por fase_numero
+- **Progresso em Videos**: contar videos completados via `progresso_videos` filtrado por `user_id` e `completado = true`
+- **Equipe Skills** (se skills): `membros_equipe_skills` filtrado por `user_id`, com join para `equipes_skills` e `backlog_skills`
+- **Entregas Skills**: `entregas_skills` filtrado por `responsavel_id = user.id`
 
-### 3. Sem alteracoes em `MainLayout.tsx`
+#### 2. Injecao no system prompt por plano
 
-O `MarIAnaFloatingButton` continua sendo renderizado no mesmo lugar; a mudanca e interna ao componente.
+Apos o bloco existente de `formulario.data` (linha ~290), adicionar seções condicionais:
 
-## Detalhes tecnicos
+**Para TODOS os planos:**
+```
+## Contexto do Plano:
+- Plano: {plano_mentoria}
+- Videos assistidos: {count}
+- Projetos: {lista com status}
+- Fase atual do processo: {fase}
 
-- O chat drawer usa `framer-motion` (ja instalado) para animacao de entrada/saida
-- Mensagens do assistente renderizadas com `ReactMarkdown` + `remarkGfm`
-- Streaming SSE identico ao `Chat.tsx`: fetch para `ai-chat-user`, parse line-by-line, flushSync para atualizacao progressiva
-- Sessao do Supabase obtida via `supabase.auth.getSession()` para autenticacao
-- Historico de mensagens mantido apenas em estado local (reset ao fechar)
-- AbortController para cancelar requisicoes longas (timeout 120s)
-- Tratamento de erros 429 (rate limit) e 402 (creditos) com toast
+INSTRUCAO: Personalize suas respostas considerando o plano do usuario.
+Para Academy: foque em trilhas e conteudos da plataforma.
+Para Skills: foque em automacao de processos e projetos da equipe.
+Para Business: foque no projeto sendo construido e resultados.
+```
+
+**Para usuarios SKILLS (se tiver diagnostico):**
+```
+## Diagnostico Skills do Usuario:
+- Cargo: {cargo}
+- Area: {area_atuacao}
+- Tarefas manuais: {tarefas_manuais}
+- Gargalos: {gargalos_identificados}
+- Onde perde mais tempo: {onde_perde_mais_tempo}
+- Insight IA gerado: {insight_ia resumido}
+- Economia estimada: {economia_horas_semana}h/semana
+
+## Projetos/Backlog da Equipe:
+{lista de itens do backlog com status}
+
+## Entregas Pendentes:
+{lista de entregas com status e prazo}
+
+INSTRUCAO: Relacione suas respostas com os gargalos e projetos do usuario. Sugira como IA resolve os problemas especificos dele.
+```
+
+**Para usuarios ACADEMY (se tiver diagnostico):**
+```
+## Projetos de Mentoria:
+{lista de projetos com status e progresso}
+
+## Fase Atual do Processo:
+{fase atual e proxima}
+
+INSTRUCAO: Guie o usuario pelo processo de mentoria. Sugira proximo passo baseado na fase atual.
+```
+
+#### 3. Instrucoes finais atualizadas
+
+Adicionar ao bloco de instrucoes finais (linha ~425):
+
+```
+## Personalizacao por Contexto:
+- SEMPRE use o nome do usuario quando disponivel
+- Relacione suas respostas com os projetos e diagnosticos do usuario
+- Para Skills: priorize recomendacoes que resolvam os gargalos identificados
+- Para Academy: sugira trilhas alinhadas com os objetivos e fase atual
+- Para Business: foque em resultados e entregas do projeto
+- Mencione progresso quando relevante ("Voce ja assistiu X videos, falta pouco!")
+- Sugira proximos passos baseados no contexto real do usuario
+```
 
 ## Resultado
 
-O usuario podera conversar com a MarIAna de qualquer pagina sem sair do contexto atual. A pagina `/chat` continua funcionando normalmente para quem preferir a experiencia em tela cheia.
+A MarIAna passara a responder de forma altamente personalizada, conhecendo o plano, diagnostico, projetos e progresso de cada usuario -- criando uma experiencia de mentoria realmente individualizada.
