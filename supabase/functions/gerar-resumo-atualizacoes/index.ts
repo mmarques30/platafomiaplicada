@@ -26,22 +26,20 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    // Verify user via getUser
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const userId = claimsData.claims.sub;
-
     // Verify admin role
     const { data: roleData } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .eq("role", "admin")
       .maybeSingle();
 
@@ -62,7 +60,8 @@ serve(async (req) => {
       .from("auditoria_conteudo")
       .select("tabela, operacao, dados_novos, dados_anteriores, campos_alterados, created_at")
       .gte("created_at", dataLimite.toISOString())
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(200);
 
     if (queryError) {
       console.error("Query error:", queryError);
@@ -79,8 +78,8 @@ serve(async (req) => {
       );
     }
 
-    // Extract titles and build alterations list
-    const alteracoes = registros.map((r: any) => {
+    // Build concise alterations list
+    const alteracoes = registros.slice(0, 80).map((r: any) => {
       const dados = r.dados_novos || r.dados_anteriores || {};
       const titulo = dados.titulo || dados.nome || dados.tema || dados.name || "(sem título)";
       const entry: any = {
@@ -116,7 +115,9 @@ Use emojis para cada categoria. Formato:
 NÃO invente dados. Use apenas as informações fornecidas.
 Se houver muitas atualizações de um mesmo tipo, agrupe de forma concisa.`;
 
-    const userPrompt = JSON.stringify({ periodo: `${dias} dias`, alteracoes });
+    const userPrompt = JSON.stringify({ periodo: `${dias} dias`, total: registros.length, alteracoes });
+
+    console.log("Sending AI request, payload size:", userPrompt.length, "chars");
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -125,7 +126,7 @@ Se houver muitas atualizações de um mesmo tipo, agrupe de forma concisa.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -134,22 +135,38 @@ Se houver muitas atualizações de um mesmo tipo, agrupe de forma concisa.`;
     });
 
     if (!aiResponse.ok) {
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit excedido. Tente novamente em alguns instantes." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const errText = await aiResponse.text();
       console.error("AI error:", aiResponse.status, errText);
-      return new Response(JSON.stringify({ error: "Erro ao gerar resumo" }), {
-        status: 500,
+
+      // Fallback to another model
+      console.log("Retrying with openai/gpt-5-nano...");
+      const fallbackResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-5-nano",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+        }),
+      });
+
+      if (!fallbackResponse.ok) {
+        const fallbackErr = await fallbackResponse.text();
+        console.error("Fallback AI error:", fallbackResponse.status, fallbackErr);
+        return new Response(JSON.stringify({ error: "Erro ao gerar resumo. Tente novamente." }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const fallbackData = await fallbackResponse.json();
+      const resumo = fallbackData.choices?.[0]?.message?.content || "Não foi possível gerar o resumo.";
+      return new Response(JSON.stringify({ resumo }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
