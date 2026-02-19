@@ -21,7 +21,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entrega: any | null;
-  onSave: (dados: { status?: string; descricao?: string; prazo?: string | null; responsavel_id?: string | null }) => void;
+  onSave: (dados: { titulo?: string; status?: string; descricao?: string; prazo?: string | null; responsavel_id?: string | null }) => void;
   isSaving: boolean;
   isLider: boolean;
   membros?: { id: string; nome_completo: string }[];
@@ -36,6 +36,7 @@ const STATUS_OPTIONS = [
 
 export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, isSaving, isLider, membros = [] }: Props) {
   const queryClient = useQueryClient();
+  const [tituloValue, setTituloValue] = useState("");
   const [status, setStatus] = useState("");
   const [descricao, setDescricao] = useState("");
   const [prazo, setPrazo] = useState<Date | undefined>(undefined);
@@ -49,6 +50,7 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
 
   useEffect(() => {
     if (entrega) {
+      setTituloValue(entrega.titulo || "");
       setStatus(entrega.status || "pendente");
       setDescricao(entrega.descricao || "");
       setPrazo(entrega.prazo ? new Date(entrega.prazo) : undefined);
@@ -116,6 +118,7 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
   const originalResponsavel = entrega.responsavel_id || "sem_responsavel";
 
   const hasChanges =
+    tituloValue !== (entrega.titulo || "") ||
     status !== entrega.status ||
     descricao !== (entrega.descricao || "") ||
     currentPrazo !== originalPrazo ||
@@ -123,6 +126,7 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
 
   const handleSave = () => {
     const dados: any = {};
+    if (tituloValue.trim() && tituloValue !== (entrega.titulo || "")) dados.titulo = tituloValue.trim();
     if (status !== entrega.status) dados.status = status;
     if (descricao !== (entrega.descricao || "")) dados.descricao = descricao || null;
     if (currentPrazo !== originalPrazo) {
@@ -148,7 +152,12 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
         <div className="space-y-4">
           <div>
             <Label className="text-muted-foreground text-xs">Título</Label>
-            <p className="font-medium">{entrega.titulo}</p>
+            <Input
+              value={tituloValue}
+              onChange={(e) => setTituloValue(e.target.value)}
+              placeholder="Título da entrega"
+              className="mt-0.5"
+            />
           </div>
 
           <div>
