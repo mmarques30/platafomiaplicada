@@ -14,14 +14,14 @@ interface StatusPieChartProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  concluido: "hsl(72, 50%, 35%)",
-  aprovada: "hsl(72, 50%, 35%)",
-  em_andamento: "hsl(45, 90%, 55%)",
-  atrasado: "hsl(0, 70%, 55%)",
-  pendente: "hsl(var(--muted-foreground))",
-  levantado: "hsl(210, 50%, 60%)",
-  priorizado: "hsl(270, 50%, 60%)",
-  nao_aprovado: "hsl(0, 40%, 50%)",
+  concluido: "#9EB038",
+  aprovada: "#9EB038",
+  em_andamento: "#D4E68A",
+  atrasado: "#C45A3C",
+  pendente: "#B8CC5A",
+  levantado: "#6B8A3D",
+  priorizado: "#4A5516",
+  nao_aprovado: "#8B6F47",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -36,13 +36,13 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const chartConfig: ChartConfig = {
-  concluido: { label: "Concluído", color: "hsl(72, 50%, 35%)" },
-  em_andamento: { label: "Em andamento", color: "hsl(45, 90%, 55%)" },
-  atrasado: { label: "Atrasado", color: "hsl(0, 70%, 55%)" },
-  pendente: { label: "Pendente", color: "hsl(var(--muted-foreground))" },
-  levantado: { label: "Levantado", color: "hsl(210, 50%, 60%)" },
-  priorizado: { label: "Priorizado", color: "hsl(270, 50%, 60%)" },
-  nao_aprovado: { label: "Não aprovado", color: "hsl(0, 40%, 50%)" },
+  concluido: { label: "Concluído", color: "#9EB038" },
+  em_andamento: { label: "Em andamento", color: "#D4E68A" },
+  atrasado: { label: "Atrasado", color: "#C45A3C" },
+  pendente: { label: "Pendente", color: "#B8CC5A" },
+  levantado: { label: "Levantado", color: "#6B8A3D" },
+  priorizado: { label: "Priorizado", color: "#4A5516" },
+  nao_aprovado: { label: "Não aprovado", color: "#8B6F47" },
 };
 
 export default function StatusPieChart({ entregas, projetos = [] }: StatusPieChartProps) {
