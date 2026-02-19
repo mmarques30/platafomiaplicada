@@ -8,7 +8,6 @@ interface ProjetoAggregated {
   id: string;
   titulo: string;
   status: string | null;
-  prioridade: string | null;
   entregasCount: number;
   subtarefasCount: number;
   progressoMedio: number;
@@ -31,11 +30,6 @@ const statusMap: Record<string, { label: string; variant: "default" | "secondary
   entregue: { label: "Entregue", variant: "default" },
 };
 
-const prioridadeMap: Record<string, { label: string; color: string }> = {
-  alta: { label: "P1", color: "#ef4444" },
-  media: { label: "P2", color: "#f59e0b" },
-  baixa: { label: "P3", color: "#9EB038" },
-};
 
 export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMais, maxRows = 5 }: ProjetosResumoTableProps) {
   const aggregated = useMemo<ProjetoAggregated[]>(() => {
@@ -54,7 +48,6 @@ export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMai
         id: p.id,
         titulo: p.titulo,
         status: p.status,
-        prioridade: p.prioridade,
         entregasCount: entregas.length,
         subtarefasCount,
         progressoMedio,
@@ -78,7 +71,7 @@ export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMai
           <TableRow className="hover:bg-transparent">
             <TableHead className="text-[11px] font-medium text-muted-foreground">Projeto</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground">Status</TableHead>
-            <TableHead className="text-[11px] font-medium text-muted-foreground">Prioridade</TableHead>
+            <TableHead className="text-[11px] font-medium text-muted-foreground text-center">Entregas</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground text-center">Entregas</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground text-center">Subtarefas</TableHead>
             <TableHead className="text-[11px] font-medium text-muted-foreground text-right">Progresso</TableHead>
@@ -87,7 +80,6 @@ export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMai
         <TableBody>
           {visible.map((p) => {
             const status = statusMap[p.status ?? ""] || { label: p.status ?? "—", variant: "outline" as const };
-            const prioridade = prioridadeMap[p.prioridade ?? ""] || { label: p.prioridade || "—", color: "#a1a1aa" };
 
             return (
               <TableRow key={p.id} className="group">
@@ -98,12 +90,6 @@ export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMai
                   <Badge variant={status.variant} className="text-[10px] font-medium">
                     {status.label}
                   </Badge>
-                </TableCell>
-                <TableCell>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold" style={{ color: prioridade.color }}>
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: prioridade.color }} />
-                    {prioridade.label}
-                  </span>
                 </TableCell>
                 <TableCell className="text-center">
                   <span className="text-xs font-semibold text-foreground">{p.entregasCount}</span>
