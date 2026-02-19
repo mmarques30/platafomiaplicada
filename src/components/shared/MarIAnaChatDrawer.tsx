@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Loader2, Maximize2 } from "lucide-react";
+import { X, Send, Loader2, Maximize2, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,9 +30,34 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Load chat history on mount
+  useEffect(() => {
+    if (!user) return;
+    const loadHistory = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("chat_messages")
+          .select("role, content, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: true })
+          .limit(50);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setMessages(data.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })));
+        }
+      } catch (err) {
+        console.error("Erro ao carregar histórico:", err);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+    loadHistory();
+  }, [user]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -178,18 +204,12 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
         }
       }
 
-      // Save history
+      // Save only the 2 new messages
       if (assistantContent) {
-        const finalMessages = [...messagesToSend, { role: "assistant" as const, content: assistantContent }];
-        await Promise.all(
-          finalMessages.map((msg) =>
-            supabase.from("chat_messages").insert({
-              user_id: user.id,
-              role: msg.role,
-              content: msg.content,
-            })
-          )
-        );
+        await supabase.from("chat_messages").insert([
+          { user_id: user.id, role: "user", content: messageToSend },
+          { user_id: user.id, role: "assistant", content: assistantContent },
+        ]);
       }
 
       setIsStreaming(false);
@@ -247,6 +267,9 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
           </h3>
           <p className="text-xs text-muted-foreground">Sua mentora de IA</p>
         </div>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMessages([])} title="Nova conversa">
+          <MessageSquarePlus className="h-4 w-4" />
+        </Button>
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleOpenFullChat} title="Abrir chat completo">
           <Maximize2 className="h-4 w-4" />
         </Button>
@@ -257,7 +280,15 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
-        {messages.length === 0 && (
+        {isLoadingHistory ? (
+          <div className="space-y-3 py-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className={`flex ${i % 2 === 1 ? "justify-end" : "justify-start"}`}>
+                <Skeleton className={`h-10 rounded-lg ${i % 2 === 1 ? "w-3/4" : "w-2/3"}`} />
+              </div>
+            ))}
+          </div>
+        ) : messages.length === 0 && !isLoading ? (
           <div className="flex flex-col items-center justify-center text-center py-4">
             <img
               src={mariAvatar}
@@ -289,7 +320,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               ))}
             </div>
           </div>
-        )}
+        ) : null}
 
         {messages.map((message, index) => (
           <div
