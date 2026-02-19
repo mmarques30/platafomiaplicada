@@ -111,7 +111,7 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
               </Badge>
               {instrucao.gerado_por_ia && (
                 <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
-                  IA
+                  Diagnóstico
                 </Badge>
               )}
             </div>

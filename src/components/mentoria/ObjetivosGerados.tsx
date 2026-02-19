@@ -70,11 +70,9 @@ export function ObjetivosGerados() {
                 {getTipoIcon(objetivo.tipo)}
                 <Badge variant="outline">{getTipoLabel(objetivo.tipo)}</Badge>
               </div>
-              {objetivo.gerado_por_ia && (
-                <Badge variant="secondary" className="text-xs">
-                  Gerado por IA
-                </Badge>
-              )}
+              <Badge variant="secondary" className="text-xs">
+                Diagnóstico
+              </Badge>
             </div>
             <p className="text-foreground">{objetivo.objetivo}</p>
           </div>

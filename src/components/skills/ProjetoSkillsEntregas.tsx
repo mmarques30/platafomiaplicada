@@ -317,7 +317,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
                 <TableHead>Responsável</TableHead>
                 <TableHead>Prazo</TableHead>
                 <TableHead>Progresso</TableHead>
-                <TableHead>Origem</TableHead>
+                
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -371,11 +371,6 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={`text-xs ${e.origem === "ia" ? "bg-purple-500/10 text-purple-700 border-purple-500/30" : "bg-sky-500/10 text-sky-700 border-sky-500/30"}`}>
-                        {e.origem === "ia" ? <><Bot className="h-3 w-3 mr-1" />IA</> : <><Users className="h-3 w-3 mr-1" />Manual</>}
-                      </Badge>
                     </TableCell>
                   </TableRow>
                 );

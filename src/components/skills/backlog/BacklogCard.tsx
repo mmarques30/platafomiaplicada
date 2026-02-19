@@ -1,7 +1,7 @@
 import { useDraggable } from "@dnd-kit/core";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Clock, Zap } from "lucide-react";
+import { BookOpen, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
@@ -86,7 +86,7 @@ export default function BacklogCard({ item, onClick }: BacklogCardProps) {
         </div>
 
         <div className="flex items-center gap-1.5">
-          {item.origem === "ia" && <Zap className="h-3 w-3 text-amber-500" />}
+          
           <div className="flex -space-x-1.5">
             {item.responsavel && (
               <Avatar className="h-5 w-5 border-2 border-background">

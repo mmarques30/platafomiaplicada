@@ -1,7 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
@@ -64,10 +63,7 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
           {items.map(item => (
             <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50" onClick={() => onItemClick(item)}>
               <TableCell className="font-medium max-w-[250px]">
-                <div className="flex items-center gap-1.5">
-                  {item.origem === "ia" && <Zap className="h-3 w-3 text-amber-500 shrink-0" />}
-                  <span className="truncate">{item.titulo}</span>
-                </div>
+                <span className="truncate">{item.titulo}</span>
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">{item.area_impactada || "—"}</TableCell>
               <TableCell>
