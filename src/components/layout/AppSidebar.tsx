@@ -595,42 +595,7 @@ export function AppSidebar() {
                 </Collapsible>
               )}
 
-              {/* Menu Cupons - Apenas visitantes (após Comunidade) */}
-              {isVisitante && !isLoadingState && (
-                <SidebarMenuItem>
-                  <NavLink 
-                    to="/cupons" 
-                    end 
-                    className={({ isActive }) => cn(
-                      "flex items-center gap-3 rounded-lg px-4 py-2.5 transition-all duration-200 font-semibold",
-                      "group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center",
-                      isActive 
-                        ? "bg-aplicada-green-700 text-black" 
-                        : "text-aplicada-green-700 hover:bg-aplicada-green-700/10"
-                    )}
-                  >
-                    {({ isActive }) => (
-                      <>
-                        <LucideIcons.Ticket 
-                          className={cn(
-                            "h-4 w-4 shrink-0",
-                            isActive ? "text-black" : "text-aplicada-green-700"
-                          )} 
-                          strokeWidth={1.5} 
-                        />
-                        {!collapsed && (
-                          <span className={cn(
-                            "text-sm",
-                            isActive ? "text-black" : "text-aplicada-green-700"
-                          )}>
-                            Cupons
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </NavLink>
-                </SidebarMenuItem>
-              )}
+              {/* Menu Cupons - Temporariamente desativado */}
 
             </SidebarMenu>
           </SidebarGroupContent>
