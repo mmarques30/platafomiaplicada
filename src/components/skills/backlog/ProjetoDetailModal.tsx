@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck, Sparkles, Loader2, Plus, ClipboardList } from "lucide-react";
+import { Clock, Zap, Tag, User, Layers, BookOpen, ExternalLink, CheckCircle2, XCircle, Play, Archive, RotateCcw, ArrowRight, PackageCheck, Sparkles, Loader2, Plus, ClipboardList, Calculator, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,6 +63,9 @@ interface ProjetoDetailModalProps {
 export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusChange, onUpdate, equipeId }: ProjetoDetailModalProps) {
   const [obsValue, setObsValue] = useState(item?.observacoes || "");
   const [areaValue, setAreaValue] = useState(item?.area_impactada || "");
+  const [tempoAtualValue, setTempoAtualValue] = useState(item?.tempo_atual_horas?.toString() || "");
+  const [cargoExecutorValue, setCargoExecutorValue] = useState(item?.cargo_executor || "");
+  const [custoHoraValue, setCustoHoraValue] = useState(item?.custo_hora_executor?.toString() || "");
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [entregaModalOpen, setEntregaModalOpen] = useState(false);
   const [selectedEntrega, setSelectedEntrega] = useState<EntregaEquipe | null>(null);
@@ -70,7 +73,10 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
   useEffect(() => {
     setObsValue(item?.observacoes || "");
     setAreaValue(item?.area_impactada || "");
-  }, [item?.observacoes, item?.area_impactada, item?.id]);
+    setTempoAtualValue(item?.tempo_atual_horas?.toString() || "");
+    setCargoExecutorValue(item?.cargo_executor || "");
+    setCustoHoraValue(item?.custo_hora_executor?.toString() || "");
+  }, [item?.observacoes, item?.area_impactada, item?.tempo_atual_horas, item?.cargo_executor, item?.custo_hora_executor, item?.id]);
 
   // Query entregas vinculadas ao projeto
   const { data: entregasProjeto, isLoading: loadingEntregas } = useQuery({
@@ -253,12 +259,24 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                       if (error) throw error;
                       const updates: Record<string, any> = {};
                       if (data?.descricao) updates.descricao = data.descricao;
-                      if (data?.area_impactada) {
-                        updates.area_impactada = data.area_impactada;
-                        setAreaValue(data.area_impactada);
-                      }
-                      if (data?.prioridade) updates.prioridade = data.prioridade;
-                      if (data?.horas_estimadas_economia) updates.horas_estimadas_economia = data.horas_estimadas_economia;
+                       if (data?.area_impactada) {
+                         updates.area_impactada = data.area_impactada;
+                         setAreaValue(data.area_impactada);
+                       }
+                       if (data?.prioridade) updates.prioridade = data.prioridade;
+                       if (data?.horas_estimadas_economia) updates.horas_estimadas_economia = data.horas_estimadas_economia;
+                       if (data?.tempo_atual_horas) {
+                         updates.tempo_atual_horas = data.tempo_atual_horas;
+                         setTempoAtualValue(String(data.tempo_atual_horas));
+                       }
+                       if (data?.cargo_executor) {
+                         updates.cargo_executor = data.cargo_executor;
+                         setCargoExecutorValue(data.cargo_executor);
+                       }
+                       if (data?.custo_hora_executor) {
+                         updates.custo_hora_executor = data.custo_hora_executor;
+                         setCustoHoraValue(String(data.custo_hora_executor));
+                       }
                       if (Object.keys(updates).length > 0) {
                         onUpdate(item.id, updates);
                         toast.success("Projeto atualizado com IA!");
@@ -487,6 +505,127 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
               <p className="text-sm whitespace-pre-wrap text-muted-foreground">
                 {item.observacoes || "Nenhuma observação"}
               </p>
+            )}
+          </div>
+
+          {/* Calculadora de ROI */}
+          <div className="rounded-lg border border-dashed border-muted-foreground/30 p-4 space-y-3">
+            <div className="flex items-center gap-1.5">
+              <Calculator className="h-4 w-4 text-primary" />
+              <h4 className="text-sm font-medium">Calculadora de ROI</h4>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Tempo gasto atual (h/semana)</p>
+                {onUpdate ? (
+                  <Input
+                    type="number"
+                    min={0}
+                    step={0.5}
+                    value={tempoAtualValue}
+                    onChange={(e) => setTempoAtualValue(e.target.value)}
+                    onBlur={() => {
+                      const val = tempoAtualValue ? Number(tempoAtualValue) : null;
+                      if (val !== item.tempo_atual_horas) {
+                        onUpdate(item.id, { tempo_atual_horas: val });
+                      }
+                    }}
+                    placeholder="Ex: 10"
+                    className="h-8 text-sm"
+                  />
+                ) : (
+                  <p className="text-sm font-medium">{item.tempo_atual_horas ?? "—"}</p>
+                )}
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Economia estimada (h/semana)</p>
+                <p className="text-sm font-medium">{item.horas_estimadas_economia ?? "—"}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Cargo de quem executa</p>
+                {onUpdate ? (
+                  <Input
+                    value={cargoExecutorValue}
+                    onChange={(e) => setCargoExecutorValue(e.target.value)}
+                    onBlur={() => {
+                      if (cargoExecutorValue !== (item.cargo_executor || "")) {
+                        onUpdate(item.id, { cargo_executor: cargoExecutorValue || null });
+                      }
+                    }}
+                    placeholder="Ex: Analista Financeiro"
+                    className="h-8 text-sm"
+                  />
+                ) : (
+                  <p className="text-sm font-medium">{item.cargo_executor ?? "—"}</p>
+                )}
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Custo/hora (R$)</p>
+                {onUpdate ? (
+                  <Input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={custoHoraValue}
+                    onChange={(e) => setCustoHoraValue(e.target.value)}
+                    onBlur={() => {
+                      const val = custoHoraValue ? Number(custoHoraValue) : null;
+                      if (val !== item.custo_hora_executor) {
+                        onUpdate(item.id, { custo_hora_executor: val });
+                      }
+                    }}
+                    placeholder="Ex: 45"
+                    className="h-8 text-sm"
+                  />
+                ) : (
+                  <p className="text-sm font-medium">{item.custo_hora_executor ? `R$ ${item.custo_hora_executor}` : "—"}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Resumo ROI calculado */}
+            {item.tempo_atual_horas != null && item.horas_estimadas_economia != null && item.custo_hora_executor != null && (
+              (() => {
+                const tempoAtual = item.tempo_atual_horas!;
+                const economia = item.horas_estimadas_economia!;
+                const custoHora = item.custo_hora_executor!;
+                const tempoApos = Math.max(tempoAtual - economia, 0);
+                const economiaSemanal = economia * custoHora;
+                const economiaAnual = economiaSemanal * 52;
+                return (
+                  <div className="rounded-md bg-primary/5 border border-primary/20 p-3 space-y-2">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                      <span className="text-xs font-medium text-primary">Projeção de Economia</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-muted-foreground">Hoje:</span>
+                        <span className="ml-1 font-medium">{tempoAtual}h/sem</span>
+                        <span className="text-muted-foreground ml-1">(R$ {(tempoAtual * custoHora).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}/sem)</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Após melhoria:</span>
+                        <span className="ml-1 font-medium">{tempoApos}h/sem</span>
+                        <span className="text-muted-foreground ml-1">(R$ {(tempoApos * custoHora).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}/sem)</span>
+                      </div>
+                    </div>
+                    <Separator />
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">Economia semanal:</span>
+                      <span className="font-semibold text-primary">{economia}h · R$ {economiaSemanal.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">ROI anual estimado:</span>
+                      <span className="font-bold text-primary text-base">R$ {economiaAnual.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}</span>
+                    </div>
+                  </div>
+                );
+              })()
             )}
           </div>
 
