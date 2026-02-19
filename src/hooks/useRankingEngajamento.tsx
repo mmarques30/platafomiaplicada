@@ -7,11 +7,9 @@ export interface RankingEngajamentoItem {
   avatar_url: string;
   total_pontos: number;
   posicao: number;
-  total_posts: number;
-  total_comentarios: number;
-  total_likes_dados: number;
-  total_likes_recebidos: number;
-  dias_ativos_30d: number;
+  total_videos_assistidos: number;
+  total_materiais_baixados: number;
+  total_aulas_presentes: number;
 }
 
 export function useRankingEngajamento() {
@@ -26,7 +24,7 @@ export function useRankingEngajamento() {
           return [];
         }
         
-        return (data as RankingEngajamentoItem[]) || [];
+        return (data as unknown as RankingEngajamentoItem[]) || [];
       } catch (error) {
         console.warn("Erro inesperado no ranking:", error);
         return [];

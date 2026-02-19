@@ -115,24 +115,16 @@ export function CommunitySidebar() {
           </p>
           <div className="space-y-1.5 text-xs text-[#0D0D0D]/60">
             <div className="flex justify-between">
-              <span>Criar post</span>
-              <span className="font-semibold text-[#0D0D0D]/80">20pts</span>
+              <span>Aula presencial</span>
+              <span className="font-semibold text-[#0D0D0D]/80">25pts</span>
             </div>
             <div className="flex justify-between">
-              <span>Receber like</span>
+              <span>Assistir vídeo</span>
               <span className="font-semibold text-[#0D0D0D]/80">10pts</span>
             </div>
             <div className="flex justify-between">
-              <span>Comentar</span>
+              <span>Baixar material</span>
               <span className="font-semibold text-[#0D0D0D]/80">5pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Dar like</span>
-              <span className="font-semibold text-[#0D0D0D]/80">2pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Dia ativo</span>
-              <span className="font-semibold text-[#0D0D0D]/80">1pt</span>
             </div>
           </div>
         </div>
