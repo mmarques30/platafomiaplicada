@@ -11,6 +11,8 @@ import { FerramentasSelector } from "./FerramentasSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, X, FileText, Image, Table, FileCode, Upload, Plus, ExternalLink } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { IA_COPIE_USE_CATEGORIAS } from "@/lib/iaCopieUseCategories";
 
 interface IACopieUseModalProps {
   open: boolean;
@@ -87,7 +89,7 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
         titulo: "",
         descricao: "",
         categoria: "",
-        ia_recomendada: "",
+        
         conteudo: "",
         ferramentas_recomendadas: [],
         arquivos_url: [],
@@ -241,12 +243,19 @@ export function IACopieUseModal({ open, onOpenChange, item }: IACopieUseModalPro
 
           <div>
             <Label htmlFor="categoria">Categoria</Label>
-            <Input id="categoria" {...register("categoria", { required: true })} />
-          </div>
-
-          <div>
-            <Label htmlFor="ia_recomendada">IA Recomendada (opcional)</Label>
-            <Input id="ia_recomendada" {...register("ia_recomendada")} />
+            <Select
+              defaultValue={item?.categoria || ""}
+              onValueChange={(value) => setValue("categoria", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {IA_COPIE_USE_CATEGORIAS.map((cat) => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
