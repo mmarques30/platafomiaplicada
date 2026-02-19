@@ -1,24 +1,30 @@
 
-# Melhorar modal de Metodos para Aplicar
+# Corrigir ordenacao dos Prompts
 
 ## Problema
-O campo "Link do Documento" esta marcado como obrigatorio, mas um metodo pode ser apenas um prompt de personalizacao, sem link externo.
+A coluna `ordem` da tabela `biblioteca_prompts` tem valores repetidos (ex: nove prompts com `ordem=1`, sete com `ordem=2`, etc.). Isso acontece porque cada lote de insercao comecou a numeracao do 1. O resultado e que a lista nao reflete a sequencia real de adicao.
 
-## Mudanca
+## Solucao
+Executar uma migracao SQL que renumera todos os 69 prompts sequencialmente (1 a 69), usando a data de criacao (`created_at`) como criterio de ordenacao. Assim, os mais antigos ficam primeiro e cada prompt tera um numero unico.
 
-### `src/components/admin/bibliotecas/MetodoModal.tsx`
-1. Remover `required` da validacao do campo `link_documento` (linha 105)
-2. Remover o asterisco `*` do label "Link do Documento" (linha 100)
-3. Atualizar o texto auxiliar para indicar que e opcional
-4. Adicionar um campo `template` (Textarea) para permitir inserir o conteudo do prompt diretamente, com placeholder explicativo — ja que a coluna `template` existe na tabela e e nullable
-5. Ajustar o `onSubmit` para usar o campo `template` diretamente ao inves de forcar "Via documento externo"
+## Detalhes tecnicos
 
-## Detalhes
+### Migracao SQL
+```sql
+WITH numbered AS (
+  SELECT id, ROW_NUMBER() OVER (ORDER BY created_at ASC) AS nova_ordem
+  FROM biblioteca_prompts
+)
+UPDATE biblioteca_prompts
+SET ordem = numbered.nova_ordem
+FROM numbered
+WHERE biblioteca_prompts.id = numbered.id;
+```
 
-- A coluna `link_documento` ja e nullable no banco, entao nao precisa de migracao
-- A coluna `template` ja existe e e nullable — sera usada para o conteudo do prompt
-- O campo `template` tera um Textarea com label "Prompt / Template" e placeholder orientativo
-- O `onSubmit` deixara de sobrescrever `template` com `data.link_documento`
+Essa query:
+1. Ordena todos os prompts por `created_at` (data de criacao)
+2. Atribui uma numeracao sequencial de 1 a 69
+3. Atualiza a coluna `ordem` com o novo valor unico
 
-## Arquivo modificado
-1. `src/components/admin/bibliotecas/MetodoModal.tsx`
+### Nenhum arquivo de codigo precisa ser alterado
+A pagina `BibliotecaPrompts.tsx` ja ordena por `ordem` no frontend. Basta corrigir os dados no banco.
