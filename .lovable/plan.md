@@ -1,31 +1,47 @@
 
 
-# Adicionar prioridades P1 / P2 / P3 nos projetos Skills
+# Enriquecer criacao de projetos com IA
 
 ## Problema atual
-O campo de prioridade dos projetos usa os valores "Alta / Media / Baixa", mas o usuario precisa de **P1 / P2 / P3** como sistema de priorizacao.
+Ao criar um novo projeto, o botao "Gerar com IA" preenche **apenas a descricao**. Os demais campos (Area Impactada, Prioridade, Economia Estimada) precisam ser preenchidos manualmente. Projetos gerados automaticamente pela IA em lote ja vem com todos esses campos preenchidos, criando uma discrepancia.
 
 ## Solucao
 
-Alterar os valores armazenados e exibidos de prioridade em todos os componentes do modulo Skills (backlog) para usar `p1`, `p2`, `p3` em vez de `alta`, `media`, `baixa`.
+### 1. Atualizar a Edge Function `personalizar-projeto-skills`
 
-### Arquivos a alterar
+Alterar a funcao para usar **tool calling** em vez de texto livre, retornando um objeto estruturado com todos os campos:
 
-| Arquivo | O que muda |
+- `descricao` (texto)
+- `area_impactada` (texto)
+- `prioridade` (p1, p2 ou p3)
+- `horas_estimadas_economia` (numero)
+
+A funcao continuara recebendo os mesmos parametros (titulo, area_impactada, descricao_atual), mas agora retornara todos os campos de uma vez.
+
+### 2. Atualizar o `AddProjetoModal.tsx`
+
+No callback `handleGenerateAI`, apos receber a resposta da IA:
+
+- Preencher automaticamente `descricao`, `area`, `prioridade` e `horas` com os valores retornados
+- Apenas sobrescrever campos que estejam vazios ou permitir sobrescrita total (a IA preenche tudo de uma vez)
+- Todos os campos continuam editaveis apos o preenchimento pela IA — o usuario pode ajustar antes de salvar
+
+### 3. Atualizar o `ProjetoDetailModal.tsx`
+
+O botao "Personalizar com IA" no modal de edicao tambem deve atualizar todos os campos retornados (nao apenas descricao), chamando `onUpdate` para cada campo que a IA retornou.
+
+## Detalhes tecnicos
+
+| Componente | Alteracao |
 |---|---|
-| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Select: trocar opcoes para P1, P2, P3. Atualizar mapa de cores `prioridadeCores` para usar `p1`, `p2`, `p3` |
-| `src/components/skills/backlog/BacklogCard.tsx` | Atualizar mapa `prioridadeCores` e label exibido para P1/P2/P3 |
-| `src/components/skills/backlog/BacklogTable.tsx` | Atualizar mapa `prioridadeCores` e label exibido para P1/P2/P3 |
-| `src/components/skills/backlog/AddProjetoModal.tsx` | Select de prioridade: trocar opcoes de Alta/Media/Baixa para P1/P2/P3 |
-| `src/components/skills/backlog/BacklogView.tsx` | Filtro de prioridade: ajustar label para exibir "P1/P2/P3" em vez de "Alta/Media/Baixa" |
+| `supabase/functions/personalizar-projeto-skills/index.ts` | Trocar prompt de texto livre por tool calling que retorna objeto com `descricao`, `area_impactada`, `prioridade`, `horas_estimadas_economia` |
+| `src/components/skills/backlog/AddProjetoModal.tsx` | No `handleGenerateAI`, usar todos os campos retornados para preencher o formulario |
+| `src/components/skills/backlog/ProjetoDetailModal.tsx` | No handler de "Personalizar com IA", atualizar todos os campos retornados via `onUpdate` |
 
-### Detalhes
+## Comportamento esperado
 
-- **Valores no banco**: `p1`, `p2`, `p3` (substituindo `alta`, `media`, `baixa`)
-- **Labels de exibicao**: "P1", "P2", "P3"
-- **Cores**: P1 = vermelho (mesmo da "alta"), P2 = amarelo/verde (mesmo da "media"), P3 = verde claro (mesmo da "baixa")
-- **Opcao "Sem prioridade"**: mantida como esta (valor `null`)
-- Dados existentes com valores antigos ("alta", "media", "baixa") continuarao exibindo corretamente se o mapa de cores incluir ambos os conjuntos como fallback
-
-Nenhuma alteracao de banco de dados necessaria — o campo `prioridade` e do tipo texto e aceita qualquer valor.
+1. Usuario digita apenas o titulo do projeto
+2. Clica em "Gerar com IA"
+3. Todos os campos do formulario sao preenchidos automaticamente (descricao, area, prioridade, economia)
+4. Usuario revisa, ajusta o que quiser e clica em "Adicionar"
 
