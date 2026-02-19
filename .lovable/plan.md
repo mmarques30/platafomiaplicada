@@ -1,51 +1,78 @@
 
 
-# Explorar Todas as Trilhas com Filtros
+# Corrigir Resumo de Atualizacoes - Dados incompletos e estrutura ruim
 
-## Problema atual
-A pagina `/trilhas` mostra apenas as **3 trilhas mais recentes** com no maximo 20 videos. Existem **5 trilhas ativas** com **46 videos** no total, mas o mentorado nao consegue acessar trilhas mais antigas.
+## Problemas identificados
+
+1. **Dados cortados**: Existem 116 registros de auditoria nos ultimos 7 dias, mas o codigo envia apenas 80 para a IA (e busca no maximo 200). Muitos INSERTs de prompts, videos e ia_copie_use ficam de fora.
+2. **Prompt da IA generico demais**: O prompt nao instrui a IA a organizar por **categoria/tema** dos itens, nem a usar os nomes corretos das tabelas (ex: `ia_copie_use` deveria aparecer como "IA Copie e Use", `biblioteca_prompts` como "Prompts").
+3. **Pre-processamento fraco**: O JSON enviado a IA e uma lista plana sem agrupamento. A IA recebe dados brutos e nao consegue organizar bem.
+4. **Categoria nao e enviada**: O campo `categoria` existe nos dados da auditoria mas nao e extraido no mapeamento dos registros.
 
 ## Solucao
 
-Reestruturar a pagina `/trilhas` para ter **duas secoes**:
+Alterar o edge function `gerar-resumo-atualizacoes` em 3 frentes:
 
-### 1. Secao "Ultimos conteudos" (topo)
-Manter o comportamento atual como preview -- os 3 carrosseis mais recentes com os cards no formato Reels (aspecto 9/16), sem alterar tamanhos.
+### 1. Aumentar limite e remover corte arbitrario
+- Subir o `.limit(200)` para `.limit(500)` na query
+- Remover o `.slice(0, 80)` - usar todos os registros
+- Pre-agrupar os dados no backend antes de enviar a IA
 
-### 2. Nova secao "Todas as Trilhas" (abaixo)
-Uma grade com **todas as 5 trilhas ativas**, cada uma como um card visual (usando imagem da trilha) com:
-- Nome da trilha
-- Categoria (nucleo, profissao, aulas semanais)
-- Numero da trilha na ordem (Trilha 1, 2, 3...)
-- Quantidade de videos
-- Link para acessar a trilha completa
+### 2. Pre-agrupar dados por tabela/tema no backend
+Em vez de enviar uma lista plana, agrupar os registros por tabela e dentro de cada tabela separar por operacao (INSERT vs UPDATE). Incluir o campo `categoria` quando disponivel.
 
-### 3. Barra de filtros
-Acima da grade "Todas as Trilhas", incluir filtros simples:
-- **Ordenar por**: Mais recentes / Mais antigos / Ordem padrao
-- **Filtrar por categoria**: Todas / nucleo / profissao / aulas semanais
+Mapa de nomes amigaveis das tabelas:
+- `videos` -> "Videos"
+- `modulos` -> "Modulos"
+- `trilhas` -> "Trilhas"
+- `biblioteca_prompts` -> "Prompts"
+- `ia_copie_use` -> "IA Copie e Use"
+- `ferramentas_ia` -> "Ferramentas de IA"
+- `metodos_aplicar` -> "Metodos para Aplicar"
+- `materiais_gratuitos` -> "Materiais Gratuitos"
 
-## Detalhes tecnicos
+Formato do JSON enviado a IA:
 
-### Arquivo: `src/pages/Trilhas.tsx`
-- Adicionar a secao "Todas as Trilhas" abaixo do componente `UltimosConteudos`
-- Importar o novo componente `TodasAsTrilhas`
+```text
+{
+  "periodo": "7 dias",
+  "total_alteracoes": 116,
+  "por_categoria": {
+    "Videos": {
+      "adicionados": ["Titulo 1", "Titulo 2"],
+      "atualizados": [{"titulo": "X", "campos": ["ordem"]}]
+    },
+    "Prompts": {
+      "adicionados_por_tema": {
+        "Vendas": ["Email Follow-up B2B", "Pesquisa de Mercado"],
+        "Analise de Dados": ["Relatorio IMRAD", "Comparativo"],
+        "Produtividade": ["Aspas Triplas", "Colchetes"]
+      }
+    },
+    "IA Copie e Use": {
+      "adicionados": ["Dashboard Financeiro", "Gestao de Rotina"]
+    }
+  }
+}
+```
 
-### Novo arquivo: `src/components/dashboard/TodasAsTrilhas.tsx`
-- Query: buscar todas as trilhas ativas com `visivel_mentorados = true`, incluindo contagem de videos
-- Filtros locais (useState) para ordenacao e categoria
-- Renderizar usando o componente `TrilhaCard` existente (que ja tem o visual com imagem e aspect ratio grande)
-- Exibir label "Trilha N" baseado no campo `ordem`
-- Grid responsivo: 1 coluna mobile, 2 tablet, 3-4 desktop
+### 3. Melhorar o prompt da IA
+Reescrever o system prompt para:
+- Organizar o resumo por **secoes tematicas** (Videos, Prompts, IA Copie e Use, etc.)
+- Dentro de cada secao, sub-agrupar por categoria/tema quando disponivel
+- Usar o formato numerico (ex: "33 novos prompts adicionados") quando ha muitos itens
+- Listar por nome quando ha poucos itens (menos de 10)
+- Manter formato WhatsApp/Telegram com emojis
+- Usar modelo `google/gemini-2.5-flash` (mais capaz que o flash-lite) como primario
 
-### Componentes mantidos sem alteracao
-- `VideoCardVertical` -- formato Reels preservado
-- `TrilhaCarousel` -- carrosseis preservados
-- `UltimosConteudos` -- secao de recentes inalterada
-- `TrilhaCard` -- card visual reutilizado na grade
+### 4. Modelo primario
+Trocar de `google/gemini-2.5-flash-lite` para `google/gemini-2.5-flash` para melhor qualidade de texto organizado.
 
-### O que NAO muda
-- Nenhum card tera seu tamanho reduzido
-- O formato Reels (9/16) dos video cards continua identico
-- Os carrosseis existentes continuam funcionando normalmente
+## Arquivo alterado
+- `supabase/functions/gerar-resumo-atualizacoes/index.ts`
+
+## O que NAO muda
+- Frontend (`ResumoTab.tsx`) continua identico
+- Tabela `auditoria_conteudo` inalterada
+- Triggers existentes mantidos
 
