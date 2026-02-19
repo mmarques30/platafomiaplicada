@@ -5453,6 +5453,7 @@ export type Database = {
           ativo: boolean | null
           bloqueada: boolean | null
           categoria: string
+          classificacao: string | null
           cohost_nome: string | null
           created_at: string | null
           descricao: string | null
@@ -5474,6 +5475,7 @@ export type Database = {
           ativo?: boolean | null
           bloqueada?: boolean | null
           categoria: string
+          classificacao?: string | null
           cohost_nome?: string | null
           created_at?: string | null
           descricao?: string | null
@@ -5495,6 +5497,7 @@ export type Database = {
           ativo?: boolean | null
           bloqueada?: boolean | null
           categoria?: string
+          classificacao?: string | null
           cohost_nome?: string | null
           created_at?: string | null
           descricao?: string | null

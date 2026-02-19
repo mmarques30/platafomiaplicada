@@ -1,0 +1,1 @@
+ALTER TABLE public.trilhas ADD COLUMN classificacao text;

@@ -31,6 +31,10 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
   const [showCustomCategoria, setShowCustomCategoria] = useState(false);
   const [categorias, setCategorias] = useState<string[]>([]);
   const [loadingCategorias, setLoadingCategorias] = useState(false);
+  const [selectedClassificacao, setSelectedClassificacao] = useState<string>("");
+  const [showCustomClassificacao, setShowCustomClassificacao] = useState(false);
+  const [classificacoes, setClassificacoes] = useState<string[]>([]);
+  const [loadingClassificacoes, setLoadingClassificacoes] = useState(false);
 
   const { data: nextOrdem } = useNextOrdem("trilhas", undefined, open && !trilha);
   
@@ -40,6 +44,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       descricao: "",
       nivel: "iniciante",
       categoria: "núcleo",
+      classificacao: "",
       ordem: 0,
       ativo: true,
       visivel_mentorados: false,
@@ -55,14 +60,17 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
   useEffect(() => {
     if (open) {
       fetchCategorias();
+      fetchClassificacoes();
     }
     
     if (trilha) {
       reset(trilha);
       const cat = trilha.categoria || "núcleo";
       setSelectedCategoria(cat);
-      // Show custom input if category isn't in the loaded list
       setShowCustomCategoria(categorias.length > 0 && !categorias.includes(cat));
+      const classif = trilha.classificacao || "";
+      setSelectedClassificacao(classif);
+      setShowCustomClassificacao(classif !== "" && classificacoes.length > 0 && !classificacoes.includes(classif));
       setImagePreview(trilha.imagem_url || "");
       setImageFile(null);
       setValue("visivel_mentorados", trilha.visivel_mentorados ?? false);
@@ -75,6 +83,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         descricao: "",
         nivel: "iniciante",
         categoria: "núcleo",
+        classificacao: "",
         ordem: nextOrdem ?? 1,
         ativo: true,
         visivel_mentorados: false,
@@ -87,6 +96,8 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       });
       setSelectedCategoria("núcleo");
       setShowCustomCategoria(false);
+      setSelectedClassificacao("");
+      setShowCustomClassificacao(false);
       setImagePreview("");
       setImageFile(null);
     }
@@ -119,6 +130,29 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       toast.error("Erro ao carregar categorias");
     } finally {
       setLoadingCategorias(false);
+    }
+  };
+
+  const fetchClassificacoes = async () => {
+    setLoadingClassificacoes(true);
+    try {
+      const { data, error } = await supabase
+        .from("trilhas")
+        .select("classificacao")
+        .not("classificacao", "is", null)
+        .order("classificacao");
+
+      if (error) throw error;
+
+      const unique = Array.from(
+        new Set(data?.map((t) => t.classificacao!.trim()).filter(Boolean) || [])
+      ).sort();
+      
+      setClassificacoes(unique);
+    } catch (error) {
+      console.error("Error fetching classificacoes:", error);
+    } finally {
+      setLoadingClassificacoes(false);
     }
   };
 
@@ -282,6 +316,55 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
             )}
             <p className="text-xs text-muted-foreground">
               Selecione uma categoria existente ou escolha "Outra..." para criar uma nova
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Classificação (visível para alunos)</Label>
+            <Select
+              value={showCustomClassificacao ? "__custom__" : (selectedClassificacao || "__none__")}
+              onValueChange={(value) => {
+                if (value === "__custom__") {
+                  setShowCustomClassificacao(true);
+                  setSelectedClassificacao("");
+                  setValue("classificacao", "");
+                } else if (value === "__none__") {
+                  setShowCustomClassificacao(false);
+                  setSelectedClassificacao("");
+                  setValue("classificacao", "");
+                } else {
+                  setShowCustomClassificacao(false);
+                  setSelectedClassificacao(value);
+                  setValue("classificacao", value);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma classificação..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">Sem classificação</SelectItem>
+                {!loadingClassificacoes && ["Aprendizado Inicial", "Produtividade", "Rotina", "Carreira", "Avançado", "Bônus"].map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+                {classificacoes.filter(c => !["Aprendizado Inicial", "Produtividade", "Rotina", "Carreira", "Avançado", "Bônus"].includes(c)).map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+                <SelectItem value="__custom__">Outra...</SelectItem>
+              </SelectContent>
+            </Select>
+            {showCustomClassificacao && (
+              <Input
+                placeholder="Digite o nome da nova classificação"
+                value={selectedClassificacao}
+                onChange={(e) => {
+                  setSelectedClassificacao(e.target.value);
+                  setValue("classificacao", e.target.value);
+                }}
+              />
+            )}
+            <p className="text-xs text-muted-foreground">
+              Descreve o que o aluno vai aprender (ex: Produtividade, Rotina, Carreira)
             </p>
           </div>
 
