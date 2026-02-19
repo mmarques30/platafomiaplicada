@@ -232,18 +232,18 @@ function MinhaAnaliseContent({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
               <p className="text-xs text-muted-foreground">Horas economizadas/semana</p>
               <p className="mt-1 text-xl font-bold text-foreground">{economia.horasSemana || 0}h</p>
             </div>
-            <div className="text-center">
+            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
               <p className="text-xs text-muted-foreground">Economia estimada</p>
               <p className="mt-1 text-xl font-bold text-[hsl(72,50%,35%)]">
                 {economia.economiaEstimada || `${economia.horasSemana || 0}h/sem`}
               </p>
             </div>
-            <div className="text-center">
+            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
               <p className="text-xs text-muted-foreground">Valor potencial mensal</p>
               <p className="mt-1 text-xl font-bold text-foreground">
                 R$ {(economia.valorMensal || 0).toLocaleString("pt-BR")}
@@ -299,9 +299,9 @@ function MinhaAnaliseContent({
 
 function ProfileItem({ label, value }: { label: string; value: string }) {
   return (
-    <div>
+    <div className="rounded-lg border border-border bg-muted/50 p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-0.5 text-sm font-medium text-foreground">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-foreground">{value}</p>
     </div>
   );
 }
