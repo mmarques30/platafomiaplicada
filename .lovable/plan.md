@@ -1,22 +1,24 @@
 
-# Adicionar opcao "Todos" nos filtros do FilterBar
+# Melhorar modal de Metodos para Aplicar
 
 ## Problema
-Nos filtros do `FilterBar` (usado em Prompts e outros), ao selecionar um valor como "Intermediario", nao ha como voltar a ver todos os itens porque falta uma opcao de reset ("Todos") no dropdown.
-
-## Solucao
-Adicionar automaticamente uma opcao "Todos" (usando o texto do `placeholder`) como primeiro item de cada `Select` no `FilterBar`, com valor vazio (`""`), permitindo limpar o filtro.
+O campo "Link do Documento" esta marcado como obrigatorio, mas um metodo pode ser apenas um prompt de personalizacao, sem link externo.
 
 ## Mudanca
 
-### `src/components/admin/content/FilterBar.tsx`
-- Dentro do `SelectContent`, antes do map de `filter.options`, adicionar:
-  ```
-  <SelectItem value="__all__">placeholder do filtro (ex: "Todos os niveis")</SelectItem>
-  ```
-- No `onValueChange`, converter `"__all__"` para `""` (string vazia) para manter compatibilidade com a logica existente de filtragem
+### `src/components/admin/bibliotecas/MetodoModal.tsx`
+1. Remover `required` da validacao do campo `link_documento` (linha 105)
+2. Remover o asterisco `*` do label "Link do Documento" (linha 100)
+3. Atualizar o texto auxiliar para indicar que e opcional
+4. Adicionar um campo `template` (Textarea) para permitir inserir o conteudo do prompt diretamente, com placeholder explicativo — ja que a coluna `template` existe na tabela e e nullable
+5. Ajustar o `onSubmit` para usar o campo `template` diretamente ao inves de forcar "Via documento externo"
 
-Obs: Usar `"__all__"` como valor porque o Radix Select nao aceita string vazia como value de um `SelectItem`.
+## Detalhes
+
+- A coluna `link_documento` ja e nullable no banco, entao nao precisa de migracao
+- A coluna `template` ja existe e e nullable — sera usada para o conteudo do prompt
+- O campo `template` tera um Textarea com label "Prompt / Template" e placeholder orientativo
+- O `onSubmit` deixara de sobrescrever `template` com `data.link_documento`
 
 ## Arquivo modificado
-1. `src/components/admin/content/FilterBar.tsx`
+1. `src/components/admin/bibliotecas/MetodoModal.tsx`
