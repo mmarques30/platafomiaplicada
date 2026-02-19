@@ -138,7 +138,7 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
-            {item.origem === "ia" && <Zap className="h-4 w-4 text-amber-500" />}
+            
             {onUpdate ? (
               <Input
                 value={tituloValue}
@@ -186,9 +186,9 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                 {item.prioridade.toUpperCase()}
               </Badge>
             ) : null}
-            {item.origem && (
+            {item.origem === "ia" && (
               <Badge variant="secondary" className="text-xs">
-                {item.origem === "ia" ? "Gerado por IA" : "Manual"}
+                Diagnóstico
               </Badge>
             )}
           </div>
