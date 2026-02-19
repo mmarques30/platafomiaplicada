@@ -23,7 +23,19 @@ function agruparRegistros(registros: any[]) {
   const agrupado: Record<string, { adicionados: any[]; atualizados: any[]; removidos: any[]; adicionados_por_tema: Record<string, string[]> }> = {};
 
   for (const r of registros) {
-    const nomeAmigavel = TABELA_NOMES[r.tabela] || r.tabela;
+    const titulo = dados.titulo || dados.nome || dados.tema || dados.name || "(sem título)";
+    let nomeAmigavel = TABELA_NOMES[r.tabela] || r.tabela;
+    if (r.tabela === 'conteudos_dashboard') {
+      const tipo = dados.tipo;
+      const TIPO_NOMES: Record<string, string> = {
+        newsletter: 'Newsletters',
+        noticia: 'Notícias',
+        dica: 'Dicas',
+        material: 'Materiais da Central',
+        criador: 'Criadores de Conteúdo',
+      };
+      nomeAmigavel = TIPO_NOMES[tipo] || 'Central de Conteúdos';
+    }
     if (!agrupado[nomeAmigavel]) {
       agrupado[nomeAmigavel] = { adicionados: [], atualizados: [], removidos: [], adicionados_por_tema: {} };
     }
@@ -162,8 +174,11 @@ REGRAS DE FORMATAÇÃO:
    - 🎯 Trilhas
    - 💡 Métodos para Aplicar
    - 📄 Materiais Gratuitos
-
-3. Dentro de cada seção:
+   - 📰 Newsletters
+   - 📣 Notícias
+   - 💡 Dicas
+   - 📦 Materiais da Central
+   - 👤 Criadores de Conteúdo
    - Se houver "adicionados_por_tema", organize por tema/categoria (ex: "**Vendas:** item1, item2")
    - Se houver "adicionados" sem tema, liste os itens
    - Se houver mais de 10 itens em uma categoria, use formato numérico: "33 novos prompts adicionados"
