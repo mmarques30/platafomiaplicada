@@ -51,6 +51,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       bloqueada: false,
       imagem_url: "",
       duracao_estimada: 0,
+      cohost_nome: "",
     },
   });
 
@@ -82,6 +83,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         bloqueada: false,
         imagem_url: "",
         duracao_estimada: 0,
+        cohost_nome: "",
       });
       setSelectedCategoria("núcleo");
       setImagePreview("");
@@ -328,6 +330,14 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
                 Recomendado: 1920x1080px, máximo 2MB
               </p>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Cohost / Responsável</Label>
+            <Input {...register("cohost_nome")} placeholder="Ex: Nome do co-apresentador" />
+            <p className="text-xs text-muted-foreground">
+              Opcional. Quem vai gravar além de você.
+            </p>
           </div>
 
           <div className="space-y-2">

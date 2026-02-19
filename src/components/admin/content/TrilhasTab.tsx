@@ -142,6 +142,7 @@ export function TrilhasTab() {
               <TableHead>Título</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Nível</TableHead>
+              <TableHead>Cohost</TableHead>
               <TableHead>Módulos</TableHead>
               <TableHead>Vídeos</TableHead>
               <TableHead>Materiais</TableHead>
@@ -185,6 +186,13 @@ export function TrilhasTab() {
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{trilha.nivel}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    {trilha.cohost_nome ? (
+                      <span className="text-sm">{trilha.cohost_nome}</span>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">—</span>
+                    )}
                   </TableCell>
                   
                   <TableCell>
