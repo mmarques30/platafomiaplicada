@@ -20,7 +20,6 @@ export function useSkillsEquipeDiagnostico() {
     queryFn: async () => {
       if (!equipeId) return null;
 
-      // Buscar membros ativos da equipe com perfil
       const { data: membrosData, error: membrosError } = await supabase
         .from("membros_equipe_skills")
         .select(`
@@ -37,12 +36,21 @@ export function useSkillsEquipeDiagnostico() {
       // Buscar diagnósticos da equipe
       const { data: diagnosticosData, error: diagError } = await supabase
         .from("diagnosticos_skills")
-        .select("user_id, completado, insight_ia")
+        .select("user_id, completado, insight_ia, versao")
         .eq("equipe_id", equipeId);
       if (diagError) throw diagError;
 
+      // Agrupar por user e usar versão mais recente
+      const latestByUser = new Map<string, any>();
+      for (const d of (diagnosticosData || [])) {
+        const existing = latestByUser.get(d.user_id);
+        if (!existing || (d.versao || 1) > (existing.versao || 1)) {
+          latestByUser.set(d.user_id, d);
+        }
+      }
+
       const membros: MembroDiagnostico[] = (membrosData || []).map((m: any) => {
-        const diag = diagnosticosData?.find((d) => d.user_id === m.user_id);
+        const diag = latestByUser.get(m.user_id);
         return {
           userId: m.user_id,
           nome: m.profiles?.nome_completo || "Usuário",

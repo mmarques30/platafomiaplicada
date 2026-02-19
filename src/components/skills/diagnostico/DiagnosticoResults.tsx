@@ -1,8 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   CheckCircle2,
@@ -14,6 +12,7 @@ import {
   BarChart3,
   Award,
   RefreshCw,
+  Plus,
 } from "lucide-react";
 import type { DiagnosticoSkills } from "@/hooks/useSkillsDiagnostico";
 import { useSkillsEquipe } from "@/hooks/useSkillsEquipe";
@@ -23,13 +22,23 @@ import EquipeConsolidadoView from "./EquipeConsolidadoView";
 interface DiagnosticoResultsProps {
   onRefill?: () => void;
   diagnostico?: DiagnosticoSkills;
+  versoes?: DiagnosticoSkills[];
+  versaoSelecionada?: number | null;
+  onSelecionarVersao?: (v: number) => void;
+  onNovoDiagnostico?: () => void;
 }
 
-export default function DiagnosticoResults({ onRefill, diagnostico }: DiagnosticoResultsProps) {
+export default function DiagnosticoResults({
+  onRefill,
+  diagnostico,
+  versoes = [],
+  versaoSelecionada,
+  onSelecionarVersao,
+  onNovoDiagnostico,
+}: DiagnosticoResultsProps) {
   const insight = diagnostico?.insight_ia;
   const hasRealData = !!insight;
   const { consolidado, isLoading: equipeLoading } = useSkillsEquipe();
-  
 
   if (!hasRealData) {
     return (
@@ -65,7 +74,33 @@ export default function DiagnosticoResults({ onRefill, diagnostico }: Diagnostic
       </TabsList>
 
       <TabsContent value="minha-analise">
-        <MinhaAnaliseContent diagnostico={diagnostico} onRefill={onRefill} insight={insight} />
+        {/* Seletor de versões */}
+        {versoes.length > 0 && (
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            {versoes
+              .slice()
+              .sort((a, b) => (a.versao || 1) - (b.versao || 1))
+              .map((v) => (
+                <Button
+                  key={v.versao}
+                  variant={versaoSelecionada === v.versao ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onSelecionarVersao?.(v.versao || 1)}
+                  className={versaoSelecionada === v.versao ? "bg-[hsl(72,50%,35%)] text-white hover:bg-[hsl(72,50%,30%)]" : ""}
+                >
+                  Diagnóstico v{v.versao}
+                </Button>
+              ))}
+            {onNovoDiagnostico && (
+              <Button variant="outline" size="sm" onClick={onNovoDiagnostico}>
+                <Plus className="h-4 w-4 mr-1" />
+                Novo Diagnóstico
+              </Button>
+            )}
+          </div>
+        )}
+
+        <MinhaAnaliseContent diagnostico={diagnostico} onRefill={onRefill} insight={insight} onNovoDiagnostico={onNovoDiagnostico} versoes={versoes} />
       </TabsContent>
 
       <TabsContent value="equipe">
@@ -114,16 +149,23 @@ function MinhaAnaliseContent({
   diagnostico,
   onRefill,
   insight,
+  onNovoDiagnostico,
+  versoes,
 }: {
   diagnostico?: DiagnosticoSkills;
   onRefill?: () => void;
   insight: any;
+  onNovoDiagnostico?: () => void;
+  versoes?: DiagnosticoSkills[];
 }) {
   const perfil = insight.perfil || {};
   const processos = insight.processos || [];
   const economia = insight.economia || {};
   const trilha = insight.trilha || {};
-  const insights = insight.insights || {};
+
+  const proximaVersao = versoes && versoes.length > 0
+    ? Math.max(...versoes.map(v => v.versao || 1)) + 1
+    : 2;
 
   return (
     <div className="space-y-6">
@@ -212,7 +254,6 @@ function MinhaAnaliseContent({
         </CardContent>
       </Card>
 
-
       {/* Trilha Personalizada */}
       {trilha.modulos?.length > 0 && (
         <Card className="border-border bg-card">
@@ -242,10 +283,10 @@ function MinhaAnaliseContent({
               <p className="text-sm text-muted-foreground">Tempo estimado: {trilha.tempoEstimado}</p>
             )}
             <div className="flex gap-2">
-              {onRefill && (
-                <Button variant="outline" onClick={onRefill}>
-                  <RefreshCw className="h-4 w-4" />
-                  Refazer Diagnóstico
+              {onNovoDiagnostico && (
+                <Button variant="outline" onClick={onNovoDiagnostico}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Novo Diagnóstico (v{proximaVersao})
                 </Button>
               )}
             </div>

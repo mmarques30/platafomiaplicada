@@ -8,23 +8,31 @@ import { Loader2 } from "lucide-react";
 export default function ProjetoSkillsDiagnostico() {
   const {
     diagnostico,
+    versoes,
+    versaoSelecionada,
+    criandoNovo,
     isLoading,
     isProcessing,
     isSaving,
     saveAndProcess,
     saveRascunho,
     hasInsight,
+    iniciarNovoDiagnostico,
+    cancelarNovoDiagnostico,
+    selecionarVersao,
   } = useSkillsDiagnostico();
 
   // Estado local apenas para controlar transição submit → processing → results
   const [manualState, setManualState] = useState<"idle" | "processing" | "results">("idle");
 
   // Estado derivado: prioridade para manualState durante submit flow
-  const currentView = manualState === "processing" || isProcessing
-    ? "processing"
-    : manualState === "results" || (diagnostico?.completado && hasInsight)
-      ? "results"
-      : "form";
+  const currentView = criandoNovo
+    ? "form"
+    : manualState === "processing" || isProcessing
+      ? "processing"
+      : manualState === "results" || (diagnostico?.completado && hasInsight)
+        ? "results"
+        : "form";
 
   const handleSubmit = async (formData: Record<string, any>) => {
     setManualState("processing");
@@ -38,6 +46,16 @@ export default function ProjetoSkillsDiagnostico() {
 
   const handleResetForm = () => {
     setManualState("idle");
+  };
+
+  const handleNovoDiagnostico = () => {
+    setManualState("idle");
+    iniciarNovoDiagnostico();
+  };
+
+  const handleCancelarNovo = () => {
+    cancelarNovoDiagnostico();
+    setManualState("results");
   };
 
   if (isLoading) {
@@ -57,6 +75,10 @@ export default function ProjetoSkillsDiagnostico() {
       <DiagnosticoResults
         onRefill={handleResetForm}
         diagnostico={diagnostico}
+        versoes={versoes}
+        versaoSelecionada={versaoSelecionada}
+        onSelecionarVersao={selecionarVersao}
+        onNovoDiagnostico={handleNovoDiagnostico}
       />
     );
   }
@@ -66,7 +88,8 @@ export default function ProjetoSkillsDiagnostico() {
       onSubmit={handleSubmit}
       onSaveRascunho={saveRascunho}
       isSaving={isSaving || isProcessing}
-      initialData={diagnostico}
+      initialData={criandoNovo ? undefined : diagnostico}
+      onCancel={criandoNovo ? handleCancelarNovo : undefined}
     />
   );
 }

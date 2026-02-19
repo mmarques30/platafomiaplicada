@@ -58,6 +58,7 @@ interface DiagnosticoFormProps {
   onSaveRascunho?: (formData: Record<string, any>) => void;
   isSaving?: boolean;
   initialData?: Record<string, any> | null;
+  onCancel?: () => void;
 }
 
 function mapDbToForm(data: Record<string, any> | null | undefined): Record<string, any> {
@@ -124,7 +125,7 @@ function mapDbToForm(data: Record<string, any> | null | undefined): Record<strin
   };
 }
 
-export default function DiagnosticoForm({ onSubmit, onSaveRascunho, isSaving, initialData }: DiagnosticoFormProps) {
+export default function DiagnosticoForm({ onSubmit, onSaveRascunho, isSaving, initialData, onCancel }: DiagnosticoFormProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<Record<string, any>>(() => mapDbToForm(initialData));
 

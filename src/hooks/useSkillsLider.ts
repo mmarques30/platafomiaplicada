@@ -357,8 +357,17 @@ export function useSkillsLider() {
 
       const { data: diagnosticosData } = await supabase
         .from("diagnosticos_skills")
-        .select("user_id, completado")
+        .select("user_id, completado, versao")
         .eq("equipe_id", equipeId);
+
+      // Use latest version per user
+      const latestDiagByUser = new Map<string, any>();
+      for (const d of (diagnosticosData || [])) {
+        const existing = latestDiagByUser.get(d.user_id);
+        if (!existing || (d.versao || 1) > (existing.versao || 1)) {
+          latestDiagByUser.set(d.user_id, d);
+        }
+      }
 
       const { data: entregasData } = await supabase
         .from("entregas_skills")
@@ -376,7 +385,7 @@ export function useSkillsLider() {
           avatar_url: m.profiles?.avatar_url,
           cargo: m.cargo,
           papel: m.papel,
-          diagnostico_completo: diagnosticosData?.find(d => d.user_id === m.user_id)?.completado || false,
+          diagnostico_completo: latestDiagByUser.get(m.user_id)?.completado || false,
           entregas_concluidas: entregasConcluidas,
           total_entregas: totalEntregas,
         };
