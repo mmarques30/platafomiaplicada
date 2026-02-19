@@ -1,44 +1,60 @@
 
-# Links clicáveis da MarIAna para trilhas e vídeos
+# Historico Persistente no Drawer da MarIAna
 
-## Objetivo
+## Problema atual
 
-Fazer a MarIAna gerar links Markdown clicáveis para trilhas e vídeos da plataforma, em vez de apenas mencionar nomes em texto. No frontend, o ReactMarkdown já renderiza links -- basta a IA gerar os links corretos no texto.
+1. O drawer inicia sempre vazio (`useState<Message[]>([])`) -- nenhum historico e carregado
+2. O bloco de salvamento (linha 182-193) salva TODAS as mensagens do array a cada troca, causando duplicatas massivas na tabela `chat_messages`
+3. Ao fechar e reabrir o drawer, a conversa se perde completamente
 
-## Alterações
+## Alteracoes
 
-### 1. Edge Function: `supabase/functions/ai-chat-user/index.ts`
+### `src/components/shared/MarIAnaChatDrawer.tsx`
 
-**Trilhas** (linha ~467): incluir o `id` na query de trilhas (já tem titulo, descricao, nivel) e formatar no prompt com link Markdown:
+#### 1. Carregar historico ao abrir (useEffect)
+
+Adicionar um `useEffect` que roda quando o componente monta (e `user` esta disponivel):
+
+- Query: `supabase.from("chat_messages").select("role, content, created_at").eq("user_id", user.id).order("created_at", { ascending: true }).limit(50)`
+- Carregar as ultimas 50 mensagens no state `messages`
+- Adicionar estado `isLoadingHistory` para mostrar um spinner enquanto carrega
+
+#### 2. Corrigir salvamento duplicado
+
+O bloco atual (linhas 182-193) salva o array inteiro de mensagens a cada resposta. Corrigir para salvar APENAS as 2 novas mensagens (a do usuario e a da assistente):
+
 ```
-- [Nome da Trilha](/trilhas/{trilha_id}) - descricao
+// Antes (ERRADO - salva tudo de novo):
+const finalMessages = [...messagesToSend, { role: "assistant", ... }];
+await Promise.all(finalMessages.map(...));
+
+// Depois (CORRETO - salva so as novas):
+await supabase.from("chat_messages").insert([
+  { user_id: user.id, role: "user", content: messageToSend },
+  { user_id: user.id, role: "assistant", content: assistantContent },
+]);
 ```
 
-**Vídeos** (linha ~534): já temos `id` e `trilhas.id` na query (precisamos adicionar `trilha_id` explicitamente). Formatar com link Markdown:
-```
-- [Nome do Vídeo](/trilhas/{trilha_id}?video={video_id}) - descrição
-```
+#### 3. Botao "Nova conversa"
 
-**Módulos** (linha ~554): incluir `trilha_id` na query e formatar:
-```
-- [Nome do Módulo](/trilhas/{trilha_id}) - descrição
-```
+Adicionar um botao no header (ao lado do botao de maximizar) que:
+- Limpa o state `messages` para `[]`
+- Nao apaga mensagens do banco (historico persiste)
+- Mostra as sugestoes iniciais novamente
 
-**Instruções ao modelo** (bloco de recomendação ~560): adicionar instrução explícita para usar os links Markdown ao mencionar conteúdos, no formato `[Nome do Conteúdo](/trilhas/xxx)`.
+#### 4. Estado de carregamento
 
-### 2. Frontend: `src/components/shared/MarIAnaChatDrawer.tsx`
+Enquanto o historico carrega, exibir um skeleton/spinner em vez da tela vazia com sugestoes. Apos carregar:
+- Se tem mensagens: exibe o historico
+- Se nao tem: exibe as sugestoes normalmente
 
-Configurar o `ReactMarkdown` para renderizar links (`<a>`) com navegação interna usando `react-router-dom`. Adicionar um `components` override no ReactMarkdown para que links internos (que começam com `/`) usem `navigate()` em vez de recarregar a página.
+### Limpeza de duplicatas (opcional)
 
-### 3. Frontend: Mesma lógica para a página `/chat` (se existir ReactMarkdown lá)
+Rodar uma query SQL para limpar as duplicatas existentes na tabela `chat_messages`, mantendo apenas a primeira ocorrencia de cada mensagem por usuario.
 
-Verificar e aplicar o mesmo override de links internos no componente de chat completo para consistência.
+## Resultado
 
-## Detalhes técnicos
-
-- Os links serão gerados em Markdown (`[texto](url)`) pela IA e renderizados pelo ReactMarkdown que já está no drawer
-- Links internos (começando com `/`) serão interceptados com `onClick` + `navigate()` para evitar reload da página
-- Links externos continuam abrindo normalmente com `target="_blank"`
-- As URLs seguem o padrão existente: `/trilhas/{trilha_id}` para trilhas e `/trilhas/{trilha_id}?video={video_id}` para vídeos
-- A query de trilhas precisa do campo `id` adicionado ao select (atualmente só tem titulo, descricao, nivel)
-- A query de vídeos já tem `id` mas precisa de `trilha_id` explícito no select para montar a URL
+- O drawer abre com a conversa anterior restaurada
+- Novas mensagens sao salvas sem duplicacao
+- O usuario pode iniciar uma nova conversa limpa quando quiser
+- A pagina `/chat` completa tambem pode se beneficiar desse mesmo historico
