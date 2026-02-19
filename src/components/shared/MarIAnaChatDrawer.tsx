@@ -317,7 +317,33 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
                 {message.role === "assistant" ? (
                   <div className="flex items-start gap-1">
                     <div className="prose prose-xs dark:prose-invert max-w-none text-sm">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          a: ({ href, children }) => {
+                            if (href?.startsWith("/")) {
+                              return (
+                                <a
+                                  href={href}
+                                  className="text-primary underline hover:text-primary/80 cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    navigate(href);
+                                    onClose();
+                                  }}
+                                >
+                                  {children}
+                                </a>
+                              );
+                            }
+                            return (
+                              <a href={href} target="_blank" rel="noopener noreferrer">
+                                {children}
+                              </a>
+                            );
+                          },
+                        }}
+                      >
                         {message.content}
                       </ReactMarkdown>
                     </div>
