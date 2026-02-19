@@ -1,48 +1,34 @@
 
-# Agrupar Modulos por Trilha no Dropdown de Videos
+# Remover Filtros "Todos" Duplicados
 
 ## Problema
-Ao adicionar ou editar um video, o dropdown de modulos exibe uma lista plana com "Trilha -- Modulo", dificultando a navegacao quando ha muitos modulos. O ideal e agrupar os modulos por trilha, com a trilha como cabecalho visual.
+O componente `FilterBar` ja adiciona automaticamente uma opcao "ver todos" usando o `placeholder` do filtro (com valor `__all__`). Porem, cada aba (TrilhasTab, ModulosTab, VideosTab) tambem inclui manualmente uma opcao "Todos/Todas" dentro do array `options`, resultando em duas opcoes de reset duplicadas em cada dropdown.
 
 ## Solucao
-Modificar o `SelectContent` no componente `VideoModal.tsx` para agrupar os modulos por trilha usando `SelectGroup` e `SelectLabel` do Radix UI.
+Remover as opcoes manuais de "Todos/Todas" do array `options` de cada filtro nas 3 abas. O `FilterBar` ja cuida disso automaticamente.
 
 ## Detalhes tecnicos
 
-### Arquivo: `src/components/admin/content/VideoModal.tsx`
+### Arquivo: `src/components/admin/content/TrilhasTab.tsx`
+Remover estas linhas dos arrays de options:
+- Linha 87: `{ value: 'todas', label: 'Todas as categorias' }`
+- Linha 101: `{ value: 'todos', label: 'Todos os niveis' }`
+- Linha 114: `{ value: 'todos', label: 'Todos os status' }`
+- E o equivalente no filtro de visibilidade
 
-**O que muda (linhas 296-303)**:
+### Arquivo: `src/components/admin/content/ModulosTab.tsx`
+Remover:
+- Linha 73: `{ value: 'todas', label: 'Todas as trilhas' }`
+- Linha 84: `{ value: 'todas', label: 'Todas as categorias' }`
+- Linha 98: `{ value: 'todos', label: 'Todos os status' }`
+- E o equivalente no filtro de visibilidade
 
-Substituir a listagem plana:
-```tsx
-{modulos?.map((modulo: any) => (
-  <SelectItem key={modulo.id} value={modulo.id}>
-    {modulo.trilha?.titulo} — {modulo.titulo}
-  </SelectItem>
-))}
-```
+### Arquivo: `src/components/admin/content/VideosTab.tsx`
+Remover:
+- Linha 96: `{ value: 'todas', label: 'Todas as trilhas' }`
+- Linha 107: `{ value: 'todos', label: 'Todos os modulos' }`
+- Linha 118: `{ value: 'todos', label: 'Todos os status' }`
+- E o equivalente no filtro de visibilidade
 
-Por uma listagem agrupada:
-```tsx
-{Object.entries(
-  (modulos || []).reduce((groups, modulo) => {
-    const trilhaTitulo = modulo.trilha?.titulo || "Sem Trilha";
-    if (!groups[trilhaTitulo]) groups[trilhaTitulo] = [];
-    groups[trilhaTitulo].push(modulo);
-    return groups;
-  }, {} as Record<string, any[]>)
-).map(([trilhaTitulo, modulosDaTrilha]) => (
-  <SelectGroup key={trilhaTitulo}>
-    <SelectLabel>{trilhaTitulo}</SelectLabel>
-    {modulosDaTrilha.map((modulo) => (
-      <SelectItem key={modulo.id} value={modulo.id}>
-        {modulo.titulo}
-      </SelectItem>
-    ))}
-  </SelectGroup>
-))}
-```
-
-**Imports**: Adicionar `SelectGroup` e `SelectLabel` ao import existente do `@/components/ui/select`.
-
-Nenhuma mudanca no hook `useModulos` -- os dados ja vem com a trilha associada e ordenados por `ordem`.
+### Impacto
+Nenhuma mudanca de logica. O `FilterBar` continuara exibindo a opcao de reset usando o `placeholder` de cada filtro e o valor `__all__`, que ja mapeia corretamente para string vazia no estado.
