@@ -16,12 +16,12 @@ interface StatusPieChartProps {
 const STATUS_COLORS: Record<string, string> = {
   concluido: "#9EB038",
   aprovada: "#9EB038",
-  em_andamento: "#D4E68A",
-  atrasado: "#C45A3C",
-  pendente: "#B8CC5A",
-  levantado: "#6B8A3D",
-  priorizado: "#4A5516",
-  nao_aprovado: "#8B6F47",
+  em_andamento: "#F59E0B",
+  atrasado: "#EF4444",
+  pendente: "#3B82F6",
+  levantado: "#6366F1",
+  priorizado: "#D4E68A",
+  nao_aprovado: "#94A3B8",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -37,12 +37,12 @@ const STATUS_LABELS: Record<string, string> = {
 
 const chartConfig: ChartConfig = {
   concluido: { label: "Concluído", color: "#9EB038" },
-  em_andamento: { label: "Em andamento", color: "#D4E68A" },
-  atrasado: { label: "Atrasado", color: "#C45A3C" },
-  pendente: { label: "Pendente", color: "#B8CC5A" },
-  levantado: { label: "Levantado", color: "#6B8A3D" },
-  priorizado: { label: "Priorizado", color: "#4A5516" },
-  nao_aprovado: { label: "Não aprovado", color: "#8B6F47" },
+  em_andamento: { label: "Em andamento", color: "#F59E0B" },
+  atrasado: { label: "Atrasado", color: "#EF4444" },
+  pendente: { label: "Pendente", color: "#3B82F6" },
+  levantado: { label: "Levantado", color: "#6366F1" },
+  priorizado: { label: "Priorizado", color: "#D4E68A" },
+  nao_aprovado: { label: "Não aprovado", color: "#94A3B8" },
 };
 
 export default function StatusPieChart({ entregas, projetos = [] }: StatusPieChartProps) {
