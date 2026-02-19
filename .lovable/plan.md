@@ -1,18 +1,28 @@
 
+# Simplificar BacklogCard - Layout mais limpo
 
-# Remover badge "IA" das entregas
+## Alteracoes em `src/components/skills/backlog/BacklogCard.tsx`
 
-## Alteracoes
+### Remover
+- Icone `BookOpen` e contagem de trilhas recomendadas (linhas 51-56)
+- Import do `BookOpen` de lucide-react (linha 4)
+- Bloco separado de area impactada (linhas 41-47)
 
-### 1. `src/components/skills/EntregaSkillsEditModal.tsx`
-- Remover o badge `<Badge>IA</Badge>` do titulo do modal (linha 149)
+### Reorganizar
+- Mover o badge de area impactada para a linha inferior, ao lado dos avatares de responsavel/colaborador
+- Resultado: card tera apenas titulo, descricao opcional, e uma unica linha inferior com area impactada a esquerda e avatares a direita
 
-### 2. `src/components/skills/ProjetoSkillsEntregas.tsx`
-- Remover o filtro de "Origem" (IA/Manual) do select de filtros (linhas 249-257)
-- Remover o state `filterOrigem` e sua logica de filtragem
-- Remover referencia a `filterOrigem` em `hasActiveFilters` e `clearFilters`
+### Estrutura final do card
 
-### O que permanece
-- A logica interna de `origem` continua existindo no codigo para diferenciar o comportamento ao abrir o modal de edicao (IA abre `EntregaSkillsEditModal`, manual abre `EntregaEquipeModal`)
-- Apenas a exposicao visual do badge e filtro de origem sera removida
+```
++---------------------------+
+| Titulo do projeto         |
+| Descricao opcional...     |
+| [Area Impactada]  (O)(O)  |
++---------------------------+
+```
 
+- Sem nenhum icone interno
+- Area impactada como badge a esquerda
+- Avatares a direita
+- Layout em apenas 1 linha inferior
