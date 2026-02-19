@@ -61,6 +61,8 @@ interface ProjetoDetailModalProps {
 }
 
 export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusChange, onUpdate, equipeId }: ProjetoDetailModalProps) {
+  const [tituloValue, setTituloValue] = useState(item?.titulo || "");
+  const [descricaoValue, setDescricaoValue] = useState(item?.descricao || "");
   const [obsValue, setObsValue] = useState(item?.observacoes || "");
   const [areaValue, setAreaValue] = useState(item?.area_impactada || "");
   const [tempoAtualValue, setTempoAtualValue] = useState(item?.tempo_atual_horas?.toString() || "");
@@ -71,12 +73,14 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
   const [selectedEntrega, setSelectedEntrega] = useState<EntregaEquipe | null>(null);
 
   useEffect(() => {
+    setTituloValue(item?.titulo || "");
+    setDescricaoValue(item?.descricao || "");
     setObsValue(item?.observacoes || "");
     setAreaValue(item?.area_impactada || "");
     setTempoAtualValue(item?.tempo_atual_horas?.toString() || "");
     setCargoExecutorValue(item?.cargo_executor || "");
     setCustoHoraValue(item?.custo_hora_executor?.toString() || "");
-  }, [item?.observacoes, item?.area_impactada, item?.tempo_atual_horas, item?.cargo_executor, item?.custo_hora_executor, item?.id]);
+  }, [item?.titulo, item?.descricao, item?.observacoes, item?.area_impactada, item?.tempo_atual_horas, item?.cargo_executor, item?.custo_hora_executor, item?.id]);
 
   // Query entregas vinculadas ao projeto
   const { data: entregasProjeto, isLoading: loadingEntregas } = useQuery({
@@ -135,7 +139,20 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             {item.origem === "ia" && <Zap className="h-4 w-4 text-amber-500" />}
-            {item.titulo}
+            {onUpdate ? (
+              <Input
+                value={tituloValue}
+                onChange={(e) => setTituloValue(e.target.value)}
+                onBlur={() => {
+                  if (tituloValue.trim() && tituloValue !== item.titulo) {
+                    onUpdate(item.id, { titulo: tituloValue.trim() });
+                  }
+                }}
+                className="h-8 text-lg font-semibold border-dashed"
+              />
+            ) : (
+              item.titulo
+            )}
           </DialogTitle>
           <DialogDescription className="sr-only">Detalhes do projeto</DialogDescription>
         </DialogHeader>
@@ -298,7 +315,21 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                 </Button>
               )}
             </div>
-            <p className="text-sm whitespace-pre-wrap">{item.descricao || "Sem descrição"}</p>
+            {onUpdate ? (
+              <Textarea
+                value={descricaoValue}
+                onChange={(e) => setDescricaoValue(e.target.value)}
+                onBlur={() => {
+                  if (descricaoValue !== (item.descricao || "")) {
+                    onUpdate(item.id, { descricao: descricaoValue || null });
+                  }
+                }}
+                placeholder="Adicione uma descrição..."
+                className="min-h-[60px] text-sm"
+              />
+            ) : (
+              <p className="text-sm whitespace-pre-wrap">{item.descricao || "Sem descrição"}</p>
+            )}
           </div>
 
           {/* Info grid */}

@@ -199,7 +199,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
     });
   };
 
-  const handleSaveIA = (dados: { status?: string; descricao?: string }) => {
+  const handleSaveIA = (dados: { titulo?: string; status?: string; descricao?: string; prazo?: string | null; responsavel_id?: string | null }) => {
     if (!selectedIA) return;
     atualizarEntrega.mutate({ entregaId: selectedIA.id, dados }, {
       onSuccess: () => setModalIAOpen(false),
