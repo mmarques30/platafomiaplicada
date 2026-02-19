@@ -289,113 +289,101 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
             )}
           </div>
 
-          {/* Info grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-start gap-2">
-              <Layers className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground">Área Impactada</p>
-                {onUpdate ? (
-                  <Input
-                    value={areaValue}
-                    onChange={(e) => setAreaValue(e.target.value)}
-                    onBlur={() => {
-                      if (areaValue !== (item.area_impactada || "")) {
-                        onUpdate(item.id, { area_impactada: areaValue || null });
-                      }
-                    }}
-                    placeholder="Ex: Financeiro, RH..."
-                    className="h-8 text-sm mt-0.5"
-                  />
-                ) : (
-                  <p className="text-sm font-medium">{item.area_impactada || "—"}</p>
-                )}
-              </div>
+          {/* Área Impactada + Responsável + Colaborador lado a lado */}
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Área Impactada</p>
+              {onUpdate ? (
+                <Input
+                  value={areaValue}
+                  onChange={(e) => setAreaValue(e.target.value)}
+                  onBlur={() => {
+                    if (areaValue !== (item.area_impactada || "")) {
+                      onUpdate(item.id, { area_impactada: areaValue || null });
+                    }
+                  }}
+                  placeholder="Ex: Financeiro"
+                  className="h-9 text-sm"
+                />
+              ) : (
+                <p className="text-sm font-medium">{item.area_impactada || "—"}</p>
+              )}
             </div>
-          </div>
 
-          {/* Responsável - Editável */}
-          <div>
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Responsável</span>
-            </div>
-            {onUpdate && membros && membros.length > 0 ? (
-              <Select
-                value={item.responsavel_id || "__none__"}
-                onValueChange={(val) => {
-                  const newId = val === "__none__" ? null : val;
-                  onUpdate(item.id, { responsavel_id: newId });
-                }}
-              >
-                <SelectTrigger className="h-9 w-full text-sm">
-                  <SelectValue placeholder="Selecione um responsável" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">
-                    <span className="text-muted-foreground">Sem responsável</span>
-                  </SelectItem>
-                  {membros.map((m) => (
-                    <SelectItem key={m.id} value={m.id}>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-5 w-5">
-                          <AvatarImage src={m.avatar_url || ""} />
-                          <AvatarFallback className="text-[8px]">{m.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <span>{m.nome}</span>
-                      </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Responsável</p>
+              {onUpdate && membros && membros.length > 0 ? (
+                <Select
+                  value={item.responsavel_id || "__none__"}
+                  onValueChange={(val) => {
+                    const newId = val === "__none__" ? null : val;
+                    onUpdate(item.id, { responsavel_id: newId });
+                  }}
+                >
+                  <SelectTrigger className="h-9 w-full text-sm">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">
+                      <span className="text-muted-foreground">Sem responsável</span>
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : item.responsavel ? (
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={item.responsavel.avatar_url || ""} />
-                  <AvatarFallback className="text-[9px]">{item.responsavel.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <span className="text-sm">{item.responsavel.nome}</span>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">Nenhum responsável atribuído</p>
-            )}
-          </div>
+                    {membros.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-5 w-5">
+                            <AvatarImage src={m.avatar_url || ""} />
+                            <AvatarFallback className="text-[8px]">{m.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                          <span>{m.nome}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : item.responsavel ? (
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src={item.responsavel.avatar_url || ""} />
+                    <AvatarFallback className="text-[9px]">{item.responsavel.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm">{item.responsavel.nome}</span>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">—</p>
+              )}
+            </div>
 
-          {/* Colaborador - Editável */}
-          <div>
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Colaborador</span>
-            </div>
-            {onUpdate && membros && membros.length > 0 ? (
-              <Select
-                value={item.colaborador_id || "__none__"}
-                onValueChange={(val) => {
-                  const newId = val === "__none__" ? null : val;
-                  onUpdate(item.id, { colaborador_id: newId });
-                }}
-              >
-                <SelectTrigger className="h-9 w-full text-sm">
-                  <SelectValue placeholder="Selecione um colaborador" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">
-                    <span className="text-muted-foreground">Sem colaborador</span>
-                  </SelectItem>
-                  {membros.filter(m => m.id !== item.responsavel_id).map((m) => (
-                    <SelectItem key={m.id} value={m.id}>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-5 w-5">
-                          <AvatarImage src={m.avatar_url || ""} />
-                          <AvatarFallback className="text-[8px]">{m.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <span>{m.nome}</span>
-                      </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Colaborador</p>
+              {onUpdate && membros && membros.length > 0 ? (
+                <Select
+                  value={item.colaborador_id || "__none__"}
+                  onValueChange={(val) => {
+                    const newId = val === "__none__" ? null : val;
+                    onUpdate(item.id, { colaborador_id: newId });
+                  }}
+                >
+                  <SelectTrigger className="h-9 w-full text-sm">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">
+                      <span className="text-muted-foreground">Sem colaborador</span>
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : item.colaborador ? (
+                    {membros.filter(m => m.id !== item.responsavel_id).map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-5 w-5">
+                            <AvatarImage src={m.avatar_url || ""} />
+                            <AvatarFallback className="text-[8px]">{m.nome?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                          <span>{m.nome}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : item.colaborador ? (
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={item.colaborador.avatar_url || ""} />
@@ -404,8 +392,9 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                 <span className="text-sm">{item.colaborador.nome}</span>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Nenhum colaborador atribuído</p>
+              <p className="text-sm text-muted-foreground">—</p>
             )}
+            </div>
           </div>
 
           {/* Tags */}
