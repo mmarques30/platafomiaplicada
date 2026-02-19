@@ -1,53 +1,57 @@
 
 
-# Trocar preto por verde da marca no painel do lider
+# Instruções dinâmicas por IA nas Entregas Skills
 
-Todos os cards com headers pretos (`#0D0D0D`) e textos pretos nos KPIs serao atualizados para usar o verde da marca (`#9EB038`).
+Atualmente, o campo `instrucoes` em `entregas_skills` e gerado uma unica vez pela IA (na funcao `gerar-entregas-skills`) e exibido como texto estatico e somente-leitura no modal de edicao. O objetivo e tornar esse campo **regeneravel por IA** sempre que o usuario desejar, especialmente apos editar titulo ou descricao da entrega.
 
 ## Alteracoes
 
-### 1. KPICard.tsx - Variante "accent" com textos verdes
+### 1. Nova edge function: `regenerar-instrucoes-entrega`
 
-A variante `accent` atualmente usa textos pretos (`#0D0D0D`, `#1a1a1a`, `#3a3a3a`). Trocar para tons do verde da marca:
+Criar uma funcao backend simples que recebe o contexto da entrega (titulo, descricao, projeto vinculado) e retorna novas instrucoes geradas por IA.
 
-| Propriedade | Antes | Depois |
-|---|---|---|
-| `title` | `text-[#1a1a1a]` | `text-[#6B7A20]` |
-| `value` | `text-[#0D0D0D]` | `text-[#4A5516]` |
-| `subtitle` | `text-[#3a3a3a]` | `text-[#6B7A20]/70` |
+- Modelo: `google/gemini-2.5-flash` (mesmo usado na geracao original)
+- Input: titulo da entrega, descricao, titulo do projeto vinculado
+- Output: texto com passo a passo atualizado
+- Usa `LOVABLE_API_KEY` (ja configurada)
 
-A variante `dark` tambem troca o fundo preto para verde escuro:
+### 2. Alterar `EntregaSkillsEditModal.tsx`
 
-| Propriedade | Antes | Depois |
-|---|---|---|
-| `card` | `bg-[#0D0D0D] border-[#0D0D0D]` | `bg-[#4A5516] border-[#4A5516]` |
+No modal de edicao, o bloco de instrucoes deixa de ser texto estatico e passa a ter:
 
-### 2. Headers dos cards de graficos - Verde no lugar de preto
+- Campo `Textarea` editavel com as instrucoes atuais (permitindo edicao manual)
+- Botao "Regenerar com IA" ao lado do label, que chama a edge function e atualiza o campo
+- Estado de loading enquanto a IA processa
+- As instrucoes editadas (manual ou por IA) sao salvas junto com os demais campos ao clicar "Salvar"
 
-Todos os `CardHeader` com `bg-[#0D0D0D]` passam para `bg-[#4A5516]` (verde escuro da marca):
+```
++-------------------------------------+
+| Instrucoes               [Regenerar]|
+| +----------------------------------+|
+| | 1. Passo gerado pela IA...       ||
+| | 2. Segundo passo...              ||
+| | (editavel pelo usuario)          ||
+| +----------------------------------+|
++-------------------------------------+
+```
 
-- **ProjetoSkillsPerformance.tsx** - Header "Ranking por Colaborador" (linha 138)
-- **MemberDonutCharts.tsx** - Header "Impacto vs ROI" (linhas 116, 131)
+### 3. Atualizar hook `useSkillsEntregas`
 
-### 3. WeeklyBarChart.tsx - Card inteiro verde escuro
+Adicionar `instrucoes` ao objeto `dados` aceito pela mutation `atualizarEntrega`, para que o campo seja salvo no banco quando editado.
 
-O card "Evolucao de Maturidade" tem fundo totalmente preto. Trocar:
+## Detalhes tecnicos
 
-| Propriedade | Antes | Depois |
-|---|---|---|
-| Card bg | `bg-[#0D0D0D] border-[#0D0D0D]` | `bg-[#4A5516] border-[#4A5516]` |
-
-### 4. StatusPieChart.tsx - Borda lateral verde (ja esta, manter)
-
-A borda `border-l-[#9EB038]` ja usa verde, nenhuma alteracao necessaria.
-
-### Resumo de arquivos
-
-| Arquivo | Alteracao |
+| Componente | Alteracao |
 |---|---|
-| `KPICard.tsx` | Textos accent para verde, fundo dark para verde escuro |
-| `ProjetoSkillsPerformance.tsx` | Header ranking: preto para verde escuro |
-| `MemberDonutCharts.tsx` | 2 headers: preto para verde escuro |
-| `WeeklyBarChart.tsx` | Card inteiro: preto para verde escuro |
+| `supabase/functions/regenerar-instrucoes-entrega/index.ts` | Nova edge function - recebe titulo, descricao, projeto_titulo e retorna instrucoes atualizadas via IA |
+| `src/components/skills/EntregaSkillsEditModal.tsx` | Campo instrucoes vira Textarea editavel + botao "Regenerar com IA" |
+| `src/hooks/useSkillsEntregas.ts` | Incluir `instrucoes` no tipo de `dados` da mutation `atualizarEntrega` |
 
-Cor verde escuro escolhida: `#4A5516` (tom escuro do verde `#9EB038` da marca, mantendo contraste com texto branco).
+### Fluxo
+
+1. Usuario abre modal de edicao de uma entrega
+2. Instrucoes aparecem em Textarea editavel (pode editar manualmente)
+3. Se clicar "Regenerar com IA", a edge function e chamada com titulo + descricao atuais
+4. O campo e preenchido com o novo texto gerado
+5. Ao salvar, instrucoes sao persistidas no banco junto com os demais campos
+
