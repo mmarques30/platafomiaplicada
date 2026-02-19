@@ -1,4 +1,4 @@
-import { Trophy, Users, Crown, Medal, Gift } from "lucide-react";
+import { Trophy, Users, Crown, Medal } from "lucide-react";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { useCommunityStats } from "@/hooks/useCommunityStats";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -98,37 +98,6 @@ export function CommunitySidebar() {
         </div>
       </div>
 
-      {/* Card de Premiação */}
-      <div className="bg-card rounded-xl border p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Gift className="w-4 h-4 text-amber-500" />
-          <h3 className="text-sm font-semibold">Premiação Mensal</h3>
-        </div>
-        
-        <p className="text-sm text-muted-foreground mb-3">
-          Todo mês, o membro mais engajado é premiado com acesso especial ou sessões de mentoria exclusivas.
-        </p>
-        
-        <div className="bg-[#E9EBC6]/30 rounded-lg p-3">
-          <p className="text-xs font-medium text-[#0D0D0D]/80 mb-2">
-            Como pontuar:
-          </p>
-          <div className="space-y-1.5 text-xs text-[#0D0D0D]/60">
-            <div className="flex justify-between">
-              <span>Aula presencial</span>
-              <span className="font-semibold text-[#0D0D0D]/80">25pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Assistir vídeo</span>
-              <span className="font-semibold text-[#0D0D0D]/80">10pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Baixar material</span>
-              <span className="font-semibold text-[#0D0D0D]/80">5pts</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
