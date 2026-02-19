@@ -93,7 +93,6 @@ export function VideosTab() {
             value: trilhaFilter,
             onChange: setTrilhaFilter,
             options: [
-              { value: 'todas', label: 'Todas as trilhas' },
               ...(trilhas?.map(t => ({ value: t.id, label: t.titulo })) || []),
             ],
           },
@@ -104,7 +103,6 @@ export function VideosTab() {
             value: moduloFilter,
             onChange: setModuloFilter,
             options: [
-              { value: 'todos', label: 'Todos os módulos' },
               ...(modulosDisponiveis.map(m => ({ value: m.id, label: m.titulo })) || []),
             ],
           },
@@ -115,7 +113,6 @@ export function VideosTab() {
             value: statusFilter,
             onChange: setStatusFilter,
             options: [
-              { value: 'todos', label: 'Todos os status' },
               { value: 'ativo', label: 'Ativo' },
               { value: 'inativo', label: 'Inativo' },
             ],
@@ -127,7 +124,6 @@ export function VideosTab() {
             value: statusVisibilidade,
             onChange: setStatusVisibilidade,
             options: [
-              { value: 'todos', label: 'Todos' },
               { value: 'publicado', label: 'Publicados' },
               { value: 'rascunho', label: 'Rascunhos' },
               { value: 'arquivado', label: 'Arquivados' },

@@ -84,7 +84,6 @@ export function TrilhasTab() {
             value: categoriaFilter,
             onChange: setCategoriaFilter,
             options: [
-              { value: 'todas', label: 'Todas as categorias' },
               { value: 'núcleo', label: 'Núcleo' },
               { value: 'ferramentas', label: 'Ferramentas' },
               { value: 'profissão', label: 'Profissão' },
@@ -98,7 +97,6 @@ export function TrilhasTab() {
             value: nivelFilter,
             onChange: setNivelFilter,
             options: [
-              { value: 'todos', label: 'Todos os níveis' },
               { value: 'iniciante', label: 'Iniciante' },
               { value: 'intermediário', label: 'Intermediário' },
               { value: 'avançado', label: 'Avançado' },
@@ -111,7 +109,6 @@ export function TrilhasTab() {
             value: statusFilter,
             onChange: setStatusFilter,
             options: [
-              { value: 'todos', label: 'Todos os status' },
               { value: 'ativo', label: 'Ativo' },
               { value: 'inativo', label: 'Inativo' },
             ],
@@ -123,7 +120,6 @@ export function TrilhasTab() {
             value: statusVisibilidade,
             onChange: setStatusVisibilidade,
             options: [
-              { value: 'todos', label: 'Todos' },
               { value: 'publicado', label: 'Publicados' },
               { value: 'rascunho', label: 'Rascunhos' },
               { value: 'arquivado', label: 'Arquivados' },
