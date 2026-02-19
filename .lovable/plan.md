@@ -1,43 +1,53 @@
 
 
-# Simplificar Cards e Modal de Projetos
+# Trocar preto por verde da marca no painel do lider
 
-## 1. BacklogCard - Layout mais limpo
+Todos os cards com headers pretos (`#0D0D0D`) e textos pretos nos KPIs serao atualizados para usar o verde da marca (`#9EB038`).
 
-**Remover:** badge de area_impactada (classificacao como "TI", "Operacoes", "Financeiro")
+## Alteracoes
 
-**Novo layout do rodape do card:** responsavel (nome) e data de criacao lado a lado, sem icones
+### 1. KPICard.tsx - Variante "accent" com textos verdes
 
-```
-+----------------------------------+
-| Titulo do projeto                |
-| Descricao opcional...            |
-| Lucio Torres        19/02/2026   |
-+----------------------------------+
-```
+A variante `accent` atualmente usa textos pretos (`#0D0D0D`, `#1a1a1a`, `#3a3a3a`). Trocar para tons do verde da marca:
 
-- Nome do responsavel a esquerda (texto simples, sem avatar)
-- Data de criacao a direita (formato curto dd/mm/yy)
-- Sem badges, sem icones internos
+| Propriedade | Antes | Depois |
+|---|---|---|
+| `title` | `text-[#1a1a1a]` | `text-[#6B7A20]` |
+| `value` | `text-[#0D0D0D]` | `text-[#4A5516]` |
+| `subtitle` | `text-[#3a3a3a]` | `text-[#6B7A20]/70` |
 
-### Arquivo: `src/components/skills/backlog/BacklogCard.tsx`
-- Remover import de `Badge` e `Avatar`/`AvatarFallback`/`AvatarImage`
-- Substituir rodape atual (badge + avatares) por dois textos lado a lado: nome do responsavel e data formatada
-- Adicionar import de `format` do `date-fns` para formatar a data
+A variante `dark` tambem troca o fundo preto para verde escuro:
 
-## 2. ProjetoDetailModal - Remover badge de status redundante
+| Propriedade | Antes | Depois |
+|---|---|---|
+| `card` | `bg-[#0D0D0D] border-[#0D0D0D]` | `bg-[#4A5516] border-[#4A5516]` |
 
-O modal atualmente mostra um badge de status E um dropdown de status. Como o dropdown ja permite ver e alterar o status, o badge separado e desnecessario.
+### 2. Headers dos cards de graficos - Verde no lugar de preto
 
-### Arquivo: `src/components/skills/backlog/ProjetoDetailModal.tsx`
-- Remover o bloco do badge de status (linhas 153-158) que mostra o badge visual do status atual
-- Manter apenas o dropdown e os botoes de acao rapida de status
+Todos os `CardHeader` com `bg-[#0D0D0D]` passam para `bg-[#4A5516]` (verde escuro da marca):
 
-### Detalhes tecnicos
+- **ProjetoSkillsPerformance.tsx** - Header "Ranking por Colaborador" (linha 138)
+- **MemberDonutCharts.tsx** - Header "Impacto vs ROI" (linhas 116, 131)
 
-| Arquivo | Acao |
+### 3. WeeklyBarChart.tsx - Card inteiro verde escuro
+
+O card "Evolucao de Maturidade" tem fundo totalmente preto. Trocar:
+
+| Propriedade | Antes | Depois |
+|---|---|---|
+| Card bg | `bg-[#0D0D0D] border-[#0D0D0D]` | `bg-[#4A5516] border-[#4A5516]` |
+
+### 4. StatusPieChart.tsx - Borda lateral verde (ja esta, manter)
+
+A borda `border-l-[#9EB038]` ja usa verde, nenhuma alteracao necessaria.
+
+### Resumo de arquivos
+
+| Arquivo | Alteracao |
 |---|---|
-| `BacklogCard.tsx` | Remover Badge/Avatar, mostrar nome responsavel + data lado a lado |
-| `ProjetoDetailModal.tsx` | Remover badge de status visivel (manter dropdown) |
-| `useSkillsBacklog.ts` | Nenhuma alteracao necessaria (created_at ja disponivel) |
+| `KPICard.tsx` | Textos accent para verde, fundo dark para verde escuro |
+| `ProjetoSkillsPerformance.tsx` | Header ranking: preto para verde escuro |
+| `MemberDonutCharts.tsx` | 2 headers: preto para verde escuro |
+| `WeeklyBarChart.tsx` | Card inteiro: preto para verde escuro |
 
+Cor verde escuro escolhida: `#4A5516` (tom escuro do verde `#9EB038` da marca, mantendo contraste com texto branco).
