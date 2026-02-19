@@ -1,67 +1,55 @@
 
-# Corrigir Painel do Lider - Dados Nao Refletidos
 
-## Diagnostico
+# Remover Badges "Gerado por IA" das Telas do Usuario
 
-O painel do lider (`ProjetoSkillsPerformance`) tem dados no banco:
-- **12 projetos** no `backlog_skills` (5 aprovados, 3 priorizados, 4 nao aprovados)
-- **48 entregas** no `entregas_skills` (todas com status `pendente`)
+## Contexto
 
-O problema e a logica de `hasEntregas`: como existem 48 entregas (mesmo todas pendentes), o painel exibe os KPIs de entregas em vez dos KPIs de projetos. Resultado: todos os KPIs mostram zero, porque nenhuma entrega foi concluida.
+Atualmente, badges como "Gerado por IA", icones de raio (Zap) e badges "IA/Manual" aparecem em diversas telas visiveis para o usuario comum. A informacao de origem (IA vs manual) deve ser visivel **somente para administradores** na area Mentoria > Skills.
 
-## Solucao
+## Arquivos a alterar (telas do usuario)
 
-Mudar a logica para **combinar ambas as fontes** em vez de usar uma ou outra. O painel deve mostrar dados de projetos E entregas simultaneamente, refletindo o estado real.
+### 1. `src/components/mentoria/ObjetivosGerados.tsx`
+- **Remover** o badge "Gerado por IA" (linhas 73-77) que aparece quando `objetivo.gerado_por_ia` e true
+- Substituir por um badge "Diagnostico" fixo no mesmo local, indicando que o objetivo veio do diagnostico
 
-## Alteracoes
+### 2. `src/components/mentoria/business/InstrucaoCard.tsx`
+- **Remover** o badge "IA" (linhas 112-114) que aparece quando `instrucao.gerado_por_ia` e true
+- Substituir por badge "Diagnostico"
 
-### 1. `useSkillsLider.ts` - Incluir novos campos ROI dos projetos
+### 3. `src/components/skills/backlog/BacklogCard.tsx`
+- **Remover** o icone Zap amarelo (linha 89) que indica `item.origem === "ia"`
+- Nao substituir por nada (o card ja tem informacoes suficientes)
 
-Atualizar a query de `backlog_skills` (linha 188) para incluir os novos campos `tempo_atual_horas`, `cargo_executor` e `custo_hora_executor`. Recalcular KPIs para combinar dados:
+### 4. `src/components/skills/backlog/BacklogTable.tsx`
+- **Remover** o icone Zap amarelo (linha 68) na coluna Titulo que indica `item.origem === "ia"`
 
-- **Horas Economizadas**: somar economia real das entregas concluidas + economia estimada dos projetos aprovados/priorizados
-- **ROI Acumulado**: calcular usando `custo_hora_executor` dos projetos quando disponivel, senao usar `custo_hora_padrao` da equipe
-- **Projetos Mapeados**: total de projetos no backlog (excluindo descartados)
-- **Entregas em Progresso**: total de entregas nao-pendentes
+### 5. `src/components/skills/backlog/ProjetoDetailModal.tsx`
+- **Remover** o icone Zap amarelo no titulo (linha 141)
+- **Remover** o badge "Gerado por IA" / "Manual" (linhas 189-193)
+- Substituir o badge por "Diagnostico" quando a origem for "ia"
 
-### 2. `ProjetoSkillsPerformance.tsx` - KPIs hibridos
+### 6. `src/components/skills/ProjetoSkillsEntregas.tsx`
+- **Remover** a coluna "Origem" da tabela de entregas (linhas 374-378) que mostra badges "IA" ou "Manual"
+- Remover o TableHead correspondente
 
-Remover a logica binaria `hasEntregas` dos KPIs e mostrar **sempre 4 KPIs relevantes** independente de haver entregas ou nao:
+## Arquivos que NAO serao alterados (admin)
 
-| KPI | Fonte | Calculo |
-|---|---|---|
-| Projetos Mapeados | `backlog_skills` | Total de projetos (excluindo nao_aprovado/descartado) |
-| Economia Estimada | `backlog_skills` | Soma de `horas_estimadas_economia` dos projetos aprovados/priorizados |
-| Entregas | `entregas_skills` | Concluidas / Total |
-| ROI Projetado | Combinado | Economia estimada * custo hora * 52 semanas (anualizado) |
-
-### 3. `ProjetoSkillsPerformance.tsx` - Ranking hibrido
-
-O ranking deve considerar **ambas as fontes**:
-- Projetos atribuidos ao membro (do `backlog_skills`)
-- Entregas atribuidas ao membro (do `entregas_skills`)
-- Score composto: projetos ativos + entregas concluidas + horas economizadas
-
-### 4. Graficos (`StatusPieChart`, `MemberDonutCharts`, `WeeklyBarChart`)
-
-- `StatusPieChart`: combinar status de projetos E entregas, ou mostrar dois pie charts lado a lado
-- `MemberDonutCharts`: mostrar progresso combinado (projetos + entregas por membro)
-- `WeeklyBarChart`: manter progresso por membro mas usando dados combinados
+Os seguintes arquivos ficam em areas administrativas e devem **manter** as indicacoes de IA:
+- `src/components/admin/business/ReportsBusinessManager.tsx`
+- `src/components/admin/business/InstrucoesBusinessManager.tsx`
+- `src/components/admin/business/GeracaoEntregasModal.tsx`
+- `src/components/admin/business/UploadTranscricaoModal.tsx`
+- `src/components/admin/skills/GerarReportSkillsModal.tsx`
+- `src/components/admin/mentoria/ProjetosIAAdmin.tsx`
 
 ## Detalhes tecnicos
 
 | Arquivo | Acao |
 |---|---|
-| `src/hooks/useSkillsLider.ts` | Adicionar campos ROI na query de projetos. Mudar KPIs para combinar projetos+entregas. Ajustar ranking para score hibrido |
-| `src/components/skills/ProjetoSkillsPerformance.tsx` | Remover logica binaria `hasEntregas` dos KPIs. Exibir 4 KPIs fixos combinando ambas fontes. Ajustar filtros e labels |
-| `src/components/skills/performance/StatusPieChart.tsx` | Combinar dados de projetos e entregas no grafico |
-| `src/components/skills/performance/MemberDonutCharts.tsx` | Mostrar dados combinados por membro |
-| `src/components/skills/performance/WeeklyBarChart.tsx` | Ajustar labels e dados para modo hibrido |
+| `ObjetivosGerados.tsx` | Remover condicional `gerado_por_ia`, colocar badge "Diagnostico" fixo |
+| `InstrucaoCard.tsx` | Remover badge "IA", colocar badge "Diagnostico" |
+| `BacklogCard.tsx` | Remover icone Zap (linha 89) |
+| `BacklogTable.tsx` | Remover icone Zap (linha 68) |
+| `ProjetoDetailModal.tsx` | Remover Zap do titulo e badge "Gerado por IA"/"Manual", mostrar "Diagnostico" se origem=ia |
+| `ProjetoSkillsEntregas.tsx` | Remover coluna "Origem" inteira da tabela |
 
-## Resultado esperado
-
-Com os dados atuais do banco:
-- **Projetos Mapeados**: 8 (5 aprovados + 3 priorizados)
-- **Economia Estimada**: ~24h/semana (soma das horas dos projetos ativos)
-- **Entregas**: 0/48 concluidas
-- **ROI Projetado**: ~R$ 74.880/ano (24h * R$ 60 * 52 semanas)
