@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useCreateVideo, useUpdateVideo, useModulos } from "@/hooks/admin/useContent";
+import { useNextOrdem } from "@/hooks/admin/useNextOrdem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { X, Plus, History, CalendarIcon } from "lucide-react";
@@ -42,6 +43,13 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
   
   const { register, handleSubmit, reset, setValue, watch } = useForm();
 
+  const moduloId = watch("modulo_id");
+  const { data: nextOrdem } = useNextOrdem(
+    "videos",
+    { campo: "modulo_id", valor: moduloId || null },
+    open && !video
+  );
+
   useEffect(() => {
     if (video) {
       reset(video);
@@ -69,7 +77,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
         modulo_id: defaultModuloId || null,
         trilha_id: null,
         duracao: 0, 
-        ordem: 0, 
+        ordem: nextOrdem ?? 1, 
         ativo: true,
         visivel_mentorados: false,
         visivel_visitantes: false,
@@ -83,6 +91,13 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
     }
     setAdicionandoMaterial(false);
   }, [video, reset, open, defaultModuloId]);
+
+  // Atualizar ordem quando nextOrdem mudar (ao trocar módulo)
+  useEffect(() => {
+    if (!video && nextOrdem !== undefined) {
+      setValue("ordem", nextOrdem);
+    }
+  }, [nextOrdem, video, setValue]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -273,6 +288,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
                 if (modulo) {
                   setValue("trilha_id", modulo.trilha_id);
                 }
+                // Ordem será atualizada automaticamente pelo useNextOrdem via watch("modulo_id")
               }}
             >
               <SelectTrigger>
