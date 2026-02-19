@@ -9,6 +9,7 @@ import { PaginaGratuitaTab } from "@/components/admin/dashboard/PaginaGratuitaTa
 import { ConteudoTab } from "@/components/admin/dashboard/ConteudoTab";
 import { MentoriaTab } from "@/components/admin/dashboard/MentoriaTab";
 import { adminTheme } from "@/components/admin/adminTheme";
+import { ResumoTab } from "@/components/admin/dashboard/ResumoTab";
 import {
   LayoutDashboard,
   Users,
@@ -16,6 +17,7 @@ import {
   Video,
   GraduationCap,
   Eye,
+  FileText,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -80,6 +82,10 @@ export default function AdminDashboard() {
             <GraduationCap className={adminTheme.tabsIcon} />
             Mentoria
           </TabsTrigger>
+          <TabsTrigger value="resumo" className={adminTheme.tabsTrigger}>
+            <FileText className={adminTheme.tabsIcon} />
+            Resumo
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="visao-geral" className={adminTheme.tabsContent}>
@@ -104,6 +110,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="mentoria" className={adminTheme.tabsContent}>
           <MentoriaTab data={data} />
+        </TabsContent>
+
+        <TabsContent value="resumo" className={adminTheme.tabsContent}>
+          <ResumoTab />
         </TabsContent>
       </Tabs>
     </div>
