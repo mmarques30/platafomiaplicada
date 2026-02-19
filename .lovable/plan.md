@@ -1,38 +1,59 @@
 
-# Filtrar entregas ativas no Acompanhamento de Projetos
+# Correcoes no Painel do Lider - Cores e Filtros de Projetos Ativos
 
-## Problema
+## Problemas identificados
 
-O KPI "Total de Entregas" no Acompanhamento mostra **todas** as 48 entregas cadastradas, incluindo entregas vinculadas a projetos reprovados (`nao_aprovado`) ou ainda em triagem (`levantado`, `backlog`). Apenas entregas de projetos ativos devem aparecer.
+### 1. Filtro de 48 entregas persiste
+O filtro adicionado no `filteredEntregas` esta correto, mas outros componentes recebem dados **nao filtrados**:
+- `PortfolioOverview` recebe `projetos` (todos os 12, incluindo inativos)
+- `ProjetosResumoTable` recebe `projetos` e `entregasEquipe` sem filtro
+- O KPI "Total de Projetos" conta todos os projetos do backlog
 
-## Solucao
+Dados reais do banco:
+- 48 entregas totais: 20 de projetos aprovados, 12 de priorizados, **16 de nao_aprovados**
+- Projetos: 5 aprovados, 3 priorizados, **4 nao_aprovados**
 
-Adicionar um filtro no `filteredEntregas` (em `ProjetoSkillsProjetosPage.tsx`) que exclui entregas cujo projeto vinculado (`backlog_item.status`) esteja em status inativo.
+### 2. Verde muito escuro nos KPIs
+Os cards usam cores como `#9EB038` (ok) e `#738925` (escuro demais). Precisa um verde mais clean e claro.
 
-### Status considerados ativos (fase de execucao)
+## Alteracoes
 
-Conforme o workflow documentado: `aprovado`, `priorizado`, `em_execucao`, `entregue`
+### Arquivo 1: `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
 
-### Status excluidos
-
-`levantado`, `nao_aprovado`, `backlog` (triagem ou reprovados)
-
-## Alteracao unica
-
-### `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
-
-No `useMemo` do `filteredEntregas` (linhas 56-75), adicionar uma verificacao antes dos filtros existentes:
+- Filtrar `projetos` para remover os inativos antes de passar para `PortfolioOverview` e `ProjetosResumoTable`
+- Filtrar `entregasEquipe` para excluir entregas de projetos inativos na tabela de resumo
 
 ```typescript
-// Excluir entregas de projetos inativos
-const statusInativos = ["nao_aprovado", "levantado", "backlog"];
-if (e.backlog_item?.status && statusInativos.includes(e.backlog_item.status)) return false;
+// Novo: projetos ativos apenas
+const projetosAtivos = useMemo(() => {
+  const statusInativos = ["nao_aprovado", "levantado", "backlog"];
+  return (projetos || []).filter(p => !statusInativos.includes(p.status));
+}, [projetos]);
+
+// Novo: entregas equipe filtradas
+const entregasEquipeAtivas = useMemo(() => {
+  if (!entregasEquipe || !projetosAtivos) return [];
+  const idsAtivos = new Set(projetosAtivos.map(p => p.id));
+  return entregasEquipe.filter(e => !e.projeto_id || idsAtivos.has(e.projeto_id));
+}, [entregasEquipe, projetosAtivos]);
 ```
 
-Entregas sem projeto vinculado (`backlog_item` nulo) continuam aparecendo normalmente.
+- Passar `projetosAtivos` em vez de `projetos` para `PortfolioOverview` e `ProjetosResumoTable`
+- Passar `entregasEquipeAtivas` para `ProjetosResumoTable`
 
-| Arquivo | Alteracao |
-|---|---|
-| `src/pages/skills/ProjetoSkillsProjetosPage.tsx` | Filtrar entregas com projeto inativo no `filteredEntregas` |
+### Arquivo 2: `src/components/skills/kanban/PortfolioOverview.tsx`
 
-Isso afeta automaticamente todos os componentes que recebem `filteredEntregas`: KPIs, grafico, sidebar e tabela de resumo.
+- Substituir verde escuro `#738925` por `#B8CC5A` (verde mais claro/clean)
+- Atualizar background dos icones para tons mais suaves
+
+### Arquivo 3: `src/components/skills/kanban/PortfolioSidebar.tsx`
+
+- Substituir `#738925` por `#B8CC5A` para consistencia visual
+
+## Resultado esperado
+
+| Metrica | Antes | Depois |
+|---|---|---|
+| Total de Projetos | 12 (todos) | 8 (apenas ativos) |
+| Total de Entregas | 48 | 32 (apenas de projetos ativos) |
+| Verde dos cards | #738925 (escuro) | #B8CC5A (claro/clean) |
