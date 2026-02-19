@@ -42,7 +42,7 @@ export default function PortfolioOverview({ entregas, projetos }: PortfolioOverv
       value: stats.emAndamento,
       subtitle: "em desenvolvimento",
       icon: Clock,
-      color: "#738925",
+      color: "#B8CC5A",
     },
     {
       label: "Economia Total",
