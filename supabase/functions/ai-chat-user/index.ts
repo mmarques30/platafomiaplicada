@@ -357,16 +357,43 @@ Como a Mariana:
 **IMPORTANTE**: Você É a Mariana Marques. Fale sempre em primeira pessoa. Não diga "a Mariana criou", diga "EU criei". Você não está simulando a Mariana, você É a Mariana conversando diretamente.`;
 
     // ===== PERSONALIZATION: User context by plan =====
+    // Calcular avaliação assertiva da fase
+    const fasesCompletas = fases.filter((f: any) => f.status === "concluida").length;
+    const fasesEmAndamento = fases.filter((f: any) => f.status === "em_andamento");
+    const projetosAtivos = projetos.filter((p: any) => p.status === "em_andamento").length;
+    const projetosConcluidos = projetos.filter((p: any) => p.status === "concluido").length;
+
+    let avaliacaoFase = "";
+    if (faseAtual) {
+      avaliacaoFase = `FASE ATUAL CONFIRMADA: ${faseAtual.nome_fase} (Fase ${faseAtual.fase_numero}). O usuário ESTÁ nessa fase. Confirme isso e oriente sobre os próximos passos dessa fase.`;
+    } else if (fasesCompletas > 0 && proximaFase) {
+      avaliacaoFase = `Fases 1-${fasesCompletas} concluídas. PRÓXIMO PASSO SUGERIDO: ${proximaFase.nome_fase} (Fase ${proximaFase.fase_numero}). Sugira ao usuário iniciar essa fase.`;
+    } else if (fasesCompletas === 0 && fases.length > 0) {
+      avaliacaoFase = `Nenhuma fase iniciada. O usuário precisa começar pela Fase 1 - Diagnóstico.`;
+    }
+
+    const statusResumo = `
+RESUMO EXECUTIVO DO MENTORADO:
+- Diagnóstico: ${formulario.data ? "Completo" : "Pendente"}
+- Fases concluídas: ${fasesCompletas} de ${fases.length}
+- Projetos ativos: ${projetosAtivos} | Concluídos: ${projetosConcluidos}
+- Vídeos assistidos: ${videosAssistidos}
+${avaliacaoFase ? `- ${avaliacaoFase}` : ""}`;
+
     if (plano || nomeUsuario) {
       systemPrompt += `\n\n## 👤 Contexto Personalizado do Usuário:
 - Nome: ${nomeUsuario || "Não informado"}
 - Plano: ${plano || "Não identificado"}
-- Vídeos assistidos: ${videosAssistidos}
-- Projetos: ${projetos.length > 0 ? projetos.map((p: any) => `${p.titulo} (${p.status}, ${p.progresso_preparacao || 0}% preparado)`).join("; ") : "Nenhum projeto"}
-- Fase atual do processo: ${faseAtual ? `${faseAtual.nome_fase} (Fase ${faseAtual.fase_numero})` : "Não iniciado"}
-- Próxima fase: ${proximaFase ? `${proximaFase.nome_fase} (Fase ${proximaFase.fase_numero})` : "N/A"}
+${statusResumo}
 
-INSTRUÇÃO: Personalize suas respostas considerando o plano do usuário.
+INSTRUÇÃO CRÍTICA SOBRE FASES:
+- Você TEM os dados do mentorado. NUNCA pergunte em que fase ele está — você JÁ SABE.
+- Quando o mentorado perguntar sobre progresso ou próximos passos, AFIRME com confiança: "Pelo que vejo nos seus dados, você está na fase X..." e peça confirmação com "Confere?" ou "Bora?".
+- Se os dados indicarem claramente a fase, use linguagem assertiva: "Você está em..." seguido de "Isso confere?" para validar.
+- Se os dados forem ambíguos (ex: nenhuma fase em andamento mas algumas concluídas), faça uma dedução lógica: "Pelos seus dados, parece que você concluiu a fase X e está pronto pra Y. Bora?"
+- JAMAIS use: "Em que fase você está?" ou "Poderia me dizer onde você está no processo?"
+
+INSTRUÇÃO GERAL:
 - Para Academy: foque em trilhas, conteúdos da plataforma e processo de mentoria.
 - Para Skills: foque em automação de processos, projetos da equipe e gargalos operacionais.
 - Para Business: foque no projeto sendo construído, resultados e entregas.
@@ -404,7 +431,10 @@ INSTRUÇÃO: Personalize suas respostas considerando o plano do usuário.
 ${entregas.map((e: any) => `- ${e.titulo_equipe} (${e.status_equipe}${e.prazo_equipe ? `, prazo: ${e.prazo_equipe}` : ""})`).join("\n")}`;
       }
 
-      systemPrompt += `\n\nINSTRUÇÃO SKILLS: Relacione suas respostas com os gargalos e projetos do usuário. Sugira como IA resolve os problemas específicos dele. Priorize recomendações que resolvam os gargalos identificados.`;
+      systemPrompt += `\n\nINSTRUÇÃO SKILLS: Você TEM os dados do colaborador. NUNCA pergunte em que fase ele está — você JÁ SABE.
+Relacione suas respostas com os gargalos e projetos do usuário. Sugira como IA resolve os problemas específicos dele.
+Ao falar sobre progresso, AFIRME a fase com confiança e peça confirmação: "Pelo que vejo, você está na [fase]. Confere?"
+Priorize recomendações que resolvam os gargalos identificados.`;
     }
 
     // Academy-specific context
@@ -417,7 +447,10 @@ ${projetos.map((p: any) => `- **${p.titulo}** — Status: ${p.status}, Preparaç
 ${fases.map((f: any) => `- Fase ${f.fase_numero}: ${f.nome_fase} — ${f.status}`).join("\n")}`;
       }
 
-      systemPrompt += `\n\nINSTRUÇÃO ACADEMY: Guie o usuário pelo processo de mentoria. Sugira próximo passo baseado na fase atual. Relacione recomendações com os projetos e trilhas alinhadas aos objetivos.`;
+      systemPrompt += `\n\nINSTRUÇÃO ACADEMY: Você TEM os dados do mentorado. NUNCA pergunte em que fase ele está — você JÁ SABE.
+Ao falar sobre progresso, AFIRME a fase com confiança e peça confirmação: "Pelo que vejo, você está na [fase]. Confere?"
+Use: "Pelo que vejo nos seus dados..." em vez de "Em que fase você está?"
+Sugira próximo passo baseado na fase atual. Relacione recomendações com os projetos e trilhas alinhadas aos objetivos.`;
     }
 
     // Original diagnostic form data (Academy diagnostic)
