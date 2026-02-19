@@ -5,14 +5,6 @@ import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
-const prioridadeCores: Record<string, string> = {
-  p1: "bg-red-500/15 text-red-700 border-red-200",
-  p2: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
-  p3: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
-  alta: "bg-red-500/15 text-red-700 border-red-200",
-  media: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
-  baixa: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
-};
 
 interface BacklogCardProps {
   item: BacklogItem;
@@ -47,21 +39,6 @@ export default function BacklogCard({ item, onClick }: BacklogCardProps) {
       )}
 
       <div className="flex flex-wrap gap-1.5">
-        {item.status === "aprovado" && (
-          <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-blue-500/15 text-blue-700 border-blue-200">
-            APROVADO
-          </Badge>
-        )}
-        {item.status === "priorizado" && (
-          <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-indigo-500/15 text-indigo-700 border-indigo-200">
-            PRIORIZADO
-          </Badge>
-        )}
-        {item.prioridade && (
-          <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", prioridadeCores[item.prioridade])}>
-            {item.prioridade.toUpperCase()}
-          </Badge>
-        )}
         {item.area_impactada && (
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
             {item.area_impactada}
