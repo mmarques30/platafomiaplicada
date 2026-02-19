@@ -46,13 +46,22 @@ export function useSkillsEquipe() {
       
       if (membrosError) throw membrosError;
       
-      // Buscar diagnósticos para verificar quem completou
+      // Buscar diagnósticos para verificar quem completou (versão mais recente)
       const { data: diagnosticosData, error: diagError } = await supabase
         .from("diagnosticos_skills")
-        .select("user_id, completado")
+        .select("user_id, completado, versao")
         .eq("equipe_id", equipeId);
       
       if (diagError) throw diagError;
+
+      // Agrupar por user e usar versão mais recente
+      const latestByUser = new Map<string, any>();
+      for (const d of (diagnosticosData || [])) {
+        const existing = latestByUser.get(d.user_id);
+        if (!existing || (d.versao || 1) > (existing.versao || 1)) {
+          latestByUser.set(d.user_id, d);
+        }
+      }
       
       // Mapear membros com status do diagnóstico
       return membrosData?.map((m: any) => ({
@@ -62,7 +71,7 @@ export function useSkillsEquipe() {
         papel: m.papel,
         nome: m.profiles?.nome_completo || "Usuário",
         avatar_url: m.profiles?.avatar_url,
-        diagnostico_completo: diagnosticosData?.find(d => d.user_id === m.user_id)?.completado || false,
+        diagnostico_completo: latestByUser.get(m.user_id)?.completado || false,
       })) || [];
     },
     enabled: !!equipeId,

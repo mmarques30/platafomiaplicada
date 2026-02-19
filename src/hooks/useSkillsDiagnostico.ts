@@ -3,13 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { useUserRole } from "./useUserRole";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
 export interface DiagnosticoSkills {
   id?: string;
   user_id?: string;
   equipe_id?: string;
+  versao?: number;
   // Bloco 1
   cargo?: string;
   area_atuacao?: string;
@@ -85,6 +86,8 @@ export function useSkillsDiagnostico() {
   const queryClient = useQueryClient();
   const [localData, setLocalData] = useState<DiagnosticoSkills>({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [versaoSelecionada, setVersaoSelecionada] = useState<number | null>(null);
+  const [criandoNovo, setCriandoNovo] = useState(false);
 
   // Obter contexto de simulação (admin visualizando como outro usuário)
   let impersonatedUserId: string | null = null;
@@ -98,7 +101,6 @@ export function useSkillsDiagnostico() {
     // Context não disponível
   }
 
-  // Se admin está simulando outro usuário, usar o ID do usuário simulado
   const effectiveUserId = (isAdmin && isViewingAs && impersonatedUserId)
     ? impersonatedUserId
     : user?.id;
@@ -120,34 +122,120 @@ export function useSkillsDiagnostico() {
     enabled: !!effectiveUserId,
   });
 
-  // Fetch diagnóstico existente
-  const { data: diagnostico, isPending: queryPending } = useQuery({
+  // Fetch TODOS os diagnósticos do usuário (ordenados por versão DESC)
+  const { data: allDiagnosticos, isPending: queryPending } = useQuery({
     queryKey: ["diagnostico-skills", effectiveUserId],
     queryFn: async () => {
-      if (!effectiveUserId) return null;
+      if (!effectiveUserId) return [];
       const { data, error } = await supabase
         .from("diagnosticos_skills")
         .select("*")
         .eq("user_id", effectiveUserId)
-        .maybeSingle();
-      if (error && error.code !== "PGRST116") throw error;
-      if (!data) return null;
-      return mapDiagnosticoFromDB(data);
+        .order("versao", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(mapDiagnosticoFromDB);
     },
     enabled: !!effectiveUserId,
   });
 
-  // isLoading verdadeiro até ter usuário E dados carregados
+  const versoes = allDiagnosticos || [];
+  const diagnosticoAtual = versaoSelecionada
+    ? versoes.find(d => d.versao === versaoSelecionada) || versoes[0] || null
+    : versoes[0] || null;
+
   const isLoading = queryPending || !effectiveUserId;
+
   // Atualizar localData quando diagnostico carregar
   useEffect(() => {
-    if (diagnostico) {
-      setLocalData(diagnostico);
+    if (criandoNovo) return;
+    if (diagnosticoAtual) {
+      setLocalData(diagnosticoAtual);
     }
-  }, [diagnostico]);
+  }, [diagnosticoAtual, criandoNovo]);
+
+  // Selecionar versão ao carregar pela primeira vez
+  useEffect(() => {
+    if (versoes.length > 0 && versaoSelecionada === null && !criandoNovo) {
+      setVersaoSelecionada(versoes[0].versao || 1);
+    }
+  }, [versoes, versaoSelecionada, criandoNovo]);
 
   const updateDiagnostico = (updates: Partial<DiagnosticoSkills>) => {
     setLocalData((prev) => ({ ...prev, ...updates }));
+  };
+
+  const iniciarNovoDiagnostico = useCallback(() => {
+    setCriandoNovo(true);
+    setLocalData({});
+  }, []);
+
+  const cancelarNovoDiagnostico = useCallback(() => {
+    setCriandoNovo(false);
+    if (diagnosticoAtual) {
+      setLocalData(diagnosticoAtual);
+    }
+  }, [diagnosticoAtual]);
+
+  const selecionarVersao = useCallback((v: number) => {
+    setCriandoNovo(false);
+    setVersaoSelecionada(v);
+  }, []);
+
+  // Construir payload a partir do formData
+  const buildPayload = (formData: Record<string, any>, completado: boolean) => {
+    const processosDetalhados = [1, 2, 3]
+      .map((n) => ({
+        nome: formData[`processo${n}Nome`] || "",
+        passos: formData[`processo${n}Passos`] || "",
+        frequencia: formData[`processo${n}Freq`] || "",
+        tempo: formData[`processo${n}Tempo`] || "",
+        impacto: formData[`processo${n}Impacto`] || "",
+        tentouAutomatizar: formData[`processo${n}Automatizar`] || "",
+      }))
+      .filter((p) => p.nome);
+
+    const desafios = [1, 2, 3]
+      .map((n) => formData[`desafio${n}`] || "")
+      .filter(Boolean);
+
+    return {
+      user_id: effectiveUserId!,
+      equipe_id: membroEquipe?.equipe_id || null,
+      cargo: formData.cargo || null,
+      area_atuacao: formData.area || null,
+      tempo_na_empresa: formData.tempoFuncao || null,
+      ferramentas_atuais: (formData.ferramentas || []).map((f: string) => ({ nome: f, uso: "diário" })),
+      horas_repetitivas: formData.horasRepetitivas || null,
+      atividade_principal: formData.atividadePrincipal || null,
+      frequencia_atividade: formData.frequencia || null,
+      tempo_gasto: formData.tempoGasto || null,
+      processos_detalhados: processosDetalhados,
+      objetivos_ia: formData.objetivosIA || [],
+      resultado_sucesso: formData.resultadoSucesso || null,
+      autonomia: formData.autonomia || null,
+      nivel_tecnico: formData.nivelTecnico || null,
+      ferramentas_automacao: formData.ferramentasAutomacao || [],
+      uso_ia: formData.usoIA || null,
+      horas_semana: formData.horasSemana || null,
+      melhor_horario: formData.melhorHorario || [],
+      preferencia_conteudo: formData.preferenciaConteudo || null,
+      tamanho_area: formData.tamanhoArea || null,
+      sistemas_erp: formData.sistemasERP || [],
+      iniciativas_ia: formData.iniciativasIA || null,
+      maturidade_digital: formData.maturidadeDigital || null,
+      desafios: desafios,
+      processo_colaborativo: formData.processoColaborativo || null,
+      automatizar_empresa: formData.automatizarEmpresa || null,
+      apoio_lideranca: formData.apoioLideranca || null,
+      restricoes_ti: formData.restricoesTI || null,
+      objetivo_programa: formData.objetivoPrograma || [],
+      areas_automacao: formData.areasAutomacao || [],
+      resultado_equipe: formData.resultadoEquipe || null,
+      projeto_colaborativo: formData.projetoColaborativo || null,
+      barreiras: formData.barreiras || null,
+      completado,
+      updated_at: new Date().toISOString(),
+    };
   };
 
   // Salvar diagnóstico no banco
@@ -155,77 +243,32 @@ export function useSkillsDiagnostico() {
     mutationFn: async (formData: Record<string, any>) => {
       if (!effectiveUserId) throw new Error("Usuário não autenticado");
 
-      const processosDetalhados = [1, 2, 3]
-        .map((n) => ({
-          nome: formData[`processo${n}Nome`] || "",
-          passos: formData[`processo${n}Passos`] || "",
-          frequencia: formData[`processo${n}Freq`] || "",
-          tempo: formData[`processo${n}Tempo`] || "",
-          impacto: formData[`processo${n}Impacto`] || "",
-          tentouAutomatizar: formData[`processo${n}Automatizar`] || "",
-        }))
-        .filter((p) => p.nome);
+      const payload = buildPayload(formData, true);
 
-      const desafios = [1, 2, 3]
-        .map((n) => formData[`desafio${n}`] || "")
-        .filter(Boolean);
+      if (criandoNovo || !diagnosticoAtual?.id) {
+        // Calcular próxima versão
+        const maxVersao = versoes.length > 0
+          ? Math.max(...versoes.map(d => d.versao || 1))
+          : 0;
+        const novaVersao = maxVersao + 1;
 
-      const payload = {
-        user_id: effectiveUserId,
-        equipe_id: membroEquipe?.equipe_id || null,
-        cargo: formData.cargo || null,
-        area_atuacao: formData.area || null,
-        tempo_na_empresa: formData.tempoFuncao || null,
-        ferramentas_atuais: (formData.ferramentas || []).map((f: string) => ({ nome: f, uso: "diário" })),
-        horas_repetitivas: formData.horasRepetitivas || null,
-        atividade_principal: formData.atividadePrincipal || null,
-        frequencia_atividade: formData.frequencia || null,
-        tempo_gasto: formData.tempoGasto || null,
-        processos_detalhados: processosDetalhados,
-        objetivos_ia: formData.objetivosIA || [],
-        resultado_sucesso: formData.resultadoSucesso || null,
-        autonomia: formData.autonomia || null,
-        nivel_tecnico: formData.nivelTecnico || null,
-        ferramentas_automacao: formData.ferramentasAutomacao || [],
-        uso_ia: formData.usoIA || null,
-        horas_semana: formData.horasSemana || null,
-        melhor_horario: formData.melhorHorario || [],
-        preferencia_conteudo: formData.preferenciaConteudo || null,
-        tamanho_area: formData.tamanhoArea || null,
-        sistemas_erp: formData.sistemasERP || [],
-        iniciativas_ia: formData.iniciativasIA || null,
-        maturidade_digital: formData.maturidadeDigital || null,
-        desafios: desafios,
-        processo_colaborativo: formData.processoColaborativo || null,
-        automatizar_empresa: formData.automatizarEmpresa || null,
-        apoio_lideranca: formData.apoioLideranca || null,
-        restricoes_ti: formData.restricoesTI || null,
-        objetivo_programa: formData.objetivoPrograma || [],
-        areas_automacao: formData.areasAutomacao || [],
-        resultado_equipe: formData.resultadoEquipe || null,
-        projeto_colaborativo: formData.projetoColaborativo || null,
-        barreiras: formData.barreiras || null,
-        completado: true,
-        updated_at: new Date().toISOString(),
-      };
-
-      if (diagnostico?.id) {
+        const { data, error } = await supabase
+          .from("diagnosticos_skills")
+          .insert({ ...payload, versao: novaVersao } as any)
+          .select("id, versao")
+          .single();
+        if (error) throw error;
+        return { id: data.id, versao: data.versao };
+      } else {
+        // Update da versão atual
         const { data, error } = await supabase
           .from("diagnosticos_skills")
           .update(payload)
-          .eq("id", diagnostico.id)
-          .select("id")
+          .eq("id", diagnosticoAtual.id)
+          .select("id, versao")
           .single();
         if (error) throw error;
-        return data.id;
-      } else {
-        const { data, error } = await supabase
-          .from("diagnosticos_skills")
-          .insert(payload)
-          .select("id")
-          .single();
-        if (error) throw error;
-        return data.id;
+        return { id: data.id, versao: data.versao };
       }
     },
   });
@@ -267,70 +310,23 @@ export function useSkillsDiagnostico() {
   const saveRascunho = async (formData: Record<string, any>) => {
     if (!effectiveUserId) return;
 
-    const processosDetalhados = [1, 2, 3]
-      .map((n) => ({
-        nome: formData[`processo${n}Nome`] || "",
-        passos: formData[`processo${n}Passos`] || "",
-        frequencia: formData[`processo${n}Freq`] || "",
-        tempo: formData[`processo${n}Tempo`] || "",
-        impacto: formData[`processo${n}Impacto`] || "",
-        tentouAutomatizar: formData[`processo${n}Automatizar`] || "",
-      }))
-      .filter((p) => p.nome);
-
-    const desafios = [1, 2, 3]
-      .map((n) => formData[`desafio${n}`] || "")
-      .filter(Boolean);
-
-    const payload: Record<string, any> = {
-      user_id: effectiveUserId,
-      equipe_id: membroEquipe?.equipe_id || null,
-      cargo: formData.cargo || null,
-      area_atuacao: formData.area || null,
-      tempo_na_empresa: formData.tempoFuncao || null,
-      ferramentas_atuais: (formData.ferramentas || []).map((f: string) => ({ nome: f, uso: "diário" })),
-      horas_repetitivas: formData.horasRepetitivas || null,
-      atividade_principal: formData.atividadePrincipal || null,
-      frequencia_atividade: formData.frequencia || null,
-      tempo_gasto: formData.tempoGasto || null,
-      processos_detalhados: processosDetalhados,
-      objetivos_ia: formData.objetivosIA || [],
-      resultado_sucesso: formData.resultadoSucesso || null,
-      autonomia: formData.autonomia || null,
-      nivel_tecnico: formData.nivelTecnico || null,
-      ferramentas_automacao: formData.ferramentasAutomacao || [],
-      uso_ia: formData.usoIA || null,
-      horas_semana: formData.horasSemana || null,
-      melhor_horario: formData.melhorHorario || [],
-      preferencia_conteudo: formData.preferenciaConteudo || null,
-      tamanho_area: formData.tamanhoArea || null,
-      sistemas_erp: formData.sistemasERP || [],
-      iniciativas_ia: formData.iniciativasIA || null,
-      maturidade_digital: formData.maturidadeDigital || null,
-      desafios: desafios,
-      processo_colaborativo: formData.processoColaborativo || null,
-      automatizar_empresa: formData.automatizarEmpresa || null,
-      apoio_lideranca: formData.apoioLideranca || null,
-      restricoes_ti: formData.restricoesTI || null,
-      objetivo_programa: formData.objetivoPrograma || [],
-      areas_automacao: formData.areasAutomacao || [],
-      resultado_equipe: formData.resultadoEquipe || null,
-      projeto_colaborativo: formData.projetoColaborativo || null,
-      barreiras: formData.barreiras || null,
-      completado: false,
-      updated_at: new Date().toISOString(),
-    };
+    const payload: Record<string, any> = buildPayload(formData, false);
 
     try {
-      if (diagnostico?.id) {
+      if (!criandoNovo && diagnosticoAtual?.id) {
         await supabase
           .from("diagnosticos_skills")
           .update(payload)
-          .eq("id", diagnostico.id);
+          .eq("id", diagnosticoAtual.id);
       } else {
+        const maxVersao = versoes.length > 0
+          ? Math.max(...versoes.map(d => d.versao || 1))
+          : 0;
+        const novaVersao = maxVersao + 1;
+
         const { data } = await supabase
           .from("diagnosticos_skills")
-          .insert(payload as any)
+          .insert({ ...payload, versao: novaVersao } as any)
           .select("id")
           .single();
         if (data) {
@@ -344,12 +340,17 @@ export function useSkillsDiagnostico() {
 
   // Salvar e processar
   const saveAndProcess = async (formData: Record<string, any>) => {
-    const id = await saveMutation.mutateAsync(formData);
-    return processarComIA(id);
+    const result = await saveMutation.mutateAsync(formData);
+    setCriandoNovo(false);
+    setVersaoSelecionada(result.versao);
+    return processarComIA(result.id);
   };
 
   return {
     diagnostico: localData,
+    versoes,
+    versaoSelecionada,
+    criandoNovo,
     isLoading,
     isProcessing,
     isSaving: saveMutation.isPending,
@@ -357,7 +358,10 @@ export function useSkillsDiagnostico() {
     saveDiagnostico: saveMutation.mutateAsync,
     saveAndProcess,
     saveRascunho,
-    hasInsight: !!diagnostico?.insight_ia,
+    hasInsight: !!diagnosticoAtual?.insight_ia,
+    iniciarNovoDiagnostico,
+    cancelarNovoDiagnostico,
+    selecionarVersao,
   };
 }
 
@@ -366,6 +370,7 @@ function mapDiagnosticoFromDB(data: any): DiagnosticoSkills {
     id: data.id,
     user_id: data.user_id,
     equipe_id: data.equipe_id || undefined,
+    versao: data.versao || 1,
     cargo: data.cargo || undefined,
     area_atuacao: data.area_atuacao || undefined,
     tempo_na_empresa: data.tempo_na_empresa || undefined,

@@ -1766,6 +1766,7 @@ export type Database = {
           updated_at: string | null
           user_id: string
           uso_ia: string | null
+          versao: number
         }
         Insert: {
           apoio_lideranca?: string | null
@@ -1820,6 +1821,7 @@ export type Database = {
           updated_at?: string | null
           user_id: string
           uso_ia?: string | null
+          versao?: number
         }
         Update: {
           apoio_lideranca?: string | null
@@ -1874,6 +1876,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           uso_ia?: string | null
+          versao?: number
         }
         Relationships: [
           {
