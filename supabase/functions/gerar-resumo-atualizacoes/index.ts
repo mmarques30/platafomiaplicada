@@ -6,6 +6,68 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const TABELA_NOMES: Record<string, string> = {
+  videos: "Vídeos",
+  modulos: "Módulos",
+  trilhas: "Trilhas",
+  biblioteca_prompts: "Prompts",
+  ia_copie_use: "IA Copie e Use",
+  ferramentas_ia: "Ferramentas de IA",
+  metodos_aplicar: "Métodos para Aplicar",
+  materiais_gratuitos: "Materiais Gratuitos",
+  conteudos_dashboard: "Conteúdos do Dashboard",
+  aulas_semanais: "Aulas Semanais",
+};
+
+function agruparRegistros(registros: any[]) {
+  const agrupado: Record<string, { adicionados: any[]; atualizados: any[]; removidos: any[]; adicionados_por_tema: Record<string, string[]> }> = {};
+
+  for (const r of registros) {
+    const nomeAmigavel = TABELA_NOMES[r.tabela] || r.tabela;
+    if (!agrupado[nomeAmigavel]) {
+      agrupado[nomeAmigavel] = { adicionados: [], atualizados: [], removidos: [], adicionados_por_tema: {} };
+    }
+
+    const dados = r.dados_novos || r.dados_anteriores || {};
+    const titulo = dados.titulo || dados.nome || dados.tema || dados.name || "(sem título)";
+    const categoria = dados.categoria || dados.categoria_principal || null;
+
+    if (r.operacao === "INSERT") {
+      if (categoria) {
+        if (!agrupado[nomeAmigavel].adicionados_por_tema[categoria]) {
+          agrupado[nomeAmigavel].adicionados_por_tema[categoria] = [];
+        }
+        agrupado[nomeAmigavel].adicionados_por_tema[categoria].push(titulo);
+      } else {
+        agrupado[nomeAmigavel].adicionados.push(titulo);
+      }
+    } else if (r.operacao === "UPDATE") {
+      const entry: any = { titulo };
+      if (r.campos_alterados?.length) {
+        entry.campos = r.campos_alterados.filter((c: string) => !["updated_at", "created_at"].includes(c));
+      }
+      if (entry.campos?.length > 0) {
+        agrupado[nomeAmigavel].atualizados.push(entry);
+      }
+    } else if (r.operacao === "DELETE") {
+      agrupado[nomeAmigavel].removidos.push(titulo);
+    }
+  }
+
+  // Clean up empty arrays
+  const resultado: Record<string, any> = {};
+  for (const [nome, dados] of Object.entries(agrupado)) {
+    const entry: any = {};
+    if (dados.adicionados.length > 0) entry.adicionados = dados.adicionados;
+    if (Object.keys(dados.adicionados_por_tema).length > 0) entry.adicionados_por_tema = dados.adicionados_por_tema;
+    if (dados.atualizados.length > 0) entry.atualizados = dados.atualizados;
+    if (dados.removidos.length > 0) entry.removidos = dados.removidos;
+    if (Object.keys(entry).length > 0) resultado[nome] = entry;
+  }
+
+  return resultado;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -26,7 +88,6 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    // Verify user via getUser
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -35,7 +96,6 @@ serve(async (req) => {
       });
     }
 
-    // Verify admin role
     const { data: roleData } = await supabase
       .from("user_roles")
       .select("role")
@@ -55,13 +115,12 @@ serve(async (req) => {
     const dataLimite = new Date();
     dataLimite.setDate(dataLimite.getDate() - dias);
 
-    // Query audit records
     const { data: registros, error: queryError } = await supabase
       .from("auditoria_conteudo")
       .select("tabela, operacao, dados_novos, dados_anteriores, campos_alterados, created_at")
       .gte("created_at", dataLimite.toISOString())
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(500);
 
     if (queryError) {
       console.error("Query error:", queryError);
@@ -78,21 +137,7 @@ serve(async (req) => {
       );
     }
 
-    // Build concise alterations list
-    const alteracoes = registros.slice(0, 80).map((r: any) => {
-      const dados = r.dados_novos || r.dados_anteriores || {};
-      const titulo = dados.titulo || dados.nome || dados.tema || dados.name || "(sem título)";
-      const entry: any = {
-        tabela: r.tabela,
-        operacao: r.operacao,
-        titulo,
-        data: new Date(r.created_at).toLocaleDateString("pt-BR"),
-      };
-      if (r.operacao === "UPDATE" && r.campos_alterados?.length) {
-        entry.campos = r.campos_alterados;
-      }
-      return entry;
-    });
+    const porCategoria = agruparRegistros(registros);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -102,73 +147,78 @@ serve(async (req) => {
       });
     }
 
-    const systemPrompt = `Você é um assistente que gera resumos de atualizações de plataforma educacional.
-Receberá uma lista de alterações recentes organizadas por tipo.
-Gere um resumo claro e organizado, em português, pronto para ser compartilhado em grupos do WhatsApp/Telegram.
+    const systemPrompt = `Você é um assistente que gera resumos de atualizações de uma plataforma educacional de IA.
 
-Use emojis para cada categoria. Formato:
-- Título com período
-- Seções por tipo (Vídeos, Módulos, Trilhas, Materiais, etc.)
-- Para cada seção, liste os itens adicionados ou alterados com seus títulos
-- Finalize com um breve destaque motivacional
+Você receberá um JSON com dados PRÉ-AGRUPADOS por seção (Vídeos, Prompts, IA Copie e Use, Ferramentas de IA, etc.).
 
-NÃO invente dados. Use apenas as informações fornecidas.
-Se houver muitas atualizações de um mesmo tipo, agrupe de forma concisa.`;
+REGRAS DE FORMATAÇÃO:
+1. Título: "📢 Resumo de Atualizações - Últimos X dias"
+2. Para CADA seção presente nos dados, crie um bloco com emoji apropriado:
+   - 🎬 Vídeos
+   - 📝 Prompts
+   - 🤖 IA Copie e Use
+   - 🔧 Ferramentas de IA
+   - 📚 Módulos
+   - 🎯 Trilhas
+   - 💡 Métodos para Aplicar
+   - 📄 Materiais Gratuitos
 
-    const userPrompt = JSON.stringify({ periodo: `${dias} dias`, total: registros.length, alteracoes });
+3. Dentro de cada seção:
+   - Se houver "adicionados_por_tema", organize por tema/categoria (ex: "**Vendas:** item1, item2")
+   - Se houver "adicionados" sem tema, liste os itens
+   - Se houver mais de 10 itens em uma categoria, use formato numérico: "33 novos prompts adicionados"
+   - Se houver menos de 10 itens, liste cada um pelo nome
+   - Se houver "atualizados", mencione brevemente quais campos foram alterados
+   - Se houver "removidos", mencione brevemente
 
-    console.log("Sending AI request, payload size:", userPrompt.length, "chars");
+4. Finalize com uma frase motivacional curta sobre as novidades.
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
+5. Use formatação compatível com WhatsApp/Telegram (negrito com *, emojis).
+
+NÃO invente dados. Use APENAS as informações fornecidas no JSON.`;
+
+    const userPrompt = JSON.stringify({
+      periodo: `${dias} dias`,
+      total_alteracoes: registros.length,
+      por_categoria: porCategoria,
     });
 
-    if (!aiResponse.ok) {
-      const errText = await aiResponse.text();
-      console.error("AI error:", aiResponse.status, errText);
+    console.log("Sending AI request, payload size:", userPrompt.length, "chars, total records:", registros.length);
 
-      // Fallback to another model
-      console.log("Retrying with openai/gpt-5-nano...");
-      const fallbackResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const makeAIRequest = async (model: string) => {
+      return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${LOVABLE_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "openai/gpt-5-nano",
+          model,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
         }),
       });
+    };
 
-      if (!fallbackResponse.ok) {
-        const fallbackErr = await fallbackResponse.text();
-        console.error("Fallback AI error:", fallbackResponse.status, fallbackErr);
+    let aiResponse = await makeAIRequest("google/gemini-2.5-flash");
+
+    if (!aiResponse.ok) {
+      const errText = await aiResponse.text();
+      console.error("AI error:", aiResponse.status, errText);
+
+      console.log("Retrying with fallback model...");
+      aiResponse = await makeAIRequest("openai/gpt-5-mini");
+
+      if (!aiResponse.ok) {
+        const fallbackErr = await aiResponse.text();
+        console.error("Fallback AI error:", aiResponse.status, fallbackErr);
         return new Response(JSON.stringify({ error: "Erro ao gerar resumo. Tente novamente." }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-
-      const fallbackData = await fallbackResponse.json();
-      const resumo = fallbackData.choices?.[0]?.message?.content || "Não foi possível gerar o resumo.";
-      return new Response(JSON.stringify({ resumo }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
     }
 
     const aiData = await aiResponse.json();
