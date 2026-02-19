@@ -1,32 +1,57 @@
 
 
-# Limpar 26 modulos orfaos do projeto CRM Completo Inteligente Dual
+# Reestruturar pagina Aprender > Trilhas
 
-## Diagnostico
+## Problema atual
+A pagina `/trilhas` tem duas secoes redundantes:
+1. **UltimosConteudos** -- mostra 3 carrosseis com videos recentes agrupados por trilha
+2. **TodasAsTrilhas** -- mostra grade com todas as trilhas
 
-- Projeto ID: `c4d88b5a-c553-4d21-937a-c8c559c7b704`
-- Total no JSONB `modulos_obrigatorios`: **36 modulos**
-- Existem no banco (tabela `modulos`): **10 modulos**
-- Orfaos a remover: **26 modulos**
+O usuario ve videos E trilhas na mesma pagina, criando confusao. Ao clicar numa trilha, vai para `/trilhas/:id` que mostra o TrilhaOverview (outro carrossel de videos) e depois o player.
 
-### Modulos que PERMANECEM (existem no banco)
+## Nova estrutura
 
-1. IA em 5 minutos: O que voce REALMENTE precisa saber
-2. Setup das IAs - Primeiros Passos
-3. Comparativo - Qual IA usar para que
-4. Configuracao de contas
-5. Seu primeiro prompt
-6. 3 erros que matam respostas
-7. Prompt Hacks: 29 atalhos
-8. Contexto e rei
-9. Casos Praticos
-10. Configuracoes Avancadas + Projeto Final
+A pagina `/trilhas` mostra **somente as trilhas** (cards visuais) como ponto de entrada. Ao clicar em uma trilha, o usuario navega para `/trilhas/:id` onde ve os videos/modulos daquela trilha (comportamento que ja existe via TrilhaOverview + player).
 
-### Modulos REMOVIDOS (nao existem mais)
+### O que muda na pagina `/trilhas`
 
-26 modulos de trilhas como Planilhas, Automacao e Claude que foram deletados do banco mas permaneceram no JSONB.
+**Remover**: componente `UltimosConteudos` (carrosseis de videos recentes)
 
-## Acao
+**Manter e promover**: componente `TodasAsTrilhas` como conteudo principal da pagina, sem header duplicado "Todas as Trilhas" -- usar o PageTitle existente como titulo unico
 
-Um unico UPDATE na tabela `projetos_mentoria` para substituir o array JSONB, mantendo apenas os 10 modulos validos. Nenhuma alteracao de codigo ou schema necessaria.
+### Resultado visual
+
+```text
++------------------------------------------+
+|  Trilhas de Aprendizado     [filtros]    |
++------------------------------------------+
+|                                          |
+|  [Card Trilha 1]  [Card Trilha 2]       |
+|  [Card Trilha 3]  [Card Trilha 4]       |
+|  [Card Trilha 5]                        |
+|                                          |
++------------------------------------------+
+```
+
+Ao clicar em qualquer card -> navega para `/trilhas/:id` -> ve o TrilhaOverview com videos da trilha (ja funciona assim hoje).
+
+## Detalhes tecnicos
+
+### Arquivo: `src/pages/Trilhas.tsx`
+- Remover import e uso de `UltimosConteudos`
+- Remover o bloco de loading com skeletons que protegia o UltimosConteudos
+- Manter `PageTitle` como titulo da pagina
+- Colocar `TodasAsTrilhas` diretamente abaixo do titulo, sem `mt-10` extra
+
+### Arquivo: `src/components/dashboard/TodasAsTrilhas.tsx`
+- Remover o header interno "Todas as Trilhas" com icone `SlidersHorizontal` (o titulo ja vem do PageTitle da pagina)
+- Mover os filtros (ordenar + categoria) para ficarem logo abaixo do PageTitle, alinhados a direita
+- Manter toda a logica de query, filtros e grid sem alteracao
+
+### Arquivos que NAO mudam
+- `TrilhaCard.tsx` -- card visual preservado
+- `TrilhaDetalhes.tsx` -- pagina de detalhe da trilha preservada
+- `TrilhaOverview.tsx` -- overview com videos preservada
+- `TrilhaCarousel.tsx` -- pode continuar existindo para outros usos
+- `UltimosConteudos.tsx` -- arquivo mantido (pode ser usado em outras paginas), apenas removido desta pagina
 
