@@ -29,7 +29,7 @@ export default function PortfolioSidebar({ entregas }: PortfolioSidebarProps) {
 
   const tipos = [
     { label: "Individuais", value: stats.individuais, pct: stats.pct(stats.individuais), color: "#9EB038" },
-    { label: "Colaborativos", value: stats.colaborativos, pct: stats.pct(stats.colaborativos), color: "#738925" },
+    { label: "Colaborativos", value: stats.colaborativos, pct: stats.pct(stats.colaborativos), color: "#B8CC5A" },
     { label: "De Sistema", value: stats.sistema, pct: stats.pct(stats.sistema), color: "#B8CC5A" },
   ];
 
@@ -58,7 +58,7 @@ export default function PortfolioSidebar({ entregas }: PortfolioSidebarProps) {
             <span className="text-[11px] text-muted-foreground">{stats.emProducao} concluídos</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#738925" }} />
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#B8CC5A" }} />
             <span className="text-[11px] text-muted-foreground">{stats.emAndamento} em andamento</span>
           </div>
           <div className="flex items-center gap-1.5">

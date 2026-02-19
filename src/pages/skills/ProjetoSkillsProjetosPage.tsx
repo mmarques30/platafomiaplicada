@@ -53,11 +53,21 @@ export default function ProjetoSkillsProjetosPage() {
     }
   }, [isLoading, equipeId, navigate]);
 
+  const projetosAtivos = useMemo(() => {
+    const statusInativos = ["nao_aprovado", "levantado", "backlog"];
+    return (projetos || []).filter((p: any) => !statusInativos.includes(p.status));
+  }, [projetos]);
+
+  const entregasEquipeAtivas = useMemo(() => {
+    if (!entregasEquipe || !projetosAtivos) return [];
+    const idsAtivos = new Set(projetosAtivos.map((p: any) => p.id));
+    return entregasEquipe.filter((e: any) => !e.projeto_id || idsAtivos.has(e.projeto_id));
+  }, [entregasEquipe, projetosAtivos]);
+
   const filteredEntregas = useMemo(() => {
     if (!entregas) return [];
     const statusInativos = ["nao_aprovado", "levantado", "backlog"];
     return entregas.filter((e: any) => {
-      // Excluir entregas de projetos inativos
       if (e.backlog_item?.status && statusInativos.includes(e.backlog_item.status)) return false;
       if (filters.projeto !== "todos" && e.id !== filters.projeto) return false;
       if (filters.responsavel !== "todos" && e.responsavel_id !== filters.responsavel) return false;
@@ -102,7 +112,7 @@ export default function ProjetoSkillsProjetosPage() {
             filters={filters}
             onFiltersChange={setFilters}
           />
-          <PortfolioOverview entregas={filteredEntregas} projetos={projetos} />
+          <PortfolioOverview entregas={filteredEntregas} projetos={projetosAtivos} />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
               <EntregasProjetadasVsExecutadasChart
@@ -116,8 +126,8 @@ export default function ProjetoSkillsProjetosPage() {
             <PortfolioSidebar entregas={filteredEntregas} />
           </div>
           <ProjetosResumoTable
-            projetos={projetos}
-            entregasEquipe={entregasEquipe ?? []}
+            projetos={projetosAtivos}
+            entregasEquipe={entregasEquipeAtivas}
             onVerMais={() => setActiveTab("backlog")}
           />
         </TabsContent>
