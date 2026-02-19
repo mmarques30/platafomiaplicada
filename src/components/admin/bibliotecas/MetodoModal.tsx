@@ -46,7 +46,6 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
   const onSubmit = (data: any) => {
     const metodoData = {
       ...data,
-      template: data.link_documento || "Via documento externo",
       ferramentas_recomendadas: ferramentasRecomendadas,
     };
 
@@ -97,19 +96,29 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
           </div>
 
           <div>
-            <Label htmlFor="link_documento">Link do Documento *</Label>
+            <Label htmlFor="template">Prompt / Template</Label>
+            <Textarea 
+              id="template" 
+              {...register("template")} 
+              rows={5}
+              placeholder="Cole aqui o prompt de personalização, template ou instruções do método..."
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Conteúdo do prompt ou template que será usado diretamente na plataforma
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="link_documento">Link do Documento (opcional)</Label>
             <Input 
               id="link_documento" 
               type="url"
               placeholder="https://docs.google.com/..." 
-              {...register("link_documento", { required: "Link do documento é obrigatório" })} 
+              {...register("link_documento")} 
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Link para o template completo (Google Docs, Notion, PDF, etc.)
+              Link para documento externo (Google Docs, Notion, PDF, etc.), se houver
             </p>
-            {errors.link_documento && (
-              <p className="text-xs text-destructive mt-1">{errors.link_documento.message as string}</p>
-            )}
           </div>
 
           <div>
