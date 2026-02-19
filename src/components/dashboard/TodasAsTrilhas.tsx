@@ -113,7 +113,7 @@ export function TodasAsTrilhas() {
   return (
     <div className="space-y-5">
       {/* Filtros */}
-      <div className="flex flex-wrap gap-3 justify-end">
+      <div className="flex flex-wrap gap-3">
         <Select value={ordenar} onValueChange={setOrdenar}>
           <SelectTrigger className="w-[170px]">
             <SelectValue placeholder="Ordenar por" />
