@@ -64,7 +64,7 @@ export function useMenuConfig() {
 
       // Skills: oculta trilhas gerais, calendário e TODO o grupo "Meu Progresso" (não usado no Skills)
       skills: [
-        'trilhas', 'calendario',
+        'trilhas',
         'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap', 
         'meu_progresso_conteudo', 'meu_progresso_entregas',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas',
@@ -75,7 +75,7 @@ export function useMenuConfig() {
       
       // Business Colaborativo: oculta menus Academy-only e Skills-only + Squad + Projeto Skills
       business: [
-        'trilhas', 'calendario', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+        'trilhas', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
         'skills_entregas', 'skills_painel_lider',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
