@@ -29,6 +29,7 @@ interface Entrega {
   concluidoEm: string | null;
   responsavelId: string | null;
   responsavelNome: string | null;
+  backlogItemId: string | null;
 }
 
 interface MetricaSemanal {
@@ -155,6 +156,7 @@ export function useSkillsLider() {
           avaliacao_nota,
           concluido_em,
           responsavel_id,
+          backlog_item_id,
           profiles:responsavel_id (nome_completo)
         `)
         .eq("equipe_id", equipeId)
@@ -173,6 +175,7 @@ export function useSkillsLider() {
         concluidoEm: e.concluido_em,
         responsavelId: e.responsavel_id,
         responsavelNome: e.profiles?.nome_completo || null,
+        backlogItemId: e.backlog_item_id || null,
       })) as Entrega[];
     },
     enabled: !!equipeId,
@@ -392,8 +395,13 @@ export function useSkillsLider() {
   const investimento = equipeData?.investimento || 0;
   const custoHora = equipeData?.custo_hora_padrao || 60;
 
-  const entregasConcluidasList = (entregas || []).filter((e) => e.status === "concluido" || e.status === "aprovada");
-  const totalEntregas = (entregas || []).length;
+  // Filtrar entregas vinculadas a projetos não aprovados/descartados
+  const projetosExcluidos = new Set(
+    (projetos || []).filter(p => ["nao_aprovado", "descartado"].includes(p.status)).map(p => p.id)
+  );
+  const entregasValidas = (entregas || []).filter(e => !e.backlogItemId || !projetosExcluidos.has(e.backlogItemId));
+  const entregasConcluidasList = entregasValidas.filter((e) => e.status === "concluido" || e.status === "aprovada");
+  const totalEntregas = entregasValidas.length;
   const horasEconomizadasEntregas = entregasConcluidasList.reduce(
     (acc, e) => acc + e.economiaHorasSemana,
     0
