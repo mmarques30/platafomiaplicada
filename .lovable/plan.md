@@ -1,63 +1,38 @@
 
-# Card de Documentos e Links na Visao Geral
+# Filtrar entregas ativas no Acompanhamento de Projetos
 
-Novo card abaixo do grafico e calendario na pagina "Visao Geral" do Projeto Skills, exibindo documentos e links importados pelo administrador em formato de tabela com paginacao de 3 itens por vez.
+## Problema
 
-## O que sera exibido
+O KPI "Total de Entregas" no Acompanhamento mostra **todas** as 48 entregas cadastradas, incluindo entregas vinculadas a projetos reprovados (`nao_aprovado`) ou ainda em triagem (`levantado`, `backlog`). Apenas entregas de projetos ativos devem aparecer.
 
-O card combina dados de duas fontes ja existentes no banco:
-- **documentos_skills** - arquivos enviados pelo admin (PDF, planilhas, etc.)
-- **links_skills** - links uteis adicionados pelo admin
+## Solucao
 
-Ambos filtrados pela equipe do usuario logado (`equipeId`).
+Adicionar um filtro no `filteredEntregas` (em `ProjetoSkillsProjetosPage.tsx`) que exclui entregas cujo projeto vinculado (`backlog_item.status`) esteja em status inativo.
 
-## Layout
+### Status considerados ativos (fase de execucao)
 
+Conforme o workflow documentado: `aprovado`, `priorizado`, `em_execucao`, `entregue`
+
+### Status excluidos
+
+`levantado`, `nao_aprovado`, `backlog` (triagem ou reprovados)
+
+## Alteracao unica
+
+### `src/pages/skills/ProjetoSkillsProjetosPage.tsx`
+
+No `useMemo` do `filteredEntregas` (linhas 56-75), adicionar uma verificacao antes dos filtros existentes:
+
+```typescript
+// Excluir entregas de projetos inativos
+const statusInativos = ["nao_aprovado", "levantado", "backlog"];
+if (e.backlog_item?.status && statusInativos.includes(e.backlog_item.status)) return false;
 ```
-+--------------------------------------------------+
-| Documentos e Recursos             [Ver todos ->] |
-|--------------------------------------------------|
-| Tipo  | Titulo            | Data                 |
-|-------|-------------------|----------------------|
-| PDF   | Manual de IA      | 15/02/2026           |
-| Link  | Guia Pratico      | 12/02/2026           |
-| DOC   | Relatorio Q1      | 10/02/2026           |
-+--------------------------------------------------+
-  Mostrando 3 de 8
-```
 
-- Cada linha e clicavel: documentos abrem o arquivo, links abrem a URL
-- Maximo 3 itens visiveis
-- Botao "Ver todos" abre um Dialog/modal com a lista completa (tabela paginada ou scroll)
-- Se nao houver documentos, exibe mensagem "Nenhum documento disponivel"
-
-## Alteracoes
-
-### 1. Novo componente: `DocumentosRecursosCard.tsx`
-
-Caminho: `src/components/skills/visao-geral/DocumentosRecursosCard.tsx`
-
-- Usa os hooks existentes `useDocumentosSkills` e `useLinksSkills` com o `equipeId` do `useSkillsMembro`
-- Combina documentos e links em uma lista unica ordenada por data
-- Exibe os 3 mais recentes em tabela
-- Links clicaveis abrindo em nova aba (`target="_blank"`)
-- Para documentos com `arquivo_url`, gera URL publica do bucket `documentos-skills`
-- Botao "Ver todos" abre um `Dialog` com a lista completa
-
-### 2. Alterar `ProjetoSkills.tsx`
-
-Adicionar o novo componente abaixo de `GraficoCalendarioSection`.
-
-## Detalhes tecnicos
+Entregas sem projeto vinculado (`backlog_item` nulo) continuam aparecendo normalmente.
 
 | Arquivo | Alteracao |
 |---|---|
-| `src/components/skills/visao-geral/DocumentosRecursosCard.tsx` | Novo componente - card com tabela de documentos/links, 3 por vez, dialog para ver todos |
-| `src/pages/skills/ProjetoSkills.tsx` | Importar e renderizar `DocumentosRecursosCard` abaixo do grafico |
+| `src/pages/skills/ProjetoSkillsProjetosPage.tsx` | Filtrar entregas com projeto inativo no `filteredEntregas` |
 
-### Dependencias reutilizadas (sem criar nada novo no backend)
-
-- `useDocumentosSkills(equipeId)` - ja existe
-- `useLinksSkills(equipeId)` - ja existe
-- `useSkillsMembro()` - para obter `equipeId`
-- Componentes UI: `Card`, `Dialog`, `Table` do shadcn
+Isso afeta automaticamente todos os componentes que recebem `filteredEntregas`: KPIs, grafico, sidebar e tabela de resumo.
