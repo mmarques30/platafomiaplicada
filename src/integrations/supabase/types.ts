@@ -3653,6 +3653,55 @@ export type Database = {
         }
         Relationships: []
       }
+      melhorias_plataforma: {
+        Row: {
+          categoria: string
+          created_at: string | null
+          created_by: string | null
+          descricao: string | null
+          id: string
+          titulo: string
+        }
+        Insert: {
+          categoria?: string
+          created_at?: string | null
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          titulo: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string | null
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "melhorias_plataforma_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "melhorias_plataforma_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_community"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "melhorias_plataforma_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "ranking_dashboard"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       membros_equipe_skills: {
         Row: {
           cargo: string | null
