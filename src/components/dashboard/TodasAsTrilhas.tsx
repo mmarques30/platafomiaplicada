@@ -115,10 +115,10 @@ export function TodasAsTrilhas() {
       {/* Filtros */}
       <div className="flex flex-wrap gap-3">
         <Select value={ordenar} onValueChange={setOrdenar}>
-          <SelectTrigger className="w-[170px]">
+          <SelectTrigger className="h-9 w-auto min-w-[150px] rounded-full border-primary/20 bg-primary/5 text-xs text-primary/80 hover:bg-primary/10 hover:border-primary/30 transition-colors">
             <SelectValue placeholder="Ordenar por" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="border-primary/20 bg-background [&_[role=option]]:text-xs [&_[role=option]]:focus:bg-primary/10 [&_[role=option]]:focus:text-primary">
             <SelectItem value="ordem">Ordem padrão</SelectItem>
             <SelectItem value="recentes">Mais recentes</SelectItem>
             <SelectItem value="antigos">Mais antigos</SelectItem>
@@ -126,10 +126,10 @@ export function TodasAsTrilhas() {
         </Select>
 
         <Select value={classificacaoFiltro} onValueChange={setClassificacaoFiltro}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="h-9 w-auto min-w-[170px] rounded-full border-primary/20 bg-primary/5 text-xs text-primary/80 hover:bg-primary/10 hover:border-primary/30 transition-colors">
             <SelectValue placeholder="Classificação" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="border-primary/20 bg-background [&_[role=option]]:text-xs [&_[role=option]]:focus:bg-primary/10 [&_[role=option]]:focus:text-primary">
             <SelectItem value="todas">Todas as classificações</SelectItem>
             {classificacoes.map((cls) => (
               <SelectItem key={cls} value={cls}>
