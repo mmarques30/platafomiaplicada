@@ -250,9 +250,17 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                         },
                       });
                       if (error) throw error;
-                      if (data?.descricao) {
-                        onUpdate(item.id, { descricao: data.descricao });
-                        toast.success("Descrição atualizada com IA!");
+                      const updates: Record<string, any> = {};
+                      if (data?.descricao) updates.descricao = data.descricao;
+                      if (data?.area_impactada) {
+                        updates.area_impactada = data.area_impactada;
+                        setAreaValue(data.area_impactada);
+                      }
+                      if (data?.prioridade) updates.prioridade = data.prioridade;
+                      if (data?.horas_estimadas_economia) updates.horas_estimadas_economia = data.horas_estimadas_economia;
+                      if (Object.keys(updates).length > 0) {
+                        onUpdate(item.id, updates);
+                        toast.success("Projeto atualizado com IA!");
                       }
                     } catch (e: any) {
                       console.error(e);
