@@ -13,7 +13,8 @@ import {
 import { useIACopieUse } from "@/hooks/useFerramentas";
 import { IACopieUseCard } from "@/components/bibliotecas/IACopieUseCard";
 import { IACopieUseDetalhesModal } from "@/components/bibliotecas/IACopieUseDetalhesModal";
-import { Sparkles, Search } from "lucide-react";
+import { Sparkles, Search, LayoutGrid, List } from "lucide-react";
+import { IACopieUseRow } from "@/components/bibliotecas/IACopieUseRow";
 import { PageTitle } from "@/components/shared/PageTitle";
 
 const ITEMS_PER_PAGE = 12;
@@ -24,6 +25,7 @@ export default function IACopieUse() {
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [selectedIA, setSelectedIA] = useState<any | null>(null);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [viewMode, setViewMode] = useState<"cards" | "tabela">("cards");
 
   const categorias = ias
     ? Array.from(new Set(ias.map((ia) => ia.categoria)))
