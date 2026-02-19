@@ -10,13 +10,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SlidersHorizontal } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
 
 interface TrilhaComContagem {
   id: string;
   titulo: string;
   imagem_url: string | null;
   categoria: string | null;
+  classificacao: string | null;
   ordem: number;
   visivel_apenas_pro: boolean;
   created_at: string;
@@ -25,21 +32,19 @@ interface TrilhaComContagem {
 
 export function TodasAsTrilhas() {
   const [ordenar, setOrdenar] = useState("ordem");
-  const [categoriaFiltro, setCategoriaFiltro] = useState("todas");
+  const [classificacaoFiltro, setClassificacaoFiltro] = useState("todas");
 
   const { data: trilhas, isLoading } = useQuery({
     queryKey: ["todas-trilhas-com-contagem"],
     queryFn: async () => {
-      // Fetch trilhas
       const { data: trilhasData, error: tError } = await supabase
         .from("trilhas")
-        .select("id, titulo, imagem_url, categoria, ordem, visivel_apenas_pro, created_at")
+        .select("id, titulo, imagem_url, categoria, classificacao, ordem, visivel_apenas_pro, created_at")
         .eq("visivel_mentorados", true)
         .order("ordem");
 
       if (tError) throw tError;
 
-      // Fetch video counts per trilha
       const { data: videosCounts, error: vError } = await supabase
         .from("videos")
         .select("trilha_id")
@@ -62,11 +67,11 @@ export function TodasAsTrilhas() {
     },
   });
 
-  // Extract unique categories
-  const categorias = useMemo(() => {
+  // Extract unique classificacoes
+  const classificacoes = useMemo(() => {
     if (!trilhas) return [];
-    const cats = [...new Set(trilhas.map((t) => t.categoria).filter(Boolean))] as string[];
-    return cats.sort();
+    const cls = [...new Set(trilhas.map((t) => t.classificacao).filter(Boolean))] as string[];
+    return cls.sort();
   }, [trilhas]);
 
   // Filter and sort
@@ -74,8 +79,8 @@ export function TodasAsTrilhas() {
     if (!trilhas) return [];
     let result = [...trilhas];
 
-    if (categoriaFiltro !== "todas") {
-      result = result.filter((t) => t.categoria === categoriaFiltro);
+    if (classificacaoFiltro !== "todas") {
+      result = result.filter((t) => t.classificacao === classificacaoFiltro);
     }
 
     switch (ordenar) {
@@ -90,15 +95,15 @@ export function TodasAsTrilhas() {
     }
 
     return result;
-  }, [trilhas, categoriaFiltro, ordenar]);
+  }, [trilhas, classificacaoFiltro, ordenar]);
 
   if (isLoading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-10 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="flex gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-[320px] rounded-xl" />
+            <Skeleton key={i} className="h-[320px] w-[300px] rounded-xl flex-shrink-0" />
           ))}
         </div>
       </div>
@@ -120,54 +125,72 @@ export function TodasAsTrilhas() {
           </SelectContent>
         </Select>
 
-        <Select value={categoriaFiltro} onValueChange={setCategoriaFiltro}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Categoria" />
+        <Select value={classificacaoFiltro} onValueChange={setClassificacaoFiltro}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Classificação" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todas">Todas as categorias</SelectItem>
-            {categorias.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            <SelectItem value="todas">Todas as classificações</SelectItem>
+            {classificacoes.map((cls) => (
+              <SelectItem key={cls} value={cls}>
+                {cls}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      {/* Grid */}
+      {/* Carousel */}
       {trilhasFiltradas.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">
           Nenhuma trilha encontrada com os filtros selecionados.
         </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {trilhasFiltradas.map((trilha) => (
-            <div key={trilha.id} className="space-y-2">
-              <TrilhaCard
-                id={trilha.id}
-                titulo={trilha.titulo}
-                imagem_url={trilha.imagem_url || undefined}
-                visivel_apenas_pro={trilha.visivel_apenas_pro}
-              />
-              <div className="px-1 space-y-0.5">
-                <p className="text-sm font-medium text-foreground line-clamp-1">
-                  {trilha.titulo}
-                </p>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="bg-muted px-2 py-0.5 rounded-full">
-                    Trilha {trilha.ordem + 1}
-                  </span>
-                  {trilha.categoria && (
-                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full capitalize">
-                      {trilha.categoria}
-                    </span>
-                  )}
-                  <span>{trilha.total_videos} vídeos</span>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="px-12">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: false,
+              dragFree: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4">
+              {trilhasFiltradas.map((trilha) => (
+                <CarouselItem
+                  key={trilha.id}
+                  className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                >
+                  <div className="space-y-2">
+                    <TrilhaCard
+                      id={trilha.id}
+                      titulo={trilha.titulo}
+                      imagem_url={trilha.imagem_url || undefined}
+                      visivel_apenas_pro={trilha.visivel_apenas_pro}
+                    />
+                    <div className="px-1 space-y-0.5">
+                      <p className="text-sm font-medium text-foreground line-clamp-1">
+                        {trilha.titulo}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                        <span className="bg-muted px-2 py-0.5 rounded-full">
+                          Trilha {trilha.ordem + 1}
+                        </span>
+                        {trilha.classificacao && (
+                          <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                            {trilha.classificacao}
+                          </span>
+                        )}
+                        <span>{trilha.total_videos} vídeos</span>
+                      </div>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
         </div>
       )}
     </div>
