@@ -185,7 +185,7 @@ export function useSkillsLider() {
       if (!equipeId) return [];
       const { data, error } = await supabase
         .from("backlog_skills")
-        .select("id, titulo, status, responsavel_id, tags, horas_estimadas_economia, profiles:responsavel_id(nome_completo)")
+        .select("id, titulo, status, responsavel_id, tags, horas_estimadas_economia, tempo_atual_horas, cargo_executor, custo_hora_executor, profiles:responsavel_id(nome_completo)")
         .eq("equipe_id", equipeId)
         .neq("status", "descartado");
       if (error) throw error;
@@ -197,6 +197,9 @@ export function useSkillsLider() {
         responsavelNome: p.profiles?.nome_completo || null,
         tags: p.tags || [],
         horasEstimadas: p.horas_estimadas_economia || 0,
+        tempoAtualHoras: p.tempo_atual_horas || 0,
+        cargoExecutor: p.cargo_executor || null,
+        custoHoraExecutor: p.custo_hora_executor || null,
       }));
     },
     enabled: !!equipeId,
@@ -385,16 +388,28 @@ export function useSkillsLider() {
     ? Math.max(1, Math.min(12, differenceInWeeks(new Date(), parseISO(dataInicio)) + 1))
     : 1;
 
-  // Calcular KPIs
+  // Calcular KPIs híbridos (projetos + entregas)
   const investimento = equipeData?.investimento || 0;
   const custoHora = equipeData?.custo_hora_padrao || 60;
 
   const entregasConcluidasList = (entregas || []).filter((e) => e.status === "concluido" || e.status === "aprovada");
   const totalEntregas = (entregas || []).length;
-  const horasEconomizadasTotal = entregasConcluidasList.reduce(
+  const horasEconomizadasEntregas = entregasConcluidasList.reduce(
     (acc, e) => acc + e.economiaHorasSemana,
     0
   );
+
+  // Projetos ativos (excluindo não aprovado e descartado)
+  const projetosAtivos = (projetos || []).filter(p => !["nao_aprovado", "descartado"].includes(p.status));
+  const totalProjetosAtivos = projetosAtivos.length;
+  const economiaEstimadaProjetos = projetosAtivos.reduce((acc, p) => acc + p.horasEstimadas, 0);
+
+  // Horas economizadas combinadas: reais das entregas + estimadas dos projetos
+  const horasEconomizadasTotal = horasEconomizadasEntregas + economiaEstimadaProjetos;
+
+  // ROI projetado anualizado: economia estimada * custo hora * 52 semanas
+  const custoMedioProjetos = projetosAtivos.reduce((acc, p) => acc + (p.custoHoraExecutor || custoHora), 0) / Math.max(1, projetosAtivos.length);
+  const roiProjetadoAnual = economiaEstimadaProjetos * custoMedioProjetos * 52;
 
   const valorGerado = entregasConcluidasList.reduce((acc, e) => {
     if (!e.concluidoEm) return acc;
@@ -408,8 +423,7 @@ export function useSkillsLider() {
     ? entregasConcluidasList.reduce((acc, e) => acc + (e.avaliacaoNota || 0), 0) / entregasConcluidasList.length
     : 0;
 
-  // Calcular ranking de colaboradores (com fallback para projetos)
-  const hasEntregas = (entregas || []).length > 0;
+  // Calcular ranking híbrido de colaboradores (projetos + entregas)
   const ranking: RankingColaborador[] = (membros || [])
     .map((m) => {
       const entregasMembro = (entregas || []).filter((e) => e.responsavelId === m.userId);
@@ -419,7 +433,7 @@ export function useSkillsLider() {
         return !isAfter(parseISO(e.concluidoEm), parseISO(e.prazo));
       });
 
-      const projetosMembro = (projetos || []).filter((p) => p.responsavelId === m.userId);
+      const projetosMembro = projetosAtivos.filter((p) => p.responsavelId === m.userId);
       const projetosEmAndamento = projetosMembro.filter((p) => p.status === "em_andamento").length;
 
       const horasEcon = entregasConcluidasMembro.reduce((acc, e) => acc + e.economiaHorasSemana, 0);
@@ -431,22 +445,23 @@ export function useSkillsLider() {
         ? (entregasNoPrazo.length / entregasConcluidasMembro.length) * 100
         : 0;
 
-      // Score: se não tem entregas, usa projetos atribuídos como base
-      const score = hasEntregas
-        ? (entregasConcluidasMembro.length * 30) + (horasEcon * 25) + (perfMedia * 5 * 25) + (taxaPrazo * 0.2)
-        : (projetosMembro.length * 20) + (projetosEmAndamento * 15) + (horasEstimadasProjetos * 5);
+      // Score híbrido: combina projetos + entregas
+      const score = (entregasConcluidasMembro.length * 30) + (horasEcon * 25) + (perfMedia * 5 * 25) + (taxaPrazo * 0.2)
+        + (projetosMembro.length * 20) + (projetosEmAndamento * 15) + (horasEstimadasProjetos * 5);
 
       return {
         posicao: 0,
         userId: m.userId,
         nome: m.nome,
         avatar: m.avatar,
-        entregasConcluidas: hasEntregas ? entregasConcluidasMembro.length : projetosEmAndamento,
-        totalEntregas: hasEntregas ? entregasMembro.length : projetosMembro.length,
-        horasEconomizadas: hasEntregas ? horasEcon : horasEstimadasProjetos,
+        entregasConcluidas: entregasConcluidasMembro.length,
+        totalEntregas: entregasMembro.length,
+        horasEconomizadas: horasEcon + horasEstimadasProjetos,
         performanceMedia: perfMedia,
         taxaPrazo,
         score,
+        totalProjetos: projetosMembro.length,
+        projetosEmAndamento,
       };
     })
     .sort((a, b) => b.score - a.score)
@@ -526,11 +541,14 @@ export function useSkillsLider() {
     entregasParaValidar: entregasParaValidar || [],
     alertasAtraso: alertasAtraso || [],
 
-    // KPIs calculados
+    // KPIs calculados (híbridos)
     semanaAtual,
     horasEconomizadasTotal,
     entregasConcluidas: entregasConcluidasList.length,
     totalEntregas,
+    totalProjetosAtivos,
+    economiaEstimadaProjetos,
+    roiProjetadoAnual,
     performanceMedia,
     valorGerado,
     roiAcumulado,

@@ -1,7 +1,5 @@
-import { useMemo } from "react";
 import { PieChart, Pie, Cell } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 interface RankingItem {
   posicao: number;
@@ -10,6 +8,8 @@ interface RankingItem {
   entregasConcluidas: number;
   totalEntregas: number;
   performanceMedia: number;
+  totalProjetos?: number;
+  projetosEmAndamento?: number;
 }
 
 interface Entrega {
@@ -46,29 +46,23 @@ const statusColor = (s: string) => {
   return "bg-muted-foreground/40";
 };
 
-const statusLabel = (s: string) => {
-  if (s === "concluido" || s === "aprovada") return "Concluído";
-  if (s === "em_andamento") return "Em andamento";
-  if (s === "atrasado") return "Atrasado";
-  if (s === "priorizado") return "Priorizado";
-  if (s === "levantado") return "Levantado";
-  if (s === "pendente") return "Pendente";
-  return s;
-};
-
 function MemberDonut({ member, entregas, projetos }: { member: RankingItem; entregas: Entrega[]; projetos: Projeto[] }) {
   const memberEntregas = entregas.filter((e) => e.responsavelId === member.userId);
   const memberProjetos = projetos.filter((p) => p.responsavelId === member.userId);
-  const hasEntregas = memberEntregas.length > 0;
 
-  const items = hasEntregas ? memberEntregas : memberProjetos;
-  const pct = member.totalEntregas > 0
-    ? Math.round((member.entregasConcluidas / member.totalEntregas) * 100)
-    : 0;
+  // Combined items for listing
+  const allItems = [
+    ...memberProjetos.map(p => ({ id: p.id, titulo: p.titulo, status: p.status, type: "projeto" as const })),
+    ...memberEntregas.map(e => ({ id: e.id, titulo: e.titulo, status: e.status, type: "entrega" as const })),
+  ];
+
+  const totalItems = (member.totalProjetos || memberProjetos.length) + member.totalEntregas;
+  const doneItems = member.entregasConcluidas + (member.projetosEmAndamento || 0);
+  const pct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
 
   const data = [
-    { name: "done", value: member.entregasConcluidas || 0.01 },
-    { name: "remaining", value: Math.max(0, member.totalEntregas - member.entregasConcluidas) || 0.01 },
+    { name: "done", value: doneItems || 0.01 },
+    { name: "remaining", value: Math.max(0, totalItems - doneItems) || 0.01 },
   ];
 
   return (
@@ -94,23 +88,21 @@ function MemberDonut({ member, entregas, projetos }: { member: RankingItem; entr
       </div>
       <p className="text-sm font-medium text-center truncate max-w-[160px]">{member.nome}</p>
       <p className="text-xs text-muted-foreground">
-        {hasEntregas
-          ? `${member.entregasConcluidas}/${member.totalEntregas} entregas`
-          : `${memberProjetos.length} projeto${memberProjetos.length !== 1 ? "s" : ""}`}
+        {memberProjetos.length} proj · {member.entregasConcluidas}/{member.totalEntregas} entregas
       </p>
       <div className="w-full space-y-1.5">
-        {items.length > 0 ? (
-          items.slice(0, 4).map((item) => (
+        {allItems.length > 0 ? (
+          allItems.slice(0, 4).map((item) => (
             <div key={item.id} className="flex items-center gap-2 text-xs">
               <span className={`w-2 h-2 rounded-full shrink-0 ${statusColor(item.status)}`} />
               <span className="truncate text-muted-foreground" title={item.titulo}>{item.titulo}</span>
             </div>
           ))
         ) : (
-          <p className="text-xs text-muted-foreground text-center">Sem projetos atribuídos</p>
+          <p className="text-xs text-muted-foreground text-center">Sem itens atribuídos</p>
         )}
-        {items.length > 4 && (
-          <p className="text-xs text-muted-foreground/60 text-center">+{items.length - 4} mais</p>
+        {allItems.length > 4 && (
+          <p className="text-xs text-muted-foreground/60 text-center">+{allItems.length - 4} mais</p>
         )}
       </div>
     </div>
