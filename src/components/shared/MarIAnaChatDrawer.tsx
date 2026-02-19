@@ -258,19 +258,36 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center text-center py-8">
+          <div className="flex flex-col items-center justify-center text-center py-4">
             <img
               src={mariAvatar}
               alt="MarIAna"
-              className="w-14 h-14 rounded-full mb-3 object-cover"
+              className="w-12 h-12 rounded-full mb-2 object-cover"
               onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
             />
             <p className="text-sm font-medium">
               Sou a Mar<span className="text-primary">IA</span>na
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
               Qual sua dúvida hoje?
             </p>
+            <div className="w-full space-y-2 px-1">
+              {[
+                "Qual meu próximo passo na mentoria?",
+                "Como usar IA para automatizar tarefas?",
+                "Me sugira uma trilha de aprendizado",
+                "Quais ferramentas de IA devo começar?",
+              ].map((suggestion) => (
+                <button
+                  key={suggestion}
+                  onClick={() => sendMessage(suggestion)}
+                  disabled={isLoading || isStreaming}
+                  className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border bg-muted/30 hover:bg-muted transition-colors text-foreground/80 hover:text-foreground disabled:opacity-50"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
