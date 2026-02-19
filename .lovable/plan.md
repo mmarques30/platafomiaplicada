@@ -1,70 +1,44 @@
 
-# Calculadora de ROI por Projeto - Situacao Atual vs. Melhoria
+# Editar Titulo e Descricao de Projetos e Entregas IA
 
-## Objetivo
+## Problema atual
 
-Adicionar campos ao projeto que registram o **cenario atual** (antes da melhoria): tempo gasto no processo e quem executa (cargo). Esses dados, combinados com a economia estimada ja existente, funcionam como uma calculadora de ROI que permite comparar o **antes** e o **depois** da implementacao do projeto.
+1. **Projeto (ProjetoDetailModal)**: O titulo do projeto e exibido como texto estatico no `DialogTitle`. Nao ha campo de descricao editavel visivel (a descricao existe mas e exibida como texto).
+2. **Entrega IA (EntregaSkillsEditModal)**: O titulo da entrega e exibido como `<p>` estatico (linha 151). A descricao ja e editavel via `Textarea`. A interface `onSave` nao inclui `titulo`.
 
-## Novos campos no banco de dados
-
-Adicionar 3 colunas na tabela `backlog_skills`:
-
-| Coluna | Tipo | Descricao |
-|---|---|---|
-| `tempo_atual_horas` | `numeric` | Tempo gasto atualmente no processo (h/semana) |
-| `cargo_executor` | `text` | Cargo/funcao de quem executa o processo hoje |
-| `custo_hora_executor` | `numeric` | Custo/hora do executor (para calculo financeiro do ROI) |
-
-Com esses campos + `horas_estimadas_economia` (ja existe), o ROI pode ser calculado:
-- **Tempo atual**: `tempo_atual_horas` h/semana
-- **Tempo apos melhoria**: `tempo_atual_horas - horas_estimadas_economia` h/semana
-- **Economia financeira**: `horas_estimadas_economia * custo_hora_executor` por semana
-- **ROI anual estimado**: economia semanal * 52
+Nota: A entrega manual (`EntregaEquipeModal`) ja possui titulo e descricao editaveis -- nao precisa de alteracao.
 
 ## Alteracoes
 
-### 1. Migracao de banco de dados
-Adicionar as 3 colunas na tabela `backlog_skills` com valores default `null`.
+### 1. ProjetoDetailModal.tsx - Titulo e Descricao editaveis
 
-### 2. Interface de tipo (`useSkillsBacklog.ts`)
-Adicionar os 3 novos campos ao `BacklogItem` interface.
+- Adicionar estados `tituloValue` e `descricaoValue` (mesmo padrao de `obsValue`/`areaValue` com auto-save onBlur)
+- Inicializar no `useEffect` existente
+- Substituir o titulo estatico `{item.titulo}` no `DialogTitle` por um `Input` editavel (quando `onUpdate` existe), com `onBlur` que chama `onUpdate(item.id, { titulo })`
+- Localizar onde a descricao e exibida e torna-la editavel com `Textarea` + `onBlur` auto-save, seguindo o mesmo padrao das observacoes
 
-### 3. Modal de criacao (`AddProjetoModal.tsx`)
-Adicionar secao "Situacao Atual" com campos:
-- Tempo gasto atualmente (h/semana) - input numerico
-- Cargo de quem executa - input texto
-- Custo/hora do executor (R$) - input numerico
+### 2. EntregaSkillsEditModal.tsx - Titulo editavel
 
-Atualizar a interface `onAdd` para incluir os novos campos. Atualizar a IA para tambem sugerir esses campos.
+- Adicionar estado `tituloValue` inicializado com `entrega.titulo`
+- Substituir `<p className="font-medium">{entrega.titulo}</p>` por um `Input` editavel
+- Expandir a interface `onSave` para aceitar `titulo?: string`
+- Incluir titulo no `hasChanges` e no `handleSave`
 
-### 4. Modal de detalhes (`ProjetoDetailModal.tsx`)
-Adicionar secao "Calculadora de ROI" entre as Observacoes e as Entregas com:
-- Campos editaveis (onBlur auto-save): tempo atual, cargo executor, custo/hora
-- Resumo calculado automaticamente:
-  - Tempo atual vs. Tempo apos melhoria
-  - Economia semanal em horas
-  - Economia financeira semanal e anual estimada
+### 3. Chamadas do onSave (ProjetoSkillsEntregas.tsx)
 
-### 5. Edge Function `personalizar-projeto-skills`
-Adicionar os novos campos ao tool calling da IA para que o "Gerar com IA" tambem sugira tempo atual, cargo e custo/hora com base no titulo do projeto.
+- Verificar se o handler de `onSave` da `EntregaSkillsEditModal` repassa o campo `titulo` ao mutation de update. Ajustar se necessario.
 
-## Fluxo do usuario
+## Comportamento esperado
 
-1. Cria/edita projeto com titulo "Automacao de relatorios financeiros"
-2. Preenche (ou IA gera): tempo atual = 10h/semana, cargo = Analista Financeiro, custo/hora = R$ 45
-3. Economia estimada = 8h/semana (ja existente)
-4. Modal exibe automaticamente:
-   - Hoje: 10h/semana (R$ 450/semana)
-   - Apos melhoria: 2h/semana (R$ 90/semana)
-   - Economia: 8h/semana = R$ 360/semana = R$ 18.720/ano
-5. Apos entrega, esses dados sao comparados com os resultados reais das entregas
+1. Abrir projeto no modal: titulo aparece como Input editavel, descricao como Textarea editavel
+2. Alterar e clicar fora: salva automaticamente (onBlur)
+3. Abrir entrega IA: titulo aparece como Input editavel (em vez de texto estatico)
+4. Clicar "Salvar Alteracoes" no modal de entrega: envia titulo atualizado junto com os demais campos
 
 ## Detalhes tecnicos
 
-| Componente | Acao |
+| Arquivo | Acao |
 |---|---|
-| Migracao SQL | `ALTER TABLE backlog_skills ADD COLUMN tempo_atual_horas numeric, ADD COLUMN cargo_executor text, ADD COLUMN custo_hora_executor numeric` |
-| `src/hooks/useSkillsBacklog.ts` | Adicionar campos ao `BacklogItem` interface e ao `addItem` mutation |
-| `src/components/skills/backlog/AddProjetoModal.tsx` | Adicionar 3 campos + incluir na interface `onAdd` + enviar para IA |
-| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Adicionar secao "Calculadora de ROI" com campos editaveis e resumo calculado |
-| `supabase/functions/personalizar-projeto-skills/index.ts` | Adicionar campos ao tool calling |
+| `src/components/skills/backlog/ProjetoDetailModal.tsx` | Adicionar estados `tituloValue` e `descricaoValue`, substituir titulo estatico por `Input` com onBlur auto-save, tornar descricao editavel com `Textarea` + onBlur |
+| `src/components/skills/EntregaSkillsEditModal.tsx` | Adicionar estado `tituloValue`, substituir `<p>` por `Input`, expandir interface `onSave` para incluir `titulo`, incluir no `hasChanges`/`handleSave` |
+| `src/components/skills/ProjetoSkillsEntregas.tsx` | Garantir que o handler de save da entrega IA repasse o campo `titulo` ao mutation |
