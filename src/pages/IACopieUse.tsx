@@ -89,41 +89,87 @@ export default function IACopieUse() {
         </Select>
       </div>
 
-      {/* Results counter */}
+      {/* Results counter + view toggle */}
       {filteredIAs && (
-        <p className="text-sm text-muted-foreground">
-          {filteredIAs.length} {filteredIAs.length === 1 ? 'resultado' : 'resultados'} encontrados
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            {filteredIAs.length} {filteredIAs.length === 1 ? 'resultado' : 'resultados'} encontrados
+          </p>
+          <div className="flex items-center gap-1">
+            <Button
+              variant={viewMode === "cards" ? "default" : "ghost"}
+              size="icon"
+              onClick={() => setViewMode("cards")}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={viewMode === "tabela" ? "default" : "ghost"}
+              size="icon"
+              onClick={() => setViewMode("tabela")}
+            >
+              <List className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <Card key={i} className="min-h-[220px]">
-              <CardContent className="p-5 space-y-3">
-                <Skeleton className="w-12 h-12 rounded-lg" />
-                <Skeleton className="h-4 w-4/5" />
-                <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-3/4" />
-                <div className="flex gap-2 mt-auto">
-                  <Skeleton className="h-5 w-20" />
-                  <Skeleton className="h-5 w-16" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : visibleIAs && visibleIAs.length > 0 ? (
-        <>
+        viewMode === "cards" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
-            {visibleIAs.map((ia) => (
-              <IACopieUseCard
-                key={ia.id}
-                ia={ia}
-                onClick={() => setSelectedIA(ia)}
-              />
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <Card key={i} className="min-h-[220px]">
+                <CardContent className="p-5 space-y-3">
+                  <Skeleton className="w-12 h-12 rounded-lg" />
+                  <Skeleton className="h-4 w-4/5" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-3/4" />
+                  <div className="flex gap-2 mt-auto">
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-5 w-16" />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
+        ) : (
+          <Card>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="flex items-center gap-3 p-4 border-b border-border last:border-b-0">
+                <Skeleton className="w-10 h-10 rounded-lg shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/5" />
+                  <Skeleton className="h-3 w-4/5" />
+                </div>
+                <Skeleton className="h-5 w-20 hidden lg:block" />
+                <Skeleton className="h-8 w-16" />
+              </div>
+            ))}
+          </Card>
+        )
+      ) : visibleIAs && visibleIAs.length > 0 ? (
+        <>
+          {viewMode === "cards" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+              {visibleIAs.map((ia) => (
+                <IACopieUseCard
+                  key={ia.id}
+                  ia={ia}
+                  onClick={() => setSelectedIA(ia)}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card>
+              {visibleIAs.map((ia) => (
+                <IACopieUseRow
+                  key={ia.id}
+                  ia={ia}
+                  onClick={() => setSelectedIA(ia)}
+                />
+              ))}
+            </Card>
+          )}
           
           {hasMore && (
             <div className="flex justify-center pt-4">
