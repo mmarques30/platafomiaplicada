@@ -1,57 +1,53 @@
 
+# Adicionar coluna "Reassistidos" no ranking de engajamento
 
-# Corrigir contagem de videos assistidos no ranking de engajamento
+## O que muda
 
-## Problema
+Uma nova coluna na tabela do ranking mostrando quantos videos foram assistidos mais de uma vez. Isso incentiva o engajamento e mostra dedicacao dos visitantes.
 
-A funcao `get_ranking_engajamento()` conta videos assistidos pela tabela `progresso_videos` (onde `completado = true`), mas visitantes quase nao registram dados nessa tabela. Os visitantes assistem videos gratuitos e o acesso e registrado na tabela `content_access_logs` com `content_type = 'video'`.
+## Como funciona o calculo
 
-Dados atuais no banco:
-- `content_access_logs` (visitantes, tipo video): **136 registros**
-- `progresso_videos` (visitantes, completado): **apenas 2 registros**
+- **Videos assistidos** (atual): conta videos unicos (`COUNT(DISTINCT content_id)`)
+- **Reassistidos** (novo): total de acessos a videos menos os unicos (`COUNT(*) - COUNT(DISTINCT content_id)`)
 
-Ou seja, o ranking mostra quase zero videos para todos os visitantes.
+Exemplo: se um visitante assistiu o video A 3 vezes e o video B 1 vez, tera Videos = 2, Reassistidos = 2.
 
-## Solucao
+## Alteracoes
 
-Atualizar a funcao `get_ranking_engajamento()` no banco de dados para contar videos assistidos a partir de `content_access_logs` (com `content_type = 'video'`) em vez de `progresso_videos`.
+### 1. Funcao do banco de dados (`get_ranking_engajamento`)
 
-### Secao tecnica
+- Adicionar um novo campo `total_videos_reassistidos` no retorno da funcao
+- Calcular como `COUNT(*) - COUNT(DISTINCT content_id)` filtrando por `content_type = 'video'`
 
-Substituir a funcao SQL por:
+### 2. Hook `useRankingEngajamento.tsx`
+
+- Adicionar `total_videos_reassistidos: number` na interface `RankingEngajamentoItem`
+
+### 3. Componente `RankingEngajamento.tsx`
+
+- Adicionar coluna "Reassistidos" no cabecalho da tabela (entre "Videos" e "Downloads")
+- Adicionar a celula correspondente em cada linha da tabela (posicoes 4-10 e alem de 10)
+- Adicionar o dado nos stats do Top 3, junto com videos e downloads
+
+### 4. Dashboard `CommunityHeroDashboard.tsx`
+
+- Nenhuma alteracao necessaria -- o dashboard nao exibe essa metrica
+
+## Secao tecnica
+
+SQL da funcao atualizada (trecho relevante):
 
 ```sql
-CREATE OR REPLACE FUNCTION public.get_ranking_engajamento()
-RETURNS TABLE(...)
-AS $$
-BEGIN
-  RETURN QUERY
-  WITH user_stats AS (
-    SELECT 
-      p.id as uid, p.nome_completo, p.avatar_url,
-      -- Videos: contar acessos distintos em content_access_logs
-      COALESCE((SELECT COUNT(DISTINCT cal.content_id) 
-                FROM content_access_logs cal 
-                WHERE cal.user_email = p.email 
-                AND cal.content_type = 'video'), 0) as videos,
-      -- Materiais: manter igual (ja usa content_access_logs)
-      COALESCE((SELECT COUNT(DISTINCT cal.content_id) 
-                FROM content_access_logs cal 
-                WHERE cal.user_email = p.email 
-                AND cal.content_type = 'material'), 0) as materiais,
-      0::BIGINT as aulas
-    FROM profiles p
-    WHERE p.conta_ativa = true
-      AND p.is_visitante = true
-  )
-  SELECT ...
-  ORDER BY total_pontos DESC;
-END;
-$$
+RETURNS TABLE(
+  ...campos existentes...,
+  total_videos_reassistidos bigint  -- novo campo
+)
+
+-- Dentro do CTE user_stats:
+COALESCE((SELECT COUNT(*) - COUNT(DISTINCT cal.content_id) 
+          FROM content_access_logs cal 
+          WHERE cal.user_email = p.email 
+          AND cal.content_type = 'video'), 0) as reassistidos
 ```
 
-Mudancas principais:
-- Videos: troca `progresso_videos` por `content_access_logs` com `COUNT(DISTINCT content_id)` para evitar contar acessos duplicados ao mesmo video
-- Materiais: adiciona `DISTINCT content_id` para evitar duplicatas tambem
-- Nenhuma alteracao no frontend -- o componente `RankingEngajamento.tsx` ja exibe os dados corretamente
-
+No componente, a nova coluna ficara visivel apenas em telas `sm+` (igual as outras colunas de detalhe), mantendo o layout mobile limpo.
