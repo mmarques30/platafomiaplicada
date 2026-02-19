@@ -125,8 +125,8 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Imagem muito grande. Máximo 2MB");
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Imagem muito grande. Máximo 10MB");
         return;
       }
       setImageFile(file);
@@ -313,7 +313,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
                 className="cursor-pointer"
               />
               <p className="text-xs text-muted-foreground">
-                Recomendado: 1920x1080px, máximo 2MB
+                Recomendado: 1920x1080px, máximo 10MB
               </p>
             </div>
           </div>
