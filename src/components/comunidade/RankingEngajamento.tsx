@@ -99,7 +99,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
               
               {/* Stats */}
               <p className="text-xs text-[#0D0D0D]/60 mt-1">
-                {item.total_videos_assistidos} vídeos • {item.total_materiais_baixados} downloads
+                {item.total_videos_assistidos} vídeos • {item.total_materiais_baixados} downloads • {item.total_aulas_presentes} presenças
               </p>
               
               {/* Pontos */}
@@ -121,6 +121,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                 <th className="text-left p-3 font-medium">Membro</th>
                 <th className="text-right p-3 font-medium hidden sm:table-cell">Vídeos</th>
                 <th className="text-right p-3 font-medium hidden sm:table-cell">Downloads</th>
+                <th className="text-right p-3 font-medium hidden sm:table-cell">Presenças</th>
                 <th className="text-right p-3 font-medium">Pontos</th>
               </tr>
             </thead>
@@ -156,6 +157,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                   </td>
                   <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_videos_assistidos}</td>
                   <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_materiais_baixados}</td>
+                  <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_aulas_presentes}</td>
                   <td className="p-3 text-right font-semibold">{item.total_pontos}</td>
                 </tr>
               ))}
@@ -191,6 +193,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                   </td>
                   <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_videos_assistidos}</td>
                   <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_materiais_baixados}</td>
+                  <td className="p-3 text-right text-muted-foreground hidden sm:table-cell">{item.total_aulas_presentes}</td>
                   <td className="p-3 text-right font-semibold">{item.total_pontos}</td>
                 </tr>
               ))}
