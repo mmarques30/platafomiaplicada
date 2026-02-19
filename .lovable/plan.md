@@ -1,39 +1,35 @@
 
+# Ajustes no Painel do Lider
 
-# Simplificar Badges - Remover Excesso de Informacao
+## 1. Trocar cards pretos (dark) por verde da marca (accent)
 
-## Problema
+No arquivo `src/components/skills/performance/KPICard.tsx`, os cards usam duas variantes: `dark` (fundo #0D0D0D preto) e `accent` (fundo verde). O pedido e usar apenas a variante verde para todos.
 
-Os cards e tabelas de projetos e entregas mostram informacao demais: badges de "Aprovado" (redundante com a coluna do Kanban), prioridade P1/P2/P3 (nao util no momento), e badges de "Diagnostico". O usuario quer manter apenas a indicacao de se o projeto esta **priorizado ou nao**.
+**Alteracao em `src/components/skills/visao-geral/ResumoPerformanceCards.tsx`:**
+- Trocar `variant="dark"` por `variant="accent"` nos dois cards que usam fundo preto ("Projetos Mapeados" e "Entregas")
+- Resultado: os 4 cards ficarao com o mesmo visual verde limpo
 
-## Alteracoes
+## 2. Corrigir contagem de entregas (excluir projetos nao aprovados)
 
-### 1. `src/components/skills/backlog/BacklogCard.tsx`
-- **Remover** o badge "APROVADO" (linhas 50-54)
-- **Remover** o badge "PRIORIZADO" (linhas 55-59)
-- **Remover** o badge de prioridade P1/P2/P3 (linhas 60-64)
-- **Manter** apenas o badge de area impactada e os avatares
-- **Remover** o objeto `prioridadeCores` (linhas 8-15) que nao sera mais usado
+Atualmente o hook `useSkillsLider.ts` conta **todas** as entregas da equipe (linha 396: `totalEntregas = entregas.length`), incluindo as 16 entregas vinculadas a projetos com status `nao_aprovado`. Isso infla o numero.
 
-### 2. `src/components/skills/backlog/BacklogTable.tsx`
-- **Remover** a coluna "Prioridade" inteira (TableHead + TableCell com badges P1/P2/P3)
-- Atualizar colSpan de 5 para 4
-- **Remover** o objeto `prioridadeCores` (linhas 27-34)
-- A coluna "Status" ja mostra se e priorizado ou nao, entao e suficiente
+**Alteracao em `src/hooks/useSkillsLider.ts`:**
+- Na query de entregas (linha 144), adicionar um JOIN com `backlog_skills` para trazer o status do projeto vinculado
+- Filtrar entregas cujo projeto vinculado (`backlog_item_id`) tenha status `nao_aprovado` ou `descartado`
+- Alternativa mais simples: filtrar no lado do cliente apos buscar os dados, usando os projetos ja carregados
 
-### 3. `src/components/skills/backlog/ProjetoDetailModal.tsx`
-- **Remover** o seletor de prioridade P1/P2/P3 (linhas 166-188) do topo do modal
-- **Remover** o badge "Diagnostico" (linhas 189-193)
-- Manter apenas o badge de status (Levantado, Aprovado, Priorizado, etc.) que ja indica se esta priorizado ou nao
+**Abordagem escolhida (cliente):**
+- Apos buscar entregas e projetos, criar um Set com os IDs de projetos nao aprovados/descartados
+- Filtrar `entregas` para excluir as que tenham `backlog_item_id` em projetos nao aprovados
+- Atualizar `totalEntregas` e `entregasConcluidasList` para usar a lista filtrada
 
-### 4. `src/components/skills/ProjetoSkillsEntregas.tsx`
-- **Remover** a coluna "Prioridade" da tabela de entregas (TableHead linha 316 + TableCell linhas 350-358)
-- Atualizar colSpan correspondente
-- **Remover** o objeto `prioridadeColors` (linhas 33-37)
+Isso requer buscar o campo `backlog_item_id` na query de entregas (que hoje nao e selecionado).
 
-## O que sera mantido
+### Detalhes tecnicos
 
-- Badge de **status** nos projetos (mostra se e priorizado, aprovado, em execucao, etc.)
-- Badge de **area impactada** nos cards
-- Coluna de **status** nas tabelas
-- Avatares de responsavel/colaborador
+| Arquivo | Acao |
+|---|---|
+| `ResumoPerformanceCards.tsx` | Trocar `variant="dark"` para `variant="accent"` em 2 cards |
+| `useSkillsLider.ts` linha 146 | Adicionar `backlog_item_id` ao select da query de entregas |
+| `useSkillsLider.ts` interface Entrega | Adicionar campo `backlogItemId` |
+| `useSkillsLider.ts` linhas 395-396 | Filtrar entregas excluindo as vinculadas a projetos `nao_aprovado`/`descartado` antes de calcular totais |
