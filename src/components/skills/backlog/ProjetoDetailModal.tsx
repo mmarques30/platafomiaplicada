@@ -150,13 +150,6 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
-          {/* Status + Prioridade */}
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className={statusColors[currentStatus]}>
-              {statusLabels[currentStatus] || currentStatus}
-            </Badge>
-          </div>
-
           {/* Ações rápidas de status - contextuais */}
           {onStatusChange && (
             <div className="flex flex-wrap gap-2">

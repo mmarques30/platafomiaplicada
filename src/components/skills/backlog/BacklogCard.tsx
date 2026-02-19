@@ -1,7 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
 interface BacklogCardProps {
@@ -36,31 +35,11 @@ export default function BacklogCard({ item, onClick }: BacklogCardProps) {
         <p className="text-xs text-muted-foreground line-clamp-2">{item.descricao}</p>
       )}
 
-      <div className="flex items-center justify-between pt-1">
-        {item.area_impactada ? (
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-            {item.area_impactada}
-          </Badge>
-        ) : <span />}
-
-        <div className="flex -space-x-1.5">
-          {item.responsavel && (
-            <Avatar className="h-5 w-5 border-2 border-background">
-              <AvatarImage src={item.responsavel.avatar_url || ""} />
-              <AvatarFallback className="text-[8px]">
-                {item.responsavel.nome?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          )}
-          {item.colaborador && (
-            <Avatar className="h-5 w-5 border-2 border-background">
-              <AvatarImage src={item.colaborador.avatar_url || ""} />
-              <AvatarFallback className="text-[8px]">
-                {item.colaborador.nome?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          )}
-        </div>
+      <div className="flex items-center justify-between pt-1 text-[10px] text-muted-foreground">
+        <span className="truncate">{item.responsavel?.nome || ""}</span>
+        {item.created_at && (
+          <span className="shrink-0 ml-2">{format(new Date(item.created_at), "dd/MM/yy")}</span>
+        )}
       </div>
     </div>
   );
