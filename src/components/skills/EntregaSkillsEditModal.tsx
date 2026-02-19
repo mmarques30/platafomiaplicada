@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Clock, FileText, Send, CheckCircle2, CalendarIcon, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
@@ -144,10 +143,7 @@ export function EntregaSkillsEditModal({ open, onOpenChange, entrega, onSave, is
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            Editar Entrega
-            <Badge variant="outline" className="bg-purple-500/10 text-purple-700 border-purple-500/30">IA</Badge>
-          </DialogTitle>
+          <DialogTitle>Editar Entrega</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>

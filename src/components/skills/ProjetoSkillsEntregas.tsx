@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Package, Bot, Users, X, Archive } from "lucide-react";
+import { Plus, Package, Users, X, Archive } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -63,7 +63,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
 
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterResponsavel, setFilterResponsavel] = useState("all");
-  const [filterOrigem, setFilterOrigem] = useState("all");
+  
   
   const [filterProjeto, setFilterProjeto] = useState("all");
   const [showArchived, setShowArchived] = useState(false);
@@ -145,7 +145,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
     // Hide archived project entregas by default
     if (!showArchived && e.projetoStatus && ARCHIVED_PROJECT_STATUSES.includes(e.projetoStatus)) return false;
     if (filterStatus !== "all" && e.status !== filterStatus) return false;
-    if (filterOrigem !== "all" && e.origem !== filterOrigem) return false;
+    
     if (filterResponsavel !== "all" && (e.responsavelNome || "") !== filterResponsavel) return false;
     
     if (filterProjeto !== "all" && (e.projetoTitulo || "") !== filterProjeto) return false;
@@ -154,12 +154,11 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
 
   const archivedCount = allEntregas.filter(e => e.projetoStatus && ARCHIVED_PROJECT_STATUSES.includes(e.projetoStatus)).length;
 
-  const hasActiveFilters = filterStatus !== "all" || filterResponsavel !== "all" || filterOrigem !== "all" || filterProjeto !== "all";
+  const hasActiveFilters = filterStatus !== "all" || filterResponsavel !== "all" || filterProjeto !== "all";
 
   const clearFilters = () => {
     setFilterStatus("all");
     setFilterResponsavel("all");
-    setFilterOrigem("all");
     setFilterProjeto("all");
   };
 
@@ -246,16 +245,6 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
             </SelectContent>
           </Select>
 
-          <Select value={filterOrigem} onValueChange={setFilterOrigem}>
-            <SelectTrigger className="border-border/50 h-8 text-xs w-[120px] bg-transparent hover:bg-muted/50 transition-colors">
-              <SelectValue placeholder="Origem" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas origens</SelectItem>
-              <SelectItem value="ia">IA</SelectItem>
-              <SelectItem value="manual">Manual</SelectItem>
-            </SelectContent>
-          </Select>
 
 
 
