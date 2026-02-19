@@ -114,23 +114,15 @@ export default function GerenciarVisitantes() {
       </div>
 
       <Tabs defaultValue="visitantes" className="space-y-4">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-md grid-cols-1">
           <TabsTrigger value="visitantes" className="gap-2">
             <Users className="h-4 w-4" />
             Visitantes
-          </TabsTrigger>
-          <TabsTrigger value="cupons" className="gap-2">
-            <Tag className="h-4 w-4" />
-            Cupons
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="visitantes">
           <VisitantesTab onExportFullReport={exportFullReportCSV} />
-        </TabsContent>
-
-        <TabsContent value="cupons">
-          <CuponsTab />
         </TabsContent>
       </Tabs>
     </div>
