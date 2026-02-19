@@ -1,55 +1,28 @@
 
 
-# Remover Badges "Gerado por IA" das Telas do Usuario
+# Remover "Economia Estimada" duplicada dos cards de projeto
 
-## Contexto
+## Problema
 
-Atualmente, badges como "Gerado por IA", icones de raio (Zap) e badges "IA/Manual" aparecem em diversas telas visiveis para o usuario comum. A informacao de origem (IA vs manual) deve ser visivel **somente para administradores** na area Mentoria > Skills.
+O campo "Economia Estimada (h/semana)" aparece como informacao fixa nos cards e detalhes do projeto, mas essa mesma informacao ja esta presente na calculadora de ROI. Isso gera duplicidade.
 
-## Arquivos a alterar (telas do usuario)
+## Alteracoes
 
-### 1. `src/components/mentoria/ObjetivosGerados.tsx`
-- **Remover** o badge "Gerado por IA" (linhas 73-77) que aparece quando `objetivo.gerado_por_ia` e true
-- Substituir por um badge "Diagnostico" fixo no mesmo local, indicando que o objetivo veio do diagnostico
+### 1. `src/components/skills/backlog/BacklogCard.tsx`
+- Remover o bloco que exibe `horas_estimadas_economia` com icone de relogio (linhas 74-79)
+- O card continuara mostrando area impactada e prioridade
 
-### 2. `src/components/mentoria/business/InstrucaoCard.tsx`
-- **Remover** o badge "IA" (linhas 112-114) que aparece quando `instrucao.gerado_por_ia` e true
-- Substituir por badge "Diagnostico"
-
-### 3. `src/components/skills/backlog/BacklogCard.tsx`
-- **Remover** o icone Zap amarelo (linha 89) que indica `item.origem === "ia"`
-- Nao substituir por nada (o card ja tem informacoes suficientes)
-
-### 4. `src/components/skills/backlog/BacklogTable.tsx`
-- **Remover** o icone Zap amarelo (linha 68) na coluna Titulo que indica `item.origem === "ia"`
-
-### 5. `src/components/skills/backlog/ProjetoDetailModal.tsx`
-- **Remover** o icone Zap amarelo no titulo (linha 141)
-- **Remover** o badge "Gerado por IA" / "Manual" (linhas 189-193)
-- Substituir o badge por "Diagnostico" quando a origem for "ia"
-
-### 6. `src/components/skills/ProjetoSkillsEntregas.tsx`
-- **Remover** a coluna "Origem" da tabela de entregas (linhas 374-378) que mostra badges "IA" ou "Manual"
+### 2. `src/components/skills/backlog/BacklogTable.tsx`
+- Remover a coluna "Economia Estimada" da tabela (linha 106)
 - Remover o TableHead correspondente
 
-## Arquivos que NAO serao alterados (admin)
+### 3. `src/components/skills/backlog/ProjetoDetailModal.tsx`
+- Remover o bloco de "Economia Estimada" da secao de informacoes do projeto (linhas 358-365), pois ja aparece na aba/secao de ROI (linhas 572-575 e no calculo de ROI linha 622+)
+- Manter a informacao na secao de ROI/calculadora onde ela ja existe
 
-Os seguintes arquivos ficam em areas administrativas e devem **manter** as indicacoes de IA:
-- `src/components/admin/business/ReportsBusinessManager.tsx`
-- `src/components/admin/business/InstrucoesBusinessManager.tsx`
-- `src/components/admin/business/GeracaoEntregasModal.tsx`
-- `src/components/admin/business/UploadTranscricaoModal.tsx`
-- `src/components/admin/skills/GerarReportSkillsModal.tsx`
-- `src/components/admin/mentoria/ProjetosIAAdmin.tsx`
+## O que NAO sera alterado
 
-## Detalhes tecnicos
-
-| Arquivo | Acao |
-|---|---|
-| `ObjetivosGerados.tsx` | Remover condicional `gerado_por_ia`, colocar badge "Diagnostico" fixo |
-| `InstrucaoCard.tsx` | Remover badge "IA", colocar badge "Diagnostico" |
-| `BacklogCard.tsx` | Remover icone Zap (linha 89) |
-| `BacklogTable.tsx` | Remover icone Zap (linha 68) |
-| `ProjetoDetailModal.tsx` | Remover Zap do titulo e badge "Gerado por IA"/"Manual", mostrar "Diagnostico" se origem=ia |
-| `ProjetoSkillsEntregas.tsx` | Remover coluna "Origem" inteira da tabela |
+- A secao de ROI no `ProjetoDetailModal` continua mostrando a economia estimada (linhas 572-575)
+- O campo no formulario `AddProjetoModal` continua existindo para cadastro
+- Os calculos de ROI que usam `horas_estimadas_economia` permanecem intactos
 
