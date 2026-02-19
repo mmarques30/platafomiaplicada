@@ -5858,7 +5858,9 @@ export type Database = {
         Returns: {
           online_visitantes: number
           total_conteudos_gratuitos: number
+          total_materiais_baixados: number
           total_materiais_gratuitos: number
+          total_videos_assistidos: number
           total_visitantes: number
         }[]
       }
