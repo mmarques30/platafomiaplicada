@@ -37,8 +37,7 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
 
       {/* Economia Total */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+        <div className="mb-3">
           <p className="text-base font-medium text-foreground">Economia da Equipe</p>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -61,8 +60,7 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
       {dores.length > 0 && (
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <AlertTriangle className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+            <CardTitle className="text-base">
               Dores Comuns da Equipe
             </CardTitle>
           </CardHeader>
@@ -91,8 +89,7 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
       {processos.length > 0 && (
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Target className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+            <CardTitle className="text-base">
               Processos com Maior Potencial
             </CardTitle>
           </CardHeader>
@@ -128,8 +125,7 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
       {sobreposicoes.length > 0 && (
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Layers className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+            <CardTitle className="text-base">
               Sobreposições de Esforço
             </CardTitle>
           </CardHeader>
@@ -150,8 +146,7 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
       {recomendacoes.length > 0 && (
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+            <CardTitle className="text-base">
               Recomendações
             </CardTitle>
           </CardHeader>
@@ -171,8 +166,7 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
       {consolidado.insights_ia && (
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+            <CardTitle className="text-base">
               Insights da IA
             </CardTitle>
           </CardHeader>

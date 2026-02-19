@@ -172,12 +172,9 @@ function MinhaAnaliseContent({
 
       {/* Perfil Mapeado */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <CheckCircle2 className="h-5 w-5 text-[hsl(72,50%,35%)]" />
-          <div>
-            <p className="text-base font-medium text-foreground">Seu Perfil Mapeado</p>
-            <p className="text-sm text-muted-foreground">Diagnóstico individual concluído</p>
-          </div>
+        <div className="mb-3">
+          <p className="text-base font-medium text-foreground">Seu Perfil Mapeado</p>
+          <p className="text-sm text-muted-foreground">Diagnóstico individual concluído</p>
         </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <ProfileItem label="Cargo" value={perfil.cargo || "—"} />
@@ -191,8 +188,7 @@ function MinhaAnaliseContent({
       {processos.length > 0 && (
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <BarChart3 className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+            <CardTitle className="text-base">
               Seus Processos Identificados
             </CardTitle>
           </CardHeader>
@@ -223,8 +219,7 @@ function MinhaAnaliseContent({
 
       {/* Economia Potencial */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+        <div className="mb-3">
           <p className="text-base font-medium text-foreground">Sua Economia Potencial</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -252,14 +247,12 @@ function MinhaAnaliseContent({
       {trilha.modulos?.length > 0 && (
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <BookOpen className="h-5 w-5 text-[hsl(72,50%,35%)]" />
+            <CardTitle className="text-base">
               Sua Trilha Personalizada
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-foreground">
-              <Award className="mr-1 inline h-4 w-4 text-[hsl(72,50%,35%)]" />
               {trilha.modulos.length} módulos selecionados para você
             </p>
             <div className="space-y-2">
