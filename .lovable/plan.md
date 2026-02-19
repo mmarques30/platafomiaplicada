@@ -1,72 +1,103 @@
 
 
-# Adicionar alternancia Cards / Tabela na pagina IA Copie e Use
+# Incluir Melhorias da Plataforma no Resumo de Atualizacoes
 
-## Contexto
+## Problema
 
-O arquivo ja possui os imports de `LayoutGrid`, `List`, `IACopieUseRow` e o estado `viewMode` declarado (linha 28), mas nao estao sendo usados. Basta adicionar os botoes de alternancia e a renderizacao condicional.
+O sistema de auditoria captura apenas alteracoes em tabelas de conteudo (videos, prompts, trilhas, etc.). Melhorias de plataforma como "chat da MarIAna com historico", "melhoria de performance" ou "novo layout lateral" sao mudancas de codigo que nao sao registradas em nenhuma tabela -- por isso nunca aparecem no resumo gerado pela IA.
 
-## Alteracoes no arquivo `src/pages/IACopieUse.tsx`
+## Solucao
 
-### 1. Botoes de alternancia ao lado do contador de resultados (linhas 92-97)
+Criar uma tabela `melhorias_plataforma` para o admin registrar manualmente essas atualizacoes, e incluir esses registros no resumo gerado pela edge function.
 
-Substituir o bloco do contador por uma div flex com o contador a esquerda e os botoes de toggle a direita:
+## Etapas
 
-```tsx
-{filteredIAs && (
-  <div className="flex items-center justify-between">
-    <p className="text-sm text-muted-foreground">
-      {filteredIAs.length} {filteredIAs.length === 1 ? 'resultado' : 'resultados'} encontrados
-    </p>
-    <div className="flex items-center gap-1">
-      <Button
-        variant={viewMode === "cards" ? "default" : "ghost"}
-        size="icon"
-        onClick={() => setViewMode("cards")}
-      >
-        <LayoutGrid className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={viewMode === "tabela" ? "default" : "ghost"}
-        size="icon"
-        onClick={() => setViewMode("tabela")}
-      >
-        <List className="w-4 h-4" />
-      </Button>
-    </div>
-  </div>
-)}
+### 1. Criar tabela `melhorias_plataforma`
+
+Nova tabela com os campos:
+- `id` (uuid, PK)
+- `titulo` (text) -- ex: "Chat MarIAna com historico persistente"
+- `descricao` (text, opcional) -- detalhes da melhoria
+- `categoria` (text) -- ex: "Funcionalidade", "Performance", "Interface", "Correcao"
+- `created_by` (uuid, referencia profiles)
+- `created_at` (timestamptz)
+
+RLS: somente admins podem inserir/editar/visualizar.
+
+### 2. Adicionar mini-formulario na ResumoTab (admin)
+
+No componente `src/components/admin/dashboard/ResumoTab.tsx`, adicionar uma secao acima do botao "Gerar Resumo" com:
+- Um botao "Registrar Melhoria" que abre um dialog simples
+- Campos: titulo (obrigatorio), descricao (opcional), categoria (select)
+- Lista das melhorias registradas nos ultimos 30 dias com opcao de remover
+
+### 3. Atualizar a edge function `gerar-resumo-atualizacoes`
+
+Na edge function, alem de buscar `auditoria_conteudo`, tambem buscar os registros de `melhorias_plataforma` do periodo selecionado e inclui-los no JSON enviado para a IA, numa secao separada chamada "Melhorias da Plataforma".
+
+### 4. Atualizar o prompt da IA
+
+Adicionar no system prompt a instrucao para tratar a secao "Melhorias da Plataforma" com o emoji adequado (ex: "Melhorias da Plataforma") e listar cada melhoria registrada.
+
+## Resultado esperado
+
+O admin registra "Novo chat MarIAna com historico" e "Melhoria de performance". Ao gerar o resumo, a IA inclui uma secao como:
+
+```
+⚡ Melhorias da Plataforma
+- Chat da MarIAna agora com historico persistente e acesso lateral
+- Melhorias gerais de performance
 ```
 
-### 2. Renderizacao condicional dos itens (linhas 117-126)
+## Secao tecnica
 
-Onde hoje renderiza apenas o grid de cards, adicionar condicao por `viewMode`:
+### SQL da migracao
 
-- `"cards"`: manter o grid atual com `IACopieUseCard`
-- `"tabela"`: renderizar um `Card` contendo os `IACopieUseRow` empilhados
+```sql
+CREATE TABLE public.melhorias_plataforma (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  titulo TEXT NOT NULL,
+  descricao TEXT,
+  categoria TEXT NOT NULL DEFAULT 'Funcionalidade',
+  created_by UUID REFERENCES public.profiles(id),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-```tsx
-{viewMode === "cards" ? (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
-    {visibleIAs.map((ia) => (
-      <IACopieUseCard key={ia.id} ia={ia} onClick={() => setSelectedIA(ia)} />
-    ))}
-  </div>
-) : (
-  <Card>
-    {visibleIAs.map((ia) => (
-      <IACopieUseRow key={ia.id} ia={ia} onClick={() => setSelectedIA(ia)} />
-    ))}
-  </Card>
-)}
+ALTER TABLE public.melhorias_plataforma ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins podem gerenciar melhorias"
+  ON public.melhorias_plataforma
+  FOR ALL
+  USING (public.has_role(auth.uid(), 'admin'))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
 ```
 
-### 3. Skeletons adaptados (linhas 99-115)
+### Alteracao na edge function
 
-Adicionar condicao para o loading tambem respeitar o `viewMode`:
+Adicionar query apos buscar `auditoria_conteudo`:
 
-- `"cards"`: manter o grid de skeletons atual
-- `"tabela"`: renderizar skeletons em formato de linhas dentro de um Card
+```typescript
+const { data: melhorias } = await supabase
+  .from("melhorias_plataforma")
+  .select("titulo, descricao, categoria")
+  .gte("created_at", dataLimite.toISOString())
+  .order("created_at", { ascending: false });
+```
 
-O botao "Ver mais" e o estado vazio continuam funcionando identicamente em ambas as visoes, sem alteracao.
+E incluir no payload enviado a IA:
+
+```typescript
+const userPrompt = JSON.stringify({
+  periodo: `${dias} dias`,
+  total_alteracoes: registros.length,
+  por_categoria: porCategoria,
+  melhorias_plataforma: melhorias || [],
+});
+```
+
+### Arquivos modificados
+
+- **Migracao SQL**: criar tabela `melhorias_plataforma`
+- **`src/components/admin/dashboard/ResumoTab.tsx`**: adicionar formulario de registro de melhorias
+- **`supabase/functions/gerar-resumo-atualizacoes/index.ts`**: buscar melhorias e incluir no prompt
 
