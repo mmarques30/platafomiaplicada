@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.regenerar-instrucoes-entrega]
 verify_jwt = false
+
+[functions.gerar-resumo-atualizacoes]
+verify_jwt = false
