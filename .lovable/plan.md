@@ -1,62 +1,72 @@
 
 
-# Corrigir resumo de atualizacoes para incluir conteudos da Central (Noticias, Dicas, etc.)
+# Adicionar alternancia Cards / Tabela na pagina IA Copie e Use
 
-## Problema
+## Contexto
 
-A edge function `gerar-resumo-atualizacoes` agrupa os registros da tabela `conteudos_dashboard` sob o nome generico "Conteudos do Dashboard". Alem disso, o agrupamento por sub-categoria usa o campo `categoria`, mas para conteudos da Central o campo relevante e `tipo` (newsletter, noticia, dica, material). Resultado: as noticias e dicas adicionadas nao aparecem de forma clara no resumo gerado pela IA.
+O arquivo ja possui os imports de `LayoutGrid`, `List`, `IACopieUseRow` e o estado `viewMode` declarado (linha 28), mas nao estao sendo usados. Basta adicionar os botoes de alternancia e a renderizacao condicional.
 
-## Solucao
+## Alteracoes no arquivo `src/pages/IACopieUse.tsx`
 
-### Arquivo: `supabase/functions/gerar-resumo-atualizacoes/index.ts`
+### 1. Botoes de alternancia ao lado do contador de resultados (linhas 92-97)
 
-**1. Separar conteudos_dashboard por tipo no mapeamento de nomes**
+Substituir o bloco do contador por uma div flex com o contador a esquerda e os botoes de toggle a direita:
 
-Ao inves de mapear `conteudos_dashboard` para um nome generico, tratar cada `tipo` como uma secao separada no agrupamento. A logica sera:
-
-- Quando a tabela for `conteudos_dashboard`, usar o campo `tipo` dos dados (dados_novos ou dados_anteriores) para gerar um nome amigavel especifico:
-  - `newsletter` -> "Newsletters"
-  - `noticia` -> "Noticias"
-  - `dica` -> "Dicas"
-  - `material` -> "Materiais"
-  - `criador` -> "Criadores de Conteudo"
-
-**2. Ajustar a funcao `agruparRegistros`**
-
-Na linha onde o `nomeAmigavel` e definido, adicionar logica especial para `conteudos_dashboard`:
-
-```
-// Antes
-const nomeAmigavel = TABELA_NOMES[r.tabela] || r.tabela;
-
-// Depois: para conteudos_dashboard, usar o tipo como secao
-let nomeAmigavel = TABELA_NOMES[r.tabela] || r.tabela;
-if (r.tabela === 'conteudos_dashboard') {
-  const tipo = dados.tipo;
-  const TIPO_NOMES = {
-    newsletter: 'Newsletters',
-    noticia: 'Noticias',
-    dica: 'Dicas',
-    material: 'Materiais da Central',
-    criador: 'Criadores de Conteudo',
-  };
-  nomeAmigavel = TIPO_NOMES[tipo] || 'Central de Conteudos';
-}
+```tsx
+{filteredIAs && (
+  <div className="flex items-center justify-between">
+    <p className="text-sm text-muted-foreground">
+      {filteredIAs.length} {filteredIAs.length === 1 ? 'resultado' : 'resultados'} encontrados
+    </p>
+    <div className="flex items-center gap-1">
+      <Button
+        variant={viewMode === "cards" ? "default" : "ghost"}
+        size="icon"
+        onClick={() => setViewMode("cards")}
+      >
+        <LayoutGrid className="w-4 h-4" />
+      </Button>
+      <Button
+        variant={viewMode === "tabela" ? "default" : "ghost"}
+        size="icon"
+        onClick={() => setViewMode("tabela")}
+      >
+        <List className="w-4 h-4" />
+      </Button>
+    </div>
+  </div>
+)}
 ```
 
-**3. Atualizar o prompt da IA**
+### 2. Renderizacao condicional dos itens (linhas 117-126)
 
-Adicionar os novos emojis para as secoes da Central no system prompt:
+Onde hoje renderiza apenas o grid de cards, adicionar condicao por `viewMode`:
 
-- Newsletters
-- Noticias
-- Dicas
-- Materiais da Central
-- Criadores de Conteudo
+- `"cards"`: manter o grid atual com `IACopieUseCard`
+- `"tabela"`: renderizar um `Card` contendo os `IACopieUseRow` empilhados
 
-Isso garante que a IA saiba formatar corretamente cada tipo de conteudo da Central com emojis apropriados.
+```tsx
+{viewMode === "cards" ? (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+    {visibleIAs.map((ia) => (
+      <IACopieUseCard key={ia.id} ia={ia} onClick={() => setSelectedIA(ia)} />
+    ))}
+  </div>
+) : (
+  <Card>
+    {visibleIAs.map((ia) => (
+      <IACopieUseRow key={ia.id} ia={ia} onClick={() => setSelectedIA(ia)} />
+    ))}
+  </Card>
+)}
+```
 
-## Resultado esperado
+### 3. Skeletons adaptados (linhas 99-115)
 
-Quando o admin gerar o resumo, ao inves de ver "Conteudos do Dashboard", vera secoes separadas como "Noticias: 3 novas noticias adicionadas" e "Dicas: Nova dica sobre ChatGPT", tornando o resumo mais claro e completo.
+Adicionar condicao para o loading tambem respeitar o `viewMode`:
+
+- `"cards"`: manter o grid de skeletons atual
+- `"tabela"`: renderizar skeletons em formato de linhas dentro de um Card
+
+O botao "Ver mais" e o estado vazio continuam funcionando identicamente em ambas as visoes, sem alteracao.
 
