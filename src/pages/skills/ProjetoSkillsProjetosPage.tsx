@@ -39,6 +39,7 @@ export default function ProjetoSkillsProjetosPage() {
     enabled: !!equipeId,
   });
 
+  const [activeTab, setActiveTab] = useState("acompanhamento");
   const [filters, setFilters] = useState<ProjetosFilters>({
     projeto: "todos",
     responsavel: "todos",
@@ -85,10 +86,10 @@ export default function ProjetoSkillsProjetosPage() {
     <div className="space-y-6 p-4 md:p-6">
       <PageTitle primary="Projeto" secondary="Skills" />
 
-      <Tabs defaultValue="acompanhamento" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="skills-tabs-list">
           <TabsTrigger value="acompanhamento" className="skills-tabs-trigger">Acompanhamento</TabsTrigger>
-          <TabsTrigger value="backlog" className="skills-tabs-trigger" id="backlog-tab">Backlog</TabsTrigger>
+          <TabsTrigger value="backlog" className="skills-tabs-trigger">Backlog</TabsTrigger>
         </TabsList>
 
         <TabsContent value="acompanhamento" className="space-y-5 mt-4">
@@ -114,10 +115,7 @@ export default function ProjetoSkillsProjetosPage() {
           <ProjetosResumoTable
             projetos={projetos}
             entregasEquipe={entregasEquipe ?? []}
-            onVerMais={() => {
-              const tab = document.getElementById("backlog-tab");
-              if (tab) tab.click();
-            }}
+            onVerMais={() => setActiveTab("backlog")}
           />
         </TabsContent>
 
