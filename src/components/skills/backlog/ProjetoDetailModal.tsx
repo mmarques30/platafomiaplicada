@@ -37,14 +37,6 @@ const statusColors: Record<string, string> = {
   entregue: "bg-emerald-500/15 text-emerald-700 border-emerald-200",
 };
 
-const prioridadeCores: Record<string, string> = {
-  p1: "bg-red-500/15 text-red-700 border-red-200",
-  p2: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
-  p3: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
-  alta: "bg-red-500/15 text-red-700 border-red-200",
-  media: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
-  baixa: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
-};
 
 const prioridadeTrilhaCores: Record<string, string> = {
   essencial: "bg-primary/15 text-primary border-primary/30",
@@ -163,34 +155,6 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
             <Badge variant="outline" className={statusColors[currentStatus]}>
               {statusLabels[currentStatus] || currentStatus}
             </Badge>
-            {onUpdate ? (
-              <Select
-                value={item.prioridade || "__none__"}
-                onValueChange={(val) => {
-                  const newPrioridade = val === "__none__" ? null : val;
-                  onUpdate(item.id, { prioridade: newPrioridade });
-                }}
-              >
-                <SelectTrigger className="h-7 w-[130px] text-xs border-dashed">
-                  <SelectValue placeholder="Prioridade" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Sem prioridade</SelectItem>
-                  <SelectItem value="p1">P1</SelectItem>
-                  <SelectItem value="p2">P2</SelectItem>
-                  <SelectItem value="p3">P3</SelectItem>
-                </SelectContent>
-              </Select>
-            ) : item.prioridade ? (
-              <Badge variant="outline" className={prioridadeCores[item.prioridade]}>
-                {item.prioridade.toUpperCase()}
-              </Badge>
-            ) : null}
-            {item.origem === "ia" && (
-              <Badge variant="secondary" className="text-xs">
-                Diagnóstico
-              </Badge>
-            )}
           </div>
 
           {/* Ações rápidas de status - contextuais */}

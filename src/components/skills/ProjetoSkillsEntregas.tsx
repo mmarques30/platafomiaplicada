@@ -30,11 +30,6 @@ const statusColors: Record<string, string> = {
   aguardando_validacao: "bg-orange-500/10 text-orange-700 border-orange-500/30",
   aprovada: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
 };
-const prioridadeColors: Record<string, string> = {
-  P1: "bg-red-500/10 text-red-700",
-  P2: "bg-yellow-500/10 text-yellow-700",
-  P3: "bg-green-500/10 text-green-700",
-};
 
 const ARCHIVED_PROJECT_STATUSES = ["nao_aprovado", "descartado"];
 
@@ -69,7 +64,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterResponsavel, setFilterResponsavel] = useState("all");
   const [filterOrigem, setFilterOrigem] = useState("all");
-  const [filterPrioridade, setFilterPrioridade] = useState("all");
+  
   const [filterProjeto, setFilterProjeto] = useState("all");
   const [showArchived, setShowArchived] = useState(false);
 
@@ -152,20 +147,19 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
     if (filterStatus !== "all" && e.status !== filterStatus) return false;
     if (filterOrigem !== "all" && e.origem !== filterOrigem) return false;
     if (filterResponsavel !== "all" && (e.responsavelNome || "") !== filterResponsavel) return false;
-    if (filterPrioridade !== "all" && (e.prioridade || "") !== filterPrioridade) return false;
+    
     if (filterProjeto !== "all" && (e.projetoTitulo || "") !== filterProjeto) return false;
     return true;
   });
 
   const archivedCount = allEntregas.filter(e => e.projetoStatus && ARCHIVED_PROJECT_STATUSES.includes(e.projetoStatus)).length;
 
-  const hasActiveFilters = filterStatus !== "all" || filterResponsavel !== "all" || filterOrigem !== "all" || filterPrioridade !== "all" || filterProjeto !== "all";
+  const hasActiveFilters = filterStatus !== "all" || filterResponsavel !== "all" || filterOrigem !== "all" || filterProjeto !== "all";
 
   const clearFilters = () => {
     setFilterStatus("all");
     setFilterResponsavel("all");
     setFilterOrigem("all");
-    setFilterPrioridade("all");
     setFilterProjeto("all");
   };
 
@@ -263,17 +257,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
             </SelectContent>
           </Select>
 
-          <Select value={filterPrioridade} onValueChange={setFilterPrioridade}>
-            <SelectTrigger className="border-border/50 h-8 text-xs w-[120px] bg-transparent hover:bg-muted/50 transition-colors">
-              <SelectValue placeholder="Prioridade" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas prioridades</SelectItem>
-              <SelectItem value="P1">P1</SelectItem>
-              <SelectItem value="P2">P2</SelectItem>
-              <SelectItem value="P3">P3</SelectItem>
-            </SelectContent>
-          </Select>
+
 
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 text-xs text-muted-foreground">
@@ -313,7 +297,6 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
                 <TableHead>Título</TableHead>
                 <TableHead>Projeto</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Prioridade</TableHead>
                 <TableHead>Responsável</TableHead>
                 <TableHead>Prazo</TableHead>
                 <TableHead>Progresso</TableHead>
@@ -346,15 +329,6 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
                       <Badge variant="outline" className={`text-xs ${statusColors[e.status] || ""}`}>
                         {statusLabels[e.status] || e.status}
                       </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {e.prioridade ? (
-                        <Badge variant="outline" className={`text-xs ${prioridadeColors[e.prioridade] || ""}`}>
-                          {e.prioridade}
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
                     </TableCell>
                     <TableCell className="text-xs">
                       {e.responsavelNome || <span className="text-muted-foreground">—</span>}

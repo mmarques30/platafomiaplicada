@@ -24,14 +24,6 @@ const statusColors: Record<string, string> = {
   entregue: "bg-emerald-500/15 text-emerald-700 border-emerald-200",
 };
 
-const prioridadeCores: Record<string, string> = {
-  p1: "bg-red-500/15 text-red-700 border-red-200",
-  p2: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
-  p3: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
-  alta: "bg-red-500/15 text-red-700 border-red-200",
-  media: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
-  baixa: "bg-[#9EB038]/10 text-[#9EB038] border-[#9EB038]/20",
-};
 
 interface BacklogTableProps {
   items: BacklogItem[];
@@ -47,14 +39,13 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
             <TableHead>Título</TableHead>
             <TableHead>Área</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Prioridade</TableHead>
             <TableHead>Responsável</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {items.length === 0 && (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+              <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                 Nenhum projeto no backlog
               </TableCell>
             </TableRow>
@@ -69,13 +60,6 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
                 <Badge variant="outline" className={cn("text-xs", statusColors[item.status || "levantado"])}>
                   {statusLabels[item.status || "levantado"] || item.status}
                 </Badge>
-              </TableCell>
-              <TableCell>
-                {item.prioridade && (
-                  <Badge variant="outline" className={cn("text-xs", prioridadeCores[item.prioridade])}>
-                    {item.prioridade.toUpperCase()}
-                  </Badge>
-                )}
               </TableCell>
               <TableCell>
                 {item.responsavel || item.colaborador ? (
