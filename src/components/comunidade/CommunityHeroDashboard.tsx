@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { useCommunityStats } from "@/hooks/useCommunityStats";
-import { TrendingUp, MessageSquare, Calendar, Users, ArrowUp, ArrowDown } from "lucide-react";
+import { TrendingUp, Video, Download, Users, ArrowUp, ArrowDown } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 export function CommunityHeroDashboard() {
@@ -12,9 +12,8 @@ export function CommunityHeroDashboard() {
   const myRanking = ranking?.find((r) => r.user_id === user?.id);
   const myPosition = myRanking?.posicao || 0;
   const myPoints = myRanking?.total_pontos || 0;
-  const myPosts = myRanking?.total_posts || 0;
-  const myComments = myRanking?.total_comentarios || 0;
-  const myActiveDays = myRanking?.dias_ativos_30d || 0;
+  const myVideos = myRanking?.total_videos_assistidos || 0;
+  const myDownloads = myRanking?.total_materiais_baixados || 0;
 
   // Calculate progress to next position
   const nextPosition = ranking?.find((r) => r.posicao === myPosition - 1);
@@ -61,27 +60,27 @@ export function CommunityHeroDashboard() {
           </div>
         </div>
 
-        {/* Posts + Comments */}
+        {/* Videos */}
         <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-primary/10">
           <div className="flex items-center gap-1.5 mb-1">
-            <MessageSquare className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs text-muted-foreground">Interações</span>
+            <Video className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs text-muted-foreground">Vídeos</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold">{myPosts + myComments}</span>
-            <span className="text-xs text-muted-foreground hidden sm:inline">posts/comments</span>
+            <span className="text-2xl sm:text-3xl font-bold">{myVideos}</span>
+            <span className="text-xs text-muted-foreground hidden sm:inline">assistidos</span>
           </div>
         </div>
 
-        {/* Active Days */}
+        {/* Downloads */}
         <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-primary/10">
           <div className="flex items-center gap-1.5 mb-1">
-            <Calendar className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs text-muted-foreground">Dias Ativos</span>
+            <Download className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs text-muted-foreground">Downloads</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold">{myActiveDays}</span>
-            <span className="text-xs text-muted-foreground">/ 30</span>
+            <span className="text-2xl sm:text-3xl font-bold">{myDownloads}</span>
+            <span className="text-xs text-muted-foreground hidden sm:inline">materiais</span>
           </div>
         </div>
       </div>

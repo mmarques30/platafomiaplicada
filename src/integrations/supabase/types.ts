@@ -5907,14 +5907,12 @@ export type Database = {
         Args: never
         Returns: {
           avatar_url: string
-          dias_ativos_30d: number
           nome_completo: string
           posicao: number
-          total_comentarios: number
-          total_likes_dados: number
-          total_likes_recebidos: number
+          total_aulas_presentes: number
+          total_materiais_baixados: number
           total_pontos: number
-          total_posts: number
+          total_videos_assistidos: number
           user_id: string
         }[]
       }
