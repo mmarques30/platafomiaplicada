@@ -1,25 +1,19 @@
 
-# Corrigir scroll do Resumo de Atualizacoes
+# Aumentar altura dos cards nas Trilhas de Aprendizado
 
 ## Problema
-O conteudo do resumo esta sendo cortado sem barra de rolagem. O `ScrollArea` do Radix precisa de uma altura fixa (`h-`) para ativar o scroll interno -- usar apenas `max-h-` nao funciona corretamente com esse componente.
+A largura dos cards foi aumentada (de `xl:basis-1/4` para `xl:basis-[28%]`), mas a altura permaneceu igual, deixando os cards desproporcionais.
 
 ## Solucao
 
-### Arquivo: `src/components/admin/dashboard/ResumoTab.tsx`
+### Arquivo: `src/components/shared/TrilhaCard.tsx` (linha 19)
 
-Trocar `max-h-[500px]` por `h-auto max-h-[70vh]` no `ScrollArea`, e envolver com um container que tenha `overflow-hidden`. A abordagem com `vh` garante que o resumo ocupe ate 70% da tela, com scroll quando ultrapassar.
+Aumentar levemente a altura em cada breakpoint para acompanhar a largura, mantendo a proporcao visual:
 
-Alternativa mais simples e confiavel: remover o `ScrollArea` do Radix e usar `overflow-y-auto` nativo do CSS com `max-h`, que funciona sem precisar de altura fixa:
+| Breakpoint | Antes | Depois |
+|---|---|---|
+| Mobile | `h-[280px]` | `h-[300px]` |
+| sm | `h-[320px]` | `h-[350px]` |
+| md+ | `h-[400px]` | `h-[440px]` |
 
-```tsx
-<div className="max-h-[70vh] overflow-y-auto pr-2">
-  <div className="prose prose-sm dark:prose-invert max-w-none">
-    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-      {resumo}
-    </ReactMarkdown>
-  </div>
-</div>
-```
-
-Isso resolve o corte de conteudo e adiciona scroll nativo quando o resumo for longo.
+A alteracao e apenas nos valores de altura do container principal do card. A imagem, overlay, badges e demais elementos continuam funcionando normalmente pois usam `h-full`, `inset-0` e posicionamento absoluto.
