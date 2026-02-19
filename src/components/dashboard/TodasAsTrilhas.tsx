@@ -159,7 +159,7 @@ export function TodasAsTrilhas() {
               {trilhasFiltradas.map((trilha) => (
                 <CarouselItem
                   key={trilha.id}
-                  className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-[28%]"
                 >
                   <div className="space-y-2">
                     <TrilhaCard
