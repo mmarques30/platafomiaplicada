@@ -55,7 +55,10 @@ export default function ProjetoSkillsProjetosPage() {
 
   const filteredEntregas = useMemo(() => {
     if (!entregas) return [];
+    const statusInativos = ["nao_aprovado", "levantado", "backlog"];
     return entregas.filter((e: any) => {
+      // Excluir entregas de projetos inativos
+      if (e.backlog_item?.status && statusInativos.includes(e.backlog_item.status)) return false;
       if (filters.projeto !== "todos" && e.id !== filters.projeto) return false;
       if (filters.responsavel !== "todos" && e.responsavel_id !== filters.responsavel) return false;
       if (filters.dataInicio) {
