@@ -32,11 +32,12 @@ export function FilterBar({ filters, totalItems, filteredItems, actionButton }: 
           <span className="text-sm font-medium text-muted-foreground mr-2">Filtros:</span>
           
           {filters.map((filter) => (
-            <Select key={filter.id} value={filter.value} onValueChange={filter.onChange}>
+            <Select key={filter.id} value={filter.value || "__all__"} onValueChange={(value) => filter.onChange(value === "__all__" ? "" : value)}>
               <SelectTrigger className="w-[200px] bg-background">
                 <SelectValue placeholder={filter.placeholder} />
               </SelectTrigger>
               <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="__all__">{filter.placeholder}</SelectItem>
                 {filter.options.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
