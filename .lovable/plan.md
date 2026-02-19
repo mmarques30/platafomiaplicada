@@ -1,36 +1,20 @@
 
-# Ranking da Comunidade: Focar em Visitantes (usuarios gratuitos)
 
-## Problema
+# Remover aba Players e card de Premiacao Mensal da Comunidade
 
-A funcao `get_ranking_engajamento` atualmente consulta **todos os usuarios ativos** (`conta_ativa = true`), sem filtrar por tipo. Isso faz com que o ranking na aba "Ranking" de `/comunidade` mostre majoritariamente usuarios pagantes. O correto e mostrar apenas **visitantes** (usuarios gratuitos), ja que o ranking de pagantes fica em outra area da plataforma.
+## Alteracoes
 
-## Alteracao
+### 1. Pagina `src/pages/Comunidade.tsx`
 
-### 1. Atualizar a funcao do banco `get_ranking_engajamento`
+- Remover o `TabsTrigger` com `value="players"`
+- Remover o `TabsContent` com `value="players"`
+- Remover o import de `PlayersList`
+- Ajustar o grid de tabs de `grid-cols-4` para `grid-cols-3`
 
-Adicionar o filtro `AND p.is_visitante = true` na clausula WHERE da CTE `user_stats`, garantindo que apenas visitantes aparecam no ranking.
+### 2. Sidebar `src/components/comunidade/CommunitySidebar.tsx`
 
-A funcao ja retorna os campos corretos (`total_videos_assistidos`, `total_materiais_baixados`, `total_aulas_presentes`) e a formula de pontos ja esta certa (`videos * 10 + materiais * 5 + aulas * 25`). A unica mudanca e o filtro.
+- Remover o card inteiro de "Premiacao Mensal" (bloco com icone Gift)
+- Remover o import de `Gift` do lucide-react
 
-### 2. Adicionar coluna "Presencas" na UI
+Os componentes `PlayersList.tsx` e `PlayerCard.tsx` permanecem no codigo para uso futuro. Nenhuma alteracao no banco de dados.
 
-O componente `RankingEngajamento.tsx` ja mostra "Videos" e "Downloads" mas nao mostra "Presencas em aulas". Adicionar essa coluna na tabela e nos cards do top 3.
-
-### Detalhes tecnicos
-
-**Migracao SQL:**
-```sql
-CREATE OR REPLACE FUNCTION public.get_ranking_engajamento()
-...
-  FROM profiles p
-  WHERE p.conta_ativa = true
-    AND p.is_visitante = true   -- << unica mudanca
-...
-```
-
-**Componente `RankingEngajamento.tsx`:**
-- Top 3 cards: adicionar "X presencas" ao lado de videos e downloads
-- Tabela: adicionar coluna "Presencas" com `item.total_aulas_presentes`
-
-Nenhuma alteracao no hook -- a interface ja possui `total_aulas_presentes`.
