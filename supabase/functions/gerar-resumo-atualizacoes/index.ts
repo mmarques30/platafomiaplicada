@@ -23,6 +23,7 @@ function agruparRegistros(registros: any[]) {
   const agrupado: Record<string, { adicionados: any[]; atualizados: any[]; removidos: any[]; adicionados_por_tema: Record<string, string[]> }> = {};
 
   for (const r of registros) {
+    const dados = r.dados_novos || r.dados_anteriores || {};
     const titulo = dados.titulo || dados.nome || dados.tema || dados.name || "(sem título)";
     let nomeAmigavel = TABELA_NOMES[r.tabela] || r.tabela;
     if (r.tabela === 'conteudos_dashboard') {
@@ -40,8 +41,6 @@ function agruparRegistros(registros: any[]) {
       agrupado[nomeAmigavel] = { adicionados: [], atualizados: [], removidos: [], adicionados_por_tema: {} };
     }
 
-    const dados = r.dados_novos || r.dados_anteriores || {};
-    const titulo = dados.titulo || dados.nome || dados.tema || dados.name || "(sem título)";
     const categoria = dados.categoria || dados.categoria_principal || null;
 
     if (r.operacao === "INSERT") {
@@ -66,7 +65,6 @@ function agruparRegistros(registros: any[]) {
     }
   }
 
-  // Clean up empty arrays
   const resultado: Record<string, any> = {};
   for (const [nome, dados] of Object.entries(agrupado)) {
     const entry: any = {};
@@ -127,29 +125,43 @@ serve(async (req) => {
     const dataLimite = new Date();
     dataLimite.setDate(dataLimite.getDate() - dias);
 
-    const { data: registros, error: queryError } = await supabase
-      .from("auditoria_conteudo")
-      .select("tabela, operacao, dados_novos, dados_anteriores, campos_alterados, created_at")
-      .gte("created_at", dataLimite.toISOString())
-      .order("created_at", { ascending: false })
-      .limit(500);
+    // Fetch audit records and platform improvements in parallel
+    const [auditoriaResult, melhoriasResult] = await Promise.all([
+      supabase
+        .from("auditoria_conteudo")
+        .select("tabela, operacao, dados_novos, dados_anteriores, campos_alterados, created_at")
+        .gte("created_at", dataLimite.toISOString())
+        .order("created_at", { ascending: false })
+        .limit(500),
+      supabase
+        .from("melhorias_plataforma")
+        .select("titulo, descricao, categoria")
+        .gte("created_at", dataLimite.toISOString())
+        .order("created_at", { ascending: false }),
+    ]);
 
-    if (queryError) {
-      console.error("Query error:", queryError);
+    const registros = auditoriaResult.data;
+    const melhorias = melhoriasResult.data;
+
+    if (auditoriaResult.error) {
+      console.error("Query error:", auditoriaResult.error);
       return new Response(JSON.stringify({ error: "Erro ao buscar dados" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    if (!registros || registros.length === 0) {
+    const semRegistros = !registros || registros.length === 0;
+    const semMelhorias = !melhorias || melhorias.length === 0;
+
+    if (semRegistros && semMelhorias) {
       return new Response(
         JSON.stringify({ resumo: `Nenhuma alteração encontrada nos últimos ${dias} dias.` }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const porCategoria = agruparRegistros(registros);
+    const porCategoria = semRegistros ? {} : agruparRegistros(registros!);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -161,7 +173,7 @@ serve(async (req) => {
 
     const systemPrompt = `Você é um assistente que gera resumos de atualizações de uma plataforma educacional de IA.
 
-Você receberá um JSON com dados PRÉ-AGRUPADOS por seção (Vídeos, Prompts, IA Copie e Use, Ferramentas de IA, etc.).
+Você receberá um JSON com dados PRÉ-AGRUPADOS por seção (Vídeos, Prompts, IA Copie e Use, Ferramentas de IA, etc.) e também uma lista de melhorias de plataforma registradas manualmente.
 
 REGRAS DE FORMATAÇÃO:
 1. Título: "📢 Resumo de Atualizações - Últimos X dias"
@@ -186,6 +198,8 @@ REGRAS DE FORMATAÇÃO:
    - Se houver "atualizados", mencione brevemente quais campos foram alterados
    - Se houver "removidos", mencione brevemente
 
+3. Se houver "melhorias_plataforma" no JSON, crie uma seção "⚡ Melhorias da Plataforma" listando cada melhoria registrada. Agrupe por categoria se possível (Funcionalidade, Performance, Interface, Correção). Use a descrição para enriquecer o texto quando disponível.
+
 4. Finalize com uma frase motivacional curta sobre as novidades.
 
 5. Use formatação compatível com WhatsApp/Telegram (negrito com *, emojis).
@@ -194,11 +208,12 @@ NÃO invente dados. Use APENAS as informações fornecidas no JSON.`;
 
     const userPrompt = JSON.stringify({
       periodo: `${dias} dias`,
-      total_alteracoes: registros.length,
+      total_alteracoes: registros?.length || 0,
       por_categoria: porCategoria,
+      melhorias_plataforma: melhorias || [],
     });
 
-    console.log("Sending AI request, payload size:", userPrompt.length, "chars, total records:", registros.length);
+    console.log("Sending AI request, payload size:", userPrompt.length, "chars, total records:", registros?.length || 0, "melhorias:", melhorias?.length || 0);
 
     const makeAIRequest = async (model: string) => {
       return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -222,7 +237,6 @@ NÃO invente dados. Use APENAS as informações fornecidas no JSON.`;
     if (!aiResponse.ok) {
       const errText = await aiResponse.text();
       console.error("AI error:", aiResponse.status, errText);
-
       console.log("Retrying with fallback model...");
       aiResponse = await makeAIRequest("openai/gpt-5-mini");
 
