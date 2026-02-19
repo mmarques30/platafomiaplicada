@@ -103,13 +103,13 @@ export function ResumoTab() {
             <CopyButton content={resumo} />
           </CardHeader>
           <CardContent>
-            <ScrollArea className="max-h-[500px]">
+            <div className="max-h-[70vh] overflow-y-auto pr-2">
               <div className="prose prose-sm dark:prose-invert max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {resumo}
                 </ReactMarkdown>
               </div>
-            </ScrollArea>
+            </div>
           </CardContent>
         </Card>
       )}
