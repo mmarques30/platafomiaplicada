@@ -99,7 +99,7 @@ export default function ProjetoSkillsPerformance() {
           value={`${isFiltered ? filteredProjetosAtivos.length : totalProjetosAtivos}`}
           subtitle="No backlog ativo"
           icon={<FolderKanban className="h-5 w-5" />}
-          variant="dark"
+          variant="accent"
         />
         <KPICard
           title="Economia Estimada"
@@ -113,7 +113,7 @@ export default function ProjetoSkillsPerformance() {
           value={`${isFiltered ? filteredEntregasConcluidas : entregasConcluidas}/${isFiltered ? filteredDeliveries.length : totalEntregas}`}
           subtitle="Concluídas / Total"
           icon={<Target className="h-5 w-5" />}
-          variant="dark"
+          variant="accent"
         />
         <KPICard
           title="ROI Projetado"
