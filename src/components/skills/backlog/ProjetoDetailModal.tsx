@@ -355,15 +355,6 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                 )}
               </div>
             </div>
-            {item.horas_estimadas_economia != null && (
-              <div className="flex items-start gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Economia Estimada</p>
-                  <p className="text-sm font-medium">{item.horas_estimadas_economia} h/semana</p>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Responsável - Editável */}
