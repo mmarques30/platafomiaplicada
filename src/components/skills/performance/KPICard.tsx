@@ -21,7 +21,7 @@ const variantStyles = {
     trend: "text-[hsl(72,50%,35%)]",
   },
   dark: {
-    card: "bg-[#0D0D0D] border-[#0D0D0D]",
+    card: "bg-[#4A5516] border-[#4A5516]",
     title: "text-white/70",
     value: "text-white",
     subtitle: "text-white/60",
@@ -30,9 +30,9 @@ const variantStyles = {
   },
   accent: {
     card: "bg-[#9EB038]/15 border-[#9EB038]/30 border-l-4 border-l-[#9EB038]",
-    title: "text-[#1a1a1a]",
-    value: "text-[#0D0D0D]",
-    subtitle: "text-[#3a3a3a]",
+    title: "text-[#6B7A20]",
+    value: "text-[#4A5516]",
+    subtitle: "text-[#6B7A20]/70",
     icon: "text-[#6B7A20]",
     trend: "text-[#5a6a1a]",
   },

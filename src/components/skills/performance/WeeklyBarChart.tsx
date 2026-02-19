@@ -24,7 +24,7 @@ interface WeeklyBarChartProps {
 
 export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: WeeklyBarChartProps) {
   return (
-    <Card className="bg-[#0D0D0D] border-[#0D0D0D] dark-header">
+    <Card className="bg-[#4A5516] border-[#4A5516] dark-header">
       <CardHeader>
         <CardTitle>Evolução de Maturidade</CardTitle>
         <CardDescription>
