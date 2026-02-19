@@ -135,7 +135,7 @@ export default function ProjetoSkillsPerformance() {
 
       {/* Ranking Híbrido */}
       <Card className="border-border bg-card overflow-hidden">
-        <CardHeader className="bg-[#0D0D0D] rounded-t-xl dark-header">
+        <CardHeader className="bg-[#4A5516] rounded-t-xl dark-header">
           <CardTitle>Ranking por Colaborador</CardTitle>
           <CardDescription>Projetos e entregas combinados</CardDescription>
         </CardHeader>
