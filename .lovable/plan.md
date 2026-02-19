@@ -1,60 +1,27 @@
 
 
-# Sincronizar Titulos de Trilhas/Modulos nos JSONB de projetos_mentoria
+# Alterar FK de biblioteca_prompts.modulo_id para ON DELETE SET NULL
 
 ## Problema
-Quando uma trilha ou modulo e renomeado no admin, os campos JSONB `trilhas_recomendadas` e `modulos_obrigatorios` da tabela `projetos_mentoria` mantem o titulo antigo (snapshot). Atualmente 37 projetos tem trilhas e 28 tem modulos armazenados como JSONB.
+A constraint atual em `biblioteca_prompts.modulo_id` usa `ON DELETE NO ACTION`, o que impede a exclusao de modulos que possuem prompts vinculados. Isso bloqueia operacoes administrativas de limpeza e reorganizacao.
 
-### Estrutura atual dos JSONB
-```text
-trilhas_recomendadas: [
-  { "trilha_id": "uuid", "titulo": "Nome antigo", "prioridade": "essencial" }
-]
+## Solucao
+Uma unica migracao SQL que:
+1. Remove a constraint de FK existente
+2. Recria com `ON DELETE SET NULL`
 
-modulos_obrigatorios: [
-  { "modulo_id": "uuid", "titulo": "Nome antigo", "trilha_id": "uuid", "video_ids": [...] }
-]
-```
-
-## Solucao: Triggers de sincronizacao no banco
-
-Criar 2 triggers (um para `trilhas`, outro para `modulos`) que, ao detectar UPDATE no campo `titulo`, percorrem todos os registros de `projetos_mentoria` e atualizam o titulo correspondente dentro do JSONB.
-
-## Alteracoes
-
-### 1. Funcao `sync_trilha_titulo_projetos()`
-- Trigger: `AFTER UPDATE OF titulo ON trilhas`
-- Logica: Busca todos os `projetos_mentoria` cujo `trilhas_recomendadas` contenha o `trilha_id` alterado e atualiza o campo `titulo` dentro de cada elemento do array JSONB
-- Tambem atualiza `trilha_titulo` nos `modulos_obrigatorios` que referenciem essa trilha
-
-### 2. Funcao `sync_modulo_titulo_projetos()`
-- Trigger: `AFTER UPDATE OF titulo ON modulos`
-- Logica: Busca todos os `projetos_mentoria` cujo `modulos_obrigatorios` contenha o `modulo_id` alterado e atualiza o campo `titulo` dentro de cada elemento do array JSONB
-
-### 3. Migracao SQL (resumo)
+## Migracao
 
 ```text
--- Funcao para trilhas
-CREATE FUNCTION sync_trilha_titulo_projetos() RETURNS trigger
-  Para cada projeto com trilhas_recomendadas contendo OLD.id:
-    Substituir titulo antigo pelo NEW.titulo no array JSONB
-    Tambem atualizar trilha_titulo em modulos_obrigatorios
-
--- Funcao para modulos  
-CREATE FUNCTION sync_modulo_titulo_projetos() RETURNS trigger
-  Para cada projeto com modulos_obrigatorios contendo OLD.id:
-    Substituir titulo antigo pelo NEW.titulo no array JSONB
-
--- Triggers
-CREATE TRIGGER on_trilha_rename AFTER UPDATE OF titulo ON trilhas
-CREATE TRIGGER on_modulo_rename AFTER UPDATE OF titulo ON modulos
+ALTER TABLE biblioteca_prompts
+  DROP CONSTRAINT biblioteca_prompts_modulo_id_fkey,
+  ADD CONSTRAINT biblioteca_prompts_modulo_id_fkey
+    FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE SET NULL;
 ```
-
-### 4. Sync inicial (one-time)
-Executar um UPDATE em lote para corrigir titulos desatualizados que ja existam hoje, garantindo que os dados atuais fiquem consistentes antes dos triggers entrarem em vigor.
 
 ## Resultado
-- Qualquer rename de trilha ou modulo no admin se propaga automaticamente para todos os projetos Business
-- Zero mudanca no frontend - tudo acontece no banco
-- Nenhum arquivo de codigo precisa ser alterado
+- Deletar um modulo nao gera mais erro de FK
+- Prompts vinculados ao modulo deletado terao `modulo_id` definido como `NULL` automaticamente
+- Os prompts continuam acessiveis normalmente, apenas sem vinculo a um modulo
+- Nenhuma alteracao de codigo frontend necessaria
 
