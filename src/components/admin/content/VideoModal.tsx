@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -295,10 +295,22 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
                 <SelectValue placeholder="Selecione um módulo" />
               </SelectTrigger>
               <SelectContent>
-                {modulos?.map((modulo: any) => (
-                  <SelectItem key={modulo.id} value={modulo.id}>
-                    {modulo.trilha?.titulo} — {modulo.titulo}
-                  </SelectItem>
+                {Object.entries(
+                  (modulos || []).reduce((groups: Record<string, any[]>, modulo: any) => {
+                    const trilhaTitulo = modulo.trilha?.titulo || "Sem Trilha";
+                    if (!groups[trilhaTitulo]) groups[trilhaTitulo] = [];
+                    groups[trilhaTitulo].push(modulo);
+                    return groups;
+                  }, {} as Record<string, any[]>)
+                ).map(([trilhaTitulo, modulosDaTrilha]) => (
+                  <SelectGroup key={trilhaTitulo}>
+                    <SelectLabel>{trilhaTitulo}</SelectLabel>
+                    {modulosDaTrilha.map((modulo: any) => (
+                      <SelectItem key={modulo.id} value={modulo.id}>
+                        {modulo.titulo}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 ))}
               </SelectContent>
             </Select>
