@@ -8,6 +8,7 @@ interface RankingItem {
   horasEconomizadas: number;
   performanceMedia: number;
   posicao: number;
+  totalProjetos?: number;
 }
 
 interface Projeto {
@@ -22,16 +23,12 @@ interface WeeklyBarChartProps {
 }
 
 export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: WeeklyBarChartProps) {
-  const hasEntregas = entregas.length > 0;
-
   return (
     <Card className="bg-[#0D0D0D] border-[#0D0D0D] dark-header">
       <CardHeader>
         <CardTitle>Evolução de Maturidade</CardTitle>
         <CardDescription>
-          {hasEntregas
-            ? `Total Entregas: ${ranking.reduce((a, r) => a + r.totalEntregas, 0)}`
-            : `Total Projetos: ${projetos.length}`}
+          {`${projetos.length} projetos · ${entregas.length} entregas`}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -40,15 +37,15 @@ export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: Wee
         ) : (
           <div className="space-y-5">
             {ranking.map((member) => {
-              const pct = member.totalEntregas > 0
-                ? Math.round((member.entregasConcluidas / member.totalEntregas) * 100)
-                : 0;
+              const totalItems = (member.totalProjetos || 0) + member.totalEntregas;
+              const doneItems = member.entregasConcluidas;
+              const pct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
               return (
                 <div key={member.userId} className="space-y-1.5">
                   <p className="text-sm font-medium text-white">{member.nome}</p>
                   <div className="flex items-center justify-between text-xs text-white/60">
                     <span>
-                      {member.entregasConcluidas} / {member.totalEntregas} {hasEntregas ? "entregas" : "projetos"}
+                      {member.entregasConcluidas} entregas · {member.totalProjetos || 0} projetos · {member.horasEconomizadas}h
                     </span>
                     <span className="font-semibold text-white">{pct}%</span>
                   </div>

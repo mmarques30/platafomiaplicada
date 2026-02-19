@@ -8,17 +8,9 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-interface Entrega {
-  status: string;
-}
-
-interface Projeto {
-  status: string;
-}
-
 interface StatusPieChartProps {
-  entregas: Entrega[];
-  projetos?: Projeto[];
+  entregas: { status: string }[];
+  projetos?: { status: string }[];
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -29,6 +21,7 @@ const STATUS_COLORS: Record<string, string> = {
   pendente: "hsl(var(--muted-foreground))",
   levantado: "hsl(210, 50%, 60%)",
   priorizado: "hsl(270, 50%, 60%)",
+  nao_aprovado: "hsl(0, 40%, 50%)",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -39,6 +32,7 @@ const STATUS_LABELS: Record<string, string> = {
   pendente: "Pendente",
   levantado: "Levantado",
   priorizado: "Priorizado",
+  nao_aprovado: "Não aprovado",
 };
 
 const chartConfig: ChartConfig = {
@@ -48,15 +42,16 @@ const chartConfig: ChartConfig = {
   pendente: { label: "Pendente", color: "hsl(var(--muted-foreground))" },
   levantado: { label: "Levantado", color: "hsl(210, 50%, 60%)" },
   priorizado: { label: "Priorizado", color: "hsl(270, 50%, 60%)" },
+  nao_aprovado: { label: "Não aprovado", color: "hsl(0, 40%, 50%)" },
 };
 
 export default function StatusPieChart({ entregas, projetos = [] }: StatusPieChartProps) {
-  const hasEntregas = entregas.length > 0;
-  const sourceItems = hasEntregas ? entregas : projetos;
+  // Combine both sources
+  const allItems = useMemo(() => [...entregas, ...projetos], [entregas, projetos]);
 
   const data = useMemo(() => {
     const counts: Record<string, number> = {};
-    sourceItems.forEach((e) => {
+    allItems.forEach((e) => {
       const key = e.status === "aprovada" ? "concluido" : (e.status || "pendente");
       counts[key] = (counts[key] || 0) + 1;
     });
@@ -65,13 +60,13 @@ export default function StatusPieChart({ entregas, projetos = [] }: StatusPieCha
       value,
       status,
     }));
-  }, [sourceItems]);
+  }, [allItems]);
 
   return (
     <Card className="border-border bg-card border-l-4 border-l-[#9EB038]">
       <CardHeader>
         <CardTitle>Distribuição por Status</CardTitle>
-        <CardDescription>{hasEntregas ? "Entregas agrupadas por status" : "Projetos agrupados por status"}</CardDescription>
+        <CardDescription>Projetos e entregas combinados</CardDescription>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (
