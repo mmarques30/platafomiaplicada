@@ -1,7 +1,7 @@
 import { useDraggable } from "@dnd-kit/core";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Clock } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BacklogItem } from "@/hooks/useSkillsBacklog";
 
@@ -71,12 +71,6 @@ export default function BacklogCard({ item, onClick }: BacklogCardProps) {
 
       <div className="flex items-center justify-between pt-1">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {item.horas_estimadas_economia != null && (
-            <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {item.horas_estimadas_economia}h/sem
-            </span>
-          )}
           {Array.isArray(item.trilhas_recomendadas) && item.trilhas_recomendadas.length > 0 && (
             <span className="flex items-center gap-1 text-primary">
               <BookOpen className="h-3 w-3" />

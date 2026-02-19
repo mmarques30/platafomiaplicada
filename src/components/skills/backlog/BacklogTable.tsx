@@ -49,13 +49,12 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
             <TableHead>Status</TableHead>
             <TableHead>Prioridade</TableHead>
             <TableHead>Responsável</TableHead>
-            <TableHead className="text-right">Economia (h/sem)</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {items.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+              <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                 Nenhum projeto no backlog
               </TableCell>
             </TableRow>
@@ -103,7 +102,6 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
                   <span className="text-muted-foreground text-sm">—</span>
                 )}
               </TableCell>
-              <TableCell className="text-right font-medium">{item.horas_estimadas_economia ?? "—"}</TableCell>
             </TableRow>
           ))}
         </TableBody>
