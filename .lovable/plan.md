@@ -1,102 +1,44 @@
 
-# Personalizar a MarIAna por usuario logado
+# Links clicáveis da MarIAna para trilhas e vídeos
 
-## Problema
+## Objetivo
 
-A edge function `ai-chat-user` ja busca o diagnostico Academy (`formulario_diagnostico`) e objetivos, mas ignora completamente:
-- **Plano do usuario** (academy, skills, business)
-- **Diagnostico Skills** (tarefas manuais, gargalos, insight IA)
-- **Projetos de mentoria** (status, titulo, progresso)
-- **Fases do processo** (em qual fase esta)
-- **Progresso nas trilhas** (videos assistidos)
-- **Equipe Skills** (backlog, entregas)
+Fazer a MarIAna gerar links Markdown clicáveis para trilhas e vídeos da plataforma, em vez de apenas mencionar nomes em texto. No frontend, o ReactMarkdown já renderiza links -- basta a IA gerar os links corretos no texto.
 
-Resultado: a MarIAna responde de forma generica, sem considerar o contexto real do usuario.
+## Alterações
 
-## Abordagem
+### 1. Edge Function: `supabase/functions/ai-chat-user/index.ts`
 
-Expandir as queries paralelas na edge function para buscar dados adicionais do usuario e injetar no system prompt de forma contextualizada por plano.
-
-## Alteracoes
-
-### `supabase/functions/ai-chat-user/index.ts`
-
-#### 1. Novas queries no bloco `Promise.all` (linha ~48)
-
-Adicionar ao bloco paralelo existente:
-
-- **Profile** (plano_mentoria, nome_completo): `profiles` filtrado por `user.id`
-- **Diagnostico Skills**: `diagnosticos_skills` filtrado por `user_id`, pegar o mais recente com `completado = true`
-- **Projetos de Mentoria**: `projetos_mentoria` filtrado por `user_id`, selecionar titulo, status, progresso_preparacao, trilhas_recomendadas
-- **Fases do Processo**: `fases_processo_mentoria` filtrado por `user_id`, ordenado por fase_numero
-- **Progresso em Videos**: contar videos completados via `progresso_videos` filtrado por `user_id` e `completado = true`
-- **Equipe Skills** (se skills): `membros_equipe_skills` filtrado por `user_id`, com join para `equipes_skills` e `backlog_skills`
-- **Entregas Skills**: `entregas_skills` filtrado por `responsavel_id = user.id`
-
-#### 2. Injecao no system prompt por plano
-
-Apos o bloco existente de `formulario.data` (linha ~290), adicionar seções condicionais:
-
-**Para TODOS os planos:**
+**Trilhas** (linha ~467): incluir o `id` na query de trilhas (já tem titulo, descricao, nivel) e formatar no prompt com link Markdown:
 ```
-## Contexto do Plano:
-- Plano: {plano_mentoria}
-- Videos assistidos: {count}
-- Projetos: {lista com status}
-- Fase atual do processo: {fase}
-
-INSTRUCAO: Personalize suas respostas considerando o plano do usuario.
-Para Academy: foque em trilhas e conteudos da plataforma.
-Para Skills: foque em automacao de processos e projetos da equipe.
-Para Business: foque no projeto sendo construido e resultados.
+- [Nome da Trilha](/trilhas/{trilha_id}) - descricao
 ```
 
-**Para usuarios SKILLS (se tiver diagnostico):**
+**Vídeos** (linha ~534): já temos `id` e `trilhas.id` na query (precisamos adicionar `trilha_id` explicitamente). Formatar com link Markdown:
 ```
-## Diagnostico Skills do Usuario:
-- Cargo: {cargo}
-- Area: {area_atuacao}
-- Tarefas manuais: {tarefas_manuais}
-- Gargalos: {gargalos_identificados}
-- Onde perde mais tempo: {onde_perde_mais_tempo}
-- Insight IA gerado: {insight_ia resumido}
-- Economia estimada: {economia_horas_semana}h/semana
-
-## Projetos/Backlog da Equipe:
-{lista de itens do backlog com status}
-
-## Entregas Pendentes:
-{lista de entregas com status e prazo}
-
-INSTRUCAO: Relacione suas respostas com os gargalos e projetos do usuario. Sugira como IA resolve os problemas especificos dele.
+- [Nome do Vídeo](/trilhas/{trilha_id}?video={video_id}) - descrição
 ```
 
-**Para usuarios ACADEMY (se tiver diagnostico):**
+**Módulos** (linha ~554): incluir `trilha_id` na query e formatar:
 ```
-## Projetos de Mentoria:
-{lista de projetos com status e progresso}
-
-## Fase Atual do Processo:
-{fase atual e proxima}
-
-INSTRUCAO: Guie o usuario pelo processo de mentoria. Sugira proximo passo baseado na fase atual.
+- [Nome do Módulo](/trilhas/{trilha_id}) - descrição
 ```
 
-#### 3. Instrucoes finais atualizadas
+**Instruções ao modelo** (bloco de recomendação ~560): adicionar instrução explícita para usar os links Markdown ao mencionar conteúdos, no formato `[Nome do Conteúdo](/trilhas/xxx)`.
 
-Adicionar ao bloco de instrucoes finais (linha ~425):
+### 2. Frontend: `src/components/shared/MarIAnaChatDrawer.tsx`
 
-```
-## Personalizacao por Contexto:
-- SEMPRE use o nome do usuario quando disponivel
-- Relacione suas respostas com os projetos e diagnosticos do usuario
-- Para Skills: priorize recomendacoes que resolvam os gargalos identificados
-- Para Academy: sugira trilhas alinhadas com os objetivos e fase atual
-- Para Business: foque em resultados e entregas do projeto
-- Mencione progresso quando relevante ("Voce ja assistiu X videos, falta pouco!")
-- Sugira proximos passos baseados no contexto real do usuario
-```
+Configurar o `ReactMarkdown` para renderizar links (`<a>`) com navegação interna usando `react-router-dom`. Adicionar um `components` override no ReactMarkdown para que links internos (que começam com `/`) usem `navigate()` em vez de recarregar a página.
 
-## Resultado
+### 3. Frontend: Mesma lógica para a página `/chat` (se existir ReactMarkdown lá)
 
-A MarIAna passara a responder de forma altamente personalizada, conhecendo o plano, diagnostico, projetos e progresso de cada usuario -- criando uma experiencia de mentoria realmente individualizada.
+Verificar e aplicar o mesmo override de links internos no componente de chat completo para consistência.
+
+## Detalhes técnicos
+
+- Os links serão gerados em Markdown (`[texto](url)`) pela IA e renderizados pelo ReactMarkdown que já está no drawer
+- Links internos (começando com `/`) serão interceptados com `onClick` + `navigate()` para evitar reload da página
+- Links externos continuam abrindo normalmente com `target="_blank"`
+- As URLs seguem o padrão existente: `/trilhas/{trilha_id}` para trilhas e `/trilhas/{trilha_id}?video={video_id}` para vídeos
+- A query de trilhas precisa do campo `id` adicionado ao select (atualmente só tem titulo, descricao, nivel)
+- A query de vídeos já tem `id` mas precisa de `trilha_id` explícito no select para montar a URL
