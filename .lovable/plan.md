@@ -1,40 +1,46 @@
 
-# Liberar "Sala de Aula" para Academy, Business e Skills
+# Cards verdes minimalistas para informacoes das trilhas
 
-## Problema
+## O que muda
 
-No arquivo `src/components/layout/AppSidebar.tsx` (linha 574), o menu "Sala de Aula" esta restrito apenas a visitantes com a condicao `{isVisitante && (`. Isso impede que usuarios Academy, Skills e Business vejam esse item no menu lateral.
+A area de informacoes abaixo de cada card de trilha (titulo, numero da trilha, classificacao, quantidade de videos) sera envolvida em um card verde discreto com estilo clean e minimalista.
 
-## Solucao
+## Visual proposto
 
-Remover a restricao `isVisitante` na linha 574 do `AppSidebar.tsx`, tornando o submenu "Sala de Aula" visivel para todos os usuarios autenticados (visitante, academy, skills e business).
+Cada bloco de informacoes abaixo da imagem da trilha sera encapsulado em um card com:
 
-A mudanca e de uma unica linha: trocar `{isVisitante && (` por renderizacao incondicional (sempre mostrar o item).
+- Fundo verde suave (`bg-primary/5`)
+- Borda verde sutil (`border border-primary/15`)
+- Cantos arredondados (`rounded-xl`)
+- Padding interno uniforme (`p-3`)
+- Mesma largura do card da trilha acima (ja garantido pelo layout do carrossel)
+
+O conteudo interno permanece o mesmo (titulo, badges de trilha/classificacao, contagem de videos), apenas organizado dentro do card verde.
 
 ## Secao Tecnica
 
 ### Arquivo modificado
 
-| Arquivo | Linha | Mudanca |
-|---|---|---|
-| `src/components/layout/AppSidebar.tsx` | 573-591 | Remover a condicao `isVisitante &&` que envolve o `SidebarMenuItem` da Sala de Aula |
+| Arquivo | Mudanca |
+|---|---|
+| `src/components/dashboard/TodasAsTrilhas.tsx` | Envolver o bloco de info (linhas 172-187) em um container com classes de card verde |
 
-### Antes
+### Antes (linhas 172-187)
+
 ```text
-{/* Sala de Aula - exclusivo para visitantes (gratuito) */}
-{isVisitante && (
-  <SidebarMenuItem>
-    ...
-  </SidebarMenuItem>
-)}
+<div className="px-1 space-y-0.5">
+  <p>titulo</p>
+  <div>badges + videos</div>
+</div>
 ```
 
 ### Depois
+
 ```text
-{/* Sala de Aula - visivel para todos os ambientes */}
-<SidebarMenuItem>
-  ...
-</SidebarMenuItem>
+<div className="bg-primary/5 border border-primary/15 rounded-xl p-3 space-y-1">
+  <p>titulo</p>
+  <div>badges + videos</div>
+</div>
 ```
 
-Nenhuma outra alteracao necessaria -- a rota `/videos-bonus` ja esta acessivel a todos os usuarios no roteamento (`App.tsx`), e o conteudo da pagina (`VideosBonus.tsx`) nao tem restricao de role.
+Nenhuma mudanca estrutural -- apenas adicionar classes de estilo ao container existente para criar o efeito de card verde discreto.
