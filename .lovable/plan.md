@@ -1,46 +1,24 @@
 
-# Cards verdes minimalistas para informacoes das trilhas
+# Inserir prompt "Fusao de Identidade Fotografica" no banco
 
-## O que muda
+## O que sera feito
 
-A area de informacoes abaixo de cada card de trilha (titulo, numero da trilha, classificacao, quantidade de videos) sera envolvida em um card verde discreto com estilo clean e minimalista.
+Inserir um novo registro na tabela `biblioteca_prompts` com os dados do prompt fornecido, usando a proxima ordem disponivel (103).
 
-## Visual proposto
+## Dados do registro
 
-Cada bloco de informacoes abaixo da imagem da trilha sera encapsulado em um card com:
-
-- Fundo verde suave (`bg-primary/5`)
-- Borda verde sutil (`border border-primary/15`)
-- Cantos arredondados (`rounded-xl`)
-- Padding interno uniforme (`p-3`)
-- Mesma largura do card da trilha acima (ja garantido pelo layout do carrossel)
-
-O conteudo interno permanece o mesmo (titulo, badges de trilha/classificacao, contagem de videos), apenas organizado dentro do card verde.
+| Campo | Valor |
+|---|---|
+| titulo | Fusao de Identidade Fotografica |
+| descricao | Prompt para instruir um modelo de IA a realizar fusao de duas imagens de referencia, extraindo a identidade de uma pessoa e inserindo-a no contexto estetico de outra imagem, gerando um resultado fotorrealista. |
+| prompt | Conteudo completo do prompt com todas as secoes (Como Funciona, Instrucao Hibrida, Resultado Esperado) |
+| categoria | Produtividade |
+| nivel_complexidade | avancado |
+| tags | ["geracao de imagem", "fotorrealismo", "fusao de identidade", "IA generativa"] |
+| ferramentas_recomendadas | ["ChatGPT", "Manus"] |
+| ordem | 103 |
+| ativo | true |
 
 ## Secao Tecnica
 
-### Arquivo modificado
-
-| Arquivo | Mudanca |
-|---|---|
-| `src/components/dashboard/TodasAsTrilhas.tsx` | Envolver o bloco de info (linhas 172-187) em um container com classes de card verde |
-
-### Antes (linhas 172-187)
-
-```text
-<div className="px-1 space-y-0.5">
-  <p>titulo</p>
-  <div>badges + videos</div>
-</div>
-```
-
-### Depois
-
-```text
-<div className="bg-primary/5 border border-primary/15 rounded-xl p-3 space-y-1">
-  <p>titulo</p>
-  <div>badges + videos</div>
-</div>
-```
-
-Nenhuma mudanca estrutural -- apenas adicionar classes de estilo ao container existente para criar o efeito de card verde discreto.
+Sera executado um INSERT direto na tabela `biblioteca_prompts` via migracao SQL. Nenhum arquivo de codigo precisa ser alterado -- a biblioteca ja exibe automaticamente os prompts do banco.
