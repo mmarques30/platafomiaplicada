@@ -1,41 +1,40 @@
 
+# Liberar "Sala de Aula" para Academy, Business e Skills
 
-# Mostrar todos os 5 icones de classificacao (disponiveis e indisponiveis)
+## Problema
 
-## Problema identificado
+No arquivo `src/components/layout/AppSidebar.tsx` (linha 574), o menu "Sala de Aula" esta restrito apenas a visitantes com a condicao `{isVisitante && (`. Isso impede que usuarios Academy, Skills e Business vejam esse item no menu lateral.
 
-Apenas 3 classificacoes existem no banco (Aprendizado Inicial, Carreira, Rotina). As classificacoes **Produtividade** e **Automacao** nao foram atribuidas as trilhas -- provavelmente os titulos usados no UPDATE nao corresponderam exatamente aos titulos no banco. Por isso, so 3 icones aparecem.
+## Solucao
 
-## Solucao (2 partes)
+Remover a restricao `isVisitante` na linha 574 do `AppSidebar.tsx`, tornando o submenu "Sala de Aula" visivel para todos os usuarios autenticados (visitante, academy, skills e business).
 
-### 1. Corrigir dados no banco
+A mudanca e de uma unica linha: trocar `{isVisitante && (` por renderizacao incondicional (sempre mostrar o item).
 
-Verificar os titulos exatos das trilhas e executar os UPDATEs corretos para Produtividade e Automacao. Isso garantira que as 5 classificacoes tenham trilhas associadas.
+## Secao Tecnica
 
-### 2. Alterar o componente `ClassificacaoIcons.tsx`
+### Arquivo modificado
 
-Mudar a logica para **sempre exibir os 5 icones**, independente de existirem trilhas com aquela classificacao:
+| Arquivo | Linha | Mudanca |
+|---|---|---|
+| `src/components/layout/AppSidebar.tsx` | 573-591 | Remover a condicao `isVisitante &&` que envolve o `SidebarMenuItem` da Sala de Aula |
 
-- **Com trilhas disponiveis**: icone na cor verde (`text-primary`) com animacao ativa
-- **Sem trilhas disponiveis**: icone na cor cinza escuro/preto (`text-foreground/60`) com animacao ativa mas visual mais discreto
-- Icones indisponiveis ainda serao clicaveis (filtrar mostrara "nenhuma trilha encontrada") ou podem ser desabilitados visualmente
-
-### Mudanca tecnica principal
-
-No componente, em vez de filtrar `orderedKeys` com base nas classificacoes vindas do banco, sempre renderizar todos os 5 icones. Adicionar uma prop ou verificacao interna para saber quais classificacoes tem trilhas, e aplicar estilo verde vs cinza escuro conforme disponibilidade.
-
+### Antes
 ```text
-Logica de cores:
-- Ativo (selecionado): fundo primary/15, borda primary/30, texto primary
-- Disponivel (tem trilhas): texto primary/60 (verde claro)
-- Indisponivel (sem trilhas): texto foreground/50 (cinza escuro)
+{/* Sala de Aula - exclusivo para visitantes (gratuito) */}
+{isVisitante && (
+  <SidebarMenuItem>
+    ...
+  </SidebarMenuItem>
+)}
 ```
 
-### Arquivos modificados
+### Depois
+```text
+{/* Sala de Aula - visivel para todos os ambientes */}
+<SidebarMenuItem>
+  ...
+</SidebarMenuItem>
+```
 
-| Arquivo | Acao |
-|---|---|
-| `src/components/dashboard/ClassificacaoIcons.tsx` | Sempre renderizar os 5 icones, aplicar cores verde vs cinza |
-| `src/components/dashboard/TodasAsTrilhas.tsx` | Nenhuma mudanca necessaria (ja passa classificacoes) |
-| Banco de dados | Corrigir UPDATEs para Produtividade e Automacao |
-
+Nenhuma outra alteracao necessaria -- a rota `/videos-bonus` ja esta acessivel a todos os usuarios no roteamento (`App.tsx`), e o conteudo da pagina (`VideosBonus.tsx`) nao tem restricao de role.
