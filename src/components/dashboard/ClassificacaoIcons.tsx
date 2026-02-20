@@ -46,22 +46,16 @@ const ANIMATION_VARIANTS: Record<string, any> = {
 };
 
 export function ClassificacaoIcons({ classificacoes, activeFilter, onSelect }: ClassificacaoIconsProps) {
-  const orderedKeys = ["Aprendizado Inicial", "Produtividade", "Automação", "Carreira", "Rotina"];
-  const items = orderedKeys.filter((k) => classificacoes.includes(k));
-
-  // Add any classificacoes not in the predefined map
-  classificacoes.forEach((c) => {
-    if (!items.includes(c)) items.push(c);
-  });
-
-  if (items.length === 0) return null;
+  // Always show all 5 icons regardless of available data
+  const allKeys = ["Aprendizado Inicial", "Produtividade", "Automação", "Carreira", "Rotina"];
 
   return (
     <div className="flex items-center justify-center gap-6 sm:gap-8 py-4 flex-wrap">
-      {items.map((cls) => {
+      {allKeys.map((cls) => {
         const config = ICON_MAP[cls] || { icon: Sparkles, label: cls };
         const Icon = config.icon;
         const isActive = activeFilter === cls;
+        const isAvailable = classificacoes.includes(cls);
         const animVariant = ANIMATION_VARIANTS[cls] || {
           scale: [1, 1.1, 1],
           transition: { duration: 2, repeat: Infinity, ease: "easeInOut" },
@@ -83,7 +77,11 @@ export function ClassificacaoIcons({ classificacoes, activeFilter, onSelect }: C
               animate={animVariant}
               className={cn(
                 "p-2.5 rounded-full",
-                isActive ? "text-primary" : "text-primary/60"
+                isActive
+                  ? "text-primary"
+                  : isAvailable
+                    ? "text-primary/60"
+                    : "text-foreground/50"
               )}
             >
               <Icon size={24} strokeWidth={1.8} />
@@ -91,7 +89,11 @@ export function ClassificacaoIcons({ classificacoes, activeFilter, onSelect }: C
             <span
               className={cn(
                 "text-[10px] font-medium leading-tight",
-                isActive ? "text-primary" : "text-muted-foreground"
+                isActive
+                  ? "text-primary"
+                  : isAvailable
+                    ? "text-muted-foreground"
+                    : "text-foreground/40"
               )}
             >
               {config.label}
