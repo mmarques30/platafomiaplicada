@@ -1,81 +1,41 @@
 
 
-# Icones Animados por Classificacao nas Trilhas
+# Mostrar todos os 5 icones de classificacao (disponiveis e indisponiveis)
 
-## Resumo
+## Problema identificado
 
-Tres etapas: preencher classificacoes no banco, criar componente de icones animados, integrar abaixo do carrossel.
+Apenas 3 classificacoes existem no banco (Aprendizado Inicial, Carreira, Rotina). As classificacoes **Produtividade** e **Automacao** nao foram atribuidas as trilhas -- provavelmente os titulos usados no UPDATE nao corresponderam exatamente aos titulos no banco. Por isso, so 3 icones aparecem.
 
-## 1. Banco de Dados -- Preencher classificacoes
+## Solucao (2 partes)
 
-Executar 5 UPDATEs para atribuir classificacoes as 22 trilhas:
+### 1. Corrigir dados no banco
 
-- **Aprendizado Inicial** (2): Como Usar a Plataforma IAplicada, Fundamentos de IA
-- **Produtividade** (7): Planilhas x2, Comunicacao com IA, Claude Avancado, Dashboard/BI, Manus, Apresentacoes (Gamma)
-- **Automacao** (4): Fundamentos de Automacao, Zapier, Make, Apps Web sem Codigo
-- **Carreira** (7): IA para Carreira, Recolocacao, Vendas, Marketing, RH, Gestao de Projetos, Financas
-- **Rotina** (2): Gravacoes Aulas Semanais, Conteudos BONUS
+Verificar os titulos exatos das trilhas e executar os UPDATEs corretos para Produtividade e Automacao. Isso garantira que as 5 classificacoes tenham trilhas associadas.
 
-## 2. Novo Componente: `ClassificacaoIcons.tsx`
+### 2. Alterar o componente `ClassificacaoIcons.tsx`
 
-Arquivo: `src/components/dashboard/ClassificacaoIcons.tsx`
+Mudar a logica para **sempre exibir os 5 icones**, independente de existirem trilhas com aquela classificacao:
 
-- Linha horizontal com 5 icones animados usando `framer-motion`
-- Animacoes continuas (sempre rodando, estilo do exemplo de referencia):
-  - BookOpen com sparkles pulsantes (Aprendizado Inicial)
-  - Zap com scale bounce (Produtividade)
-  - Cog com rotacao 360 continua (Automacao)
-  - Rocket com float vertical (Carreira)
-  - Clock com rotacao interna (Rotina)
-- Cores da marca (tons de primary/verde)
-- Label discreto abaixo de cada icone
-- Clique ativa/desativa filtro de classificacao
-- Icone ativo: fundo primary/15, borda primary/30
+- **Com trilhas disponiveis**: icone na cor verde (`text-primary`) com animacao ativa
+- **Sem trilhas disponiveis**: icone na cor cinza escuro/preto (`text-foreground/60`) com animacao ativa mas visual mais discreto
+- Icones indisponiveis ainda serao clicaveis (filtrar mostrara "nenhuma trilha encontrada") ou podem ser desabilitados visualmente
 
-## 3. Integracao no `TodasAsTrilhas.tsx`
+### Mudanca tecnica principal
 
-- Importar e renderizar `ClassificacaoIcons` logo apos o carrossel (linha ~195)
-- Passar `classificacaoFiltro` e `setClassificacaoFiltro` como props
-- Clicar no icone ja ativo volta para "todas"
+No componente, em vez de filtrar `orderedKeys` com base nas classificacoes vindas do banco, sempre renderizar todos os 5 icones. Adicionar uma prop ou verificacao interna para saber quais classificacoes tem trilhas, e aplicar estilo verde vs cinza escuro conforme disponibilidade.
 
-Layout:
 ```text
-[Filtros (pills verdes)]
-[Carrossel de Cards]
-[Faixa de icones animados]  <-- NOVO
+Logica de cores:
+- Ativo (selecionado): fundo primary/15, borda primary/30, texto primary
+- Disponivel (tem trilhas): texto primary/60 (verde claro)
+- Indisponivel (sem trilhas): texto foreground/50 (cinza escuro)
 ```
 
-## Secao Tecnica
-
-### Arquivos
+### Arquivos modificados
 
 | Arquivo | Acao |
 |---|---|
-| `src/components/dashboard/ClassificacaoIcons.tsx` | Criar |
-| `src/components/dashboard/TodasAsTrilhas.tsx` | Editar (adicionar import + componente apos carrossel) |
-
-### Dados
-
-22 registros na tabela `trilhas` atualizados via UPDATE (campo `classificacao`)
-
-### Props do componente
-
-```text
-ClassificacaoIcons {
-  classificacoes: string[]
-  activeFilter: string
-  onSelect: (cls: string) => void
-}
-```
-
-### Mapeamento icone-classificacao
-
-```text
-"Aprendizado Inicial" -> BookOpen + sparkle-pulse
-"Produtividade"       -> Zap + energy-bounce
-"Automacao"           -> Cog + rotate-360
-"Carreira"            -> Rocket + float-up
-"Rotina"              -> Clock + tick-rotate
-Fallback              -> Sparkles + pulse
-```
+| `src/components/dashboard/ClassificacaoIcons.tsx` | Sempre renderizar os 5 icones, aplicar cores verde vs cinza |
+| `src/components/dashboard/TodasAsTrilhas.tsx` | Nenhuma mudanca necessaria (ja passa classificacoes) |
+| Banco de dados | Corrigir UPDATEs para Produtividade e Automacao |
 
