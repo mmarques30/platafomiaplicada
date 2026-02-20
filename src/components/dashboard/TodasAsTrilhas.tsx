@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TrilhaCard } from "@/components/shared/TrilhaCard";
+import { ClassificacaoIcons } from "@/components/dashboard/ClassificacaoIcons";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -192,6 +193,15 @@ export function TodasAsTrilhas() {
             <CarouselNext />
           </Carousel>
         </div>
+      )}
+
+      {/* Ícones animados de classificação */}
+      {classificacoes.length > 0 && (
+        <ClassificacaoIcons
+          classificacoes={classificacoes}
+          activeFilter={classificacaoFiltro}
+          onSelect={setClassificacaoFiltro}
+        />
       )}
     </div>
   );
