@@ -570,25 +570,23 @@ export function AppSidebar() {
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                         
-                        {/* Sala de Aula - exclusivo para visitantes (gratuito) */}
-                        {isVisitante && (
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild className="group">
-                              <NavLink 
-                                to="/videos-bonus" 
-                                end
-                                className={cn(
-                                  "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                  location.pathname === '/videos-bonus'
-                                    ? "text-primary font-semibold" 
-                                    : "text-sidebar-foreground/70 hover:text-primary"
-                                )}
-                              >
-                                {!collapsed && <span>Sala de Aula</span>}
-                              </NavLink>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                        )}
+                        {/* Sala de Aula - visível para todos os ambientes */}
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild className="group">
+                            <NavLink 
+                              to="/videos-bonus" 
+                              end
+                              className={cn(
+                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
+                                location.pathname === '/videos-bonus'
+                                  ? "text-primary font-semibold" 
+                                  : "text-sidebar-foreground/70 hover:text-primary"
+                              )}
+                            >
+                              {!collapsed && <span>Sala de Aula</span>}
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
                       </SidebarMenu>
                     </CollapsibleContent>
                   </SidebarMenuItem>
