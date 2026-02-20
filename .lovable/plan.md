@@ -1,99 +1,81 @@
 
 
-# Icones Animados por Classificacao nas Trilhas de Aprendizado
+# Icones Animados por Classificacao nas Trilhas
 
-## Contexto
+## Resumo
 
-As trilhas atualmente nao possuem classificacoes preenchidas (campo `classificacao` existe mas esta NULL). Vamos:
-1. Definir e atribuir classificacoes a todas as 22 trilhas
-2. Criar um componente de icones animados horizontais abaixo do carrossel de cards
-3. Ao clicar, o filtro de classificacao e ativado automaticamente
+Tres etapas: preencher classificacoes no banco, criar componente de icones animados, integrar abaixo do carrossel.
 
-## Classificacoes Sugeridas (5 grupos)
+## 1. Banco de Dados -- Preencher classificacoes
 
-| Classificacao | Icone Animado | Trilhas |
-|---|---|---|
-| Aprendizado Inicial | Livro com brilho pulsante | Como Usar a Plataforma, Fundamentos de IA |
-| Produtividade | Raio com pulso energetico | Planilhas (x2), Comunicacao com IA, Claude Avancado, Dashboard/BI, Manus, Apresentacoes (Gamma) |
-| Automacao | Engrenagem com rotacao continua | Fundamentos de Automacao, Zapier, Make, Apps Web sem Codigo |
-| Carreira | Foguete com animacao de subida | IA para Carreira, Recolocacao, Vendas, Marketing, RH, Gestao de Projetos, Financas |
-| Rotina | Relogio com ponteiro animado | Gravacoes Aulas Semanais, Conteudos BONUS |
+Executar 5 UPDATEs para atribuir classificacoes as 22 trilhas:
 
-## Alteracoes
+- **Aprendizado Inicial** (2): Como Usar a Plataforma IAplicada, Fundamentos de IA
+- **Produtividade** (7): Planilhas x2, Comunicacao com IA, Claude Avancado, Dashboard/BI, Manus, Apresentacoes (Gamma)
+- **Automacao** (4): Fundamentos de Automacao, Zapier, Make, Apps Web sem Codigo
+- **Carreira** (7): IA para Carreira, Recolocacao, Vendas, Marketing, RH, Gestao de Projetos, Financas
+- **Rotina** (2): Gravacoes Aulas Semanais, Conteudos BONUS
 
-### 1. Banco de Dados -- Atribuir classificacoes (operacao de dados, nao migracao)
-
-Executar UPDATE nas 22 trilhas para preencher o campo `classificacao`:
-
-```sql
-UPDATE trilhas SET classificacao = 'Aprendizado Inicial' WHERE titulo IN ('Como Usar a Plataforma IAplicada', 'Fundamentos de IA');
-UPDATE trilhas SET classificacao = 'Produtividade' WHERE titulo IN ('Planilhas - Limpeza e Organização', 'Planilhas - Análise e Insights', 'Comunicação com IA', 'Claude Avançado', 'Dashboard e Business Intelligence', 'Manus - Dashboards Profissionais', 'Apresentações Executivas (Gamma)');
-UPDATE trilhas SET classificacao = 'Automação' WHERE titulo IN ('Fundamentos de Automação', 'Zapier do Zero ao Avançado', 'Make do Zero ao Avançado', 'Apps Web sem Código');
-UPDATE trilhas SET classificacao = 'Carreira' WHERE titulo IN ('IA para Carreira e Liderança', 'IA para Recolocação e Posicionamento', 'IA para Vendas', 'IA para Marketing', 'IA para RH e Pessoas', 'IA para Gestão de Projetos', 'IA para Finanças');
-UPDATE trilhas SET classificacao = 'Rotina' WHERE titulo IN ('Gravações Aulas Semanais', 'Conteúdos BÔNUS');
-```
-
-### 2. Novo Componente: `ClassificacaoIcons`
+## 2. Novo Componente: `ClassificacaoIcons.tsx`
 
 Arquivo: `src/components/dashboard/ClassificacaoIcons.tsx`
 
-- Linha horizontal unica com 5 icones animados usando `framer-motion` (ja instalado)
-- Cada icone: SVG customizado com animacao continua (sem hover -- sempre animando, como no exemplo de referencia)
-- Cores da marca (verde primario em tons variados: `primary`, `primary/70`, `primary/40`)
-- Label discreto abaixo de cada icone (nome da classificacao)
-- Ao clicar: chama callback `onSelectClassificacao(nome)` que ativa o filtro
+- Linha horizontal com 5 icones animados usando `framer-motion`
+- Animacoes continuas (sempre rodando, estilo do exemplo de referencia):
+  - BookOpen com sparkles pulsantes (Aprendizado Inicial)
+  - Zap com scale bounce (Produtividade)
+  - Cog com rotacao 360 continua (Automacao)
+  - Rocket com float vertical (Carreira)
+  - Clock com rotacao interna (Rotina)
+- Cores da marca (tons de primary/verde)
+- Label discreto abaixo de cada icone
+- Clique ativa/desativa filtro de classificacao
+- Icone ativo: fundo primary/15, borda primary/30
 
-Animacoes por icone:
-- **Aprendizado Inicial**: Icone `BookOpen` do Lucide com sparkles pulsantes ao redor (scale + opacity loop)
-- **Produtividade**: Icone `Zap` com pulso de energia (scale bounce infinito)
-- **Automacao**: Icone `Cog` com rotacao continua suave (rotate 360 loop)
-- **Carreira**: Icone `Rocket` com movimento sutil de subida (translateY oscilante)
-- **Rotina**: Icone `Clock` com ponteiro girando (rotate interno)
+## 3. Integracao no `TodasAsTrilhas.tsx`
 
-### 3. Integracao no `TodasAsTrilhas.tsx`
-
-- Adicionar o componente `ClassificacaoIcons` logo apos o fechamento do carrossel (abaixo dos cards)
+- Importar e renderizar `ClassificacaoIcons` logo apos o carrossel (linha ~195)
 - Passar `classificacaoFiltro` e `setClassificacaoFiltro` como props
-- O icone ativo tera destaque visual (fundo `primary/15` com borda `primary/30`)
-- Clicar no icone ja ativo desativa o filtro (volta para "todas")
+- Clicar no icone ja ativo volta para "todas"
 
-Layout final da pagina:
-```
+Layout:
+```text
 [Filtros (pills verdes)]
-[Carrossel de Cards 9:16]
-[Faixa horizontal de icones animados]  <-- NOVO
+[Carrossel de Cards]
+[Faixa de icones animados]  <-- NOVO
 ```
 
 ## Secao Tecnica
 
-### Estrutura do componente
+### Arquivos
+
+| Arquivo | Acao |
+|---|---|
+| `src/components/dashboard/ClassificacaoIcons.tsx` | Criar |
+| `src/components/dashboard/TodasAsTrilhas.tsx` | Editar (adicionar import + componente apos carrossel) |
+
+### Dados
+
+22 registros na tabela `trilhas` atualizados via UPDATE (campo `classificacao`)
+
+### Props do componente
 
 ```text
-ClassificacaoIcons
-  props: {
-    classificacoes: string[]           // lista dinamica do banco
-    activeFilter: string               // "todas" | nome da classificacao
-    onSelect: (cls: string) => void    // callback para setClassificacaoFiltro
-  }
-```
-
-Mapeamento icone-classificacao via objeto constante:
-```text
-ICON_MAP = {
-  "Aprendizado Inicial": { icon: BookOpen, animation: sparkle-pulse },
-  "Produtividade":       { icon: Zap,      animation: energy-bounce },
-  "Automação":           { icon: Cog,      animation: rotate-360 },
-  "Carreira":            { icon: Rocket,   animation: float-up },
-  "Rotina":              { icon: Clock,    animation: tick-rotate },
+ClassificacaoIcons {
+  classificacoes: string[]
+  activeFilter: string
+  onSelect: (cls: string) => void
 }
 ```
 
-Classificacoes nao mapeadas receberao um icone generico (`Sparkles`) com animacao de pulso.
+### Mapeamento icone-classificacao
 
-### Arquivos modificados
-- `src/components/dashboard/TodasAsTrilhas.tsx` -- adicionar ClassificacaoIcons apos carrossel
-- Novo: `src/components/dashboard/ClassificacaoIcons.tsx` -- componente dos icones animados
-
-### Dados atualizados
-- 22 registros em `trilhas` terao campo `classificacao` preenchido
+```text
+"Aprendizado Inicial" -> BookOpen + sparkle-pulse
+"Produtividade"       -> Zap + energy-bounce
+"Automacao"           -> Cog + rotate-360
+"Carreira"            -> Rocket + float-up
+"Rotina"              -> Clock + tick-rotate
+Fallback              -> Sparkles + pulse
+```
 
