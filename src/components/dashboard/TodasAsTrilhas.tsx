@@ -169,7 +169,7 @@ export function TodasAsTrilhas() {
                       imagem_url={trilha.imagem_url || undefined}
                       visivel_apenas_pro={trilha.visivel_apenas_pro}
                     />
-                    <div className="px-1 space-y-0.5">
+                    <div className="bg-primary/5 border border-primary/15 rounded-xl p-3 space-y-1">
                       <p className="text-sm font-medium text-foreground line-clamp-1">
                         {trilha.titulo}
                       </p>
