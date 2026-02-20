@@ -162,14 +162,14 @@ export function TodasAsTrilhas() {
                   key={trilha.id}
                   className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-[28%]"
                 >
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2 h-full">
                     <TrilhaCard
                       id={trilha.id}
                       titulo={trilha.titulo}
                       imagem_url={trilha.imagem_url || undefined}
                       visivel_apenas_pro={trilha.visivel_apenas_pro}
                     />
-                    <div className="bg-primary/5 border border-primary/15 rounded-xl p-3 space-y-1">
+                    <div className="bg-primary/5 border border-primary/15 rounded-xl p-3 space-y-1 flex-1 flex flex-col justify-between">
                       <p className="text-sm font-medium text-foreground line-clamp-1">
                         {trilha.titulo}
                       </p>
