@@ -266,7 +266,17 @@ export default function GerenciarMateriais() {
 
     setIsUploading(true);
     try {
-      const fileName = `${Date.now()}_${file.name}`;
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+      const base = file.name.replace(/\.[^/.]+$/, '');
+      const normalized = base
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9.-]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_+|_+$/g, '');
+      const safeBase = normalized || 'arquivo';
+      const fileName = `${Date.now()}-${safeBase}.${ext}`;
+
       const { data, error } = await supabase.storage
         .from('materiais-gratuitos')
         .upload(fileName, file);
@@ -279,9 +289,9 @@ export default function GerenciarMateriais() {
 
       setArquivoUrls(prev => [...prev, publicUrl]);
       toast.success('Arquivo enviado com sucesso!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error('Erro ao enviar arquivo');
+      toast.error(error?.message || 'Erro ao enviar arquivo');
     } finally {
       setIsUploading(false);
       e.target.value = '';
