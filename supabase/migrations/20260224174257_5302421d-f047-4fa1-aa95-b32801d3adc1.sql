@@ -1,0 +1,1 @@
+ALTER TABLE materiais_gratuitos ALTER COLUMN url DROP NOT NULL;

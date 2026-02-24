@@ -306,10 +306,12 @@ export default function GerenciarMateriais() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const autoUrl = linkUrls[0] || arquivoUrls[0] || null;
+    const payload = { ...formData, url: autoUrl };
     if (editingMaterial) {
-      updateMutation.mutate({ id: editingMaterial.id, data: formData });
+      updateMutation.mutate({ id: editingMaterial.id, data: payload });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(payload);
     }
   };
 
