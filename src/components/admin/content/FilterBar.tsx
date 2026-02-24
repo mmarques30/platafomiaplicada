@@ -38,7 +38,7 @@ export function FilterBar({ filters, totalItems, filteredItems, actionButton }: 
               </SelectTrigger>
               <SelectContent className="bg-background border shadow-lg z-50">
                 <SelectItem value="__all__">{filter.placeholder}</SelectItem>
-                {filter.options.map((option) => (
+                {filter.options.filter((option) => option.value !== '').map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
