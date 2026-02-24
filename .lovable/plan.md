@@ -1,24 +1,42 @@
 
-# Inserir prompt "Fusao de Identidade Fotografica" no banco
+# Corrigir erro de upload de arquivo em Materiais Gratuitos
 
-## O que sera feito
+## Problema identificado
 
-Inserir um novo registro na tabela `biblioteca_prompts` com os dados do prompt fornecido, usando a proxima ordem disponivel (103).
+Ao criar um novo material gratuito no painel admin, o formulario nao possui um campo visivel para a coluna `url`, que e obrigatoria (NOT NULL) no banco de dados. Quando o usuario cria um material apenas com arquivos (upload) ou links, o campo `url` vai como string vazia, o que pode causar erros de validacao ou comportamento inesperado.
 
-## Dados do registro
+Alem disso, se o formulario e submetido sem links nem arquivos, nao ha nenhuma URL valida associada ao material.
 
-| Campo | Valor |
-|---|---|
-| titulo | Fusao de Identidade Fotografica |
-| descricao | Prompt para instruir um modelo de IA a realizar fusao de duas imagens de referencia, extraindo a identidade de uma pessoa e inserindo-a no contexto estetico de outra imagem, gerando um resultado fotorrealista. |
-| prompt | Conteudo completo do prompt com todas as secoes (Como Funciona, Instrucao Hibrida, Resultado Esperado) |
-| categoria | Produtividade |
-| nivel_complexidade | avancado |
-| tags | ["geracao de imagem", "fotorrealismo", "fusao de identidade", "IA generativa"] |
-| ferramentas_recomendadas | ["ChatGPT", "Manus"] |
-| ordem | 103 |
-| ativo | true |
+## Solucao
+
+Duas alteracoes combinadas:
+
+1. **Banco de dados**: Tornar a coluna `url` nullable (permitir NULL), ja que os materiais agora usam `arquivos_url` e `links_url` como fontes principais.
+
+2. **Codigo**: No `handleSubmit`, auto-preencher o campo `url` com o primeiro link ou a primeira URL de arquivo disponivel. Se nenhum existir, enviar `null`.
 
 ## Secao Tecnica
 
-Sera executado um INSERT direto na tabela `biblioteca_prompts` via migracao SQL. Nenhum arquivo de codigo precisa ser alterado -- a biblioteca ja exibe automaticamente os prompts do banco.
+### 1. Migracao SQL
+
+```sql
+ALTER TABLE materiais_gratuitos ALTER COLUMN url DROP NOT NULL;
+```
+
+### 2. Arquivo modificado
+
+| Arquivo | Mudanca |
+|---|---|
+| `src/pages/admin/GerenciarMateriais.tsx` | Ajustar `handleSubmit` para calcular `url` automaticamente a partir dos links/arquivos |
+
+### Logica no handleSubmit
+
+```text
+const autoUrl = linkUrls[0] || arquivoUrls[0] || null;
+// Incluir autoUrl no payload de create/update
+```
+
+Isso garante que:
+- Se o usuario adicionou links, o primeiro link vira a URL principal
+- Se so enviou arquivos, a URL do primeiro arquivo e usada
+- Se nao tem nada, `url` fica como `null` (agora permitido)
