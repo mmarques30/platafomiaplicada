@@ -121,7 +121,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       if (error) throw error;
 
       const uniqueCategorias = Array.from(
-        new Set(data?.map((t) => t.categoria.trim()) || [])
+        new Set(data?.map((t) => t.categoria?.trim()).filter(Boolean) || [])
       ).sort();
       
       setCategorias(uniqueCategorias);
