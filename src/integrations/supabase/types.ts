@@ -3616,7 +3616,7 @@ export type Database = {
           tipo: string | null
           titulo: string
           updated_at: string | null
-          url: string
+          url: string | null
           visivel_gratuitos: boolean | null
         }
         Insert: {
@@ -3632,7 +3632,7 @@ export type Database = {
           tipo?: string | null
           titulo: string
           updated_at?: string | null
-          url: string
+          url?: string | null
           visivel_gratuitos?: boolean | null
         }
         Update: {
@@ -3648,7 +3648,7 @@ export type Database = {
           tipo?: string | null
           titulo?: string
           updated_at?: string | null
-          url?: string
+          url?: string | null
           visivel_gratuitos?: boolean | null
         }
         Relationships: []
