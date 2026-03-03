@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
-import { TrocarSenhaModal } from "./components/auth/TrocarSenhaModal";
 import { useAuth } from "./hooks/useAuth";
 import { useVersionCheck } from "./hooks/useVersionCheck";
 import { AdminViewProvider } from "./contexts/AdminViewContext";
