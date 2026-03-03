@@ -14,7 +14,7 @@ export function AboutSection() {
   const thumbnail = getYouTubeThumbnail(videoId);
 
   const handleVideoEnd = () => {
-    console.log("Video ended at 3:26");
+    // Video ended callback
   };
 
   return (

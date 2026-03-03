@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole, UserRole } from "@/hooks/useUserRole";
@@ -14,13 +14,6 @@ export function ProtectedRoute({ children, requireRole, requireAnyRole }: Protec
   const { hasRole, isLoading: roleLoading, roles, isVisitante } = useUserRole();
 
   const needsRoleCheck = Boolean(requireRole) || (Array.isArray(requireAnyRole) && requireAnyRole.length > 0);
-
-  // Debug logs - apenas em desenvolvimento
-  // useEffect(() => {
-  //   if (import.meta.env.DEV) {
-  //     console.log("[ProtectedRoute]", { authLoading, roleLoading, user: user?.email, roles });
-  //   }
-  // }, [authLoading, roleLoading, user, roles]);
 
   // Enquanto estiver carregando auth ou papéis (quando necessário), apenas mostra loader
   if (authLoading || (needsRoleCheck && roleLoading)) {
