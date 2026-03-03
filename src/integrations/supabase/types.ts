@@ -6027,17 +6027,8 @@ export type Database = {
         | "visitante"
         | "facilitador"
         | "equipe"
-      nivel_acesso_plano: "academy" | "lab" | "skills" | "club" | "business"
-      plano_mentoria:
-        | "club"
-        | "pro"
-        | "boost"
-        | "legacy"
-        | "academy"
-        | "lab"
-        | "skills"
-        | "business"
-        | "business_iaplicada"
+      nivel_acesso_plano: "academy" | "skills" | "business"
+      plano_mentoria: "academy" | "skills" | "business" | "business_iaplicada"
       status_projeto:
         | "planejamento"
         | "em_andamento"
@@ -6179,18 +6170,8 @@ export const Constants = {
         "facilitador",
         "equipe",
       ],
-      nivel_acesso_plano: ["academy", "lab", "skills", "club", "business"],
-      plano_mentoria: [
-        "club",
-        "pro",
-        "boost",
-        "legacy",
-        "academy",
-        "lab",
-        "skills",
-        "business",
-        "business_iaplicada",
-      ],
+      nivel_acesso_plano: ["academy", "skills", "business"],
+      plano_mentoria: ["academy", "skills", "business", "business_iaplicada"],
       status_projeto: [
         "planejamento",
         "em_andamento",
