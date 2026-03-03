@@ -1,70 +1,36 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Limpar enums legados: plano_mentoria e nivel_acesso_plano
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Situacao atual
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+Verifiquei o banco de dados e o codigo:
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+- **plano_mentoria** tem 9 valores: `club, pro, boost, legacy, academy, lab, skills, business, business_iaplicada`
+- **nivel_acesso_plano** tem 5 valores: `academy, lab, skills, club, business`
+- **Zero usuarios** associados aos planos antigos (club, pro, boost, legacy, lab)
+- **Zero conteudos** com nivel_acesso lab ou club
+- Os modais de admin ja mostram apenas academy/skills/business — so faltam os enums no banco e referencias residuais no codigo
 
-## O que será implementado
+Nenhuma pessoa sera afetada. Podemos prosseguir com seguranca.
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+## O que sera feito
 
-## Estratégia técnica
+### 1. Migracao SQL (banco de dados)
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
+Recriar os dois enums apenas com os valores validos:
 
-### Ajustes no `handleFileUpload`
+- **plano_mentoria**: `academy`, `skills`, `business`, `business_iaplicada`
+- **nivel_acesso_plano**: `academy`, `skills`, `business`
 
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
+Isso envolve: renomear enum antigo → criar novo → migrar colunas → dropar antigo. Tambem atualizar as funcoes `calcular_prazo_sla` e `user_has_access_level` que referenciam valores antigos.
 
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
+### 2. Codigo (2 arquivos)
 
-Isso evita chaves inválidas com `+`, acentos e símbolos.
+| Arquivo | Mudanca |
+|---|---|
+| `src/components/shared/TrilhaCardBloqueavel.tsx` | Remover condicional `nivel_minimo_acesso === 'club'` (badge Club) |
+| `src/components/admin/formularios/DiagnosticoPreviewModal.tsx` | Remover `'legacy'` do tipo `DiagnosticoTipo` |
 
-### Robustez adicional recomendada
+O arquivo `types.ts` sera regenerado automaticamente apos a migracao.
 
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
