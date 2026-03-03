@@ -19,13 +19,6 @@ import {
   businessStep4Schema,
   businessStep5Schema,
   businessStep6Schema,
-  step1Schema,
-  step2Schema,
-  step3Schema,
-  step4Schema,
-  step5Schema,
-  step6Schema,
-  step7Schema,
 } from "@/components/mentoria/schema";
 
 type DiagnosticoTipo = 'academy' | 'business';
@@ -147,21 +140,12 @@ const ETAPAS_CONFIG = {
     { titulo: "Interesse em Expansão", schema: businessStep5Schema },
     { titulo: "Sucesso e Parceria", schema: businessStep6Schema },
   ],
-  legacy: [
-    { titulo: "Informações Pessoais", schema: step1Schema },
-    { titulo: "Experiência com IA", schema: step2Schema },
-    { titulo: "Objetivos", schema: step3Schema },
-    { titulo: "Cenário Atual", schema: step4Schema },
-    { titulo: "Estilo de Aprendizagem", schema: step5Schema },
-    { titulo: "Comprometimento e Limites", schema: step6Schema },
-    { titulo: "Prioridades", schema: step7Schema },
-  ],
 };
 
 const TITULOS = {
   academy: "Diagnóstico Academy",
   business: "Diagnóstico Business",
-  legacy: "Diagnóstico Mentoria (Legado)",
+  
 };
 
 export function DiagnosticoPreviewModal({ 
