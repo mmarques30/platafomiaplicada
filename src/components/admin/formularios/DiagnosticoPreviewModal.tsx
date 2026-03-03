@@ -28,7 +28,7 @@ import {
   step7Schema,
 } from "@/components/mentoria/schema";
 
-type DiagnosticoTipo = 'academy' | 'business' | 'legacy';
+type DiagnosticoTipo = 'academy' | 'business';
 
 interface DiagnosticoPreviewModalProps {
   open: boolean;

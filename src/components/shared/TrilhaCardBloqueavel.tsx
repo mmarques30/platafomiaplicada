@@ -72,11 +72,6 @@ export function TrilhaCardBloqueavel({
               🔒 PRO
             </div>
           )}
-          {nivel_minimo_acesso === 'club' && (
-            <div className="absolute top-2 right-2 md:top-4 md:right-4 z-10 bg-amber-500 text-white px-2 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1 md:gap-2 shadow-lg">
-              ⭐ Club
-            </div>
-          )}
           
           {!imageLoaded && (
             <div className="absolute inset-0 bg-muted animate-pulse" />
@@ -115,11 +110,6 @@ export function TrilhaCardBloqueavel({
         {visivel_apenas_pro && (
           <div className="absolute top-2 left-2 md:top-4 md:left-4 z-10 bg-primary text-primary-foreground px-2 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1 md:gap-2 shadow-lg">
             🔒 PRO
-          </div>
-        )}
-        {nivel_minimo_acesso === 'club' && (
-          <div className="absolute top-2 right-2 md:top-4 md:right-4 z-10 bg-amber-500 text-white px-2 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1 md:gap-2 shadow-lg">
-            ⭐ Club
           </div>
         )}
         <div className="absolute top-2 right-2 md:top-4 md:right-4 z-10">
