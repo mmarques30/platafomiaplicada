@@ -1,70 +1,43 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Criar role "parceiros" com visao Business
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Resumo
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+Adicionar o tipo de usuario `parceiros` ao sistema. Parceiros terao uma role propria no banco e verao a plataforma com a mesma interface do plano Business. Na gestao administrativa, aparecerao junto com os usuarios Business, identificados por um badge "Parceiro".
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+## Alteracoes
 
-## O que será implementado
+### 1. Migracao SQL
+- Adicionar `parceiros` ao enum `app_role`
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+### 2. Hooks — acesso e plano
+| Arquivo | Mudanca |
+|---|---|
+| `src/hooks/useUserRole.tsx` | Adicionar `isParceiro` ao retorno; incluir parceiros em `hasAccess` |
+| `src/hooks/useUserPlan.tsx` | Em `useUserPlan`: se usuario tem role `parceiros` e nao tem `plano_mentoria`, tratar como business. Em `useEffectivePlan`: parceiros verao visao business |
 
-## Estratégia técnica
+### 3. Modais de admin (role selection)
+| Arquivo | Mudanca |
+|---|---|
+| `src/components/admin/NovoUsuarioModal.tsx` | Adicionar checkbox "Parceiro" nas roles |
+| `src/components/admin/UserRoleModal.tsx` | Adicionar "Parceiro" em AVAILABLE_ROLES |
+| `src/components/admin/EditUserModal.tsx` | Adicionar "Parceiro" na lista de roles |
+| `src/hooks/admin/useUsers.tsx` | Incluir `parceiros` no tipo AppRole |
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
+### 4. Gestao Business — incluir parceiros
+| Arquivo | Mudanca |
+|---|---|
+| `src/pages/admin/mentoria/MentoriaBusinessPage.tsx` | Alterar filtro de usuarios: incluir quem tem role `parceiros`. Exibir badge "Parceiro" ao lado do nome |
+| `src/pages/admin/GerenciarUsuarios.tsx` | Exibir badge "Parceiro" quando user tem role parceiros |
 
-### Ajustes no `handleFileUpload`
+### 5. Edge function
+| Arquivo | Mudanca |
+|---|---|
+| `supabase/functions/create-user-admin/index.ts` | Aceitar `parceiros` como role valida. Quando role inclui `parceiros`, setar `plano_mentoria = 'business'` automaticamente se nenhum plano foi selecionado |
 
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
+### 6. Exportacao CSV
+| Arquivo | Mudanca |
+|---|---|
+| `src/lib/exportUsers.ts` | Nenhuma — roles ja sao exportadas dinamicamente |
 
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
-
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
