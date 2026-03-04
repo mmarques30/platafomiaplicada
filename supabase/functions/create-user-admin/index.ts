@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
       updateData.empresa_consultoria = empresaConsultoria
     }
     
-    if (planoMentoria === 'business') {
+    if (effectivePlanoMentoria === 'business' || effectivePlanoMentoria === 'business_iaplicada') {
       updateData.skills_liberado = skillsLiberado ?? false
     }
 
