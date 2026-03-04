@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 
-export type UserRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "visitante" | null;
+export type UserRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "visitante" | "parceiros" | null;
 
 export function useUserRole() {
   const { user } = useAuth();
@@ -49,13 +49,14 @@ export function useUserRole() {
   const isMentorado = hasRole("mentorado");
   const isAlunoTrilha = hasRole("aluno_trilha");
   const realIsVisitante = hasRole("visitante");
+  const isParceiro = hasRole("parceiros");
 
   // Se admin está simulando visitante
   const effectiveIsVisitante = isAdmin && isViewingAs && viewAs === "visitante" 
     ? true 
     : realIsVisitante;
 
-  const hasAccess = isAdmin || isMentorado || isAlunoTrilha || effectiveIsVisitante;
+  const hasAccess = isAdmin || isMentorado || isAlunoTrilha || isParceiro || effectiveIsVisitante;
 
   return {
     roles: roles || [],
@@ -64,6 +65,7 @@ export function useUserRole() {
     isEquipe,
     isMentorado,
     isAlunoTrilha,
+    isParceiro,
     isVisitante: effectiveIsVisitante,
     realIsVisitante,
     hasAccess,
