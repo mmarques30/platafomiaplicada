@@ -397,8 +397,8 @@ export function AppSidebar() {
                       
                       <CollapsibleContent>
                         <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                          {/* IAplicada: apenas Prompts e Ferramentas */}
-                          {isBusinessIAplicadaEnv ? (
+                          {/* Business Sistemas: apenas Prompts e Ferramentas */}
+                          {isBusinessSistemasEnv ? (
                             <>
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
