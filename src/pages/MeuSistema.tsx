@@ -78,10 +78,11 @@ const MeuSistema = () => {
       {/* Overview Cards */}
       <ProjetoOverviewCards
         progressoGeral={progressoGeral}
-        faseAtual={faseAtual}
+        etapaAtualNumero={etapaAtualNumero}
         dataInicio={contrato.data_inicio}
         dataFim={contrato.data_fim}
-        totalEtapas={etapas.length}
+        entregasConcluidas={entregasConcluidas}
+        totalEntregas={entregas.length}
       />
 
       {/* Próximos Passos & Entregas Concluídas */}
