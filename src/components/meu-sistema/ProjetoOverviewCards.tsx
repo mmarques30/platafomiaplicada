@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { differenceInDays } from "date-fns";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ProjetoOverviewCardsProps {
@@ -38,52 +38,73 @@ interface StatCardProps {
   value?: number;
   textValue?: string;
   suffix?: string;
-  trendLabel: string;
+  changeValue: string;
+  changeLabel: string;
   trendType: "positive" | "negative" | "neutral";
   index: number;
 }
 
-function StatCard({ title, value, textValue, suffix, trendLabel, trendType, index }: StatCardProps) {
-  const trendColor = {
-    positive: "text-[hsl(var(--chart-3))]",
-    negative: "text-destructive",
-    neutral: "text-muted-foreground",
-  }[trendType];
+function StatCard({ title, value, textValue, suffix, changeValue, changeLabel, trendType, index }: StatCardProps) {
+  const TrendIcon = trendType === "positive" ? ArrowUpRight : trendType === "negative" ? ArrowDownRight : Minus;
 
-  const TrendIcon = trendType === "positive" ? TrendingUp : trendType === "negative" ? TrendingDown : ArrowRight;
+  const trendStyles = {
+    positive: {
+      iconBg: "bg-emerald-500/15",
+      iconColor: "text-emerald-600 dark:text-emerald-400",
+      changeColor: "text-emerald-600 dark:text-emerald-400",
+    },
+    negative: {
+      iconBg: "bg-red-500/15",
+      iconColor: "text-red-600 dark:text-red-400",
+      changeColor: "text-red-600 dark:text-red-400",
+    },
+    neutral: {
+      iconBg: "bg-muted",
+      iconColor: "text-muted-foreground",
+      changeColor: "text-muted-foreground",
+    },
+  }[trendType];
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
+      transition={{ duration: 0.45, delay: index * 0.08, ease: "easeOut" }}
     >
-      <Card className="border border-border rounded-xl p-5 space-y-3 hover:shadow-md transition-shadow">
+      <Card className="rounded-2xl border border-border bg-card p-6 space-y-4">
+        {/* Value */}
         <div className="flex items-baseline gap-1">
           {textValue ? (
             <motion.span
-              className="text-3xl font-bold text-foreground"
+              className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
               {textValue}
             </motion.span>
           ) : (
-            <span className="text-3xl font-bold text-foreground">
+            <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
               <CountUpValue value={value ?? 0} />
             </span>
           )}
           {suffix && (
-            <span className="text-xl font-semibold text-muted-foreground">{suffix}</span>
+            <span className="text-2xl sm:text-3xl font-semibold text-muted-foreground">{suffix}</span>
           )}
         </div>
 
+        {/* Title */}
         <p className="text-sm font-medium text-muted-foreground">{title}</p>
 
-        <div className={cn("flex items-center gap-1.5 text-xs font-medium", trendColor)}>
-          <TrendIcon className="h-3.5 w-3.5" />
-          <span>{trendLabel}</span>
+        {/* Trend badge */}
+        <div className="flex items-center gap-2 pt-1">
+          <div className={cn("flex items-center justify-center w-7 h-7 rounded-full", trendStyles.iconBg)}>
+            <TrendIcon className={cn("h-4 w-4", trendStyles.iconColor)} />
+          </div>
+          <span className={cn("text-sm font-semibold", trendStyles.changeColor)}>
+            {changeValue}
+          </span>
+          <span className="text-xs text-muted-foreground">{changeLabel}</span>
         </div>
       </Card>
     </motion.div>
@@ -105,22 +126,23 @@ export function ProjetoOverviewCards({
   const progressoEntregas = totalEntregas > 0 ? (entregasConcluidas / totalEntregas) * 100 : 0;
   const progressoEntregasRounded = Math.round(progressoEntregas);
 
-  let saude: { label: string; trend: "positive" | "negative" | "neutral"; trendLabel: string };
+  let saude: { label: string; trend: "positive" | "negative" | "neutral"; changeValue: string; changeLabel: string };
   if (progressoEntregas > cronogramaPercentual + 10) {
-    saude = { label: "Avançado", trend: "positive", trendLabel: "Entregas à frente do cronograma" };
+    saude = { label: "Avançado", trend: "positive", changeValue: `+${Math.round(progressoEntregas - cronogramaPercentual)}%`, changeLabel: "à frente do cronograma" };
   } else if (progressoEntregas >= cronogramaPercentual) {
-    saude = { label: "Saudável", trend: "positive", trendLabel: "Entregas alinhadas ao cronograma" };
+    saude = { label: "Saudável", trend: "positive", changeValue: "On track", changeLabel: "alinhado ao cronograma" };
   } else {
-    saude = { label: "Em Risco", trend: "negative", trendLabel: "Entregas atrasadas vs cronograma" };
+    saude = { label: "Em Risco", trend: "negative", changeValue: `${Math.round(progressoEntregas - cronogramaPercentual)}%`, changeLabel: "atrasado vs cronograma" };
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <StatCard
         index={0}
         title="Saúde do Projeto"
         textValue={saude.label}
-        trendLabel={saude.trendLabel}
+        changeValue={saude.changeValue}
+        changeLabel={saude.changeLabel}
         trendType={saude.trend}
       />
       <StatCard
@@ -128,7 +150,8 @@ export function ProjetoOverviewCards({
         title="Roadmap"
         value={etapaAtualNumero ?? 0}
         suffix={etapaAtualNumero ? "ª fase" : undefined}
-        trendLabel="Fase atual em andamento"
+        changeValue={`${etapaAtualNumero ?? 0} de ${etapaAtualNumero ? etapaAtualNumero + 1 : 1}`}
+        changeLabel="fase atual"
         trendType="neutral"
       />
       <StatCard
@@ -136,7 +159,8 @@ export function ProjetoOverviewCards({
         title="Cronograma"
         value={cronogramaPercentual}
         suffix="%"
-        trendLabel={`${diasRestantes} dias restantes`}
+        changeValue={`${diasRestantes}d`}
+        changeLabel="dias restantes"
         trendType={cronogramaPercentual > 80 ? "negative" : "positive"}
       />
       <StatCard
@@ -144,7 +168,8 @@ export function ProjetoOverviewCards({
         title="Entregas"
         value={entregasConcluidas}
         suffix={`/${totalEntregas}`}
-        trendLabel={`${progressoEntregasRounded}% concluído`}
+        changeValue={`${progressoEntregasRounded}%`}
+        changeLabel="concluído"
         trendType={progressoEntregasRounded >= 50 ? "positive" : "neutral"}
       />
     </div>
