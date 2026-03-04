@@ -23,12 +23,14 @@ const MeuSistema = () => {
   const entregasConcluidas = entregas.filter((e) => e.status === "concluida").length;
   const progressoGeral = Math.round((entregasConcluidas / totalEntregas) * 100);
 
-  // Determinar fase atual
-  const faseAtual =
-    etapas.find((e) => e.status === "em_andamento")?.titulo ||
-    [...etapas].reverse().find((e) => e.status === "concluida")?.titulo ||
-    etapas[0]?.titulo ||
-    null;
+  // Determinar número da etapa atual
+  const etapaAtualIndex = etapas.findIndex((e) => e.status === "em_andamento");
+  const etapaAtualNumero = etapaAtualIndex !== -1
+    ? etapaAtualIndex + 1
+    : (() => {
+        const lastConcluida = [...etapas].reverse().findIndex((e) => e.status === "concluida");
+        return lastConcluida !== -1 ? etapas.length - lastConcluida : (etapas.length > 0 ? 1 : null);
+      })();
 
   if (isLoading) {
     return (
