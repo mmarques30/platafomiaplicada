@@ -73,8 +73,8 @@ export function useMenuConfig() {
         'meu_sistema'
       ],
       
-      // Business Colaborativo: oculta menus Academy-only e Skills-only + Squad + Projeto Skills
-      business: [
+      // Business Parceria: oculta menus Academy-only e Skills-only + Squad + Projeto Skills
+      business_parceria: [
         'trilhas', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
         'skills_entregas', 'skills_painel_lider',
@@ -83,8 +83,8 @@ export function useMenuConfig() {
         'meu_sistema'
       ],
       
-      // Business IAplicada: versão mais restrita (cliente apenas acompanha) + Squad + Projeto Skills
-      business_iaplicada: [
+      // Business Sistemas: versão mais restrita (cliente apenas acompanha) + Squad + Projeto Skills
+      business_sistemas: [
         'trilhas', 'trilhas_skills', 'calendario',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
@@ -125,7 +125,7 @@ export function useMenuConfig() {
       // Fallback: verificar plano do usuário
       return m.planos_permitidos.includes(userPlan);
     }).map(m => {
-      if (m.menu_key === 'meu_progresso' && currentEnvironment === 'business') {
+      if (m.menu_key === 'meu_progresso' && currentEnvironment === 'business_parceria') {
         return { ...m, label: 'Minha Trajetória' };
       }
       return m;

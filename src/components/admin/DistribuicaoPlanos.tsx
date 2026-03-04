@@ -20,7 +20,7 @@ const COLORS = {
 const LABELS = {
   academy: "Academy",
   skills: "Skills",
-  business: "Business",
+  business: "Business Parceria",
   sem_plano: "Sem Plano",
 };
 

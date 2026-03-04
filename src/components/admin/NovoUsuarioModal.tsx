@@ -28,8 +28,8 @@ interface NovoUsuarioModalProps {
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
   { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
-  { value: "business", label: "Business", description: "Consultoria colaborativa - cliente participa" },
-  { value: "business_iaplicada", label: "Business iAplicada", description: "iAplicada constrói - cliente acompanha" },
+  { value: "business_parceria", label: "Business Parceria", description: "Consultoria colaborativa - cliente participa" },
+  { value: "business_sistemas", label: "Business Sistemas", description: "iAplicada constrói - cliente acompanha" },
 ];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {
@@ -85,7 +85,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
       nomeCompleto,
       roles: selectedRoles,
       planoMentoria: selectedPlano || null,
-      skillsLiberado: (selectedPlano === "business" || selectedPlano === "business_iaplicada") ? skillsLiberado : false,
+      skillsLiberado: (selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") ? skillsLiberado : false,
       // Skills team data
       equipeId: selectedPlano === "skills" ? skillsEquipeData.equipeId : null,
       novaEquipe: selectedPlano === "skills" ? skillsEquipeData.novaEquipe : null,
@@ -260,7 +260,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
             )}
             
             {/* Switch para liberar Skills - apenas para Business colaborativo */}
-            {(selectedPlano === "business" || selectedPlano === "business_iaplicada") && (
+            {(selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") && (
               <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
                 <div>
                   <Label htmlFor="skills-liberado-novo" className="text-sm font-medium">
