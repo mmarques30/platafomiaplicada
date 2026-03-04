@@ -9,19 +9,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEnvironment, Environment, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
+import { useEnvironmentSafe, Environment, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
 import { cn } from "@/lib/utils";
 
 const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business"];
 
 export function EnvironmentSwitcher() {
   const navigate = useNavigate();
+  const env = useEnvironmentSafe();
+
+  if (!env) return null;
+
   const { 
     currentEnvironment, 
     availableEnvironments, 
     setEnvironment,
     environmentConfig 
-  } = useEnvironment();
+  } = env;
 
   if (!currentEnvironment || !environmentConfig) {
     return null;
