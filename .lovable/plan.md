@@ -1,70 +1,38 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Criar pagina de detalhe de fase exclusiva para Meu Sistema
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Problema
+Atualmente, ao clicar numa fase no RoadMap de "Meu Sistema", o usuario e redirecionado para `/mentoria/etapa/:etapaId` -- a mesma pagina usada em Business Parceria, que foca em gestao de entregas com seletores de status. Para "Meu Sistema", a visao deve ser informativa e estrategica: descrever a fase, sua necessidade, projecao de execucao e impacto.
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+## Solucao
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+### 1. Nova pagina `src/pages/MeuSistemaEtapaDetalhe.tsx`
+Pagina dedicada com layout diferenciado, contendo:
 
-## O que será implementado
+- **Header**: Nome da fase, numero, badge de status, data prevista/conclusao
+- **Card "Sobre esta Fase"**: Objetivo/descricao detalhada da fase com destaque visual
+- **Card "Projecao de Execucao"**: Data prevista, data de conclusao (se houver), duracao estimada, barra de progresso das entregas
+- **Card "Impacto e Necessidade"**: Listagem dos marcos (`marcos_proxima_etapa`) apresentados como impactos esperados da fase
+- **Card "Entregas Previstas"**: Lista simplificada (somente leitura) das entregas vinculadas, com status visual (icone + cor), modulo relacionado e prazo -- sem seletor de status (diferente da Parceria)
+- Botao "Voltar" para `/meu-sistema`
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+### 2. Nova rota em `src/App.tsx`
+- Adicionar rota `/meu-sistema/fase/:etapaId` apontando para `MeuSistemaEtapaDetalhe`
 
-## Estratégia técnica
+### 3. Atualizar `src/components/meu-sistema/TimelineEtapas.tsx`
+- Alterar o `onClick` de `/mentoria/etapa/${etapa.id}` para `/meu-sistema/fase/${etapa.id}`
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
+### Diferencas em relacao a pagina de Parceria
+| Parceria (`MentoriaEtapa`) | Sistema (`MeuSistemaEtapaDetalhe`) |
+|---|---|
+| Select para mudar status das entregas | Somente leitura, visual limpo |
+| Foco em gestao/tarefas | Foco em clareza, necessidade e impacto |
+| Marcos como "proximo encontro" | Marcos como impacto esperado |
+| Layout funcional | Layout informativo/estrategico |
 
-### Ajustes no `handleFileUpload`
+### Arquivos editados/criados
+1. **Criar** `src/pages/MeuSistemaEtapaDetalhe.tsx`
+2. **Editar** `src/App.tsx` -- nova rota
+3. **Editar** `src/components/meu-sistema/TimelineEtapas.tsx` -- alterar navegacao
 
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
-
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
-
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
