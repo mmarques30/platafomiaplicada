@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { differenceInDays } from "date-fns";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { Activity, Map, Clock, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Area, AreaChart, ResponsiveContainer } from "recharts";
 
 interface ProjetoOverviewCardsProps {
   etapaAtualNumero: number | null;
@@ -33,82 +34,114 @@ function CountUpValue({ value, duration = 1.5 }: { value: number; duration?: num
   return <span ref={ref}>0</span>;
 }
 
+function MiniSparkline({ data, color }: { data: number[]; color: string }) {
+  const chartData = useMemo(() => data.map((v, i) => ({ v, i })), [data]);
+  return (
+    <ResponsiveContainer width="100%" height={40}>
+      <AreaChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+        <defs>
+          <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity={0.4} />
+            <stop offset="100%" stopColor={color} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <Area
+          type="monotone"
+          dataKey="v"
+          stroke={color}
+          strokeWidth={2}
+          fill={`url(#grad-${color})`}
+          dot={false}
+          isAnimationActive
+          animationDuration={1200}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
 interface StatCardProps {
   title: string;
   value?: number;
   textValue?: string;
   suffix?: string;
-  changeValue: string;
-  changeLabel: string;
+  changeText: string;
   trendType: "positive" | "negative" | "neutral";
+  icon: React.ReactNode;
+  sparkData: number[];
   index: number;
 }
 
-function StatCard({ title, value, textValue, suffix, changeValue, changeLabel, trendType, index }: StatCardProps) {
-  const TrendIcon = trendType === "positive" ? ArrowUpRight : trendType === "negative" ? ArrowDownRight : Minus;
+function StatCard({ title, value, textValue, suffix, changeText, trendType, icon, sparkData, index }: StatCardProps) {
+  const changeColor = {
+    positive: "text-emerald-400",
+    negative: "text-red-400",
+    neutral: "text-muted-foreground",
+  }[trendType];
 
-  const trendStyles = {
-    positive: {
-      iconBg: "bg-emerald-500/15",
-      iconColor: "text-emerald-600 dark:text-emerald-400",
-      changeColor: "text-emerald-600 dark:text-emerald-400",
-    },
-    negative: {
-      iconBg: "bg-red-500/15",
-      iconColor: "text-red-600 dark:text-red-400",
-      changeColor: "text-red-600 dark:text-red-400",
-    },
-    neutral: {
-      iconBg: "bg-muted",
-      iconColor: "text-muted-foreground",
-      changeColor: "text-muted-foreground",
-    },
+  const sparkColor = {
+    positive: "#4ade80",
+    negative: "#f87171",
+    neutral: "#9ca3af",
   }[trendType];
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.07, ease: "easeOut" }}
+      transition={{ duration: 0.45, delay: index * 0.09, ease: "easeOut" }}
     >
-      <Card className="rounded-xl border border-border bg-card p-4 space-y-2.5">
-        {/* Title */}
-        <p className="text-xs font-semibold uppercase tracking-wide text-foreground/70">{title}</p>
-
-        {/* Value */}
-        <div className="flex items-baseline gap-0.5">
-          {textValue ? (
-            <motion.span
-              className="text-2xl font-bold tracking-tight text-foreground/80"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {textValue}
-            </motion.span>
-          ) : (
-            <span className="text-2xl font-bold tracking-tight text-foreground">
-              <CountUpValue value={value ?? 0} />
-            </span>
-          )}
-          {suffix && (
-            <span className="text-lg font-semibold text-foreground/50">{suffix}</span>
-          )}
+      <Card className="relative overflow-hidden rounded-xl border-0 bg-[hsl(var(--chart-4))] p-5 flex flex-col justify-between min-h-[150px]">
+        {/* Header: title + icon */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-white/60">{title}</p>
+          <div className="text-white/30">{icon}</div>
         </div>
 
-        {/* Trend badge */}
-        <div className="flex items-center gap-1.5">
-          <div className={cn("flex items-center justify-center w-5 h-5 rounded-full", trendStyles.iconBg)}>
-            <TrendIcon className={cn("h-3 w-3", trendStyles.iconColor)} />
+        {/* Value + sparkline row */}
+        <div className="flex items-end justify-between mt-3 gap-3">
+          <div className="flex items-baseline gap-1 min-w-0">
+            {textValue ? (
+              <motion.span
+                className="text-2xl font-bold text-white truncate"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+              >
+                {textValue}
+              </motion.span>
+            ) : (
+              <span className="text-2xl font-bold text-white">
+                <CountUpValue value={value ?? 0} />
+              </span>
+            )}
+            {suffix && (
+              <span className="text-base font-semibold text-white/50">{suffix}</span>
+            )}
           </div>
-          <span className={cn("text-xs font-semibold", trendStyles.changeColor)}>
-            {changeValue}
-          </span>
-          <span className="text-[11px] text-foreground/50">{changeLabel}</span>
+          {/* Mini sparkline */}
+          <div className="w-24 h-10 flex-shrink-0">
+            <MiniSparkline data={sparkData} color={sparkColor} />
+          </div>
         </div>
+
+        {/* Change text */}
+        <p className={cn("text-xs font-medium mt-2", changeColor)}>
+          {changeText}
+        </p>
       </Card>
     </motion.div>
   );
+}
+
+// Generate fake sparkline data based on a target percentage
+function generateSparkData(target: number, points = 7): number[] {
+  const data: number[] = [];
+  for (let i = 0; i < points; i++) {
+    const progress = i / (points - 1);
+    data.push(Math.max(0, Math.round(target * progress + (Math.random() - 0.5) * target * 0.3)));
+  }
+  return data;
 }
 
 export function ProjetoOverviewCards({
@@ -126,51 +159,60 @@ export function ProjetoOverviewCards({
   const progressoEntregas = totalEntregas > 0 ? (entregasConcluidas / totalEntregas) * 100 : 0;
   const progressoEntregasRounded = Math.round(progressoEntregas);
 
-  let saude: { label: string; trend: "positive" | "negative" | "neutral"; changeValue: string; changeLabel: string };
+  let saude: { label: string; trend: "positive" | "negative" | "neutral"; changeText: string };
   if (progressoEntregas > cronogramaPercentual + 10) {
-    saude = { label: "Avançado", trend: "positive", changeValue: `+${Math.round(progressoEntregas - cronogramaPercentual)}%`, changeLabel: "à frente do cronograma" };
+    saude = { label: "Avançado", trend: "positive", changeText: `+${Math.round(progressoEntregas - cronogramaPercentual)}% à frente do cronograma` };
   } else if (progressoEntregas >= cronogramaPercentual) {
-    saude = { label: "Saudável", trend: "positive", changeValue: "On track", changeLabel: "alinhado ao cronograma" };
+    saude = { label: "Saudável", trend: "positive", changeText: "Alinhado ao cronograma" };
   } else {
-    saude = { label: "Em Risco", trend: "negative", changeValue: `${Math.round(progressoEntregas - cronogramaPercentual)}%`, changeLabel: "atrasado vs cronograma" };
+    saude = { label: "Em Risco", trend: "negative", changeText: `${Math.round(progressoEntregas - cronogramaPercentual)}% atrasado vs cronograma` };
   }
 
+  const sparkSaude = useMemo(() => generateSparkData(progressoEntregasRounded), [progressoEntregasRounded]);
+  const sparkRoadmap = useMemo(() => generateSparkData((etapaAtualNumero ?? 1) * 20), [etapaAtualNumero]);
+  const sparkCronograma = useMemo(() => generateSparkData(cronogramaPercentual), [cronogramaPercentual]);
+  const sparkEntregas = useMemo(() => generateSparkData(progressoEntregasRounded), [progressoEntregasRounded]);
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
         index={0}
         title="Saúde do Projeto"
         textValue={saude.label}
-        changeValue={saude.changeValue}
-        changeLabel={saude.changeLabel}
+        changeText={saude.changeText}
         trendType={saude.trend}
+        icon={<Activity className="h-5 w-5" />}
+        sparkData={sparkSaude}
       />
       <StatCard
         index={1}
         title="Roadmap"
         value={etapaAtualNumero ?? 0}
         suffix={etapaAtualNumero ? "ª fase" : undefined}
-        changeValue={`${etapaAtualNumero ?? 0} de ${etapaAtualNumero ? etapaAtualNumero + 1 : 1}`}
-        changeLabel="fase atual"
+        changeText={`Fase ${etapaAtualNumero ?? 0} em andamento`}
         trendType="neutral"
+        icon={<Map className="h-5 w-5" />}
+        sparkData={sparkRoadmap}
       />
       <StatCard
         index={2}
         title="Cronograma"
         value={cronogramaPercentual}
         suffix="%"
-        changeValue={`${diasRestantes}d`}
-        changeLabel="dias restantes"
+        changeText={`${diasRestantes} dias restantes`}
         trendType={cronogramaPercentual > 80 ? "negative" : "positive"}
+        icon={<Clock className="h-5 w-5" />}
+        sparkData={sparkCronograma}
       />
       <StatCard
         index={3}
         title="Entregas"
         value={entregasConcluidas}
         suffix={`/${totalEntregas}`}
-        changeValue={`${progressoEntregasRounded}%`}
-        changeLabel="concluído"
+        changeText={`+${progressoEntregasRounded}% concluído`}
         trendType={progressoEntregasRounded >= 50 ? "positive" : "neutral"}
+        icon={<CheckCircle2 className="h-5 w-5" />}
+        sparkData={sparkEntregas}
       />
     </div>
   );
