@@ -108,6 +108,7 @@ import PoliticaUso from "./pages/PoliticaUso";
 import GerenciarPoliticas from "./pages/admin/GerenciarPoliticas";
 import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
 import MeuSistema from "./pages/MeuSistema";
+import MeuSistemaEtapaDetalhe from "./pages/MeuSistemaEtapaDetalhe";
 import FormularioAplica from "./pages/FormularioAplica";
 import Instalar from "./pages/Instalar";
 import Central from "./pages/Central";
@@ -218,6 +219,7 @@ function AppContent() {
             <Route path="/central" element={<Central />} />
             <Route path="/cupons" element={<Cupons />} />
             <Route path="/meu-sistema" element={<MeuSistema />} />
+            <Route path="/meu-sistema/fase/:etapaId" element={<MeuSistemaEtapaDetalhe />} />
             <Route path="/instalar" element={<Instalar />} />
             <Route path="/politica-servicos" element={<PoliticaServicos />} />
           </Route>
