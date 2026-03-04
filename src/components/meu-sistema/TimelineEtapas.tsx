@@ -138,7 +138,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
                 className={`flex-1 mb-4 transition-all duration-500 cursor-pointer hover:shadow-md ${
                   isActive ? "border-border/50 shadow-sm" : "border-border/20"
                 }`}
-                onClick={() => navigate(`/mentoria/etapa/${etapa.id}`)}
+                onClick={() => navigate(`/meu-sistema/fase/${etapa.id}`)}
               >
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-2">
