@@ -44,11 +44,11 @@ export function ProjetoOverviewCards({
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map((card) => (
-        <Card key={card.label} className="bg-primary/5 border-primary/20">
-          <CardContent className="p-4 space-y-1">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{card.label}</span>
-            <p className="text-lg font-bold">{card.value}</p>
-            {card.extra}
+        <Card key={card.label} className="bg-primary/5 border-primary/20 shadow-sm">
+          <CardContent className="py-5 px-3 flex flex-col items-center text-center space-y-1.5">
+            <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{card.label}</span>
+            <p className="text-sm font-semibold truncate max-w-full">{card.value}</p>
+            {card.extra && <div className="w-4/5 mx-auto">{card.extra}</div>}
           </CardContent>
         </Card>
       ))}
