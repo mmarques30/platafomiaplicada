@@ -33,8 +33,8 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, isMentorado, isLoading: roleLoading } = useUserRole();
-  const { effectivePlan, isVisitante, isBusiness, isSkills, isAcademy, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading);
+  const { isAdmin, isMentorado, isParceiro, isLoading: roleLoading } = useUserRole();
+  const { effectivePlan, isVisitante, isBusiness, isSkills, isAcademy, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading, isParceiro);
   const { isViewingAs, resetView, viewAs } = useAdminViewContext();
   const { signOut } = useAuth();
   const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();

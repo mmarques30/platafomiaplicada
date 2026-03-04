@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { SkillsEquipeSelector, type SkillsEquipeData } from "./SkillsEquipeSelector";
 
-type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha";
+type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "parceiros";
 
 interface NovoUsuarioModalProps {
   open: boolean;
@@ -196,6 +196,16 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
                 />
                 <Label htmlFor="aluno_trilha" className="cursor-pointer">
                   Aluno da Trilha
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="parceiros"
+                  checked={selectedRoles.includes("parceiros")}
+                  onCheckedChange={() => toggleRole("parceiros")}
+                />
+                <Label htmlFor="parceiros" className="cursor-pointer">
+                  Parceiro
                 </Label>
               </div>
             </div>

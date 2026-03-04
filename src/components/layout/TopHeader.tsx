@@ -31,8 +31,8 @@ export function TopHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { isAdmin } = useUserRole();
-  const { effectivePlan, isBusiness, isSkills, isAcademy, isVisitante, hasEffectiveAccessTo } = useEffectivePlan(isAdmin);
+  const { isAdmin, isParceiro } = useUserRole();
+  const { effectivePlan, isBusiness, isSkills, isAcademy, isVisitante, hasEffectiveAccessTo } = useEffectivePlan(isAdmin, false, isParceiro);
   const { profile } = useUserProfile();
   const { data: produtosAtivos } = useProdutosAtivos();
   const { viewAs, impersonatedUserName, resetView, isViewingAs } = useAdminViewContext();

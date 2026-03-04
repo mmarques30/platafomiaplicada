@@ -80,7 +80,7 @@ export function useUserPlan() {
 }
 
 // Hook separado para obter plano efetivo considerando admin e viewAs
-export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = false) {
+export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = false, isParceiro: boolean = false) {
   const { plan, hasAccessTo, isLoading: planLoading, isAcademy, isSkills, isBusiness, isBusinessColaborativo, isBusinessIAplicada, isVisitante: isRealVisitante } = useUserPlan();
   
   // isLoading combinado inclui o carregamento do role para evitar race conditions
@@ -103,8 +103,8 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
     // Se há simulação ativa, usar o plano simulado
     if (hasActiveSimulation) {
       currentPlan = viewAs === "visitante" ? null : viewAs as UserPlan;
-    } else if (isAdmin) {
-      currentPlan = "business"; // Admin sem viewAs vê como business
+    } else if (isAdmin || isParceiro) {
+      currentPlan = "business"; // Admin e parceiros sem viewAs veem como business
     } else {
       currentPlan = plan;
     }
@@ -163,19 +163,19 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
   // IMPORTANTE: Durante loading, não marcar como visitante para evitar redirect prematuro
   const effectiveIsVisitante = isLoading ? false : (isRealVisitante || (!isAdmin && !plan));
 
-  // Sem simulação: admin vê como business (padrão)
-  const effectiveIsBusiness = isAdmin || isBusiness;
+  // Sem simulação: admin e parceiros veem como business (padrão)
+  const effectiveIsBusiness = isAdmin || isParceiro || isBusiness;
   const effectiveIsSkills = !effectiveIsBusiness && isSkills;
   // Corrigir: visitantes NÃO são Academy - só é Academy se tiver plano academy real
   const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills && !effectiveIsVisitante && isAcademy;
 
-  // Para flags específicas de Business: admin vê como colaborativo por padrão
-  const effectiveIsBusinessColaborativo = isAdmin || isBusinessColaborativo;
-  const effectiveIsBusinessIAplicada = !isAdmin && isBusinessIAplicada;
+  // Para flags específicas de Business: admin e parceiros veem como colaborativo por padrão
+  const effectiveIsBusinessColaborativo = isAdmin || isParceiro || isBusinessColaborativo;
+  const effectiveIsBusinessIAplicada = !isAdmin && !isParceiro && isBusinessIAplicada;
 
   return {
     plan,
-    effectivePlan: isAdmin ? "business" as UserPlan : plan,
+    effectivePlan: (isAdmin || isParceiro) ? "business" as UserPlan : plan,
     hasAccessTo,
     hasEffectiveAccessTo,
     isLoading,

@@ -6027,6 +6027,7 @@ export type Database = {
         | "visitante"
         | "facilitador"
         | "equipe"
+        | "parceiros"
       nivel_acesso_plano: "academy" | "skills" | "business"
       plano_mentoria: "academy" | "skills" | "business" | "business_iaplicada"
       status_projeto:
@@ -6169,6 +6170,7 @@ export const Constants = {
         "visitante",
         "facilitador",
         "equipe",
+        "parceiros",
       ],
       nivel_acesso_plano: ["academy", "skills", "business"],
       plano_mentoria: ["academy", "skills", "business", "business_iaplicada"],

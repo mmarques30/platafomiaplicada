@@ -41,8 +41,8 @@ export default function MentoriaBusinessPage() {
   const { data: allUsers = [] } = useUsers();
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
-  // Filtrar usuários Business
-  const users = allUsers.filter(u => u.plano_mentoria === "business");
+  // Filtrar usuários Business + Parceiros
+  const users = allUsers.filter(u => u.plano_mentoria === "business" || u.roles.includes("parceiros"));
   const selectedUser = users.find(u => u.id === selectedUserId);
 
   // Buscar contrato do usuário selecionado
@@ -150,6 +150,7 @@ export default function MentoriaBusinessPage() {
                   {users.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.nome_completo}
+                      {user.roles.includes("parceiros") ? " (Parceiro)" : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
