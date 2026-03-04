@@ -1,70 +1,33 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Corrigir StatCards para seguir fielmente o design card-10
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Problemas atuais vs referencia
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+O design de referencia mostra:
+- Numero **muito grande** (text-5xl/6xl) com sufixo menor ao lado
+- Titulo descritivo **abaixo** do numero, em texto cinza medio
+- Trend badge na parte inferior com **icone dentro de circulo colorido** (verde ou vermelho), valor de mudanca em cor, e descricao em cinza
+- Cards com **padding generoso**, borda sutil, cantos arredondados
+- Espacamento vertical claro entre numero, titulo e trend
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+## O que mudar em `ProjetoOverviewCards.tsx`
 
-## O que será implementado
+### StatCard redesenhado:
+1. **Numero**: `text-5xl font-bold` com sufixo em `text-3xl text-muted-foreground` inline
+2. **Titulo**: `text-sm text-muted-foreground` abaixo do numero, com `mt-2`
+3. **Trend line**: flex row com:
+   - Icone (ArrowUpRight/ArrowDownRight) dentro de um **circulo** (`w-7 h-7 rounded-full`) com bg verde/vermelho translucido
+   - Valor de change em **cor** (green-600/red-600) com sinal +/-
+   - Texto descritivo em muted-foreground
+4. **Card**: `rounded-2xl border border-border p-6 space-y-4`, sem shadow no hover (clean)
+5. **Grid**: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6`
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+### Adaptacao dos dados:
+- Saude: textValue sem sufixo, trend mostra comparacao
+- Roadmap: value com sufixo "ª fase"  
+- Cronograma: value com sufixo "%", change baseado em progresso
+- Entregas: value com sufixo `/${total}`, change baseado em percentual
 
-## Estratégia técnica
+1 arquivo editado: `src/components/meu-sistema/ProjetoOverviewCards.tsx`
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
-
-### Ajustes no `handleFileUpload`
-
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
-
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
-
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
