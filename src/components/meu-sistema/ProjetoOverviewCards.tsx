@@ -67,16 +67,19 @@ function StatCard({ title, value, textValue, suffix, changeValue, changeLabel, t
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: index * 0.08, ease: "easeOut" }}
+      transition={{ duration: 0.4, delay: index * 0.07, ease: "easeOut" }}
     >
-      <Card className="rounded-2xl border border-border bg-card p-6 space-y-4">
+      <Card className="rounded-xl border border-border bg-card p-4 space-y-2.5">
+        {/* Title */}
+        <p className="text-xs font-semibold uppercase tracking-wide text-foreground/70">{title}</p>
+
         {/* Value */}
-        <div className="flex items-baseline gap-1">
+        <div className="flex items-baseline gap-0.5">
           {textValue ? (
             <motion.span
-              className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground"
+              className="text-2xl font-bold tracking-tight text-foreground"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -84,27 +87,24 @@ function StatCard({ title, value, textValue, suffix, changeValue, changeLabel, t
               {textValue}
             </motion.span>
           ) : (
-            <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+            <span className="text-2xl font-bold tracking-tight text-foreground">
               <CountUpValue value={value ?? 0} />
             </span>
           )}
           {suffix && (
-            <span className="text-2xl sm:text-3xl font-semibold text-muted-foreground">{suffix}</span>
+            <span className="text-lg font-semibold text-foreground/50">{suffix}</span>
           )}
         </div>
 
-        {/* Title */}
-        <p className="text-sm font-medium text-muted-foreground">{title}</p>
-
         {/* Trend badge */}
-        <div className="flex items-center gap-2 pt-1">
-          <div className={cn("flex items-center justify-center w-7 h-7 rounded-full", trendStyles.iconBg)}>
-            <TrendIcon className={cn("h-4 w-4", trendStyles.iconColor)} />
+        <div className="flex items-center gap-1.5">
+          <div className={cn("flex items-center justify-center w-5 h-5 rounded-full", trendStyles.iconBg)}>
+            <TrendIcon className={cn("h-3 w-3", trendStyles.iconColor)} />
           </div>
-          <span className={cn("text-sm font-semibold", trendStyles.changeColor)}>
+          <span className={cn("text-xs font-semibold", trendStyles.changeColor)}>
             {changeValue}
           </span>
-          <span className="text-xs text-muted-foreground">{changeLabel}</span>
+          <span className="text-[11px] text-foreground/50">{changeLabel}</span>
         </div>
       </Card>
     </motion.div>
