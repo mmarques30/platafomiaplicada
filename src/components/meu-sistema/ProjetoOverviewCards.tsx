@@ -1,43 +1,44 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { differenceInDays } from "date-fns";
 
 interface ProjetoOverviewCardsProps {
   progressoGeral: number;
-  faseAtual: string | null;
+  etapaAtualNumero: number | null;
   dataInicio: string | null;
   dataFim: string | null;
-  totalEtapas: number;
+  entregasConcluidas: number;
+  totalEntregas: number;
 }
 
 export function ProjetoOverviewCards({
   progressoGeral,
-  faseAtual,
+  etapaAtualNumero,
   dataInicio,
   dataFim,
-  totalEtapas,
+  entregasConcluidas,
+  totalEntregas,
 }: ProjetoOverviewCardsProps) {
   const diasDecorridos = dataInicio ? differenceInDays(new Date(), new Date(dataInicio)) : 0;
   const diasTotais = dataInicio && dataFim ? differenceInDays(new Date(dataFim), new Date(dataInicio)) : 1;
-  const cronogramaLabel = `${Math.max(0, diasDecorridos)}/${diasTotais} dias`;
+  const cronogramaPercentual = Math.min(100, Math.max(0, Math.round((diasDecorridos / diasTotais) * 100)));
+  const cronogramaLabel = `${Math.max(0, diasDecorridos)}/${diasTotais} dias (${cronogramaPercentual}%)`;
 
   const cards = [
     {
       label: "Progresso Geral",
       value: `${progressoGeral}%`,
-      extra: <Progress value={progressoGeral} className="h-1.5 mt-2" />,
     },
     {
-      label: "Fase Atual",
-      value: faseAtual || "—",
+      label: "Roadmap",
+      value: etapaAtualNumero ? `Fase ${etapaAtualNumero}` : "—",
     },
     {
       label: "Cronograma",
       value: cronogramaLabel,
     },
     {
-      label: "Etapas",
-      value: `${totalEtapas} etapas`,
+      label: "Entregas",
+      value: `${entregasConcluidas}/${totalEntregas}`,
     },
   ];
 
@@ -48,7 +49,6 @@ export function ProjetoOverviewCards({
           <CardContent className="py-5 px-3 flex flex-col items-center text-center space-y-1.5">
             <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{card.label}</span>
             <p className="text-sm font-semibold truncate max-w-full">{card.value}</p>
-            {card.extra && <div className="w-4/5 mx-auto">{card.extra}</div>}
           </CardContent>
         </Card>
       ))}
