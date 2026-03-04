@@ -79,7 +79,7 @@ function StatCard({ title, value, textValue, suffix, changeValue, changeLabel, t
         <div className="flex items-baseline gap-0.5">
           {textValue ? (
             <motion.span
-              className="text-2xl font-bold tracking-tight text-foreground"
+              className="text-2xl font-bold tracking-tight text-foreground/80"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
