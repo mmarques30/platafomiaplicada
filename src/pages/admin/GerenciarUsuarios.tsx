@@ -24,7 +24,8 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Users } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Users, Download } from "lucide-react";
+import { exportUsersToCSV } from "@/lib/exportUsers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { adminTheme } from "@/components/admin/adminTheme";
