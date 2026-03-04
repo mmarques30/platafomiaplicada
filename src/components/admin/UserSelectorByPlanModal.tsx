@@ -11,7 +11,7 @@ import { Search, Building2, User, GraduationCap, Briefcase } from 'lucide-react'
 import { useUsers } from '@/hooks/admin/useUsers';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-type PlanType = 'academy' | 'skills' | 'business' | 'business_iaplicada';
+type PlanType = 'academy' | 'skills' | 'business_parceria' | 'business_sistemas';
 
 interface UserSelectorByPlanModalProps {
   open: boolean;
@@ -31,15 +31,15 @@ const planConfig: Record<PlanType, { title: string; icon: React.ReactNode; empty
     icon: <Briefcase className="h-5 w-5 text-primary" />,
     emptyMessage: 'Nenhum mentorado Skills encontrado',
   },
-  business: {
-    title: 'Selecionar Mentorado Business',
+  business_parceria: {
+    title: 'Selecionar Mentorado Business Parceria',
     icon: <Building2 className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum mentorado Business encontrado',
+    emptyMessage: 'Nenhum mentorado Business Parceria encontrado',
   },
-  business_iaplicada: {
-    title: 'Selecionar Mentorado Business iAplicada',
+  business_sistemas: {
+    title: 'Selecionar Mentorado Business Sistemas',
     icon: <Building2 className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum mentorado Business iAplicada encontrado',
+    emptyMessage: 'Nenhum mentorado Business Sistemas encontrado',
   },
 };
 
@@ -57,7 +57,7 @@ export function UserSelectorByPlanModal({ open, onClose, onSelect, planType }: U
     if (planType === 'skills') {
       return allUsers.filter(user => 
         user.plano_mentoria === 'skills' || 
-        ((user.plano_mentoria === 'business' || user.plano_mentoria === 'business_iaplicada') && user.skills_liberado)
+        ((user.plano_mentoria === 'business_parceria' || user.plano_mentoria === 'business_sistemas') && user.skills_liberado)
       );
     }
     
@@ -98,8 +98,8 @@ export function UserSelectorByPlanModal({ open, onClose, onSelect, planType }: U
     switch (planType) {
       case 'academy': return <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />;
       case 'skills': return <Briefcase className="h-4 w-4 text-muted-foreground shrink-0" />;
-      case 'business': 
-      case 'business_iaplicada': 
+      case 'business_parceria': 
+      case 'business_sistemas': 
         return <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />;
     }
   };

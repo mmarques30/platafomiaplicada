@@ -18,21 +18,21 @@ const ICONS: Record<Environment, React.ComponentType<LucideProps>> = {
   gratuito: Gift,
   academy: GraduationCap,
   skills: Users,
-  business: Crown,
-  business_iaplicada: Wrench,
+  business_parceria: Crown,
+  business_sistemas: Wrench,
 };
 
 const ENVIRONMENT_IMAGES: Partial<Record<Environment, string>> = {
   gratuito: envGratuitoImage,
   academy: envAcademyImage,
   skills: envSkillsImage,
-  business: envBusinessImage,
-  business_iaplicada: envBusinessImage, // Usa mesma imagem do business
+  business_parceria: envBusinessImage,
+  business_sistemas: envBusinessImage, // Usa mesma imagem do business
 };
 
-// Importante: o ambiente "business_iaplicada" não deve aparecer na seleção inicial.
-// Usuários desse plano entram via "business" e a experiência é ajustada por identificação interna.
-const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business"];
+// Importante: o ambiente "business_sistemas" não deve aparecer na seleção inicial.
+// Usuários desse plano entram via "business_parceria" e a experiência é ajustada por identificação interna.
+const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business_parceria"];
 
 export default function EnvironmentSelector() {
   const navigate = useNavigate();

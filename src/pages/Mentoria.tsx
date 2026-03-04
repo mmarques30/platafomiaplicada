@@ -25,7 +25,7 @@ export default function Mentoria() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
-  const { isBusiness, isBusinessColaborativo, isBusinessIAplicada, isSkills } = useEffectivePlan(isAdmin);
+  const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills } = useEffectivePlan(isAdmin);
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Redirecionar usuários Skills para suas páginas específicas
@@ -46,8 +46,8 @@ export default function Mentoria() {
     return null;
   }
   
-  // Mostrar aba Evolução apenas para Business Colaborativo (não IAplicada)
-  const showEvolucaoTab = isBusiness && !isBusinessIAplicada;
+  // Mostrar aba Evolução apenas para Business Parceria (não Sistemas)
+  const showEvolucaoTab = isBusiness && !isBusinessSistemas;
   
   // Ler tab da URL ou usar padrão
   const tabFromUrl = searchParams.get("tab");
@@ -99,7 +99,7 @@ export default function Mentoria() {
 
         {/* Aba Visão Geral - Diferente para cada tipo */}
         <TabsContent value="visao-geral" className="mt-0 space-y-4">
-          {isBusinessIAplicada ? (
+          {isBusinessSistemas ? (
             <IAplicadaVisaoGeral />
           ) : isBusiness ? (
             <>
@@ -123,7 +123,7 @@ export default function Mentoria() {
 
         {/* Aba Roadmap - Diferente para cada tipo */}
         <TabsContent value="roadmap" className="mt-0 space-y-6">
-          {isBusinessIAplicada ? (
+          {isBusinessSistemas ? (
             <IAplicadaRoadmap />
           ) : isBusiness ? (
             <BusinessExecutiveRoadmap />
