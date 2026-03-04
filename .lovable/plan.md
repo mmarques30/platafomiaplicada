@@ -1,70 +1,73 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Painel "Projeto (Empresa)" para Business Sistemas
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Contexto
+A pagina `/meu-sistema` esta vazia. O menu `meu_sistema` no banco ainda referencia `business_iaplicada` (precisa atualizar para `business_sistemas`). Os dados ja existem nas tabelas `contratos_business`, `etapas_business` e `entregas_business`.
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+## Alteracoes
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+### 1. Migration: corrigir planos_permitidos do menu
+Atualizar o registro `meu_sistema` em `menu_config` para `planos_permitidos = ['business_sistemas']`.
 
-## O que será implementado
+### 2. Construir a pagina `MeuSistema.tsx`
+Reescrever a pagina seguindo o layout do preview UX (https://dry-mountain-9703.21st.app/), adaptado ao design system atual (dark theme, cores da marca).
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+**Estrutura da pagina:**
 
-## Estratégia técnica
-
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
-
-### Ajustes no `handleFileUpload`
-
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
+```text
+┌─────────────────────────────────────────────────────┐
+│  Titulo: "Sistema de Gestao Empresarial"            │
+│  Subtitulo: "Cliente: {nome_empresa}"               │
+├────────────┬────────────┬────────────┬──────────────┤
+│ Progresso  │ Fase Atual │ Cronograma │   Equipe     │
+│   65%      │ Implement. │  95/165    │  8 membros   │
+├────────────┴────────────┴────────────┴──────────────┤
+│                                                     │
+│  ┌─ Proximos Passos ──┐  ┌─ Entregas Concluidas ─┐ │
+│  │ • item 1           │  │ ✓ entrega 1           │ │
+│  │ • item 2           │  │ ✓ entrega 2           │ │
+│  └────────────────────┘  └───────────────────────┘ │
+│                                                     │
+│  Metodologia APLICA - Timeline do Projeto           │
+│                                                     │
+│  ○ Analise ──── [Card com progresso, datas, ...]   │
+│  │                                                  │
+│  ○ Planejamento [Card...]                          │
+│  │                                                  │
+│  ... (7 etapas)                                    │
+└─────────────────────────────────────────────────────┘
 ```
 
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
+**Dados consumidos:**
+- `useContratosBusiness(businessUserId)` — nome_empresa, proximos_passos, data_inicio, data_fim
+- `useEtapasBusiness(contrato.id)` — lista de etapas com status, datas, objetivo
+- `useEntregasBusiness(contrato.id)` — entregas por etapa com status
 
-Isso evita chaves inválidas com `+`, acentos e símbolos.
+**Componentes a criar:**
+- `src/components/meu-sistema/ProjetoOverviewCards.tsx` — 4 mini cards (progresso, fase atual, cronograma, equipe)
+- `src/components/meu-sistema/ProximosPassosCard.tsx` — lista de proximos passos pendentes
+- `src/components/meu-sistema/EntregasConcluidasCard.tsx` — lista de entregas com status concluida
+- `src/components/meu-sistema/TimelineEtapas.tsx` — timeline vertical com cards de cada etapa (icone, titulo, descricao, progresso, datas, entregas da etapa)
 
-### Robustez adicional recomendada
+**Calculo de progresso por etapa:** percentual = entregas concluidas da etapa / total entregas da etapa.
 
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+**Calculo de cronograma:** dias decorridos desde `data_inicio` do contrato vs total de dias ate `data_fim`.
 
-## Resultado esperado
+**Fase atual:** primeira etapa com status `em_andamento`, ou ultima `concluida` se nenhuma em andamento.
 
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+### 3. Atualizar label do menu sidebar
+O menu deve exibir "Projeto {nome_empresa}" dinamicamente. Como o `menu_config` e estatico, a label sera ajustada no `AppSidebar.tsx` (similar ao rename de "Meu Progresso" → "Minha Trajetoria") quando o ambiente e `business_sistemas`.
 
-## Validação (teste fim a fim)
+### Arquivos afetados
+| Arquivo | Acao |
+|---------|------|
+| `src/pages/MeuSistema.tsx` | Reescrever com layout completo |
+| `src/components/meu-sistema/ProjetoOverviewCards.tsx` | Criar |
+| `src/components/meu-sistema/ProximosPassosCard.tsx` | Criar |
+| `src/components/meu-sistema/EntregasConcluidasCard.tsx` | Criar |
+| `src/components/meu-sistema/TimelineEtapas.tsx` | Criar |
+| `src/components/layout/AppSidebar.tsx` | Ajustar label dinamica |
+| `src/hooks/useMenuConfig.tsx` | Remover `meu_sistema` da lista hidden de `business_sistemas` (ja esta correto, nao esta na lista) |
+| Migration SQL | Atualizar `planos_permitidos` de `business_iaplicada` para `business_sistemas` |
 
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
