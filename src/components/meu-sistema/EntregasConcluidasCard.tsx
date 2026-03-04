@@ -12,11 +12,8 @@ export function EntregasConcluidasCard({ entregas }: EntregasConcluidasCardProps
   return (
     <Card className="border-border/50 h-full">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">
+        <CardTitle className="text-base text-primary">
           Entregas Concluídas
-          <span className="ml-auto text-xs text-muted-foreground font-normal">
-            {concluidas.length} de {entregas.length}
-          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
