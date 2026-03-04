@@ -63,7 +63,7 @@ const MeuSistema = () => {
       {/* Header */}
       <div>
         <PageTitle
-          primary={`Projeto ${contrato.nome_empresa || "Sistema"}`}
+          primary={`Gestão ${contrato.nome_empresa || "Sistema"}`}
           icon={<Monitor className="h-7 w-7 text-primary" />}
         />
         {contrato.nome_empresa && (
