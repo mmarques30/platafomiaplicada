@@ -1,39 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Refazer Gantt com layout estilo Haydenbleasel/Kibo-UI
+## Diagnóstico encontrado
 
-## Referencia
-O componente Gantt do Haydenbleasel apresenta:
-- **Sidebar fixa a esquerda** com itens agrupados por categoria (collapsible groups)
-- **Timeline a direita** com scroll horizontal independente
-- **Header de meses** fixo no topo da timeline
-- **Barras horizontais coloridas** por status, com cantos arredondados
-- **Linha "Today"** vertical destacada
-- **Layout split**: sidebar + timeline lado a lado
-- **Altura fixa** com scroll vertical interno
-- Dialog ao clicar na entrega
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-## Adaptacao para dados reais
-- Agrupar entregas por `modulo_relacionado` (ou por etapa se modulo nao existir)
-- Barras posicionadas por `created_at` ate `prazo_previsto`
-- Cores por status: green (concluida), primary (em_andamento), muted (pendente), destructive (cancelada)
-- Manter dialog de detalhes ao clicar
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-## Alteracoes
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-### `src/components/meu-sistema/GanttEntregas.tsx`
-Reescrever completamente:
+## O que será implementado
 
-- **Layout split**: flex container com altura fixa (~400px), overflow hidden
-  - **Sidebar** (w-[220px], border-right): lista de entregas agrupadas por modulo/etapa com headers collapsible, scroll vertical sincronizado
-  - **Timeline** (flex-1): scroll horizontal + vertical, com header de meses sticky no topo
-- **Header de meses**: cada mes ocupa largura fixa (ex: 150px), com nome capitalizado em pt-BR
-- **Barras**: posicionadas absolutamente dentro de cada row, com cor do status, rounded-md, h-7, com label do titulo dentro da barra (truncado)
-- **Today line**: linha vertical vermelha/primary cortando toda a timeline
-- **Hover**: highlight na row inteira + tooltip
-- **Click**: abre Dialog com detalhes (manter existente)
-- **Grid lines**: linhas verticais sutis separando meses
-- Usar framer-motion para fade-in das barras ao aparecerem
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-1 arquivo editado.
+## Estratégia técnica
 
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
+
+### Ajustes no `handleFileUpload`
+
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
+```
+
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
+
+Isso evita chaves inválidas com `+`, acentos e símbolos.
+
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
