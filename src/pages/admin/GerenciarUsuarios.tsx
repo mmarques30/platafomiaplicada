@@ -73,6 +73,8 @@ export default function GerenciarUsuários() {
         return "secondary";
       case "parceiros":
         return "outline" as const;
+      case "equipe":
+        return "secondary";
       default:
         return "outline";
     }
@@ -88,6 +90,8 @@ export default function GerenciarUsuários() {
         return "Aluno Trilha";
       case "parceiros":
         return "Parceiro";
+      case "equipe":
+        return "Equipe";
       default:
         return role;
     }
@@ -190,6 +194,7 @@ export default function GerenciarUsuários() {
             <SelectItem value="mentorado">Mentorado</SelectItem>
             <SelectItem value="aluno_trilha">Aluno Trilha</SelectItem>
             <SelectItem value="parceiros">Parceiro</SelectItem>
+            <SelectItem value="equipe">Equipe</SelectItem>
             <SelectItem value="none">Sem Role</SelectItem>
           </SelectContent>
         </Select>
