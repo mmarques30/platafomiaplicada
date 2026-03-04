@@ -1,12 +1,99 @@
 import { PageTitle } from "@/components/shared/PageTitle";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
+import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
+import { ProjetoOverviewCards } from "@/components/meu-sistema/ProjetoOverviewCards";
+import { ProximosPassosCard } from "@/components/meu-sistema/ProximosPassosCard";
+import { EntregasConcluidasCard } from "@/components/meu-sistema/EntregasConcluidasCard";
+import { TimelineEtapas } from "@/components/meu-sistema/TimelineEtapas";
+import { Monitor } from "lucide-react";
 
 const MeuSistema = () => {
+  const businessUserId = useBusinessUserId();
+  const { contrato, isLoading: loadingContrato } = useContratosBusiness(businessUserId);
+  const { data: etapas = [], isLoading: loadingEtapas } = useEtapasBusiness(contrato?.id);
+  const { entregas, entregasPorEtapa, calcularProgressoEtapa, isLoading: loadingEntregas } = useEntregasBusiness(contrato?.id);
+
+  const isLoading = loadingContrato || loadingEtapas || loadingEntregas;
+
+  // Calcular progresso geral
+  const totalEntregas = entregas.length || 1;
+  const entregasConcluidas = entregas.filter((e) => e.status === "concluida").length;
+  const progressoGeral = Math.round((entregasConcluidas / totalEntregas) * 100);
+
+  // Determinar fase atual
+  const faseAtual =
+    etapas.find((e) => e.status === "em_andamento")?.titulo ||
+    [...etapas].reverse().find((e) => e.status === "concluida")?.titulo ||
+    etapas[0]?.titulo ||
+    null;
+
+  if (isLoading) {
+    return (
+      <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6">
+        <Skeleton className="h-10 w-64" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24" />
+          ))}
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Skeleton className="h-48" />
+          <Skeleton className="h-48" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!contrato) {
+    return (
+      <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6">
+        <PageTitle primary="Meu Sistema" icon={<Monitor className="h-7 w-7 text-primary" />} />
+        <p className="text-muted-foreground">
+          Nenhum contrato ativo encontrado. Entre em contato com a equipe para mais informações.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6">
-      <PageTitle primary="Meu Sistema" />
-      <p className="text-muted-foreground">
-        Acompanhe o sistema que está sendo desenvolvido para você.
-      </p>
+    <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-8">
+      {/* Header */}
+      <div>
+        <PageTitle
+          primary={`Projeto ${contrato.nome_empresa || "Sistema"}`}
+          icon={<Monitor className="h-7 w-7 text-primary" />}
+        />
+        {contrato.nome_empresa && (
+          <p className="text-muted-foreground mt-1">
+            Acompanhe o progresso do seu sistema em tempo real
+          </p>
+        )}
+      </div>
+
+      {/* Overview Cards */}
+      <ProjetoOverviewCards
+        progressoGeral={progressoGeral}
+        faseAtual={faseAtual}
+        dataInicio={contrato.data_inicio}
+        dataFim={contrato.data_fim}
+        totalEtapas={etapas.length}
+      />
+
+      {/* Próximos Passos & Entregas Concluídas */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <ProximosPassosCard entregas={entregas} />
+        <EntregasConcluidasCard entregas={entregas} />
+      </div>
+
+      {/* Timeline */}
+      <TimelineEtapas
+        etapas={etapas}
+        entregasPorEtapa={entregasPorEtapa}
+        calcularProgressoEtapa={calcularProgressoEtapa}
+      />
     </div>
   );
 };
