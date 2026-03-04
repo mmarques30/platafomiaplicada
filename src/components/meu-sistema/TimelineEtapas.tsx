@@ -71,8 +71,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold flex items-center gap-2">
-        <Map className="h-5 w-5 text-primary" />
+      <h2 className="text-lg font-semibold">
         RoadMap
       </h2>
 

@@ -94,8 +94,7 @@ export function ProximosPassosCard({ entregas }: ProximosPassosCardProps) {
     <>
       <Card className="border-border/50 h-full">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <ListTodo className="h-4 w-4 text-primary" />
+          <CardTitle className="text-base">
             Próximos Passos
           </CardTitle>
         </CardHeader>
