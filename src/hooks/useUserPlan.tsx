@@ -80,7 +80,7 @@ export function useUserPlan() {
 }
 
 // Hook separado para obter plano efetivo considerando admin e viewAs
-export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = false) {
+export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = false, isParceiro: boolean = false) {
   const { plan, hasAccessTo, isLoading: planLoading, isAcademy, isSkills, isBusiness, isBusinessColaborativo, isBusinessIAplicada, isVisitante: isRealVisitante } = useUserPlan();
   
   // isLoading combinado inclui o carregamento do role para evitar race conditions
@@ -103,8 +103,8 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
     // Se há simulação ativa, usar o plano simulado
     if (hasActiveSimulation) {
       currentPlan = viewAs === "visitante" ? null : viewAs as UserPlan;
-    } else if (isAdmin) {
-      currentPlan = "business"; // Admin sem viewAs vê como business
+    } else if (isAdmin || isParceiro) {
+      currentPlan = "business"; // Admin e parceiros sem viewAs veem como business
     } else {
       currentPlan = plan;
     }
@@ -176,7 +176,7 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
 
   return {
     plan,
-    effectivePlan: isAdmin ? "business" as UserPlan : plan,
+    effectivePlan: (isAdmin || isParceiro) ? "business" as UserPlan : plan,
     hasAccessTo,
     hasEffectiveAccessTo,
     isLoading,
