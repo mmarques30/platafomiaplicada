@@ -164,15 +164,14 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
   const effectiveIsVisitante = isLoading ? false : (isRealVisitante || (!isAdmin && !plan));
 
   // Sem simulação: admin e parceiros veem como business (padrão)
-  // Importar isParceiro via lazy check on roles
-  const effectiveIsBusiness = isAdmin || isBusiness;
+  const effectiveIsBusiness = isAdmin || isParceiro || isBusiness;
   const effectiveIsSkills = !effectiveIsBusiness && isSkills;
   // Corrigir: visitantes NÃO são Academy - só é Academy se tiver plano academy real
   const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills && !effectiveIsVisitante && isAcademy;
 
-  // Para flags específicas de Business: admin vê como colaborativo por padrão
-  const effectiveIsBusinessColaborativo = isAdmin || isBusinessColaborativo;
-  const effectiveIsBusinessIAplicada = !isAdmin && isBusinessIAplicada;
+  // Para flags específicas de Business: admin e parceiros veem como colaborativo por padrão
+  const effectiveIsBusinessColaborativo = isAdmin || isParceiro || isBusinessColaborativo;
+  const effectiveIsBusinessIAplicada = !isAdmin && !isParceiro && isBusinessIAplicada;
 
   return {
     plan,
