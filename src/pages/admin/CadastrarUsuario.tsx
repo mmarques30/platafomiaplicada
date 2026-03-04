@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-type AppRole = "admin" | "mentorado" | "aluno_trilha";
+type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha";
 
 export default function CadastrarUsuario() {
   const navigate = useNavigate();
@@ -120,6 +120,16 @@ export default function CadastrarUsuario() {
                   />
                   <Label htmlFor="admin" className="cursor-pointer">
                     Administrador
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="equipe"
+                    checked={selectedRoles.includes("equipe")}
+                    onCheckedChange={() => toggleRole("equipe")}
+                  />
+                  <Label htmlFor="equipe" className="cursor-pointer">
+                    Equipe
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
