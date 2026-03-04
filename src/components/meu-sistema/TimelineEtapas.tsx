@@ -106,7 +106,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
                       </span>
                     )}
                     {etapa.data_conclusao && (
-                      <span className="flex items-center gap-1.5 text-green-600">
+                      <span className="flex items-center gap-1.5 text-primary">
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Concluída: {format(parseISO(etapa.data_conclusao), "dd MMM yyyy", { locale: ptBR })}
                       </span>
