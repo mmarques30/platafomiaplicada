@@ -66,14 +66,14 @@ Deno.serve(async (req) => {
     console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado, equipeId, novaEquipe, papelEquipe })
 
     // Validar planoMentoria
-    const planosValidos = ['academy', 'skills', 'business', 'business_iaplicada'];
+    const planosValidos = ['academy', 'skills', 'business_parceria', 'business_sistemas'];
     if (planoMentoria && !planosValidos.includes(planoMentoria)) {
       throw new Error(`Plano de mentoria inválido. Valores aceitos: ${planosValidos.join(', ')}`)
     }
 
     // Se role inclui parceiros e não tem plano, setar como business automaticamente
     const effectivePlanoMentoria = (!planoMentoria && userRoles?.includes('parceiros')) 
-      ? 'business' 
+      ? 'business_parceria' 
       : planoMentoria;
 
     // Validate Skills requires team
@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
       updateData.empresa_consultoria = empresaConsultoria
     }
     
-    if (effectivePlanoMentoria === 'business' || effectivePlanoMentoria === 'business_iaplicada') {
+    if (effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'business_sistemas') {
       updateData.skills_liberado = skillsLiberado ?? false
     }
 
