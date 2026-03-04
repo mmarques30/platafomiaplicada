@@ -1,70 +1,63 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Renomear planos Business no banco e frontend
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Resumo da mudanca
+- `plano_mentoria = 'business'` → `'business_parceria'`
+- `plano_mentoria = 'business_iaplicada'` → `'business_sistemas'`
+- Role `mentorado` permanece no banco (sem alteracao em RLS)
+- Frontend diferencia a view pelo valor de `plano_mentoria`
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+## Impacto
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+### Banco de dados (1 migration)
+1. Recriar enum `plano_mentoria` com novos valores: `academy`, `skills`, `business_parceria`, `business_sistemas`
+2. Migrar dados existentes (`business` → `business_parceria`, `business_iaplicada` → `business_sistemas`)
+3. Atualizar todas as funcoes SQL que referenciam os valores antigos:
+   - `calcular_prazo_sla` — referencia `business`, `business_iaplicada`
+   - `user_has_access_level` — referencia `business`, `business_iaplicada`
+   - `get_public_profiles` — retorna tipo `plano_mentoria`
+   - `verificar_email_mentorado` — usa `plano_mentoria IS NOT NULL` (sem impacto)
+   - `handle_new_user` — sem impacto (nao seta plano)
+4. Atualizar enum `nivel_acesso_plano` **nao muda** (continua `academy`, `skills`, `business`)
 
-## O que será implementado
+### Frontend (~20 arquivos)
+Substituir todas as referencias de string:
+- `"business"` (como plano) → `"business_parceria"`
+- `"business_iaplicada"` → `"business_sistemas"`
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+**Arquivos principais afetados:**
 
-## Estratégia técnica
+| Arquivo | O que muda |
+|---------|-----------|
+| `useUserPlan.tsx` | Tipo `UserPlan`, comparacoes, helpers `isBusinessColaborativo`/`isBusinessIAplicada` → `isBusinessParceria`/`isBusinessSistemas` |
+| `useEffectivePlan` (mesmo arquivo) | Todas as comparacoes de plano e flags retornadas |
+| `EnvironmentContext.tsx` | Tipo `Environment`, config, `availableEnvironments` |
+| `AdminViewContext.tsx` | Tipo `AdminViewMode` |
+| `EditUserModal.tsx` | Opcoes de plano, tipo do state |
+| `GerenciarUsuarios.tsx` | Labels no filtro de plano |
+| `CadastrarUsuario.tsx` | Opcoes de plano |
+| `AppSidebar.tsx` | Deteccao `isBusinessIAplicadaEnv` |
+| `EnvironmentSwitcher.tsx` | Lista de ambientes |
+| `EnvironmentSelector.tsx` | Icones e imagens |
+| `Mentoria.tsx` | Condicoes de tabs |
+| `TopHeader.tsx` | Condicao `hasEffectiveAccessTo("business")` |
+| `UserSelectorByPlanModal.tsx` | Tipo e filtros |
+| `DistribuicaoPlanos.tsx` | Labels do grafico |
+| `NovoUsuarioModal.tsx` | Opcoes de plano |
+| `useSkillsLider.ts` | Condicao de acesso |
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
+**Labels de exibicao:**
+- `"Business"` → `"Business Parceria"`
+- `"Business iAplicada"` → `"Business Sistemas"`
 
-### Ajustes no `handleFileUpload`
+### Ordem de execucao
+1. Migration SQL (renomear enum + atualizar funcoes)
+2. Atualizar todos os arquivos frontend em sequencia
+3. Testar fluxo completo
 
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
+### Risco
+- **Alto**: a migration precisa recriar o enum (Postgres nao permite renomear valores de enum). Isso exige: criar novo tipo, alterar coluna, dropar tipo antigo
+- As funcoes SQL com `SECURITY DEFINER` precisam ser recriadas com os novos valores
+- O `types.ts` sera regenerado automaticamente apos a migration
 
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
-
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
