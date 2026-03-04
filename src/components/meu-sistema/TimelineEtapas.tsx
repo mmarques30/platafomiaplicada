@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Circle, Loader2, Calendar, Map } from "lucide-react";
 import { format, parseISO } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import { ptBR } from "date-fns/locale";
 import type { EtapaBusiness } from "@/hooks/useEtapasBusiness";
 import type { EntregaBusiness } from "@/hooks/useEntregasBusiness";
@@ -21,6 +22,7 @@ const statusConfig = {
 };
 
 export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtapa }: TimelineEtapasProps) {
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(-1);
   const [lineHeight, setLineHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -133,9 +135,12 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
               </div>
 
               {/* Card */}
-              <Card className={`flex-1 mb-4 transition-all duration-500 ${
-                isActive ? "border-border/50 shadow-sm" : "border-border/20"
-              }`}>
+              <Card
+                className={`flex-1 mb-4 transition-all duration-500 cursor-pointer hover:shadow-md ${
+                  isActive ? "border-border/50 shadow-sm" : "border-border/20"
+                }`}
+                onClick={() => navigate(`/mentoria/etapa/${etapa.id}`)}
+              >
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
