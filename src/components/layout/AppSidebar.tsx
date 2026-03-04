@@ -58,17 +58,17 @@ export function AppSidebar() {
 
   // Em modo simulação, o EnvironmentSwitcher fica oculto; então garantimos que o filtro de menus
   // acompanhe o plano simulado (evita cenário: ambiente "business" ocultando submenus de academy/skills).
-  // Para usuários reais: se o plano é business_iaplicada, forçamos esse ambiente.
+  // Para usuários reais: se o plano é business_sistemas, forçamos esse ambiente.
   const effectiveEnvironment = (() => {
     if (!isViewingAs) {
-      // Usuário real: se plano é business_iaplicada, usar esse ambiente
-      if (effectivePlan === 'business_iaplicada') {
-        return 'business_iaplicada';
+      // Usuário real: se plano é business_sistemas, usar esse ambiente
+      if (effectivePlan === 'business_sistemas') {
+        return 'business_sistemas';
       }
       // Fallback: se nenhum ambiente selecionado, inferir do plano
       if (!currentEnvironment) {
         if (effectivePlan === 'skills') return 'skills';
-        if (effectivePlan === 'business') return 'business';
+        if (effectivePlan === 'business_parceria') return 'business_parceria';
         if (effectivePlan === 'academy') return 'academy';
         if (isVisitante) return 'gratuito';
         return null;
@@ -84,10 +84,10 @@ export function AppSidebar() {
         return "academy";
       case "skills":
         return "skills";
-      case "business":
-        return "business";
-      case "business_iaplicada":
-        return "business_iaplicada";
+      case "business_parceria":
+        return "business_parceria";
+      case "business_sistemas":
+        return "business_sistemas";
       default:
         return currentEnvironment;
     }
@@ -95,9 +95,9 @@ export function AppSidebar() {
 
   const sidebarMenus = getSidebarMenus(effectivePlan, effectiveEnvironment);
   
-  // Detectar se é Business IAplicada (para filtros especiais)
-  const isBusinessIAplicadaEnv = effectiveEnvironment === 'business_iaplicada' 
-    || effectivePlan === 'business_iaplicada';
+  // Detectar se é Business Sistemas (para filtros especiais)
+  const isBusinessSistemasEnv = effectiveEnvironment === 'business_sistemas' 
+    || effectivePlan === 'business_sistemas';
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
@@ -146,7 +146,7 @@ export function AppSidebar() {
         return '/skills/equipe';
       }
       // Business vai para /mentoria (Visão Geral)
-      if (effectivePlan === 'business' || effectivePlan === 'business_iaplicada') {
+      if (effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas') {
         return '/mentoria';
       }
       // Demais (Academy) vai para /evolucao
@@ -397,8 +397,8 @@ export function AppSidebar() {
                       
                       <CollapsibleContent>
                         <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                          {/* IAplicada: apenas Prompts e Ferramentas */}
-                          {isBusinessIAplicadaEnv ? (
+                          {/* Business Sistemas: apenas Prompts e Ferramentas */}
+                          {isBusinessSistemasEnv ? (
                             <>
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">

@@ -41,8 +41,8 @@ export default function MentoriaBusinessIAplicadaPage() {
   const { data: allUsers = [] } = useUsers();
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
-  // Filtrar usuários Business iAplicada
-  const users = allUsers.filter(u => u.plano_mentoria === "business_iaplicada");
+  // Filtrar usuários Business Sistemas
+  const users = allUsers.filter(u => u.plano_mentoria === "business_sistemas");
   const selectedUser = users.find(u => u.id === selectedUserId);
 
   // Buscar contrato do usuário selecionado
@@ -126,7 +126,7 @@ export default function MentoriaBusinessIAplicadaPage() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-xl font-bold tracking-tight">Business iAplicada</h1>
+          <h1 className="text-xl font-bold tracking-tight">Business Sistemas</h1>
           <p className="text-sm text-muted-foreground">
             Acompanhamento de projeto - iAplicada constrói
           </p>
@@ -144,7 +144,7 @@ export default function MentoriaBusinessIAplicadaPage() {
             <div className="flex-1">
               <Select value={selectedUserId} onValueChange={setSelectedUserId}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Selecione um cliente iAplicada" />
+                  <SelectValue placeholder="Selecione um cliente Business Sistemas" />
                 </SelectTrigger>
                 <SelectContent>
                   {users.map((user) => (
@@ -163,9 +163,9 @@ export default function MentoriaBusinessIAplicadaPage() {
         <Card className="border-border/50">
           <CardContent className="flex flex-col items-center justify-center py-10">
             <FolderOpen className="h-10 w-10 text-muted-foreground mb-3" />
-            <p className="font-medium">Nenhum cliente iAplicada</p>
+            <p className="font-medium">Nenhum cliente Business Sistemas</p>
             <p className="text-sm text-muted-foreground">
-              Não há clientes com plano Business iAplicada cadastrados
+              Não há clientes com plano Business Sistemas cadastrados
             </p>
           </CardContent>
         </Card>

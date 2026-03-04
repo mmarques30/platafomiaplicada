@@ -56,8 +56,8 @@ interface EditUserModalProps {
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
   { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
-  { value: "business", label: "Business", description: "Consultoria colaborativa - cliente participa" },
-  { value: "business_iaplicada", label: "Business iAplicada", description: "iAplicada constrói - cliente acompanha" },
+  { value: "business_parceria", label: "Business Parceria", description: "Consultoria colaborativa - cliente participa" },
+  { value: "business_sistemas", label: "Business Sistemas", description: "iAplicada constrói - cliente acompanha" },
 ];
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
@@ -69,7 +69,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const { data: userSkillsMembro, isLoading: loadingSkillsMembro } = useUserSkillsMembro(user?.id);
   
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
-  const [selectedPlano, setSelectedPlano] = useState<"academy" | "skills" | "business" | "business_iaplicada" | null>(null);
+  const [selectedPlano, setSelectedPlano] = useState<"academy" | "skills" | "business_parceria" | "business_sistemas" | null>(null);
   const [dataExpiracao, setDataExpiracao] = useState<Date | undefined>();
   const [contaAtiva, setContaAtiva] = useState(true);
   const [novaSenha, setNovaSenha] = useState("");
@@ -92,7 +92,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setValue("linkedin", user.linkedin || "");
       
       setSelectedRoles(user.roles as AppRole[]);
-      setSelectedPlano((user.plano_mentoria as "academy" | "skills" | "business" | "business_iaplicada") || null);
+      setSelectedPlano((user.plano_mentoria as "academy" | "skills" | "business_parceria" | "business_sistemas") || null);
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
       setSkillsLiberado(user.skills_liberado ?? false);
@@ -143,13 +143,13 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         data_expiracao_acesso: dataExpiracao?.toISOString() || null,
         conta_ativa: contaAtiva,
         roles: selectedRoles,
-        skills_liberado: (selectedPlano === "business" || selectedPlano === "business_iaplicada") ? skillsLiberado : false,
+        skills_liberado: (selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") ? skillsLiberado : false,
         google_login_autorizado: googleLoginAutorizado,
       },
     });
 
     // Atualizar vínculo Skills quando configuração está visível e há dados de equipe
-    const isAnyBusiness = selectedPlano === "business" || selectedPlano === "business_iaplicada";
+    const isAnyBusiness = selectedPlano === "business_parceria" || selectedPlano === "business_sistemas";
     const shouldUpdateSkills = (selectedPlano === "skills" || (isAnyBusiness && skillsLiberado)) && 
                                (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe);
     
@@ -189,7 +189,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const hasSkillsVinculo = !!userSkillsMembro;
   
   // Mostrar configuração Skills quando plano é Skills OU qualquer Business com Skills liberado
-  const isAnyBusinessPlan = selectedPlano === "business" || selectedPlano === "business_iaplicada";
+  const isAnyBusinessPlan = selectedPlano === "business_parceria" || selectedPlano === "business_sistemas";
   const showSkillsConfig = selectedPlano === "skills" || 
                            (isAnyBusinessPlan && skillsLiberado);
 
@@ -318,7 +318,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                           ? "border-primary bg-primary/10"
                           : "hover:border-primary/50"
                       )}
-                      onClick={() => setSelectedPlano(plano.value as "academy" | "skills" | "business" | "business_iaplicada")}
+                      onClick={() => setSelectedPlano(plano.value as "academy" | "skills" | "business_parceria" | "business_sistemas")}
                     >
                       <p className={cn(
                         "font-semibold mb-1 text-sm",

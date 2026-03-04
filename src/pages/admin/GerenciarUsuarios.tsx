@@ -206,8 +206,8 @@ export default function GerenciarUsuários() {
             <SelectItem value="all">Todos os Planos</SelectItem>
             <SelectItem value="academy">Academy</SelectItem>
             <SelectItem value="skills">Skills</SelectItem>
-            <SelectItem value="business">Business</SelectItem>
-            <SelectItem value="business_iaplicada">Business IAplicada</SelectItem>
+            <SelectItem value="business_parceria">Business Parceria</SelectItem>
+            <SelectItem value="business_sistemas">Business Sistemas</SelectItem>
             <SelectItem value="none">Sem Plano</SelectItem>
           </SelectContent>
         </Select>
@@ -259,17 +259,17 @@ export default function GerenciarUsuários() {
                           ? "border-blue-500 text-blue-700"
                           : (user as any).plano_mentoria === "skills"
                           ? "border-orange-500 text-orange-700"
-                          : (user as any).plano_mentoria === "business"
+                          : (user as any).plano_mentoria === "business_parceria"
                           ? "border-purple-500 text-purple-700"
-                          : (user as any).plano_mentoria === "business_iaplicada"
+                          : (user as any).plano_mentoria === "business_sistemas"
                           ? "border-violet-500 text-violet-700"
                           : "border-gray-500 text-gray-700"
                       }`}
                     >
                       {(user as any).plano_mentoria === "academy" && "Academy"}
                       {(user as any).plano_mentoria === "skills" && "Skills"}
-                      {(user as any).plano_mentoria === "business" && "Business"}
-                      {(user as any).plano_mentoria === "business_iaplicada" && "Business IAplicada"}
+                      {(user as any).plano_mentoria === "business_parceria" && "Business Parceria"}
+                      {(user as any).plano_mentoria === "business_sistemas" && "Business Sistemas"}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="border-gray-400 text-gray-600 text-xs">

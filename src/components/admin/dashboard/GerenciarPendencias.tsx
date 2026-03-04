@@ -42,7 +42,7 @@ import { adminTheme } from "@/components/admin/adminTheme";
 
 const PLANOS_DISPONIVEIS = [
   { value: "academy", label: "Academy" },
-  { value: "business", label: "Business" },
+  { value: "business_parceria", label: "Business Parceria" },
   { value: "skills", label: "Skills" },
 ];
 
@@ -77,7 +77,7 @@ export function GerenciarPendencias() {
     titulo: "",
     descricao: "",
     link: "",
-    planos_aplicaveis: ["academy", "business", "skills"],
+    planos_aplicaveis: ["academy", "business_parceria", "skills"],
     ordem: 0,
   });
 
@@ -89,7 +89,7 @@ export function GerenciarPendencias() {
         titulo: pendencia.titulo,
         descricao: pendencia.descricao || "",
         link: pendencia.link,
-        planos_aplicaveis: pendencia.planos_aplicaveis || ["academy", "business", "skills"],
+        planos_aplicaveis: pendencia.planos_aplicaveis || ["academy", "business_parceria", "skills"],
         ordem: pendencia.ordem,
       });
     } else {
@@ -99,7 +99,7 @@ export function GerenciarPendencias() {
         titulo: "",
         descricao: "",
         link: "",
-        planos_aplicaveis: ["academy", "business", "skills"],
+        planos_aplicaveis: ["academy", "business_parceria", "skills"],
         ordem: (pendencias?.length || 0) + 1,
       });
     }
@@ -114,7 +114,7 @@ export function GerenciarPendencias() {
       titulo: "",
       descricao: "",
       link: "",
-      planos_aplicaveis: ["academy", "business", "skills"],
+      planos_aplicaveis: ["academy", "business_parceria", "skills"],
       ordem: 0,
     });
   };
