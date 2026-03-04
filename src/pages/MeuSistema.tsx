@@ -80,11 +80,12 @@ const MeuSistema = () => {
         totalEntregas={entregas.length}
       />
 
-      {/* Próximos Passos & Entregas Concluídas */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <ProximosPassosCard entregas={entregas} />
-        <EntregasConcluidasCard entregas={entregas} />
-      </div>
+      {/* Gantt Chart */}
+      <GanttEntregas
+        entregas={entregas}
+        dataInicio={contrato.data_inicio}
+        dataFim={contrato.data_fim}
+      />
 
       {/* Timeline */}
       <TimelineEtapas
