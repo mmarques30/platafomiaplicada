@@ -12,8 +12,7 @@ export function EntregasConcluidasCard({ entregas }: EntregasConcluidasCardProps
   return (
     <Card className="border-border/50 h-full">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4 text-primary" />
+        <CardTitle className="text-base">
           Entregas Concluídas
           <span className="ml-auto text-xs text-muted-foreground font-normal">
             {concluidas.length} de {entregas.length}
