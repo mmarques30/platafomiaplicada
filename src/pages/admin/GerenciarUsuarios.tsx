@@ -133,6 +133,16 @@ export default function GerenciarUsuários() {
           <Badge variant="secondary" className="text-xs">{filteredUsers?.length || 0}</Badge>
         </div>
         <div className="flex gap-2">
+          <Button
+            onClick={() => filteredUsers && exportUsersToCSV(filteredUsers as any)}
+            variant="outline"
+            size="sm"
+            className={adminTheme.buttonSm}
+            disabled={!filteredUsers || filteredUsers.length === 0}
+          >
+            <Download className="h-3.5 w-3.5 mr-1.5" />
+            Exportar
+          </Button>
           <Button 
             onClick={() => navigate('/admin/importar-usuarios')}
             variant="outline"
