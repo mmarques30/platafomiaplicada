@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, ReactNo
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 
-export type Environment = "gratuito" | "academy" | "skills" | "business" | "business_iaplicada";
+export type Environment = "gratuito" | "academy" | "skills" | "business_parceria" | "business_sistemas";
 
 interface EnvironmentContextType {
   currentEnvironment: Environment | null;
@@ -44,14 +44,14 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
     color: "hsl(217, 91%, 60%)",
     description: "Academy + capacitação para equipes",
   },
-  business: {
-    label: "Business",
+  business_parceria: {
+    label: "Business Parceria",
     icon: "Crown",
     color: "hsl(45, 93%, 47%)",
     description: "Academy + mentoria 1:1 + roadmap",
   },
-  business_iaplicada: {
-    label: "Business iAplicada",
+  business_sistemas: {
+    label: "Business Sistemas",
     icon: "Wrench",
     color: "hsl(45, 93%, 47%)",
     description: "Acompanhamento de projeto - iAplicada constrói",
@@ -72,7 +72,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
   const availableEnvironments = useMemo<Environment[]>(() => {
     // Admin vê todos para simulação
     if (isAdmin) {
-      return ["gratuito", "academy", "skills", "business"];
+      return ["gratuito", "academy", "skills", "business_parceria"];
     }
     
     // Visitante só vê gratuito
@@ -82,16 +82,16 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     
     // Baseado no plano - hierarquia paralela
     switch (plan) {
-      case "business":
+      case "business_parceria":
         // Business sempre tem academy, e skills só se liberado
         return skillsLiberado 
-          ? ["gratuito", "academy", "skills", "business"]
-          : ["gratuito", "academy", "business"];
-      case "business_iaplicada":
-        // IAplicada entra pelo ambiente "business", identificação interna determina o que vê
+          ? ["gratuito", "academy", "skills", "business_parceria"]
+          : ["gratuito", "academy", "business_parceria"];
+      case "business_sistemas":
+        // Sistemas entra pelo ambiente "business_parceria", identificação interna determina o que vê
         return skillsLiberado 
-          ? ["gratuito", "academy", "skills", "business"]
-          : ["gratuito", "academy", "business"];
+          ? ["gratuito", "academy", "skills", "business_parceria"]
+          : ["gratuito", "academy", "business_parceria"];
       case "skills":
         return ["gratuito", "academy", "skills"];
       case "academy":

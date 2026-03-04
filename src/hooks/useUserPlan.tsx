@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useAdminViewContext, AdminViewMode } from "@/contexts/AdminViewContext";
 
-export type UserPlan = "academy" | "skills" | "business" | "business_iaplicada" | null;
+export type UserPlan = "academy" | "skills" | "business_parceria" | "business_sistemas" | null;
 
 export function useUserPlan() {
   const { user, loading: authLoading } = useAuth();
@@ -50,20 +50,20 @@ export function useUserPlan() {
     
     switch (product) {
       case "trilhas": // academy - base para todos
-        return ["academy", "skills", "business", "business_iaplicada"].includes(plan);
+        return ["academy", "skills", "business_parceria", "business_sistemas"].includes(plan);
       case "skills": // apenas skills
         return plan === "skills";
       case "business": // ambos os tipos business
-        return plan === "business" || plan === "business_iaplicada";
+        return plan === "business_parceria" || plan === "business_sistemas";
       default:
         return false;
     }
   };
 
   // Helpers para tipos específicos de Business
-  const isBusinessColaborativo = plan === "business";
-  const isBusinessIAplicada = plan === "business_iaplicada";
-  const isAnyBusiness = isBusinessColaborativo || isBusinessIAplicada;
+  const isBusinessParceria = plan === "business_parceria";
+  const isBusinessSistemas = plan === "business_sistemas";
+  const isAnyBusiness = isBusinessParceria || isBusinessSistemas;
 
   return {
     plan,
@@ -72,8 +72,8 @@ export function useUserPlan() {
     isAcademy: plan === "academy",
     isSkills: plan === "skills",
     isBusiness: isAnyBusiness,
-    isBusinessColaborativo,
-    isBusinessIAplicada,
+    isBusinessParceria,
+    isBusinessSistemas,
     isVisitante: isProfileVisitante,
     skillsLiberado,
   };
@@ -81,7 +81,7 @@ export function useUserPlan() {
 
 // Hook separado para obter plano efetivo considerando admin e viewAs
 export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = false, isParceiro: boolean = false) {
-  const { plan, hasAccessTo, isLoading: planLoading, isAcademy, isSkills, isBusiness, isBusinessColaborativo, isBusinessIAplicada, isVisitante: isRealVisitante } = useUserPlan();
+  const { plan, hasAccessTo, isLoading: planLoading, isAcademy, isSkills, isBusiness, isBusinessParceria, isBusinessSistemas, isVisitante: isRealVisitante } = useUserPlan();
   
   // isLoading combinado inclui o carregamento do role para evitar race conditions
   const isLoading = planLoading || isAdminLoading;
@@ -104,7 +104,7 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
     if (hasActiveSimulation) {
       currentPlan = viewAs === "visitante" ? null : viewAs as UserPlan;
     } else if (isAdmin || isParceiro) {
-      currentPlan = "business"; // Admin e parceiros sem viewAs veem como business
+      currentPlan = "business_parceria"; // Admin e parceiros sem viewAs veem como business
     } else {
       currentPlan = plan;
     }
@@ -117,11 +117,11 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
     // Business (ambos) = business + academy
     switch (product) {
       case "trilhas": // academy - base para todos
-        return ["academy", "skills", "business", "business_iaplicada"].includes(currentPlan);
+        return ["academy", "skills", "business_parceria", "business_sistemas"].includes(currentPlan);
       case "skills": // apenas skills
         return currentPlan === "skills";
       case "business": // ambos os tipos business
-        return currentPlan === "business" || currentPlan === "business_iaplicada";
+        return currentPlan === "business_parceria" || currentPlan === "business_sistemas";
       default:
         return false;
     }
@@ -132,7 +132,7 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
   if (hasActiveSimulation) {
     const isSimulatingVisitante = viewAs === "visitante";
     const simulatedPlan = isSimulatingVisitante ? null : viewAs as UserPlan;
-    const isSimulatingAnyBusiness = viewAs === "business" || viewAs === "business_iaplicada";
+    const isSimulatingAnyBusiness = viewAs === "business_parceria" || viewAs === "business_sistemas";
     
     return {
       plan,
@@ -142,15 +142,15 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
       isLoading,
       // Flags efetivas (baseadas na simulação)
       isBusiness: isSimulatingAnyBusiness,
-      isBusinessColaborativo: viewAs === "business",
-      isBusinessIAplicada: viewAs === "business_iaplicada",
+      isBusinessParceria: viewAs === "business_parceria",
+      isBusinessSistemas: viewAs === "business_sistemas",
       isSkills: viewAs === "skills",
       isAcademy: viewAs === "academy",
       isVisitante: viewAs === "visitante",
       // Flags do plano real
       rawIsBusiness: isBusiness,
-      rawIsBusinessColaborativo: isBusinessColaborativo,
-      rawIsBusinessIAplicada: isBusinessIAplicada,
+      rawIsBusinessParceria: isBusinessParceria,
+      rawIsBusinessSistemas: isBusinessSistemas,
       rawIsSkills: isSkills,
       rawIsAcademy: isAcademy,
       // Info de simulação
@@ -169,27 +169,27 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
   // Corrigir: visitantes NÃO são Academy - só é Academy se tiver plano academy real
   const effectiveIsAcademy = !effectiveIsBusiness && !effectiveIsSkills && !effectiveIsVisitante && isAcademy;
 
-  // Para flags específicas de Business: admin e parceiros veem como colaborativo por padrão
-  const effectiveIsBusinessColaborativo = isAdmin || isParceiro || isBusinessColaborativo;
-  const effectiveIsBusinessIAplicada = !isAdmin && !isParceiro && isBusinessIAplicada;
+  // Para flags específicas de Business: admin e parceiros veem como parceria por padrão
+  const effectiveIsBusinessParceria = isAdmin || isParceiro || isBusinessParceria;
+  const effectiveIsBusinessSistemas = !isAdmin && !isParceiro && isBusinessSistemas;
 
   return {
     plan,
-    effectivePlan: (isAdmin || isParceiro) ? "business" as UserPlan : plan,
+    effectivePlan: (isAdmin || isParceiro) ? "business_parceria" as UserPlan : plan,
     hasAccessTo,
     hasEffectiveAccessTo,
     isLoading,
     // Flags efetivas (consideram admin)
     isBusiness: effectiveIsBusiness,
-    isBusinessColaborativo: effectiveIsBusinessColaborativo,
-    isBusinessIAplicada: effectiveIsBusinessIAplicada,
+    isBusinessParceria: effectiveIsBusinessParceria,
+    isBusinessSistemas: effectiveIsBusinessSistemas,
     isSkills: effectiveIsSkills,
     isAcademy: effectiveIsAcademy,
     isVisitante: effectiveIsVisitante,
     // Flags do plano real (sem considerar admin)
     rawIsBusiness: isBusiness,
-    rawIsBusinessColaborativo: isBusinessColaborativo,
-    rawIsBusinessIAplicada: isBusinessIAplicada,
+    rawIsBusinessParceria: isBusinessParceria,
+    rawIsBusinessSistemas: isBusinessSistemas,
     rawIsSkills: isSkills,
     rawIsAcademy: isAcademy,
     // Info de simulação

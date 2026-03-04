@@ -10,8 +10,8 @@ export function useBusinessUserId(): string | undefined {
   const { user } = useAuth();
   const { viewAs, impersonatedUserId } = useAdminViewContext();
   
-  // Se admin está visualizando como Business ou Business iAplicada com user específico
-  if ((viewAs === 'business' || viewAs === 'business_iaplicada') && impersonatedUserId) {
+  // Se admin está visualizando como Business Parceria ou Business Sistemas com user específico
+  if ((viewAs === 'business_parceria' || viewAs === 'business_sistemas') && impersonatedUserId) {
     return impersonatedUserId;
   }
   

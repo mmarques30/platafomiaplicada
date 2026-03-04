@@ -16,14 +16,14 @@ interface AdminViewSelectorProps {
   isAdmin: boolean;
 }
 
-type PlanType = 'academy' | 'skills' | 'business' | 'business_iaplicada';
+type PlanType = 'academy' | 'skills' | 'business_parceria' | 'business_sistemas';
 
 const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }[] = [
   { mode: "visitante", label: "Visitante (gratuito)", icon: <User className="h-4 w-4" /> },
   { mode: "academy", label: "Academy", icon: <GraduationCap className="h-4 w-4" /> },
   { mode: "skills", label: "Skills", icon: <Briefcase className="h-4 w-4" /> },
-  { mode: "business", label: "Business", icon: <Building2 className="h-4 w-4" /> },
-  { mode: "business_iaplicada", label: "Business iAplicada", icon: <Wrench className="h-4 w-4" /> },
+  { mode: "business_parceria", label: "Business Parceria", icon: <Building2 className="h-4 w-4" /> },
+  { mode: "business_sistemas", label: "Business Sistemas", icon: <Wrench className="h-4 w-4" /> },
 ];
 
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
