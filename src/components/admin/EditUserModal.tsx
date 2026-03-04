@@ -24,7 +24,7 @@ import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SkillsEquipeSelector, SkillsEquipeData } from "./SkillsEquipeSelector";
 
-type AppRole = "admin" | "mentorado" | "aluno_trilha" | "parceiros";
+type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "parceiros";
 
 // Verifica se o email é do Google (@gmail.com ou @googlemail.com)
 function isGoogleEmail(email: string): boolean {
@@ -248,6 +248,14 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                       onCheckedChange={() => toggleRole("admin")}
                     />
                     <Label htmlFor="role-admin" className="cursor-pointer">Administrador</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="role-equipe"
+                      checked={selectedRoles.includes("equipe")}
+                      onCheckedChange={() => toggleRole("equipe")}
+                    />
+                    <Label htmlFor="role-equipe" className="cursor-pointer">Equipe</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
