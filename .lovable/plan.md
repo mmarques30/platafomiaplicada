@@ -1,70 +1,24 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Corrigir TimelineEtapas (RoadMap) para alinhar com visual dos cards
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Problema
+O roadmap atual usa um estilo vertical timeline com dots e linhas finas que nao combina com os cards escuros do dashboard. A barra de progresso e pequena (h-1.5) e o visual geral esta desalinhado.
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+## Solucao
+Refazer o TimelineEtapas para usar o mesmo fundo escuro (`bg-[hsl(var(--chart-4))]`) dos cards, com layout horizontal estilo roadmap visual, barras de progresso maiores, e tipografia em branco consistente.
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+## Alteracoes em `src/components/meu-sistema/TimelineEtapas.tsx`
 
-## O que será implementado
+1. **Container**: Envolver tudo em um Card com `bg-[hsl(var(--chart-4))]` rounded-xl, titulo "RoadMap" em branco dentro do card
+2. **Timeline horizontal**: Linha horizontal conectando nodes (circulos) de cada etapa, com gradiente do verde ao muted
+3. **Nodes**: Circulos maiores (w-10 h-10) com icones de status, cores por status (emerald para concluida, primary para em andamento, white/30 para pendente)
+4. **Labels**: Titulo da etapa abaixo do node em `text-white/90`, numero da etapa em `text-white/50`
+5. **Barra de progresso geral**: Altura maior (h-2.5), gradiente verde, com label "Progresso geral" e contagem de etapas em branco
+6. **Scroll horizontal em mobile**: overflow-x-auto para muitas etapas
+7. **Animacoes**: framer-motion fade-in staggered nos nodes
+8. **Click**: Manter navegacao ao clicar na etapa
+9. **Progresso por etapa**: Mostrar % abaixo do titulo de cada node em texto pequeno
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+1 arquivo editado.
 
-## Estratégia técnica
-
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
-
-### Ajustes no `handleFileUpload`
-
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
-
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
-
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
