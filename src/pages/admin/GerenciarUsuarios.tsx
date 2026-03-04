@@ -38,6 +38,7 @@ export default function GerenciarUsuários() {
   const updateOnboardingStatus = useUpdateOnboardingStatus();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [planoFilter, setPlanoFilter] = useState<string>("all");
   const [novoUsuarioOpen, setNovoUsuarioOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [deletingUser, setDeletingUser] = useState<{ id: string; nome: string } | null>(null);
@@ -53,7 +54,13 @@ export default function GerenciarUsuários() {
       (roleFilter === "none" && user.roles.length === 0) ||
       user.roles.some(r => r === roleFilter);
 
-    return matchesSearch && matchesRole;
+    const userPlano = (user as any).plano_mentoria;
+    const matchesPlano =
+      planoFilter === "all" ||
+      (planoFilter === "none" && !userPlano) ||
+      userPlano === planoFilter;
+
+    return matchesSearch && matchesRole && matchesPlano;
   });
 
   const getRoleBadgeVariant = (role: string) => {
@@ -184,6 +191,19 @@ export default function GerenciarUsuários() {
             <SelectItem value="aluno_trilha">Aluno Trilha</SelectItem>
             <SelectItem value="parceiros">Parceiro</SelectItem>
             <SelectItem value="none">Sem Role</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={planoFilter} onValueChange={setPlanoFilter}>
+          <SelectTrigger className={adminTheme.filterSelect}>
+            <SelectValue placeholder="Filtrar por plano" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os Planos</SelectItem>
+            <SelectItem value="academy">Academy</SelectItem>
+            <SelectItem value="skills">Skills</SelectItem>
+            <SelectItem value="business">Business</SelectItem>
+            <SelectItem value="business_iaplicada">Business IAplicada</SelectItem>
+            <SelectItem value="none">Sem Plano</SelectItem>
           </SelectContent>
         </Select>
       </div>
