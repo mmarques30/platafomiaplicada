@@ -66,7 +66,6 @@ const MeuSistema = () => {
       <div>
         <PageTitle
           primary={`Gestão ${contrato.nome_empresa || "Sistema"}`}
-          icon={<Monitor className="h-7 w-7 text-primary" />}
         />
         {contrato.nome_empresa && (
           <p className="text-muted-foreground mt-1">
