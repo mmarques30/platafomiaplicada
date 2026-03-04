@@ -1,70 +1,39 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Refazer Overview Cards com design StatCard (count-up + trend)
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Referencia
+O componente referenciado exibe cards com:
+- Valor numerico grande com animacao count-up (framer-motion)
+- Sufixo (ex: `%`)
+- Titulo descritivo abaixo
+- Linha de tendencia com icone (seta up/down), percentual de mudanca e descricao
+- Cards com borda sutil, rounded, fundo limpo
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+## Adaptacao para dados reais
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+Os 4 cards atuais serao adaptados:
 
-## O que será implementado
+1. **Saude do Projeto** - Valor: texto "Saudavel"/"Em Risco"/"Avancado" (sem count-up, apenas fade-in). Trend: comparacao entregas vs cronograma com icone e cor contextual.
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+2. **Roadmap** - Valor numerico: numero da fase atual (count-up). Sufixo: nenhum. Trend: "fase atual em andamento".
 
-## Estratégia técnica
+3. **Cronograma** - Valor numerico: percentual (count-up). Sufixo: `%`. Trend: dias restantes.
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
+4. **Entregas** - Valor numerico: concluidas (count-up). Sufixo: `/${total}`. Trend: percentual concluido.
 
-### Ajustes no `handleFileUpload`
+## Alteracoes
 
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
+### `src/components/meu-sistema/ProjetoOverviewCards.tsx`
+Reescrever completamente:
+- Criar sub-componente `StatCard` interno com:
+  - Animacao count-up usando `framer-motion` `useMotionValue` + `useTransform` + `animate`
+  - Layout: valor grande (text-4xl font-bold) + sufixo menor + titulo + linha de trend com icone
+  - Cores da marca (verde aplicada para positivo, destructive para negativo)
+- Card com `border border-border rounded-xl` sem background colorido excessivo
+- Grid 2x2 em mobile, 4 colunas em desktop (manter)
 
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
+Nenhum outro arquivo precisa ser alterado, apenas este componente.
 
-Isso evita chaves inválidas com `+`, acentos e símbolos.
+1 arquivo editado.
 
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
