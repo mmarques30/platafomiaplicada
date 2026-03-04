@@ -5,8 +5,7 @@ import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { ProjetoOverviewCards } from "@/components/meu-sistema/ProjetoOverviewCards";
-import { ProximosPassosCard } from "@/components/meu-sistema/ProximosPassosCard";
-import { EntregasConcluidasCard } from "@/components/meu-sistema/EntregasConcluidasCard";
+import { GanttEntregas } from "@/components/meu-sistema/GanttEntregas";
 import { TimelineEtapas } from "@/components/meu-sistema/TimelineEtapas";
 import { Monitor } from "lucide-react";
 
