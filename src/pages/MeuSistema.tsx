@@ -18,10 +18,8 @@ const MeuSistema = () => {
 
   const isLoading = loadingContrato || loadingEtapas || loadingEntregas;
 
-  // Calcular progresso geral
-  const totalEntregas = entregas.length || 1;
+  const totalEntregas = entregas.length;
   const entregasConcluidas = entregas.filter((e) => e.status === "concluida").length;
-  const progressoGeral = Math.round((entregasConcluidas / totalEntregas) * 100);
 
   // Determinar número da etapa atual
   const etapaAtualIndex = etapas.findIndex((e) => e.status === "em_andamento");
@@ -76,7 +74,6 @@ const MeuSistema = () => {
 
       {/* Overview Cards */}
       <ProjetoOverviewCards
-        progressoGeral={progressoGeral}
         etapaAtualNumero={etapaAtualNumero}
         dataInicio={contrato.data_inicio}
         dataFim={contrato.data_fim}
