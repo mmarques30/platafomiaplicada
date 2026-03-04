@@ -5,8 +5,7 @@ import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { ProjetoOverviewCards } from "@/components/meu-sistema/ProjetoOverviewCards";
-import { ProximosPassosCard } from "@/components/meu-sistema/ProximosPassosCard";
-import { EntregasConcluidasCard } from "@/components/meu-sistema/EntregasConcluidasCard";
+import { GanttEntregas } from "@/components/meu-sistema/GanttEntregas";
 import { TimelineEtapas } from "@/components/meu-sistema/TimelineEtapas";
 import { Monitor } from "lucide-react";
 
@@ -81,11 +80,12 @@ const MeuSistema = () => {
         totalEntregas={entregas.length}
       />
 
-      {/* Próximos Passos & Entregas Concluídas */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <ProximosPassosCard entregas={entregas} />
-        <EntregasConcluidasCard entregas={entregas} />
-      </div>
+      {/* Gantt Chart */}
+      <GanttEntregas
+        entregas={entregas}
+        dataInicio={contrato.data_inicio}
+        dataFim={contrato.data_fim}
+      />
 
       {/* Timeline */}
       <TimelineEtapas

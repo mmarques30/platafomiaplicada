@@ -1,27 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Substituir cards por Gráfico Gantt de Entregas
+## Diagnóstico encontrado
 
-## Resumo
-Remover os dois cards (Próximos Passos e Entregas Concluídas) e substituir por um gráfico Gantt horizontal customizado com CSS/HTML puro, mostrando as entregas distribuídas por suas datas de prazo (`prazo_previsto`), com barras coloridas por status.
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-## Alterações
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-### 1. Criar `src/components/meu-sistema/GanttEntregas.tsx`
-Novo componente que renderiza um gráfico Gantt horizontal:
-- Recebe `entregas: EntregaBusiness[]` e opcionalmente `dataInicio`/`dataFim` do contrato como range
-- Cada entrega vira uma linha com barra posicionada de acordo com `created_at` até `prazo_previsto`
-- Entregas sem `prazo_previsto` usam uma largura fixa ou estimada
-- Barras coloridas por status: verde (concluída), azul/primary (em andamento), cinza (pendente), vermelho (cancelada)
-- Eixo horizontal mostra meses
-- Scroll horizontal se necessário, ocupando largura total
-- Ao clicar numa barra, abre dialog com detalhes (reutilizar padrão do ProximosPassosCard)
-- Componente dentro de um Card com título "Cronograma de Entregas"
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-### 2. Atualizar `src/pages/MeuSistema.tsx`
-- Remover imports de `ProximosPassosCard` e `EntregasConcluidasCard`
-- Substituir o `grid md:grid-cols-2` pelos dois cards por `<GanttEntregas>` passando as entregas e datas do contrato
-- O Gantt ocupa largura total (sem grid de 2 colunas)
+## O que será implementado
 
-2 arquivos (1 novo, 1 editado).
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
+## Estratégia técnica
+
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
+
+### Ajustes no `handleFileUpload`
+
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
+```
+
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
+
+Isso evita chaves inválidas com `+`, acentos e símbolos.
+
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
