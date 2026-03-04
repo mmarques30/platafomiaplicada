@@ -54,18 +54,19 @@ function RoadmapSparkline({ data }: { data: number[] }) {
 export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtapa }: TimelineEtapasProps) {
   const navigate = useNavigate();
 
-  if (!etapas.length) return null;
-
   const concluidas = etapas.filter((e) => e.status === "concluida").length;
-  const progressoGeral = Math.round((concluidas / etapas.length) * 100);
+  const progressoGeral = etapas.length > 0 ? Math.round((concluidas / etapas.length) * 100) : 0;
 
   // Build sparkline from cumulative progress
   const sparkData = useMemo(() => {
+    if (!etapas.length) return [0];
     return etapas.map((_, i) => {
       const done = etapas.slice(0, i + 1).filter((e) => e.status === "concluida").length;
       return Math.round((done / etapas.length) * 100);
     });
   }, [etapas]);
+
+  if (!etapas.length) return null;
 
   return (
     <Card className="relative overflow-hidden rounded-xl border-0 bg-[hsl(var(--chart-4))] p-6">
