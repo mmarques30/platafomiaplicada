@@ -10,7 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useContratosBusiness, ReportBusiness } from "@/hooks/useContratosBusiness";
 import { useReportsBusinessMutations } from "@/hooks/useReportsBusinessMutations";
 import { ExportarDadosProjetoModal } from "./ExportarDadosProjetoModal";
-import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning, Eye, TrendingUp, ListChecks, Video, CheckCircle, Download } from "lucide-react";
+import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning, Eye, Download } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
