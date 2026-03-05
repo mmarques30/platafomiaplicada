@@ -175,6 +175,25 @@ serve(async (req) => {
       console.log(`Texto puro extraído: ${textoExtraido.length} caracteres`);
     }
     
+    // ===== HTML - EXTRAIR TEXTO REMOVENDO TAGS =====
+    else if (fileType === 'text/html' || fileNameLower.endsWith('.html') || fileNameLower.endsWith('.htm')) {
+      const htmlRaw = atob(fileBase64);
+      // Preservar quebras de linha antes de remover tags
+      textoExtraido = htmlRaw
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/(p|div|h[1-6]|li|tr|blockquote)>/gi, '\n')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+      console.log(`HTML extraído: ${textoExtraido.length} caracteres`);
+    }
+    
     // ===== DOCX - USAR MAMMOTH (EXTRAÇÃO NATIVA) =====
     else if (fileNameLower.endsWith('.docx') || fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       textoExtraido = await extrairTextoDOCX(fileBase64);

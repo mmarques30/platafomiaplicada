@@ -245,7 +245,7 @@ export function DocumentosUploadSection({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".pdf,.doc,.docx,.txt,.md,.pptx,.ppt"
+                  accept=".pdf,.doc,.docx,.txt,.md,.pptx,.ppt,.html,.htm"
                   onChange={handleFileUpload}
                   className="hidden"
                   id="file-upload"

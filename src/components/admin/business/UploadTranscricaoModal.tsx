@@ -49,9 +49,9 @@ export function UploadTranscricaoModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const validTypes = ['text/plain', 'text/markdown', 'application/pdf'];
-    if (!validTypes.includes(file.type) && !file.name.endsWith('.md')) {
-      toast.error("Formato não suportado. Use TXT, MD ou PDF.");
+    const validTypes = ['text/plain', 'text/markdown', 'application/pdf', 'text/html'];
+    if (!validTypes.includes(file.type) && !file.name.endsWith('.md') && !file.name.endsWith('.html') && !file.name.endsWith('.htm')) {
+      toast.error("Formato não suportado. Use TXT, MD, PDF ou HTML.");
       return;
     }
 
@@ -175,7 +175,7 @@ export function UploadTranscricaoModal({
             <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
               <input
                 type="file"
-                accept=".txt,.md,.pdf"
+                accept=".txt,.md,.pdf,.html,.htm"
                 onChange={handleFileUpload}
                 className="hidden"
                 id="file-upload"
