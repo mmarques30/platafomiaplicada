@@ -72,7 +72,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
   return (
     <Card
       className="relative overflow-hidden rounded-xl border-0 p-6 md:p-8"
-      style={{ backgroundColor: brand[100] }}
+      style={{ backgroundColor: "#FAFAF5" }}
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
