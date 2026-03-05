@@ -124,12 +124,42 @@ export default function MeuSistemaEntregas() {
             ))}
           </div>
         ) : (
-          <Card className="border-dashed">
-            <CardContent className="p-8 flex flex-col items-center text-center text-muted-foreground">
-              <ClipboardList className="h-8 w-8 mb-2 opacity-20" />
-              <p className="text-sm">Nenhum processo mapeado ainda.</p>
-            </CardContent>
-          </Card>
+          <div className="opacity-50 pointer-events-none">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                { titulo: "Processo de exemplo 1", tipo: "link", descricao: "Instrução de trabalho documentada" },
+                { titulo: "Processo de exemplo 2", tipo: "arquivo", descricao: "SOP do fluxo operacional" },
+              ].map((p, i) => (
+                <Card key={i} className="border-border/50">
+                  <CardContent className="p-4 space-y-2">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 shrink-0 rounded-lg bg-primary/10 p-2">
+                        {p.tipo === "link" ? (
+                          <ExternalLink className="h-4 w-4 text-primary" />
+                        ) : (
+                          <FileText className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm text-foreground">{p.titulo}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{p.descricao}</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button variant="outline" size="sm" className="text-xs h-7" disabled>
+                        {p.tipo === "link" ? (
+                          <><ExternalLink className="h-3 w-3 mr-1" /> Acessar</>
+                        ) : (
+                          <><FileText className="h-3 w-3 mr-1" /> Baixar</>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <p className="text-xs text-center text-muted-foreground mt-3">Nenhum processo mapeado ainda.</p>
+          </div>
         )}
       </section>
 
