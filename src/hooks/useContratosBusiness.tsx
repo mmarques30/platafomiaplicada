@@ -108,7 +108,9 @@ export function useContratosBusiness(userId?: string) {
     },
     enabled: !!targetUserId,
     staleTime: 0,
-    gcTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 2,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   const { data: reports, isLoading: isLoadingReports } = useQuery({
