@@ -1,70 +1,64 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Nova sub-aba "Entregas" em Meu Projeto
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Visão geral
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+Criar a página `/meu-sistema/entregas` como sub-aba entre "Sistema" e "Documentos" no menu lateral. A página terá 3 seções: Processos Mapeados (SOPs), Telas do Sistema (carrossel com preview), e Vídeos de Instrução (preview com lens effect).
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+## 1. Novas tabelas no banco de dados
 
-## O que será implementado
+### `processos_mapeados_business`
+Armazena links/documentos de processos e SOPs do projeto.
+- `id`, `contrato_id` (FK contratos_business), `titulo`, `descricao`, `tipo` (link/documento), `url`, `arquivo_path` (storage), `ordem`, `created_at`
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+### `telas_sistema_business`
+Armazena as telas/screenshots do sistema com descrição e link.
+- `id`, `contrato_id` (FK contratos_business), `titulo`, `descricao`, `screenshot_url` (imagem de preview), `link_sistema` (URL para acessar a tela), `ordem`, `created_at`
 
-## Estratégia técnica
+### `videos_instrucao_business`
+Armazena vídeos de instrução hospedados no Google Drive.
+- `id`, `contrato_id` (FK contratos_business), `titulo`, `descricao`, `video_url` (link Google Drive), `thumbnail_url` (capa do vídeo), `ordem`, `created_at`
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
+RLS: leitura para o dono do contrato (user_id via join) e admins. Escrita apenas para admins.
 
-### Ajustes no `handleFileUpload`
+## 2. Menu lateral - Adicionar "Entregas"
 
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
+Inserir novo registro em `menu_config` com `menu_key: 'meu_sistema_entregas'`, `parent_key: 'meu_sistema'`, `url: '/meu-sistema/entregas'`, `ordem: 1.5` (entre Sistema e Documentos).
 
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
+## 3. Nova página `src/pages/MeuSistemaEntregas.tsx`
 
-Isso evita chaves inválidas com `+`, acentos e símbolos.
+Layout com 3 seções:
 
-### Robustez adicional recomendada
+### Processos Mapeados
+- Lista de cards com título, descrição e botão para abrir link/baixar documento
+- Ícone de tipo (link externo vs documento)
 
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+### Telas do Sistema
+- Carrossel horizontal (Embla Carousel, já instalado) com cards mostrando screenshot
+- Ao clicar em uma tela, abre um Dialog com descrição completa e botão "Acessar Sistema" (link)
+- Inspirado no carousel-card do 21st.dev: cards com imagem + hover effect
 
-## Resultado esperado
+### Vídeos de Instrução  
+- Grid de cards com thumbnail/capa do vídeo
+- Efeito lens (zoom on hover) usando framer-motion (já instalado) — ao passar o mouse, amplia a área sob o cursor
+- Ao clicar, abre Dialog com iframe do Google Drive (usando `getGoogleDriveEmbedUrl` existente)
 
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+## 4. Rota no App.tsx
 
-## Validação (teste fim a fim)
+Adicionar: `<Route path="/meu-sistema/entregas" element={<MeuSistemaEntregas />} />`
 
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
+## 5. Hook `useEntregasBusinessView.tsx`
+
+Hook para buscar processos, telas e vídeos de instrução pelo `contrato_id`.
+
+## 6. Componente Lens
+
+Componente `src/components/ui/lens.tsx` inspirado no Aceternity Lens: div com efeito de zoom magnético via framer-motion, usado como wrapper dos thumbnails de vídeo.
+
+## Arquivos
+
+- **Criar:** `src/pages/MeuSistemaEntregas.tsx`, `src/hooks/useEntregasBusinessView.tsx`, `src/components/ui/lens.tsx`
+- **Editar:** `src/App.tsx` (nova rota)
+- **Migração:** 3 tabelas + RLS + insert menu_config
+
