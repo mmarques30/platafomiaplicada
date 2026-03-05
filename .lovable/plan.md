@@ -1,42 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Fix: HTML document processing returns empty results
+## Diagnóstico encontrado
 
-## Root cause
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-The logs show `processarDocumentoLivre` is called correctly with 51999 chars, but `extractJsonFromResponse` fails both parse attempts. The problem is **two-fold**:
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-1. **max_tokens too low**: `callAI` is called with `8192` max_tokens. The Focus Fintax document has 5+ modules with dozens of features. The AI needs to output a JSON with etapas, entregas, AND instrucoes for all of them -- easily 15K+ tokens. The response gets **truncated mid-JSON**, producing invalid JSON like `{"etapas": [...], "entregas": [...], "instruc` which can never be parsed.
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-2. **No truncation recovery**: When JSON is truncated, `extractJsonFromResponse` tries simple regex fixes (trailing commas, smart quotes) but has no logic to handle incomplete/cut-off JSON, which is the actual failure mode.
+## O que será implementado
 
-3. **No logging of AI response**: We never log what the AI returns, making debugging impossible.
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-## Changes
+## Estratégia técnica
 
-### File: `supabase/functions/processar-documentos-business/index.ts`
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
 
-**Change 1: Increase max_tokens in `processarDocumentoLivre`** (line 1153)
-- Change `callAI(apiKey, prompt, 8192)` to `callAI(apiKey, prompt, 16384)`
-- Gemini 2.5 Flash supports large output; 16K tokens gives enough room for complex documents
+### Ajustes no `handleFileUpload`
 
-**Change 2: Add debug logging** (after line 1153)
-- Log the first 500 chars and total length of the raw AI response before parsing
-- This allows debugging if issues persist
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
+```
 
-**Change 3: Add truncation recovery to `extractJsonFromResponse`** (after line 604, before the empty return)
-- Before returning empty structure, attempt to salvage truncated JSON by:
-  - Closing any open strings (add `"`)
-  - Closing open arrays (add `]`)
-  - Closing open objects (add `}`)
-  - Try parsing again after each closure
-- This handles the common case where the response is valid JSON that was simply cut off
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
 
-**Change 4: Simplify the prompt to reduce response size** (lines 1073-1150)
-- Remove the `instrucoes` requirement from `processarDocumentoLivre` prompt entirely
-- Ask only for `etapas` and `entregas` -- which are the critical data
-- This dramatically reduces the response size needed, making truncation less likely
-- Instrucoes can be generated in a follow-up call if needed
+Isso evita chaves inválidas com `+`, acentos e símbolos.
 
-This combination of larger token limit + smaller response requirement + truncation recovery should resolve the parsing failures.
+### Robustez adicional recomendada
 
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.

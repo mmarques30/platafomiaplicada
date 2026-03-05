@@ -603,7 +603,43 @@ function extractJsonFromResponse(response: string): any {
     try {
       return JSON.parse(cleaned);
     } catch (e2) {
-      console.log("Second parse failed, returning empty structure");
+      console.log("Second parse failed, attempting truncation recovery...");
+      
+      // Truncation recovery: try to close open JSON structures
+      let truncated = cleaned;
+      
+      // Remove trailing incomplete string (after last complete value)
+      // Find last valid comma, closing bracket, or closing brace
+      const lastGoodIdx = Math.max(
+        truncated.lastIndexOf('",'),
+        truncated.lastIndexOf('"],'),
+        truncated.lastIndexOf('"},'),
+        truncated.lastIndexOf('"]'),
+        truncated.lastIndexOf('"}'),
+      );
+      
+      if (lastGoodIdx > 0) {
+        truncated = truncated.substring(0, lastGoodIdx + 1);
+        // Remove trailing comma if present
+        truncated = truncated.replace(/,\s*$/, '');
+        
+        // Count open brackets and braces and close them
+        const openBrackets = (truncated.match(/\[/g) || []).length - (truncated.match(/\]/g) || []).length;
+        const openBraces = (truncated.match(/\{/g) || []).length - (truncated.match(/\}/g) || []).length;
+        
+        for (let i = 0; i < openBrackets; i++) truncated += ']';
+        for (let i = 0; i < openBraces; i++) truncated += '}';
+        
+        try {
+          const recovered = JSON.parse(truncated);
+          console.log("Truncation recovery SUCCEEDED!");
+          return recovered;
+        } catch (e3) {
+          console.log("Truncation recovery also failed");
+        }
+      }
+      
+      console.log("All parse attempts failed, returning empty structure");
       return {
         etapas: [],
         entregas: [],
@@ -1133,24 +1169,17 @@ Responda APENAS com JSON válido:
       "modulo_relacionado": "Nome do módulo se aplicável"
     }
   ],
-  "instrucoes": [
-    {
-      "entrega_numero": 1,
-      "titulo": "TÍTULO DO REQUISITO/ITEM",
-      "descricao": "Detalhes copiados do documento",
-      "prompt_sugerido": null,
-      "dicas": null,
-      "responsavel": "voce",
-      "ferramenta": "outro",
-      "ordem": 1
-    }
-  ],
   "tasks": [],
   "backlog": []
-}`;
+}
+
+IMPORTANTE: NÃO inclua o campo "instrucoes" na resposta. Retorne APENAS etapas e entregas.
+Mantenha a resposta compacta para evitar truncamento.`;
 
   try {
-    const content = await callAI(apiKey, prompt, 8192);
+    const content = await callAI(apiKey, prompt, 16384);
+    console.log(`[processarDocumentoLivre] AI response length: ${content?.length || 0} chars`);
+    console.log(`[processarDocumentoLivre] AI response preview: ${content?.substring(0, 500)}`);
     const parsed = extractJsonFromResponse(content);
 
     // Validação básica
