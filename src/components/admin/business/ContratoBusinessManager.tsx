@@ -13,6 +13,7 @@ import { useContratosBusiness, EntregaEsperada } from "@/hooks/useContratosBusin
 import { useContratoBusinessMutations } from "@/hooks/useContratoBusinessMutations";
 import { ContratoImportSection } from "./ContratoImportSection";
 import { ContratoPreviewPDF } from "./ContratoPreviewPDF";
+import { ContratoAditivoSection } from "./ContratoAditivoSection";
 import { ContratoParseResult } from "@/hooks/useParseContratoTexto";
 import { MODULOS_DISPONIVEIS, ContratoData, gerarEntregasContratoPadrao, EntregaContratoPadrao } from "@/lib/contratoBusinessTemplate";
 import { Plus, Trash2, FileText, Calendar, Target, Save, Loader2, Building2, DollarSign, ChevronDown, ChevronUp, RefreshCw, Sparkles, RotateCcw } from "lucide-react";
@@ -263,6 +264,28 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
 
     // NOTA: Etapas/entregas NÃO são mais extraídas do contrato
     // Elas são geradas como padrão a partir da quantidade de módulos
+  };
+
+  // Handler para alterações do aditivo
+  const handleAditivoAplicado = (alteracoes: Record<string, any>) => {
+    if (alteracoes.contratante) {
+      setDadosContratante(prev => ({ ...prev, ...alteracoes.contratante }));
+    }
+    if (alteracoes.contrato) {
+      setFormData(prev => ({ ...prev, ...alteracoes.contrato }));
+    }
+    if (alteracoes.modulos_selecionados) {
+      setModulosSelecionados(alteracoes.modulos_selecionados);
+    }
+    if (alteracoes.valores) {
+      const v = alteracoes.valores;
+      setValores(prev => ({
+        ...prev,
+        ...Object.fromEntries(
+          Object.entries(v).map(([k, val]) => [k, val != null ? String(val) : prev[k as keyof typeof prev]])
+        ),
+      }));
+    }
   };
 
   const handleSave = () => {
@@ -1055,6 +1078,29 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
           </CollapsibleContent>
         </Card>
       </Collapsible>
+
+      {/* Seção de Aditivo - só aparece quando contrato existe */}
+      {contrato && (
+        <ContratoAditivoSection
+          contratoId={contrato.id}
+          contratoAtual={{
+            ...dadosContratante,
+            ...formData,
+            modulos_selecionados: modulosSelecionados,
+            valor_contrato: valores.valor_contrato ? Number(valores.valor_contrato) : null,
+            valor_entrada: valores.valor_entrada ? Number(valores.valor_entrada) : null,
+            numero_parcelas: valores.numero_parcelas ? Number(valores.numero_parcelas) : null,
+            valor_parcela: valores.valor_parcela ? Number(valores.valor_parcela) : null,
+            creditos_iniciais: valores.creditos_iniciais ? Number(valores.creditos_iniciais) : null,
+            valor_credito_adicional: valores.valor_credito_adicional ? Number(valores.valor_credito_adicional) : null,
+            duracao_academy_meses: valores.duracao_academy_meses ? Number(valores.duracao_academy_meses) : null,
+            roi_projetado: valores.roi_projetado ? Number(valores.roi_projetado) : null,
+            multa_rescisao_percentual: valores.multa_rescisao_percentual ? Number(valores.multa_rescisao_percentual) : null,
+            valor_hora_tecnica: valores.valor_hora_tecnica ? Number(valores.valor_hora_tecnica) : null,
+          }}
+          onAlteracoesAplicadas={handleAditivoAplicado}
+        />
+      )}
 
       {/* Botões de Ação */}
       <div className="flex justify-between items-center">
