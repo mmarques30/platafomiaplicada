@@ -100,7 +100,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
       {/* Progress bar */}
       <div
         className="mb-10 relative h-2 w-full rounded-full overflow-hidden"
-        style={{ backgroundColor: `${brand[900]}15` }}
+        style={{ backgroundColor: brand[200] }}
       >
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
@@ -116,7 +116,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
         {/* Static track line */}
         <div
           className="absolute left-[15px] md:left-[19px] top-0 bottom-0 w-[2px]"
-          style={{ backgroundColor: `${brand[900]}15` }}
+          style={{ backgroundColor: brand[300] }}
         />
 
         {/* Animated beam */}
@@ -150,10 +150,9 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
                   {statusIcon[cfg] || statusIcon.pendente}
                 </div>
 
-                {/* Content card */}
                 <div
-                  className="flex-1 rounded-lg transition-colors p-4 mb-4 group-hover:brightness-95"
-                  style={{ backgroundColor: `${brand[400]}60` }}
+                  className="flex-1 rounded-lg transition-colors p-4 mb-4"
+                  style={{ backgroundColor: "#FFFFFF", border: `1px solid ${brand[300]}` }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
