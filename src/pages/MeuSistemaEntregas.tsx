@@ -232,6 +232,19 @@ export default function MeuSistemaEntregas() {
                         </div>
                       </div>
                     </div>
+                  ) : video.video_url && isGoogleDriveUrl(video.video_url) ? (
+                    <div className="relative w-full h-full">
+                      <iframe
+                        src={getGoogleDriveEmbedUrl(video.video_url) || ""}
+                        className="w-full h-full pointer-events-none"
+                        allow="autoplay"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <div className="rounded-full bg-white/90 p-3 shadow-lg">
+                          <Play className="h-6 w-6 text-primary fill-primary" />
+                        </div>
+                      </div>
+                    </div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-muted">
                       <div className="text-center">

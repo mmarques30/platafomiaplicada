@@ -36,6 +36,7 @@ import { ptBR } from "date-fns/locale";
 import { EntregasBusinessManager } from "@/components/admin/business/EntregasBusinessManager";
 import { ProcessosMapeadosManager } from "@/components/admin/business/ProcessosMapeadosManager";
 import { TelasSistemaManager } from "@/components/admin/business/TelasSistemaManager";
+import { VideosInstrucaoManager } from "@/components/admin/business/VideosInstrucaoManager";
 
 export default function MentoriaBusinessPage() {
   const navigate = useNavigate();
