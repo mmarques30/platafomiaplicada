@@ -178,8 +178,14 @@ serve(async (req) => {
     // ===== HTML - EXTRAIR TEXTO REMOVENDO TAGS =====
     else if (fileType === 'text/html' || fileNameLower.endsWith('.html') || fileNameLower.endsWith('.htm')) {
       const htmlRaw = atob(fileBase64);
-      // Preservar quebras de linha antes de remover tags
+      // Remover blocos não-conteúdo ANTES de strip de tags
       textoExtraido = htmlRaw
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
+        .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '')
+        .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
+        // Preservar quebras de linha antes de remover tags
         .replace(/<br\s*\/?>/gi, '\n')
         .replace(/<\/(p|div|h[1-6]|li|tr|blockquote)>/gi, '\n')
         .replace(/<[^>]*>/g, '')

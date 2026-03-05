@@ -1,41 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Fix: HTML document processing fails to generate deliverables
+## Diagnóstico encontrado
 
-## Root Cause (confirmed by logs)
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-The logs show: `processarDocumentoLivre` IS being called correctly, but produces **0 etapas, 0 entregas, 0 instrucoes**. Two bugs cause this:
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-### Bug 1: CSS/script noise in extracted text
-`extrair-texto-documento` strips HTML tags but leaves `<style>`, `<script>`, `<nav>`, `<head>` **content** intact. The Focus Fintax HTML has ~140 lines of CSS that become raw text like `:root { --green-deep: #2F302B; }`. This wastes ~5000+ chars of the 30000 char limit and confuses the AI model.
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-### Bug 2: JSON parser destroys valid responses
-`extractJsonFromResponse` (line 597) does `.replace(/\\"/g, "'")` in recovery mode. This replaces ALL escaped quotes with single quotes, which **corrupts valid JSON**. For example, a JSON value `"titulo": "Central da \"Holding\""` becomes `"titulo": "Central da 'Holding'"` which then breaks subsequent parsing.
+## O que será implementado
 
-The logs confirm: "First parse failed, attempting recovery... Second parse failed, returning empty structure."
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-## Changes
+## Estratégia técnica
 
-### 1. Fix HTML extraction (`supabase/functions/extrair-texto-documento/index.ts`, lines 179-195)
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
 
-Remove `<style>`, `<script>`, `<nav>`, `<head>`, `<footer>` blocks BEFORE stripping tags:
+### Ajustes no `handleFileUpload`
 
-```typescript
-const htmlRaw = atob(fileBase64);
-textoExtraido = htmlRaw
-  .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-  .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-  .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
-  .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '')
-  .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
-  // then existing tag stripping...
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
 ```
 
-### 2. Fix JSON recovery (`supabase/functions/processar-documentos-business/index.ts`, line 597)
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
 
-Remove the destructive `\\\"` → `'` replacement. Replace with a safe approach that removes problematic escape sequences without corrupting the JSON structure.
+Isso evita chaves inválidas com `+`, acentos e símbolos.
 
-### 3. Increase text limit (`supabase/functions/processar-documentos-business/index.ts`, line 1113)
+### Robustez adicional recomendada
 
-Change `texto.substring(0, 30000)` to `texto.substring(0, 45000)` in `processarDocumentoLivre` - the model supports larger context and with CSS removed, the actual content will fit better.
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
 
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
