@@ -1,70 +1,20 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Corrigir contraste do RoadMap Timeline
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Problema
+O fundo `brand[500]` (#BCC95D) e os cards internos `brand[400]60` (#C8D27B com 37% opacidade) sao tons de verde muito proximos, tornando tudo indistinguivel.
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+## Solucao
+Aumentar o contraste usando tons mais claros da propria paleta da marca:
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+1. **Fundo do card principal**: Trocar de `brand[500]` para `brand[100]` (#F6F7E9 - off-white da marca) - fundo claro e limpo
+2. **Cards internos de cada etapa**: Usar `white` com borda sutil em `brand[300]` - destaque claro sobre o fundo off-white
+3. **Barra de progresso geral**: Manter `brand[900]` (#738925) sobre fundo `brand[200]` (#E9EBC6) - contraste forte
+4. **Track line e beam**: Usar `brand[300]` para a track e `brand[700]` para o beam animado
+5. **Dots de status**: Manter as cores atuais (ja usam brand[900]/[800]) que terao mais destaque no fundo claro
+6. **Barras de progresso por etapa**: Track em `brand[200]`, preenchimento em `brand[900]`
+7. **Hover nos cards**: `brand[200]` como background no hover
 
-## O que será implementado
+1 arquivo editado: `TimelineEtapas.tsx`
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
-
-## Estratégia técnica
-
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
-
-### Ajustes no `handleFileUpload`
-
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
-
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
-
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
