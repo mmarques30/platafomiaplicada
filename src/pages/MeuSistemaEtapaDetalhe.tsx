@@ -69,7 +69,7 @@ export default function MeuSistemaEtapaDetalhe() {
   const marcos = etapa.marcos_proxima_etapa as string[] | null;
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-6 max-w-3xl">
+    <div className="container mx-auto py-8 px-4 space-y-6 max-w-5xl">
       {/* Header */}
       <div className="flex items-start gap-4">
         <Button
