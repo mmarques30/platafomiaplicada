@@ -1,46 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Correcao: HTML nao processado no upload de documentos Business
+## Diagnóstico encontrado
 
-## Problema identificado
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-No arquivo `DocumentosUploadSection.tsx`, o `handleFileUpload` aceita arquivos `.html/.htm` no input, mas o codigo de extracao de texto **nao tem tratamento para HTML**:
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-- Arquivos `.txt/.md` -> lidos diretamente com `file.text()`
-- Arquivos `.docx/.pdf/.pptx` -> enviados para edge function `extrair-texto-documento`
-- Arquivos `.html/.htm` -> **caem no vazio**, `conteudoTexto` fica vazio
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-A edge function `extrair-texto-documento` ja tem suporte completo para HTML (remove tags, preserva quebras de linha), mas o cliente nunca envia HTMLs para ela.
+## O que será implementado
 
-## Solucao
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-Adicionar `.html` e `.htm` ao bloco que envia arquivos para a edge function `extrair-texto-documento`, junto com DOCX/PDF/PPTX. A edge function ja sabe processar HTML corretamente.
+## Estratégia técnica
 
-### Alteracao unica em `src/components/admin/business/DocumentosUploadSection.tsx`
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
 
-Na funcao `handleFileUpload` (linha ~110), adicionar as extensoes `.html` e `.htm` na condicao que decide quais arquivos enviar para extracao via edge function:
+### Ajustes no `handleFileUpload`
 
-```typescript
-// De:
-else if (
-  file.name.endsWith(".docx") || 
-  file.name.endsWith(".doc") ||
-  file.name.endsWith(".pdf") ||
-  file.name.endsWith(".pptx") ||
-  file.name.endsWith(".ppt")
-)
-
-// Para:
-else if (
-  file.name.endsWith(".docx") || 
-  file.name.endsWith(".doc") ||
-  file.name.endsWith(".pdf") ||
-  file.name.endsWith(".pptx") ||
-  file.name.endsWith(".ppt") ||
-  file.name.endsWith(".html") ||
-  file.name.endsWith(".htm")
-)
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
 ```
 
-Isso e suficiente pois a edge function ja extrai texto de HTML corretamente.
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
 
+Isso evita chaves inválidas com `+`, acentos e símbolos.
+
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
