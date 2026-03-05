@@ -38,7 +38,7 @@ export default function MeuSistemaDocumentos() {
   const userId = useBusinessUserId();
   const { contrato, reports, isLoading } = useContratosBusiness(userId);
   const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id);
-  const [contratoOpen, setContratoOpen] = useState(false);
+  const [contratoOpen, setContratoOpen] = useState(true);
   const [viewingReport, setViewingReport] = useState<{ titulo: string; html: string } | null>(null);
   const [filtroTipo, setFiltroTipo] = useState("todos");
 
