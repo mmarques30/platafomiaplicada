@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      aditivos_contrato: {
+        Row: {
+          alteracoes_json: Json
+          contrato_id: string
+          created_at: string
+          id: string
+          resumo: string | null
+          texto_original: string
+        }
+        Insert: {
+          alteracoes_json?: Json
+          contrato_id: string
+          created_at?: string
+          id?: string
+          resumo?: string | null
+          texto_original: string
+        }
+        Update: {
+          alteracoes_json?: Json
+          contrato_id?: string
+          created_at?: string
+          id?: string
+          resumo?: string | null
+          texto_original?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aditivos_contrato_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_permissions: {
         Row: {
           admin_label: string
