@@ -72,7 +72,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
   return (
     <Card
       className="relative overflow-hidden rounded-xl border-0 p-6 md:p-8"
-      style={{ backgroundColor: brand[500] }}
+      style={{ backgroundColor: brand[100] }}
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
@@ -122,7 +122,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
         {/* Animated beam */}
         <motion.div
           className="absolute left-[15px] md:left-[19px] top-0 w-[2px]"
-          style={{ backgroundColor: `${brand[900]}50`, height: beamHeight } as any}
+          style={{ backgroundColor: brand[700], height: beamHeight } as any}
         />
 
         {/* Timeline items */}
@@ -182,7 +182,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
                       <div className="mt-3 flex items-center gap-3">
                         <div
                           className="flex-1 h-1.5 rounded-full overflow-hidden"
-                          style={{ backgroundColor: `${brand[900]}12` }}
+                          style={{ backgroundColor: brand[200] }}
                         >
                           <motion.div
                             className="h-full rounded-full"
