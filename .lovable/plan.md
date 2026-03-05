@@ -1,31 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Remover abas Instruções e Tasks do Business Sistemas
+## Diagnóstico encontrado
 
-## Resumo
-Remover as abas "Instruções" e "Tasks" do painel admin Business iAplicada e da visão do mentorado Business Sistemas, mantendo-as nos demais planos (Business Parceria, Academy).
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-## Alterações
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-### 1. Admin — `MentoriaBusinessIAplicadaPage.tsx`
-- Remover os dois `TabsTrigger` (Instruções e Tasks) — linhas 193-200
-- Remover os dois `TabsContent` correspondentes — linhas 352-387
-- Remover imports não utilizados: `InstrucoesBusinessManager`, `TasksBusinessManager`, `ListChecks`, `ClipboardCheck`
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-### 2. Mentee — `BusinessAcessoRapido.tsx`
-- Esse componente é usado por todos os Business (Parceria e Sistemas)
-- Torná-lo ciente do plano: receber prop ou usar `useEffectivePlan` para filtrar os itens "Instruções" e "Tasks" quando o usuário for `business_sistemas`
-- Alternativa mais simples: usar o hook `useEffectivePlan` internamente e filtrar os itens
+## O que será implementado
 
-### 3. Mentee — Rotas em `App.tsx`
-- As rotas `/mentoria/instrucoes-business` e `/mentoria/tasks-business` devem ser mantidas (servem Business Parceria)
-- A filtragem ocorre apenas na navegação (BusinessAcessoRapido), não nas rotas
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-### Impacto na geração com IA
-- Nenhum impacto — a geração de entregas/etapas/instruções/tasks pela IA (edge function `gerar-entregas-business`) continua funcionando normalmente no backend
-- Os dados gerados ficam no banco; apenas a interface admin e mentee de Business Sistemas não exibirá essas abas
+## Estratégia técnica
 
-### Arquivos alterados
-1. `src/pages/admin/mentoria/MentoriaBusinessIAplicadaPage.tsx` — remover tabs e imports
-2. `src/components/mentoria/business/BusinessAcessoRapido.tsx` — filtrar itens por plano
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
 
+### Ajustes no `handleFileUpload`
+
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
+```
+
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
+
+Isso evita chaves inválidas com `+`, acentos e símbolos.
+
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
