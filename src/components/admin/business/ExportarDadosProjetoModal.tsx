@@ -29,10 +29,10 @@ export function ExportarDadosProjetoModal({ open, onOpenChange, contrato, userId
       const [etapasRes, entregasRes, processosRes, telasRes, videosRes, sessoesRes] = await Promise.all([
         supabase.from("etapas_business").select("*").eq("contrato_id", contrato.id).order("numero_etapa"),
         supabase.from("entregas_business").select("*").eq("contrato_id", contrato.id).order("created_at"),
-        supabase.from("processos_business").select("*").eq("contrato_id", contrato.id).order("created_at"),
+        supabase.from("processos_mapeados_business").select("*").eq("contrato_id", contrato.id).order("created_at"),
         supabase.from("telas_sistema_business").select("*").eq("contrato_id", contrato.id).order("ordem"),
         supabase.from("videos_instrucao_business").select("*").eq("contrato_id", contrato.id).order("ordem"),
-        supabase.from("sessoes_business").select("*").eq("contrato_id", contrato.id).order("data_sessao", { ascending: false }),
+        supabase.from("sessoes_mentoria").select("*").eq("user_id", userId).order("data_sessao", { ascending: false }),
       ]);
 
       const etapas = etapasRes.data || [];

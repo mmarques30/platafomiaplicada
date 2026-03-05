@@ -160,22 +160,12 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
                   className="flex items-start justify-between p-4 rounded-lg border bg-card hover:shadow-sm transition-shadow"
                 >
                   <div className="flex items-start gap-4 flex-1">
-                    <div className={`p-2 rounded-lg ${report.gerado_por_ia ? 'bg-primary/10' : 'bg-muted'}`}>
-                      {report.gerado_por_ia ? (
-                        <Sparkles className="h-4 w-4 text-primary" />
-                      ) : (
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                      )}
+                    <div className="p-2 rounded-lg bg-muted">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="font-medium text-sm">{report.titulo}</h4>
-                        {report.gerado_por_ia && (
-                          <Badge variant="secondary" className="text-[10px] gap-1">
-                            <Sparkles className="h-2.5 w-2.5" />
-                            IA
-                          </Badge>
-                        )}
                       </div>
                       
                       {report.descricao && (
