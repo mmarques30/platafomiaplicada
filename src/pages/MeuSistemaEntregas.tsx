@@ -208,16 +208,8 @@ export default function MeuSistemaEntregas() {
                         <Monitor className="h-10 w-10 text-muted-foreground/40" />
                       </div>
                     )}
-                    {/* Overlay with title */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                      <p className="text-white font-medium text-sm truncate">{tela.titulo}</p>
-                      {tela.descricao && (
-                        <p className="text-white/70 text-xs line-clamp-1 mt-0.5">{tela.descricao}</p>
-                      )}
-                    </div>
-                    {/* Always-visible title bar at bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-sm px-3 py-2 group-hover:opacity-0 transition-opacity duration-300">
-                      <p className="font-medium text-sm text-foreground truncate">{tela.titulo}</p>
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8">
+                      <p className="text-white text-sm font-medium truncate">{tela.titulo}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -234,8 +226,8 @@ export default function MeuSistemaEntregas() {
                       <div className="aspect-video bg-muted flex items-center justify-center">
                         <Monitor className="h-10 w-10 text-muted-foreground/40" />
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-sm px-3 py-2">
-                        <p className="font-medium text-sm text-foreground truncate">Tela de exemplo {i}</p>
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8">
+                        <p className="text-white text-sm font-medium truncate">Tela de exemplo {i}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -345,9 +337,6 @@ export default function MeuSistemaEntregas() {
                 className="w-full object-contain max-h-[50vh]"
               />
             </div>
-          )}
-          {selectedTela?.descricao && (
-            <p className="text-sm text-muted-foreground">{selectedTela.descricao}</p>
           )}
           {selectedTela?.link_sistema && (
             <Button onClick={() => window.open(selectedTela.link_sistema, "_blank")} className="w-full">
