@@ -1,70 +1,30 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Ajustar cores dos cards em Meu Projeto para a paleta da marca
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Problema
+Os StatCards em `ProjetoOverviewCards.tsx` usam cores fora da paleta da marca:
+- Sparklines: `#4ade80` (emerald), `#f87171` (red), `#9ca3af` (gray)
+- Texto de tendência: `text-emerald-400`, `text-red-400`
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+## Paleta correta (Brand Book)
+- Positivo: `#738925` (Brand 900) ou `#9EB038` (Brand 700)
+- Negativo: manter vermelho mas mais discreto, ou usar tom escuro
+- Neutro: `rgba(255,255,255,0.5)` (já está sobre fundo escuro)
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+## Alterações em `src/components/meu-sistema/ProjetoOverviewCards.tsx`
 
-## O que será implementado
+1. **Cores do texto de tendência** (linhas 76-80):
+   - `positive` → `text-[#BCC95D]` (Brand 500 — bom contraste sobre fundo escuro)
+   - `negative` → `text-[#f87171]` (manter, é funcional para alerta)
+   - `neutral` → `text-white/50`
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+2. **Cores das sparklines** (linhas 82-86):
+   - `positive` → `#BCC95D` (Brand 500)
+   - `negative` → `#f87171` (manter)
+   - `neutral` → `#C8D27B` (Brand 400)
 
-## Estratégia técnica
+Isso alinha os indicadores positivos e neutros à paleta verde da marca, mantendo o vermelho funcional para alertas.
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
+**1 arquivo editado, 6 valores de cor alterados.**
 
-### Ajustes no `handleFileUpload`
-
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
-
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
-
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
