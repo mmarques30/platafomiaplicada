@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { ExternalLink, FileText, Play, Monitor, Video, ClipboardList, X } from "lucide-react";
+import { ExternalLink, FileText, Play, Monitor, Video, ClipboardList } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useEntregasBusinessView } from "@/hooks/useEntregasBusinessView";
@@ -66,8 +64,6 @@ export default function MeuSistemaEntregas() {
     );
   }
 
-  const hasContent = processos.length > 0 || telas.length > 0 || videos.length > 0;
-
   return (
     <div className="p-4 md:p-6 space-y-8 max-w-5xl mx-auto">
       <div>
@@ -77,22 +73,14 @@ export default function MeuSistemaEntregas() {
         </p>
       </div>
 
-      {!hasContent && (
-        <Card className="border-dashed">
-          <CardContent className="p-8 text-center text-muted-foreground">
-            <p>Nenhuma entrega disponível ainda.</p>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Processos Mapeados */}
-      {processos.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Processos Mapeados</h2>
-            <Badge variant="secondary" className="text-xs">{processos.length}</Badge>
-          </div>
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <ClipboardList className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold text-foreground">Processos Mapeados</h2>
+          <Badge variant="secondary" className="text-xs">{processos.length}</Badge>
+        </div>
+        {processos.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2">
             {processos.map((p) => (
               <Card key={p.id} className="border-border/50 hover:shadow-md transition-shadow">
@@ -130,17 +118,24 @@ export default function MeuSistemaEntregas() {
               </Card>
             ))}
           </div>
-        </section>
-      )}
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="p-8 flex flex-col items-center text-center text-muted-foreground">
+              <ClipboardList className="h-8 w-8 mb-2 opacity-20" />
+              <p className="text-sm">Nenhum processo mapeado ainda.</p>
+            </CardContent>
+          </Card>
+        )}
+      </section>
 
       {/* Telas do Sistema */}
-      {telas.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Monitor className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Telas do Sistema</h2>
-            <Badge variant="secondary" className="text-xs">{telas.length}</Badge>
-          </div>
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Monitor className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold text-foreground">Telas do Sistema</h2>
+          <Badge variant="secondary" className="text-xs">{telas.length}</Badge>
+        </div>
+        {telas.length > 0 ? (
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex gap-4">
               {telas.map((tela) => (
@@ -178,17 +173,24 @@ export default function MeuSistemaEntregas() {
               ))}
             </div>
           </div>
-        </section>
-      )}
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="p-8 flex flex-col items-center text-center text-muted-foreground">
+              <Monitor className="h-8 w-8 mb-2 opacity-20" />
+              <p className="text-sm">Nenhuma tela cadastrada ainda.</p>
+            </CardContent>
+          </Card>
+        )}
+      </section>
 
       {/* Vídeos de Instrução */}
-      {videos.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Video className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Vídeos de Instrução</h2>
-            <Badge variant="secondary" className="text-xs">{videos.length}</Badge>
-          </div>
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Video className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold text-foreground">Vídeos de Instrução</h2>
+          <Badge variant="secondary" className="text-xs">{videos.length}</Badge>
+        </div>
+        {videos.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {videos.map((video) => (
               <Card
@@ -228,8 +230,15 @@ export default function MeuSistemaEntregas() {
               </Card>
             ))}
           </div>
-        </section>
-      )}
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="p-8 flex flex-col items-center text-center text-muted-foreground">
+              <Video className="h-8 w-8 mb-2 opacity-20" />
+              <p className="text-sm">Nenhum vídeo de instrução ainda.</p>
+            </CardContent>
+          </Card>
+        )}
+      </section>
 
       {/* Dialog: Tela do Sistema */}
       <Dialog open={!!selectedTela} onOpenChange={() => setSelectedTela(null)}>
