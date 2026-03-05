@@ -74,15 +74,15 @@ interface StatCardProps {
 
 function StatCard({ title, value, textValue, suffix, changeText, trendType, icon, sparkData, index }: StatCardProps) {
   const changeColor = {
-    positive: "text-emerald-400",
+    positive: "text-aplicada-green-500",
     negative: "text-red-400",
-    neutral: "text-muted-foreground",
+    neutral: "text-white/50",
   }[trendType];
 
   const sparkColor = {
-    positive: "#4ade80",
+    positive: "hsl(73, 37%, 58%)",
     negative: "#f87171",
-    neutral: "#9ca3af",
+    neutral: "hsl(73, 40%, 75%)",
   }[trendType];
 
   return (
