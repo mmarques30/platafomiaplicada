@@ -128,7 +128,7 @@ export function RecursoUploadModal({
                 ref={fileInputRef}
                 id="file"
                 type="file"
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.gif,.webp"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.gif,.webp,.html,.htm"
                 onChange={handleFileChange}
               />
               {selectedFile && (

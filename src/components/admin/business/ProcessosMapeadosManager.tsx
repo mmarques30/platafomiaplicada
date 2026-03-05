@@ -327,7 +327,7 @@ export function ProcessosMapeadosManager({ contratoId, userId, userName }: Proce
                 )}
                 <Input
                   type="file"
-                  accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.pptx,.ppt"
+                  accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.pptx,.ppt,.html,.htm"
                   onChange={e => setSelectedFile(e.target.files?.[0] || null)}
                 />
               </div>
