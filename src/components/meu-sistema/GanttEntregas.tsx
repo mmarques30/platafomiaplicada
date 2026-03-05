@@ -163,7 +163,7 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
 
   return (
     <>
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden border-0 shadow-none">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <CardTitle className="text-base">
