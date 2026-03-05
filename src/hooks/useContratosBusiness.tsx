@@ -107,7 +107,7 @@ export function useContratosBusiness(userId?: string) {
       } as ContratoBusiness;
     },
     enabled: !!targetUserId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     gcTime: 1000 * 60 * 10,
   });
 
