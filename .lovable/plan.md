@@ -1,70 +1,43 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
+# Aplicar cores da marca no Gantt
 
-## Diagnóstico encontrado
+## Problema
+O Gantt usa cores genericas do tema (`bg-muted/30`, `border-border`, `hsl(var(--primary))`) em vez da paleta da marca IAplicada, ficando desconectado visualmente do resto da pagina.
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Solucao
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+Arquivo: `src/components/meu-sistema/GanttEntregas.tsx`
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+### 1. STATUS_CONFIG - usar cores da marca
+- `concluida`: manter `#738925` (brand 900)
+- `em_andamento`: trocar `hsl(var(--primary))` para `#889C2D` (brand 800) 
+- `pendente`: manter `#D4A017` (amber)
+- `cancelada`: trocar para `#B91C1C` (vermelho solido)
 
-## O que será implementado
+### 2. Fundo do card principal
+- Adicionar borda sutil em brand green: `border` com cor `aplicada-green-300`
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+### 3. Header da sidebar e month headers
+- Trocar `bg-muted/30` para fundo brand off-white `#F6F7E9` (brand 100)
+- Texto dos headers em `#2F302B` (aplicada dark) em vez de `text-muted-foreground`
 
-## Estratégia técnica
+### 4. Group headers dos modulos
+- Fundo `#E9EBC6` (brand 200) em vez de `bg-muted/20`
+- Texto em `#738925` (brand 900) em vez de `text-muted-foreground`
+- Chevron na cor brand 700
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
+### 5. Grid lines e bordas
+- Grid lines verticais em brand 200 com opacidade (`#E9EBC640`)
+- Bordas entre rows em brand 200
 
-### Ajustes no `handleFileUpload`
+### 6. Today marker
+- Trocar de vermelho destructive para brand 900 (`#738925`) com label em verde escuro
 
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
+### 7. Hover states
+- Hover nas rows: fundo `#F6F7E9` (brand 100) em vez de `bg-muted/20`
+- Hover na sidebar: mesmo brand 100
 
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
+### 8. Dialog de detalhes
+- Manter neutro (ja funciona bem)
 
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
+1 arquivo editado: `GanttEntregas.tsx`
