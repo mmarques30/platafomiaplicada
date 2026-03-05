@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 // Interface atualizada - SEM entregas_esperadas (etapas são padrão, não extraídas do contrato)
 export interface ContratoParseResult {
   contratante?: {
+    nome_empresa?: string;
     razao_social?: string;
     cnpj?: string;
     endereco?: string;
