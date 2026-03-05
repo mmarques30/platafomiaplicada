@@ -1,26 +1,70 @@
 
-# Corrigir cores e titulo do Gantt
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Problema
-1. As barras do Gantt usam cores apagadas/cinza (especialmente "pendente" com `muted-foreground/0.4` e textos em `text-muted-foreground`)
-2. O titulo tem um icone `CalendarDays` que deve ser removido
+## Diagnóstico encontrado
 
-## Solucao
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-### 1. Cores mais vivas no STATUS_CONFIG (linhas 27-32)
-- `concluida`: bg verde forte `#738925` com opacidade total
-- `em_andamento`: bg azul/primary com opacidade 100%
-- `pendente`: trocar de `muted-foreground/0.4` para um amarelo/amber visivel como `#D4A017` 
-- `cancelada`: vermelho mais visivel, opacidade maior
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-### 2. Remover icone do titulo (linhas 169-171)
-- Remover `<CalendarDays>` do CardTitle principal
-- Manter apenas o texto "Cronograma de Entregas"
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-### 3. Textos da sidebar mais visiveis (linha 240)
-- Trocar `text-muted-foreground` dos titulos das entregas por `text-foreground` para ficarem legiveis
+## O que será implementado
 
-### 4. Texto nas barras (linha 363)
-- Garantir que o texto dentro das barras use branco `#FFFFFF` em vez de `hsl(var(--card))` que pode ser cinza
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-1 arquivo editado: `GanttEntregas.tsx`
+## Estratégia técnica
+
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
+
+### Ajustes no `handleFileUpload`
+
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
+```
+
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
+
+Isso evita chaves inválidas com `+`, acentos e símbolos.
+
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
