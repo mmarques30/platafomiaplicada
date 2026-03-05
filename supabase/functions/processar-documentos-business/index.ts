@@ -1169,21 +1169,12 @@ Responda APENAS com JSON válido:
       "modulo_relacionado": "Nome do módulo se aplicável"
     }
   ],
-  "instrucoes": [
-    {
-      "entrega_numero": 1,
-      "titulo": "TÍTULO DO REQUISITO/ITEM",
-      "descricao": "Detalhes copiados do documento",
-      "prompt_sugerido": null,
-      "dicas": null,
-      "responsavel": "voce",
-      "ferramenta": "outro",
-      "ordem": 1
-    }
-  ],
   "tasks": [],
   "backlog": []
-}`;
+}
+
+IMPORTANTE: NÃO inclua o campo "instrucoes" na resposta. Retorne APENAS etapas e entregas.
+Mantenha a resposta compacta para evitar truncamento.`;
 
   try {
     const content = await callAI(apiKey, prompt, 16384);
