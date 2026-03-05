@@ -31,8 +31,8 @@ export const ContratoImportSection = ({ onDataParsed }: ContratoImportSectionPro
     if (!file) return;
 
     // Validate file type
-    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'text/plain'];
-    const validExtensions = ['.pdf', '.docx', '.doc', '.txt'];
+    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'text/plain', 'text/html'];
+    const validExtensions = ['.pdf', '.docx', '.doc', '.txt', '.html', '.htm'];
     
     const isValidType = validTypes.includes(file.type) || validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
     
