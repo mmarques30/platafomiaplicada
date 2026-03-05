@@ -112,7 +112,9 @@ export function DocumentosUploadSection({
         file.name.endsWith(".doc") ||
         file.name.endsWith(".pdf") ||
         file.name.endsWith(".pptx") ||
-        file.name.endsWith(".ppt")
+        file.name.endsWith(".ppt") ||
+        file.name.endsWith(".html") ||
+        file.name.endsWith(".htm")
       ) {
         toast.info("Extraindo texto do documento...");
         const textoExtraido = await extrairTextoDocumento(file);
