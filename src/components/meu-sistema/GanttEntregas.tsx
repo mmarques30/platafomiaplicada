@@ -25,10 +25,10 @@ interface GanttEntregasProps {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-  concluida: { label: "Concluída", color: "hsl(var(--chart-2))", bg: "hsl(var(--chart-2) / 0.85)", icon: <CheckCircle2 className="h-3 w-3" /> },
-  em_andamento: { label: "Em andamento", color: "hsl(var(--primary))", bg: "hsl(var(--primary) / 0.85)", icon: <Clock className="h-3 w-3" /> },
-  pendente: { label: "Pendente", color: "hsl(var(--muted-foreground))", bg: "hsl(var(--muted-foreground) / 0.4)", icon: <Circle className="h-3 w-3" /> },
-  cancelada: { label: "Cancelada", color: "hsl(var(--destructive))", bg: "hsl(var(--destructive) / 0.5)", icon: <XCircle className="h-3 w-3" /> },
+  concluida: { label: "Concluída", color: "#738925", bg: "#738925", icon: <CheckCircle2 className="h-3 w-3" /> },
+  em_andamento: { label: "Em andamento", color: "hsl(var(--primary))", bg: "hsl(var(--primary))", icon: <Clock className="h-3 w-3" /> },
+  pendente: { label: "Pendente", color: "#D4A017", bg: "#D4A017", icon: <Circle className="h-3 w-3" /> },
+  cancelada: { label: "Cancelada", color: "hsl(var(--destructive))", bg: "hsl(var(--destructive))", icon: <XCircle className="h-3 w-3" /> },
 };
 
 const ROW_HEIGHT = 40;
@@ -166,8 +166,7 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
       <Card className="overflow-hidden">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 text-primary" />
+            <CardTitle className="text-base">
               Cronograma de Entregas
             </CardTitle>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -237,7 +236,7 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                             onClick={() => setSelectedEntrega(entrega)}
                           >
                             <span style={{ color: cfg.color }}>{cfg.icon}</span>
-                            <span className="text-xs truncate flex-1 group-hover:text-foreground text-muted-foreground">
+                            <span className="text-xs truncate flex-1 group-hover:text-foreground text-foreground">
                               {entrega.titulo}
                             </span>
                           </div>
@@ -360,7 +359,7 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                                   className="h-7 rounded-md flex items-center px-2 text-[11px] font-medium truncate shadow-sm hover:shadow-md transition-shadow"
                                   style={{
                                     backgroundColor: cfg.bg,
-                                    color: "hsl(var(--card))",
+                                    color: "#FFFFFF",
                                   }}
                                   title={`${entrega.titulo} — ${cfg.label}`}
                                 >
