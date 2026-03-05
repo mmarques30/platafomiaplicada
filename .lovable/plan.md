@@ -1,44 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Correcao: IA nao gera entregas de documentos HTML sem estrutura padrao
+## Diagnóstico encontrado
 
-## Problema raiz
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-O `processar-documentos-business` usa um pre-parser regex que busca marcadores especificos como `FASE 1:`, `ENTREGA 1:`, `MODULO 1:`, `PASSO 1:`. O documento HTML da Focus Fintax usa outra estrutura: secoes HTML como `03 · Modulo 01` seguido de `<h2>Central da Holding</h2>`.
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-Apos o strip de tags HTML, o texto nao contem os marcadores esperados. Resultado: **0 fases, 0 entregas, 0 passos** extraidos.
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-O fallback chama `processarComIARestrita`, mas esse prompt diz **"PROIBIDO inventar titulos que NAO estao na lista acima"** - e a lista esta vazia. A IA obedece e retorna 0 entregas.
+## O que será implementado
 
-## Solucao
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-Adicionar uma funcao `processarDocumentoLivre` no edge function `processar-documentos-business` com um prompt de IA **permissivo** que extrai modulos/secoes como entregas quando o pre-parser nao encontra nenhuma ancora. Essa funcao sera chamada no bloco de fallback (linhas 1500-1507) quando `ancoras.fases.length === 0 && ancoras.entregas.length === 0`.
+## Estratégia técnica
 
-### Alteracoes no edge function `supabase/functions/processar-documentos-business/index.ts`
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
 
-1. **Nova funcao `processarDocumentoLivre`** (~linha 958, antes do handler principal):
-   - Prompt que instrui a IA a **extrair** (nao inventar) modulos, secoes e requisitos do documento
-   - Identifica secoes como "Modulo 01 - Central da Holding", "Modulo 02 - Motor de Teses" etc.
-   - Cada modulo/secao vira uma entrega, cada sub-item vira uma instrucao
-   - Mantém restricoes contra invencao de conteudo generico, mas permite extrair titulos literais do documento
+### Ajustes no `handleFileUpload`
 
-2. **Alterar bloco de fallback** (linhas 1500-1507):
-   - Quando nao ha ancoras E o texto tem tamanho significativo (>500 chars), chamar `processarDocumentoLivre` em vez de `processarComIARestrita` com ancoras vazias
-
-### Prompt da funcao livre (resumo)
-
-```
-Voce e um EXTRATOR de estrutura de documentos tecnicos.
-O documento abaixo descreve um sistema/projeto. Extraia:
-- Modulos/secoes principais como ETAPAS
-- Sub-modulos ou funcionalidades como ENTREGAS  
-- Requisitos ou itens detalhados como INSTRUCOES
-
-REGRAS:
-- Use APENAS titulos e descricoes que existem no documento
-- NAO invente, NAO resuma, NAO parafraseie
-- Copie os titulos EXATAMENTE como estao no texto
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
 ```
 
-Isso resolve o caso de documentos HTML ricos que tem estrutura semantica mas nao usam os marcadores `FASE/ENTREGA/PASSO` do formato padrao.
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
 
+Isso evita chaves inválidas com `+`, acentos e símbolos.
+
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
