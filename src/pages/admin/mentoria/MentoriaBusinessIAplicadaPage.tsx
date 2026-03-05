@@ -341,42 +341,7 @@ export default function MentoriaBusinessIAplicadaPage() {
             )}
           </TabsContent>
 
-          {/* Aba Instruções */}
-          <TabsContent value="instrucoes" className="space-y-4 mt-4">
-            {contrato?.id ? (
-              <InstrucoesBusinessManager 
-                contratoId={contrato.id}
-                userId={selectedUserId}
-                userName={selectedUser?.nome_completo}
-              />
-            ) : (
-              <Card className="border-border/50">
-                <CardContent className="py-10 text-center">
-                  <ListChecks className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-                  <p className="font-medium">Crie um contrato primeiro</p>
-                  <p className="text-sm text-muted-foreground">Para ver as instruções, crie o contrato na aba "Contrato"</p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
 
-          {/* Aba Tasks */}
-          <TabsContent value="tasks" className="space-y-4 mt-4">
-            {contrato?.id ? (
-              <TasksBusinessManager 
-                contratoId={contrato.id} 
-                userId={selectedUserId} 
-              />
-            ) : (
-              <Card className="border-border/50">
-                <CardContent className="py-10 text-center">
-                  <ClipboardCheck className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-                  <p className="font-medium">Crie um contrato primeiro</p>
-                  <p className="text-sm text-muted-foreground">Para gerenciar tasks, crie o contrato na aba "Contrato"</p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
 
           {/* Aba Documentos */}
           <TabsContent value="documentos" className="space-y-4 mt-4">
