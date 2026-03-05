@@ -247,7 +247,7 @@ export function ContratoAditivoSection({
         {/* Preview das alterações */}
         {resultado && (
           <div className="space-y-4">
-            <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+            <div className="p-3 rounded-lg bg-accent/50 border border-accent">
               <p className="text-sm font-medium mb-1">📋 Resumo das Alterações:</p>
               <p className="text-sm text-muted-foreground">{resultado.resumo_alteracoes}</p>
             </div>
