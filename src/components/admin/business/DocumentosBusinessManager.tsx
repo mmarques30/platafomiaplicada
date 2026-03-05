@@ -243,7 +243,7 @@ export function DocumentosBusinessManager({ contratoId, userId, userName }: Docu
                     id="file-upload"
                     className="hidden"
                     onChange={handleFileUpload}
-                    accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.pptx,.ppt"
+                    accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.pptx,.ppt,.html,.htm"
                     disabled={uploadingFile}
                   />
                   <Button
