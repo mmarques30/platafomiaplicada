@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Key, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 import { useUpdateUser, useResetUserPassword } from "@/hooks/admin/useUsers";
 import { useUserSkillsMembro, useUpdateUserSkillsMembro, useRemoveUserSkillsMembro } from "@/hooks/admin/useEquipesSkillsAdmin";
 import { Card } from "@/components/ui/card";
@@ -82,6 +84,29 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
     papelEquipe: "membro",
   });
   const [cargo, setCargo] = useState("");
+  const [nomeEmpresa, setNomeEmpresa] = useState("");
+
+  // Buscar nome_empresa do contrato business
+  const { data: contratoBusiness } = useQuery({
+    queryKey: ["contrato-business-nome", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("contratos_business")
+        .select("id, nome_empresa")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  useEffect(() => {
+    if (contratoBusiness) {
+      setNomeEmpresa(contratoBusiness.nome_empresa || "");
+    } else {
+      setNomeEmpresa("");
+    }
+  }, [contratoBusiness]);
 
   useEffect(() => {
     if (user) {
@@ -163,6 +188,15 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       });
     }
 
+    // Atualizar nome_empresa no contrato business
+    const isBusinessPlan = selectedPlano === "business_parceria" || selectedPlano === "business_sistemas";
+    if (isBusinessPlan && contratoBusiness?.id) {
+      await supabase
+        .from("contratos_business")
+        .update({ nome_empresa: nomeEmpresa || null })
+        .eq("id", contratoBusiness.id);
+    }
+
     onOpenChange(false);
   };
 
@@ -234,6 +268,22 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                   <Label htmlFor="linkedin">LinkedIn</Label>
                   <Input id="linkedin" {...register("linkedin")} placeholder="https://linkedin.com/in/..." />
                 </div>
+
+                {/* Nome da Empresa - visível para planos Business */}
+                {(selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") && (
+                  <div>
+                    <Label htmlFor="nome_empresa">Nome da Empresa (exibição no projeto)</Label>
+                    <Input
+                      id="nome_empresa"
+                      value={nomeEmpresa}
+                      onChange={(e) => setNomeEmpresa(e.target.value)}
+                      placeholder="Nome fantasia / nome curto para exibição"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Este nome aparece no título "Projeto [Nome]"
+                    </p>
+                  </div>
+                )}
               </div>
             </TabsContent>
 
