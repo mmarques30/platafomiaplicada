@@ -24,9 +24,12 @@ export default function MeuSistemaEntregas() {
   const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
+  const [emblaRefVideos, emblaApiVideos] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const scrollPrevVideos = useCallback(() => emblaApiVideos?.scrollPrev(), [emblaApiVideos]);
+  const scrollNextVideos = useCallback(() => emblaApiVideos?.scrollNext(), [emblaApiVideos]);
 
   const isLoading = loadingContrato || loadingEntregas;
 
@@ -170,16 +173,14 @@ export default function MeuSistemaEntregas() {
             <h2 className="text-lg font-semibold text-foreground">Telas do Sistema</h2>
             <Badge variant="secondary" className="text-xs">{telas.length}</Badge>
           </div>
-          {telas.length > 1 && (
-            <div className="flex items-center gap-1">
-              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollPrev}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollNext}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollPrev}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollNext}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         {telas.length > 0 ? (
           <div className="overflow-hidden" ref={emblaRef}>
@@ -241,82 +242,104 @@ export default function MeuSistemaEntregas() {
 
       {/* Vídeos de Instrução */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-foreground">Vídeos de Instrução</h2>
-          <Badge variant="secondary" className="text-xs">{videos.length}</Badge>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Vídeos de Instrução</h2>
+            <Badge variant="secondary" className="text-xs">{videos.length}</Badge>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollPrevVideos}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollNextVideos}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         {videos.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {videos.map((video) => (
-              <Card
-                key={video.id}
-                className="cursor-pointer border-border/50 overflow-hidden hover:shadow-lg transition-shadow"
-                onClick={() => setSelectedVideo(video)}
-              >
-                <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
-                  {video.thumbnail_url ? (
-                    <div className="relative w-full h-full">
-                      <img
-                        src={video.thumbnail_url}
-                        alt={video.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <div className="rounded-full bg-white/90 p-3 shadow-lg">
-                          <Play className="h-6 w-6 text-primary fill-primary" />
+          <div className="overflow-hidden" ref={emblaRefVideos}>
+            <div className="flex gap-4">
+              {videos.map((video) => (
+                <motion.div
+                  key={video.id}
+                  className="flex-none w-[280px] md:w-[320px]"
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  <Card
+                    className="cursor-pointer border-border/50 overflow-hidden hover:shadow-lg transition-shadow"
+                    onClick={() => setSelectedVideo(video)}
+                  >
+                    <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
+                      {video.thumbnail_url ? (
+                        <div className="relative w-full h-full">
+                          <img
+                            src={video.thumbnail_url}
+                            alt={video.titulo}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                            <div className="rounded-full bg-white/90 p-3 shadow-lg">
+                              <Play className="h-6 w-6 text-primary fill-primary" />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ) : video.video_url && isGoogleDriveUrl(video.video_url) ? (
-                    <div className="relative w-full h-full">
-                      <iframe
-                        src={getGoogleDriveEmbedUrl(video.video_url) || ""}
-                        className="w-full h-full pointer-events-none"
-                        allow="autoplay"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <div className="rounded-full bg-white/90 p-3 shadow-lg">
-                          <Play className="h-6 w-6 text-primary fill-primary" />
+                      ) : video.video_url && isGoogleDriveUrl(video.video_url) ? (
+                        <div className="relative w-full h-full">
+                          <iframe
+                            src={getGoogleDriveEmbedUrl(video.video_url) || ""}
+                            className="w-full h-full pointer-events-none"
+                            allow="autoplay"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <div className="rounded-full bg-white/90 p-3 shadow-lg">
+                              <Play className="h-6 w-6 text-primary fill-primary" />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted">
-                      <div className="text-center">
-                        <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
-                        <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
-                      </div>
-                    </div>
-                  )}
-                </Lens>
-                <CardContent className="p-3">
-                  <p className="font-medium text-sm text-foreground truncate">{video.titulo}</p>
-                  {video.descricao && (
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{video.descricao}</p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted">
+                          <div className="text-center">
+                            <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
+                            <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
+                          </div>
+                        </div>
+                      )}
+                    </Lens>
+                    <CardContent className="p-3">
+                      <p className="font-medium text-sm text-foreground truncate">{video.titulo}</p>
+                      {video.descricao && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{video.descricao}</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="opacity-50 pointer-events-none">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="border-border/50 overflow-hidden">
-                  <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
-                    <div className="w-full h-full flex items-center justify-center bg-muted">
-                      <div className="text-center">
-                        <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
-                        <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
-                      </div>
-                    </div>
-                  </Lens>
-                  <CardContent className="p-3">
-                    <p className="font-medium text-sm text-foreground truncate">Vídeo de exemplo {i}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">Descrição do vídeo de instrução</p>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="overflow-hidden">
+              <div className="flex gap-4">
+                {[1, 2, 3].map((i) => (
+                  <motion.div key={i} className="flex-none w-[280px] md:w-[320px]">
+                    <Card className="border-border/50 overflow-hidden">
+                      <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
+                        <div className="w-full h-full flex items-center justify-center bg-muted">
+                          <div className="text-center">
+                            <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
+                            <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
+                          </div>
+                        </div>
+                      </Lens>
+                      <CardContent className="p-3">
+                        <p className="font-medium text-sm text-foreground truncate">Vídeo de exemplo {i}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">Descrição do vídeo de instrução</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
             </div>
             <p className="text-xs text-center text-muted-foreground mt-3">Nenhum vídeo de instrução ainda.</p>
           </div>
