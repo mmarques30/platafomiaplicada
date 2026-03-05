@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Key, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 import { useUpdateUser, useResetUserPassword } from "@/hooks/admin/useUsers";
 import { useUserSkillsMembro, useUpdateUserSkillsMembro, useRemoveUserSkillsMembro } from "@/hooks/admin/useEquipesSkillsAdmin";
 import { Card } from "@/components/ui/card";
@@ -82,6 +84,29 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
     papelEquipe: "membro",
   });
   const [cargo, setCargo] = useState("");
+  const [nomeEmpresa, setNomeEmpresa] = useState("");
+
+  // Buscar nome_empresa do contrato business
+  const { data: contratoBusiness } = useQuery({
+    queryKey: ["contrato-business-nome", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("contratos_business")
+        .select("id, nome_empresa")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  useEffect(() => {
+    if (contratoBusiness) {
+      setNomeEmpresa(contratoBusiness.nome_empresa || "");
+    } else {
+      setNomeEmpresa("");
+    }
+  }, [contratoBusiness]);
 
   useEffect(() => {
     if (user) {
