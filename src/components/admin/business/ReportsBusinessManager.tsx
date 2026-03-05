@@ -9,8 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useContratosBusiness, ReportBusiness } from "@/hooks/useContratosBusiness";
 import { useReportsBusinessMutations } from "@/hooks/useReportsBusinessMutations";
-import { GerarReportIAModal } from "./GerarReportIAModal";
-import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning, Sparkles, Eye, TrendingUp, ListChecks, Video, CheckCircle } from "lucide-react";
+import { ExportarDadosProjetoModal } from "./ExportarDadosProjetoModal";
+import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning, Eye, TrendingUp, ListChecks, Video, CheckCircle, Download } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -24,7 +24,7 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
   const { reports, isLoading: isLoadingReports, createReport, updateReport, deleteReport } = useReportsBusinessMutations(contrato?.id);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [gerarIAModalOpen, setGerarIAModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [htmlPreviewOpen, setHtmlPreviewOpen] = useState(false);
   const [selectedHtml, setSelectedHtml] = useState<string | null>(null);
   const [editingReport, setEditingReport] = useState<ReportBusiness | null>(null);
@@ -130,9 +130,9 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setGerarIAModalOpen(true)}>
-                <Sparkles className="h-4 w-4 mr-2" />
-                Gerar via IA
+              <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)}>
+                <Download className="h-4 w-4 mr-2" />
+                Exportar Dados
               </Button>
               <Button size="sm" onClick={() => handleOpenModal()}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -277,13 +277,13 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
         </CardContent>
       </Card>
 
-      {/* Modal de Geração via IA */}
-      <GerarReportIAModal
-        open={gerarIAModalOpen}
-        onOpenChange={setGerarIAModalOpen}
-        contratoId={contrato.id}
+      {/* Modal de Exportação de Dados */}
+      <ExportarDadosProjetoModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        contrato={contrato}
         userId={userId}
-        onSuccess={() => {}}
+        userName={userName}
       />
 
       {/* Modal de Preview HTML */}
