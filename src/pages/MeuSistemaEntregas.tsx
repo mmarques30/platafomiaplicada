@@ -203,7 +203,7 @@ export default function MeuSistemaEntregas() {
               {telas.map((tela) => (
                 <motion.div
                   key={tela.id}
-                  className="flex-none w-[300px] md:w-[360px]"
+                  className="flex-none w-[240px] md:w-[300px] lg:w-[340px]"
                   whileHover={{ scale: 1.02, y: -4 }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 >
@@ -237,7 +237,7 @@ export default function MeuSistemaEntregas() {
             <div className="overflow-hidden">
               <div className="flex gap-4">
                 {[1, 2, 3].map((i) => (
-                  <motion.div key={i} className="flex-none w-[300px] md:w-[360px]">
+                  <motion.div key={i} className="flex-none w-[240px] md:w-[300px] lg:w-[340px]">
                     <div className="relative rounded-xl overflow-hidden shadow-md border border-border/50">
                       <div className="aspect-video bg-muted flex items-center justify-center">
                         <Monitor className="h-10 w-10 text-muted-foreground/40" />
@@ -277,7 +277,7 @@ export default function MeuSistemaEntregas() {
               {videos.map((video) => (
                 <motion.div
                   key={video.id}
-                  className="flex-none w-[280px] md:w-[320px]"
+                  className="flex-none w-[220px] md:w-[280px] lg:w-[320px]"
                   whileHover={{ scale: 1.02, y: -4 }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 >
@@ -337,7 +337,7 @@ export default function MeuSistemaEntregas() {
             <div className="overflow-hidden">
               <div className="flex gap-4">
                 {[1, 2, 3].map((i) => (
-                  <motion.div key={i} className="flex-none w-[280px] md:w-[320px]">
+                  <motion.div key={i} className="flex-none w-[220px] md:w-[280px] lg:w-[320px]">
                     <Card className="border-border/50 overflow-hidden">
                       <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
                         <div className="w-full h-full flex items-center justify-center bg-muted">

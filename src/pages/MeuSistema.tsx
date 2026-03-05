@@ -31,7 +31,7 @@ const MeuSistema = () => {
 
   if (isLoading) {
     return (
-      <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6">
+      <div className="py-6 md:py-8 px-4 md:px-6 space-y-6">
         <Skeleton className="h-10 w-64" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -48,7 +48,7 @@ const MeuSistema = () => {
 
   if (!contrato) {
     return (
-      <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6">
+      <div className="py-6 md:py-8 px-4 md:px-6 space-y-6">
         <PageTitle primary="Meu Projeto" icon={<Monitor className="h-7 w-7 text-primary" />} />
         <p className="text-muted-foreground">
           Nenhum contrato ativo encontrado. Entre em contato com a equipe para mais informações.
@@ -58,7 +58,7 @@ const MeuSistema = () => {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-8">
+    <div className="py-6 md:py-8 px-4 md:px-6 space-y-8">
       {/* Header */}
       <div>
         <PageTitle
