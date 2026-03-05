@@ -171,28 +171,8 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
                       {report.descricao && (
                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{report.descricao}</p>
                       )}
-                      
-                      {/* Métricas inline para reports gerados por IA */}
-                      {report.gerado_por_ia && report.metricas && (
-                        <div className="flex items-center gap-4 mt-2 text-xs">
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <TrendingUp className="h-3 w-3" />
-                            Etapas: {(report.metricas as any)?.etapas?.percentual || 0}%
-                          </span>
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <CheckCircle className="h-3 w-3" />
-                            Entregas: {(report.metricas as any)?.entregas?.concluidas || 0}/{(report.metricas as any)?.entregas?.total || 0}
-                          </span>
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <ListChecks className="h-3 w-3" />
-                            Tarefas: {(report.metricas as any)?.tarefas?.concluidas || 0}
-                          </span>
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <Video className="h-3 w-3" />
-                            Vídeos: {(report.metricas as any)?.videos_assistidos || 0}
-                          </span>
-                        </div>
-                      )}
+
+
                       
                       <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
