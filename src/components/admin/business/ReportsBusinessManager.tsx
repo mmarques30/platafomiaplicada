@@ -9,8 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useContratosBusiness, ReportBusiness } from "@/hooks/useContratosBusiness";
 import { useReportsBusinessMutations } from "@/hooks/useReportsBusinessMutations";
-import { GerarReportIAModal } from "./GerarReportIAModal";
-import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning, Sparkles, Eye, TrendingUp, ListChecks, Video, CheckCircle } from "lucide-react";
+import { ExportarDadosProjetoModal } from "./ExportarDadosProjetoModal";
+import { Plus, FileText, Pencil, Trash2, Calendar, ExternalLink, Loader2, FileWarning, Eye, Download } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -24,7 +24,7 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
   const { reports, isLoading: isLoadingReports, createReport, updateReport, deleteReport } = useReportsBusinessMutations(contrato?.id);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [gerarIAModalOpen, setGerarIAModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [htmlPreviewOpen, setHtmlPreviewOpen] = useState(false);
   const [selectedHtml, setSelectedHtml] = useState<string | null>(null);
   const [editingReport, setEditingReport] = useState<ReportBusiness | null>(null);
@@ -130,9 +130,9 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setGerarIAModalOpen(true)}>
-                <Sparkles className="h-4 w-4 mr-2" />
-                Gerar via IA
+              <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)}>
+                <Download className="h-4 w-4 mr-2" />
+                Exportar Dados
               </Button>
               <Button size="sm" onClick={() => handleOpenModal()}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -160,49 +160,19 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
                   className="flex items-start justify-between p-4 rounded-lg border bg-card hover:shadow-sm transition-shadow"
                 >
                   <div className="flex items-start gap-4 flex-1">
-                    <div className={`p-2 rounded-lg ${report.gerado_por_ia ? 'bg-primary/10' : 'bg-muted'}`}>
-                      {report.gerado_por_ia ? (
-                        <Sparkles className="h-4 w-4 text-primary" />
-                      ) : (
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                      )}
+                    <div className="p-2 rounded-lg bg-muted">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="font-medium text-sm">{report.titulo}</h4>
-                        {report.gerado_por_ia && (
-                          <Badge variant="secondary" className="text-[10px] gap-1">
-                            <Sparkles className="h-2.5 w-2.5" />
-                            IA
-                          </Badge>
-                        )}
                       </div>
                       
                       {report.descricao && (
                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{report.descricao}</p>
                       )}
-                      
-                      {/* Métricas inline para reports gerados por IA */}
-                      {report.gerado_por_ia && report.metricas && (
-                        <div className="flex items-center gap-4 mt-2 text-xs">
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <TrendingUp className="h-3 w-3" />
-                            Etapas: {(report.metricas as any)?.etapas?.percentual || 0}%
-                          </span>
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <CheckCircle className="h-3 w-3" />
-                            Entregas: {(report.metricas as any)?.entregas?.concluidas || 0}/{(report.metricas as any)?.entregas?.total || 0}
-                          </span>
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <ListChecks className="h-3 w-3" />
-                            Tarefas: {(report.metricas as any)?.tarefas?.concluidas || 0}
-                          </span>
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <Video className="h-3 w-3" />
-                            Vídeos: {(report.metricas as any)?.videos_assistidos || 0}
-                          </span>
-                        </div>
-                      )}
+
+
                       
                       <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
@@ -277,13 +247,13 @@ export function ReportsBusinessManager({ userId, userName }: ReportsBusinessMana
         </CardContent>
       </Card>
 
-      {/* Modal de Geração via IA */}
-      <GerarReportIAModal
-        open={gerarIAModalOpen}
-        onOpenChange={setGerarIAModalOpen}
-        contratoId={contrato.id}
+      {/* Modal de Exportação de Dados */}
+      <ExportarDadosProjetoModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        contrato={contrato}
         userId={userId}
-        onSuccess={() => {}}
+        userName={userName}
       />
 
       {/* Modal de Preview HTML */}

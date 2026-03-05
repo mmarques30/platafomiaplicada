@@ -1,39 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Substituir "Gerar via IA" por "Exportar Dados do Projeto" na aba Reports
+## Diagnóstico encontrado
 
-## Contexto
-Na aba Reports do Business iAplicada/Sistemas, existe um botão "Gerar via IA" que chama uma edge function para gerar reports automaticamente. O usuário quer remover essa funcionalidade de IA e substituir por uma exportação de todos os dados do projeto em formato documento (texto/markdown), para que o report seja gerado em outra plataforma.
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-## Mudanças
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-### 1. Remover botão "Gerar via IA" e modal de geração IA
-**Arquivo:** `src/components/admin/business/ReportsBusinessManager.tsx`
-- Remover import e uso do `GerarReportIAModal`
-- Remover estado `gerarIAModalOpen` e o botão "Gerar via IA"
-- Remover renderização do componente `GerarReportIAModal`
-- Adicionar botão "Exportar Dados" que coleta todas as informações do projeto (contrato, etapas, entregas, processos, telas, vídeos, sessões) e gera um arquivo de texto/markdown para download
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-### 2. Criar função de exportação de dados
-No mesmo arquivo, implementar função que:
-- Busca dados do contrato (nome, módulos, valores, datas)
-- Busca etapas e seu status
-- Busca entregas e progresso
-- Busca processos mapeados
-- Busca telas do sistema
-- Busca vídeos de instrução
-- Busca sessões/reuniões
-- Compila tudo em um documento markdown estruturado
-- Faz download como arquivo `.md` ou `.txt`
+## O que será implementado
 
-### 3. Criar componente `ExportarDadosProjetoModal`
-**Novo arquivo:** `src/components/admin/business/ExportarDadosProjetoModal.tsx`
-- Modal com preview dos dados que serão exportados
-- Botão para copiar para clipboard e/ou baixar como arquivo
-- Formato estruturado com seções: Contrato, Etapas, Entregas, Processos, Telas, Vídeos, Sessões
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-### Arquivos impactados
-- `src/components/admin/business/ReportsBusinessManager.tsx` — remover IA, adicionar exportação
-- `src/components/admin/business/ExportarDadosProjetoModal.tsx` — novo componente
-- `src/components/admin/business/GerarReportIAModal.tsx` — pode ser mantido mas não será mais usado neste contexto
+## Estratégia técnica
 
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
+
+### Ajustes no `handleFileUpload`
+
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
+```
+
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
+
+Isso evita chaves inválidas com `+`, acentos e símbolos.
+
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
