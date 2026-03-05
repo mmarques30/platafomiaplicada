@@ -1,70 +1,22 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Telas do Sistema — Formato imagem clean com título sobre a imagem
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Mudança
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+Remover a barra de título separada na parte inferior dos cards de "Telas do Sistema". O título deve aparecer **sobre a imagem** com um gradiente sutil, sempre visível, sem descrição abaixo.
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+### Cards com dados (lines 211-221)
+- Remover o overlay de hover separado (lines 211-217) e a barra inferior (lines 218-221)
+- Substituir por um único gradiente `from-black/60 to-transparent` sempre visível na parte inferior, com o título em branco sobre ele
+- Sem descrição
 
-## O que será implementado
+### Cards placeholder (lines 237-239)
+- Mesmo tratamento: título sobre a imagem com gradiente, sem barra separada
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+### Dialog de tela (lines 340-360 aprox)
+- Remover a exibição de `descricao` no dialog também, manter apenas imagem + botão de acesso
 
-## Estratégia técnica
+## Arquivo
+- **Editar:** `src/pages/MeuSistemaEntregas.tsx`
 
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
-
-### Ajustes no `handleFileUpload`
-
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
-```
-
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
-
-Isso evita chaves inválidas com `+`, acentos e símbolos.
-
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
