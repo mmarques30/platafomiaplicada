@@ -22,6 +22,7 @@ export default function MeuSistemaEntregas() {
 
   const [selectedTela, setSelectedTela] = useState<any | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
+  const [showAllProcessos, setShowAllProcessos] = useState(false);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
   const [emblaRefVideos, emblaApiVideos] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
