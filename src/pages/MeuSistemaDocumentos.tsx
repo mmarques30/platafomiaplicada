@@ -93,7 +93,7 @@ export default function MeuSistemaDocumentos() {
     v != null ? v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—";
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
+    <div className="p-4 md:p-6 space-y-6">
       <PageTitle primary="Documentos" />
 
       {/* Reports */}
