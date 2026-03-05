@@ -75,9 +75,12 @@ export default function MeuSistemaEntregas() {
 
       {/* Processos Mapeados */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-foreground">Processos Mapeados</h2>
-          <Badge variant="secondary" className="text-xs">{processos.length}</Badge>
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Processos Mapeados</h2>
+            <Badge variant="secondary" className="text-xs">{processos.length}</Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">Instruções de trabalho · SOPs</p>
         </div>
         {processos.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2">

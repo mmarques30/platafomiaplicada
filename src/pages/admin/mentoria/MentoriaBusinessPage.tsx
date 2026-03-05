@@ -34,6 +34,7 @@ import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { EntregasBusinessManager } from "@/components/admin/business/EntregasBusinessManager";
+import { ProcessosMapeadosManager } from "@/components/admin/business/ProcessosMapeadosManager";
 
 export default function MentoriaBusinessPage() {
   const navigate = useNavigate();
