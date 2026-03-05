@@ -76,7 +76,6 @@ export default function MeuSistemaEntregas() {
       {/* Processos Mapeados */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <ClipboardList className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-foreground">Processos Mapeados</h2>
           <Badge variant="secondary" className="text-xs">{processos.length}</Badge>
         </div>
@@ -131,7 +130,6 @@ export default function MeuSistemaEntregas() {
       {/* Telas do Sistema */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <Monitor className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-foreground">Telas do Sistema</h2>
           <Badge variant="secondary" className="text-xs">{telas.length}</Badge>
         </div>
@@ -186,7 +184,6 @@ export default function MeuSistemaEntregas() {
       {/* Vídeos de Instrução */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <Video className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-foreground">Vídeos de Instrução</h2>
           <Badge variant="secondary" className="text-xs">{videos.length}</Badge>
         </div>
