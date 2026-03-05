@@ -259,6 +259,22 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                   <Label htmlFor="linkedin">LinkedIn</Label>
                   <Input id="linkedin" {...register("linkedin")} placeholder="https://linkedin.com/in/..." />
                 </div>
+
+                {/* Nome da Empresa - visível para planos Business */}
+                {(selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") && (
+                  <div>
+                    <Label htmlFor="nome_empresa">Nome da Empresa (exibição no projeto)</Label>
+                    <Input
+                      id="nome_empresa"
+                      value={nomeEmpresa}
+                      onChange={(e) => setNomeEmpresa(e.target.value)}
+                      placeholder="Nome fantasia / nome curto para exibição"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Este nome aparece no título "Projeto [Nome]"
+                    </p>
+                  </div>
+                )}
               </div>
             </TabsContent>
 
