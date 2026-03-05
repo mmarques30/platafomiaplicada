@@ -49,7 +49,7 @@ const MeuSistema = () => {
   if (!contrato) {
     return (
       <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6">
-        <PageTitle primary="Meu Sistema" icon={<Monitor className="h-7 w-7 text-primary" />} />
+        <PageTitle primary="Meu Projeto" icon={<Monitor className="h-7 w-7 text-primary" />} />
         <p className="text-muted-foreground">
           Nenhum contrato ativo encontrado. Entre em contato com a equipe para mais informações.
         </p>
@@ -62,11 +62,11 @@ const MeuSistema = () => {
       {/* Header */}
       <div>
         <PageTitle
-          primary={`Gestão ${contrato.nome_empresa || "Sistema"}`}
+          primary={`Projeto ${contrato.nome_empresa || ""}`}
         />
         {contrato.nome_empresa && (
           <p className="text-muted-foreground mt-1">
-            Acompanhe o progresso do seu sistema em tempo real
+            Acompanhe o progresso do seu projeto em tempo real
           </p>
         )}
       </div>
