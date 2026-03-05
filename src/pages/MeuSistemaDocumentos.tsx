@@ -103,10 +103,7 @@ export default function MeuSistemaDocumentos() {
       {/* Reports */}
       {reports.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            Reports
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground">Reports</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {reports.map((report) => (
               <Card key={report.id} className="border-border/50">
@@ -155,47 +152,73 @@ export default function MeuSistemaDocumentos() {
         </section>
       )}
 
-      {/* Documentos */}
+      {/* Documentos do Projeto - Tabela */}
       {documentos.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            Documentos do Contrato
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {documentos.map((doc) => (
-              <Card key={doc.id} className="border-border/50">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">{doc.titulo}</p>
-                      <p className="text-xs text-muted-foreground">{formatDate(doc.created_at)}</p>
-                    </div>
-                    <Badge variant={tipoBadgeVariant[doc.tipo] || "secondary"} className="text-[10px] shrink-0">
-                      {tipoLabel[doc.tipo] || doc.tipo}
-                    </Badge>
-                  </div>
-                  {doc.arquivo_url && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs h-7 mt-2"
-                      onClick={() => handleDownloadDoc(doc.arquivo_url!, doc.titulo)}
-                    >
-                      <Download className="h-3 w-3 mr-1" /> Baixar
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-lg font-semibold text-foreground">Documentos do Projeto</h2>
+            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+              <SelectTrigger className="w-[160px] h-8 text-xs">
+                <SelectValue placeholder="Filtrar tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                {Object.entries(tipoLabel).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+          <Card className="border-border/50">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead className="text-right">Ação</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {documentosFiltrados.map((doc) => (
+                  <TableRow key={doc.id}>
+                    <TableCell className="font-medium text-sm">{doc.titulo}</TableCell>
+                    <TableCell>
+                      <Badge variant={tipoBadgeVariant[doc.tipo] || "secondary"} className="text-[10px]">
+                        {tipoLabel[doc.tipo] || doc.tipo}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{formatDate(doc.created_at)}</TableCell>
+                    <TableCell className="text-right">
+                      {doc.arquivo_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs h-7"
+                          onClick={() => handleDownloadDoc(doc.arquivo_url!, doc.titulo)}
+                        >
+                          <Download className="h-3 w-3 mr-1" /> Baixar
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {documentosFiltrados.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground py-6">
+                      Nenhum documento encontrado para este filtro.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
         </section>
       )}
 
       {reports.length === 0 && documentos.length === 0 && (
         <Card className="border-dashed">
           <CardContent className="p-8 text-center text-muted-foreground">
-            <FileText className="h-10 w-10 mx-auto mb-3 opacity-40" />
             <p>Nenhum documento ou report disponível ainda.</p>
           </CardContent>
         </Card>
@@ -205,10 +228,7 @@ export default function MeuSistemaDocumentos() {
       <Collapsible open={contratoOpen} onOpenChange={setContratoOpen}>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" className="w-full justify-between text-foreground hover:bg-accent/50 h-auto py-3">
-            <span className="flex items-center gap-2 font-semibold">
-              <Building2 className="h-5 w-5 text-primary" />
-              Dados do Contrato
-            </span>
+            <span className="text-lg font-semibold">Dados do Contrato</span>
             {contratoOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </CollapsibleTrigger>
