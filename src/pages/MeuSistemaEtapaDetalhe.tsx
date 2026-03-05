@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Target, Calendar, CheckCircle2, Clock, PlayCircle, AlertCircle, TrendingUp, Zap, Package } from "lucide-react";
+import { ArrowLeft, Calendar, CheckCircle2, Clock, PlayCircle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -105,8 +105,7 @@ export default function MeuSistemaEtapaDetalhe() {
       {etapa.objetivo && (
         <Card className="border-primary/20 bg-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Target className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base">
               Sobre esta Fase
             </CardTitle>
           </CardHeader>
@@ -119,10 +118,9 @@ export default function MeuSistemaEtapaDetalhe() {
       {/* Projeção de Execução */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            Projeção de Execução
-          </CardTitle>
+            <CardTitle className="text-base">
+              Projeção de Execução
+            </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -168,8 +166,7 @@ export default function MeuSistemaEtapaDetalhe() {
       {marcos && marcos.length > 0 && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base">
               Impacto e Necessidade
             </CardTitle>
           </CardHeader>
@@ -191,8 +188,7 @@ export default function MeuSistemaEtapaDetalhe() {
       {/* Entregas Previstas (somente leitura) */}
       {entregas && entregas.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-base font-semibold flex items-center gap-2">
-            <Package className="h-4 w-4 text-primary" />
+          <h2 className="text-base font-semibold">
             Entregas Previstas ({entregas.length})
           </h2>
           <div className="space-y-2">
@@ -241,7 +237,7 @@ export default function MeuSistemaEtapaDetalhe() {
       {(!entregas || entregas.length === 0) && (
         <Card className="border-dashed">
           <CardContent className="py-10 text-center">
-            <Package className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+            <Clock className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
             <p className="text-sm text-muted-foreground">Nenhuma entrega cadastrada para esta fase.</p>
           </CardContent>
         </Card>
