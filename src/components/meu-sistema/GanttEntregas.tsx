@@ -184,7 +184,7 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
         </CardHeader>
 
         <CardContent className="p-0">
-          <div className="flex border-t border-border" style={{ height: "420px" }}>
+          <div className="flex border-t border-border" style={{ height: "420px", background: "#FAFAF5" }}>
             {/* Sidebar */}
             <div
               className="flex-shrink-0 border-r border-border flex flex-col"
