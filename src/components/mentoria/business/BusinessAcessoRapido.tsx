@@ -8,6 +8,7 @@ import {
   CheckSquare,
   FolderOpen
 } from "lucide-react";
+import { useUserPlan } from "@/hooks/useUserPlan";
 
 interface QuickNavItem {
   title: string;
@@ -15,7 +16,7 @@ interface QuickNavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const navItems: QuickNavItem[] = [
+const allNavItems: QuickNavItem[] = [
   { title: "Diagnóstico", path: "/mentoria/diagnostico", icon: ClipboardCheck },
   { title: "Sessões", path: "/mentoria/sessoes", icon: Calendar },
   { title: "Etapas", path: "/mentoria/etapas-business", icon: Route },
@@ -25,8 +26,15 @@ const navItems: QuickNavItem[] = [
   { title: "Documentos", path: "/mentoria/documentos", icon: FolderOpen },
 ];
 
+const hiddenForSistemas = ["Instruções", "Tasks"];
+
 export function BusinessAcessoRapido() {
   const navigate = useNavigate();
+  const { isBusinessSistemas } = useUserPlan();
+  
+  const navItems = isBusinessSistemas
+    ? allNavItems.filter(item => !hiddenForSistemas.includes(item.title))
+    : allNavItems;
 
   return (
     <div className="bg-[#0D0D0D] rounded-xl p-4 mt-4 border border-white/10">
