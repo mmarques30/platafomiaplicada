@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, Sparkles, FolderOpen, Trash2 } from "lucide-react";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, Sparkles, FolderOpen, Trash2, Monitor } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +35,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { EntregasBusinessManager } from "@/components/admin/business/EntregasBusinessManager";
 import { ProcessosMapeadosManager } from "@/components/admin/business/ProcessosMapeadosManager";
+import { TelasSistemaManager } from "@/components/admin/business/TelasSistemaManager";
 
 export default function MentoriaBusinessIAplicadaPage() {
   const navigate = useNavigate();
@@ -194,6 +195,10 @@ export default function MentoriaBusinessIAplicadaPage() {
             <TabsTrigger value="processos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <FileText className="h-3.5 w-3.5" />
               Processos
+            </TabsTrigger>
+            <TabsTrigger value="telas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Monitor className="h-3.5 w-3.5" />
+              Telas
             </TabsTrigger>
             <TabsTrigger value="documentos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <FolderOpen className="h-3.5 w-3.5" />
@@ -360,6 +365,25 @@ export default function MentoriaBusinessIAplicadaPage() {
                   <FileText className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
                   <p className="font-medium">Crie um contrato primeiro</p>
                   <p className="text-sm text-muted-foreground">Para gerenciar processos, crie o contrato na aba "Contrato"</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Aba Telas */}
+          <TabsContent value="telas" className="space-y-4 mt-4">
+            {contrato?.id ? (
+              <TelasSistemaManager
+                contratoId={contrato.id}
+                userId={selectedUserId}
+                userName={selectedUser?.nome_completo}
+              />
+            ) : (
+              <Card className="border-border/50">
+                <CardContent className="py-10 text-center">
+                  <Monitor className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+                  <p className="font-medium">Crie um contrato primeiro</p>
+                  <p className="text-sm text-muted-foreground">Para gerenciar telas, crie o contrato na aba "Contrato"</p>
                 </CardContent>
               </Card>
             )}
