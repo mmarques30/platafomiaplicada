@@ -22,6 +22,7 @@ export default function MeuSistemaEntregas() {
 
   const [selectedTela, setSelectedTela] = useState<any | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
+  const [showAllProcessos, setShowAllProcessos] = useState(false);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
   const [emblaRefVideos, emblaApiVideos] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
@@ -89,77 +90,95 @@ export default function MeuSistemaEntregas() {
           <p className="text-xs text-muted-foreground mt-0.5">Instruções de trabalho · SOPs</p>
         </div>
         {processos.length > 0 ? (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {processos.map((p) => (
-              <Card key={p.id} className="border-border/50 hover:shadow-md transition-shadow">
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 shrink-0 rounded-lg bg-primary/10 p-2">
-                      {p.tipo === "link" ? (
-                        <ExternalLink className="h-4 w-4 text-primary" />
-                      ) : (
-                        <FileText className="h-4 w-4 text-primary" />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-sm text-foreground">{p.titulo}</p>
-                      {p.descricao && (
-                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{p.descricao}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs h-7"
-                      onClick={() => handleDownloadProcesso(p)}
-                    >
-                      {p.tipo === "link" ? (
-                        <><ExternalLink className="h-3 w-3 mr-1" /> Acessar</>
-                      ) : (
-                        <><FileText className="h-3 w-3 mr-1" /> Baixar</>
-                      )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="space-y-2">
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2 w-10">Tipo</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2">Título</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2 hidden sm:table-cell">Descrição</th>
+                    <th className="text-right font-medium text-muted-foreground px-4 py-2 w-24">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(showAllProcessos ? processos : processos.slice(0, 2)).map((p) => (
+                    <tr key={p.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="rounded-lg bg-primary/10 p-1.5 w-fit">
+                          {p.tipo === "link" ? (
+                            <ExternalLink className="h-4 w-4 text-primary" />
+                          ) : (
+                            <FileText className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-foreground">{p.titulo}</td>
+                      <td className="px-4 py-3 text-muted-foreground text-xs line-clamp-1 hidden sm:table-cell">{p.descricao || "—"}</td>
+                      <td className="px-4 py-3 text-right">
+                        <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => handleDownloadProcesso(p)}>
+                          {p.tipo === "link" ? (
+                            <><ExternalLink className="h-3 w-3 mr-1" /> Acessar</>
+                          ) : (
+                            <><FileText className="h-3 w-3 mr-1" /> Baixar</>
+                          )}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {processos.length > 2 && (
+              <div className="flex justify-center">
+                <Button variant="ghost" size="sm" className="text-xs" onClick={() => setShowAllProcessos(!showAllProcessos)}>
+                  {showAllProcessos ? "Ver menos" : `Ver mais (${processos.length - 2})`}
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="opacity-50 pointer-events-none">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                { titulo: "Processo de exemplo 1", tipo: "link", descricao: "Instrução de trabalho documentada" },
-                { titulo: "Processo de exemplo 2", tipo: "arquivo", descricao: "SOP do fluxo operacional" },
-              ].map((p, i) => (
-                <Card key={i} className="border-border/50">
-                  <CardContent className="p-4 space-y-2">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 shrink-0 rounded-lg bg-primary/10 p-2">
-                        {p.tipo === "link" ? (
-                          <ExternalLink className="h-4 w-4 text-primary" />
-                        ) : (
-                          <FileText className="h-4 w-4 text-primary" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm text-foreground">{p.titulo}</p>
-                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{p.descricao}</p>
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <Button variant="outline" size="sm" className="text-xs h-7" disabled>
-                        {p.tipo === "link" ? (
-                          <><ExternalLink className="h-3 w-3 mr-1" /> Acessar</>
-                        ) : (
-                          <><FileText className="h-3 w-3 mr-1" /> Baixar</>
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2 w-10">Tipo</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2">Título</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2 hidden sm:table-cell">Descrição</th>
+                    <th className="text-right font-medium text-muted-foreground px-4 py-2 w-24">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { titulo: "Processo de exemplo 1", tipo: "link", descricao: "Instrução de trabalho documentada" },
+                    { titulo: "Processo de exemplo 2", tipo: "arquivo", descricao: "SOP do fluxo operacional" },
+                  ].map((p, i) => (
+                    <tr key={i} className="border-b border-border/50 last:border-0">
+                      <td className="px-4 py-3">
+                        <div className="rounded-lg bg-primary/10 p-1.5 w-fit">
+                          {p.tipo === "link" ? (
+                            <ExternalLink className="h-4 w-4 text-primary" />
+                          ) : (
+                            <FileText className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-foreground">{p.titulo}</td>
+                      <td className="px-4 py-3 text-muted-foreground text-xs hidden sm:table-cell">{p.descricao}</td>
+                      <td className="px-4 py-3 text-right">
+                        <Button variant="outline" size="sm" className="text-xs h-7" disabled>
+                          {p.tipo === "link" ? (
+                            <><ExternalLink className="h-3 w-3 mr-1" /> Acessar</>
+                          ) : (
+                            <><FileText className="h-3 w-3 mr-1" /> Baixar</>
+                          )}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
             <p className="text-xs text-center text-muted-foreground mt-3">Nenhum processo mapeado ainda.</p>
           </div>
