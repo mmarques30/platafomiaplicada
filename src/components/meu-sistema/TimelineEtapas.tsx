@@ -72,7 +72,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
   return (
     <Card
       className="relative overflow-hidden rounded-xl border-0 p-6 md:p-8"
-      style={{ backgroundColor: brand[500] }}
+      style={{ backgroundColor: brand[100] }}
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
@@ -100,7 +100,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
       {/* Progress bar */}
       <div
         className="mb-10 relative h-2 w-full rounded-full overflow-hidden"
-        style={{ backgroundColor: `${brand[900]}15` }}
+        style={{ backgroundColor: brand[200] }}
       >
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
@@ -116,13 +116,13 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
         {/* Static track line */}
         <div
           className="absolute left-[15px] md:left-[19px] top-0 bottom-0 w-[2px]"
-          style={{ backgroundColor: `${brand[900]}15` }}
+          style={{ backgroundColor: brand[300] }}
         />
 
         {/* Animated beam */}
         <motion.div
           className="absolute left-[15px] md:left-[19px] top-0 w-[2px]"
-          style={{ backgroundColor: `${brand[900]}50`, height: beamHeight } as any}
+          style={{ backgroundColor: brand[700], height: beamHeight } as any}
         />
 
         {/* Timeline items */}
@@ -150,10 +150,9 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
                   {statusIcon[cfg] || statusIcon.pendente}
                 </div>
 
-                {/* Content card */}
                 <div
-                  className="flex-1 rounded-lg transition-colors p-4 mb-4 group-hover:brightness-95"
-                  style={{ backgroundColor: `${brand[400]}60` }}
+                  className="flex-1 rounded-lg transition-colors p-4 mb-4"
+                  style={{ backgroundColor: "#FFFFFF", border: `1px solid ${brand[300]}` }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -182,7 +181,7 @@ export function TimelineEtapas({ etapas, entregasPorEtapa, calcularProgressoEtap
                       <div className="mt-3 flex items-center gap-3">
                         <div
                           className="flex-1 h-1.5 rounded-full overflow-hidden"
-                          style={{ backgroundColor: `${brand[900]}12` }}
+                          style={{ backgroundColor: brand[200] }}
                         >
                           <motion.div
                             className="h-full rounded-full"
