@@ -1,38 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Ajustar Telas do Sistema — Carousel Card + Admin Manager
+## Diagnóstico encontrado
 
-## 1. Melhorar o carrossel de Telas (client view)
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-Refatorar a seção "Telas do Sistema" em `MeuSistemaEntregas.tsx` para um estilo inspirado no carousel-card do 21st.dev:
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-- Cards maiores com imagem screenshot em destaque (aspect-video, rounded, shadow)
-- Hover com scale sutil + elevação (framer-motion `whileHover`)
-- Overlay sutil com título sobre a imagem na parte inferior (gradiente escuro)
-- Navegação com botões prev/next nas laterais do carrossel (setas Embla)
-- Ao clicar no card, abre Dialog com:
-  - Screenshot em tamanho maior
-  - Título e descrição completa
-  - Botão "Acessar Sistema" com link externo (se houver `link_sistema`)
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-A implementação atual já tem o Dialog e o Embla. As mudanças são visuais: cards com overlay de título, setas de navegação, e estilo mais polido.
+## O que será implementado
 
-## 2. Criar admin manager `TelasSistemaManager.tsx`
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-Componente CRUD em `src/components/admin/business/TelasSistemaManager.tsx` para o admin gerenciar telas de cada contrato Business:
+## Estratégia técnica
 
-- Listar telas com thumbnail, título e descrição
-- Modal para criar/editar: título, descrição, screenshot (upload para bucket `contratos-business`), link do sistema (URL)
-- Reordenação por setas up/down
-- Excluir com confirmação
-- Seguir padrão visual do `ProcessosMapeadosManager`
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
 
-## 3. Adicionar aba "Telas" no admin Business
+### Ajustes no `handleFileUpload`
 
-Inserir aba "Telas" em `MentoriaBusinessPage.tsx` e `MentoriaBusinessIAplicadaPage.tsx`, renderizando o `TelasSistemaManager`.
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
+```
 
-## Arquivos
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
 
-- **Criar:** `src/components/admin/business/TelasSistemaManager.tsx`
-- **Editar:** `src/pages/MeuSistemaEntregas.tsx` (refatorar carrossel), `src/pages/admin/mentoria/MentoriaBusinessPage.tsx`, `src/pages/admin/mentoria/MentoriaBusinessIAplicadaPage.tsx`
+Isso evita chaves inválidas com `+`, acentos e símbolos.
 
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.
