@@ -237,7 +237,7 @@ export default function MeuSistemaEtapaDetalhe() {
       {(!entregas || entregas.length === 0) && (
         <Card className="border-dashed">
           <CardContent className="py-10 text-center">
-            <Package className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+            <Clock className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
             <p className="text-sm text-muted-foreground">Nenhuma entrega cadastrada para esta fase.</p>
           </CardContent>
         </Card>
