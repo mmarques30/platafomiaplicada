@@ -34,6 +34,7 @@ import { SessaoMentoria } from "@/hooks/useMentoriaSessoes";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { EntregasBusinessManager } from "@/components/admin/business/EntregasBusinessManager";
+import { ProcessosMapeadosManager } from "@/components/admin/business/ProcessosMapeadosManager";
 
 export default function MentoriaBusinessIAplicadaPage() {
   const navigate = useNavigate();
@@ -190,6 +191,10 @@ export default function MentoriaBusinessIAplicadaPage() {
               <FolderKanban className="h-3.5 w-3.5" />
               Entregas
             </TabsTrigger>
+            <TabsTrigger value="processos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <FileText className="h-3.5 w-3.5" />
+              Processos
+            </TabsTrigger>
             <TabsTrigger value="documentos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <FolderOpen className="h-3.5 w-3.5" />
               Documentos
@@ -341,6 +346,24 @@ export default function MentoriaBusinessIAplicadaPage() {
             )}
           </TabsContent>
 
+          {/* Aba Processos */}
+          <TabsContent value="processos" className="space-y-4 mt-4">
+            {contrato?.id ? (
+              <ProcessosMapeadosManager
+                contratoId={contrato.id}
+                userId={selectedUserId}
+                userName={selectedUser?.nome_completo}
+              />
+            ) : (
+              <Card className="border-border/50">
+                <CardContent className="py-10 text-center">
+                  <FileText className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+                  <p className="font-medium">Crie um contrato primeiro</p>
+                  <p className="text-sm text-muted-foreground">Para gerenciar processos, crie o contrato na aba "Contrato"</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
 
 
           {/* Aba Documentos */}
