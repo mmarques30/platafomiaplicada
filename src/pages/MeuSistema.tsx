@@ -62,9 +62,9 @@ const MeuSistema = () => {
       {/* Header */}
       <div>
         <PageTitle
-          primary={`Projeto ${contrato.nome_empresa || ""}`}
+          primary={`Projeto ${contrato.nome_empresa || contrato.razao_social || ""}`}
         />
-        {contrato.nome_empresa && (
+        {(contrato.nome_empresa || contrato.razao_social) && (
           <p className="text-muted-foreground mt-1">
             Acompanhe o progresso do seu projeto em tempo real
           </p>
