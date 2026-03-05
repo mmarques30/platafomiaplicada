@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen, Trash2, Monitor } from "lucide-react";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen, Trash2, Monitor, Video } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -201,6 +201,10 @@ export default function MentoriaBusinessPage() {
             <TabsTrigger value="telas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <Monitor className="h-3.5 w-3.5" />
               Telas
+            </TabsTrigger>
+            <TabsTrigger value="videos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Video className="h-3.5 w-3.5" />
+              Vídeos
             </TabsTrigger>
             <TabsTrigger value="instrucoes" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <ListChecks className="h-3.5 w-3.5" />
@@ -399,7 +403,25 @@ export default function MentoriaBusinessPage() {
             )}
           </TabsContent>
 
-          {/* Aba Instruções */}
+          {/* Aba Vídeos */}
+          <TabsContent value="videos" className="space-y-4 mt-4">
+            {contrato?.id ? (
+              <VideosInstrucaoManager
+                contratoId={contrato.id}
+                userId={selectedUserId}
+                userName={selectedUser?.nome_completo}
+              />
+            ) : (
+              <Card className="border-border/50">
+                <CardContent className="py-10 text-center">
+                  <Video className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+                  <p className="font-medium">Crie um contrato primeiro</p>
+                  <p className="text-sm text-muted-foreground">Para gerenciar vídeos, crie o contrato na aba "Contrato"</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
           <TabsContent value="instrucoes" className="space-y-4 mt-4">
             {contrato?.id ? (
               <InstrucoesBusinessManager 
