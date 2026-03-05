@@ -109,6 +109,7 @@ import GerenciarPoliticas from "./pages/admin/GerenciarPoliticas";
 import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
 import MeuSistema from "./pages/MeuSistema";
 import MeuSistemaEtapaDetalhe from "./pages/MeuSistemaEtapaDetalhe";
+import MeuSistemaDocumentos from "./pages/MeuSistemaDocumentos";
 import FormularioAplica from "./pages/FormularioAplica";
 import Instalar from "./pages/Instalar";
 import Central from "./pages/Central";
