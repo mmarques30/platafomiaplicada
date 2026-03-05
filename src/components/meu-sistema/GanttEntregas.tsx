@@ -26,9 +26,9 @@ interface GanttEntregasProps {
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
   concluida: { label: "Concluída", color: "#738925", bg: "#738925", icon: <CheckCircle2 className="h-3 w-3" /> },
-  em_andamento: { label: "Em andamento", color: "hsl(var(--primary))", bg: "hsl(var(--primary))", icon: <Clock className="h-3 w-3" /> },
+  em_andamento: { label: "Em andamento", color: "#889C2D", bg: "#889C2D", icon: <Clock className="h-3 w-3" /> },
   pendente: { label: "Pendente", color: "#D4A017", bg: "#D4A017", icon: <Circle className="h-3 w-3" /> },
-  cancelada: { label: "Cancelada", color: "hsl(var(--destructive))", bg: "hsl(var(--destructive))", icon: <XCircle className="h-3 w-3" /> },
+  cancelada: { label: "Cancelada", color: "#B91C1C", bg: "#B91C1C", icon: <XCircle className="h-3 w-3" /> },
 };
 
 const ROW_HEIGHT = 40;
@@ -163,7 +163,7 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
 
   return (
     <>
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden" style={{ borderColor: "#C5CC8A" }}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <CardTitle className="text-base">
@@ -192,8 +192,8 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
             >
               {/* Sidebar header */}
               <div
-                className="px-4 flex items-center text-xs font-medium text-muted-foreground border-b border-border bg-muted/30"
-                style={{ height: `${ROW_HEIGHT}px`, minHeight: `${ROW_HEIGHT}px` }}
+                className="px-4 flex items-center text-xs font-semibold border-b"
+                style={{ height: `${ROW_HEIGHT}px`, minHeight: `${ROW_HEIGHT}px`, background: "#F6F7E9", color: "#2F302B", borderColor: "#C5CC8A" }}
               >
                 Entregas
               </div>
@@ -209,14 +209,15 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                   <div key={key}>
                     {/* Group header */}
                     <div
-                      className="flex items-center gap-1.5 px-3 text-xs font-semibold text-muted-foreground bg-muted/20 border-b border-border/30 cursor-pointer hover:bg-muted/40 transition-colors select-none"
-                      style={{ height: `${GROUP_HEADER_HEIGHT}px` }}
+                      className="flex items-center gap-1.5 px-3 text-xs font-semibold cursor-pointer transition-colors select-none"
+                      style={{ height: `${GROUP_HEADER_HEIGHT}px`, background: "#E9EBC6", color: "#738925", borderBottom: "1px solid #C5CC8A" }}
                       onClick={() => toggleGroup(key)}
                     >
                       <ChevronRight
                         className={`h-3.5 w-3.5 transition-transform duration-200 ${
                           openGroups[key] !== false ? "rotate-90" : ""
                         }`}
+                        style={{ color: "#889C2D" }}
                       />
                       <span className="truncate">{key}</span>
                       <span className="ml-auto text-[10px] font-normal opacity-60">
@@ -231,8 +232,10 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                         return (
                           <div
                             key={entrega.id}
-                            className="flex items-center gap-1.5 px-4 border-b border-border/20 hover:bg-muted/30 transition-colors cursor-pointer group"
-                            style={{ height: `${ROW_HEIGHT}px` }}
+                            className="flex items-center gap-1.5 px-4 transition-colors cursor-pointer group"
+                            style={{ height: `${ROW_HEIGHT}px`, borderBottom: "1px solid #E9EBC6" }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = "#F6F7E9"}
+                            onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                             onClick={() => setSelectedEntrega(entrega)}
                           >
                             <span style={{ color: cfg.color }}>{cfg.icon}</span>
@@ -251,8 +254,8 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
             <div className="flex-1 flex flex-col overflow-hidden">
               {/* Month headers - fixed */}
               <div
-                className="flex border-b border-border bg-muted/30 overflow-hidden flex-shrink-0"
-                style={{ height: `${ROW_HEIGHT}px`, minHeight: `${ROW_HEIGHT}px` }}
+                className="flex overflow-hidden flex-shrink-0"
+                style={{ height: `${ROW_HEIGHT}px`, minHeight: `${ROW_HEIGHT}px`, background: "#F6F7E9", borderBottom: "1px solid #C5CC8A" }}
               >
                 <div
                   className="flex"
@@ -265,8 +268,8 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                   {months.map((month, i) => (
                     <div
                       key={i}
-                      className="text-xs text-muted-foreground flex items-center justify-center border-r border-border/40 capitalize"
-                      style={{ width: `${MONTH_WIDTH}px`, minWidth: `${MONTH_WIDTH}px` }}
+                      className="text-xs font-medium flex items-center justify-center capitalize"
+                      style={{ width: `${MONTH_WIDTH}px`, minWidth: `${MONTH_WIDTH}px`, color: "#2F302B", borderRight: "1px solid #C5CC8A" }}
                     >
                       {format(month, "MMM yyyy", { locale: ptBR })}
                     </div>
@@ -293,8 +296,7 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                     {months.map((_, i) => (
                       <div
                         key={i}
-                        className="border-r border-border/15"
-                        style={{ width: `${MONTH_WIDTH}px`, minWidth: `${MONTH_WIDTH}px` }}
+                        style={{ width: `${MONTH_WIDTH}px`, minWidth: `${MONTH_WIDTH}px`, borderRight: "1px solid #E9EBC640" }}
                       />
                     ))}
                   </div>
@@ -305,14 +307,14 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                       className="absolute top-0 bottom-0 w-px z-20 pointer-events-none"
                       style={{
                         left: `${todayOffset}px`,
-                        background: "hsl(var(--destructive) / 0.5)",
+                        background: "#738925",
                       }}
                     >
                       <div
                         className="absolute -top-0 -translate-x-1/2 text-[9px] font-medium px-1.5 py-0.5 rounded-b"
                         style={{
-                          background: "hsl(var(--destructive))",
-                          color: "hsl(var(--destructive-foreground))",
+                          background: "#738925",
+                          color: "#FFFFFF",
                         }}
                       >
                         Hoje
@@ -325,8 +327,7 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                     <div key={key}>
                       {/* Group spacer row */}
                       <div
-                        className="border-b border-border/30 bg-muted/10"
-                        style={{ height: `${GROUP_HEADER_HEIGHT}px` }}
+                        style={{ height: `${GROUP_HEADER_HEIGHT}px`, background: "#E9EBC6", borderBottom: "1px solid #C5CC8A" }}
                       />
 
                       {/* Item rows with bars */}
@@ -338,8 +339,10 @@ export function GanttEntregas({ entregas, dataInicio, dataFim }: GanttEntregasPr
                           return (
                             <div
                               key={entrega.id}
-                              className="relative border-b border-border/20 hover:bg-muted/20 transition-colors cursor-pointer"
-                              style={{ height: `${ROW_HEIGHT}px` }}
+                              className="relative transition-colors cursor-pointer"
+                              style={{ height: `${ROW_HEIGHT}px`, borderBottom: "1px solid #E9EBC6" }}
+                              onMouseEnter={(e) => e.currentTarget.style.background = "#F6F7E9"}
+                              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                               onClick={() => setSelectedEntrega(entrega)}
                             >
                               <motion.div
