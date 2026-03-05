@@ -1631,7 +1631,13 @@ serve(async (req) => {
       
       // Se não encontrou nada, tentar IA
       if (resultado.etapas.length === 0 && resultado.entregas.length === 0) {
-        resultado = await processarComIARestrita(apiKey, texto, ancoras, modulosLista);
+        if (texto.length > 500) {
+          // Documento sem marcadores padrão mas com conteúdo significativo
+          console.log("Usando processarDocumentoLivre (texto > 500 chars, sem âncoras)");
+          resultado = await processarDocumentoLivre(apiKey, texto, modulosLista);
+        } else {
+          resultado = await processarComIARestrita(apiKey, texto, ancoras, modulosLista);
+        }
       }
     }
     
