@@ -110,6 +110,7 @@ import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
 import MeuSistema from "./pages/MeuSistema";
 import MeuSistemaEtapaDetalhe from "./pages/MeuSistemaEtapaDetalhe";
 import MeuSistemaDocumentos from "./pages/MeuSistemaDocumentos";
+import MeuSistemaEntregas from "./pages/MeuSistemaEntregas";
 import FormularioAplica from "./pages/FormularioAplica";
 import Instalar from "./pages/Instalar";
 import Central from "./pages/Central";
@@ -221,6 +222,7 @@ function AppContent() {
             <Route path="/cupons" element={<Cupons />} />
             <Route path="/meu-sistema" element={<MeuSistema />} />
             <Route path="/meu-sistema/fase/:etapaId" element={<MeuSistemaEtapaDetalhe />} />
+            <Route path="/meu-sistema/entregas" element={<MeuSistemaEntregas />} />
             <Route path="/meu-sistema/documentos" element={<MeuSistemaDocumentos />} />
             <Route path="/instalar" element={<Instalar />} />
             <Route path="/politica-servicos" element={<PoliticaServicos />} />
