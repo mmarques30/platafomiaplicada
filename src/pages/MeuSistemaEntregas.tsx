@@ -195,12 +195,25 @@ export default function MeuSistemaEntregas() {
             </div>
           </div>
         ) : (
-          <Card className="border-dashed">
-            <CardContent className="p-8 flex flex-col items-center text-center text-muted-foreground">
-              <Monitor className="h-8 w-8 mb-2 opacity-20" />
-              <p className="text-sm">Nenhuma tela cadastrada ainda.</p>
-            </CardContent>
-          </Card>
+          <div className="opacity-50 pointer-events-none">
+            <div className="overflow-hidden">
+              <div className="flex gap-4">
+                {[1, 2, 3].map((i) => (
+                  <motion.div key={i} className="flex-none w-[300px] md:w-[360px]">
+                    <div className="relative rounded-xl overflow-hidden shadow-md border border-border/50">
+                      <div className="aspect-video bg-muted flex items-center justify-center">
+                        <Monitor className="h-10 w-10 text-muted-foreground/40" />
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-sm px-3 py-2">
+                        <p className="font-medium text-sm text-foreground truncate">Tela de exemplo {i}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+            <p className="text-xs text-center text-muted-foreground mt-3">Nenhuma tela cadastrada ainda.</p>
+          </div>
         )}
       </section>
 
@@ -264,12 +277,27 @@ export default function MeuSistemaEntregas() {
             ))}
           </div>
         ) : (
-          <Card className="border-dashed">
-            <CardContent className="p-8 flex flex-col items-center text-center text-muted-foreground">
-              <Video className="h-8 w-8 mb-2 opacity-20" />
-              <p className="text-sm">Nenhum vídeo de instrução ainda.</p>
-            </CardContent>
-          </Card>
+          <div className="opacity-50 pointer-events-none">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="border-border/50 overflow-hidden">
+                  <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
+                    <div className="w-full h-full flex items-center justify-center bg-muted">
+                      <div className="text-center">
+                        <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
+                        <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
+                      </div>
+                    </div>
+                  </Lens>
+                  <CardContent className="p-3">
+                    <p className="font-medium text-sm text-foreground truncate">Vídeo de exemplo {i}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">Descrição do vídeo de instrução</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <p className="text-xs text-center text-muted-foreground mt-3">Nenhum vídeo de instrução ainda.</p>
+          </div>
         )}
       </section>
 
