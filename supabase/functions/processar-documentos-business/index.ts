@@ -1059,6 +1059,134 @@ Responda APENAS com JSON válido seguindo EXATAMENTE as âncoras acima:
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// PROCESSAR DOCUMENTO LIVRE (SEM ESTRUTURA PADRÃO)
+// ═══════════════════════════════════════════════════════════════════
+
+async function processarDocumentoLivre(
+  apiKey: string,
+  texto: string,
+  modulosLista: string
+): Promise<ResultadoParcial> {
+  console.log("=== PROCESSANDO DOCUMENTO LIVRE (SEM ÂNCORAS) ===");
+  console.log(`Texto: ${texto.length} caracteres`);
+
+  const prompt = `Você é um EXTRATOR de estrutura de documentos técnicos.
+
+O documento abaixo descreve um sistema, projeto ou conjunto de requisitos. Sua tarefa é EXTRAIR a estrutura existente no documento e organizá-la como etapas, entregas e instruções.
+
+═══════════════════════════════════════════════════════════════
+COMO IDENTIFICAR A ESTRUTURA:
+═══════════════════════════════════════════════════════════════
+
+ETAPAS = Seções principais / Módulos do documento
+- Exemplos: "Módulo 01 - Central da Holding", "03 · Módulo 01", "Seção 3 - Motor de Teses"
+- Use o título EXATO que aparece no documento
+
+ENTREGAS = Sub-seções / Funcionalidades / Telas / Componentes dentro de cada módulo
+- Exemplos: "Painel de controle fiscal", "Dashboard de resultados", "Cadastro de empresas"
+- Cada funcionalidade ou componente descrito vira UMA entrega
+
+INSTRUÇÕES = Requisitos detalhados / Itens específicos / Campos / Regras de negócio
+- Exemplos: "Campo CNPJ com validação", "Filtro por período", "Exportar para PDF"
+- Cada requisito ou item detalhado vira UMA instrução da entrega correspondente
+
+═══════════════════════════════════════════════════════════════
+REGRAS ABSOLUTAS:
+═══════════════════════════════════════════════════════════════
+
+✅ Use APENAS títulos e descrições que EXISTEM no documento
+✅ Copie os títulos EXATAMENTE como estão no texto
+✅ Preserve a hierarquia original do documento
+✅ Extraia TODOS os módulos/seções encontrados
+
+❌ NÃO invente títulos ou descrições
+❌ NÃO resuma ou parafraseie - copie literalmente
+❌ NÃO adicione conteúdo que não existe no documento
+❌ NÃO use termos genéricos como "Planejamento", "Canvas", "Estruturação"
+
+═══════════════════════════════════════════════════════════════
+MÓDULOS CONTRATADOS (para referência):
+${modulosLista || 'Não especificados'}
+═══════════════════════════════════════════════════════════════
+
+DOCUMENTO A EXTRAIR:
+${texto.substring(0, 30000)}
+
+═══════════════════════════════════════════════════════════════
+Responda APENAS com JSON válido:
+{
+  "etapas": [
+    {
+      "numero": 1,
+      "titulo": "TÍTULO EXATO DO MÓDULO/SEÇÃO DO DOCUMENTO",
+      "objetivo": "Descrição copiada do documento"
+    }
+  ],
+  "entregas": [
+    {
+      "etapa_numero": 1,
+      "numero_entrega": 1,
+      "titulo": "TÍTULO EXATO DA FUNCIONALIDADE/COMPONENTE",
+      "descricao": "Descrição copiada do documento",
+      "tipo": "ativa",
+      "prioridade": "alta",
+      "modulo_relacionado": "Nome do módulo se aplicável"
+    }
+  ],
+  "instrucoes": [
+    {
+      "entrega_numero": 1,
+      "titulo": "TÍTULO DO REQUISITO/ITEM",
+      "descricao": "Detalhes copiados do documento",
+      "prompt_sugerido": null,
+      "dicas": null,
+      "responsavel": "voce",
+      "ferramenta": "outro",
+      "ordem": 1
+    }
+  ],
+  "tasks": [],
+  "backlog": []
+}`;
+
+  try {
+    const content = await callAI(apiKey, prompt, 8192);
+    const parsed = extractJsonFromResponse(content);
+
+    // Validação básica
+    const resultado: ResultadoParcial = {
+      etapas: Array.isArray(parsed.etapas) ? parsed.etapas : [],
+      entregas: Array.isArray(parsed.entregas) ? parsed.entregas : [],
+      instrucoes: Array.isArray(parsed.instrucoes) ? parsed.instrucoes : [],
+      tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
+      backlog: Array.isArray(parsed.backlog) ? parsed.backlog : [],
+    };
+
+    // Normalizar ferramentas e responsáveis
+    resultado.instrucoes = resultado.instrucoes.map((inst: any, idx: number) => ({
+      ...inst,
+      ferramenta: normalizarFerramenta(inst.ferramenta),
+      responsavel: normalizarResponsavel(inst.responsavel),
+      ordem: inst.ordem || idx + 1,
+      descricao: inst.descricao ? formatarDescricaoInstrucao(inst.descricao) : '',
+    }));
+
+    // Renumerar entregas globalmente
+    resultado.entregas = resultado.entregas.map((e: any, idx: number) => ({
+      ...e,
+      numero_entrega: idx + 1,
+    }));
+
+    console.log(`Documento livre extraiu: ${resultado.etapas.length} etapas, ${resultado.entregas.length} entregas, ${resultado.instrucoes.length} instruções`);
+
+    return resultado;
+  } catch (error) {
+    console.error("Erro ao processar documento livre:", error);
+    return { etapas: [], entregas: [], instrucoes: [], tasks: [], backlog: [] };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // VALIDAR RESULTADO CONTRA ÂNCORAS LITERAIS
 // ═══════════════════════════════════════════════════════════════════
 
