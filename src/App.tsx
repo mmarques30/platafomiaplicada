@@ -221,6 +221,7 @@ function AppContent() {
             <Route path="/cupons" element={<Cupons />} />
             <Route path="/meu-sistema" element={<MeuSistema />} />
             <Route path="/meu-sistema/fase/:etapaId" element={<MeuSistemaEtapaDetalhe />} />
+            <Route path="/meu-sistema/documentos" element={<MeuSistemaDocumentos />} />
             <Route path="/instalar" element={<Instalar />} />
             <Route path="/politica-servicos" element={<PoliticaServicos />} />
           </Route>
