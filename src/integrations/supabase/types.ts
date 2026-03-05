@@ -4352,6 +4352,53 @@ export type Database = {
           },
         ]
       }
+      processos_mapeados_business: {
+        Row: {
+          arquivo_path: string | null
+          contrato_id: string
+          created_at: string
+          descricao: string | null
+          id: string
+          ordem: number | null
+          tipo: string
+          titulo: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          arquivo_path?: string | null
+          contrato_id: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number | null
+          tipo?: string
+          titulo: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          arquivo_path?: string | null
+          contrato_id?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processos_mapeados_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       produtos: {
         Row: {
           ativo: boolean | null
@@ -5467,6 +5514,50 @@ export type Database = {
           },
         ]
       }
+      telas_sistema_business: {
+        Row: {
+          contrato_id: string
+          created_at: string
+          descricao: string | null
+          id: string
+          link_sistema: string | null
+          ordem: number | null
+          screenshot_url: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          contrato_id: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          link_sistema?: string | null
+          ordem?: number | null
+          screenshot_url?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          contrato_id?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          link_sistema?: string | null
+          ordem?: number | null
+          screenshot_url?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telas_sistema_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tentativas_acesso_nao_autorizado: {
         Row: {
           email: string | null
@@ -5773,6 +5864,50 @@ export type Database = {
             columns: ["trilha_id"]
             isOneToOne: false
             referencedRelation: "trilhas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos_instrucao_business: {
+        Row: {
+          contrato_id: string
+          created_at: string
+          descricao: string | null
+          id: string
+          ordem: number | null
+          thumbnail_url: string | null
+          titulo: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          contrato_id: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number | null
+          thumbnail_url?: string | null
+          titulo: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          contrato_id?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number | null
+          thumbnail_url?: string | null
+          titulo?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "videos_instrucao_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
             referencedColumns: ["id"]
           },
         ]
