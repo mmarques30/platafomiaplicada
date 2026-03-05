@@ -20,6 +20,7 @@ export interface ContratoBusinessInput {
   observacoes?: string | null;
   entregas_esperadas?: EntregaEsperada[];
   status?: string;
+  nome_empresa?: string | null;
 }
 
 // Helper to convert EntregaEsperada[] to Json
