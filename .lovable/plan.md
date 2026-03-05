@@ -1,70 +1,29 @@
 
-# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-## Diagnóstico encontrado
+# Fix: UTF-8 encoding broken in HTML text extraction
 
-O erro atual não é mais do campo `url` no banco.  
-Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
+## Problem
+The screenshot shows classic UTF-8 mojibake: "ESTRATÃ©GICO" instead of "ESTRATÉGICO", "MÃ³DULO" instead of "MÓDULO". 
 
-- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
+`atob()` decodes base64 to a binary string where each character = 1 byte. UTF-8 characters like `é`, `ó`, `ã` are multi-byte, so they get split into garbage characters.
 
-Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
+## Fix
 
-## O que será implementado
+**File: `supabase/functions/extrair-texto-documento/index.ts`**
 
-1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
-2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
-3. **Manter URL pública normalmente** após upload bem-sucedido.
-4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
-5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
+Replace `atob(fileBase64)` on line 180 with proper UTF-8 decoding:
 
-## Estratégia técnica
-
-### Arquivo alvo
-- `src/pages/admin/GerenciarMateriais.tsx`
-
-### Ajustes no `handleFileUpload`
-
-- Trocar:
-```ts
-const fileName = `${Date.now()}_${file.name}`;
+```typescript
+// Decode base64 to bytes, then properly decode as UTF-8
+const binaryString = atob(fileBase64);
+const bytes = new Uint8Array(binaryString.length);
+for (let i = 0; i < binaryString.length; i++) {
+  bytes[i] = binaryString.charCodeAt(i);
+}
+const htmlRaw = new TextDecoder('utf-8').decode(bytes);
 ```
 
-- Por geração segura, por exemplo:
-```ts
-const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
-const base = file.name.replace(/\.[^/.]+$/, '');
-const normalized = base
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
-  .replace(/_+/g, '_')               // colapsa __
-  .replace(/^_+|_+$/g, '');          // trim de _
-const safeBase = normalized || 'arquivo';
-const fileName = `${Date.now()}-${safeBase}.${ext}`;
-```
+Same fix needed for the plain text branch (line 174) which has the identical `atob()` problem.
 
-Isso evita chaves inválidas com `+`, acentos e símbolos.
+This is the same pattern already used in `extrairTextoDOCX` and `extrairTextoPPTX` functions in this same file — just not applied to the HTML/text paths.
 
-### Robustez adicional recomendada
-
-- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
-- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
-
-## Resultado esperado
-
-Após esse ajuste:
-- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
-- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
-- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
-
-## Validação (teste fim a fim)
-
-1. Ir em `/admin/materiais`.
-2. Clicar em **Novo Material**.
-3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
-4. Confirmar:
-   - upload concluído sem erro;
-   - arquivo aparece na lista;
-   - salvar material com sucesso;
-   - material aparece na tabela e abre corretamente no front.
