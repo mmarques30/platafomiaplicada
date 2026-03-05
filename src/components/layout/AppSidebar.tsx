@@ -152,6 +152,11 @@ export function AppSidebar() {
       // Demais (Academy) vai para /evolucao
       return '/evolucao';
     }
+    // Grupo sem URL (ex: meu_sistema): redireciona para primeiro filho
+    if (!menu.url) {
+      const children = sidebarMenus.filter(m => m.parent_key === menu.menu_key);
+      if (children.length > 0 && children[0].url) return children[0].url;
+    }
     return menu.url || "/";
   };
 
