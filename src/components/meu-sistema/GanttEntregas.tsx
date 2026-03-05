@@ -27,7 +27,7 @@ interface GanttEntregasProps {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
   concluida: { label: "Concluída", color: "#738925", bg: "#738925", icon: <CheckCircle2 className="h-3 w-3" /> },
   em_andamento: { label: "Em andamento", color: "#889C2D", bg: "#889C2D", icon: <Clock className="h-3 w-3" /> },
-  pendente: { label: "Pendente", color: "#D4A017", bg: "#D4A017", icon: <Circle className="h-3 w-3" /> },
+  pendente: { label: "Pendente", color: "#2F302B", bg: "#2F302B", icon: <Circle className="h-3 w-3" /> },
   cancelada: { label: "Cancelada", color: "#B91C1C", bg: "#B91C1C", icon: <XCircle className="h-3 w-3" /> },
 };
 
