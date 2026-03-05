@@ -48,6 +48,7 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
 
   // Dados da Contratante
   const [dadosContratante, setDadosContratante] = useState({
+    nome_empresa: "",
     razao_social: "",
     cnpj: "",
     endereco: "",
@@ -118,6 +119,7 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
   // Função para limpar todos os dados do formulário
   const handleLimparTudo = () => {
     setDadosContratante({
+      nome_empresa: "",
       razao_social: "",
       cnpj: "",
       endereco: "",
@@ -165,6 +167,7 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
   useEffect(() => {
     if (contrato) {
       setDadosContratante({
+        nome_empresa: (contrato as any).nome_empresa || "",
         razao_social: (contrato as any).razao_social || "",
         cnpj: (contrato as any).cnpj || "",
         endereco: (contrato as any).endereco || "",
@@ -214,6 +217,7 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
   const handleDataParsed = (parsed: ContratoParseResult) => {
     if (parsed.contratante) {
       setDadosContratante({
+        nome_empresa: parsed.contratante.nome_empresa || "",
         razao_social: parsed.contratante.razao_social || "",
         cnpj: parsed.contratante.cnpj || "",
         endereco: parsed.contratante.endereco || "",
@@ -265,6 +269,7 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
     const data = {
       user_id: userId,
       // Contratante
+      nome_empresa: dadosContratante.nome_empresa || null,
       razao_social: dadosContratante.razao_social || null,
       cnpj: dadosContratante.cnpj || null,
       endereco: dadosContratante.endereco || null,
@@ -466,6 +471,15 @@ export function ContratoBusinessManager({ userId, userName }: ContratoBusinessMa
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="nome_empresa">Nome da Empresa (exibição no projeto)</Label>
+                <Input
+                  id="nome_empresa"
+                  value={dadosContratante.nome_empresa}
+                  onChange={(e) => setDadosContratante({ ...dadosContratante, nome_empresa: e.target.value })}
+                  placeholder="Nome fantasia / nome curto para exibição"
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="razao_social">Razão Social</Label>
