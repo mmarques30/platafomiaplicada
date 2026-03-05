@@ -45,7 +45,7 @@ export default function MentoriaBusinessPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
   // Filtrar usuários Business + Parceiros
-  const users = allUsers.filter(u => u.plano_mentoria === "business" || u.roles.includes("parceiros"));
+  const users = allUsers.filter(u => u.plano_mentoria === "business_parceria" || u.plano_mentoria === "business" || u.roles.includes("parceiros"));
   const selectedUser = users.find(u => u.id === selectedUserId);
 
   // Buscar contrato do usuário selecionado
