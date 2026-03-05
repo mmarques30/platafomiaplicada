@@ -594,7 +594,7 @@ function extractJsonFromResponse(response: string): any {
       .replace(/,\s*]/g, "]")
       .replace(/\\n/g, " ")
       .replace(/\\t/g, " ")
-      .replace(/\\"/g, "'")
+      .replace(/\\\\"/g, '"')
       .replace(/[\u2018\u2019]/g, "'")
       .replace(/[\u201C\u201D]/g, '"')
       .replace(/\u2026/g, "...")
@@ -1110,7 +1110,7 @@ ${modulosLista || 'Não especificados'}
 ═══════════════════════════════════════════════════════════════
 
 DOCUMENTO A EXTRAIR:
-${texto.substring(0, 30000)}
+${texto.substring(0, 45000)}
 
 ═══════════════════════════════════════════════════════════════
 Responda APENAS com JSON válido:
