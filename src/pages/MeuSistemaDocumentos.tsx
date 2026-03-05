@@ -40,7 +40,15 @@ export default function MeuSistemaDocumentos() {
   const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id);
   const [contratoOpen, setContratoOpen] = useState(false);
   const [viewingReport, setViewingReport] = useState<{ titulo: string; html: string } | null>(null);
+  const [filtroTipo, setFiltroTipo] = useState("todos");
 
+  const documentosFiltrados = useMemo(() => {
+    let filtered = documentos;
+    if (filtroTipo !== "todos") {
+      filtered = filtered.filter((d) => d.tipo === filtroTipo);
+    }
+    return filtered.sort((a, b) => new Date(b.created_at || "").getTime() - new Date(a.created_at || "").getTime());
+  }, [documentos, filtroTipo]);
   const handleDownloadDoc = async (arquivoUrl: string, titulo: string) => {
     try {
       const { data } = await supabase.storage
