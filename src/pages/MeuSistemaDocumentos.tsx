@@ -17,6 +17,7 @@ import { downloadUrl } from "@/lib/download";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 const tipoLabel: Record<string, string> = {
   proposta: "Proposta",
@@ -93,12 +94,7 @@ export default function MeuSistemaDocumentos() {
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Documentos</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Reports, documentos e dados do contrato
-        </p>
-      </div>
+      <PageTitle primary="Documentos" />
 
       {/* Reports */}
       {reports.length > 0 && (

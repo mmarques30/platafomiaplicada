@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { ExternalLink, FileText, Play, Monitor, Video, ClipboardList, ChevronLeft, ChevronRight } from "lucide-react";
+import { PageTitle } from "@/components/shared/PageTitle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,12 +74,7 @@ export default function MeuSistemaEntregas() {
 
   return (
     <div className="p-4 md:p-6 space-y-8 max-w-5xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Entregas</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Processos mapeados, telas do sistema e vídeos de instrução
-        </p>
-      </div>
+      <PageTitle primary="Entregas" />
 
       {/* Processos Mapeados */}
       <section className="space-y-3">
