@@ -188,6 +188,15 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       });
     }
 
+    // Atualizar nome_empresa no contrato business
+    const isBusinessPlan = selectedPlano === "business_parceria" || selectedPlano === "business_sistemas";
+    if (isBusinessPlan && contratoBusiness?.id) {
+      await supabase
+        .from("contratos_business")
+        .update({ nome_empresa: nomeEmpresa || null })
+        .eq("id", contratoBusiness.id);
+    }
+
     onOpenChange(false);
   };
 
