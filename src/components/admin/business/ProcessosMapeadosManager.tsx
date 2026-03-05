@@ -61,7 +61,7 @@ export function ProcessosMapeadosManager({ contratoId, userId, userName }: Proce
 
   const createMutation = useMutation({
     mutationFn: async (payload: Partial<Processo>) => {
-      const { error } = await supabase.from("processos_mapeados_business").insert(payload);
+      const { error } = await supabase.from("processos_mapeados_business").insert([payload as any]);
       if (error) throw error;
     },
     onSuccess: () => {
