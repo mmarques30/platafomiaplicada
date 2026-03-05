@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ExternalLink, FileText, Play, Monitor, Video, ClipboardList } from "lucide-react";
+import { useState, useCallback } from "react";
+import { ExternalLink, FileText, Play, Monitor, Video, ClipboardList, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +23,10 @@ export default function MeuSistemaEntregas() {
   const [selectedTela, setSelectedTela] = useState<any | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
 
-  const [emblaRef] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   const isLoading = loadingContrato || loadingEntregas;
 
@@ -132,9 +135,21 @@ export default function MeuSistemaEntregas() {
 
       {/* Telas do Sistema */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-foreground">Telas do Sistema</h2>
-          <Badge variant="secondary" className="text-xs">{telas.length}</Badge>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Telas do Sistema</h2>
+            <Badge variant="secondary" className="text-xs">{telas.length}</Badge>
+          </div>
+          {telas.length > 1 && (
+            <div className="flex items-center gap-1">
+              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollPrev}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollNext}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
         {telas.length > 0 ? (
           <div className="overflow-hidden" ref={emblaRef}>
@@ -142,20 +157,20 @@ export default function MeuSistemaEntregas() {
               {telas.map((tela) => (
                 <motion.div
                   key={tela.id}
-                  className="flex-none w-[280px] md:w-[320px]"
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.2 }}
+                  className="flex-none w-[300px] md:w-[360px]"
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
                 >
-                  <Card
-                    className="cursor-pointer border-border/50 overflow-hidden hover:shadow-lg transition-shadow h-full"
+                  <div
+                    className="relative cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group border border-border/50"
                     onClick={() => setSelectedTela(tela)}
                   >
                     {tela.screenshot_url ? (
-                      <div className="aspect-video bg-muted overflow-hidden">
+                      <div className="aspect-video bg-muted">
                         <img
                           src={tela.screenshot_url}
                           alt={tela.titulo}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       </div>
                     ) : (
@@ -163,13 +178,18 @@ export default function MeuSistemaEntregas() {
                         <Monitor className="h-10 w-10 text-muted-foreground/40" />
                       </div>
                     )}
-                    <CardContent className="p-3">
-                      <p className="font-medium text-sm text-foreground truncate">{tela.titulo}</p>
+                    {/* Overlay with title */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                      <p className="text-white font-medium text-sm truncate">{tela.titulo}</p>
                       {tela.descricao && (
-                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{tela.descricao}</p>
+                        <p className="text-white/70 text-xs line-clamp-1 mt-0.5">{tela.descricao}</p>
                       )}
-                    </CardContent>
-                  </Card>
+                    </div>
+                    {/* Always-visible title bar at bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-sm px-3 py-2 group-hover:opacity-0 transition-opacity duration-300">
+                      <p className="font-medium text-sm text-foreground truncate">{tela.titulo}</p>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
