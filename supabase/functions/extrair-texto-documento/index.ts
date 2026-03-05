@@ -171,13 +171,19 @@ serve(async (req) => {
 
     // ===== ARQUIVOS TEXTO - DECODIFICAR DIRETAMENTE =====
     if (fileType === 'text/plain' || fileNameLower.endsWith('.txt') || fileNameLower.endsWith('.md')) {
-      textoExtraido = atob(fileBase64);
+      const binStr = atob(fileBase64);
+      const bytesArr = new Uint8Array(binStr.length);
+      for (let i = 0; i < binStr.length; i++) { bytesArr[i] = binStr.charCodeAt(i); }
+      textoExtraido = new TextDecoder('utf-8').decode(bytesArr);
       console.log(`Texto puro extraído: ${textoExtraido.length} caracteres`);
     }
     
     // ===== HTML - EXTRAIR TEXTO REMOVENDO TAGS =====
     else if (fileType === 'text/html' || fileNameLower.endsWith('.html') || fileNameLower.endsWith('.htm')) {
-      const htmlRaw = atob(fileBase64);
+      const htmlBinStr = atob(fileBase64);
+      const htmlBytes = new Uint8Array(htmlBinStr.length);
+      for (let i = 0; i < htmlBinStr.length; i++) { htmlBytes[i] = htmlBinStr.charCodeAt(i); }
+      const htmlRaw = new TextDecoder('utf-8').decode(htmlBytes);
       // Remover blocos não-conteúdo ANTES de strip de tags
       textoExtraido = htmlRaw
         .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
