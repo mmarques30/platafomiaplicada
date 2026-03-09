@@ -45,7 +45,7 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
     description: "Academy + capacitação para equipes",
   },
   business_parceria: {
-    label: "Business Parceria",
+    label: "Business",
     icon: "Crown",
     color: "hsl(45, 93%, 47%)",
     description: "Academy + mentoria 1:1 + roadmap",
