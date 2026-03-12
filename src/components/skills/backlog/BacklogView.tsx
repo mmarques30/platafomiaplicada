@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { LayoutGrid, List, Loader2, Plus } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,13 @@ export default function BacklogView() {
   const [filtroResponsavel, setFiltroResponsavel] = useState("todos");
   const [filtroPrioridade, setFiltroPrioridade] = useState("todos");
   const [filtroArea, setFiltroArea] = useState("todos");
+
+  useEffect(() => {
+    if (selectedItem) {
+      const updated = items.find(i => i.id === selectedItem.id);
+      if (updated) setSelectedItem(updated);
+    }
+  }, [items]);
 
   const responsavelOptions = useMemo(() => {
     const names = [
