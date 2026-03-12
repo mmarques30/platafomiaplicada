@@ -27,6 +27,13 @@ export default function BacklogView() {
   const [filtroPrioridade, setFiltroPrioridade] = useState("todos");
   const [filtroArea, setFiltroArea] = useState("todos");
 
+  useEffect(() => {
+    if (selectedItem) {
+      const updated = items.find(i => i.id === selectedItem.id);
+      if (updated) setSelectedItem(updated);
+    }
+  }, [items]);
+
   const responsavelOptions = useMemo(() => {
     const names = [
       ...items.map(i => i.responsavel?.nome),
