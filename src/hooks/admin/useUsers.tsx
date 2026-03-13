@@ -118,7 +118,7 @@ export function useCreateUser() {
           nomeCompleto, 
           roles,
           planoMentoria,
-          skillsLiberado: planoMentoria === "business" ? skillsLiberado : false,
+          skillsLiberado: (planoMentoria === "business_parceria" || planoMentoria === "business_sistemas") ? skillsLiberado : false,
           equipeId,
           novaEquipe,
           papelEquipe,
