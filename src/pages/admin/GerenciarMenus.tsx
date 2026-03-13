@@ -19,6 +19,48 @@ export default function GerenciarMenus() {
 
   const sidebarMenus = menuConfig?.filter(m => m.tipo === 'sidebar') || [];
   const headerMenus = menuConfig?.filter(m => m.tipo === 'header') || [];
+  const adminMenus = menuConfig?.filter(m => m.tipo === 'admin_sidebar') || [];
+
+  const adminPages = [
+    { grupo: "Dashboard", items: [{ path: "/admin", label: "Dashboard" }] },
+    { grupo: "Usuários", items: [
+      { path: "/admin/usuarios", label: "Gerenciar Usuários" },
+      { path: "/admin/visitantes", label: "Visitantes" },
+      { path: "/admin/importar-usuarios", label: "Importar Usuários" },
+    ]},
+    { grupo: "Conteúdo", items: [
+      { path: "/admin/conteudo", label: "Gerenciar Conteúdo" },
+      { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas" },
+      { path: "/admin/materiais", label: "Materiais Gratuitos" },
+    ]},
+    { grupo: "Mentoria", items: [
+      { path: "/admin/mentoria/bonus", label: "Bônus Globais" },
+      { path: "/admin/mentoria/academy", label: "Academy" },
+      { path: "/admin/mentoria/skills", label: "Skills" },
+      { path: "/admin/mentoria/business", label: "Business" },
+      { path: "/admin/mentoria/business-iaplicada", label: "Business iAplicada" },
+      { path: "/admin/mentoria/preview-paineis", label: "Preview Painéis" },
+      { path: "/admin/formularios", label: "Diagnósticos" },
+      { path: "/admin/duvidas", label: "Central de Dúvidas" },
+    ]},
+    { grupo: "Comunicação", items: [
+      { path: "/admin/avisos", label: "Gerenciar Avisos" },
+      { path: "/admin/comunidade", label: "Comunidade" },
+      { path: "/admin/pesquisas", label: "Pesquisas" },
+    ]},
+    { grupo: "Gestão", items: [
+      { path: "/admin/produtos", label: "Produtos" },
+      { path: "/admin/minhas-tarefas", label: "Minhas Tarefas" },
+    ]},
+    { grupo: "Sistema", items: [
+      { path: "/admin/menus", label: "Menus" },
+      { path: "/admin/auditoria", label: "Auditoria do Sistema" },
+      { path: "/admin/conhecimento", label: "Base de Conhecimento" },
+      { path: "/admin/permissoes-equipe", label: "Permissões Equipe" },
+      { path: "/admin/politicas", label: "Políticas" },
+      { path: "/admin/historico-senhas", label: "Histórico de Senhas" },
+    ]},
+  ];
 
   const handleToggleVisivel = async (id: string, currentValue: boolean) => {
     setSaving(true);
@@ -234,6 +276,46 @@ export default function GerenciarMenus() {
         </CardHeader>
         <CardContent className="space-y-3">
           {headerMenus.map(renderMenuRow)}
+        </CardContent>
+      </Card>
+
+      {adminMenus.length > 0 && (
+        <Card className={adminTheme.card}>
+          <CardHeader className={adminTheme.cardHeader}>
+            <CardTitle className={adminTheme.cardTitle}>Menus Admin (Configuráveis)</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
+              Itens do painel administrativo gerenciáveis pelo banco de dados
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {adminMenus.map(renderMenuRow)}
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className={adminTheme.card}>
+        <CardHeader className={adminTheme.cardHeader}>
+          <CardTitle className={adminTheme.cardTitle}>Referência: Todas as Páginas Admin</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            Lista completa de todas as páginas disponíveis no painel administrativo
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {adminPages.map((grupo) => (
+            <div key={grupo.grupo}>
+              <h4 className="font-semibold text-sm mb-2 text-foreground">{grupo.grupo}</h4>
+              <div className="space-y-1 ml-2">
+                {grupo.items.map((item) => (
+                  <div key={item.path} className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors">
+                    <Badge variant="outline" className="text-xs font-mono shrink-0">
+                      {item.path}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </CardContent>
       </Card>
     </div>

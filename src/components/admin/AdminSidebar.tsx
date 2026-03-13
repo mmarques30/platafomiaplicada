@@ -71,6 +71,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: "/admin/usuarios", label: "Gerenciar Usuários" },
       { path: "/admin/visitantes", label: "Visitantes" },
+      { path: "/admin/importar-usuarios", label: "Importar Usuários" },
     ],
   },
   {
@@ -126,6 +127,8 @@ const menuGroups: MenuGroup[] = [
       { path: "/admin/auditoria", label: "Auditoria do Sistema" },
       { path: "/admin/conhecimento", label: "Base de Conhecimento" },
       { path: "/admin/permissoes-equipe", label: "Permissões Equipe" },
+      { path: "/admin/politicas", label: "Políticas" },
+      { path: "/admin/historico-senhas", label: "Histórico de Senhas" },
     ],
   },
   {
