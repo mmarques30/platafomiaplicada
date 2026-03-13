@@ -278,6 +278,46 @@ export default function GerenciarMenus() {
           {headerMenus.map(renderMenuRow)}
         </CardContent>
       </Card>
+
+      {adminMenus.length > 0 && (
+        <Card className={adminTheme.card}>
+          <CardHeader className={adminTheme.cardHeader}>
+            <CardTitle className={adminTheme.cardTitle}>Menus Admin (Configuráveis)</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
+              Itens do painel administrativo gerenciáveis pelo banco de dados
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {adminMenus.map(renderMenuRow)}
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className={adminTheme.card}>
+        <CardHeader className={adminTheme.cardHeader}>
+          <CardTitle className={adminTheme.cardTitle}>Referência: Todas as Páginas Admin</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            Lista completa de todas as páginas disponíveis no painel administrativo
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {adminPages.map((grupo) => (
+            <div key={grupo.grupo}>
+              <h4 className="font-semibold text-sm mb-2 text-foreground">{grupo.grupo}</h4>
+              <div className="space-y-1 ml-2">
+                {grupo.items.map((item) => (
+                  <div key={item.path} className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors">
+                    <Badge variant="outline" className="text-xs font-mono shrink-0">
+                      {item.path}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }
