@@ -19,6 +19,48 @@ export default function GerenciarMenus() {
 
   const sidebarMenus = menuConfig?.filter(m => m.tipo === 'sidebar') || [];
   const headerMenus = menuConfig?.filter(m => m.tipo === 'header') || [];
+  const adminMenus = menuConfig?.filter(m => m.tipo === 'admin_sidebar') || [];
+
+  const adminPages = [
+    { grupo: "Dashboard", items: [{ path: "/admin", label: "Dashboard" }] },
+    { grupo: "Usuários", items: [
+      { path: "/admin/usuarios", label: "Gerenciar Usuários" },
+      { path: "/admin/visitantes", label: "Visitantes" },
+      { path: "/admin/importar-usuarios", label: "Importar Usuários" },
+    ]},
+    { grupo: "Conteúdo", items: [
+      { path: "/admin/conteudo", label: "Gerenciar Conteúdo" },
+      { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas" },
+      { path: "/admin/materiais", label: "Materiais Gratuitos" },
+    ]},
+    { grupo: "Mentoria", items: [
+      { path: "/admin/mentoria/bonus", label: "Bônus Globais" },
+      { path: "/admin/mentoria/academy", label: "Academy" },
+      { path: "/admin/mentoria/skills", label: "Skills" },
+      { path: "/admin/mentoria/business", label: "Business" },
+      { path: "/admin/mentoria/business-iaplicada", label: "Business iAplicada" },
+      { path: "/admin/mentoria/preview-paineis", label: "Preview Painéis" },
+      { path: "/admin/formularios", label: "Diagnósticos" },
+      { path: "/admin/duvidas", label: "Central de Dúvidas" },
+    ]},
+    { grupo: "Comunicação", items: [
+      { path: "/admin/avisos", label: "Gerenciar Avisos" },
+      { path: "/admin/comunidade", label: "Comunidade" },
+      { path: "/admin/pesquisas", label: "Pesquisas" },
+    ]},
+    { grupo: "Gestão", items: [
+      { path: "/admin/produtos", label: "Produtos" },
+      { path: "/admin/minhas-tarefas", label: "Minhas Tarefas" },
+    ]},
+    { grupo: "Sistema", items: [
+      { path: "/admin/menus", label: "Menus" },
+      { path: "/admin/auditoria", label: "Auditoria do Sistema" },
+      { path: "/admin/conhecimento", label: "Base de Conhecimento" },
+      { path: "/admin/permissoes-equipe", label: "Permissões Equipe" },
+      { path: "/admin/politicas", label: "Políticas" },
+      { path: "/admin/historico-senhas", label: "Histórico de Senhas" },
+    ]},
+  ];
 
   const handleToggleVisivel = async (id: string, currentValue: boolean) => {
     setSaving(true);
