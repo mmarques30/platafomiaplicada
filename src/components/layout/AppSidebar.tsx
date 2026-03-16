@@ -365,7 +365,7 @@ export function AppSidebar() {
 
                 // Renderizar Bibliotecas imediatamente após "Aprender"
                 // Para IAplicada: apenas Prompts e Ferramentas
-                const bibliotecasMenu = renderBibliotecasAfter && !isVisitante ? (
+                const bibliotecasMenu = renderBibliotecasAfter && !isVisitante && isMenuVisible('bibliotecas') ? (
                   <Collapsible 
                     key="bibliotecas_menu"
                     open={expandedMenus.includes('bibliotecas_menu')} 
