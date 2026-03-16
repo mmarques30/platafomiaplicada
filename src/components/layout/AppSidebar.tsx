@@ -37,7 +37,7 @@ export function AppSidebar() {
   const { effectivePlan, isVisitante, isBusiness, isSkills, isAcademy, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading, isParceiro);
   const { isViewingAs, resetView, viewAs } = useAdminViewContext();
   const { signOut } = useAuth();
-  const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
+  const { getSidebarMenus, isMenuVisible, isLoading: menuLoading } = useMenuConfig();
   const { isLider: isSkillsLider, isLoading: skillsMembroLoading } = useSkillsMembro();
   const { currentEnvironment } = useEnvironment();
   
