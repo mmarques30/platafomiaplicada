@@ -525,7 +525,7 @@ export function AppSidebar() {
                     
                     <CollapsibleContent>
                       <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                        {/* Feed */}
+                        {isMenuVisible('comunidade_feed') && (
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className="group">
                             <NavLink 
@@ -542,8 +542,8 @@ export function AppSidebar() {
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
-                        
-                        {/* Sala de Aula - visível para todos os ambientes */}
+                        )}
+                        {isMenuVisible('comunidade_sala_aula') && (
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className="group">
                             <NavLink 
@@ -560,6 +560,7 @@ export function AppSidebar() {
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
+                        )}
                       </SidebarMenu>
                     </CollapsibleContent>
                   </SidebarMenuItem>
