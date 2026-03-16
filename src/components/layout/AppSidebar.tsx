@@ -402,9 +402,7 @@ export function AppSidebar() {
                       
                       <CollapsibleContent>
                         <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                          {/* Business Sistemas: apenas Prompts e Ferramentas */}
-                          {isBusinessSistemasEnv ? (
-                            <>
+                          {isMenuVisible('biblioteca_prompts') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -421,6 +419,8 @@ export function AppSidebar() {
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
+                          )}
+                          {isMenuVisible('biblioteca_ferramentas') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -437,8 +437,7 @@ export function AppSidebar() {
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
-                            </>
-                          ) : (
+                          )}
                             <>
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
