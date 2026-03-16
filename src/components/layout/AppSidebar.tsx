@@ -438,7 +438,7 @@ export function AppSidebar() {
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
                           )}
-                            <>
+                          {!isBusinessSistemasEnv && isMenuVisible('ia_copie_use') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -455,38 +455,8 @@ export function AppSidebar() {
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to="/biblioteca-ferramentas" 
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      location.pathname === '/biblioteca-ferramentas'
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
-                                    )}
-                                  >
-                                    {!collapsed && <span>Ferramentas</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to="/biblioteca-prompts" 
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      location.pathname === '/biblioteca-prompts'
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
-                                    )}
-                                  >
-                                    {!collapsed && <span>Prompts</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
+                          )}
+                          {!isBusinessSistemasEnv && isMenuVisible('metodos_aplicar') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -503,7 +473,6 @@ export function AppSidebar() {
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
-                            </>
                           )}
                         </SidebarMenu>
                       </CollapsibleContent>
