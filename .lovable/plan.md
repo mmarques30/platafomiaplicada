@@ -1,40 +1,70 @@
 
+# Corrigir erro persistente de importação de arquivo em “Novo Material Gratuito” (Admin)
 
-# Adicionar submenus faltantes ao menu_config para gestão pelo admin
+## Diagnóstico encontrado
 
-## Problema
-Páginas como "Métodos", "Ferramentas", "Prompts", "IA Copie e Use", "Feed", "Vídeos Bônus" etc. estão **hardcoded** no `AppSidebar.tsx` e não existem na tabela `menu_config`. Por isso, o admin não consegue ocultar/mostrar essas páginas pela tela "Gerenciar Menus".
+O erro atual não é mais do campo `url` no banco.  
+Pelos logs do navegador, a falha agora acontece no upload do arquivo para o storage:
 
-## Solução
+- `StorageApiError: Invalid key: 1771955595073_ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`
 
-### 1. Inserir registros faltantes no `menu_config`
-Criar migration com os submenus que faltam:
+Causa: o nome do arquivo está sendo enviado quase “cru” (`${Date.now()}_${file.name}`), contendo caracteres especiais (acentos, `+`, espaços/símbolos) que podem invalidar a chave do objeto no storage.
 
-| menu_key | label | parent_key | tipo |
-|---|---|---|---|
-| `bibliotecas` | Bibliotecas | `aprender` | sidebar |
-| `biblioteca_ferramentas` | Ferramentas | `bibliotecas` | sidebar |
-| `biblioteca_prompts` | Prompts | `bibliotecas` | sidebar |
-| `ia_copie_use` | IA "Copie e Use" | `bibliotecas` | sidebar |
-| `metodos_aplicar` | Métodos | `bibliotecas` | sidebar |
-| `comunidade_feed` | Feed | `comunidade` | sidebar |
-| `comunidade_videos_bonus` | Vídeos Bônus | `comunidade` | sidebar |
+## O que será implementado
 
-Todos com `visivel = true`, `editavel = true`, `tipo = 'sidebar'`.
+1. **Sanitizar o nome do arquivo antes do upload** em `GerenciarMateriais.tsx`, seguindo padrão já usado em outras partes do projeto.
+2. **Gerar chave de arquivo segura** (somente caracteres permitidos), preservando extensão.
+3. **Manter URL pública normalmente** após upload bem-sucedido.
+4. **Aprimorar feedback de erro** para facilitar diagnóstico caso algum upload volte a falhar.
+5. **(Opcional recomendado) validação de tamanho** de arquivo no front para evitar tentativas inválidas.
 
-### 2. Atualizar `AppSidebar.tsx`
-Usar `isMenuVisible()` do hook `useMenuConfig` para condicionar a renderização de cada subitem hardcoded:
-- Antes de renderizar "Métodos": checar `isMenuVisible('metodos_aplicar')`
-- Antes de renderizar "Ferramentas": checar `isMenuVisible('biblioteca_ferramentas')`
-- Idem para Prompts, IA Copie e Use, Feed, Vídeos Bônus
+## Estratégia técnica
 
-Se todos os subitens de "Bibliotecas" estão ocultos, ocultar o grupo inteiro.
+### Arquivo alvo
+- `src/pages/admin/GerenciarMateriais.tsx`
 
-### 3. Atualizar `GerenciarMenus.tsx`
-Esses novos registros já aparecerão automaticamente na hierarquia pai-filho existente, pois a query já busca todos os itens `tipo = 'sidebar'`.
+### Ajustes no `handleFileUpload`
 
-## Arquivos alterados
-- **Migration SQL**: inserir ~7 registros no `menu_config`
-- **`src/components/layout/AppSidebar.tsx`**: adicionar checagens `isMenuVisible()` nos subitens hardcoded
-- **`src/hooks/useMenuConfig.tsx`**: sem alteração (já tem `isMenuVisible`)
+- Trocar:
+```ts
+const fileName = `${Date.now()}_${file.name}`;
+```
 
+- Por geração segura, por exemplo:
+```ts
+const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+const base = file.name.replace(/\.[^/.]+$/, '');
+const normalized = base
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+  .replace(/[^a-zA-Z0-9.-]/g, '_')   // troca inválidos por _
+  .replace(/_+/g, '_')               // colapsa __
+  .replace(/^_+|_+$/g, '');          // trim de _
+const safeBase = normalized || 'arquivo';
+const fileName = `${Date.now()}-${safeBase}.${ext}`;
+```
+
+Isso evita chaves inválidas com `+`, acentos e símbolos.
+
+### Robustez adicional recomendada
+
+- Em `handleRemoveFile`, extrair o path do arquivo de forma mais robusta via `new URL(url)` + decode, para não quebrar se houver subpastas/futuros ajustes de estrutura.
+- Melhorar `toast.error(...)` para mostrar mensagem amigável baseada no erro retornado (`error.message`) em vez de sempre genérica.
+
+## Resultado esperado
+
+Após esse ajuste:
+- Upload de arquivos com nomes complexos (acentos, espaços, símbolos) funcionará normalmente.
+- Criação de “Novo Material Gratuito” com arquivo voltará a funcionar sem erro de chave inválida.
+- Fluxo ficará mais resiliente para diferentes nomes de arquivo.
+
+## Validação (teste fim a fim)
+
+1. Ir em `/admin/materiais`.
+2. Clicar em **Novo Material**.
+3. Fazer upload de um arquivo com nome “problemático” (ex.: `ZAPIER + IA AUTOMAÇÕES INTELIGENTES.pdf`).
+4. Confirmar:
+   - upload concluído sem erro;
+   - arquivo aparece na lista;
+   - salvar material com sucesso;
+   - material aparece na tabela e abre corretamente no front.

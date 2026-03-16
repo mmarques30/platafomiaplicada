@@ -37,7 +37,7 @@ export function AppSidebar() {
   const { effectivePlan, isVisitante, isBusiness, isSkills, isAcademy, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading, isParceiro);
   const { isViewingAs, resetView, viewAs } = useAdminViewContext();
   const { signOut } = useAuth();
-  const { getSidebarMenus, isLoading: menuLoading } = useMenuConfig();
+  const { getSidebarMenus, isMenuVisible, isLoading: menuLoading } = useMenuConfig();
   const { isLider: isSkillsLider, isLoading: skillsMembroLoading } = useSkillsMembro();
   const { currentEnvironment } = useEnvironment();
   
@@ -365,7 +365,7 @@ export function AppSidebar() {
 
                 // Renderizar Bibliotecas imediatamente após "Aprender"
                 // Para IAplicada: apenas Prompts e Ferramentas
-                const bibliotecasMenu = renderBibliotecasAfter && !isVisitante ? (
+                const bibliotecasMenu = renderBibliotecasAfter && !isVisitante && isMenuVisible('bibliotecas') ? (
                   <Collapsible 
                     key="bibliotecas_menu"
                     open={expandedMenus.includes('bibliotecas_menu')} 
@@ -402,9 +402,7 @@ export function AppSidebar() {
                       
                       <CollapsibleContent>
                         <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                          {/* Business Sistemas: apenas Prompts e Ferramentas */}
-                          {isBusinessSistemasEnv ? (
-                            <>
+                          {isMenuVisible('biblioteca_prompts') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -421,6 +419,8 @@ export function AppSidebar() {
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
+                          )}
+                          {isMenuVisible('biblioteca_ferramentas') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -437,9 +437,8 @@ export function AppSidebar() {
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
-                            </>
-                          ) : (
-                            <>
+                          )}
+                          {!isBusinessSistemasEnv && isMenuVisible('ia_copie_use') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -456,38 +455,8 @@ export function AppSidebar() {
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to="/biblioteca-ferramentas" 
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      location.pathname === '/biblioteca-ferramentas'
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
-                                    )}
-                                  >
-                                    {!collapsed && <span>Ferramentas</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to="/biblioteca-prompts" 
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      location.pathname === '/biblioteca-prompts'
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
-                                    )}
-                                  >
-                                    {!collapsed && <span>Prompts</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
+                          )}
+                          {!isBusinessSistemasEnv && isMenuVisible('metodos_aplicar') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -504,7 +473,6 @@ export function AppSidebar() {
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
-                            </>
                           )}
                         </SidebarMenu>
                       </CollapsibleContent>
@@ -557,7 +525,7 @@ export function AppSidebar() {
                     
                     <CollapsibleContent>
                       <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                        {/* Feed */}
+                        {isMenuVisible('comunidade_feed') && (
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className="group">
                             <NavLink 
@@ -574,8 +542,8 @@ export function AppSidebar() {
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
-                        
-                        {/* Sala de Aula - visível para todos os ambientes */}
+                        )}
+                        {isMenuVisible('comunidade_sala_aula') && (
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className="group">
                             <NavLink 
@@ -592,6 +560,7 @@ export function AppSidebar() {
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
+                        )}
                       </SidebarMenu>
                     </CollapsibleContent>
                   </SidebarMenuItem>
