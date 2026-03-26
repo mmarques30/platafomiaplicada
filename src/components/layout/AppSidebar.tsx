@@ -124,8 +124,10 @@ export function AppSidebar() {
     
     // Filtrar menu "Painel do Líder" se não for líder Skills (e não for admin)
     // Filtrar Performance e Diagnóstico do Projeto Skills para não-líderes/não-admins
+    const BIBLIOTECAS_KEYS = ['bibliotecas', 'biblioteca_ferramentas', 'biblioteca_prompts', 'ia_copie_use', 'metodos_aplicar'];
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
+      .filter(menu => !BIBLIOTECAS_KEYS.includes(menu.menu_key))
       .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading)
       .filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading);
   };

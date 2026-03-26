@@ -147,7 +147,7 @@ export function TodasAsTrilhas() {
           Nenhuma trilha encontrada com os filtros selecionados.
         </p>
       ) : (
-        <div className="px-12">
+        <div className="px-2 md:px-12">
           <Carousel
             opts={{
               align: "start",
