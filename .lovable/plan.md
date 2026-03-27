@@ -1,18 +1,32 @@
 
 
-# Correções: Mobile responsivo + Bibliotecas duplicada no menu
+# Adicionar progresso Business Parceria na página Evolução
 
-## Problema 1: Layout mobile nao adaptado
-A pagina inicial e a pagina de Trilhas nao se adaptam ao mobile. Na tela de Trilhas, o card do carrossel com aspect-ratio 9/16 ocupa a tela inteira verticalmente, e o padding `px-12` das setas do carrossel comprime o conteudo. O header superior tambem tem elementos que nao se ajustam bem.
+## Problema
+A página `/evolucao` (`Evolucao.tsx`) não exibe nenhum conteúdo específico para usuários Business Parceria. Ela usa `useEffectivePlan` mas só verifica `isAcademy` (para mostrar `BonusEvolucao`). Usuários como Paula (business_parceria) veem apenas o conteúdo genérico (Hero, Trilhas, Conquistas) sem o progresso do Business.
 
-## Problema 2: Bibliotecas aparece duplicada
-"Bibliotecas" aparece como submenu dentro de "Aprender" (vindo do banco com `parent_key = 'aprender'`) E tambem como bloco hardcoded separado logo apos "Aprender" (linhas 366-481 do AppSidebar). Deveria aparecer SOMENTE fora, como grupo independente.
+Os componentes `BusinessProgressoConteudo` e `BusinessEvolucaoAprendizado` existem mas só são usados na página `/mentoria`.
 
----
+## Solução
 
-## Correcoes
+**Arquivo: `src/pages/Evolucao.tsx`**
 
-### 1. Carousel de Trilhas - mobile responsivo
-**Arquivo: `src/components/dashboard/TodasAsTrilhas.tsx`**
+1. Importar `useEffectivePlan` com as flags `isBusiness`, `isBusinessParceria` (já usa o hook, só precisa extrair mais flags)
+2. Importar `BusinessProgressoConteudo` de `@/components/mentoria/business/BusinessProgressoConteudo`
+3. Importar `BusinessEvolucaoAprendizado` de `@/components/mentoria/business/BusinessEvolucaoAprendizado`
+4. Na aba "minha-evolucao", adicionar seção condicional para Business Parceria:
 
-- Reduzir o `px-12` para `px-2 md:px-12` para nao comprimir o carrossel no
+```tsx
+const { isAcademy, isBusinessParceria } = useEffectivePlan(isAdmin);
+
+// Na TabsContent "minha-evolucao":
+<HeroEvolucao />
+{isBusinessParceria && <BusinessProgressoConteudo />}
+{isBusinessParceria && <BusinessEvolucaoAprendizado />}
+<TrilhasEmAndamentoCards />
+<VitrineConquistas />
+{isAcademy && <BonusEvolucao />}
+```
+
+Mudança simples em um único arquivo — adicionar 2 imports e 2 linhas condicionais.
+
