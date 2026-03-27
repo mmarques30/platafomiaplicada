@@ -9,6 +9,8 @@ import { HeroComunidade } from "@/components/evolucao/HeroComunidade";
 import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndamentoCards";
 import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
 import { BonusEvolucao } from "@/components/evolucao/BonusEvolucao";
+import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
+import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
@@ -19,7 +21,7 @@ import { PageTitle } from "@/components/shared/PageTitle";
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
   const { isAdmin } = useUserRole();
-  const { isAcademy } = useEffectivePlan(isAdmin);
+  const { isAcademy, isBusinessParceria } = useEffectivePlan(isAdmin);
   
   
 
@@ -60,6 +62,8 @@ export default function Evolucao() {
         {/* ABA 1: MINHA EVOLUÇÃO */}
         <TabsContent value="minha-evolucao" className="space-y-6 mt-6">
           <HeroEvolucao />
+          {isBusinessParceria && <BusinessProgressoConteudo />}
+          {isBusinessParceria && <BusinessEvolucaoAprendizado />}
           <TrilhasEmAndamentoCards />
           <VitrineConquistas />
           {isAcademy && <BonusEvolucao />}
