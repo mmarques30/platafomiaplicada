@@ -25,8 +25,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function Mentoria() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isAdmin } = useUserRole();
-  const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills } = useEffectivePlan(isAdmin);
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills } = useEffectivePlan(isAdmin, roleLoading);
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Redirecionar usuários Skills para suas páginas específicas

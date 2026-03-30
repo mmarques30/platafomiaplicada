@@ -28,12 +28,12 @@ export interface ProgressoConteudoData {
 }
 
 export function useBusinessProgressoConteudo() {
-  const { user } = useAuth();
+  const userId = useBusinessUserId();
 
   return useQuery({
-    queryKey: ["business-progresso-conteudo", user?.id],
+    queryKey: ["business-progresso-conteudo", userId],
     queryFn: async (): Promise<ProgressoConteudoData> => {
-      if (!user?.id) {
+      if (!userId) {
         return {
           videos: { total: 0, tempoTotalMinutos: 0, percentualConcluido: 0, ultimoAcesso: null },
           prompts: { total: 0, ultimos: [] },

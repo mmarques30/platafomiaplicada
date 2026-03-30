@@ -29,12 +29,12 @@ export interface EvolucaoAprendizadoData {
 }
 
 export function useBusinessEvolucaoAprendizado() {
-  const { user } = useAuth();
+  const userId = useBusinessUserId();
 
   return useQuery({
-    queryKey: ["business-evolucao-aprendizado", user?.id],
+    queryKey: ["business-evolucao-aprendizado", userId],
     queryFn: async (): Promise<EvolucaoAprendizadoData> => {
-      if (!user?.id) {
+      if (!userId) {
         return {
           videos: { total: 0, tempoTotalMinutos: 0, percentualConcluido: 0, ultimoAcesso: null },
           prompts: { total: 0 },
