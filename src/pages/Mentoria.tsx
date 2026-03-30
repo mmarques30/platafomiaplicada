@@ -104,8 +104,9 @@ export default function Mentoria() {
             <IAplicadaVisaoGeral />
           ) : isBusiness ? (
             <>
-              {/* Business Colaborativo: ROI → Pendências */}
+              {/* Business Colaborativo: ROI → Progresso → Reports */}
               <BusinessROIChart />
+              <BusinessProgressoConteudo />
               <BusinessReportsCard />
             </>
           ) : (
