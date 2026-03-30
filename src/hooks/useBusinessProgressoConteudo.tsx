@@ -47,14 +47,14 @@ export function useBusinessProgressoConteudo() {
         supabase
           .from("progresso_videos")
           .select("*, videos(titulo)")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("updated_at", { ascending: false }),
         
         // Prompts copiados
         supabase
           .from("prompt_copy_logs")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("copied_at", { ascending: false })
           .limit(5),
         
@@ -62,7 +62,7 @@ export function useBusinessProgressoConteudo() {
         supabase
           .from("content_access_logs")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("accessed_at", { ascending: false })
           .limit(10),
         
@@ -70,7 +70,7 @@ export function useBusinessProgressoConteudo() {
         supabase
           .from("button_click_logs")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("clicked_at", { ascending: false })
           .limit(10),
       ]);
@@ -136,7 +136,7 @@ export function useBusinessProgressoConteudo() {
         }
       };
     },
-    enabled: !!user?.id,
+    enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 min cache
   });
 }

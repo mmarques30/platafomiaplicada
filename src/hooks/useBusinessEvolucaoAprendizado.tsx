@@ -50,35 +50,35 @@ export function useBusinessEvolucaoAprendizado() {
         supabase
           .from("progresso_videos")
           .select("*, videos(titulo)")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("updated_at", { ascending: false }),
         
         // Prompts copiados
         supabase
           .from("prompt_copy_logs")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("copied_at", { ascending: false }),
         
         // Acessos a conteúdos
         supabase
           .from("content_access_logs")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("accessed_at", { ascending: false }),
         
         // Ferramentas criadas pelo usuário
         supabase
           .from("ferramentas_compartilhadas")
           .select("*", { count: "exact" })
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .eq("ativo", true),
         
         // Favoritos do usuário
         supabase
           .from("favoritos")
           .select("item_id")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
       ]);
 
       // Processar videos
@@ -150,7 +150,7 @@ export function useBusinessEvolucaoAprendizado() {
         favoritos
       };
     },
-    enabled: !!user?.id,
+    enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 min cache
   });
 }
