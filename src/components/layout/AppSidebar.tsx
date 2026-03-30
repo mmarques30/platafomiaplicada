@@ -343,7 +343,7 @@ export function AppSidebar() {
                   <SidebarMenuItem key={menu.menu_key}>
                     <SidebarMenuButton asChild className="group">
                       <NavLink 
-                        to={menu.url || "/"} 
+                        to={getMenuUrl(menu)} 
                         end 
                         className={cn(
                           "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",

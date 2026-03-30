@@ -121,10 +121,23 @@ export function useMenuConfig() {
       if (!userPlan) return false;
       
       // Verifica se o plano do usuário está na lista de permitidos
+      // Aliases para compatibilidade entre chaves legadas e novas
+      const PLAN_ALIASES: Record<string, string[]> = {
+        'business_parceria': ['business_parceria', 'business'],
+        'business_sistemas': ['business_sistemas', 'business_iaplicada'],
+        'business': ['business', 'business_parceria'],
+        'business_iaplicada': ['business_iaplicada', 'business_sistemas'],
+      };
+      
+      const matchesPlan = (plan: string) => {
+        const aliases = PLAN_ALIASES[plan] || [plan];
+        return m.planos_permitidos!.some(p => aliases.includes(p));
+      };
+      
       // Se o ambiente selecionado corresponde a um dos planos permitidos, mostrar o menu
-      if (currentEnvironment && m.planos_permitidos.includes(currentEnvironment)) return true;
+      if (currentEnvironment && matchesPlan(currentEnvironment)) return true;
       // Fallback: verificar plano do usuário
-      return m.planos_permitidos.includes(userPlan);
+      return matchesPlan(userPlan);
     }).map(m => {
     if (m.menu_key === 'meu_progresso' && currentEnvironment === 'business_parceria') {
         return { ...m, label: 'Minha Trajetória' };
