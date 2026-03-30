@@ -21,7 +21,8 @@ import { PageTitle } from "@/components/shared/PageTitle";
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
   const { isAdmin } = useUserRole();
-  const { isAcademy, isBusinessParceria } = useEffectivePlan(isAdmin);
+  const { isAdmin: isRoleAdmin, isLoading: roleLoading } = useUserRole();
+  const { isAcademy, isBusiness } = useEffectivePlan(isRoleAdmin, roleLoading);
   
   
 
