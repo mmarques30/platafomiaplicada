@@ -1,32 +1,30 @@
 
 
-# Adicionar progresso Business Parceria na página Evolução
+# Fix: Business progress em Minha Trajetória + preview admin
 
 ## Problema
-A página `/evolucao` (`Evolucao.tsx`) não exibe nenhum conteúdo específico para usuários Business Parceria. Ela usa `useEffectivePlan` mas só verifica `isAcademy` (para mostrar `BonusEvolucao`). Usuários como Paula (business_parceria) veem apenas o conteúdo genérico (Hero, Trilhas, Conquistas) sem o progresso do Business.
+1. Os hooks `useBusinessProgressoConteudo` e `useBusinessEvolucaoAprendizado` usam `user?.id` diretamente em vez de `useBusinessUserId()`, então quando o admin simula via "Ver como", os dados do usuário simulado não são carregados
+2. O `Mentoria.tsx` não passa `roleLoading` ao `useEffectivePlan`, causando possível race condition
+3. O componente `BusinessProgressoConteudo` não está presente na página Mentoria (Minha Trajetória) — só na Evolução
 
-Os componentes `BusinessProgressoConteudo` e `BusinessEvolucaoAprendizado` existem mas só são usados na página `/mentoria`.
+## Correções
 
-## Solução
+### 1. Hook `useBusinessProgressoConteudo` — usar `useBusinessUserId`
+**Arquivo: `src/hooks/useBusinessProgressoConteudo.tsx`**
+- Substituir `useAuth` + `user?.id` por `useBusinessUserId()` para que admin simulando veja os dados do usuário correto
 
-**Arquivo: `src/pages/Evolucao.tsx`**
+### 2. Hook `useBusinessEvolucaoAprendizado` — usar `useBusinessUserId`
+**Arquivo: `src/hooks/useBusinessEvolucaoAprendizado.tsx`**
+- Mesma correção: substituir `user?.id` por `useBusinessUserId()`
 
-1. Importar `useEffectivePlan` com as flags `isBusiness`, `isBusinessParceria` (já usa o hook, só precisa extrair mais flags)
-2. Importar `BusinessProgressoConteudo` de `@/components/mentoria/business/BusinessProgressoConteudo`
-3. Importar `BusinessEvolucaoAprendizado` de `@/components/mentoria/business/BusinessEvolucaoAprendizado`
-4. Na aba "minha-evolucao", adicionar seção condicional para Business Parceria:
+### 3. Mentoria.tsx — passar `roleLoading` e adicionar `BusinessProgressoConteudo`
+**Arquivo: `src/pages/Mentoria.tsx`**
+- Extrair `isLoading: roleLoading` do `useUserRole()` e passar para `useEffectivePlan(isAdmin, roleLoading)`
+- Adicionar `BusinessProgressoConteudo` na aba "visão geral" do Business Parceria (junto com ROIChart e ReportsCard)
+- Adicionar `BusinessProgressoConteudo` na aba "evolução aprendizado" (antes do `BusinessEvolucaoAprendizado`)
 
-```tsx
-const { isAcademy, isBusinessParceria } = useEffectivePlan(isAdmin);
-
-// Na TabsContent "minha-evolucao":
-<HeroEvolucao />
-{isBusinessParceria && <BusinessProgressoConteudo />}
-{isBusinessParceria && <BusinessEvolucaoAprendizado />}
-<TrilhasEmAndamentoCards />
-<VitrineConquistas />
-{isAcademy && <BonusEvolucao />}
-```
-
-Mudança simples em um único arquivo — adicionar 2 imports e 2 linhas condicionais.
+## Arquivos alterados
+- `src/hooks/useBusinessProgressoConteudo.tsx`
+- `src/hooks/useBusinessEvolucaoAprendizado.tsx`
+- `src/pages/Mentoria.tsx`
 
