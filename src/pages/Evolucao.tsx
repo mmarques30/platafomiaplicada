@@ -20,8 +20,8 @@ import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
-  const { isAdmin } = useUserRole();
-  const { isAcademy, isBusinessParceria } = useEffectivePlan(isAdmin);
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isAcademy, isBusiness } = useEffectivePlan(isAdmin, roleLoading);
   
   
 
@@ -62,8 +62,8 @@ export default function Evolucao() {
         {/* ABA 1: MINHA EVOLUÇÃO */}
         <TabsContent value="minha-evolucao" className="space-y-6 mt-6">
           <HeroEvolucao />
-          {isBusinessParceria && <BusinessProgressoConteudo />}
-          {isBusinessParceria && <BusinessEvolucaoAprendizado />}
+          {isBusiness && <BusinessProgressoConteudo />}
+          {isBusiness && <BusinessEvolucaoAprendizado />}
           <TrilhasEmAndamentoCards />
           <VitrineConquistas />
           {isAcademy && <BonusEvolucao />}
