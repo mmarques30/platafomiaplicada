@@ -15,6 +15,7 @@ import { FaseAtualCard } from "@/components/mentoria/FaseAtualCard";
 import { BusinessAcessoRapido } from "@/components/mentoria/business/BusinessAcessoRapido";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
+import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
 import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
@@ -24,8 +25,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function Mentoria() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isAdmin } = useUserRole();
-  const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills } = useEffectivePlan(isAdmin);
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills } = useEffectivePlan(isAdmin, roleLoading);
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Redirecionar usuários Skills para suas páginas específicas
@@ -103,8 +104,9 @@ export default function Mentoria() {
             <IAplicadaVisaoGeral />
           ) : isBusiness ? (
             <>
-              {/* Business Colaborativo: ROI → Pendências */}
+              {/* Business Colaborativo: ROI → Progresso → Reports */}
               <BusinessROIChart />
+              <BusinessProgressoConteudo />
               <BusinessReportsCard />
             </>
           ) : (
@@ -138,6 +140,7 @@ export default function Mentoria() {
         {/* Aba Evolução Aprendizado - Apenas Business Colaborativo */}
         {showEvolucaoTab && (
           <TabsContent value="evolucao-aprendizado" className="mt-0 space-y-6">
+            <BusinessProgressoConteudo />
             <BusinessEvolucaoAprendizado />
           </TabsContent>
         )}

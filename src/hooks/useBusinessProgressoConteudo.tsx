@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 
 export interface ProgressoConteudoData {
   videos: {
@@ -28,12 +28,12 @@ export interface ProgressoConteudoData {
 }
 
 export function useBusinessProgressoConteudo() {
-  const { user } = useAuth();
+  const userId = useBusinessUserId();
 
   return useQuery({
-    queryKey: ["business-progresso-conteudo", user?.id],
+    queryKey: ["business-progresso-conteudo", userId],
     queryFn: async (): Promise<ProgressoConteudoData> => {
-      if (!user?.id) {
+      if (!userId) {
         return {
           videos: { total: 0, tempoTotalMinutos: 0, percentualConcluido: 0, ultimoAcesso: null },
           prompts: { total: 0, ultimos: [] },
@@ -47,14 +47,14 @@ export function useBusinessProgressoConteudo() {
         supabase
           .from("progresso_videos")
           .select("*, videos(titulo)")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("updated_at", { ascending: false }),
         
         // Prompts copiados
         supabase
           .from("prompt_copy_logs")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("copied_at", { ascending: false })
           .limit(5),
         
@@ -62,7 +62,7 @@ export function useBusinessProgressoConteudo() {
         supabase
           .from("content_access_logs")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("accessed_at", { ascending: false })
           .limit(10),
         
@@ -70,7 +70,7 @@ export function useBusinessProgressoConteudo() {
         supabase
           .from("button_click_logs")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("clicked_at", { ascending: false })
           .limit(10),
       ]);
@@ -136,7 +136,7 @@ export function useBusinessProgressoConteudo() {
         }
       };
     },
-    enabled: !!user?.id,
+    enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 min cache
   });
 }
