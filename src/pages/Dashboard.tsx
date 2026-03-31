@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
 export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
@@ -31,11 +32,7 @@ export default function Dashboard() {
 
   // IMPORTANTE: Não renderizar enquanto carrega
   if (loadingRole) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <PageSkeleton variant="dashboard" />;
   }
 
   return (

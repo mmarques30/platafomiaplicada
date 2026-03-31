@@ -1,6 +1,7 @@
 import { useAulasCalendario, useProximaAula } from "@/hooks/useCalendarioAulas";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Calendar, Clock } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -9,11 +10,7 @@ export function CalendarioAulas() {
   const { data: proximaAula } = useProximaAula();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageSkeleton variant="calendario" />;
   }
 
   if (!aulas || aulas.length === 0) {
