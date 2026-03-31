@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, EyeOff } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, TrendingUp, GraduationCap, Layers, ChevronDown } from "lucide-react";
+import { SidebarComunidadeItem } from "./SidebarComunidadeItem";
+import { SidebarAdminSection } from "./SidebarAdminSection";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -495,146 +497,25 @@ export function AppSidebar() {
                 );
               })}
 
-              {/* Comunidade - Menu expansível (oculto para Business) */}
-              {!isBusiness && (
-                <Collapsible 
-                  open={expandedMenus.includes('comunidade_menu')} 
-                  onOpenChange={() => toggleMenu('comunidade_menu')}
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="group w-full relative pl-4">
-                        <span className={cn(
-                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                          (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
-                            ? "bg-[#0D0D0D] opacity-100" 
-                            : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
-                        )} />
-                        <div className={cn(
-                          "flex items-center gap-3 rounded-lg transition-all duration-200 font-medium py-2.5 w-full",
-                          (location.pathname === '/comunidade' || location.pathname === '/videos-bonus')
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
-                        )}>
-                          <LucideIcons.Users className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                          {!collapsed && (
-                            <>
-                              <span className="text-sm flex-1 text-left">Comunidade</span>
-                              <LucideIcons.ChevronDown className={cn(
-                                "h-4 w-4 transition-transform duration-200",
-                                expandedMenus.includes('comunidade_menu') && "rotate-180"
-                              )} />
-                            </>
-                          )}
-                        </div>
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    
-                    <CollapsibleContent>
-                      <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                        {isMenuVisible('comunidade_feed') && (
-                        <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="group">
-                            <NavLink 
-                              to="/comunidade" 
-                              end
-                              className={cn(
-                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                location.pathname === '/comunidade'
-                                  ? "text-primary font-semibold" 
-                                  : "text-sidebar-foreground/70 hover:text-primary"
-                              )}
-                            >
-                              {!collapsed && <span>Feed</span>}
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        )}
-                        {isMenuVisible('comunidade_sala_aula') && (
-                        <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="group">
-                            <NavLink 
-                              to="/videos-bonus" 
-                              end
-                              className={cn(
-                                "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                location.pathname === '/videos-bonus'
-                                  ? "text-primary font-semibold" 
-                                  : "text-sidebar-foreground/70 hover:text-primary"
-                              )}
-                            >
-                              {!collapsed && <span>Sala de Aula</span>}
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        )}
-                      </SidebarMenu>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
-              )}
-
-              {/* Menu Cupons - Temporariamente desativado */}
+              <SidebarComunidadeItem
+                isBusiness={isBusiness}
+                collapsed={collapsed}
+                expandedMenus={expandedMenus}
+                toggleMenu={toggleMenu}
+                isMenuVisible={isMenuVisible}
+                pathname={location.pathname}
+              />
 
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isAdmin && !isViewingAs && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="px-4 text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider">
-              Administração
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-1 px-3">
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild className="group">
-                    <NavLink 
-                      to="/admin" 
-                      className={({ isActive }) => cn(
-                        "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
-                        isActive 
-                          ? "text-primary font-semibold" 
-                          : "text-sidebar-foreground hover:text-primary"
-                      )}
-                    >
-                      {({ isActive }) => (
-                        <>
-                          <span className={cn(
-                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                            isActive 
-                              ? "bg-[#0D0D0D] opacity-100" 
-                              : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
-                          )} />
-                          <Shield className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                          {!collapsed && <span className="text-sm">Painel Admin</span>}
-                        </>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {isAdmin && isViewingAs && (
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-1 px-3">
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    onClick={resetView}
-                    className="group relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                  >
-                    <EyeOff className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                    {!collapsed && <span className="text-sm">Sair da Simulação</span>}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        <SidebarAdminSection
+          isAdmin={isAdmin}
+          isViewingAs={isViewingAs}
+          resetView={resetView}
+          collapsed={collapsed}
+        />
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
