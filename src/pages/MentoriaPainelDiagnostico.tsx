@@ -14,6 +14,7 @@ import { PainelCard, PainelCardHeader } from "@/components/mentoria/painel/Paine
 import { BusinessDashboard } from "@/components/mentoria/business/BusinessDashboard";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
