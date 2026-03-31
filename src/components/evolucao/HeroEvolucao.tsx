@@ -1,5 +1,5 @@
 import { Progress } from "@/components/ui/progress";
-import { Trophy } from "lucide-react";
+
 import grafiaEvolucao from "@/assets/grafia-evolucao.svg";
 import { useNivelUsuario } from "@/hooks/useNivelUsuario";
 import { useMinhaEvolucao } from "@/hooks/useMinhaEvolucao";
