@@ -89,14 +89,14 @@ export default function MentoriaTarefas() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; label: string }> = {
-      pendente: { variant: "secondary", label: "Pendente" },
-      em_andamento: { variant: "default", label: "Em Andamento" },
-      atrasada: { variant: "destructive", label: "Atrasada" },
-      concluida: { variant: "outline", label: "Concluída" }
+    const map: Record<string, { status: string; label: string }> = {
+      pendente: { status: "pendente", label: "Pendente" },
+      em_andamento: { status: "em_andamento", label: "Em Andamento" },
+      atrasada: { status: "atrasado", label: "Atrasada" },
+      concluida: { status: "concluido", label: "Concluída" },
     };
-    const config = variants[status] || variants.pendente;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = map[status] || map.pendente;
+    return <StatusBadge status={config.status} label={config.label} />;
   };
 
   const getDiasRestantes = (prazo: string) => {
