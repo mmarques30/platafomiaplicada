@@ -7,12 +7,37 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PageTitle } from "@/components/shared/PageTitle";
 
+const getBarColor = (tipo: string | null | undefined): string => {
+  switch (tipo) {
+    case "urgente":
+    case "critico":
+    case "atrasado":
+    case "alerta":
+    case "prazo":
+      return "#E8684A";
+    case "importante":
+    case "entrega":
+    case "tarefa":
+      return "#E8A43C";
+    case "informativo":
+    case "sessao":
+      return "#4A9FE0";
+    case "conquista":
+    case "certificado":
+      return "#AFC040";
+    default:
+      return "#2CBBA6";
+  }
+};
+
+const removeEmojis = (text: string): string =>
+  text.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, "").trim();
+
 export default function Notificacoes() {
   const { data: avisos, isLoading } = useAvisosPublicos();
   const { mutate: marcarComoLidos } = useMarcarAvisosComoLidos();
   const marcadoRef = useRef(false);
 
-  // Marcar avisos como lidos quando a página carregar
   useEffect(() => {
     if (avisos && avisos.length > 0 && !marcadoRef.current) {
       const ids = avisos.map(a => a.id);
@@ -48,11 +73,15 @@ export default function Notificacoes() {
         ) : (
           <div className="space-y-3">
             {avisos.map((aviso) => (
-              <Card key={aviso.id} className="border-primary/30 bg-primary/5">
-                <CardHeader>
+              <Card key={aviso.id} className="relative overflow-hidden border-primary/30 bg-primary/5">
+                <div
+                  className="absolute left-0 top-0 h-full"
+                  style={{ width: 3, backgroundColor: getBarColor(aviso.tipo) }}
+                />
+                <CardHeader className="pl-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <CardTitle className="text-lg">{aviso.titulo}</CardTitle>
+                      <CardTitle className="text-lg">{removeEmojis(aviso.titulo)}</CardTitle>
                       <CardDescription>
                         {formatDistanceToNow(new Date(aviso.created_at), {
                           addSuffix: true,
@@ -74,8 +103,8 @@ export default function Notificacoes() {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm whitespace-pre-wrap">{aviso.mensagem}</p>
+                <CardContent className="pl-5">
+                  <p className="text-sm whitespace-pre-wrap">{removeEmojis(aviso.mensagem)}</p>
                   {aviso.data_expiracao && (
                     <p className="text-xs text-muted-foreground mt-3">
                       Válido até: {new Date(aviso.data_expiracao).toLocaleDateString('pt-BR')}
