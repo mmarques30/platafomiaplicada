@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePainelDiagnostico } from "@/hooks/usePainelDiagnostico";
