@@ -1,4 +1,3 @@
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface StepLabel {
@@ -53,7 +52,6 @@ export function ProgressBar({ currentStep, totalSteps, steps, isBusiness = false
         ))}
       </div>
       
-      {/* Progress Bar */}
       <div className="relative h-2 rounded-full overflow-hidden bg-secondary">
         <div
           className="h-full transition-all duration-500 ease-out bg-primary"
