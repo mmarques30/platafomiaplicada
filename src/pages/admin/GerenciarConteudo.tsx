@@ -63,6 +63,10 @@ export default function GerenciarConteudo() {
         <TabsContent value="central" className={adminTheme.tabsContent}>
           <CentralTab />
         </TabsContent>
+
+        <TabsContent value="curadoria" className={adminTheme.tabsContent}>
+          <CuradoriaIATab />
+        </TabsContent>
       </Tabs>
     </div>
   );

@@ -92,3 +92,6 @@ verify_jwt = false
 
 [functions.parse-aditivo-contrato]
 verify_jwt = false
+
+[functions.gerar-curadoria-semanal]
+verify_jwt = false
