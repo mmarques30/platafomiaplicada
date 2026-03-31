@@ -68,6 +68,7 @@ import BibliotecaFerramentas from "./pages/BibliotecaFerramentas";
 import BibliotecaPrompts from "./pages/BibliotecaPrompts";
 import MetodosAplicar from "./pages/MetodosAplicar";
 import Sobre from "./pages/Sobre";
+import OnboardingWelcome from "./pages/OnboardingWelcome";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainLayout } from "./components/layout/MainLayout";

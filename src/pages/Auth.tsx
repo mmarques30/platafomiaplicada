@@ -16,9 +16,18 @@ export default function Auth() {
   const initialTab = searchParams.get("tab") === "signup" ? "signup" : "login";
   const [activeTab, setActiveTab] = useState<"login" | "signup">(initialTab);
 
-  // Redirecionar usuários já autenticados para seleção de ambiente
+  // Redirecionar usuários já autenticados
   useEffect(() => {
     if (!loading && user) {
+      const onboardingComplete = sessionStorage.getItem("onboarding_complete");
+      const hasOnboardingData = sessionStorage.getItem("onboarding_nome");
+      
+      // Novo cadastro com dados de onboarding → tela de boas-vindas
+      if (hasOnboardingData && !onboardingComplete) {
+        navigate("/onboarding-welcome");
+        return;
+      }
+      
       const savedEnv = sessionStorage.getItem("selected_environment");
       navigate(savedEnv ? "/" : "/selecionar-ambiente");
     }
