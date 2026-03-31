@@ -104,7 +104,9 @@ export function AppSidebar() {
     || effectivePlan === 'business_parceria';
   const isBusinessEnv = isBusinessSistemasEnv || isBusinessParceriaEnv || isBusiness;
 
-  // Business groups definition
+  // ========== BUSINESS GROUPS (hardcoded) — START ==========
+  // Estes grupos têm prioridade sobre menu_config para Business.
+  // Se adicionar rotas aqui, ocultar no hiddenByEnvironment do useMenuConfig.
   const businessGroups = [
     {
       key: 'biz_jornada',
@@ -141,6 +143,7 @@ export function AppSidebar() {
       ],
     },
   ];
+  // ========== BUSINESS GROUPS (hardcoded) — END ==========
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
