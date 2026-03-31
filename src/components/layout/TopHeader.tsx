@@ -59,6 +59,8 @@ export function TopHeader() {
   const isComunicacoesActive = ['/chat', '/notificacoes', '/avisos'].some(path => location.pathname.startsWith(path));
 
   const { data: avisosCount } = useAvisosAtivosCount();
+  const { data: notifNaoLidasCount } = useNotificacoesNaoLidasCount();
+  const totalBadgeCount = (avisosCount ?? 0) + (notifNaoLidasCount ?? 0);
 
   const handleLogout = async () => {
     await signOut();
