@@ -1,36 +1,67 @@
 
 
-# Adicionar botão "Gerar novo report" na página /mentoria/reports
+# Integrar contexto de mentoria ao chat da MarIAna
 
-## Alteração
+## Visão geral
 
-**Arquivo**: `src/pages/MentoriaReports.tsx`
+Quando o chat da MarIAna abre em páginas `/mentoria/*`, buscar dados de urgência do usuário (entregas, sessões, etapas, tarefas críticas), gerar uma mensagem proativa como primeira mensagem da assistente, e enviar contexto extra ao `ai-chat-user` para personalizar as respostas.
 
-### 1. Imports adicionais
-- `useState` do React
-- `Sparkles`, `Loader2` do lucide-react
-- `supabase` do client
-- `useQueryClient` do react-query
-- `toast` do use-toast
-- `SkeletonCard` do ui/SkeletonCard
+A edge function `personalizar-instrucao` **não será usada** — ela é voltada para gerar descrições de instruções de etapas, não para chat. O contexto será montado no cliente e enviado como campo extra ao `ai-chat-user`, que já possui system prompt completo.
 
-### 2. Header com botão (entre a descrição e a lista, linhas 24-27)
-Adicionar flex row com título à esquerda e botão "Gerar novo report" à direita (outline, ícone Sparkles). Durante processamento: ícone troca para Loader2 animate-spin, botão disabled.
+## Arquitetura
 
-### 3. Lógica do botão
-- `useState` para `isGenerating`
-- Ao clicar: chama `supabase.functions.invoke('gerar-report-business', { body: { contrato_id: contrato.id, user_id: businessUserId } })`
-- Precisa do `contrato` do hook `useContratosBusiness` (já disponível, basta desestruturar)
-- Sucesso: `queryClient.invalidateQueries({ queryKey: ["reports-business"] })` + toast sucesso
-- Erro: toast erro + reabilitar botão
+```text
+MarIAnaChatDrawer
+  ├─ useLocation() → detecta /mentoria/*
+  ├─ useMentoriaContext() [novo hook]
+  │   ├─ useContratosBusiness(businessUserId)
+  │   ├─ useEntregasBusiness(contratoId)
+  │   ├─ useMentoriaSessoes(businessUserId)
+  │   ├─ useEtapasBusiness(contratoId)
+  │   └─ useTasksByUser(userId)
+  │   → retorna { proximaEntrega, proximaSessao, etapaAtual, tarefasCriticas, contextText }
+  ├─ Mensagem proativa (se urgência + /mentoria/*)
+  └─ sendMessage → envia mentoria_context ao ai-chat-user
+```
 
-### 4. Skeleton durante geração
-Quando `isGenerating === true`, renderizar um `<SkeletonCard variant="list" />` no topo da lista de reports existente.
+## Alterações
+
+### 1. Novo hook: `src/hooks/useMentoriaContext.tsx`
+
+- Aceita `enabled: boolean` para evitar fetches fora de `/mentoria/*`
+- Usa hooks existentes (`useBusinessUserId`, `useContratosBusiness`, `useEntregasBusiness`, `useMentoriaSessoes`, `useEtapasBusiness`, `useTasksByUser`)
+- Calcula:
+  - Próxima entrega pendente com prazo (ordenada por prazo)
+  - Próxima sessão agendada (data futura mais próxima)
+  - Etapa atual (status `em_andamento`)
+  - Contagem de tarefas com prioridade `critica` ou `urgente`
+- Retorna um `contextText` (string) com resumo para o system prompt e um `proactiveMessage` (string | null) baseado na prioridade:
+  1. Sessão em < 24h → "Sua próxima sessão é amanhã..."
+  2. Entrega em < 3 dias → "Sua próxima entrega vence em X dias..."
+  3. Tarefas críticas → "Você tem X tarefa(s) crítica(s)..."
+  4. Nenhuma urgência → `null`
+
+### 2. Editar `src/components/shared/MarIAnaChatDrawer.tsx`
+
+- Importar `useLocation` e `useMentoriaContext`
+- Detectar `isMentoriaPage = pathname.startsWith("/mentoria")`
+- Chamar `useMentoriaContext({ enabled: isMentoriaPage })`
+- **Mensagem proativa**: Após carregar histórico, se `messages.length === 0` e `proactiveMessage` existe, inserir como primeira mensagem `{ role: "assistant", content: proactiveMessage }` (sem salvar no banco — é efêmera)
+- **Contexto no request**: Ao chamar `ai-chat-user`, incluir `mentoria_context: contextText` no body JSON (apenas quando `isMentoriaPage`)
+
+### 3. Editar `supabase/functions/ai-chat-user/index.ts`
+
+- Extrair `mentoria_context` do request body (campo opcional)
+- Se presente, concatenar ao final do system prompt como seção `## Contexto da Sessão Atual` com o texto recebido
+- Nenhuma query adicional na edge function
 
 ## Arquivos
+
 | Arquivo | Ação |
 |---|---|
-| `src/pages/MentoriaReports.tsx` | Editado |
+| `src/hooks/useMentoriaContext.tsx` | Novo |
+| `src/components/shared/MarIAnaChatDrawer.tsx` | Editado |
+| `supabase/functions/ai-chat-user/index.ts` | Editado (aceitar campo `mentoria_context`) |
 
-Nenhum outro arquivo alterado.
+Nenhum outro componente alterado. Nenhuma migration necessária.
 
