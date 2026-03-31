@@ -9,7 +9,7 @@ import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
-import { format } from "date-fns";
+import { format, differenceInHours } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   Dialog,
