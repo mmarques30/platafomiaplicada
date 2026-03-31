@@ -205,14 +205,13 @@ export function AppSidebar() {
     return menu.url || "/";
   };
 
-  // Auto-expandir menu quando rota ativa está em submenu (incluindo 3º nível)
+  // Auto-expandir menu quando rota ativa está em submenu (incluindo 3º nível e business groups)
   useEffect(() => {
     const newExpanded: string[] = [];
     mainMenus.forEach(menu => {
       const subMenus = getSubMenus(menu.menu_key);
       const isInSubRoute = subMenus.some(sub => {
         if (sub.url && location.pathname.startsWith(sub.url)) return true;
-        // Check 3rd-level children
         const thirdLevel = getSubMenus(sub.menu_key);
         return thirdLevel.some(child => child.url && location.pathname.startsWith(child.url));
       });
@@ -220,6 +219,16 @@ export function AppSidebar() {
         newExpanded.push(menu.menu_key);
       }
     });
+    // Auto-expand business groups based on active route
+    if (isBusinessEnv) {
+      businessGroups.forEach(group => {
+        const hasActive = group.items.some(item => {
+          const itemPath = item.url.split('?')[0];
+          return location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
+        });
+        if (hasActive) newExpanded.push(group.key);
+      });
+    }
     if (newExpanded.length > 0) {
       setExpandedMenus(prev => {
         const combined = [...new Set([...prev, ...newExpanded])];
