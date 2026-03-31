@@ -69,7 +69,7 @@ export function WeeklyProgressCard() {
   }
 
   return (
-    <div className="card-micro-hover relative bg-[#1a1c19]/80 border border-[#9EB038]/20 rounded-xl p-4 md:p-5">
+    <div className="card-interactive relative bg-[#1a1c19]/80 border border-[#9EB038]/20 rounded-xl p-4 md:p-5">
       <Button
         variant="ghost"
         size="icon"
