@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
 export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
