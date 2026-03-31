@@ -24,7 +24,7 @@ export function BusinessProgressoConteudo() {
             </Card>
           ))}
         </div>
-        <Card className="border-primary/20">
+        <Card className="border-border bg-card">
           <CardHeader>
             <Skeleton className="h-5 w-40" />
           </CardHeader>
