@@ -149,11 +149,7 @@ export function AcademyRoadmapEducacional() {
                     {trilha.percentual}% · faltam {trilha.faltamVideos} vídeos
                   </span>
                 </div>
-                <Progress
-                  value={trilha.percentual}
-                  className="h-2 bg-white/5"
-                  indicatorClassName="bg-primary"
-                />
+                <ProgressBar value={trilha.percentual} height={8} />
               </div>
             ))
           )}
