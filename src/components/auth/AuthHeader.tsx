@@ -62,6 +62,7 @@ export function AuthHeader() {
   const navLinksData = [
     { label: 'Sobre', to: '/sobre' },
     { label: 'Serviços', to: '/servicos' },
+    { label: 'Entrar', to: '/auth' },
   ];
 
   return (

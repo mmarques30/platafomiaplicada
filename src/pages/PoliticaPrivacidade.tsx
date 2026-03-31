@@ -1,19 +1,15 @@
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { AuthHeader } from "@/components/auth/AuthHeader";
 
 export default function PoliticaPrivacidade() {
-  const navigate = useNavigate();
-
-  // Busca o documento imediatamente, sem esperar autenticação
   const { data: documento, isLoading } = useQuery({
     queryKey: ["documento-legal-publico", "politica-privacidade"],
     queryFn: async () => {
@@ -34,27 +30,18 @@ export default function PoliticaPrivacidade() {
     staleTime: 1000 * 60 * 10,
   });
 
-  const handleVoltar = () => {
-    // Usa history.back() para voltar à página anterior, sem depender de auth
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate("/auth");
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container max-w-4xl py-8">
-          <Skeleton className="h-10 w-48 mb-6" />
-          <Card>
+      <div className="min-h-screen bg-[#1a1c19]">
+        <AuthHeader />
+        <div className="container max-w-4xl pt-24 pb-12 px-4">
+          <Card className="bg-white/5 border-white/10">
             <CardHeader>
-              <Skeleton className="h-8 w-64" />
-              <Skeleton className="h-4 w-48 mt-2" />
+              <Skeleton className="h-8 w-64 bg-white/10" />
+              <Skeleton className="h-4 w-48 mt-2 bg-white/10" />
             </CardHeader>
             <CardContent>
-              <Skeleton className="h-96 w-full" />
+              <Skeleton className="h-96 w-full bg-white/10" />
             </CardContent>
           </Card>
         </div>
@@ -64,15 +51,12 @@ export default function PoliticaPrivacidade() {
 
   if (!documento) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container max-w-4xl py-8">
-          <Button variant="ghost" onClick={handleVoltar} className="mb-6">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
-          </Button>
-          <Card>
+      <div className="min-h-screen bg-[#1a1c19]">
+        <AuthHeader />
+        <div className="container max-w-4xl pt-24 pb-12 px-4">
+          <Card className="bg-white/5 border-white/10">
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">Documento não encontrado.</p>
+              <p className="text-gray-400">Documento não encontrado.</p>
             </CardContent>
           </Card>
         </div>
@@ -81,27 +65,23 @@ export default function PoliticaPrivacidade() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl py-8">
-        <Button variant="ghost" onClick={handleVoltar} className="mb-6">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar
-        </Button>
-
-        <Card>
+    <div className="min-h-screen bg-[#1a1c19]">
+      <AuthHeader />
+      <div className="container max-w-4xl pt-24 pb-12 px-4">
+        <Card className="bg-white/5 border-white/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white">
               <Shield className="h-6 w-6" />
               {documento.titulo}
             </CardTitle>
             {documento.ultima_atualizacao && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-400">
                 Última atualização: {format(new Date(documento.ultima_atualizacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
               </p>
             )}
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm dark:prose-invert max-w-none">
+            <div className="prose prose-sm prose-invert max-w-none">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {documento.conteudo}
               </ReactMarkdown>
