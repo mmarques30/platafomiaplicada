@@ -33,9 +33,9 @@ function DashboardSkeleton() {
           <div className="h-full w-full rounded-lg bg-muted/40" />
         </div>
         {/* Ranking ticker */}
-        <SkeletonCardLocal className="h-16" />
+        <SkeletonCard className="h-16" />
         {/* Novidades */}
-        <SkeletonCardLocal className="h-[200px]" />
+        <SkeletonCard className="h-[200px]" />
       </main>
     </div>
   );
