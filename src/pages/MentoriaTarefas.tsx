@@ -138,7 +138,7 @@ export default function MentoriaTarefas() {
         {tasks.map(tarefa => (
           <Card 
             key={tarefa.id} 
-            className="cursor-pointer hover:shadow-md transition-shadow"
+            className="cursor-pointer hover:shadow-md transition-shadow card-interactive"
             onClick={() => handleOpenTarefa(tarefa.id)}
           >
             <CardContent className="p-3">

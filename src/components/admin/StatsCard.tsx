@@ -12,7 +12,7 @@ interface StatsCardProps {
 export function StatsCard({ title, value, description, icon: Icon, onClick }: StatsCardProps) {
   return (
     <Card 
-      className={onClick ? "cursor-pointer hover:bg-accent/50 transition-colors" : ""}
+      className={onClick ? "cursor-pointer hover:bg-accent/50 transition-colors card-interactive" : ""}
       onClick={onClick}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

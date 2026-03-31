@@ -43,7 +43,7 @@ export function ConteudoCard({ conteudo }: ConteudoCardProps) {
         transition-all duration-300 cursor-pointer
         shadow-md sm:shadow-lg hover:shadow-xl hover:shadow-primary/20
         min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0
-        h-[200px] sm:h-[240px] flex flex-col
+        h-[200px] sm:h-[240px] flex flex-col card-interactive
       `}
       onClick={handleClick}
     >
