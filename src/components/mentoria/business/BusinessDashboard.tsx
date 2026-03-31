@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePainelDiagnostico } from "@/hooks/usePainelDiagnostico";
@@ -120,11 +121,7 @@ export function BusinessDashboard({ diagnostico, userId }: BusinessDashboardProp
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-aplicada-green-700" />
-      </div>
-    );
+    return <PageSkeleton variant="dashboard" />;
   }
 
   return (

@@ -13,6 +13,7 @@ import { useLinksBusiness } from "@/hooks/useLinksBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
 const tipoLabels: Record<string, string> = {
   proposta: "Contrato",
@@ -84,13 +85,7 @@ export default function MentoriaDocumentos() {
   const isLoading = isLoadingContrato || isLoadingDocs || isLoadingLinks;
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </div>
-    );
+    return <PageSkeleton variant="evolucao" />;
   }
 
   if (!contrato) {

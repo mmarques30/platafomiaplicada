@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, Loader2, Package, FolderOpen, CheckCircle2, Filter } from "lucide-react";
+import { ArrowLeft, ChevronDown, Package, FolderOpen, CheckCircle2, Filter } from "lucide-react";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -171,11 +172,7 @@ export default function MentoriaInstrucoesBusiness() {
   };
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto py-8 px-4 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PageSkeleton variant="evolucao" />;
   }
 
   return (

@@ -14,6 +14,7 @@ import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { cn } from "@/lib/utils";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -216,11 +217,7 @@ export default function MentoriaTasksBusiness() {
   };
 
   if (isLoading) {
-    return (
-      <div className="container py-8 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PageSkeleton variant="evolucao" />;
   }
 
   return (
