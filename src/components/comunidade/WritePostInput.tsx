@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 
 interface WritePostInputProps {
   onClick: () => void;
