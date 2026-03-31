@@ -27,6 +27,9 @@ interface MarIAnaChatDrawerProps {
 export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isMentoriaPage = pathname.startsWith("/mentoria");
+  const { contextText, proactiveMessage } = useMentoriaContext({ enabled: isMentoriaPage });
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
