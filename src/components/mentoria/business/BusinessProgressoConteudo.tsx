@@ -13,7 +13,7 @@ export function BusinessProgressoConteudo() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-primary/20">
+            <Card key={i} className="border-border bg-card">
               <CardHeader className="pb-2">
                 <Skeleton className="h-5 w-32" />
               </CardHeader>
