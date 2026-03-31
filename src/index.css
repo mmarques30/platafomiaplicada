@@ -419,6 +419,10 @@
 
   strong, b {
     font-weight: 600;
+  }
+
+  .brand-text strong,
+  .brand-text b {
     color: hsl(73 54% 39%);
   }
 
