@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { StaggerList } from "@/components/ui/StaggerList";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { ArrowLeft, Package, Clock, CheckCircle2, AlertCircle, PlayCircle, Layers, ChevronDown, ChevronRight } from "lucide-react";
@@ -275,7 +276,7 @@ export default function MentoriaEntregas() {
       {entregas.length === 0 ? (
         <EmptyState icon={Package} title="Nenhuma entrega ainda" description="As entregas definidas pela sua mentora aparecerão aqui." />
       ) : (
-        <div className="space-y-4">
+        <StaggerList className="space-y-4">
           {/* Entregas agrupadas por Fase */}
           {etapasOrdenadas.map(renderEtapaSection)}
 
@@ -291,7 +292,7 @@ export default function MentoriaEntregas() {
               </div>
             </div>
           )}
-        </div>
+        </StaggerList>
       )}
     </div>
   );
