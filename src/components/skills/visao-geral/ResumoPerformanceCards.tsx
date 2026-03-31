@@ -1,5 +1,6 @@
 import KPICard from "../performance/KPICard";
 import { useSkillsLider } from "@/hooks/useSkillsLider";
+import { StaggerList } from "@/components/ui/StaggerList";
 
 export default function ResumoPerformanceCards() {
   const {
