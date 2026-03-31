@@ -344,6 +344,11 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild className="group">
                       <NavLink 
                         to={getMenuUrl(menu)} 
+                        data-tour={
+                          getMenuUrl(menu).includes('calendario') ? 'calendario' :
+                          getMenuUrl(menu).includes('evolucao') ? 'evolucao' :
+                          undefined
+                        }
                         end 
                         className={cn(
                           "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
