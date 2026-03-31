@@ -5,6 +5,7 @@ import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { Target, ListTodo, Calendar, TrendingUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { differenceInDays } from "date-fns";
+import { useCountUp } from "@/hooks/useCountUp";
 
 export function MentoriaHeroDashboard() {
   const { user } = useAuth();

@@ -15,6 +15,7 @@ import {
   ClipboardCheck, BookOpen, Trophy, Target,
   CheckCircle2, Clock, ArrowRight, Award, Flame, Star
 } from "lucide-react";
+import { useCountUp } from "@/hooks/useCountUp";
 
 export function AcademyRoadmapEducacional() {
   const navigate = useNavigate();
