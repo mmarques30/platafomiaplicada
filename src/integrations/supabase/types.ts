@@ -5692,6 +5692,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_onboarding_responses: {
+        Row: {
+          area_atuacao: string
+          created_at: string | null
+          desafio_principal: string | null
+          id: string
+          nome: string
+          objetivo: string
+          user_id: string
+        }
+        Insert: {
+          area_atuacao: string
+          created_at?: string | null
+          desafio_principal?: string | null
+          id?: string
+          nome: string
+          objetivo: string
+          user_id: string
+        }
+        Update: {
+          area_atuacao?: string
+          created_at?: string | null
+          desafio_principal?: string | null
+          id?: string
+          nome?: string
+          objetivo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
