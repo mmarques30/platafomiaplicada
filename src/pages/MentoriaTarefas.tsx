@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { StaggerList } from "@/components/ui/StaggerList";
 import { CheckSquare } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useNavigate } from "react-router-dom";

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { StaggerList } from "@/components/ui/StaggerList";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { ArrowLeft, Package, Clock, CheckCircle2, AlertCircle, PlayCircle, Layers, ChevronDown, ChevronRight } from "lucide-react";
