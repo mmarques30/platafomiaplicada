@@ -99,6 +99,7 @@ export function useCreateUser() {
       equipeId,
       novaEquipe,
       papelEquipe,
+      mensagemBoasVindas,
     }: {
       email: string;
       password: string;
