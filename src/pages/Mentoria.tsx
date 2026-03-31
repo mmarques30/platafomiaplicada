@@ -11,6 +11,7 @@ import { NavegacaoRapida } from "@/components/mentoria/NavegacaoRapida";
 import { ResumoProgresso } from "@/components/mentoria/ResumoProgresso";
 import { PendenciasUrgentes } from "@/components/mentoria/PendenciasUrgentes";
 import { FaseAtualCard } from "@/components/mentoria/FaseAtualCard";
+import { AcademyProximoPasso } from "@/components/mentoria/AcademyProximoPasso";
 
 import { BusinessAcessoRapido } from "@/components/mentoria/business/BusinessAcessoRapido";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
