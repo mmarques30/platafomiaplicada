@@ -38,6 +38,10 @@ export default function GerenciarConteudo() {
             <LayoutGrid className={adminTheme.tabsIcon} />
             Central
           </TabsTrigger>
+          <TabsTrigger value="curadoria" className={adminTheme.tabsTrigger}>
+            <Sparkles className={adminTheme.tabsIcon} />
+            Curadoria IA
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="trilhas" className={adminTheme.tabsContent}>
