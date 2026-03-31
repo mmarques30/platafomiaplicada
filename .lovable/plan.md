@@ -1,37 +1,52 @@
 
 
-# Skeleton Loading para paginas autenticadas
+# Expandir formulário de cadastro com campos de perfil
 
-## Problema
-Durante 2-3s de carregamento, as paginas mostram tela preta (spinner pequeno ou nada). Precisamos de skeletons que simulem o layout real.
+## Resumo
+Adicionar campos de onboarding ao signup (objetivo, área, desafio) e salvar numa nova tabela `user_onboarding_responses`.
 
-## Solucao
-Criar um componente reutilizavel `PageSkeleton` com variantes por pagina, e substituir os spinners atuais.
+## Alterações
 
-### 1. Criar `src/components/shared/PageSkeleton.tsx`
-Componente com variantes: `dashboard`, `trilhas`, `calendario`, `evolucao`. Usa `Skeleton` existente com classes customizadas (`bg-white/5` ou `bg-zinc-800/50`) para manter identidade visual escura.
+### 1. Criar tabela `user_onboarding_responses`
+Migração SQL:
+```sql
+CREATE TABLE public.user_onboarding_responses (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  nome text NOT NULL,
+  objetivo text NOT NULL,
+  area_atuacao text NOT NULL,
+  desafio_principal text,
+  created_at timestamptz DEFAULT now()
+);
 
-Cada variante simula o layout real:
-- **Dashboard**: header welcome (titulo + subtitulo), card grande central de conteudo, ticker de ranking
-- **Trilhas**: titulo, grid de 3 cards com imagem placeholder + texto
-- **Calendario**: titulo + tabs, card grande de calendario, card de proximo encontro
-- **Evolucao**: titulo, tabs, card hero, grid de cards de trilhas
+ALTER TABLE public.user_onboarding_responses ENABLE ROW LEVEL SECURITY;
 
-### 2. Atualizar `src/pages/Dashboard.tsx`
-- Substituir o spinner `loadingRole` (linhas 33-38) por `<PageSkeleton variant="dashboard" />`
+CREATE POLICY "Users can insert own onboarding" ON public.user_onboarding_responses
+  FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
-### 3. Atualizar `src/pages/Trilhas.tsx`
-- Adicionar estado de loading com `loadingRole` mostrando `<PageSkeleton variant="trilhas" />`
+CREATE POLICY "Users can view own onboarding" ON public.user_onboarding_responses
+  FOR SELECT TO authenticated USING (auth.uid() = user_id);
 
-### 4. Atualizar `src/components/calendario/CalendarioAulas.tsx`
-- Substituir o `Loader2` spinner (linhas 11-16) por skeleton de cards de aula
+CREATE POLICY "Admins can view all onboarding" ON public.user_onboarding_responses
+  FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+```
 
-### 5. Atualizar `src/pages/Evolucao.tsx`
-- Adicionar guard `roleLoading` com `<PageSkeleton variant="evolucao" />`
+### 2. Atualizar `src/components/auth/SignupForm.tsx`
+Após os campos de email/senha, adicionar:
+- **Select "Qual seu objetivo principal?"** (obrigatório) com 4 opções
+- **Select "Área de atuação"** (obrigatório) com 6 opções
+- **Textarea "Qual seu maior desafio hoje?"** (opcional, maxLength 200, contador de caracteres)
 
-## Detalhes tecnicos
-- Skeleton base: `bg-white/5 animate-pulse rounded-lg` (fundo escuro com pulse)
-- Cards skeleton: `bg-zinc-900/50 border border-white/5 rounded-xl`
-- Nao muda nenhuma logica de dados, apenas o estado visual durante loading
-- Arquivos: 1 novo + 4 editados
+Todos com estilo consistente (`bg-zinc-800/80 border-white/10 text-white`).
+
+No `handleVisitorSignup`, após signup bem-sucedido:
+- Aguardar sessão do usuário
+- Inserir na `user_onboarding_responses` com `user_id`, `nome`, `objetivo`, `area_atuacao`, `desafio_principal`
+
+O campo `nome` já é salvo no profile via `handle_new_user` trigger (campo `nome_completo`), então não precisa de alteração adicional.
+
+## Arquivos alterados
+- Migração SQL (nova tabela)
+- `src/components/auth/SignupForm.tsx`
 
