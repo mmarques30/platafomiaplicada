@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Loader2, Maximize2, MessageSquarePlus } from "lucide-react";
+import { X, Send, Maximize2, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
