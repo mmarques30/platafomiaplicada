@@ -1,29 +1,47 @@
 
 
-# StaggerList — entrada escalonada de cards com Framer Motion
+# Typing indicator animado no chat da MarIAna
 
-## 1. Novo componente: `src/components/ui/StaggerList.tsx`
-Criar conforme especificado — `motion.div` com `staggerChildren: 0.06`, cada item com fade+translateY de 6px, duração 200ms. Usar `React.Children.toArray` para lidar com children de forma segura.
+## Alteração
 
-## 2. Aplicações
+Substituir o indicador de loading atual (Loader2 + "Pensando...") nas linhas 393-410 por um typing indicator com 3 dots pulsantes.
 
-### `src/pages/MentoriaEntregas.tsx`
-- **Linha 278-294**: Envolver `etapasOrdenadas.map(renderEtapaSection)` com `<StaggerList>`
-- **Linha 289-291**: Envolver `entregasSemEtapa.map(renderEntregaCard)` dentro do grid com `<StaggerList>`
+### `src/index.css` — adicionar keyframe `pulse-dot`
+```css
+@keyframes pulse-dot {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+```
 
-### `src/pages/MentoriaTarefas.tsx`
-- **Kanban columns (linha 137-156)**: Envolver `tasks.map(...)` dentro de cada `KanbanColumn` com `<StaggerList>`
+### `src/components/shared/MarIAnaChatDrawer.tsx` — linhas 393-410
+Substituir o bloco `isLoading && !isStreaming` por:
 
-### `src/pages/MentoriaSessoes.tsx`
-- Usa `<Table>` — StaggerList não se aplica a table rows. **Ignorado.**
+```tsx
+{isLoading && !isStreaming && (
+  <div className="flex justify-start">
+    <div className="flex gap-2 items-start">
+      <img src={mariAvatar} alt="MarIAna" className="w-7 h-7 rounded-full flex-shrink-0"
+        onError={(e) => { e.currentTarget.src = mariAvatarFallback; }} />
+      <div className="bg-muted rounded-lg px-4 py-3 flex items-center gap-1">
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="block w-2 h-2 rounded-full bg-muted-foreground"
+            style={{
+              animation: 'pulse-dot 1.4s ease-in-out infinite',
+              animationDelay: `${i * 0.2}s`,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+```
 
-### `src/pages/Trilhas.tsx` / `TodasAsTrilhas.tsx`
-- Usa `<Carousel>` com Embla — StaggerList conflitaria com o scroll. **Ignorado.**
-
-### Dashboard: `src/components/skills/visao-geral/ResumoPerformanceCards.tsx`
-- **Linha 18-24**: Envolver os 4 `<KPICard>` com `<StaggerList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">` (substituindo a div grid atual)
+Remover import de `Loader2` se não for usado em outro lugar do arquivo (verificação: não é usado em nenhum outro ponto).
 
 ## Arquivos
-- **Novo**: `src/components/ui/StaggerList.tsx`
-- **Editados**: `MentoriaEntregas.tsx`, `MentoriaTarefas.tsx`, `ResumoPerformanceCards.tsx`
+- **Editados**: `src/index.css` (1 keyframe), `src/components/shared/MarIAnaChatDrawer.tsx` (substituir bloco de loading)
 
