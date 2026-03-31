@@ -1,29 +1,47 @@
 
 
-# Unificar estilos de cards na área /mentoria
+# Eliminar duplicatas no sidebar Business
 
-## Resumo
-Padronizar todos os cards para `bg-card border-border` removendo gradientes, cores verdes e opacidades parciais.
+## Problema encontrado
+
+**Business Parceria**: O grupo `meu_progresso` (renderizado como "Minha Trajetória") e seus 4 submenus (`visao_geral`, `roadmap`, `conteudo`, `entregas`) vêm do `menu_config` e aparecem no sidebar. Os hardcoded Business Groups já cobrem essas rotas — em especial `meu_progresso_roadmap` (/mentoria?tab=roadmap) é idêntico ao "Roadmap" no grupo MINHA JORNADA.
+
+**Business Sistemas**: `meu_sistema` e seus filhos (`sistema`, `entregas`, `documentos`) aparecem do `menu_config` com labels "Entregas" e "Documentos" que conflitam com os mesmos labels nos hardcoded groups, embora apontem para rotas diferentes (/meu-sistema/* vs /mentoria/*).
 
 ## Alterações
 
-### 1. `BusinessEvolucaoAprendizado.tsx`
-- Linhas 65, 114, 132, 150: trocar `border-aplicada-green-300 bg-aplicada-green-100` por `border-border bg-card`
-- Linha 169: trocar `border-border/50 bg-card/50 backdrop-blur-sm` por `border-border bg-card`
+### 1. `src/hooks/useMenuConfig.tsx` — Ocultar entradas duplicadas
 
-### 2. `BusinessProgressoConteudo.tsx`
-- Linhas 16, 27: trocar `border-primary/20` por `border-border bg-card`
-- Linha 73: trocar `border-primary/20 bg-gradient-to-br from-blue-500/5 to-transparent` por `border-border bg-card`
-- Linha 103: trocar `border-primary/20 bg-gradient-to-br from-green-500/5 to-transparent` por `border-border bg-card`
-- Linha 131: trocar `border-primary/20 bg-gradient-to-br from-purple-500/5 to-transparent` por `border-border bg-card`
-- Linha 151: trocar `border-primary/20` por `border-border bg-card`
+Adicionar ao array `business_parceria` (linha 77-83):
+```
+'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+'meu_progresso_conteudo', 'meu_progresso_entregas',
+```
 
-### 3. `BusinessROIChart.tsx`
-- Linha 108: trocar `border-border/50 bg-card/50 backdrop-blur-sm` por `border-border bg-card`
+Adicionar ao array `business_sistemas` (linha 87-97):
+```
+'meu_sistema', 'meu_sistema_sistema', 'meu_sistema_entregas', 'meu_sistema_documentos',
+```
 
-### 4. `BusinessReportsCard.tsx`
-- Linhas 19, 32, 66: trocar `border-border/50 bg-card/50` por `border-border bg-card`
+### 2. `src/components/layout/AppSidebar.tsx` — Comentários de demarcação
+
+Adicionar comentários claros marcando início e fim dos Business Groups hardcoded (em torno das linhas 107-143 e 550-630):
+```
+// ========== BUSINESS GROUPS (hardcoded) — START ==========
+// Estes grupos têm prioridade sobre menu_config para Business.
+// Se adicionar rotas aqui, ocultar no hiddenByEnvironment do useMenuConfig.
+```
+e
+```
+// ========== BUSINESS GROUPS (hardcoded) — END ==========
+```
 
 ## Resultado
-Todos os cards usam `bg-card border-border` — consistente no light e dark mode, sem gradientes ou cores custom.
+- Business Parceria: desaparece o grupo "Minha Trajetória" (menu_config) — ficam apenas os 3 grupos hardcoded
+- Business Sistemas: desaparece o grupo "Meu Sistema" (menu_config) — ficam apenas os 3 grupos hardcoded
+- Zero duplicatas visíveis
+
+## Arquivos
+- **Editado**: `src/hooks/useMenuConfig.tsx` (2 arrays de hiddenByEnvironment)
+- **Editado**: `src/components/layout/AppSidebar.tsx` (apenas comentários)
 
