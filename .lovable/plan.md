@@ -1,45 +1,50 @@
 
 
-# Link direto para reunião nas sessões de mentoria
+# Integrar MarIAna ao contexto da área de mentoria
 
 ## Resumo
-Adicionar campo `link_reuniao` na tabela `sessoes_mentoria`, input no admin, e botões contextuais na listagem do mentorado e no `BusinessVisaoRapida`.
+Quando o chat flutuante for aberto em páginas `/mentoria/*`, buscar dados contextuais do mentorado (entregas, sessões, etapas, tarefas críticas) e enviá-los ao edge function, que os injeta no system prompt. A MarIAna inicia com mensagem proativa baseada nas pendências. Fora de `/mentoria/*`, comportamento inalterado.
 
 ## Alterações
 
-### 1. Migração SQL
-```sql
-ALTER TABLE public.sessoes_mentoria ADD COLUMN link_reuniao TEXT DEFAULT NULL;
+### 1. Frontend — `MarIAnaChatDrawer.tsx`
+- Importar `useLocation` e `useBusinessUserId`
+- Detectar `isMentoriaContext = location.pathname.startsWith("/mentoria")`
+- Quando `isMentoriaContext`, ao montar, buscar do Supabase:
+  - Próxima entrega pendente: `entregas_business` via `contratos_business` (WHERE status != 'concluida', ORDER BY prazo ASC, LIMIT 1)
+  - Próxima sessão agendada: `sessoes_mentoria` (WHERE status = 'agendada' AND data_sessao > now(), ORDER BY data_sessao ASC, LIMIT 1)
+  - Etapa atual: `etapas_business` via contrato (WHERE status = 'em_andamento', LIMIT 1)
+  - Tarefas críticas: `tarefas_mentoria` (WHERE prioridade IN ('alta','critica','urgente') AND status != 'concluida', count)
+- Montar objeto `mentoriaContext` com esses dados
+- Passar `mentoriaContext` no body do fetch para `ai-chat-user`
+- Ao abrir em `/mentoria/*` sem histórico prévio, em vez de mostrar sugestões genéricas, mostrar sugestões contextuais baseadas nas pendências (ex: "Revisar minha próxima entrega", "Preparar para a sessão de amanhã")
+
+### 2. Frontend — `Chat.tsx` (tela completa)
+- Mesma lógica: detectar se veio de `/mentoria/*` via `location` e enviar `mentoriaContext` no body
+
+### 3. Edge Function — `ai-chat-user/index.ts`
+- Extrair `mentoriaContext` do request body (opcional)
+- Se presente, adicionar bloco ao system prompt após o contexto Business existente:
+
+```
+## 📋 Contexto Mentoria Atual:
+- Próxima entrega: "[titulo]" — prazo em X dias
+- Próxima sessão: DD/MM/YYYY às HH:MM
+- Etapa atual: "[nome]" (X% progresso)
+- Tarefas críticas em aberto: N
+
+INSTRUÇÃO: Na primeira mensagem, inicie proativamente:
+- Se entrega vence em ≤3 dias: "Sua próxima entrega '[titulo]' vence em X dias. Quer revisar?"
+- Se sessão em ≤24h: "Sua sessão é amanhã. Tem algo que quer preparar?"
+- Se tarefas críticas > 0: "Você tem N tarefas críticas. Quer ver o que está pendente?"
+- Se nada urgente: "Olá, [nome]. Como posso te ajudar hoje?"
 ```
 
-### 2. Tipo TypeScript
-**Arquivo: `src/hooks/useMentoriaSessoes.tsx`**
-- Adicionar `link_reuniao?: string;` ao type `SessaoMentoria`
-
-### 3. Admin — Campo no modal de sessão
-**Arquivo: `src/components/admin/mentoria/SessaoModal.tsx`**
-- Adicionar input `link_reuniao` com label "Link da Reunião (Zoom, Meet, Teams)" após o campo `video_url`
-- Placeholder: `https://zoom.us/j/... ou https://meet.google.com/...`
-- Incluir no `reset()` do useEffect
-
-### 4. Listagem do mentorado — Botões contextuais
-**Arquivo: `src/pages/MentoriaSessoes.tsx`**
-- Importar `ExternalLink` e `differenceInHours`
-- Adicionar coluna "Reunião" na tabela (entre Status e Recursos)
-- Lógica por sessão:
-  - **Sessão agendada, dentro de 24h, com link**: Botão destacado `variant="default"` "Entrar" com ícone ExternalLink, `onClick` abre `link_reuniao` em nova aba
-  - **Sessão agendada, mais de 24h, com link**: Link discreto `text-xs text-primary hover:underline` "Link da reunião"
-  - **Sessão sem link ou passada/cancelada**: `-`
-
-### 5. BusinessVisaoRapida — Usar `link_reuniao` em vez de `video_url`
-**Arquivo: `src/components/mentoria/business/BusinessVisaoRapida.tsx`**
-- Na query de próxima sessão, o `select("*")` já traz `link_reuniao`
-- Substituir a lógica que usa `video_url` pelo `link_reuniao`:
-  - Se `link_reuniao` existe e sessão dentro de 24h: botão destacado "Entrar na reunião"
-  - Se `link_reuniao` existe mas +24h: link discreto
-  - Sem link: "Aguardando link" (como já está)
+## Detalhe técnico
+- O `mentoriaContext` é enviado como campo opcional no body JSON — não quebra chamadas existentes
+- Queries usam `useBusinessUserId()` para suportar admin impersonando Business
+- Nenhuma migração SQL — dados já existem nas tabelas
 
 ## Arquivos
-- **Migração SQL**: nova coluna `link_reuniao`
-- **Editados**: `useMentoriaSessoes.tsx` (tipo), `SessaoModal.tsx` (input), `MentoriaSessoes.tsx` (coluna), `BusinessVisaoRapida.tsx` (link)
+- **Editados**: `MarIAnaChatDrawer.tsx`, `Chat.tsx`, `ai-chat-user/index.ts`
 
