@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Video, FileText, Loader2, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, Video, FileText, Loader2, ArrowLeft, ExternalLink } from "lucide-react";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
