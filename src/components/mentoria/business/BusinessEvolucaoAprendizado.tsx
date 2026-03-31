@@ -111,7 +111,7 @@ export function BusinessEvolucaoAprendizado() {
       {/* Cards de Métricas - Compactos e Verde */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Tempo de Tela */}
-        <Card className="border-aplicada-green-300 bg-aplicada-green-100">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-1 pt-3">
             <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
