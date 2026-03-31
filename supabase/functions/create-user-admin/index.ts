@@ -60,7 +60,8 @@ Deno.serve(async (req) => {
       skillsLiberado,
       equipeId,
       novaEquipe,
-      papelEquipe
+      papelEquipe,
+      mensagemBoasVindas
     } = await req.json()
 
     console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado, equipeId, novaEquipe, papelEquipe })
