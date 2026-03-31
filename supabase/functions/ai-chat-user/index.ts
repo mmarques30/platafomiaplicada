@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const requestBody = await req.json();
-    const { messages } = requestBody;
+    const { messages, mentoria_context } = requestBody;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       console.error("Payload inválido: messages ausente ou vazio");
@@ -635,6 +635,11 @@ SEMPRE use links Markdown clicáveis ao mencionar conteúdos da plataforma:
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY não está configurada");
       throw new Error("LOVABLE_API_KEY não configurada");
+    }
+
+    // Inject mentoria context if provided
+    if (mentoria_context && typeof mentoria_context === "string") {
+      systemPrompt += `\n\n## Contexto da Sessão Atual\n${mentoria_context}`;
     }
 
     const requestBody2 = {
