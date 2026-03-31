@@ -1,47 +1,40 @@
 
 
-# StatusBadge semântico + integração nos 4 componentes
+# Criar EmptyState e aplicar nos 4 componentes
 
-## 1. Novo componente: `src/components/ui/StatusBadge.tsx`
-Componente que aceita `status` string e renderiza badge semântico com os estilos especificados:
+## 1. Novo componente: `src/components/ui/EmptyState.tsx`
+Props: `icon` (LucideIcon), `title` (string), `description` (string), `action?` ({ label, href }).
+Visual: centralizado, ícone 32px muted, título 15px weight 500, descrição 13px muted, botão outline opcional.
 
-| Status | Fundo | Texto | Label |
-|--------|-------|-------|-------|
-| ativo / concluido / aprovado | rgba(175,192,64,0.12) | #C0DD97 | Ativo / Concluído / Aprovado |
-| em_andamento | rgba(74,159,224,0.12) | #85B7EB | Em andamento |
-| pendente / aguardando | rgba(232,164,60,0.12) | #FAC775 | Pendente |
-| cancelado / bloqueado | rgba(138,142,130,0.12) | #B4B2A9 | Bloqueado / Cancelado |
-| critico / atrasado | rgba(232,104,74,0.12) | #F09595 | Crítico / Atrasado |
+## 2. Integrações
 
-Estilo inline: `padding: 2px 10px`, `border-radius: 20px`, `font-size: 11px`, `font-weight: 500`, `display: inline-flex`.
+### `MentoriaEntregas.tsx` (linhas 277-284)
+Substituir o bloco Card/CardContent com Package+texto por:
+```tsx
+<EmptyState icon={Package} title="Nenhuma entrega ainda" description="As entregas definidas pela sua mentora aparecerão aqui." />
+```
 
-Aceita prop opcional `label` para override do texto padrão.
+### `MentoriaTarefas.tsx` (linhas 155-159)
+Substituir o div vazio "Nenhuma tarefa" no kanban por:
+```tsx
+<EmptyState icon={CheckSquare} title="Nenhuma tarefa ainda" description="As tarefas do seu projeto aparecerão aqui quando forem criadas." />
+```
+Importar `CheckSquare` de lucide-react.
 
-## 2. MentoriaTarefas.tsx
-Substituir a função `getStatusBadge` (linhas 91-100) por uso de `<StatusBadge>`. Mapear:
-- `pendente` → status "pendente"
-- `em_andamento` → status "em_andamento"
-- `atrasada` → status "atrasado"
-- `concluida` → status "concluido" (label "Concluída")
+### `MentoriaSessoes.tsx` (linhas 183-188)
+Substituir o bloco Calendar+texto por:
+```tsx
+<EmptyState icon={Calendar} title="Nenhuma sessão agendada" description="Suas sessões aparecerão aqui quando forem confirmadas." />
+```
 
-## 3. MentoriaValidacoes.tsx
-Substituir a função `getStatusBadge` (linhas 81-91) por `<StatusBadge>`. Mapear:
-- `pendente` → "pendente"
-- `em_analise` → "em_andamento" (label "Em Análise")
-- `aprovado` → "aprovado"
-- `rejeitado` → "critico" (label "Rejeitado")
-- `revisao_solicitada` → "pendente" (label "Revisão Solicitada")
-
-## 4. MentoriaEntregas.tsx
-Substituir o uso de Badge genérico no STATUS_CONFIG para usar `<StatusBadge>` no `renderEntregaCard`. O select dropdown mantém a lógica atual (não é badge de status).
-
-## 5. MinhasDuvidas.tsx → AbaDuvidas.tsx
-Substituir o Badge inline (linha 76) por `<StatusBadge>`:
-- `respondida` → "concluido" (label "Respondida")
-- `em_analise` → "em_andamento" (label "Em Análise")
-- default → "pendente" (label "Aguardando")
+### `MentoriaValidacoes.tsx` (linhas 289-299)
+Substituir Card/CardContent com CheckSquare+texto condicional por:
+```tsx
+<EmptyState icon={ClipboardCheck} title="Nenhuma validação pendente" description="Validações do seu projeto aparecerão aqui." />
+```
+Importar `ClipboardCheck` de lucide-react.
 
 ## Arquivos
-- **Novo**: `src/components/ui/StatusBadge.tsx`
-- **Editados**: `MentoriaTarefas.tsx`, `MentoriaValidacoes.tsx`, `MentoriaEntregas.tsx`, `src/components/evolucao/AbaDuvidas.tsx`
+- **Novo**: `src/components/ui/EmptyState.tsx`
+- **Editados**: `MentoriaEntregas.tsx`, `MentoriaTarefas.tsx`, `MentoriaSessoes.tsx`, `MentoriaValidacoes.tsx`
 
