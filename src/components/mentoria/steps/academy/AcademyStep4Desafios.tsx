@@ -210,6 +210,19 @@ export function AcademyStep4Desafios({ form, onNext, onPrev }: StepProps) {
         </div>
       )}
 
+      {/* Card informativo sobre InsightIA */}
+      <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl flex items-start gap-3">
+        <div className="p-2 rounded-lg bg-primary/10 shrink-0 mt-0.5">
+          <Sparkles className="h-5 w-5 text-primary" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-foreground mb-1">Diagnóstico personalizado com IA</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Ao finalizar, nossa IA vai gerar um diagnóstico personalizado com seus principais gaps e recomendações de onde começar. Você receberá insights exclusivos baseados no seu perfil.
+          </p>
+        </div>
+      </div>
+
       <div className="flex justify-between pt-4">
         <Button variant="outline" onClick={onPrev} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
