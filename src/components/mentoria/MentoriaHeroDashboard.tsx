@@ -32,6 +32,9 @@ export function MentoriaHeroDashboard() {
 
   const firstName = user?.user_metadata?.nome_completo?.split(" ")[0] || "Mentorado";
 
+  const animatedProgresso = useCountUp(progressoGeral);
+  const animatedTarefas = useCountUp(tarefasPendentes);
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-card to-primary/5 rounded-xl border-2 border-primary/30 shadow-lg shadow-primary/10 p-4 sm:p-6 mb-6">
       {/* Logo 3D transparente como background centralizado */}
