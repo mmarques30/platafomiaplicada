@@ -3,8 +3,8 @@ const SkeletonBlock = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse rounded-lg bg-white/5 ${className}`} />
 );
 
-const SkeletonCard = ({ className = "" }: { className?: string }) => (
-  <div className={`animate-pulse rounded-xl bg-zinc-900/50 border border-white/5 ${className}`} />
+const SkeletonCard = ({ className = "", children }: { className?: string; children?: React.ReactNode }) => (
+  <div className={`animate-pulse rounded-xl bg-zinc-900/50 border border-white/5 ${className}`}>{children}</div>
 );
 
 function DashboardSkeleton() {

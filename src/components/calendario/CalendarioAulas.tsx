@@ -1,6 +1,7 @@
 import { useAulasCalendario, useProximaAula } from "@/hooks/useCalendarioAulas";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Calendar, Clock } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
