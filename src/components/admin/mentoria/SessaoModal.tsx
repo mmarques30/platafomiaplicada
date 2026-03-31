@@ -53,6 +53,7 @@ export default function SessaoModal({
         duracao: sessao.duracao,
         status: sessao.status,
         video_url: sessao.video_url || "",
+        link_reuniao: sessao.link_reuniao || "",
         transcricao_url: sessao.transcricao_url || "",
         transcricao: sessao.transcricao || "",
         notas: sessao.notas || ""
