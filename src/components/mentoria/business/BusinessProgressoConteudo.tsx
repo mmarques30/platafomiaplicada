@@ -72,8 +72,7 @@ export function BusinessProgressoConteudo() {
         {/* Videos */}
         <Card className="border-primary/20 bg-gradient-to-br from-blue-500/5 to-transparent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <Video className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Vídeos Assistidos
             </CardTitle>
           </CardHeader>
@@ -102,8 +101,7 @@ export function BusinessProgressoConteudo() {
         {/* Prompts */}
         <Card className="border-primary/20 bg-gradient-to-br from-green-500/5 to-transparent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <FileText className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Prompts Consumidos
             </CardTitle>
           </CardHeader>
@@ -130,8 +128,7 @@ export function BusinessProgressoConteudo() {
         {/* Interações */}
         <Card className="border-primary/20 bg-gradient-to-br from-purple-500/5 to-transparent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <MousePointerClick className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Interações
             </CardTitle>
           </CardHeader>
@@ -150,8 +147,7 @@ export function BusinessProgressoConteudo() {
       {/* Atividade Recente */}
       <Card className="border-primary/20">
         <CardHeader>
-          <CardTitle className="text-base font-medium flex items-center gap-2">
-            <Activity className="h-4 w-4 text-primary" />
+          <CardTitle className="text-base font-medium">
             Atividade Recente
           </CardTitle>
         </CardHeader>
