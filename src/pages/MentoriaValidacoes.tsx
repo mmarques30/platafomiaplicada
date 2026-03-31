@@ -287,16 +287,7 @@ export default function MentoriaValidacoes() {
 
         <TabsContent value={activeTab} className="space-y-4">
           {filteredTasks.length === 0 ? (
-            <Card className="border-dashed">
-              <CardContent className="py-12 text-center">
-                <CheckSquare className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground">
-                  {activeTab === 'pendentes' && 'Nenhuma task pendente'}
-                  {activeTab === 'em_analise' && 'Nenhuma task em análise'}
-                  {activeTab === 'concluidas' && 'Nenhuma task concluída'}
-                </p>
-              </CardContent>
-            </Card>
+            <EmptyState icon={ClipboardCheck} title="Nenhuma validação pendente" description="Validações do seu projeto aparecerão aqui." />
           ) : (
             filteredTasks.map(renderTaskCard)
           )}

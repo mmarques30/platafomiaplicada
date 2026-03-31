@@ -274,14 +274,7 @@ export default function MentoriaEntregas() {
       </div>
 
       {entregas.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="py-12 text-center">
-            <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-            <p className="text-muted-foreground">
-              Nenhuma entrega cadastrada ainda. Aguarde a configuração pelo administrador.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState icon={Package} title="Nenhuma entrega ainda" description="As entregas definidas pela sua mentora aparecerão aqui." />
       ) : (
         <div className="space-y-4">
           {/* Entregas agrupadas por Fase */}

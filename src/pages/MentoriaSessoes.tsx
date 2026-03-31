@@ -181,10 +181,7 @@ export default function MentoriaSessoes() {
         </Table>
         
         {sessoesFiltradas.length === 0 && (
-          <div className="py-12 text-center">
-            <Calendar className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-            <p className="text-muted-foreground">Nenhuma sessão encontrada</p>
-          </div>
+          <EmptyState icon={Calendar} title="Nenhuma sessão agendada" description="Suas sessões aparecerão aqui quando forem confirmadas." />
         )}
       </div>
 

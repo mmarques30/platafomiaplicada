@@ -153,9 +153,7 @@ export default function MentoriaTarefas() {
           </Card>
         ))}
         {tasks.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm py-8">
-            Nenhuma tarefa
-          </div>
+          <EmptyState icon={CheckSquare} title="Nenhuma tarefa ainda" description="As tarefas do seu projeto aparecerão aqui quando forem criadas." />
         )}
       </div>
     </div>
