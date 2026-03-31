@@ -121,7 +121,7 @@ export default function MentoriaSessoes() {
             {sessoesFiltradas.map((sessao, index) => (
               <TableRow 
                 key={sessao.id} 
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                className="cursor-pointer hover:bg-muted/50 transition-colors card-interactive"
                 onClick={() => setSelectedSessao(sessao)}
               >
                 <TableCell className="font-medium text-muted-foreground">
