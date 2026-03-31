@@ -100,6 +100,47 @@ export function AppSidebar() {
   // Detectar se é Business Sistemas (para filtros especiais)
   const isBusinessSistemasEnv = effectiveEnvironment === 'business_sistemas' 
     || effectivePlan === 'business_sistemas';
+  const isBusinessParceriaEnv = effectiveEnvironment === 'business_parceria'
+    || effectivePlan === 'business_parceria';
+  const isBusinessEnv = isBusinessSistemasEnv || isBusinessParceriaEnv || isBusiness;
+
+  // Business groups definition
+  const businessGroups = [
+    {
+      key: 'biz_jornada',
+      label: 'MINHA JORNADA',
+      icon: Route,
+      items: [
+        { label: 'Etapas', url: '/mentoria/etapas-business', parceria: true, sistemas: true },
+        { label: 'Roadmap', url: '/mentoria?tab=roadmap', parceria: true, sistemas: false },
+        { label: 'Instruções', url: '/mentoria/instrucoes-business', parceria: true, sistemas: false },
+      ],
+    },
+    {
+      key: 'biz_entregas',
+      label: 'ENTREGAS E TAREFAS',
+      icon: Package,
+      items: [
+        { label: 'Entregas', url: '/mentoria/entregas', parceria: true, sistemas: true },
+        { label: 'Tarefas', url: '/mentoria/tarefas', parceria: true, sistemas: false },
+        { label: 'Tasks', url: '/mentoria/tasks-business', parceria: true, sistemas: false },
+        { label: 'Validações', url: '/mentoria/validacoes', parceria: true, sistemas: true },
+        { label: 'Projetos', url: '/mentoria/projetos', parceria: true, sistemas: false },
+      ],
+    },
+    {
+      key: 'biz_comunicacao',
+      label: 'COMUNICAÇÃO',
+      icon: MessageSquare,
+      items: [
+        { label: 'Sessões', url: '/mentoria/sessoes', parceria: true, sistemas: true },
+        { label: 'Dúvidas', url: '/mentoria/duvidas', parceria: true, sistemas: false },
+        { label: 'Documentos', url: '/mentoria/documentos', parceria: true, sistemas: true },
+        { label: 'Recursos', url: '/mentoria/recursos', parceria: true, sistemas: false },
+        { label: 'Reports', url: '/mentoria/reports', parceria: true, sistemas: true },
+      ],
+    },
+  ];
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
