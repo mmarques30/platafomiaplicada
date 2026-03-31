@@ -1,61 +1,58 @@
 
 
-# Notificações automáticas por triggers + integração no sino e página
+# Reorganizar menu lateral Business em 3 grupos colapsáveis
 
 ## Resumo
-Criar 4 triggers no banco para inserir notificações automaticamente quando o admin cria/atualiza entregas, tarefas, sessões e status de entregas. Integrar a tabela `notificacoes` no sino do header e na página de Notificações.
+Para ambientes Business Parceria e Business Sistemas, substituir a renderização flat dos menus por 3 grupos colapsáveis com section headers, mantendo "Minha Trajetória" / "Meu Projeto" fixo no topo.
 
----
+## Abordagem
+Em vez de alterar a tabela `menu_config` (que afetaria todos os planos), adicionar lógica condicional no `AppSidebar.tsx` que, quando `isBusiness`, renderiza os menus em grupos hardcoded. Os itens de cada grupo são definidos por `menu_key` e filtrados conforme o ambiente (parceria vs sistemas).
 
-## 1. Migração SQL — 4 triggers
+## Alterações
 
-**Trigger 1: Nova entrega criada (`entregas_business` INSERT)**
-- Resolve `user_id` via JOIN em `contratos_business`
-- Insere: tipo `entrega`, titulo `Nova entrega: [titulo]`, link `/mentoria`
+### 1. Editar: `src/components/layout/AppSidebar.tsx`
 
-**Trigger 2: Tarefa com prioridade alta/crítica (`tarefas_mentoria` INSERT + `tasks_business` INSERT)**
-- Só dispara se `prioridade` IN ('alta', 'critica', 'urgente')
-- Insere: tipo `tarefa`, titulo `Tarefa urgente adicionada: [titulo]`, link `/mentoria/tarefas`
+Quando `effectiveEnvironment` é `business_parceria` ou `business_sistemas`, após renderizar o menu "Início" e "Minha Trajetória"/"Meu Projeto" (que ficam fixos no topo), renderizar 3 `Collapsible` com `SidebarGroupLabel` em maiúsculas:
 
-**Trigger 3: Sessão agendada ou horário alterado (`sessoes_mentoria` INSERT + UPDATE de `data_sessao`)**
-- Insere: tipo `sessao`, titulo `Sessão confirmada: [data formatada]`, link `/notificacoes/calendario`
+**Item fixo no topo (fora dos grupos):**
+- "Minha Trajetória" (parceria) / "Meu Projeto" (sistemas) — já existente como `meu_progresso` / `meu_sistema`
 
-**Trigger 4: Status de entrega atualizado (`entregas_business` UPDATE de `status`)**
-- Só dispara se `OLD.status IS DISTINCT FROM NEW.status`
-- Resolve `user_id` via `contratos_business`
-- Insere: tipo `entrega`, titulo `Sua entrega "[titulo]" foi marcada como [status]`, link `/mentoria`
+**Grupo 1 — "MINHA JORNADA"** (ícone: `Route`)
+| Item | URL | Parceria | Sistemas |
+|------|-----|----------|----------|
+| Etapas | /mentoria/etapas-business | ✅ | ✅ |
+| Roadmap | /mentoria?tab=roadmap | ✅ | ❌ |
+| Instruções | /mentoria/instrucoes-business | ✅ | ❌ |
 
-Todos os triggers usam `SECURITY DEFINER` para bypassar RLS na inserção em `notificacoes`.
+**Grupo 2 — "ENTREGAS E TAREFAS"** (ícone: `Package`)
+| Item | URL | Parceria | Sistemas |
+|------|-----|----------|----------|
+| Entregas | /mentoria/entregas | ✅ | ✅ |
+| Tarefas | /mentoria/tarefas | ✅ | ❌ |
+| Tasks | /mentoria/tasks-business | ✅ | ❌ |
+| Validações | /mentoria/validacoes | ✅ | ✅ |
+| Projetos | /mentoria/projetos | ✅ | ❌ |
 
----
+**Grupo 3 — "COMUNICAÇÃO"** (ícone: `MessageSquare`)
+| Item | URL | Parceria | Sistemas |
+|------|-----|----------|----------|
+| Sessões | /mentoria/sessoes | ✅ | ✅ |
+| Dúvidas | /mentoria/duvidas | ✅ | ❌ |
+| Documentos | /mentoria/documentos | ✅ | ✅ |
+| Recursos | /mentoria/recursos | ✅ | ❌ |
+| Reports | /mentoria/reports | ✅ | ✅ |
 
-## 2. Hook para notificações pessoais
-**Novo arquivo: `src/hooks/useNotificacoesPessoais.tsx`**
-- `useNotificacoesPessoais()` — busca `notificacoes` do user, ordenado por `created_at DESC`
-- `useNotificacoesNaoLidas()` — count de `notificacoes` onde `lida = false`
-- `useMarcarNotificacoesComoLidas()` — mutation que faz UPDATE `lida = true` nos IDs passados
+**Implementação:**
+- Definir array de grupos com `groupKey`, `label`, `icon`, `items[]` (cada item com `label`, `url`, `environments[]`)
+- Renderizar cada grupo como `Collapsible` com `defaultOpen={true}` e toggle no header
+- Header do grupo: ícone + label em `text-[10px] uppercase tracking-widest text-sidebar-foreground/50 font-semibold`
+- Items recuados com `pl-8`, estilo consistente com submenus existentes
+- Lógica condicional: quando `isBusiness`, inserir os 3 grupos após o menu principal (Início + Trajetória/Projeto) e antes de Bibliotecas/Comunidade
+- Grupos expandidos por padrão, com auto-expand quando rota ativa está dentro de um grupo
 
----
-
-## 3. Atualizar sino no header
-**Arquivo: `src/components/layout/TopHeader.tsx`**
-- Importar `useNotificacoesNaoLidas`
-- Somar `avisosCount + notificacoesNaoLidasCount` no badge do sino
-
----
-
-## 4. Atualizar página de Notificações
-**Arquivo: `src/pages/Notificacoes.tsx`**
-- Adicionar seção "Notificações" acima dos avisos, listando itens da tabela `notificacoes`
-- Cada item mostra ícone por tipo (entrega/tarefa/sessão), título, mensagem, tempo relativo
-- Items não lidos têm destaque visual (borda primária)
-- Marcar como lidos ao carregar (como já faz com avisos)
-- Manter a seção de Avisos existente abaixo
-
----
+### 2. Nenhuma migração SQL necessária
+Os itens são hardcoded no componente, sem novas entradas na `menu_config`.
 
 ## Arquivos
-- **Migração SQL**: 4 triggers + 4 funções
-- **Novo**: `src/hooks/useNotificacoesPessoais.tsx`
-- **Editados**: `TopHeader.tsx`, `Notificacoes.tsx`
+- **Editado**: `src/components/layout/AppSidebar.tsx`
 
