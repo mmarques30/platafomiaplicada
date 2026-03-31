@@ -1,40 +1,24 @@
 
 
-# Grade pontilhada sutil no background — páginas autenticadas
+# Hook useCountUp para animar KPI cards
 
-## Abordagem
-Em vez de adicionar o `div.dot-grid-bg` em cada página individualmente, adicionar uma única vez no `MainLayout.tsx` (cobre todas as páginas autenticadas) e garantir que o conteúdo fique acima com `relative z-[1]`.
+## 1. Novo hook: `src/hooks/useCountUp.ts`
+Criar conforme especificado — easeOutCubic, duration 700ms default, retorna inteiro animado.
 
-## 1. `src/index.css` — adicionar classe `.dot-grid-bg`
-Após `.card-interactive:active`, adicionar:
-```css
-.dot-grid-bg {
-  background-image: radial-gradient(circle, #AFC040 1px, transparent 1px);
-  background-size: 28px 28px;
-  opacity: 0.025;
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-```
+## 2. Aplicar em `MentoriaHeroDashboard.tsx`
+- `progressoGeral` (linha 84): substituir `{progressoGeral}` por `{useCountUp(progressoGeral)}`
+- `tarefasPendentes` (linha 96): substituir `{tarefasPendentes}` por `{useCountUp(tarefasPendentes)}`
 
-## 2. `src/components/layout/MainLayout.tsx`
-Dentro do `div.min-h-screen` (linha 72-75), adicionar `<div className="dot-grid-bg" />` como primeiro filho, e adicionar `relative z-[1]` ao `flex-1 flex flex-col` div que contém o `<main>`.
+## 3. Aplicar em `WeeklyProgressCard.tsx`
+- `data.videoCount` (linha 94): animar com useCountUp
 
-```tsx
-<div className={cn("min-h-screen flex w-full bg-background", ...)}>
-  <div className="dot-grid-bg" />
-  <AppSidebar />
-  <div className="flex-1 flex flex-col relative z-[1]">
-    ...
-  </div>
-  ...
-</div>
-```
+## 4. Aplicar em `AcademyRoadmapEducacional.tsx`
+- Conquistas grid (linhas 178, 182, 187, 192): animar `totalVideos`, `certificadosEmitidos.length`, `diasSequencia`, `totalProjetos`
+- Trilha percentual (linhas 143, 219): animar `trilha.percentual` e `proximoObjetivo.percentual`
 
-Isso cobre Dashboard, Mentoria, Trilhas, Evolução e todas as páginas autenticadas sem tocar em páginas públicas (que usam layouts separados).
+**Nota**: `BusinessVisaoRapida` não existe no código atual — será ignorado.
 
 ## Arquivos
-- **Editados**: `src/index.css` (1 classe), `src/components/layout/MainLayout.tsx` (2 linhas)
+- **Novo**: `src/hooks/useCountUp.ts`
+- **Editados**: `MentoriaHeroDashboard.tsx`, `WeeklyProgressCard.tsx`, `AcademyRoadmapEducacional.tsx`
 
