@@ -1,55 +1,65 @@
 
 
-# DashboardCommandStrip — substituir WelcomeHeader para usuários com plano
+# Reescrever DashboardCommandStrip com KPIs visuais e useCountUp
 
 ## Visão geral
 
-Criar um componente `DashboardCommandStrip` que substitui o `WelcomeHeader` no Dashboard para usuários com plano definido. Visitantes mantêm o `WelcomeHeader` original. O componente exibe nome + contexto da jornada à esquerda e KPIs + ação à direita, variando por plano.
+Reescrever completamente o componente para seguir o layout especificado: coluna esquerda (nome + semana/plano), coluna direita com 3 KPI cards coloridos + botão CTA verde. Cada KPI tem valor animado via `useCountUp`, label uppercase, e cor específica. Visitantes retornam `null`.
 
-## Novo componente: `src/components/dashboard/DashboardCommandStrip.tsx`
+## Alteração
 
-**Layout**: faixa horizontal, `bg-card border border-border rounded-xl`, padding `py-3.5 px-5`, flex row justify-between.
+**Arquivo**: `src/components/dashboard/DashboardCommandStrip.tsx` — reescrita completa
 
-**Coluna esquerda**:
-- Nome do usuário (17px, font-medium) via `useUserProfile`
-- Subtexto 12px muted: "Semana X da sua jornada · [plano formatado]"
-- Semana = `Math.ceil((now - profile.created_at) / 7 dias)`
-- Plano formatado via mapa: `academy → "Academy"`, `business_parceria → "Business Parceria"`, `business_sistemas → "Business Sistemas"`, `skills → "Skills"`
+### Estrutura JSX
 
-**Coluna direita — condicional por plano** (usa `useUserPlan`):
+- Container: `bg-card border border-border rounded-xl py-3.5 px-5`, flex row justify-between
+- Esquerda: nome completo (17px medium) + subtexto "Semana X · Plano" (12px muted)
+- Direita: flex row com 3 KPI blocks + botão CTA
+- Cada KPI: valor com `useCountUp(valor, 600)` na cor especificada + label uppercase 11px muted
+- Separadores verticais (`h-8 w-px bg-border`) entre KPIs
+- Botão CTA: `background: #AFC040`, `color: #0C0F0A`, 13px, 8px 16px padding, border-radius 8px
 
-1. **Business Parceria / Sistemas**: usa `useBusinessUserId`, `useContratosBusiness`, `useEtapasBusiness`, `useTasksByUser`, `useMentoriaSessoes`
-   - % roadmap = `(etapas concluídas / total etapas) * 100` — badge teal
-   - Tarefas críticas (prioridade alta/urgente + pendente) — badge amber
-   - Próxima sessão agendada (dia formatado)
-   - Botão "Ver sessão" → `/mentoria/sessoes`
+### Subcomponentes internos
 
-2. **Academy**: usa query `progresso_videos` (semana atual, completados) e módulos em andamento
-   - Vídeos concluídos esta semana — badge teal
-   - Módulos em andamento — badge muted
-   - Botão "Continuar trilha" → `/trilhas`
+1. **BusinessKPIs** — usa `useBusinessUserId`, `useContratosBusiness`, `useEtapasBusiness`, `useTasksByUser`, `useMentoriaSessoes`
+   - KPI1: `% roadmap` (#2CBBA6) — etapas concluídas / total
+   - KPI2: `tarefas críticas` (#E8A43C) — prioridade alta/urgente + pendente
+   - KPI3: `próx. sessão` (#AFC040) — dia da semana (ex: "Sex") ou "—"
+   - CTA: "Ver sessão →" → `/mentoria/sessoes`
 
-3. **Skills**: usa `useSkillsEquipe` (membros ativos) e `useSkillsEntregas` (pendentes)
-   - Membros ativos — badge teal
-   - Entregas pendentes — badge amber
-   - Botão "Ver equipe" → `/skills/equipe`
+2. **AcademyKPIs** — query `progresso_videos` + conquistas hardcoded (como em EvolucaoConquistas)
+   - KPI1: `vídeos esta semana` (#2CBBA6) — completados nos últimos 7 dias
+   - KPI2: `trilhas em andamento` (#E8A43C) — módulos com progresso incompleto
+   - KPI3: `conquistas` (#AFC040) — contagem calculada como em VitrineConquistas/EvolucaoConquistas (baseada em progressoGeral)
+   - CTA: "Continuar trilha →" → `/trilhas`
 
-Cada KPI é um `<span>` inline com cor + texto compacto. Botão é `variant="outline" size="sm"`.
+3. **SkillsKPIs** — usa `useSkillsEquipe` (membros) e `useSkillsEntregas` (entregas)
+   - KPI1: `membros ativos` (#2CBBA6) — `membros.length`
+   - KPI2: `entregas pendentes` (#E8A43C) — entregas com status pendente
+   - KPI3: `progresso %` (#AFC040) — entregas concluídas / total
+   - CTA: "Ver equipe →" → `/skills/equipe`
 
-Quando dados ainda carregam, exibe skeleton inline (pulsing dots) nos KPIs.
+### KpiBlock component
 
-## Editar: `src/pages/Dashboard.tsx`
+```tsx
+function KpiBlock({ value, label, color }: { value: number; label: string; color: string }) {
+  const animated = useCountUp(value, 600);
+  const display = label.includes("%") ? `${animated}%` : String(animated);
+  // For session day (string), pass as-is without useCountUp
+}
+```
 
-- Import `DashboardCommandStrip`
-- Na seção de não-visitantes (linha 80-82), substituir `<WelcomeHeader />` por `<DashboardCommandStrip />`
-- Manter `<WelcomeHeader />` inalterado no bloco de visitantes (linha 50)
+Para o KPI3 do Business (dia da semana = string), usar variante sem useCountUp — exibir o texto diretamente.
+
+### Visitante
+
+`useUserPlan` → se `!plan` e não é business/academy/skills, retorna `null`.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/DashboardCommandStrip.tsx` | Novo |
-| `src/pages/Dashboard.tsx` | Editado — troca WelcomeHeader por DashboardCommandStrip para não-visitantes |
+| `src/components/dashboard/DashboardCommandStrip.tsx` | Reescrito |
 
-Nenhum outro componente alterado. Nenhuma migration necessária.
+Nenhum outro arquivo alterado.
 
