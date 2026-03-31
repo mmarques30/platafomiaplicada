@@ -1,30 +1,37 @@
 
 
-# Correções no fluxo de autenticação
+# Skeleton Loading para paginas autenticadas
 
-## Problema atual
-1. **Após login**: sempre redireciona para `/selecionar-ambiente`, mesmo que o usuário já tenha selecionado antes
-2. **`/selecionar-ambiente` sem auth**: se o usuário não está autenticado, `useUserPlan` e `useUserRole` nunca resolvem → spinner infinito
-3. **Botão Google ausente no signup**: só existe no `LoginForm`, não no `SignupForm`
+## Problema
+Durante 2-3s de carregamento, as paginas mostram tela preta (spinner pequeno ou nada). Precisamos de skeletons que simulem o layout real.
 
-## Correções
+## Solucao
+Criar um componente reutilizavel `PageSkeleton` com variantes por pagina, e substituir os spinners atuais.
 
-### 1. Redirecionar direto ao Dashboard se ambiente já salvo
-**Arquivo: `src/pages/Auth.tsx`**
-- Mudar o redirect de `/selecionar-ambiente` para checagem: se `sessionStorage.getItem("selected_environment")` existe, ir para `/` (dashboard); senão, ir para `/selecionar-ambiente`
+### 1. Criar `src/components/shared/PageSkeleton.tsx`
+Componente com variantes: `dashboard`, `trilhas`, `calendario`, `evolucao`. Usa `Skeleton` existente com classes customizadas (`bg-white/5` ou `bg-zinc-800/50`) para manter identidade visual escura.
 
-### 2. Proteger `/selecionar-ambiente` contra acesso sem auth
-**Arquivo: `src/pages/EnvironmentSelector.tsx`**
-- Importar `useAuth` e verificar `user` e `loading`
-- Se `!loading && !user`, redirecionar para `/auth`
-- Mostrar spinner apenas enquanto `loading` do auth for `true`
+Cada variante simula o layout real:
+- **Dashboard**: header welcome (titulo + subtitulo), card grande central de conteudo, ticker de ranking
+- **Trilhas**: titulo, grid de 3 cards com imagem placeholder + texto
+- **Calendario**: titulo + tabs, card grande de calendario, card de proximo encontro
+- **Evolucao**: titulo, tabs, card hero, grid de cards de trilhas
 
-### 3. Botão Google na aba Criar Conta
-**Arquivo: `src/components/auth/SignupForm.tsx`**
-- Adicionar divisor "ou" + `GoogleLoginButton` + `GoogleLoginVerificationModal` após o botão "Criar conta grátis", igual ao `LoginForm`
+### 2. Atualizar `src/pages/Dashboard.tsx`
+- Substituir o spinner `loadingRole` (linhas 33-38) por `<PageSkeleton variant="dashboard" />`
 
-## Arquivos alterados
-- `src/pages/Auth.tsx` (1 linha de redirect)
-- `src/pages/EnvironmentSelector.tsx` (adicionar guard de auth ~10 linhas)
-- `src/components/auth/SignupForm.tsx` (adicionar Google button + modal)
+### 3. Atualizar `src/pages/Trilhas.tsx`
+- Adicionar estado de loading com `loadingRole` mostrando `<PageSkeleton variant="trilhas" />`
+
+### 4. Atualizar `src/components/calendario/CalendarioAulas.tsx`
+- Substituir o `Loader2` spinner (linhas 11-16) por skeleton de cards de aula
+
+### 5. Atualizar `src/pages/Evolucao.tsx`
+- Adicionar guard `roleLoading` com `<PageSkeleton variant="evolucao" />`
+
+## Detalhes tecnicos
+- Skeleton base: `bg-white/5 animate-pulse rounded-lg` (fundo escuro com pulse)
+- Cards skeleton: `bg-zinc-900/50 border border-white/5 rounded-xl`
+- Nao muda nenhuma logica de dados, apenas o estado visual durante loading
+- Arquivos: 1 novo + 4 editados
 
