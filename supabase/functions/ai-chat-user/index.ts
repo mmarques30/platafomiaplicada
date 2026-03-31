@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const requestBody = await req.json();
-    const { messages } = requestBody;
+    const { messages, mentoria_context } = requestBody;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       console.error("Payload inválido: messages ausente ou vazio");
