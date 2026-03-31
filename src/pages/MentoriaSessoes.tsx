@@ -112,6 +112,7 @@ export default function MentoriaSessoes() {
               <TableHead>Data</TableHead>
               <TableHead className="hidden sm:table-cell">Duração</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="hidden md:table-cell">Reunião</TableHead>
               <TableHead className="hidden lg:table-cell">Recursos</TableHead>
             </TableRow>
           </TableHeader>
