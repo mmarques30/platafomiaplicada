@@ -388,15 +388,29 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               Sou a Mar<span className="text-primary">IA</span>na
             </p>
             <p className="text-xs text-muted-foreground mt-1 mb-3">
-              Qual sua dúvida hoje?
+              {isMentoriaRoute ? "Como posso te ajudar no seu projeto?" : "Qual sua dúvida hoje?"}
             </p>
             <div className="w-full space-y-2 px-1">
-              {[
-                "Qual meu próximo passo na mentoria?",
-                "Como usar IA para automatizar tarefas?",
-                "Me sugira uma trilha de aprendizado",
-                "Quais ferramentas de IA devo começar?",
-              ].map((suggestion) => (
+              {(isMentoriaRoute && mentoriaContext
+                ? [
+                    mentoriaContext.proximaEntrega
+                      ? `Revisar minha próxima entrega: ${mentoriaContext.proximaEntrega.titulo}`
+                      : null,
+                    mentoriaContext.proximaSessao
+                      ? "Preparar para a próxima sessão de mentoria"
+                      : null,
+                    mentoriaContext.tarefasCriticas && mentoriaContext.tarefasCriticas > 0
+                      ? `Ver minhas ${mentoriaContext.tarefasCriticas} tarefas críticas`
+                      : null,
+                    "Qual o status do meu projeto?",
+                  ].filter(Boolean) as string[]
+                : [
+                    "Qual meu próximo passo na mentoria?",
+                    "Como usar IA para automatizar tarefas?",
+                    "Me sugira uma trilha de aprendizado",
+                    "Quais ferramentas de IA devo começar?",
+                  ]
+              ).map((suggestion) => (
                 <button
                   key={suggestion}
                   onClick={() => sendMessage(suggestion)}

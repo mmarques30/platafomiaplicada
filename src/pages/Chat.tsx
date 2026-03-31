@@ -79,6 +79,9 @@ const Chat = () => {
               role: msg.role,
               content: msg.content,
             })),
+            ...(location.pathname.startsWith("/mentoria") && location.state?.mentoriaContext
+              ? { mentoriaContext: location.state.mentoriaContext }
+              : {}),
           }),
           signal: abortControllerRef.current.signal,
         }

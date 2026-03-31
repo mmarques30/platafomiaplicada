@@ -591,8 +591,43 @@ ${videos.data.slice(0, 15).map((v: any) => {
 ${modulos.data.map((m: any) => `- [${m.titulo}](/trilhas/${m.trilha_id}) (${m.categoria}): ${m.descricao}`).join("\n")}`;
     }
 
+    // Mentoria context (real-time data from frontend)
+    if (mentoriaContext) {
+      let mentoriaBlock = `\n\n## 📋 Contexto Mentoria Atual (dados em tempo real):`;
+
+      if (mentoriaContext.proximaEntrega) {
+        const prazoDate = new Date(mentoriaContext.proximaEntrega.prazo);
+        const diasRestantes = Math.ceil((prazoDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+        mentoriaBlock += `\n- Próxima entrega: "${mentoriaContext.proximaEntrega.titulo}" — prazo em ${diasRestantes} dia(s)`;
+      }
+
+      if (mentoriaContext.proximaSessao) {
+        const sessaoDate = new Date(mentoriaContext.proximaSessao.data_sessao);
+        const horasAte = Math.ceil((sessaoDate.getTime() - Date.now()) / (1000 * 60 * 60));
+        const dataFormatada = sessaoDate.toLocaleDateString("pt-BR") + " às " + sessaoDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        mentoriaBlock += `\n- Próxima sessão: ${dataFormatada} (em ${horasAte}h)`;
+      }
+
+      if (mentoriaContext.etapaAtual) {
+        mentoriaBlock += `\n- Etapa atual: "${mentoriaContext.etapaAtual.nome}" (${mentoriaContext.etapaAtual.progresso}% progresso)`;
+      }
+
+      if (mentoriaContext.tarefasCriticas !== undefined) {
+        mentoriaBlock += `\n- Tarefas críticas em aberto: ${mentoriaContext.tarefasCriticas}`;
+      }
+
+      mentoriaBlock += `\n\nINSTRUÇÃO: Na PRIMEIRA mensagem da conversa, inicie proativamente baseado nesses dados:
+- Se entrega vence em ≤3 dias: "Sua próxima entrega '[titulo]' vence em X dias. Quer revisar o que precisa entregar?"
+- Se sessão em ≤24h: "Sua sessão é amanhã. Tem algo que quer preparar?"
+- Se tarefas críticas > 0: "Você tem N tarefas críticas em aberto. Quer ver o que está pendente?"
+- Se nada urgente: "Olá, [nome]. Como posso te ajudar hoje?"
+Combine as informações mais urgentes se houver múltiplas pendências.`;
+
+      systemPrompt += mentoriaBlock;
+    }
+
     // Instruções finais de recomendação
-    systemPrompt += `\n\n## 🎯 Como Recomendar Conteúdos da Plataforma:
+    systemPrompt += `\n\n## 🎯 Como Recomendar Conteúdos da Plataforma:`;
 
 **REGRAS FUNDAMENTAIS:**
 ✅ SEMPRE que existir conteúdo relevante na plataforma, MENCIONE naturalmente
