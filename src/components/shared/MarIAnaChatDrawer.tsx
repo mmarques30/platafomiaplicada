@@ -34,14 +34,93 @@ interface MarIAnaChatDrawerProps {
 export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const businessUserId = useBusinessUserId();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [mentoriaContext, setMentoriaContext] = useState<MentoriaContext | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const isMentoriaRoute = location.pathname.startsWith("/mentoria");
+
+  // Fetch mentoria context when on /mentoria/* routes
+  useEffect(() => {
+    if (!isMentoriaRoute || !businessUserId) {
+      setMentoriaContext(null);
+      return;
+    }
+
+    const fetchContext = async () => {
+      try {
+        // Get user's contract ID first
+        const { data: contrato } = await supabase
+          .from("contratos_business")
+          .select("id")
+          .eq("user_id", businessUserId)
+          .limit(1)
+          .maybeSingle();
+
+        const contratoId = contrato?.id;
+
+        const [entregaRes, sessaoRes, etapaRes, tarefasRes] = await Promise.all([
+          // Próxima entrega pendente
+          contratoId
+            ? supabase
+                .from("entregas_business")
+                .select("titulo, prazo")
+                .eq("contrato_id", contratoId)
+                .neq("status", "concluida")
+                .order("prazo", { ascending: true })
+                .limit(1)
+                .maybeSingle()
+            : Promise.resolve({ data: null }),
+          // Próxima sessão agendada
+          supabase
+            .from("sessoes_mentoria")
+            .select("data_sessao")
+            .eq("user_id", businessUserId)
+            .eq("status", "agendada")
+            .gt("data_sessao", new Date().toISOString())
+            .order("data_sessao", { ascending: true })
+            .limit(1)
+            .maybeSingle(),
+          // Etapa atual em andamento
+          contratoId
+            ? supabase
+                .from("etapas_business")
+                .select("nome, progresso")
+                .eq("contrato_id", contratoId)
+                .eq("status", "em_andamento")
+                .limit(1)
+                .maybeSingle()
+            : Promise.resolve({ data: null }),
+          // Tarefas críticas
+          supabase
+            .from("tarefas_mentoria")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", businessUserId)
+            .in("prioridade", ["alta", "critica", "urgente"])
+            .neq("status", "concluida"),
+        ]);
+
+        setMentoriaContext({
+          proximaEntrega: entregaRes.data ? { titulo: entregaRes.data.titulo, prazo: entregaRes.data.prazo } : null,
+          proximaSessao: sessaoRes.data ? { data_sessao: sessaoRes.data.data_sessao } : null,
+          etapaAtual: etapaRes.data ? { nome: etapaRes.data.nome, progresso: etapaRes.data.progresso || 0 } : null,
+          tarefasCriticas: tarefasRes.count || 0,
+        });
+      } catch (err) {
+        console.error("Erro ao buscar contexto mentoria:", err);
+      }
+    };
+
+    fetchContext();
+  }, [isMentoriaRoute, businessUserId]);
 
   // Load chat history on mount
   useEffect(() => {
