@@ -1,40 +1,29 @@
 
 
-# Unificar Business Sistemas com componentes reais
+# Unificar estilos de cards na área /mentoria
 
 ## Resumo
-Substituir os placeholders estáticos do Business Sistemas por componentes reais já existentes, adicionar aba Evolução, e eliminar o roadmap hardcoded.
+Padronizar todos os cards para `bg-card border-border` removendo gradientes, cores verdes e opacidades parciais.
 
-## Alterações em `src/pages/Mentoria.tsx`
+## Alterações
 
-### 1. Visão Geral: trocar IAplicadaVisaoGeral por BusinessVisaoRapida
-Linha 105-106: substituir o bloco `isBusinessSistemas ? <IAplicadaVisaoGeral />` para que Business Sistemas use os mesmos componentes que Business Parceria (BusinessVisaoRapida + BusinessROIChart + BusinessReportsCard, sem BusinessProgressoConteudo que fica na aba Evolução).
+### 1. `BusinessEvolucaoAprendizado.tsx`
+- Linhas 65, 114, 132, 150: trocar `border-aplicada-green-300 bg-aplicada-green-100` por `border-border bg-card`
+- Linha 169: trocar `border-border/50 bg-card/50 backdrop-blur-sm` por `border-border bg-card`
 
-Resultado: ambos os planos Business renderizam o mesmo bloco na aba Visão Geral.
+### 2. `BusinessProgressoConteudo.tsx`
+- Linhas 16, 27: trocar `border-primary/20` por `border-border bg-card`
+- Linha 73: trocar `border-primary/20 bg-gradient-to-br from-blue-500/5 to-transparent` por `border-border bg-card`
+- Linha 103: trocar `border-primary/20 bg-gradient-to-br from-green-500/5 to-transparent` por `border-border bg-card`
+- Linha 131: trocar `border-primary/20 bg-gradient-to-br from-purple-500/5 to-transparent` por `border-border bg-card`
+- Linha 151: trocar `border-primary/20` por `border-border bg-card`
 
-### 2. Aba Evolução: habilitar para Business Sistemas
-- Linha 53: mudar `showEvolucaoTab` de `isBusiness && !isBusinessSistemas` para `isBusiness` (ambos os planos)
-- No conteúdo da aba Evolução (linha 142-145): manter `BusinessProgressoConteudo` para todos, mas renderizar `BusinessEvolucaoAprendizado` apenas para Parceria:
-  ```
-  <BusinessProgressoConteudo />
-  {!isBusinessSistemas && <BusinessEvolucaoAprendizado />}
-  ```
+### 3. `BusinessROIChart.tsx`
+- Linha 108: trocar `border-border/50 bg-card/50 backdrop-blur-sm` por `border-border bg-card`
 
-### 3. Roadmap: trocar IAplicadaRoadmap por BusinessExecutiveRoadmap
-Linha 131-132: substituir `isBusinessSistemas ? <IAplicadaRoadmap />` por `<BusinessExecutiveRoadmap />` para ambos os planos Business. O `BusinessExecutiveRoadmap` já tem lógica de preview com banner âmbar quando sem contrato, e dados reais quando disponíveis.
+### 4. `BusinessReportsCard.tsx`
+- Linhas 19, 32, 66: trocar `border-border/50 bg-card/50` por `border-border bg-card`
 
-### 4. Limpeza de imports
-- Remover imports de `IAplicadaVisaoGeral` e `IAplicadaRoadmap` (linhas 23-24)
-- Os arquivos dos componentes podem permanecer no repositório (sem risco, apenas código morto)
-
-## Resultado final para Business Sistemas
-
-```text
-Aba Visão Geral:  BusinessVisaoRapida + BusinessROIChart + BusinessReportsCard
-Aba Roadmap:      BusinessExecutiveRoadmap (dados reais ou preview com banner)
-Aba Evolução:     BusinessProgressoConteudo (versão simplificada, sem EvolucaoAprendizado)
-```
-
-## Arquivos
-- **Editado**: `src/pages/Mentoria.tsx` (imports + 3 blocos condicionais)
+## Resultado
+Todos os cards usam `bg-card border-border` — consistente no light e dark mode, sem gradientes ou cores custom.
 
