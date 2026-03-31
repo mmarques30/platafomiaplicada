@@ -5,6 +5,7 @@ import { useDuvidasMentoria } from "@/hooks/useDuvidasMentoria";
 import { useState } from "react";
 import { NovaDuvidaModal } from "@/components/mentoria/NovaDuvidaModal";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -73,9 +74,10 @@ export function AbaDuvidas() {
                       <CardTitle className="text-lg">{duvida.titulo}</CardTitle>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant={duvida.status === "respondida" ? "default" : "secondary"}>
-                        {getStatusLabel(duvida.status)}
-                      </Badge>
+                      <StatusBadge 
+                        status={duvida.status === "respondida" ? "concluido" : duvida.status === "em_analise" ? "em_andamento" : "pendente"} 
+                        label={getStatusLabel(duvida.status)} 
+                      />
                       <Badge variant={getPrioridadeColor(duvida.prioridade)}>
                         {duvida.prioridade.charAt(0).toUpperCase() + duvida.prioridade.slice(1)}
                       </Badge>

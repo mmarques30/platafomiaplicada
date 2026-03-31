@@ -15,6 +15,7 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 const STATUS_CONFIG = {
   pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const, color: "text-muted-foreground" },
@@ -120,6 +121,10 @@ export default function MentoriaEntregas() {
                 )}>
                   {entrega.titulo}
                 </h3>
+                <StatusBadge 
+                  status={entrega.status === 'cancelada' ? 'cancelado' : entrega.status === 'concluida' ? 'concluido' : entrega.status} 
+                  label={statusConfig.label} 
+                />
                 <Badge variant={prioridadeConfig.variant} className="text-xs">
                   {prioridadeConfig.label}
                 </Badge>
