@@ -190,7 +190,7 @@ export function AcademyRoadmapEducacional() {
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
               <Flame className={`h-5 w-5 ${diasSequencia > 0 ? "text-orange-400" : "text-zinc-600"}`} />
-              <span className="text-lg font-bold">{diasSequencia}</span>
+              <span className="text-lg font-bold">{animatedDias}</span>
               <span className="text-[11px] text-muted-foreground">Dias seguidos</span>
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
