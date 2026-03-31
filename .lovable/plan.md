@@ -1,37 +1,30 @@
 
 
-# Correções em 3 páginas públicas
+# Correções no fluxo de autenticação
 
-## 1. Logo quebrado na /sobre
-A página `Sobre.tsx` não usa o `AuthHeader` — tem apenas um botão "Voltar". O logo exibido vem do `AboutSection` que importa `logo-iaplicada-icon.png` (arquivo existe). Preciso verificar se o problema é de fato esse logo ou se o usuário se refere ao header. Solução: adicionar o `AuthHeader` à página Sobre (como já existe em Serviços), que já tem o logo funcional. Remover o botão "Voltar" manual que hoje ocupa esse espaço.
+## Problema atual
+1. **Após login**: sempre redireciona para `/selecionar-ambiente`, mesmo que o usuário já tenha selecionado antes
+2. **`/selecionar-ambiente` sem auth**: se o usuário não está autenticado, `useUserPlan` e `useUserRole` nunca resolvem → spinner infinito
+3. **Botão Google ausente no signup**: só existe no `LoginForm`, não no `SignupForm`
 
-**Arquivo: `src/pages/Sobre.tsx`**
-- Importar e adicionar `<AuthHeader />` no topo
-- Remover o bloco do botão "Voltar" (sticky)
-- Adicionar `pt-20` ao conteúdo para compensar o header fixo
+## Correções
 
-## 2. Navbar faltando em /servicos
-A página Serviços já tem `AuthHeader`, mas o header não tem link "Entrar". 
+### 1. Redirecionar direto ao Dashboard se ambiente já salvo
+**Arquivo: `src/pages/Auth.tsx`**
+- Mudar o redirect de `/selecionar-ambiente` para checagem: se `sessionStorage.getItem("selected_environment")` existe, ir para `/` (dashboard); senão, ir para `/selecionar-ambiente`
 
-**Arquivo: `src/components/auth/AuthHeader.tsx`**
-- Adicionar `{ label: 'Entrar', to: '/auth' }` ao array `navLinksData`
+### 2. Proteger `/selecionar-ambiente` contra acesso sem auth
+**Arquivo: `src/pages/EnvironmentSelector.tsx`**
+- Importar `useAuth` e verificar `user` e `loading`
+- Se `!loading && !user`, redirecionar para `/auth`
+- Mostrar spinner apenas enquanto `loading` do auth for `true`
 
-## 3. Tema escuro nas páginas /termos-uso e /politica-privacidade
-Ambas usam `bg-background` (branco no tema claro). Precisam usar fundo escuro `bg-[#1a1c19]` + textos claros, igual Sobre/Serviços. Também adicionar o `AuthHeader` para navegação consistente.
-
-**Arquivo: `src/pages/PoliticaUso.tsx`**
-- Trocar `bg-background` por `bg-[#1a1c19]` nos 3 blocos de return (loading, not found, content)
-- Adicionar `<AuthHeader />` e padding top
-- Estilizar Card com fundo escuro: `bg-[#1a1c19]/80 border-white/10`
-- Textos em branco/cinza claro
-- Remover botão "Voltar" manual (AuthHeader já tem navegação)
-
-**Arquivo: `src/pages/PoliticaPrivacidade.tsx`**
-- Mesmas alterações de tema escuro e AuthHeader
+### 3. Botão Google na aba Criar Conta
+**Arquivo: `src/components/auth/SignupForm.tsx`**
+- Adicionar divisor "ou" + `GoogleLoginButton` + `GoogleLoginVerificationModal` após o botão "Criar conta grátis", igual ao `LoginForm`
 
 ## Arquivos alterados
-- `src/pages/Sobre.tsx`
-- `src/components/auth/AuthHeader.tsx`
-- `src/pages/PoliticaUso.tsx`
-- `src/pages/PoliticaPrivacidade.tsx`
+- `src/pages/Auth.tsx` (1 linha de redirect)
+- `src/pages/EnvironmentSelector.tsx` (adicionar guard de auth ~10 linhas)
+- `src/components/auth/SignupForm.tsx` (adicionar Google button + modal)
 
