@@ -61,7 +61,9 @@ interface FormularioWizardProps {
 export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [draftSaved, setDraftSaved] = useState(false);
-  const { formulario, finalizarFormulario, salvarRascunho, isSaving } = useMentoriaForm();
+  const [submitted, setSubmitted] = useState(false);
+  const [insightReady, setInsightReady] = useState(false);
+  const { formulario, finalizarFormulario, salvarRascunho, isSaving, refetch } = useMentoriaForm();
   const { isAdmin } = useUserRole();
   const { effectivePlan, isBusiness } = useEffectivePlan(isAdmin);
   const navigate = useNavigate();
