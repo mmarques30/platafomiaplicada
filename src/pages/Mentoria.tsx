@@ -107,7 +107,6 @@ export default function Mentoria() {
             <>
               {/* Business Colaborativo: ROI → Progresso → Reports */}
               <BusinessROIChart />
-              <BusinessProgressoConteudo />
               <BusinessReportsCard />
             </>
           ) : (
