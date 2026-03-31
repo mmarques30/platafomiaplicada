@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, Loader2, Package, FolderOpen, CheckCircle2, Filter } from "lucide-react";
+import { ArrowLeft, ChevronDown, Package, FolderOpen, CheckCircle2, Filter } from "lucide-react";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
