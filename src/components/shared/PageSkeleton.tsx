@@ -1,10 +1,10 @@
 
 const SkeletonBlock = ({ className = "" }: { className?: string }) => (
-  <div className={`animate-pulse rounded-lg bg-white/5 ${className}`} />
+  <div className={`animate-pulse rounded-lg bg-muted/60 ${className}`} />
 );
 
 const SkeletonCard = ({ className = "", children }: { className?: string; children?: React.ReactNode }) => (
-  <div className={`animate-pulse rounded-xl bg-zinc-900/50 border border-white/5 ${className}`}>{children}</div>
+  <div className={`animate-pulse rounded-xl bg-muted border border-border ${className}`}>{children}</div>
 );
 
 function DashboardSkeleton() {
@@ -50,9 +50,9 @@ function TrilhasSkeleton() {
           {[1, 2, 3, 4, 5, 6].map(i => (
             <SkeletonCard key={i} className="h-[220px] p-4">
               <div className="space-y-3">
-                <SkeletonBlock className="h-[100px] rounded-lg bg-white/10" />
-                <SkeletonBlock className="h-5 w-3/4 bg-white/10" />
-                <SkeletonBlock className="h-4 w-1/2 bg-white/10" />
+                <SkeletonBlock className="h-[100px] rounded-lg bg-muted/40" />
+                <SkeletonBlock className="h-5 w-3/4 bg-muted/40" />
+                <SkeletonBlock className="h-4 w-1/2 bg-muted/40" />
               </div>
             </SkeletonCard>
           ))}
@@ -68,22 +68,22 @@ function CalendarioSkeleton() {
       {/* Próxima aula card */}
       <SkeletonCard className="h-[160px] p-6">
         <div className="space-y-3">
-          <SkeletonBlock className="h-5 w-28 bg-white/10" />
-          <SkeletonBlock className="h-7 w-64 bg-white/10" />
-          <SkeletonBlock className="h-4 w-48 bg-white/10" />
+          <SkeletonBlock className="h-5 w-28 bg-muted/40" />
+          <SkeletonBlock className="h-7 w-64 bg-muted/40" />
+          <SkeletonBlock className="h-4 w-48 bg-muted/40" />
         </div>
       </SkeletonCard>
       {/* Lista de aulas */}
       <SkeletonCard className="p-6">
         <div className="space-y-4">
-          <SkeletonBlock className="h-5 w-32 bg-white/10" />
+          <SkeletonBlock className="h-5 w-32 bg-muted/40" />
           {[1, 2, 3].map(i => (
-            <div key={i} className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+            <div key={i} className="flex items-center justify-between py-3 border-b border-border/50 last:border-0">
               <div className="space-y-2 flex-1">
-                <SkeletonBlock className="h-5 w-48 bg-white/10" />
-                <SkeletonBlock className="h-4 w-32 bg-white/10" />
+                <SkeletonBlock className="h-5 w-48 bg-muted/40" />
+                <SkeletonBlock className="h-4 w-32 bg-muted/40" />
               </div>
-              <SkeletonBlock className="h-8 w-16 bg-white/10" />
+              <SkeletonBlock className="h-8 w-16 bg-muted/40" />
             </div>
           ))}
         </div>
@@ -101,10 +101,10 @@ function EvolucaoSkeleton() {
       {/* Hero */}
       <SkeletonCard className="h-[200px] p-6">
         <div className="space-y-4">
-          <SkeletonBlock className="h-6 w-40 bg-white/10" />
+          <SkeletonBlock className="h-6 w-40 bg-muted/40" />
           <div className="grid grid-cols-3 gap-4">
             {[1, 2, 3].map(i => (
-              <SkeletonBlock key={i} className="h-20 rounded-lg bg-white/10" />
+              <SkeletonBlock key={i} className="h-20 rounded-lg bg-muted/40" />
             ))}
           </div>
         </div>
