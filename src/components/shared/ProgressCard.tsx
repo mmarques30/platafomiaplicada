@@ -25,7 +25,7 @@ export function ProgressCard({
   };
 
   return (
-    <Card className="card-enhanced">
+    <Card className="card-interactive">
       <CardHeader>
         <CardTitle className="font-bold text-foreground text-xl">Progresso Geral</CardTitle>
       </CardHeader>
