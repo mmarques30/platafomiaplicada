@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, EyeOff } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, EyeOff, Route, Package, Calendar, ListChecks, CheckSquare, ClipboardCheck, FileText, FolderOpen, HelpCircle, BarChart3, Wrench } from "lucide-react";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -42,7 +42,9 @@ export function AppSidebar() {
   const { currentEnvironment } = useEnvironment();
   
   const collapsed = !open;
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([
+    'biz_jornada', 'biz_entregas', 'biz_comunicacao' // Business groups default expanded
+  ]);
   const [logoError, setLogoError] = useState(false);
 
   const handleLogout = async () => {
@@ -98,6 +100,47 @@ export function AppSidebar() {
   // Detectar se é Business Sistemas (para filtros especiais)
   const isBusinessSistemasEnv = effectiveEnvironment === 'business_sistemas' 
     || effectivePlan === 'business_sistemas';
+  const isBusinessParceriaEnv = effectiveEnvironment === 'business_parceria'
+    || effectivePlan === 'business_parceria';
+  const isBusinessEnv = isBusinessSistemasEnv || isBusinessParceriaEnv || isBusiness;
+
+  // Business groups definition
+  const businessGroups = [
+    {
+      key: 'biz_jornada',
+      label: 'MINHA JORNADA',
+      icon: Route,
+      items: [
+        { label: 'Etapas', url: '/mentoria/etapas-business', parceria: true, sistemas: true },
+        { label: 'Roadmap', url: '/mentoria?tab=roadmap', parceria: true, sistemas: false },
+        { label: 'Instruções', url: '/mentoria/instrucoes-business', parceria: true, sistemas: false },
+      ],
+    },
+    {
+      key: 'biz_entregas',
+      label: 'ENTREGAS E TAREFAS',
+      icon: Package,
+      items: [
+        { label: 'Entregas', url: '/mentoria/entregas', parceria: true, sistemas: true },
+        { label: 'Tarefas', url: '/mentoria/tarefas', parceria: true, sistemas: false },
+        { label: 'Tasks', url: '/mentoria/tasks-business', parceria: true, sistemas: false },
+        { label: 'Validações', url: '/mentoria/validacoes', parceria: true, sistemas: true },
+        { label: 'Projetos', url: '/mentoria/projetos', parceria: true, sistemas: false },
+      ],
+    },
+    {
+      key: 'biz_comunicacao',
+      label: 'COMUNICAÇÃO',
+      icon: MessageSquare,
+      items: [
+        { label: 'Sessões', url: '/mentoria/sessoes', parceria: true, sistemas: true },
+        { label: 'Dúvidas', url: '/mentoria/duvidas', parceria: true, sistemas: false },
+        { label: 'Documentos', url: '/mentoria/documentos', parceria: true, sistemas: true },
+        { label: 'Recursos', url: '/mentoria/recursos', parceria: true, sistemas: false },
+        { label: 'Reports', url: '/mentoria/reports', parceria: true, sistemas: true },
+      ],
+    },
+  ];
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
@@ -162,14 +205,13 @@ export function AppSidebar() {
     return menu.url || "/";
   };
 
-  // Auto-expandir menu quando rota ativa está em submenu (incluindo 3º nível)
+  // Auto-expandir menu quando rota ativa está em submenu (incluindo 3º nível e business groups)
   useEffect(() => {
     const newExpanded: string[] = [];
     mainMenus.forEach(menu => {
       const subMenus = getSubMenus(menu.menu_key);
       const isInSubRoute = subMenus.some(sub => {
         if (sub.url && location.pathname.startsWith(sub.url)) return true;
-        // Check 3rd-level children
         const thirdLevel = getSubMenus(sub.menu_key);
         return thirdLevel.some(child => child.url && location.pathname.startsWith(child.url));
       });
@@ -177,6 +219,16 @@ export function AppSidebar() {
         newExpanded.push(menu.menu_key);
       }
     });
+    // Auto-expand business groups based on active route
+    if (isBusinessEnv) {
+      businessGroups.forEach(group => {
+        const hasActive = group.items.some(item => {
+          const itemPath = item.url.split('?')[0];
+          return location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
+        });
+        if (hasActive) newExpanded.push(group.key);
+      });
+    }
     if (newExpanded.length > 0) {
       setExpandedMenus(prev => {
         const combined = [...new Set([...prev, ...newExpanded])];
@@ -492,6 +544,81 @@ export function AppSidebar() {
                     {menuElement}
                     {bibliotecasMenu}
                   </>
+                );
+              })}
+
+              {/* Business Groups - 3 collapsible sections */}
+              {isBusinessEnv && businessGroups.map((group) => {
+                const GroupIcon = group.icon;
+                const filteredItems = group.items.filter(item => 
+                  isBusinessSistemasEnv ? item.sistemas : item.parceria
+                );
+                if (filteredItems.length === 0) return null;
+                const isGroupExpanded = expandedMenus.includes(group.key);
+                const hasActiveItem = filteredItems.some(item => {
+                  const itemPath = item.url.split('?')[0];
+                  return location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
+                });
+
+                return (
+                  <Collapsible
+                    key={group.key}
+                    open={isGroupExpanded}
+                    onOpenChange={() => toggleMenu(group.key)}
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="group w-full pl-4">
+                          <div className={cn(
+                            "flex items-center gap-3 rounded-lg transition-all duration-200 py-2 w-full",
+                            hasActiveItem
+                              ? "text-primary" 
+                              : "text-sidebar-foreground/50 hover:text-sidebar-foreground/80"
+                          )}>
+                            <GroupIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
+                            {!collapsed && (
+                              <>
+                                <span className="text-[10px] uppercase tracking-widest font-semibold flex-1 text-left">
+                                  {group.label}
+                                </span>
+                                <ChevronDown className={cn(
+                                  "h-3.5 w-3.5 transition-transform duration-200",
+                                  isGroupExpanded && "rotate-180"
+                                )} />
+                              </>
+                            )}
+                          </div>
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+                        <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
+                          {filteredItems.map((item) => {
+                            const itemPath = item.url.split('?')[0];
+                            const itemIsActive = location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
+                            return (
+                              <SidebarMenuItem key={item.url}>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink
+                                    to={item.url}
+                                    end
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-4 py-2 text-sm",
+                                      itemIsActive
+                                        ? "text-primary font-semibold"
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>{item.label}</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            );
+                          })}
+                        </SidebarMenu>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
                 );
               })}
 
