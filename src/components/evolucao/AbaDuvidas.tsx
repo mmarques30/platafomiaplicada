@@ -5,6 +5,7 @@ import { useDuvidasMentoria } from "@/hooks/useDuvidasMentoria";
 import { useState } from "react";
 import { NovaDuvidaModal } from "@/components/mentoria/NovaDuvidaModal";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
