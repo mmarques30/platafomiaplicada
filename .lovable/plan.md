@@ -1,26 +1,20 @@
 
 
-# Substituir spinner genérico por PageSkeleton no MainLayout
+# Consolidar barras de progresso — remover componente morto
+
+## Descoberta
+
+O `src/components/mentoria/ProgressBar.tsx` **não é importado por nenhum arquivo** do projeto. É código morto.
+
+Além disso, ele não é realmente uma "barra de progresso" — é um **stepper** (círculos numerados com etapas). Suas props (`currentStep`, `totalSteps`, `steps`) são completamente incompatíveis com o `ui/ProgressBar.tsx` (`value`, `color`, `height`, `label`). Não há migração de imports necessária.
 
 ## Alteração
 
-**Arquivo**: `src/components/layout/MainLayout.tsx`
+1. **Deletar** `src/components/mentoria/ProgressBar.tsx` — arquivo não utilizado.
 
-**Linhas 60–66** — substituir:
-```tsx
-return (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-  </div>
-);
-```
+Nenhum outro arquivo precisa ser alterado.
 
-Por:
-```tsx
-return <PageSkeleton variant="dashboard" />;
-```
+## Arquivos
 
-**Import**: Adicionar `import { PageSkeleton } from "@/components/shared/PageSkeleton";` no topo do arquivo.
-
-Nenhuma outra alteração no arquivo.
+- **Deletado**: `src/components/mentoria/ProgressBar.tsx`
 
