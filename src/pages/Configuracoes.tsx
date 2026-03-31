@@ -17,6 +17,7 @@ import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, C
 import { useTheme } from "next-themes";
 import { forceFullAppReload } from "@/lib/pwaUpdate";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { OnboardingProgressCard } from "@/components/configuracoes/OnboardingProgressCard";
 
 export default function Configuracoes() {
   const { user, signOut } = useAuth();
