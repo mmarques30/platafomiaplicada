@@ -129,7 +129,7 @@ export function MateriaisExclusivos() {
                     </div>
                     {!material.liberado && (
                       <Badge variant="secondary" className="text-xs">
-                        🔒 Bloqueado
+                        <Lock className="h-3 w-3 inline mr-1" /> Bloqueado
                       </Badge>
                     )}
                   </div>

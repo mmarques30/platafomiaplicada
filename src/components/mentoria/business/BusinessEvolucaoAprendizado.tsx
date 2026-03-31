@@ -204,7 +204,7 @@ export function BusinessEvolucaoAprendizado() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
-                <SelectItem value="favoritos">⭐ Favoritos</SelectItem>
+                <SelectItem value="favoritos">Favoritos</SelectItem>
               </SelectContent>
             </Select>
           </div>

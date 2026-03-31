@@ -72,7 +72,7 @@ export default function Cupons() {
               O Academy é o primeiro passo da sua jornada na IAplicada. Aqui você começa sua trilha de aprendizado em Inteligência Artificial aplicada ao seu dia a dia profissional.
               {isVisitante && expirationData?.diasRestantes != null && expirationData.diasRestantes <= 7 && (
                 <span className="block mt-2 text-sm font-medium text-primary">
-                  🎁 Você tem um cupom especial de {desconto} de desconto!
+                  <Gift className="h-4 w-4 inline mr-1" /> Você tem um cupom especial de {desconto} de desconto!
                 </span>
               )}
             </p>

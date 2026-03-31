@@ -84,7 +84,7 @@ export function TopHeader() {
       {isAdmin && isViewingAs && (
         <div className="fixed top-0 left-0 right-0 bg-amber-500 text-black text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
           <span>
-            👁️ Visualizando como: <strong>
+            <Eye className="h-4 w-4 inline mr-1" /> Visualizando como: <strong>
               {viewAs === 'visitante' 
                 ? 'Visitante' 
                 : `${impersonatedUserName} (${viewAs === 'academy' ? 'Academy' : viewAs === 'skills' ? 'Skills' : 'Business'})`
