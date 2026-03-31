@@ -53,11 +53,7 @@ export default function MentoriaEtapasBusiness() {
   };
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto py-8 px-4 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PageSkeleton variant="evolucao" />;
   }
 
   return (

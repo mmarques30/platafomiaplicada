@@ -67,11 +67,7 @@ export default function MentoriaPainelDiagnostico() {
         : 'Voltar para Mentoria';
 
   if (isLoading || roleLoading || effectivePlanLoading) {
-    return (
-      <div className="container mx-auto py-8 flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageSkeleton variant="dashboard" />;
   }
 
   // Estado vazio: mostrar shell com conteúdo simplificado

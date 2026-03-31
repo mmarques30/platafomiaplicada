@@ -217,11 +217,7 @@ export default function MentoriaTasksBusiness() {
   };
 
   if (isLoading) {
-    return (
-      <div className="container py-8 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PageSkeleton variant="evolucao" />;
   }
 
   return (
