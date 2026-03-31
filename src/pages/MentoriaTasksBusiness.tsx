@@ -14,6 +14,7 @@ import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { cn } from "@/lib/utils";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
