@@ -147,8 +147,7 @@ export function BusinessProgressoConteudo() {
       {/* Atividade Recente */}
       <Card className="border-primary/20">
         <CardHeader>
-          <CardTitle className="text-base font-medium flex items-center gap-2">
-            <Activity className="h-4 w-4 text-primary" />
+          <CardTitle className="text-base font-medium">
             Atividade Recente
           </CardTitle>
         </CardHeader>
