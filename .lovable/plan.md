@@ -1,33 +1,26 @@
 
 
-# Barra colorida lateral + remoção de emojis em Notificações
+# Tela de primeiro acesso para Business Parceria e Sistemas
 
-## Análise
+## Abordagem
+Criar uma nova página `BusinessWelcome.tsx` e interceptar o fluxo no `MainLayout.tsx` para redirecionar usuários Business com `primeiro_acesso = true` para essa tela antes de acessar a plataforma.
 
-A página `Notificacoes.tsx` usa a tabela `avisos` cujo campo `tipo` tem valores como `"urgente"`, `"importante"`, `"informativo"`. Os tipos mencionados na solicitação (`sessao`, `entrega`, `tarefa`, etc.) não existem atualmente nessa tabela.
+## 1. Nova página: `src/pages/BusinessWelcome.tsx`
+- Layout centralizado com `bg-background`
+- Logo `logo-aplicada-nova.png` centralizado no topo
+- Título dinâmico com nome do perfil (28px, weight 500)
+- Subtítulo muted (15px)
+- 3 itens numerados com borda esquerda 3px `#2CBBA6`
+- Botão "Entrar na plataforma" (`#AFC040` bg, `#0C0F0A` texto)
+- Ao clicar: `supabase.from("profiles").update({ primeiro_acesso: false })` + `navigate("/mentoria")`
 
-**Mapeamento proposto** — combinar os tipos existentes com os solicitados:
+## 2. Rota: `src/App.tsx`
+- Adicionar rota `/welcome-business` como rota protegida fora do `MainLayout` (similar a `/onboarding-welcome`)
 
-| Tipo aviso | Cor | Razão |
-|------------|-----|-------|
-| `urgente` | #E8684A (alerta) | Urgência = alerta |
-| `importante` | #E8A43C (entrega/tarefa) | Importância = atenção |
-| `informativo` | #4A9FE0 (sessao) | Informação = neutro/sessão |
-| Qualquer outro / sem tipo | #2CBBA6 | Fallback padrão |
+## 3. Redirecionamento: `src/components/layout/MainLayout.tsx`
+- No `useEffect` existente, adicionar check: se `profile.primeiro_acesso === true` e `plano_mentoria` é `business_parceria` ou `business_sistemas`, redirecionar para `/welcome-business`
 
-Se no futuro novos tipos forem adicionados (`sessao`, `entrega`, `conquista`, etc.), o mapeamento já os cobrirá.
-
-## Alteração única: `src/pages/Notificacoes.tsx`
-
-### 1. Função helper de cor
-Criar `getBarColor(tipo)` que retorna a cor hexadecimal com base no tipo do aviso, incluindo os tipos futuros solicitados.
-
-### 2. Barra lateral 3px
-No Card de cada aviso, adicionar `overflow-hidden` e um `div` absoluto na esquerda com `width: 3px`, `height: 100%`, `backgroundColor` dinâmico via `getBarColor`.
-
-### 3. Remoção de emojis
-Criar helper `removeEmojis(text)` usando regex para limpar emojis dos campos `titulo` e `mensagem` antes de renderizar.
-
-## Nenhum outro arquivo alterado
-Sem mudanças em fetch, contagem, marcação como lido, posicionamento ou componentes ocultos.
+## Arquivos
+- **Novo**: `src/pages/BusinessWelcome.tsx`
+- **Editados**: `src/App.tsx` (1 rota), `src/components/layout/MainLayout.tsx` (1 useEffect)
 
