@@ -344,6 +344,11 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild className="group">
                       <NavLink 
                         to={getMenuUrl(menu)} 
+                        data-tour={
+                          getMenuUrl(menu).includes('calendario') ? 'calendario' :
+                          getMenuUrl(menu).includes('evolucao') ? 'evolucao' :
+                          undefined
+                        }
                         end 
                         className={cn(
                           "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
@@ -637,7 +642,8 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="group">
               <NavLink 
-                to="/configuracoes" 
+                data-tour="configuracoes"
+                to="/configuracoes"
                 className={({ isActive }) => cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium pl-4",
                   isActive ? "text-primary font-semibold" : "text-sidebar-foreground hover:text-primary"

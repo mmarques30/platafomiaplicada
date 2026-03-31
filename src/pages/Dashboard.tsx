@@ -9,6 +9,8 @@ import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTicker } from "@/components/dashboard/RankingTicker";
 import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
+import { DashboardTour } from "@/components/dashboard/DashboardTour";
+import { WeeklyProgressCard } from "@/components/dashboard/WeeklyProgressCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -19,38 +21,37 @@ export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
   const { profile, isLoading: loadingProfile } = useUserProfile();
 
-  // Derivar o estado do aviso de senha diretamente dos dados carregados (elimina race condition)
   const mostrarAvisoSenha = useMemo(() => {
-    // Não mostrar durante carregamento
     if (loadingRole || loadingProfile) return false;
-    // Visitantes não veem o aviso
     if (isVisitante) return false;
-    // Só mostra se tem senha temporária ou primeiro acesso
     return profile?.senha_temporaria === true || profile?.primeiro_acesso === true;
   }, [loadingRole, loadingProfile, isVisitante, profile]);
 
+  const showTour = useMemo(() => {
+    if (loadingProfile) return false;
+    if (isVisitante) return false;
+    return profile?.primeiro_acesso === true;
+  }, [loadingProfile, isVisitante, profile]);
 
-  // IMPORTANTE: Não renderizar enquanto carrega
   if (loadingRole) {
     return <PageSkeleton variant="dashboard" />;
   }
 
   return (
     <div className="min-h-screen bg-background pt-2">
+      {/* Tour guiado no primeiro acesso */}
+      {showTour && <DashboardTour run={showTour} />}
+
       <main className="container py-3 md:py-6 px-3 md:px-4 space-y-4 md:space-y-6 lg:space-y-8">
         {isVisitante ? (
-          // Layout visitante - similar a outros ambientes
           <div className="space-y-6">
             <WelcomeHeader />
-
             <PWAInstallBanner />
             <CentralConteudoGratuito />
             <RankingTickerGratuito />
           </div>
         ) : (
-          // Layout mentorado existente
           <>
-            {/* Aviso de senha temporária */}
             {mostrarAvisoSenha && (
               <Alert className="border-2 border-primary bg-primary/5 shadow-md">
                 <AlertCircle className="h-4 w-4 text-primary" />
@@ -66,11 +67,7 @@ export default function Dashboard() {
                     .
                   </div>
                   <Link to="/configuracoes">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-4 hover:bg-primary/10"
-                    >
+                    <Button variant="ghost" size="sm" className="ml-4 hover:bg-primary/10">
                       <X className="h-4 w-4" />
                     </Button>
                   </Link>
@@ -78,24 +75,24 @@ export default function Dashboard() {
               </Alert>
             )}
 
-            {/* Hero Section */}
             <section>
               <WelcomeHeader />
             </section>
 
-            {/* Banner PWA (apenas para mentorados) */}
             <PWAInstallBanner />
 
-            {/* Card de Pendências (apenas mentorados) */}
+            {/* Card semanal de progresso */}
+            <WeeklyProgressCard />
+
             <PendenciasOnboarding />
 
-            {/* Central de Conteúdo Interativa */}
-            <CentralConteudo />
+            {/* Central de Conteúdo - target do tour */}
+            <div data-tour="trilha-recomendada">
+              <CentralConteudo />
+            </div>
 
-            {/* Painel de Destaques - Ranking */}
             <RankingTicker />
 
-            {/* Novidades da Semana */}
             <section>
               <NovidadesSemana />
             </section>

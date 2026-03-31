@@ -105,6 +105,11 @@ export function SignupForm() {
         }
       }
 
+      // Salvar dados para tela de onboarding
+      sessionStorage.setItem("onboarding_nome", nome);
+      sessionStorage.setItem("onboarding_objetivo", objetivo);
+      sessionStorage.setItem("onboarding_area", areaAtuacao);
+
       toast.success("Cadastro realizado! Bem-vindo à IAplicada!");
     } catch (error: any) {
       toast.error(error.message || "Erro ao processar cadastro");

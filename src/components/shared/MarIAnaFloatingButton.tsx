@@ -22,6 +22,7 @@ export function MarIAnaFloatingButton() {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                data-tour="mariana-button"
                 onClick={() => setIsOpen(true)}
                 size="icon"
                 className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 h-11 w-11 md:h-14 md:w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-[#0D0D0D] hover:bg-[#1a1a1a] p-2"
