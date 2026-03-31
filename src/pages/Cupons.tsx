@@ -1,4 +1,4 @@
-import { Check, Minus, Copy, ExternalLink } from "lucide-react";
+import { Check, Minus, Copy, ExternalLink, Gift } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/shared/PageTitle";
