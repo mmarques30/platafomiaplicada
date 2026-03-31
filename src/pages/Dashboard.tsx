@@ -4,6 +4,7 @@ import { AlertCircle, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
+import { AcademyWelcomeCard } from "@/components/dashboard/AcademyWelcomeCard";
 import { PendenciasOnboarding } from "@/components/dashboard/PendenciasOnboarding";
 import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
@@ -80,6 +81,9 @@ export default function Dashboard() {
             </section>
 
             <PWAInstallBanner />
+
+            {/* Card de boas-vindas Academy no primeiro acesso */}
+            <AcademyWelcomeCard />
 
             {/* Card semanal de progresso */}
             <WeeklyProgressCard />
