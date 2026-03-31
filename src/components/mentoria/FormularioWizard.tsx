@@ -237,6 +237,59 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
     }
   };
 
+  // Post-submission screen
+  if (submitted) {
+    const destino = effectivePlan === 'academy' ? '/evolucao' : '/mentoria';
+
+    return (
+      <Card className={cn(
+        "w-full max-w-4xl mx-auto relative overflow-hidden",
+        isBusiness && "bg-zinc-900 border-zinc-700"
+      )}>
+        <CardContent className={cn("pt-6", isBusiness && "text-white")}>
+          {!insightReady ? (
+            <div className="flex flex-col items-center justify-center py-16 space-y-6">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                <div className="relative p-4 rounded-full bg-primary/10">
+                  <Sparkles className="h-8 w-8 text-primary animate-pulse" />
+                </div>
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-semibold text-foreground">Seu InsightIA está sendo gerado...</h3>
+                <p className="text-sm text-muted-foreground max-w-md">
+                  Nossa IA está analisando seu perfil, objetivos e desafios para criar recomendações personalizadas.
+                </p>
+              </div>
+              <Loader2 className="h-5 w-5 text-primary animate-spin" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="text-center space-y-2 pb-4 border-b border-border">
+                <h3 className="text-xl font-semibold text-foreground">🎉 Diagnóstico concluído!</h3>
+                <p className="text-sm text-muted-foreground">
+                  Confira abaixo seus insights personalizados
+                </p>
+              </div>
+
+              <InsightIA formulario={formulario} />
+
+              <div className="flex justify-center pt-4">
+                <Button
+                  onClick={() => onFinalizado ? onFinalizado() : navigate(destino)}
+                  className="gap-2"
+                >
+                  Ir para o Dashboard
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className={cn(
       "w-full max-w-4xl mx-auto relative overflow-hidden",
@@ -244,7 +297,6 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
     )}>
       <CardContent className={cn("pt-6", isBusiness && "text-white")}>
         <div className="flex justify-between items-center mb-4">
-          {/* Business Premium Badge */}
           {isBusiness && (
             <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full flex items-center gap-1.5">
               <Crown className="h-3.5 w-3.5" />
