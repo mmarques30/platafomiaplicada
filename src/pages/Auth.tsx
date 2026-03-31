@@ -19,7 +19,8 @@ export default function Auth() {
   // Redirecionar usuários já autenticados para seleção de ambiente
   useEffect(() => {
     if (!loading && user) {
-      navigate("/selecionar-ambiente");
+      const savedEnv = sessionStorage.getItem("selected_environment");
+      navigate(savedEnv ? "/" : "/selecionar-ambiente");
     }
   }, [user, loading, navigate]);
 

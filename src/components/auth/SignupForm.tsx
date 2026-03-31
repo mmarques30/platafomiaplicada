@@ -5,9 +5,12 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
+import { GoogleLoginVerificationModal } from "@/components/auth/GoogleLoginVerificationModal";
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showGoogleVerification, setShowGoogleVerification] = useState(false);
 
   const logSignupAttempt = async (
     email: string, 
