@@ -1,153 +1,110 @@
 
 
-# Varredura Completa — Plataforma IAplicada
+# Varredura Completa — Estado Atual + Problemas Identificados
 
-## 1. Visão Geral da Arquitetura
+## 1. Arquitetura da Página Mentoria (`/mentoria`)
+
+A página `/mentoria` é o hub central, renderizada diferentemente por plano:
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│                    FRONTEND (React 18 + Vite 5)          │
-│  Tailwind CSS v3 · TypeScript 5 · Sora font             │
-│  React Query · Framer Motion · Recharts · shadcn/ui      │
-├──────────────────────────────────────────────────────────┤
-│                    BACKEND (Lovable Cloud)                │
-│  Supabase: Auth · RLS · Triggers · Storage · Realtime    │
-│  40+ Edge Functions (AI, parsing, reports)                │
-│  21 Storage Buckets                                      │
-└──────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────┐
+│  MentoriaHeroDashboard (TODOS os planos)    │  ← "Olá, [nome]" + 4 KPIs
+├─────────────────────────────────────────────┤
+│  BusinessAcessoRapido (só Business)         │  ← Barra de atalhos escura
+├─────────────────────────────────────────────┤
+│  Tabs: [Visão Geral] [Roadmap] [Evolução*] │  ← *Evolução só Parceria
+├─────────────────────────────────────────────┤
+│  Conteúdo da aba ativa                      │
+└─────────────────────────────────────────────┘
 ```
 
-**Stack**: React 18, Vite 5, Tailwind v3, shadcn/ui, React Query, Framer Motion, Recharts, react-router-dom v6, next-themes (dark/light), react-markdown, date-fns (pt-BR).
+---
 
-**Fonte**: Sora (system-ui fallback). Cores: brand green `#9EB038` (HSL 73 55% 47%) como primary em ambos os modos.
+## 2. PROBLEMAS DE DUPLICIDADE IDENTIFICADOS
+
+### 2.1 — Saudação duplicada (Hero + VisaoRapida)
+- `MentoriaHeroDashboard` (linha 52): "Olá, {firstName}!" + KPIs (fase atual, tarefas, sessão, progresso)
+- `BusinessVisaoRapida` (linha 91): "Olá, {nome} — Semana X da sua jornada" + badge status + progresso + grid 3 cards
+
+**Resultado para Business Parceria**: O usuário vê dois headers de boas-vindas empilhados com informações sobrepostas (progresso, próxima sessão, tarefas). O Hero mostra dados Academy (fases_processo) que não se aplicam a Business.
+
+### 2.2 — Acesso rápido duplicado (AcessoRapido + Sidebar Groups)
+- `BusinessAcessoRapido`: barra preta com 7 ícones (Diagnóstico, Sessões, Etapas, Instruções, Entregas, Tasks, Documentos)
+- Sidebar Business Groups: 3 grupos colapsáveis com exatamente os mesmos destinos (Etapas, Entregas, Tarefas, Tasks, Sessões, Documentos, etc.)
+
+**Resultado**: Navegação redundante — mesmos links em 2 lugares diferentes na tela.
+
+### 2.3 — Progresso de conteúdo duplicado entre abas
+- Aba "Visão Geral": renderiza `BusinessProgressoConteudo` (vídeos, prompts, interações)
+- Aba "Evolução Aprendizado": renderiza `BusinessProgressoConteudo` **novamente** + `BusinessEvolucaoAprendizado`
+
+**Código em Mentoria.tsx:**
+```
+Visão Geral (linha 112):    <BusinessProgressoConteudo />
+Evolução (linha 143):       <BusinessProgressoConteudo />  ← DUPLICADO
+                            <BusinessEvolucaoAprendizado />
+```
+
+### 2.4 — Dados de próxima sessão em 3 lugares
+- `MentoriaHeroDashboard`: "Próx. sessão em X dias" (KPI card)
+- `BusinessVisaoRapida`: Card "Próxima Sessão" com data/hora + botão entrar
+- `BusinessAcessoRapido`: Atalho para `/mentoria/sessoes`
+
+### 2.5 — MentoriaHeroDashboard usa dados Academy para Business
+O Hero usa `useFasesProcesso` (tabela `fases_processo` — Academy) e `useMentoriaTarefas` (tabela `tarefas_mentoria`) para todos os planos. Business Parceria usa `etapas_business`, `contratos_business`, `entregas_business` — tabelas diferentes. Os KPIs do Hero mostram dados incorretos ou zerados para Business.
 
 ---
 
-## 2. Ambientes e Planos
+## 3. PROBLEMAS DE LAYOUT E ALINHAMENTO
 
-A plataforma suporta **5 ambientes** via `EnvironmentContext` + `useEffectivePlan`:
+### 3.1 — Aba "Evolução Aprendizado" com estilo inconsistente
+- `BusinessEvolucaoAprendizado`: Cards usam `bg-aplicada-green-100 border-aplicada-green-300` (fundo verde claro)
+- `BusinessProgressoConteudo`: Cards usam `bg-gradient-to-br from-blue-500/5` (gradientes suaves)
+- `BusinessVisaoRapida`: Cards usam `bg-card border-border` (padrão do sistema)
 
-| Ambiente | Plano DB | Descrição |
-|----------|----------|-----------|
-| Gratuito | `is_visitante=true` | Visitante com 30 dias de acesso, conteúdo limitado |
-| Academy | `academy` | Mentorado com trilhas, diagnóstico, comunidade |
-| Skills | `skills` | Equipes com líder, backlog, entregas, roadmap |
-| Business Parceria | `business_parceria` | Consultoria 1:1, ROI, etapas, entregas, sessões |
-| Business Sistemas | `business_sistemas` | IAplicada, visão própria (Meu Sistema) |
+3 estilos diferentes de cards na mesma área. O green-100/300 do EvolucaoAprendizado é especialmente dissonante em dark mode.
 
-**Admin** pode simular qualquer plano via `AdminViewSelector` + `AdminViewContext`.
+### 3.2 — IAplicadaVisaoGeral é placeholder estático
+Para Business Sistemas, a aba Visão Geral mostra `IAplicadaVisaoGeral` com 3 cards contendo apenas "-" e "Em breve". Sem dados reais conectados.
 
----
-
-## 3. Estrutura de Páginas (70+ rotas)
-
-### Área do Mentorado
-- **Dashboard** (`/`): Cards de boas-vindas, progresso semanal, central de conteúdo, ranking
-- **Trilhas** (`/trilhas`): Grade de trilhas com módulos e vídeos
-- **Mentoria** (`/mentoria`): Hub com tabs (Visão Geral, Roadmap, Evolução)
-- **Sub-páginas**: Sessões, Tarefas, Entregas, Dúvidas, Projetos, Etapas, Validações, Reports, Documentos, Recursos, Instruções, Tasks Business
-- **Skills**: Equipe, Backlog, Roadmap, Entregas, Líder Dashboard, Projeto Skills (com sub-páginas)
-- **Meu Sistema** (Business Sistemas): Visão própria com etapas, entregas, documentos
-- **Ecossistema, Comunidade, Bibliotecas** (Ferramentas, Prompts, IA Copie&Use, Métodos)
-- **Evolução**: Conquistas, Certificados
-- **Chat**: MarIAna (página completa) + Drawer flutuante
-
-### Área Admin (20+ páginas)
-- Dashboard, Usuários, Visitantes, Conteúdo, Bibliotecas, Avisos, Conhecimento
-- Mentoria: Academy, Business, Business IAplicada, Skills, Bonus, Preview Painéis
-- Dúvidas, Produtos, Materiais, Formulários, Menus, Auditoria, Importar Usuários, Comunidade, Políticas, Pesquisas, Histórico Senhas, Permissões Equipe
+### 3.3 — BusinessExecutiveRoadmap sem dados reais
+O Roadmap Business mostra fases do contrato (`fases_projeto`) que raramente são preenchidas. Quando vazias, mostra 4 fases de exemplo hardcoded com opacidade 60%.
 
 ---
 
-## 4. Atualizações Recentes (Sessão Atual)
+## 4. SIDEBAR (804 linhas)
 
-| Feature | Status | Arquivos |
-|---------|--------|----------|
-| **Fluxo Business Welcome** | Implementado | `BusinessWelcome.tsx`, `NovoUsuarioModal.tsx`, `Dashboard.tsx` (redirect), migração `mensagem_boas_vindas` |
-| **Banner ROI fictício** | Implementado | `BusinessROIChart.tsx` — opacidade 40% + banner âmbar quando `!contrato?.data_inicio` |
-| **BusinessVisaoRapida** | Implementado | Componente com header contextual (semana X), grid 3 cards (sessão, tarefas críticas, última entrega) |
-| **Notificações por triggers** | Implementado | 4 funções SQL + triggers: nova entrega, tarefa urgente, sessão agendada/alterada, status entrega. Hook `useNotificacoesPessoais`, sino no `TopHeader`, página `Notificacoes.tsx` |
-| **Sidebar Business reorganizada** | Implementado | 3 grupos colapsáveis (Minha Jornada, Entregas e Tarefas, Comunicação) com section headers uppercase |
-| **Link reunião nas sessões** | Implementado | Coluna `link_reuniao` em `sessoes_mentoria`, input no admin, botões contextuais (24h = destaque, >24h = discreto) em `MentoriaSessoes.tsx` e `BusinessVisaoRapida.tsx` |
-| **MarIAna contextual** | Implementado | Context de mentoria (entrega, sessão, etapa, tarefas críticas) injetado no system prompt do edge function `ai-chat-user`. Sugestões contextuais no drawer |
+### Estrutura atual para Business:
+```text
+[Menus do menu_config (Início, Minha Trajetória, Aprender, etc.)]
+  └─ Submenus via menu_config
+[Bibliotecas] (hardcoded após Aprender)
+[Business Groups] (hardcoded)
+  ├─ MINHA JORNADA: Etapas, Roadmap, Instruções
+  ├─ ENTREGAS E TAREFAS: Entregas, Tarefas, Tasks, Validações, Projetos
+  └─ COMUNICAÇÃO: Sessões, Dúvidas, Documentos, Recursos, Reports
+[Comunidade] (oculta para Business)
+[Admin / Simulação]
+```
 
----
+**Problema**: Os Business Groups são hardcoded no componente (linhas 108-143) e coexistem com os menus dinâmicos do `menu_config`. Se a tabela `menu_config` também tiver entradas para "Entregas", "Sessões", etc. visíveis para Business, haverá itens duplicados no sidebar.
 
-## 5. Design System
-
-### Tokens
-- **Light**: Background branco, cards `#F5F5F3`, border verde suave `hsl(73 20% 85%)`
-- **Dark**: Background `#1E1F1C`, cards `#2F302B`, muted `#38392F`
-- **Primary**: `#9EB038` em ambos os modos
-- **Sidebar**: Independente com tokens próprios (dark: `#1A1B17`)
-- **Radius**: `0.75rem` (padrão)
-
-### Componentes Reutilizáveis
-- `PainelCard` / `PainelCardHeader` / `PainelSeparator` com `painelTheme.ts` (Academy vs Business)
-- `PageTitle` padronizado
-- `PageSkeleton` com variantes
-- `PWAInstallBanner` / `PWAUpdatePrompt`
-- `MarIAnaChatDrawer` (chat flutuante global)
-
-### Padrões de UI
-- Cards com `bg-card border-border rounded-xl`
-- Badges com variantes semânticas (emerald para sucesso, amber para warning)
-- Tabs com estilo customizado (`bg-primary/20`, active `bg-[#0D0D0D]`)
-- Collapsible groups no sidebar com `text-[10px] uppercase tracking-widest`
+### Complexidade excessiva
+804 linhas com: menus dinâmicos, submenus de 3 níveis, bibliotecas hardcoded, business groups hardcoded, comunidade hardcoded, admin, simulação — tudo num único componente.
 
 ---
 
-## 6. Backend — Edge Functions (40+)
+## 5. RECOMENDAÇÕES PRIORIZADAS
 
-**IA/AI**: `ai-chat-user`, `gerar-insight-mentoria`, `gerar-resumo-atualizacoes`, `gerar-report-business`, `gerar-report-skills`, `gerar-instrucoes-etapa`, `personalizar-instrucao`, `personalizar-projeto-skills`, `recomendar-conteudo-projeto`, `analisar-respostas-formulario`, `gerar-perguntas-formulario`
+| # | Problema | Impacto | Ação |
+|---|----------|---------|------|
+| 1 | Hero duplica VisaoRapida | Alto — confuso para Business | Ocultar `MentoriaHeroDashboard` para Business (já tem VisaoRapida) |
+| 2 | AcessoRapido duplica Sidebar | Médio — redundância visual | Remover `BusinessAcessoRapido` (sidebar groups cumprem o mesmo papel) |
+| 3 | ProgressoConteudo duplicado nas abas | Alto — mesmo componente 2x | Remover de "Visão Geral", manter só na "Evolução" |
+| 4 | Estilos inconsistentes nos cards | Médio — visual desalinhado | Unificar para `bg-card border-border` (padrão do sistema) |
+| 5 | Hero usa dados Academy para Business | Alto — KPIs errados | Condicionar queries do Hero ao plano ou substituir por VisaoRapida |
+| 6 | IAplicadaVisaoGeral placeholder | Baixo — funcional mas vazio | Conectar dados reais do contrato/entregas Business Sistemas |
+| 7 | Sidebar 804 linhas | Médio — manutenção difícil | Extrair BusinessSidebarGroups, BibliotecasMenu, ComunidadeMenu |
 
-**Processamento**: `processar-documento`, `processar-documentos-business`, `processar-contrato-skills`, `parse-contrato-texto`, `parse-documento-contrato`, `parse-aditivo-contrato`, `extrair-texto-documento`
-
-**Admin**: `create-user-admin`, `delete-user`, `reset-user-password`, `import-users-batch`, `get-users-auth-providers`
-
-**Skills**: `gerar-projetos-skills`, `gerar-entregas-skills`, `gerar-metricas-skills`, `consolidar-diagnosticos-skills`, `associar-membros-skills`, `processar-diagnostico-skills`
-
-**Outros**: `api-visitantes`, `process-visitor-expirations`, `verificar-google-login`, `generate-reset-token`, `reset-password-with-token`, `organizar-backlog`, `formatar-direcional`, `formatar-texto-conteudo`, `gerar-metadados-material`, `regenerar-instrucoes-entrega`, `atualizar-conteudos-projeto`
-
----
-
-## 7. Hooks (100+)
-
-Organização por domínio: `useAuth`, `useUserRole`, `useUserProfile`, `useEffectivePlan`, `useEnvironment`, `useMenuConfig`, `useBusinessUserId`, `useContratosBusiness`, `useEtapasBusiness`, `useEntregasBusiness`, `useMentoriaSessoes`, `useMentoriaTarefas`, `useNotificacoesPessoais`, `useCommunityPosts`, etc.
-
----
-
-## 8. Segurança
-
-- RLS em todas as tabelas públicas
-- `has_role()` SECURITY DEFINER para checar roles
-- Roles em tabela separada `user_roles` (enum: admin, moderator, user, visitante, equipe, parceiro)
-- `handle_google_auth` bloqueia cadastro via Google para emails não existentes
-- `throttle_password_reset` limita 3 resets por 15 min
-- Idle logout via `useIdleLogout` (admin)
-- Auditoria automática via trigger `registrar_auditoria`
-
----
-
-## 9. Pontos de Atenção / Oportunidades de Melhoria
-
-1. **Triggers sem registro no DB info**: O sistema reporta "no triggers" mas existem ~15+ triggers via funções. Pode ser questão de schema visibility.
-
-2. **Dados fictícios em múltiplos componentes**: BusinessROIChart já tem banner. Verificar se `BusinessKPICards`, `BusinessPerformanceCharts` e `BusinessDashboard` também usam dados hardcoded sem aviso.
-
-3. **Sidebar com 804 linhas**: `AppSidebar.tsx` é complexo — lógica de Business groups, Skills, menus dinâmicos e simulação admin tudo no mesmo arquivo. Candidato a refatoração em sub-componentes.
-
-4. **Consistência de tema**: `painelTheme.ts` existe para Painel de Diagnóstico mas não é usado nos componentes Business recentes (BusinessVisaoRapida, BusinessROIChart usam classes diretas). Oportunidade de unificar.
-
-5. **MarIAna contextual**: Funciona em `/mentoria/*` mas depende de `useBusinessUserId` — se o usuário Academy estiver em `/mentoria`, pode não ter contrato/entregas. Garantir fallback gracioso.
-
-6. **Notificações**: Triggers SQL criados mas schema info diz "no triggers" — validar se estão efetivamente ativos no banco.
-
-7. **PWA**: Tem install banner + update prompt, mas sem service worker visível no scan. Verificar se PWA está configurado corretamente.
-
-8. **Performance**: 70+ rotas importadas diretamente no App.tsx sem lazy loading. Em apps grandes, isso impacta o bundle inicial.
-
-9. **Tipagem**: Uso de `as any` em vários pontos (ex: `(profile as any)?.mensagem_boas_vindas` no BusinessWelcome) — indica que os types do Supabase ainda não refletem colunas recém-adicionadas até o rebuild.
-
-10. **Mobile**: Sidebar colapsável + TopHeader responsivo existem. Verificar se os novos componentes (BusinessVisaoRapida grid 3 cols, sidebar groups) funcionam bem em telas pequenas.
+Quer que eu implemente essas correções?
 
