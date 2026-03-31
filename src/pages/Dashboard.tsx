@@ -21,6 +21,20 @@ import { PageSkeleton } from "@/components/shared/PageSkeleton";
 export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
   const { profile, isLoading: loadingProfile } = useUserProfile();
+  const navigate = useNavigate();
+
+  // Redirect Business users on first access to welcome page
+  useEffect(() => {
+    if (loadingProfile || loadingRole) return;
+    if (isVisitante) return;
+    const plano = profile?.plano_mentoria;
+    if (
+      profile?.primeiro_acesso === true &&
+      (plano === "business_parceria" || plano === "business_sistemas")
+    ) {
+      navigate("/business-welcome", { replace: true });
+    }
+  }, [loadingProfile, loadingRole, isVisitante, profile, navigate]);
 
   const mostrarAvisoSenha = useMemo(() => {
     if (loadingRole || loadingProfile) return false;

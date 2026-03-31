@@ -188,6 +188,9 @@ Deno.serve(async (req) => {
     
     if (effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'business_sistemas') {
       updateData.skills_liberado = skillsLiberado ?? false
+      if (mensagemBoasVindas) {
+        updateData.mensagem_boas_vindas = mensagemBoasVindas
+      }
     }
 
     const { error: profileError } = await supabaseAdmin
