@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Gift, Lock, ExternalLink, Download, Copy } from "lucide-react";
+import { Lock, ExternalLink, Download, Copy } from "lucide-react";
 import { useMentoriaBonus, getArquivoUrls } from "@/hooks/useMentoriaBonus";
 import { toast } from "@/hooks/use-toast";
 
@@ -53,8 +53,7 @@ export function BonusEvolucao() {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-foreground">
-          <Gift className="h-5 w-5 text-primary" />
+        <CardTitle className="text-foreground">
           Bônus Exclusivos
         </CardTitle>
       </CardHeader>

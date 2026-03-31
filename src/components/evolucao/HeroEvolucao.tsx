@@ -1,5 +1,5 @@
 import { Progress } from "@/components/ui/progress";
-import { Trophy } from "lucide-react";
+
 import grafiaEvolucao from "@/assets/grafia-evolucao.svg";
 import { useNivelUsuario } from "@/hooks/useNivelUsuario";
 import { useMinhaEvolucao } from "@/hooks/useMinhaEvolucao";
@@ -27,10 +27,7 @@ export function HeroEvolucao() {
           {/* Header: Nível e Título */}
           <div className="flex items-center justify-between gap-2">
             <div className="space-y-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <Trophy className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
-                <span className="text-xs md:text-sm text-muted-foreground">Nível {nivel}</span>
-              </div>
+              <span className="text-xs md:text-sm text-muted-foreground">Nível {nivel}</span>
               <h2 className="text-lg md:text-2xl font-semibold text-foreground truncate">{tituloNivel}</h2>
             </div>
             <div className="text-right shrink-0">

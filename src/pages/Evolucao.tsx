@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, Trophy, Star } from "lucide-react";
+
 
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
 import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
@@ -42,21 +42,18 @@ export default function Evolucao() {
             value="minha-evolucao"
             className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
-            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Evolução
           </TabsTrigger>
           <TabsTrigger 
             value="comunidade"
             className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
-            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Ranking
           </TabsTrigger>
           <TabsTrigger 
             value="favoritos"
             className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
           >
-            <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Favoritos
           </TabsTrigger>
         </TabsList>
