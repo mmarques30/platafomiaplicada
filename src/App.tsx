@@ -142,6 +142,7 @@ function AppContent() {
         <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route path="/acesso-expirado" element={<AcessoExpirado />} />
+        <Route path="/onboarding-welcome" element={<OnboardingWelcome />} />
         <Route path="/sobre" element={<Sobre />} />
 
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
