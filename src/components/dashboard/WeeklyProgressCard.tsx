@@ -94,7 +94,7 @@ export function WeeklyProgressCard() {
             {data.videoCount > 0 ? (
               <>
                 Na última semana você concluiu{" "}
-                <strong className="text-white">{data.videoCount} vídeo{data.videoCount > 1 ? "s" : ""}</strong>.{" "}
+                <strong className="text-white">{animatedVideoCount} vídeo{data.videoCount > 1 ? "s" : ""}</strong>.{" "}
               </>
             ) : (
               <>Você não concluiu vídeos na última semana. </>
