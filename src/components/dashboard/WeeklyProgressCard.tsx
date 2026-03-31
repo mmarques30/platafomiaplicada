@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { X, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCountUp } from "@/hooks/useCountUp";
 
 const STORAGE_KEY = "last_weekly_card_shown";
 
@@ -61,6 +62,8 @@ export function WeeklyProgressCard() {
     setVisible(false);
   };
 
+  const animatedVideoCount = useCountUp(data?.videoCount ?? 0);
+
   if (!visible || !data || (data.videoCount === 0 && !data.trilhaEmAndamento)) {
     return null;
   }
@@ -91,7 +94,7 @@ export function WeeklyProgressCard() {
             {data.videoCount > 0 ? (
               <>
                 Na última semana você concluiu{" "}
-                <strong className="text-white">{data.videoCount} vídeo{data.videoCount > 1 ? "s" : ""}</strong>.{" "}
+                <strong className="text-white">{animatedVideoCount} vídeo{data.videoCount > 1 ? "s" : ""}</strong>.{" "}
               </>
             ) : (
               <>Você não concluiu vídeos na última semana. </>

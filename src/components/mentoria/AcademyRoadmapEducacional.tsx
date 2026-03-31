@@ -15,6 +15,7 @@ import {
   ClipboardCheck, BookOpen, Trophy, Target,
   CheckCircle2, Clock, ArrowRight, Award, Flame, Star
 } from "lucide-react";
+import { useCountUp } from "@/hooks/useCountUp";
 
 export function AcademyRoadmapEducacional() {
   const navigate = useNavigate();
@@ -32,6 +33,11 @@ export function AcademyRoadmapEducacional() {
   const totalProjetos = evolucao?.totalProjetos || 0;
   const totalFerramentas = evolucao?.totalFerramentas || 0;
   const diasSequencia = sequencia || 0;
+
+  const animatedVideos = useCountUp(totalVideos);
+  const animatedCerts = useCountUp(certificadosEmitidos.length);
+  const animatedDias = useCountUp(diasSequencia);
+  const animatedProjetos = useCountUp(totalProjetos);
 
   // Trilhas com progresso (incluindo 100%)
   const allTrilhas = trilhasProgresso || [];
@@ -174,22 +180,22 @@ export function AcademyRoadmapEducacional() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
               <Star className={`h-5 w-5 ${totalVideos > 0 ? "text-primary" : "text-zinc-600"}`} />
-              <span className="text-lg font-bold">{totalVideos}</span>
+              <span className="text-lg font-bold">{animatedVideos}</span>
               <span className="text-[11px] text-muted-foreground">Vídeos</span>
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
               <Award className={`h-5 w-5 ${certificadosEmitidos.length > 0 ? "text-primary" : "text-zinc-600"}`} />
-              <span className="text-lg font-bold">{certificadosEmitidos.length}</span>
+              <span className="text-lg font-bold">{animatedCerts}</span>
               <span className="text-[11px] text-muted-foreground">Certificados</span>
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
               <Flame className={`h-5 w-5 ${diasSequencia > 0 ? "text-orange-400" : "text-zinc-600"}`} />
-              <span className="text-lg font-bold">{diasSequencia}</span>
+              <span className="text-lg font-bold">{animatedDias}</span>
               <span className="text-[11px] text-muted-foreground">Dias seguidos</span>
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
               <Target className={`h-5 w-5 ${totalProjetos > 0 ? "text-primary" : "text-zinc-600"}`} />
-              <span className="text-lg font-bold">{totalProjetos}</span>
+              <span className="text-lg font-bold">{animatedProjetos}</span>
               <span className="text-[11px] text-muted-foreground">Projetos</span>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { Target, ListTodo, Calendar, TrendingUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { differenceInDays } from "date-fns";
+import { useCountUp } from "@/hooks/useCountUp";
 
 export function MentoriaHeroDashboard() {
   const { user } = useAuth();
@@ -30,6 +31,9 @@ export function MentoriaHeroDashboard() {
     : null;
 
   const firstName = user?.user_metadata?.nome_completo?.split(" ")[0] || "Mentorado";
+
+  const animatedProgresso = useCountUp(progressoGeral);
+  const animatedTarefas = useCountUp(tarefasPendentes);
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-card to-primary/5 rounded-xl border-2 border-primary/30 shadow-lg shadow-primary/10 p-4 sm:p-6 mb-6">
@@ -81,7 +85,7 @@ export function MentoriaHeroDashboard() {
             <span className="text-xs text-muted-foreground">Progresso</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold text-foreground">{progressoGeral}</span>
+            <span className="text-2xl sm:text-3xl font-bold text-foreground">{animatedProgresso}</span>
             <span className="text-xs text-muted-foreground">%</span>
           </div>
         </div>
@@ -93,7 +97,7 @@ export function MentoriaHeroDashboard() {
             <span className="text-xs text-muted-foreground">Tarefas</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold text-foreground">{tarefasPendentes}</span>
+            <span className="text-2xl sm:text-3xl font-bold text-foreground">{animatedTarefas}</span>
             <span className="text-xs text-muted-foreground">pendentes</span>
           </div>
         </div>
