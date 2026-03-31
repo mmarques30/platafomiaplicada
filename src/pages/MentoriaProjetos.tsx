@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FolderKanban, Star, Loader2, MessageSquare, Calendar, Plus, ArrowLeft, Target } from "lucide-react";
+import { FolderKanban, Star, MessageSquare, Calendar, Plus, ArrowLeft, Target } from "lucide-react";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { useMentoriaProjetos } from "@/hooks/useMentoriaProjetos";
 import ProjetoModal from "@/components/admin/mentoria/ProjetoModal";
 import { ProjetoPreparacaoCard } from "@/components/mentoria/ProjetoPreparacaoCard";
