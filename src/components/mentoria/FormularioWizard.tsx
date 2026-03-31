@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { X, Save, Crown, Loader2, Sparkles, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InsightIA } from "./InsightIA";
-import { cn } from "@/lib/utils";
 
 // Academy Steps
 import { AcademyStep1Perfil } from "./steps/academy/AcademyStep1Perfil";
