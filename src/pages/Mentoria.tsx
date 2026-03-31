@@ -14,6 +14,7 @@ import { AcademyRoadmapEducacional } from "@/components/mentoria/AcademyRoadmapE
 import { AcademyProximoPasso } from "@/components/mentoria/AcademyProximoPasso";
 
 import { BusinessAcessoRapido } from "@/components/mentoria/business/BusinessAcessoRapido";
+import { InsightSemanalCard } from "@/components/mentoria/business/InsightSemanalCard";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
 import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
