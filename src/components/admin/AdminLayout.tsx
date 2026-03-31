@@ -1,11 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { useIdleLogout } from "@/hooks/useIdleLogout";
+import { AnimatePresence } from "framer-motion";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 export function AdminLayout() {
-  useIdleLogout(); // Logout automático após 10 minutos de inatividade
+  useIdleLogout();
+  const location = useLocation();
   
   return (
     <SidebarProvider defaultOpen={true}>
@@ -14,7 +17,11 @@ export function AdminLayout() {
         <AdminSidebar />
         <SidebarInset>
           <main className="flex-1 p-8">
-            <Outlet />
+            <AnimatePresence mode="wait">
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
+            </AnimatePresence>
           </main>
         </SidebarInset>
       </div>

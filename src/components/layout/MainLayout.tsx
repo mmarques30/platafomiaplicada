@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { TopHeader } from "./TopHeader";
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { useIdleLogout } from "@/hooks/useIdleLogout";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -17,10 +17,13 @@ import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNo
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { AnimatePresence } from "framer-motion";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 export function MainLayout() {
   useIdleLogout();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isVisitante, isAdmin, isLoading } = useUserRole();
   const { profile } = useUserProfile();
   const { user, signOut } = useAuth();
@@ -73,7 +76,11 @@ export function MainLayout() {
         <AppSidebar />
         <div className="flex-1 flex flex-col">
           <main className="flex-1 overflow-x-hidden">
-            <Outlet />
+            <AnimatePresence mode="wait">
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
+            </AnimatePresence>
           </main>
         </div>
         {(!isLoading && !isVisitante) && <MarIAnaFloatingButton />}
