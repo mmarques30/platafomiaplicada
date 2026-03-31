@@ -538,6 +538,81 @@ export function AppSidebar() {
                 );
               })}
 
+              {/* Business Groups - 3 collapsible sections */}
+              {isBusinessEnv && businessGroups.map((group) => {
+                const GroupIcon = group.icon;
+                const filteredItems = group.items.filter(item => 
+                  isBusinessSistemasEnv ? item.sistemas : item.parceria
+                );
+                if (filteredItems.length === 0) return null;
+                const isGroupExpanded = expandedMenus.includes(group.key);
+                const hasActiveItem = filteredItems.some(item => {
+                  const itemPath = item.url.split('?')[0];
+                  return location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
+                });
+
+                return (
+                  <Collapsible
+                    key={group.key}
+                    open={isGroupExpanded}
+                    onOpenChange={() => toggleMenu(group.key)}
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="group w-full pl-4">
+                          <div className={cn(
+                            "flex items-center gap-3 rounded-lg transition-all duration-200 py-2 w-full",
+                            hasActiveItem
+                              ? "text-primary" 
+                              : "text-sidebar-foreground/50 hover:text-sidebar-foreground/80"
+                          )}>
+                            <GroupIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
+                            {!collapsed && (
+                              <>
+                                <span className="text-[10px] uppercase tracking-widest font-semibold flex-1 text-left">
+                                  {group.label}
+                                </span>
+                                <ChevronDown className={cn(
+                                  "h-3.5 w-3.5 transition-transform duration-200",
+                                  isGroupExpanded && "rotate-180"
+                                )} />
+                              </>
+                            )}
+                          </div>
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+                        <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
+                          {filteredItems.map((item) => {
+                            const itemPath = item.url.split('?')[0];
+                            const itemIsActive = location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
+                            return (
+                              <SidebarMenuItem key={item.url}>
+                                <SidebarMenuButton asChild className="group">
+                                  <NavLink
+                                    to={item.url}
+                                    end
+                                    className={cn(
+                                      "rounded-lg transition-all duration-200 font-medium pl-4 py-2 text-sm",
+                                      itemIsActive
+                                        ? "text-primary font-semibold"
+                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                    )}
+                                  >
+                                    {!collapsed && <span>{item.label}</span>}
+                                  </NavLink>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            );
+                          })}
+                        </SidebarMenu>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                );
+              })}
+
               {/* Comunidade - Menu expansível (oculto para Business) */}
               {!isBusiness && (
                 <Collapsible 
