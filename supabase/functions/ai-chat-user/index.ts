@@ -627,7 +627,7 @@ Combine as informações mais urgentes se houver múltiplas pendências.`;
     }
 
     // Instruções finais de recomendação
-    systemPrompt += `\n\n## 🎯 Como Recomendar Conteúdos da Plataforma:`;
+    systemPrompt += `\n\n## 🎯 Como Recomendar Conteúdos da Plataforma:
 
 **REGRAS FUNDAMENTAIS:**
 ✅ SEMPRE que existir conteúdo relevante na plataforma, MENCIONE naturalmente
