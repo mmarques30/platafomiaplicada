@@ -5,9 +5,12 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
+import { GoogleLoginVerificationModal } from "@/components/auth/GoogleLoginVerificationModal";
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showGoogleVerification, setShowGoogleVerification] = useState(false);
 
   const logSignupAttempt = async (
     email: string, 
@@ -75,73 +78,94 @@ export function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleVisitorSignup} className="space-y-4">
-      <div className="space-y-2 text-left">
-        <Label htmlFor="visitor-name" className="text-white/80 text-sm font-medium">
-          Nome Completo
-        </Label>
-        <Input
-          id="visitor-name"
-          name="visitor-name"
-          type="text"
-          placeholder="Seu nome"
-          required
-          className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
-        />
-      </div>
+    <>
+      <form onSubmit={handleVisitorSignup} className="space-y-4">
+        <div className="space-y-2 text-left">
+          <Label htmlFor="visitor-name" className="text-white/80 text-sm font-medium">
+            Nome Completo
+          </Label>
+          <Input
+            id="visitor-name"
+            name="visitor-name"
+            type="text"
+            placeholder="Seu nome"
+            required
+            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
+          />
+        </div>
 
-      <div className="space-y-2 text-left">
-        <Label htmlFor="visitor-email" className="text-white/80 text-sm font-medium">
-          Email
-        </Label>
-        <Input
-          id="visitor-email"
-          name="visitor-email"
-          type="email"
-          placeholder="seu@email.com"
-          required
-          className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
-        />
-      </div>
+        <div className="space-y-2 text-left">
+          <Label htmlFor="visitor-email" className="text-white/80 text-sm font-medium">
+            Email
+          </Label>
+          <Input
+            id="visitor-email"
+            name="visitor-email"
+            type="email"
+            placeholder="seu@email.com"
+            required
+            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
+          />
+        </div>
 
-      <div className="space-y-2 text-left">
-        <Label htmlFor="visitor-phone" className="text-white/80 text-sm font-medium">
-          Telefone
-        </Label>
-        <Input
-          id="visitor-phone"
-          name="visitor-phone"
-          type="tel"
-          placeholder="(00) 00000-0000"
-          required
-          className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
-        />
-      </div>
-      
-      <div className="space-y-2 text-left">
-        <Label htmlFor="visitor-password" className="text-white/80 text-sm font-medium">
-          Crie uma senha
-        </Label>
-        <PasswordInput
-          id="visitor-password"
-          name="visitor-password"
-          placeholder="Mínimo 6 caracteres"
-          required
-          minLength={6}
-          className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
-        />
-        <p className="text-xs text-white/50">
-          Você vai usar essa senha para acessar depois
-        </p>
-      </div>
-      
-      <Button 
-        type="submit" 
-        className="w-full h-12 bg-[#9EB038] hover:bg-[#8a9a31] text-white font-medium rounded-lg transition-all mt-2" 
-        disabled={isLoading}
-      >
-        {isLoading ? "Criando conta..." : "Criar conta grátis"}
-      </Button>
-    </form>
+        <div className="space-y-2 text-left">
+          <Label htmlFor="visitor-phone" className="text-white/80 text-sm font-medium">
+            Telefone
+          </Label>
+          <Input
+            id="visitor-phone"
+            name="visitor-phone"
+            type="tel"
+            placeholder="(00) 00000-0000"
+            required
+            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
+          />
+        </div>
+        
+        <div className="space-y-2 text-left">
+          <Label htmlFor="visitor-password" className="text-white/80 text-sm font-medium">
+            Crie uma senha
+          </Label>
+          <PasswordInput
+            id="visitor-password"
+            name="visitor-password"
+            placeholder="Mínimo 6 caracteres"
+            required
+            minLength={6}
+            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
+          />
+          <p className="text-xs text-white/50">
+            Você vai usar essa senha para acessar depois
+          </p>
+        </div>
+        
+        <Button 
+          type="submit" 
+          className="w-full h-12 bg-[#9EB038] hover:bg-[#8a9a31] text-white font-medium rounded-lg transition-all mt-2" 
+          disabled={isLoading}
+        >
+          {isLoading ? "Criando conta..." : "Criar conta grátis"}
+        </Button>
+
+        {/* Divisor */}
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-white/10" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-zinc-900 px-4 text-white/40">ou</span>
+          </div>
+        </div>
+
+        {/* Botão Google */}
+        <GoogleLoginButton onClick={() => setShowGoogleVerification(true)} />
+      </form>
+
+      {/* Modal de verificação Google */}
+      <GoogleLoginVerificationModal
+        open={showGoogleVerification}
+        onOpenChange={setShowGoogleVerification}
+      />
+    </>
   );
 }

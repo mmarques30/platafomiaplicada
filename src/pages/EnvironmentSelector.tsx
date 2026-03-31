@@ -36,7 +36,7 @@ const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "busin
 
 export default function EnvironmentSelector() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user, loading: authLoading } = useAuth();
   const { 
     availableEnvironments, 
     setEnvironment, 
@@ -59,6 +59,13 @@ export default function EnvironmentSelector() {
     });
   }, []);
 
+  // Guard: redirecionar para /auth se não autenticado
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth", { replace: true });
+    }
+  }, [authLoading, user, navigate]);
+
   useEffect(() => {
     if (!isLoading && currentEnvironment) {
       navigate("/", { replace: true });
@@ -78,18 +85,18 @@ export default function EnvironmentSelector() {
     navigate("/", { replace: true });
   };
 
-  if (isLoading) {
+  const handleBackToAuth = async () => {
+    await signOut();
+    navigate("/auth", { replace: true });
+  };
+
+  if (isLoading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
-
-  const handleBackToAuth = async () => {
-    await signOut();
-    navigate("/auth", { replace: true });
-  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a] p-6 relative">
