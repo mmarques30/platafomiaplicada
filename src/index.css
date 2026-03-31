@@ -460,6 +460,9 @@
     transition: all 0.2s ease;
   }
   
+  /* !important necessário: Tailwind utility classes têm especificidade igual;
+     sem !important a ordem de compilação pode sobrescrever estas cores de texto
+     que precisam acompanhar seus respectivos fundos em ambos os temas. */
   .bg-card {
     color: hsl(var(--card-foreground)) !important;
   }
