@@ -1,29 +1,40 @@
 
 
-# Transições de página com Framer Motion
+# Grade pontilhada sutil no background — páginas autenticadas
 
-## 1. Novo componente: `src/components/ui/PageTransition.tsx`
-Wrapper com `motion.div` usando fade + translateY sutil, duração 150ms, `exit` com fade-out rápido.
+## Abordagem
+Em vez de adicionar o `div.dot-grid-bg` em cada página individualmente, adicionar uma única vez no `MainLayout.tsx` (cobre todas as páginas autenticadas) e garantir que o conteúdo fique acima com `relative z-[1]`.
 
-## 2. `src/components/layout/MainLayout.tsx`
-- Importar `AnimatePresence` e `useLocation`
-- Envolver `<Outlet />` com `<AnimatePresence mode="wait">` usando `location.pathname` como key
-- Envolver `<Outlet />` dentro de `<PageTransition key={location.pathname}>`
-
-```tsx
-const location = useLocation();
-...
-<AnimatePresence mode="wait">
-  <PageTransition key={location.pathname}>
-    <Outlet />
-  </PageTransition>
-</AnimatePresence>
+## 1. `src/index.css` — adicionar classe `.dot-grid-bg`
+Após `.card-interactive:active`, adicionar:
+```css
+.dot-grid-bg {
+  background-image: radial-gradient(circle, #AFC040 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.025;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
 ```
 
-## 3. Admin layout: `src/components/admin/AdminLayout.tsx`
-Mesma abordagem — envolver o `<Outlet />` com `AnimatePresence` + `PageTransition`.
+## 2. `src/components/layout/MainLayout.tsx`
+Dentro do `div.min-h-screen` (linha 72-75), adicionar `<div className="dot-grid-bg" />` como primeiro filho, e adicionar `relative z-[1]` ao `flex-1 flex flex-col` div que contém o `<main>`.
+
+```tsx
+<div className={cn("min-h-screen flex w-full bg-background", ...)}>
+  <div className="dot-grid-bg" />
+  <AppSidebar />
+  <div className="flex-1 flex flex-col relative z-[1]">
+    ...
+  </div>
+  ...
+</div>
+```
+
+Isso cobre Dashboard, Mentoria, Trilhas, Evolução e todas as páginas autenticadas sem tocar em páginas públicas (que usam layouts separados).
 
 ## Arquivos
-- **Novo**: `src/components/ui/PageTransition.tsx`
-- **Editados**: `MainLayout.tsx`, `AdminLayout.tsx` (apenas wrapper no Outlet)
+- **Editados**: `src/index.css` (1 classe), `src/components/layout/MainLayout.tsx` (2 linhas)
 
