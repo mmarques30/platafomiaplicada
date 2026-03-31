@@ -77,6 +77,7 @@ export function BusinessROIChart() {
   };
 
   const dados = gerarDadosGrafico();
+  const isDadosFicticios = !contrato?.data_inicio;
   
   // Calcular ROI atual baseado em entregas concluídas
   const totalEntregas = entregas.length || 1;
