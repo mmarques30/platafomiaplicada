@@ -143,6 +143,7 @@ export function AppSidebar() {
       ],
     },
   ];
+  // ========== BUSINESS GROUPS (hardcoded) — END ==========
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
