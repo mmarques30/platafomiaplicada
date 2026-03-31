@@ -79,7 +79,7 @@ export default function Dashboard() {
             )}
 
             <section>
-              <WelcomeHeader />
+              <DashboardCommandStrip />
             </section>
 
             <DashboardUrgencias />
