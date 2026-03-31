@@ -220,18 +220,6 @@
     overflow-x: hidden;
   }
 
-  /* Card Variants - Simplified, no gradients */
-  .card-enhanced {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    box-shadow: 0 1px 3px hsla(var(--foreground), 0.04);
-    transition: all 0.2s ease;
-  }
-
-  .card-enhanced:hover {
-    box-shadow: 0 4px 12px hsla(var(--foreground), 0.08);
-    border-color: hsl(var(--primary) / 0.3);
-  }
 
   .card-primary {
     background: hsl(var(--card));
