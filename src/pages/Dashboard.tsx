@@ -82,6 +82,9 @@ export default function Dashboard() {
 
             <PWAInstallBanner />
 
+            {/* Card de boas-vindas Academy no primeiro acesso */}
+            <AcademyWelcomeCard />
+
             {/* Card semanal de progresso */}
             <WeeklyProgressCard />
 

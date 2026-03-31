@@ -112,14 +112,14 @@ export default function Mentoria() {
             </>
           ) : (
             <>
-              {/* Academy: Layout original */}
+              {/* Academy: Layout com próximo passo inteligente */}
               <PendenciasUrgentes />
+              <AcademyProximoPasso />
               <div className="space-y-2">
                 <StatusDiagnostico />
                 <ProximaSessao />
               </div>
               <TarefasUrgentes />
-              <NavegacaoRapida />
             </>
           )}
         </TabsContent>
