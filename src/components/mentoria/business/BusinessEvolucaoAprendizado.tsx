@@ -62,7 +62,7 @@ export function BusinessEvolucaoAprendizado() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-aplicada-green-300 bg-aplicada-green-100">
+            <Card key={i} className="border-border bg-card">
               <CardHeader className="pb-1 pt-3">
                 <Skeleton className="h-4 w-24" />
               </CardHeader>
