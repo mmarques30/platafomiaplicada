@@ -17,6 +17,8 @@ import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNo
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { AnimatePresence } from "framer-motion";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 export function MainLayout() {
   useIdleLogout();
