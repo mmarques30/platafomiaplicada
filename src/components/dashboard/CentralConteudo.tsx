@@ -25,7 +25,7 @@ export function CentralConteudo() {
   const { data: materiais, isLoading: isLoadingMateriais } = useMateriaisGratuitos(10);
 
   return (
-    <section className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-primary/30 sm:border-2 bg-gradient-to-br from-primary/10 via-card to-primary/5 shadow-lg sm:shadow-xl shadow-primary/10 dark:border-primary/40 dark:from-primary/15 dark:to-primary/5">
+    <section className="card-micro-hover relative overflow-hidden rounded-xl sm:rounded-2xl border border-primary/30 sm:border-2 bg-gradient-to-br from-primary/10 via-card to-primary/5 shadow-lg sm:shadow-xl shadow-primary/10 dark:border-primary/40 dark:from-primary/15 dark:to-primary/5">
       {/* Background Logo 3D - hidden on mobile for performance */}
       <div className="hidden sm:flex absolute inset-0 items-center justify-center pointer-events-none overflow-hidden">
         <img 

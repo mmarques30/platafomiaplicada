@@ -71,7 +71,7 @@ export default function Auth() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.5 }}
-            className="bg-black/45 backdrop-blur-md border border-white/10 rounded-2xl p-6"
+            className="bg-white/5 backdrop-blur-[8px] border border-white/15 rounded-2xl p-6 shadow-xl shadow-black/20"
           >
             {/* Sub-abas discretas */}
             <div className="flex justify-center gap-8 mb-6 border-b border-white/10 pb-4">
