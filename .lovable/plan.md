@@ -1,40 +1,34 @@
 
+# Criar SkeletonCard e aplicar nos carregamentos
 
-# Criar EmptyState e aplicar nos 4 componentes
+## 1. Novo componente: `src/components/ui/SkeletonCard.tsx`
+Props: `variant` ("kpi" | "list" | "chart"), `count?` (default 1).
 
-## 1. Novo componente: `src/components/ui/EmptyState.tsx`
-Props: `icon` (LucideIcon), `title` (string), `description` (string), `action?` ({ label, href }).
-Visual: centralizado, ícone 32px muted, título 15px weight 500, descrição 13px muted, botão outline opcional.
+| Variante | Altura | Detalhes |
+|----------|--------|----------|
+| kpi | 80px | Barra 3px no topo (cor primária), dois blocos internos lado a lado |
+| list | 48px | Dois blocos inline (um largo, um curto) |
+| chart | 200px | Bloco único interno simulando gráfico |
+
+Animação: `@keyframes skeleton-pulse` opacidade 0.4 → 0.8, 1.5s ease-in-out infinite.
+Background: `bg-card` com opacity 0.6, borda `border-border`.
 
 ## 2. Integrações
 
-### `MentoriaEntregas.tsx` (linhas 277-284)
-Substituir o bloco Card/CardContent com Package+texto por:
-```tsx
-<EmptyState icon={Package} title="Nenhuma entrega ainda" description="As entregas definidas pela sua mentora aparecerão aqui." />
-```
+### `MentoriaEntregas.tsx` (linhas 68-77)
+Substituir o loading atual por: 4x `SkeletonCard variant="list"` dentro do container existente.
 
-### `MentoriaTarefas.tsx` (linhas 155-159)
-Substituir o div vazio "Nenhuma tarefa" no kanban por:
-```tsx
-<EmptyState icon={CheckSquare} title="Nenhuma tarefa ainda" description="As tarefas do seu projeto aparecerão aqui quando forem criadas." />
-```
-Importar `CheckSquare` de lucide-react.
+### `MentoriaSessoes.tsx` (linhas 71-76)
+Substituir o spinner `Loader2` por: 3x `SkeletonCard variant="list"` dentro de container com padding.
 
-### `MentoriaSessoes.tsx` (linhas 183-188)
-Substituir o bloco Calendar+texto por:
-```tsx
-<EmptyState icon={Calendar} title="Nenhuma sessão agendada" description="Suas sessões aparecerão aqui quando forem confirmadas." />
-```
+### `Mentoria.tsx`
+Não tem loading state próprio (cada sub-componente carrega individualmente) — sem alteração necessária aqui. Os componentes internos da aba Visão Geral já gerenciam seus loadings.
 
-### `MentoriaValidacoes.tsx` (linhas 289-299)
-Substituir Card/CardContent com CheckSquare+texto condicional por:
-```tsx
-<EmptyState icon={ClipboardCheck} title="Nenhuma validação pendente" description="Validações do seu projeto aparecerão aqui." />
-```
-Importar `ClipboardCheck` de lucide-react.
+### `Dashboard.tsx` (linhas 37-39)
+O Dashboard já usa `PageSkeleton variant="dashboard"`. Substituir por 4x `SkeletonCard variant="kpi"` dentro do layout existente do `DashboardSkeleton` em `PageSkeleton.tsx`, ou alterar diretamente o fallback no Dashboard.
+
+**Abordagem escolhida**: Manter `PageSkeleton` para o Dashboard mas atualizar o `DashboardSkeleton` em `PageSkeleton.tsx` para usar `SkeletonCard` internamente (4x kpi + 1x chart), garantindo consistência visual.
 
 ## Arquivos
-- **Novo**: `src/components/ui/EmptyState.tsx`
-- **Editados**: `MentoriaEntregas.tsx`, `MentoriaTarefas.tsx`, `MentoriaSessoes.tsx`, `MentoriaValidacoes.tsx`
-
+- **Novo**: `src/components/ui/SkeletonCard.tsx`
+- **Editados**: `MentoriaEntregas.tsx`, `MentoriaSessoes.tsx`, `PageSkeleton.tsx`
