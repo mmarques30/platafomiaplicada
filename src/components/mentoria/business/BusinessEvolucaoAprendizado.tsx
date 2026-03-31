@@ -166,7 +166,7 @@ export function BusinessEvolucaoAprendizado() {
       </div>
 
       {/* Atividade Recente com Filtros */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+      <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle className="text-base font-medium">
             Atividade Recente

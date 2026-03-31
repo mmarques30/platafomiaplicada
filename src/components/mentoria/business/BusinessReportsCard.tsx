@@ -63,7 +63,7 @@ const BusinessReportsCard: React.FC = () => {
   );
 
   return (
-    <Card className="border-border/50 bg-card/50">
+    <Card className="border-border bg-card">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-medium">Reports</CardTitle>
       </CardHeader>
