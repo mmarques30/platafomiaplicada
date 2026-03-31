@@ -1,24 +1,29 @@
 
 
-# Hook useCountUp para animar KPI cards
+# ProgressBar animada com crescimento 0% → valor
 
-## 1. Novo hook: `src/hooks/useCountUp.ts`
-Criar conforme especificado — easeOutCubic, duration 700ms default, retorna inteiro animado.
+## 1. Novo componente: `src/components/ui/ProgressBar.tsx`
+Criar conforme especificado — `useState(0)` inicial, `setTimeout` de 80ms para setar o valor real, transição CSS `width` com `transition: all 500ms ease-out`.
 
-## 2. Aplicar em `MentoriaHeroDashboard.tsx`
-- `progressoGeral` (linha 84): substituir `{progressoGeral}` por `{useCountUp(progressoGeral)}`
-- `tarefasPendentes` (linha 96): substituir `{tarefasPendentes}` por `{useCountUp(tarefasPendentes)}`
+## 2. Substituições
 
-## 3. Aplicar em `WeeklyProgressCard.tsx`
-- `data.videoCount` (linha 94): animar com useCountUp
+### `src/components/mentoria/AcademyRoadmapEducacional.tsx`
+- **Linha 152-156**: Trilhas em andamento — substituir `<Progress>` por `<ProgressBar value={trilha.percentual} height={8} showValue={false} />`
+- **Linha 220-224**: Próximo objetivo — substituir `<Progress>` por `<ProgressBar value={proximoObjetivo.percentual} height={10} />`
+- Remover import de `Progress` (não mais usado)
 
-## 4. Aplicar em `AcademyRoadmapEducacional.tsx`
-- Conquistas grid (linhas 178, 182, 187, 192): animar `totalVideos`, `certificadosEmitidos.length`, `diasSequencia`, `totalProjetos`
-- Trilha percentual (linhas 143, 219): animar `trilha.percentual` e `proximoObjetivo.percentual`
+### `src/components/evolucao/TrilhasEmAndamentoCards.tsx`
+- **Linha 101**: Substituir `<Progress value={progresso} className="h-1.5" />` por `<ProgressBar value={progresso} height={6} />`
 
-**Nota**: `BusinessVisaoRapida` não existe no código atual — será ignorado.
+### `src/components/evolucao/ProgressoCertificados.tsx`
+- **Linha 59**: Substituir `<Progress value={trilha.percentual} className="h-2" />` por `<ProgressBar value={trilha.percentual} height={8} />`
+
+### `src/components/evolucao/TrilhaEmAndamentoCard.tsx`
+- **Linha 58**: Substituir `<Progress value={progressoPercent} className="h-3" />` por `<ProgressBar value={progressoPercent} height={12} />`
+
+**Nota**: `BusinessVisaoRapida` não existe no código atual — ignorado.
 
 ## Arquivos
-- **Novo**: `src/hooks/useCountUp.ts`
-- **Editados**: `MentoriaHeroDashboard.tsx`, `WeeklyProgressCard.tsx`, `AcademyRoadmapEducacional.tsx`
+- **Novo**: `src/components/ui/ProgressBar.tsx`
+- **Editados**: `AcademyRoadmapEducacional.tsx`, `TrilhasEmAndamentoCards.tsx`, `ProgressoCertificados.tsx`, `TrilhaEmAndamentoCard.tsx`
 
