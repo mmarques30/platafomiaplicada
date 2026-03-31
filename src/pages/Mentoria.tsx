@@ -14,6 +14,7 @@ import { AcademyRoadmapEducacional } from "@/components/mentoria/AcademyRoadmapE
 import { AcademyProximoPasso } from "@/components/mentoria/AcademyProximoPasso";
 
 import { BusinessAcessoRapido } from "@/components/mentoria/business/BusinessAcessoRapido";
+import { BusinessVisaoRapida } from "@/components/mentoria/business/BusinessVisaoRapida";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
 import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
@@ -105,7 +106,8 @@ export default function Mentoria() {
             <IAplicadaVisaoGeral />
           ) : isBusiness ? (
             <>
-              {/* Business Colaborativo: ROI → Progresso → Reports */}
+              {/* Business Colaborativo: Visão Rápida → ROI → Progresso → Reports */}
+              <BusinessVisaoRapida />
               <BusinessROIChart />
               <BusinessProgressoConteudo />
               <BusinessReportsCard />
