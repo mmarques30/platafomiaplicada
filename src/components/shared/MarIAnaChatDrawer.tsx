@@ -189,6 +189,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               role: msg.role,
               content: msg.content,
             })),
+            ...(isMentoriaRoute && mentoriaContext ? { mentoriaContext } : {}),
           }),
           signal: abortControllerRef.current.signal,
         }
