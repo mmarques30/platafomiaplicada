@@ -16,7 +16,7 @@ const steps: Step[] = [
   {
     target: '[data-tour="calendario"]',
     content: "Confira as sessões ao vivo, aulas e eventos programados no calendário.",
-    title: "📅 Calendário",
+    title: "Calendário",
     placement: "right",
   },
   {
