@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Target, CheckCircle2, TrendingUp } from "lucide-react";
+import { Target, CheckCircle2, TrendingUp, Info } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
