@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN mensagem_boas_vindas TEXT DEFAULT NULL;

@@ -4532,6 +4532,7 @@ export type Database = {
           idade: number | null
           is_visitante: boolean | null
           linkedin: string | null
+          mensagem_boas_vindas: string | null
           nivel_comunidade: number | null
           nome_completo: string
           origem_consultoria: boolean | null
@@ -4565,6 +4566,7 @@ export type Database = {
           idade?: number | null
           is_visitante?: boolean | null
           linkedin?: string | null
+          mensagem_boas_vindas?: string | null
           nivel_comunidade?: number | null
           nome_completo: string
           origem_consultoria?: boolean | null
@@ -4598,6 +4600,7 @@ export type Database = {
           idade?: number | null
           is_visitante?: boolean | null
           linkedin?: string | null
+          mensagem_boas_vindas?: string | null
           nivel_comunidade?: number | null
           nome_completo?: string
           origem_consultoria?: boolean | null
