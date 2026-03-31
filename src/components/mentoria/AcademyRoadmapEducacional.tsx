@@ -180,7 +180,7 @@ export function AcademyRoadmapEducacional() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
               <Star className={`h-5 w-5 ${totalVideos > 0 ? "text-primary" : "text-zinc-600"}`} />
-              <span className="text-lg font-bold">{totalVideos}</span>
+              <span className="text-lg font-bold">{animatedVideos}</span>
               <span className="text-[11px] text-muted-foreground">Vídeos</span>
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
