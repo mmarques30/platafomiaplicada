@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { CheckSquare } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -153,9 +155,7 @@ export default function MentoriaTarefas() {
           </Card>
         ))}
         {tasks.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm py-8">
-            Nenhuma tarefa
-          </div>
+          <EmptyState icon={CheckSquare} title="Nenhuma tarefa ainda" description="As tarefas do seu projeto aparecerão aqui quando forem criadas." />
         )}
       </div>
     </div>
