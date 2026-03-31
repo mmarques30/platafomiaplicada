@@ -65,6 +65,7 @@ export default function SessaoModal({
         duracao: undefined,
         status: "agendada",
         video_url: "",
+        link_reuniao: "",
         transcricao_url: "",
         transcricao: "",
         notas: ""
