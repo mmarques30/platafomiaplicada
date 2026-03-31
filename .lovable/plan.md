@@ -1,48 +1,48 @@
 
 
-# Fluxo de primeiro acesso Academy
+# Redesenhar Roadmap Academy — Jornada Educacional
 
 ## Resumo
-Criar experiência direcionada para alunos Academy no primeiro acesso: card de boas-vindas no Dashboard + componente inteligente de próximo passo na Mentoria.
+Substituir `FaseAtualCard` + `ResumoProgresso` na aba Roadmap do Academy por um novo componente `AcademyRoadmapEducacional` com 4 seções educacionais concretas.
 
----
+## Alterações
 
-## 1. Card de boas-vindas no Dashboard (primeiro acesso)
-**Novo componente: `src/components/dashboard/AcademyWelcomeCard.tsx`**
-- Exibido apenas quando `profile.plano_mentoria === 'academy'` e `profile.primeiro_acesso === true`
-- Texto: "Olá, [nome]! Por onde começar?"
-- 3 botões de ação rápida:
-  - "Ver minha primeira trilha" → `/trilhas` (primeira trilha disponível)
-  - "Preencher meu diagnóstico" → `/diagnostico/formulario`
-  - "Conhecer a plataforma" → dispara o tour (via callback)
-- Botão de fechar (X) que chama `supabase.from('profiles').update({ primeiro_acesso: false })` e remove o card
-- Estilo: card com borda verde, fundo escuro, ícones para cada ação
+### 1. Novo componente: `src/components/mentoria/AcademyRoadmapEducacional.tsx`
+Componente único com 4 seções verticais:
 
-**Arquivo: `src/pages/Dashboard.tsx`**
-- Importar `AcademyWelcomeCard`
-- Renderizar entre `WelcomeHeader` e `WeeklyProgressCard` quando `profile.plano_mentoria === 'academy'` e `profile.primeiro_acesso === true`
-- Ao fechar o card, invalidar query do profile
+**Seção 1 — Diagnóstico**
+- Query em `formulario_diagnostico` (via `useMentoriaForm` existente)
+- Exibe: status preenchido (sim/não), data de preenchimento, insight IA gerado (sim/não com data)
+- Badge verde se completo, amarelo se pendente, com CTA para preencher
 
----
+**Seção 2 — Trilhas em Andamento**
+- Reutiliza lógica do `useProgressoCertificados` existente para obter trilhas com progresso
+- Também busca trilhas com 0% mas que o aluno já acessou (via `progresso_videos`)
+- Para cada trilha: nome, barra de progresso (% módulos concluídos), X de Y vídeos
+- CTA "Continuar" por trilha
 
-## 2. Componente AcademyProximoPasso (substituir NavegacaoRapida)
-**Novo componente: `src/components/mentoria/AcademyProximoPasso.tsx`**
-- Lógica condicional em 3 níveis:
-  1. Se diagnóstico não preenchido (query em `formulario_diagnostico` onde `completado = true`) → card com CTA "Preencher diagnóstico" + link `/diagnostico/formulario`
-  2. Se diagnóstico preenchido mas sem trilha iniciada → card "Trilha recomendada" + link para primeira trilha
-  3. Se trilha iniciada → busca último vídeo não concluído em `progresso_videos` → card "Continue de onde parou" + link para aula
+**Seção 3 — Conquistas Desbloqueadas**
+- Reutiliza lógica da `VitrineConquistas` (hooks `useMinhaEvolucao`, `useSequenciaEstudo`, `useMeusCertificados`)
+- Exibe apenas as desbloqueadas como badges compactos + certificados emitidos
+- Link "Ver todas" para `/evolucao/conquistas`
 
-**Arquivo: `src/pages/Mentoria.tsx`**
-- Na seção Academy (linhas 112-122), substituir `<NavegacaoRapida />` por `<AcademyProximoPasso />`
-- Manter `PendenciasUrgentes`, `StatusDiagnostico`, `ProximaSessao` e `TarefasUrgentes`
+**Seção 4 — Próximo Objetivo**
+- Lógica: encontrar a trilha com maior % de progresso que ainda não está 100%
+- Exibe: nome da trilha, % atual, quantos vídeos faltam
+- CTA direto "Continuar esta trilha" → `/trilhas/{id}`
+- Se nenhuma trilha iniciada, sugere a primeira trilha disponível
 
----
+### 2. Atualizar `src/pages/Mentoria.tsx`
+- Linhas 133-138: substituir `<FaseAtualCard />` + `<ResumoProgresso />` por `<AcademyRoadmapEducacional />`
+- Remover imports de `FaseAtualCard` e `ResumoProgresso` (usados apenas aqui no contexto Academy)
 
-## 3. Lógica de fechamento do card
-- O botão X do `AcademyWelcomeCard` faz `update profiles set primeiro_acesso = false` e invalida a query `user-profile`
-- O card não aparece mais após fechamento (reativo via react-query)
+## Detalhes técnicos
+- Dados: `formulario_diagnostico`, `progresso_videos`, `trilhas`, `videos`, `certificados` — todas tabelas existentes
+- Hooks reutilizados: `useMentoriaForm`, `useProgressoCertificados`, `useMinhaEvolucao`, `useSequenciaEstudo`, `useMeusCertificados`
+- Nenhuma referência a "mentoria", "candidatura", "Business" ou "fases de processo"
+- Visual: cards com estilo dark consistente, Progress bars, badges de conquista
 
 ## Arquivos
-- **Novos**: `AcademyWelcomeCard.tsx`, `AcademyProximoPasso.tsx`
-- **Editados**: `Dashboard.tsx`, `Mentoria.tsx`
+- **Novo**: `src/components/mentoria/AcademyRoadmapEducacional.tsx`
+- **Editado**: `src/pages/Mentoria.tsx`
 
