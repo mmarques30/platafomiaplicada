@@ -48,7 +48,7 @@ export function DashboardTour({ run }: DashboardTourProps) {
   const queryClient = useQueryClient();
 
   const handleEvent = useCallback(
-    async (data: EventData, controls: Controls) => {
+    async (data: EventData, _controls: Controls) => {
       const { status, type } = data;
 
       if (
@@ -72,11 +72,15 @@ export function DashboardTour({ run }: DashboardTourProps) {
       steps={steps}
       run={run}
       continuous
-      showProgress
-      backgroundColor="#1a1c19"
-      primaryColor="#9EB038"
-      textColor="#ffffff"
-      overlayColor="rgba(0, 0, 0, 0.7)"
+      options={{
+        backgroundColor: "#1a1c19",
+        primaryColor: "#9EB038",
+        textColor: "#ffffff",
+        overlayColor: "rgba(0, 0, 0, 0.7)",
+        showProgress: true,
+        arrowColor: "#1a1c19",
+        zIndex: 10000,
+      }}
       locale={{
         back: "Voltar",
         close: "Fechar",
