@@ -1,51 +1,33 @@
 
 
-# Corrigir CSS global — strong/b e auditoria de !important
+# DashboardUrgencias — banner compacto de urgência
 
-## 1. Restringir `strong, b` à classe `.brand-text`
+## O que será feito
 
-**Linha 420-423** — substituir:
-```css
-strong, b {
-  font-weight: 600;
-  color: hsl(73 54% 39%);
-}
-```
-Por:
-```css
-strong, b {
-  font-weight: 600;
-}
+Criar um componente `DashboardUrgencias` que aparece entre `WelcomeHeader` e `WeeklyProgressCard` apenas quando houver 1 item urgente. Exibe um banner horizontal compacto (max 48px) com borda esquerda coral e link de ação.
 
-.brand-text strong,
-.brand-text b {
-  color: hsl(73 54% 39%);
-}
-```
+## Lógica de prioridade (primeiro encontrado = exibido)
 
-Isso mantém o `font-weight: 600` global (desejável) mas remove a cor de marca de todo `<strong>` e `<b>` — agora só aplica dentro de `.brand-text`.
+1. **Sessão em 24h** (Business) — `useMentoriaSessoes`: filtra sessões com `data_sessao` nas próximas 24h e `link_meet` preenchido. Ação: "Acessar sessão" → link_meet.
+2. **Tarefa vencendo em 48h** (Academy) — `useMentoriaTarefas`: filtra tarefas com `prazo_entrega` ≤ 48h e status `pendente`/`em_andamento`. Ação: "Ver tarefa" → `/mentoria/tarefas`.
+3. **Tarefa vencendo em 48h** (Business) — `useTasksByUser`: filtra tasks com `prazo` ≤ 48h e status `pendente`. Ação: "Ver tarefa" → `/mentoria/tarefas-business`.
+4. **Diagnóstico não preenchido** (Academy) — `useMentoriaForm`: se `formulario` é `null` ou `completado === false`. Ação: "Preencher diagnóstico" → `/meu-diagnostico`.
 
-## 2. Auditoria dos `!important`
+## Componente
 
-### Podem ser removidos com segurança:
-Nenhum. Todos os `!important` nas regras `bg-card`, `bg-muted`, `bg-input`, `bg-popover` existem porque Tailwind utility classes geram especificidade igual — sem `!important`, a ordem de compilação do Tailwind pode sobrescrever a cor. Como o projeto não usa dark mode via classe `.dark` para essas regras (usa tokens CSS que mudam automaticamente via `:root` / `.dark`), o `!important` é necessário para garantir que a cor do texto acompanhe o fundo.
+**Novo arquivo**: `src/components/dashboard/DashboardUrgencias.tsx`
 
-### Decisão: manter todos, adicionar comentário explicativo
+- Usa hooks existentes (`useMentoriaTarefas`, `useTasksByUser`, `useMentoriaSessoes`, `useMentoriaForm`, `useUserPlan`)
+- Calcula o item mais urgente via `useMemo`
+- Se nenhum item urgente → retorna `null`
+- Renderiza: `div` com `border-l-4 border-[#E8684A]`, `bg-card`, `h-12`, `flex items-center justify-between`, texto descritivo + `Link` de ação
+- Condiciona queries Business somente se `isBusiness`, evitando fetches desnecessários para Academy
 
-Adicionar um comentário bloco antes da linha 459:
-```css
-/* !important necessário: Tailwind utility classes têm especificidade igual;
-   sem !important a ordem de compilação pode sobrescrever estas cores de texto
-   que precisam acompanhar seus respectivos fundos em ambos os temas. */
-```
+## Integração no Dashboard
 
-## Resumo de alterações
+**Editado**: `src/pages/Dashboard.tsx`
 
-| Linha | Alteração |
-|---|---|
-| 420-423 | Separar `strong, b` — peso global, cor só em `.brand-text` |
-| 458 (antes) | Adicionar comentário explicativo sobre `!important` |
-
-## Arquivo editado
-- `src/index.css`
+- Importar `DashboardUrgencias`
+- Inserir `<DashboardUrgencias />` entre `<WelcomeHeader />` e `<WeeklyProgressCard />` (após linha 81, antes de linha 89)
+- Sem alteração em nenhum outro componente
 
