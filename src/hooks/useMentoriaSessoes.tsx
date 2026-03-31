@@ -12,6 +12,7 @@ export type SessaoMentoria = {
   transcricao?: string;
   transcricao_url?: string;
   video_url?: string;
+  link_reuniao?: string;
   notas?: string;
   feedback_entregas?: string;
   status: "agendada" | "realizada" | "cancelada";
