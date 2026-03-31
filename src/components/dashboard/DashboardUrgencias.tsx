@@ -18,10 +18,9 @@ export function DashboardUrgencias() {
 
   const { tarefas } = useMentoriaTarefas(user?.id);
   const { data: tasksBusiness } = useTasksByUser(isBusiness ? user?.id : undefined);
-  const { formulario, isLoading: formLoading } = useMentoriaForm();
 
   const urgency = useMemo<UrgencyItem | null>(() => {
-    if (planLoading || formLoading) return null;
+    if (planLoading) return null;
 
     const now = Date.now();
     const in48h = now + 48 * 60 * 60 * 1000;
