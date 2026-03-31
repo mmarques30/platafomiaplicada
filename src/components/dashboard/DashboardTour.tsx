@@ -22,7 +22,7 @@ const steps: Step[] = [
   {
     target: '[data-tour="mariana-button"]',
     content: "Sou a MarIAna! Clique aqui sempre que precisar de ajuda, dicas ou recomendações.",
-    title: "🤖 MarIAna — Sua Assistente",
+    title: "MarIAna — Sua Assistente",
     placement: "left",
   },
   {
