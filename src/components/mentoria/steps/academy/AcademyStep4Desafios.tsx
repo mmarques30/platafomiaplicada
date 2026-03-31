@@ -3,7 +3,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Zap, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, Zap, TrendingUp, Sparkles } from "lucide-react";
 import type { AcademyFormData } from "../../schema";
 
 interface StepProps {
