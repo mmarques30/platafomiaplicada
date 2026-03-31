@@ -1,67 +1,22 @@
 
 
-# Integrar contexto de mentoria ao chat da MarIAna
+# Eliminar duplicação de banners no Dashboard
 
-## Visão geral
+## Problema
 
-Quando o chat da MarIAna abre em páginas `/mentoria/*`, buscar dados de urgência do usuário (entregas, sessões, etapas, tarefas críticas), gerar uma mensagem proativa como primeira mensagem da assistente, e enviar contexto extra ao `ai-chat-user` para personalizar as respostas.
+`DashboardUrgencias` e `PendenciasOnboarding` ambos verificam o diagnóstico, gerando dois avisos redundantes na tela (visível no screenshot).
 
-A edge function `personalizar-instrucao` **não será usada** — ela é voltada para gerar descrições de instruções de etapas, não para chat. O contexto será montado no cliente e enviado como campo extra ao `ai-chat-user`, que já possui system prompt completo.
+## Solução
 
-## Arquitetura
+Remover a verificação de diagnóstico do `DashboardUrgencias`. Esse componente foi criado para urgências com prazo (sessões em 24h, entregas em 3 dias, tarefas críticas) — o diagnóstico não tem prazo e já é coberto pelo `PendenciasOnboarding`.
 
-```text
-MarIAnaChatDrawer
-  ├─ useLocation() → detecta /mentoria/*
-  ├─ useMentoriaContext() [novo hook]
-  │   ├─ useContratosBusiness(businessUserId)
-  │   ├─ useEntregasBusiness(contratoId)
-  │   ├─ useMentoriaSessoes(businessUserId)
-  │   ├─ useEtapasBusiness(contratoId)
-  │   └─ useTasksByUser(userId)
-  │   → retorna { proximaEntrega, proximaSessao, etapaAtual, tarefasCriticas, contextText }
-  ├─ Mensagem proativa (se urgência + /mentoria/*)
-  └─ sendMessage → envia mentoria_context ao ai-chat-user
-```
+## Alteração
 
-## Alterações
+**Arquivo**: `src/components/dashboard/DashboardUrgencias.tsx`
 
-### 1. Novo hook: `src/hooks/useMentoriaContext.tsx`
+- Remover o bloco que busca `formulario_diagnostico` e gera a urgência "Preencha seu diagnóstico"
+- Manter apenas as 3 urgências com deadline: sessão em 24h, entrega em 3 dias, tarefas críticas
+- Se nenhuma dessas urgências existir, o componente retorna `null` (como já faz)
 
-- Aceita `enabled: boolean` para evitar fetches fora de `/mentoria/*`
-- Usa hooks existentes (`useBusinessUserId`, `useContratosBusiness`, `useEntregasBusiness`, `useMentoriaSessoes`, `useEtapasBusiness`, `useTasksByUser`)
-- Calcula:
-  - Próxima entrega pendente com prazo (ordenada por prazo)
-  - Próxima sessão agendada (data futura mais próxima)
-  - Etapa atual (status `em_andamento`)
-  - Contagem de tarefas com prioridade `critica` ou `urgente`
-- Retorna um `contextText` (string) com resumo para o system prompt e um `proactiveMessage` (string | null) baseado na prioridade:
-  1. Sessão em < 24h → "Sua próxima sessão é amanhã..."
-  2. Entrega em < 3 dias → "Sua próxima entrega vence em X dias..."
-  3. Tarefas críticas → "Você tem X tarefa(s) crítica(s)..."
-  4. Nenhuma urgência → `null`
-
-### 2. Editar `src/components/shared/MarIAnaChatDrawer.tsx`
-
-- Importar `useLocation` e `useMentoriaContext`
-- Detectar `isMentoriaPage = pathname.startsWith("/mentoria")`
-- Chamar `useMentoriaContext({ enabled: isMentoriaPage })`
-- **Mensagem proativa**: Após carregar histórico, se `messages.length === 0` e `proactiveMessage` existe, inserir como primeira mensagem `{ role: "assistant", content: proactiveMessage }` (sem salvar no banco — é efêmera)
-- **Contexto no request**: Ao chamar `ai-chat-user`, incluir `mentoria_context: contextText` no body JSON (apenas quando `isMentoriaPage`)
-
-### 3. Editar `supabase/functions/ai-chat-user/index.ts`
-
-- Extrair `mentoria_context` do request body (campo opcional)
-- Se presente, concatenar ao final do system prompt como seção `## Contexto da Sessão Atual` com o texto recebido
-- Nenhuma query adicional na edge function
-
-## Arquivos
-
-| Arquivo | Ação |
-|---|---|
-| `src/hooks/useMentoriaContext.tsx` | Novo |
-| `src/components/shared/MarIAnaChatDrawer.tsx` | Editado |
-| `supabase/functions/ai-chat-user/index.ts` | Editado (aceitar campo `mentoria_context`) |
-
-Nenhum outro componente alterado. Nenhuma migration necessária.
+Nenhum outro arquivo alterado.
 
