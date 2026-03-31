@@ -34,6 +34,11 @@ export function AcademyRoadmapEducacional() {
   const totalFerramentas = evolucao?.totalFerramentas || 0;
   const diasSequencia = sequencia || 0;
 
+  const animatedVideos = useCountUp(totalVideos);
+  const animatedCerts = useCountUp(certificadosEmitidos.length);
+  const animatedDias = useCountUp(diasSequencia);
+  const animatedProjetos = useCountUp(totalProjetos);
+
   // Trilhas com progresso (incluindo 100%)
   const allTrilhas = trilhasProgresso || [];
 
