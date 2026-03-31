@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, Trophy, Star } from "lucide-react";
+
 
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
 import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
