@@ -1,51 +1,33 @@
 
 
-# Hover states sutis em cards clicáveis
+# Barra colorida lateral + remoção de emojis em Notificações
 
-## Abordagem
-Criar uma classe CSS utilitária `card-interactive` em `src/index.css` com o padrão de hover/active especificado, e aplicá-la nos cards clicáveis dos 5 contextos listados.
+## Análise
 
-## 1. Nova classe em `src/index.css`
-Adicionar dentro de `@layer components`:
-```css
-.card-interactive {
-  transition: border-color 150ms ease, transform 150ms ease;
-}
-.card-interactive:hover {
-  border-color: hsl(var(--muted-foreground) / 0.3);
-  transform: scale(1.003);
-}
-.card-interactive:active {
-  transform: scale(0.998);
-}
-```
+A página `Notificacoes.tsx` usa a tabela `avisos` cujo campo `tipo` tem valores como `"urgente"`, `"importante"`, `"informativo"`. Os tipos mencionados na solicitação (`sessao`, `entrega`, `tarefa`, etc.) não existem atualmente nessa tabela.
 
-## 2. Integrações (apenas adicionar a classe)
+**Mapeamento proposto** — combinar os tipos existentes com os solicitados:
 
-### `MentoriaEntregas.tsx` (linha ~104)
-No `renderEntregaCard`, o Card não é clicável (sem onClick/cursor-pointer). **Sem alteração** — entregas não são clicáveis.
+| Tipo aviso | Cor | Razão |
+|------------|-----|-------|
+| `urgente` | #E8684A (alerta) | Urgência = alerta |
+| `importante` | #E8A43C (entrega/tarefa) | Importância = atenção |
+| `informativo` | #4A9FE0 (sessao) | Informação = neutro/sessão |
+| Qualquer outro / sem tipo | #2CBBA6 | Fallback padrão |
 
-### `MentoriaTarefas.tsx` (linha ~139-141)
-Card kanban: já tem `cursor-pointer`. Adicionar `card-interactive` à className.
+Se no futuro novos tipos forem adicionados (`sessao`, `entrega`, `conquista`, etc.), o mapeamento já os cobrirá.
 
-### `MentoriaSessoes.tsx` (linha ~122-124)
-TableRow com `cursor-pointer`: adicionar `card-interactive` à className da row.
+## Alteração única: `src/pages/Notificacoes.tsx`
 
-### `TrilhaCard.tsx` (linha ~19)
-O wrapper div dentro do Link: adicionar `card-interactive` à className existente.
+### 1. Função helper de cor
+Criar `getBarColor(tipo)` que retorna a cor hexadecimal com base no tipo do aviso, incluindo os tipos futuros solicitados.
 
-### Dashboard — `StatsCard.tsx` (linha ~15)
-Quando `onClick` existe: adicionar `card-interactive` à className condicional.
+### 2. Barra lateral 3px
+No Card de cada aviso, adicionar `overflow-hidden` e um `div` absoluto na esquerda com `width: 3px`, `height: 100%`, `backgroundColor` dinâmico via `getBarColor`.
 
-### Dashboard — `ConteudoCard.tsx` e `MaterialCard.tsx`
-Cards com `cursor-pointer`: adicionar `card-interactive` à className.
+### 3. Remoção de emojis
+Criar helper `removeEmojis(text)` usando regex para limpar emojis dos campos `titulo` e `mensagem` antes de renderizar.
 
-## Arquivos editados
-- `src/index.css` (1 classe nova)
-- `src/pages/MentoriaTarefas.tsx`
-- `src/pages/MentoriaSessoes.tsx`
-- `src/components/shared/TrilhaCard.tsx`
-- `src/components/admin/StatsCard.tsx`
-- `src/components/dashboard/ConteudoCard.tsx`
-- `src/components/dashboard/MaterialCard.tsx`
+## Nenhum outro arquivo alterado
+Sem mudanças em fetch, contagem, marcação como lido, posicionamento ou componentes ocultos.
 
