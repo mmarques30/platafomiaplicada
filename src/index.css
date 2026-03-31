@@ -23,6 +23,17 @@
   transform: scale(0.998);
 }
 
+/* Dot grid background for authenticated pages */
+.dot-grid-bg {
+  background-image: radial-gradient(circle, #AFC040 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.025;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* Auth page subtle animations */
 @keyframes subtle-glow {
   0%, 100% { 
