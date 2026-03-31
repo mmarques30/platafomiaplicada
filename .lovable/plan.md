@@ -1,58 +1,45 @@
 
 
-# Reorganizar menu lateral Business em 3 grupos colapsáveis
+# Link direto para reunião nas sessões de mentoria
 
 ## Resumo
-Para ambientes Business Parceria e Business Sistemas, substituir a renderização flat dos menus por 3 grupos colapsáveis com section headers, mantendo "Minha Trajetória" / "Meu Projeto" fixo no topo.
-
-## Abordagem
-Em vez de alterar a tabela `menu_config` (que afetaria todos os planos), adicionar lógica condicional no `AppSidebar.tsx` que, quando `isBusiness`, renderiza os menus em grupos hardcoded. Os itens de cada grupo são definidos por `menu_key` e filtrados conforme o ambiente (parceria vs sistemas).
+Adicionar campo `link_reuniao` na tabela `sessoes_mentoria`, input no admin, e botões contextuais na listagem do mentorado e no `BusinessVisaoRapida`.
 
 ## Alterações
 
-### 1. Editar: `src/components/layout/AppSidebar.tsx`
+### 1. Migração SQL
+```sql
+ALTER TABLE public.sessoes_mentoria ADD COLUMN link_reuniao TEXT DEFAULT NULL;
+```
 
-Quando `effectiveEnvironment` é `business_parceria` ou `business_sistemas`, após renderizar o menu "Início" e "Minha Trajetória"/"Meu Projeto" (que ficam fixos no topo), renderizar 3 `Collapsible` com `SidebarGroupLabel` em maiúsculas:
+### 2. Tipo TypeScript
+**Arquivo: `src/hooks/useMentoriaSessoes.tsx`**
+- Adicionar `link_reuniao?: string;` ao type `SessaoMentoria`
 
-**Item fixo no topo (fora dos grupos):**
-- "Minha Trajetória" (parceria) / "Meu Projeto" (sistemas) — já existente como `meu_progresso` / `meu_sistema`
+### 3. Admin — Campo no modal de sessão
+**Arquivo: `src/components/admin/mentoria/SessaoModal.tsx`**
+- Adicionar input `link_reuniao` com label "Link da Reunião (Zoom, Meet, Teams)" após o campo `video_url`
+- Placeholder: `https://zoom.us/j/... ou https://meet.google.com/...`
+- Incluir no `reset()` do useEffect
 
-**Grupo 1 — "MINHA JORNADA"** (ícone: `Route`)
-| Item | URL | Parceria | Sistemas |
-|------|-----|----------|----------|
-| Etapas | /mentoria/etapas-business | ✅ | ✅ |
-| Roadmap | /mentoria?tab=roadmap | ✅ | ❌ |
-| Instruções | /mentoria/instrucoes-business | ✅ | ❌ |
+### 4. Listagem do mentorado — Botões contextuais
+**Arquivo: `src/pages/MentoriaSessoes.tsx`**
+- Importar `ExternalLink` e `differenceInHours`
+- Adicionar coluna "Reunião" na tabela (entre Status e Recursos)
+- Lógica por sessão:
+  - **Sessão agendada, dentro de 24h, com link**: Botão destacado `variant="default"` "Entrar" com ícone ExternalLink, `onClick` abre `link_reuniao` em nova aba
+  - **Sessão agendada, mais de 24h, com link**: Link discreto `text-xs text-primary hover:underline` "Link da reunião"
+  - **Sessão sem link ou passada/cancelada**: `-`
 
-**Grupo 2 — "ENTREGAS E TAREFAS"** (ícone: `Package`)
-| Item | URL | Parceria | Sistemas |
-|------|-----|----------|----------|
-| Entregas | /mentoria/entregas | ✅ | ✅ |
-| Tarefas | /mentoria/tarefas | ✅ | ❌ |
-| Tasks | /mentoria/tasks-business | ✅ | ❌ |
-| Validações | /mentoria/validacoes | ✅ | ✅ |
-| Projetos | /mentoria/projetos | ✅ | ❌ |
-
-**Grupo 3 — "COMUNICAÇÃO"** (ícone: `MessageSquare`)
-| Item | URL | Parceria | Sistemas |
-|------|-----|----------|----------|
-| Sessões | /mentoria/sessoes | ✅ | ✅ |
-| Dúvidas | /mentoria/duvidas | ✅ | ❌ |
-| Documentos | /mentoria/documentos | ✅ | ✅ |
-| Recursos | /mentoria/recursos | ✅ | ❌ |
-| Reports | /mentoria/reports | ✅ | ✅ |
-
-**Implementação:**
-- Definir array de grupos com `groupKey`, `label`, `icon`, `items[]` (cada item com `label`, `url`, `environments[]`)
-- Renderizar cada grupo como `Collapsible` com `defaultOpen={true}` e toggle no header
-- Header do grupo: ícone + label em `text-[10px] uppercase tracking-widest text-sidebar-foreground/50 font-semibold`
-- Items recuados com `pl-8`, estilo consistente com submenus existentes
-- Lógica condicional: quando `isBusiness`, inserir os 3 grupos após o menu principal (Início + Trajetória/Projeto) e antes de Bibliotecas/Comunidade
-- Grupos expandidos por padrão, com auto-expand quando rota ativa está dentro de um grupo
-
-### 2. Nenhuma migração SQL necessária
-Os itens são hardcoded no componente, sem novas entradas na `menu_config`.
+### 5. BusinessVisaoRapida — Usar `link_reuniao` em vez de `video_url`
+**Arquivo: `src/components/mentoria/business/BusinessVisaoRapida.tsx`**
+- Na query de próxima sessão, o `select("*")` já traz `link_reuniao`
+- Substituir a lógica que usa `video_url` pelo `link_reuniao`:
+  - Se `link_reuniao` existe e sessão dentro de 24h: botão destacado "Entrar na reunião"
+  - Se `link_reuniao` existe mas +24h: link discreto
+  - Sem link: "Aguardando link" (como já está)
 
 ## Arquivos
-- **Editado**: `src/components/layout/AppSidebar.tsx`
+- **Migração SQL**: nova coluna `link_reuniao`
+- **Editados**: `useMentoriaSessoes.tsx` (tipo), `SessaoModal.tsx` (input), `MentoriaSessoes.tsx` (coluna), `BusinessVisaoRapida.tsx` (link)
 
