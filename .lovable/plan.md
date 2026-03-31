@@ -1,36 +1,36 @@
 
 
-# Consolidar hover patterns e limpar CSS legado
+# Substituir Loader2 por PageSkeleton em páginas de mentoria
 
-## 1. `src/index.css` — Consolidar hovers
+As variantes existentes do `PageSkeleton` são: `dashboard`, `trilhas`, `calendario`, `evolucao`. Como não podemos alterar o componente nem criar novos, cada página receberá a variante mais próxima da sua estrutura visual.
 
-**Remover** (linhas 5-12): `.card-micro-hover` e `.card-micro-hover:hover`
+## Páginas a alterar (full-page Loader2 → PageSkeleton)
 
-**Atualizar** (linhas 14-24): `.card-interactive` — mudar `border-color` de `hsl(var(--muted-foreground) / 0.3)` para `rgba(175,192,64,0.25)` conforme especificado.
+| Arquivo | Variante | Justificativa |
+|---------|----------|---------------|
+| `BusinessDashboard.tsx` (L123-127) | `dashboard` | KPI cards + gráficos |
+| `MentoriaPainelDiagnostico.tsx` (L69-73) | `dashboard` | Painel com cards |
+| `MentoriaProjetos.tsx` (L49-53) | `trilhas` | Grid de cards |
+| `MentoriaDocumentos.tsx` (L88-92) | `evolucao` | Lista de itens |
+| `MentoriaTasksBusiness.tsx` (L218-224) | `evolucao` | Lista de tarefas |
+| `MentoriaEtapasBusiness.tsx` (L55-59) | `evolucao` | Lista de etapas |
+| `MentoriaInstrucoesBusiness.tsx` (L174-178) | `evolucao` | Lista de instruções |
 
-**Remover** (linhas 231-242): primeira definição de `.card-enhanced` e `.card-enhanced:hover`
+## Loader2 mantidos (inline em botões/ações) — sem alteração
 
-**Remover** (linhas 466-472): segunda definição duplicada de `.card-enhanced`
+- `InsightIA.tsx` — botão "Gerando diagnóstico..."
+- `DiagnosticoAcademyPanel.tsx` — botões de gerar/atualizar
+- `AtividadeModal.tsx` — botão "Salvando..."
+- `ProjetoPreparacaoSection.tsx` — botão "Atualizando..."
+- `MentoriaDocumentos.tsx` (L189) — botão "Baixando..."
+- `AcademyProximoPasso.tsx` — loading parcial dentro de card
+- `MentoriaPainelDiagnostico.tsx` (L95-98) — loading dentro de seção de card
 
-## 2. `src/App.css` — Limpar todo o arquivo
+## Para cada arquivo
 
-Esvaziar completamente (ou remover). Todo o conteúdo é legado do template Vite: `.logo`, `.card`, `.read-the-docs`, `logo-spin`.
+Substituir o bloco `Loader2` de loading full-page por `<PageSkeleton variant="..." />`, importar de `@/components/shared/PageSkeleton`, e remover `Loader2` do import se não for mais usado no arquivo.
 
-## 3. Substituir `card-micro-hover` → `card-interactive` nos componentes
+## Arquivos editados
 
-- `src/components/dashboard/WeeklyProgressCard.tsx` (linha 72)
-- `src/components/dashboard/NovidadesSemana.tsx` (linha 34)
-- `src/components/dashboard/CentralConteudo.tsx` (linha 28)
-
-## 4. Substituir `card-enhanced` → `card-interactive` nos componentes
-
-- `src/components/shared/ProgressCard.tsx` (linha 28) — único uso encontrado
-
-## 5. Temas: `adminTheme.ts` vs `painelTheme.ts`
-
-Os dois arquivos servem propósitos diferentes — `adminTheme` define tokens para o painel administrativo (tabelas, filtros, stats cards), enquanto `painelTheme` define tokens para o Painel de Diagnóstico do mentorado (com variante Academy/Business). Os tokens não se sobrepõem significativamente. **Manter separados** e adicionar comentário explicativo no topo de cada arquivo clarificando o escopo.
-
-## Arquivos
-
-- **Editados**: `src/index.css`, `src/App.css`, `WeeklyProgressCard.tsx`, `NovidadesSemana.tsx`, `CentralConteudo.tsx`, `ProgressCard.tsx`, `adminTheme.ts`, `painelTheme.ts`
+`BusinessDashboard.tsx`, `MentoriaPainelDiagnostico.tsx`, `MentoriaProjetos.tsx`, `MentoriaDocumentos.tsx`, `MentoriaTasksBusiness.tsx`, `MentoriaEtapasBusiness.tsx`, `MentoriaInstrucoesBusiness.tsx`
 
