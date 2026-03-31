@@ -98,7 +98,7 @@ export function TrilhasEmAndamentoCards() {
                           {progresso.toFixed(0)}%
                         </span>
                       </div>
-                      <Progress value={progresso} className="h-1.5" />
+                      <ProgressBar value={progresso} height={6} />
                     </div>
                   </div>
 

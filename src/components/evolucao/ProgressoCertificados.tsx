@@ -56,7 +56,7 @@ export function ProgressoCertificados() {
                   {trilha.percentual}%
                 </span>
               </div>
-              <Progress value={trilha.percentual} className="h-2" />
+              <ProgressBar value={trilha.percentual} height={8} />
             </div>
             <div className="flex items-center justify-between text-sm">
               <p className="text-muted-foreground">
