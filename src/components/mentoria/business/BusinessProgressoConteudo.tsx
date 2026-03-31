@@ -128,8 +128,7 @@ export function BusinessProgressoConteudo() {
         {/* Interações */}
         <Card className="border-primary/20 bg-gradient-to-br from-purple-500/5 to-transparent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <MousePointerClick className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Interações
             </CardTitle>
           </CardHeader>
