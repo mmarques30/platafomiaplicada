@@ -36,7 +36,7 @@ const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "busin
 
 export default function EnvironmentSelector() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user, loading: authLoading } = useAuth();
   const { 
     availableEnvironments, 
     setEnvironment, 
