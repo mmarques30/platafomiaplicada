@@ -2,21 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Card micro-hover animation */
-.card-micro-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.card-micro-hover:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.4);
-}
-
-/* Card interactive hover */
+/* Card interactive hover — single consolidated pattern */
 .card-interactive {
+  cursor: pointer;
   transition: border-color 150ms ease, transform 150ms ease;
 }
 .card-interactive:hover {
-  border-color: hsl(var(--muted-foreground) / 0.3);
+  border-color: rgba(175,192,64,0.25);
   transform: scale(1.003);
 }
 .card-interactive:active {
