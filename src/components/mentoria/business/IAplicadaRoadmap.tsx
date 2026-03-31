@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Map, CheckCircle2, Circle, Clock } from "lucide-react";
+import { Map, CheckCircle2, Circle, Clock, Construction } from "lucide-react";
 
 export function IAplicadaRoadmap() {
   return (
@@ -91,7 +91,7 @@ export function IAplicadaRoadmap() {
       {/* Mensagem de construção */}
       <Card className="border-dashed border-2 border-muted-foreground/30">
         <CardContent className="py-12 text-center">
-          <div className="text-4xl mb-4">🚧</div>
+          <Construction className="h-10 w-10 text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">Roadmap em Construção</h3>
           <p className="text-muted-foreground max-w-md mx-auto">
             O roadmap detalhado do seu projeto será exibido aqui assim que 

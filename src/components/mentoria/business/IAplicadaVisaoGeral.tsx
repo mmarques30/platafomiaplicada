@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Clock, Package } from "lucide-react";
+import { Eye, Clock, Package, Construction } from "lucide-react";
 
 export function IAplicadaVisaoGeral() {
   return (
@@ -65,7 +65,7 @@ export function IAplicadaVisaoGeral() {
       {/* Mensagem de construção */}
       <Card className="border-dashed border-2 border-muted-foreground/30">
         <CardContent className="py-12 text-center">
-          <div className="text-4xl mb-4">🚧</div>
+          <Construction className="h-10 w-10 text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">Em Construção</h3>
           <p className="text-muted-foreground max-w-md mx-auto">
             Este painel está sendo desenvolvido para exibir o status em tempo real 

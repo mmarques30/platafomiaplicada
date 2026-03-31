@@ -9,32 +9,32 @@ const steps: Step[] = [
   {
     target: '[data-tour="trilha-recomendada"]',
     content: "Aqui você encontra os conteúdos e trilhas recomendados para sua jornada. Comece por aqui!",
-    title: "📚 Trilha Recomendada",
+    title: "Trilha Recomendada",
     skipBeacon: true,
     placement: "bottom",
   },
   {
     target: '[data-tour="calendario"]',
     content: "Confira as sessões ao vivo, aulas e eventos programados no calendário.",
-    title: "📅 Calendário",
+    title: "Calendário",
     placement: "right",
   },
   {
     target: '[data-tour="mariana-button"]',
     content: "Sou a MarIAna! Clique aqui sempre que precisar de ajuda, dicas ou recomendações.",
-    title: "🤖 MarIAna — Sua Assistente",
+    title: "MarIAna — Sua Assistente",
     placement: "left",
   },
   {
     target: '[data-tour="evolucao"]',
     content: "Acompanhe seu progresso, conquistas e certificados na seção de evolução.",
-    title: "📈 Sua Evolução",
+    title: "Sua Evolução",
     placement: "right",
   },
   {
     target: '[data-tour="configuracoes"]',
     content: "Personalize seu perfil, altere senha e ajuste preferências aqui.",
-    title: "⚙️ Configurações",
+    title: "Configurações",
     placement: "right",
   },
 ];
