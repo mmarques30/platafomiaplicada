@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Loader2, Maximize2, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useAuth } from "@/hooks/useAuth";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import mariAvatar from "@/assets/mariana-avatar.png";
 import mariAvatarFallback from "@/assets/mari-avatar.jpg";
+
+interface MentoriaContext {
+  proximaEntrega?: { titulo: string; prazo: string } | null;
+  proximaSessao?: { data_sessao: string } | null;
+  etapaAtual?: { nome: string; progresso: number } | null;
+  tarefasCriticas?: number;
+}
 
 interface Message {
   role: "user" | "assistant";
