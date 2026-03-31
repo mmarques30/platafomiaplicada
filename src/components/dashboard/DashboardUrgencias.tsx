@@ -59,17 +59,8 @@ export function DashboardUrgencias() {
       }
     }
 
-    // 3. Diagnostico not filled
-    if (!formulario || formulario.completado === false) {
-      return {
-        text: "Preencha seu diagnóstico para personalizar sua jornada",
-        link: "/meu-diagnostico",
-        linkLabel: "Preencher diagnóstico",
-      };
-    }
-
     return null;
-  }, [tarefas, tasksBusiness, formulario, isBusiness, planLoading, formLoading]);
+  }, [tarefas, tasksBusiness, isBusiness, planLoading]);
 
   if (!urgency) return null;
 
