@@ -101,6 +101,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     setSelectedRoles([]);
     setSelectedPlano("");
     setSkillsLiberado(false);
+    setMensagemBoasVindas("");
     setSkillsEquipeData({
       equipeId: null,
       novaEquipe: null,
