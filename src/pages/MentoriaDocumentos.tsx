@@ -13,6 +13,7 @@ import { useLinksBusiness } from "@/hooks/useLinksBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
 const tipoLabels: Record<string, string> = {
   proposta: "Contrato",
