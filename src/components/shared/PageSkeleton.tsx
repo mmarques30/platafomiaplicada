@@ -16,21 +16,26 @@ function DashboardSkeleton() {
           <SkeletonBlock className="h-8 w-64" />
           <SkeletonBlock className="h-5 w-48" />
         </div>
-        {/* Central conteudo */}
-        <SkeletonCard className="h-[280px] p-6">
-          <div className="space-y-4">
-            <SkeletonBlock className="h-6 w-40 bg-white/10" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[1, 2, 3, 4].map(i => (
-                <SkeletonBlock key={i} className="h-[160px] rounded-xl bg-white/10" />
-              ))}
+        {/* KPI cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="rounded-xl border border-border bg-card/60 animate-[skeleton-pulse_1.5s_ease-in-out_infinite] h-[80px] overflow-hidden">
+              <div className="h-[3px] bg-primary/30 w-full" />
+              <div className="flex items-center gap-4 p-4">
+                <div className="h-5 w-24 rounded bg-muted/40" />
+                <div className="h-7 w-16 rounded bg-muted/40 ml-auto" />
+              </div>
             </div>
-          </div>
-        </SkeletonCard>
+          ))}
+        </div>
+        {/* Chart */}
+        <div className="rounded-xl border border-border bg-card/60 animate-[skeleton-pulse_1.5s_ease-in-out_infinite] h-[200px] p-4">
+          <div className="h-full w-full rounded-lg bg-muted/40" />
+        </div>
         {/* Ranking ticker */}
-        <SkeletonCard className="h-16" />
+        <SkeletonCardLocal className="h-16" />
         {/* Novidades */}
-        <SkeletonCard className="h-[200px]" />
+        <SkeletonCardLocal className="h-[200px]" />
       </main>
     </div>
   );

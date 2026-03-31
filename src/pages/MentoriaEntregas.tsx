@@ -67,11 +67,8 @@ export default function MentoriaEntregas() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="space-y-4 animate-pulse">
-          <div className="h-10 bg-muted rounded-lg w-48" />
-          <div className="h-64 bg-muted rounded-xl" />
-        </div>
+      <div className="container mx-auto py-8 px-4 space-y-3">
+        <SkeletonCard variant="list" count={4} />
       </div>
     );
   }

@@ -70,8 +70,8 @@ export default function MentoriaSessoes() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <div className="container mx-auto py-8 px-4 max-w-6xl space-y-3">
+        <SkeletonCard variant="list" count={3} />
       </div>
     );
   }
