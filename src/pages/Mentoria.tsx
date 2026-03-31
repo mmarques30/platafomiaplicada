@@ -131,10 +131,7 @@ export default function Mentoria() {
           ) : isBusiness ? (
             <BusinessExecutiveRoadmap />
           ) : (
-            <>
-              <FaseAtualCard />
-              <ResumoProgresso />
-            </>
+            <AcademyRoadmapEducacional />
           )}
         </TabsContent>
 
