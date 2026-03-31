@@ -81,6 +81,8 @@ export default function Dashboard() {
               <WelcomeHeader />
             </section>
 
+            <DashboardUrgencias />
+
             <PWAInstallBanner />
 
             {/* Card de boas-vindas Academy no primeiro acesso */}
