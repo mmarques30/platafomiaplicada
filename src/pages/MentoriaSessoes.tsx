@@ -4,8 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Video, FileText, Loader2, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, Video, FileText, ArrowLeft } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
@@ -70,8 +71,8 @@ export default function MentoriaSessoes() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <div className="container mx-auto py-8 px-4 max-w-6xl space-y-3">
+        <SkeletonCard variant="list" count={3} />
       </div>
     );
   }
