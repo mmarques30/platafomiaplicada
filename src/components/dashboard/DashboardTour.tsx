@@ -34,7 +34,7 @@ const steps: Step[] = [
   {
     target: '[data-tour="configuracoes"]',
     content: "Personalize seu perfil, altere senha e ajuste preferências aqui.",
-    title: "⚙️ Configurações",
+    title: "Configurações",
     placement: "right",
   },
 ];

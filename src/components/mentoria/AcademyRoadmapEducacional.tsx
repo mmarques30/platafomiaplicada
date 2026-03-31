@@ -231,7 +231,7 @@ export function AcademyRoadmapEducacional() {
             </div>
           ) : allTrilhas.length > 0 ? (
             <div className="text-center py-2">
-              <p className="text-sm text-muted-foreground">🎉 Todas as trilhas concluídas!</p>
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1"><CheckCircle2 className="h-4 w-4 text-primary" /> Todas as trilhas concluídas!</p>
             </div>
           ) : (
             <div className="space-y-3">

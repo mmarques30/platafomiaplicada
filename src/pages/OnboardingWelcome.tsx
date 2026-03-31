@@ -67,7 +67,7 @@ export default function OnboardingWelcome() {
           className="space-y-4"
         >
           <h1 className="text-2xl md:text-3xl font-bold text-white">
-            Olá, <span className="text-[#9EB038]">{nome}</span>! 👋
+            Olá, <span className="text-[#9EB038]">{nome}</span>!
           </h1>
 
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-left space-y-3">
