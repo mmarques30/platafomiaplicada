@@ -28,7 +28,7 @@ const steps: Step[] = [
   {
     target: '[data-tour="evolucao"]',
     content: "Acompanhe seu progresso, conquistas e certificados na seção de evolução.",
-    title: "📈 Sua Evolução",
+    title: "Sua Evolução",
     placement: "right",
   },
   {
