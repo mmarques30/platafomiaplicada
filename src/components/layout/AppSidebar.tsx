@@ -42,7 +42,9 @@ export function AppSidebar() {
   const { currentEnvironment } = useEnvironment();
   
   const collapsed = !open;
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([
+    'biz_jornada', 'biz_entregas', 'biz_comunicacao' // Business groups default expanded
+  ]);
   const [logoError, setLogoError] = useState(false);
 
   const handleLogout = async () => {
