@@ -59,6 +59,13 @@ export default function EnvironmentSelector() {
     });
   }, []);
 
+  // Guard: redirecionar para /auth se não autenticado
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth", { replace: true });
+    }
+  }, [authLoading, user, navigate]);
+
   useEffect(() => {
     if (!isLoading && currentEnvironment) {
       navigate("/", { replace: true });
@@ -78,29 +85,12 @@ export default function EnvironmentSelector() {
     navigate("/", { replace: true });
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  // Guard: redirecionar para /auth se não autenticado
-  const { user, loading: authLoading } = useAuth();
-  
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/auth", { replace: true });
-    }
-  }, [authLoading, user, navigate]);
-
   const handleBackToAuth = async () => {
     await signOut();
     navigate("/auth", { replace: true });
   };
 
-  if (authLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
