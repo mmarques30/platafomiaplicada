@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library } from "lucide-react";
+import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library, Eye } from "lucide-react";
 import logoHeaderDark from "@/assets/logo-header-dark.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
