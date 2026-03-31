@@ -275,7 +275,7 @@ export default function MentoriaEntregas() {
       {entregas.length === 0 ? (
         <EmptyState icon={Package} title="Nenhuma entrega ainda" description="As entregas definidas pela sua mentora aparecerão aqui." />
       ) : (
-        <div className="space-y-4">
+        <StaggerList className="space-y-4">
           {/* Entregas agrupadas por Fase */}
           {etapasOrdenadas.map(renderEtapaSection)}
 
@@ -291,7 +291,7 @@ export default function MentoriaEntregas() {
               </div>
             </div>
           )}
-        </div>
+        </StaggerList>
       )}
     </div>
   );

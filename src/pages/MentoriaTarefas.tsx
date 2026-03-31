@@ -135,25 +135,27 @@ export default function MentoriaTarefas() {
         </h3>
       </div>
       <div className="bg-muted/30 rounded-b-lg p-2 min-h-[400px] space-y-2">
-        {tasks.map(tarefa => (
-          <Card 
-            key={tarefa.id} 
-            className="cursor-pointer hover:shadow-md transition-shadow card-interactive"
-            onClick={() => handleOpenTarefa(tarefa.id)}
-          >
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2 mb-2">
-                {getPrioridadeBadge(tarefa.prioridade)}
-              </div>
-              <h4 className="font-medium text-sm line-clamp-2">{tarefa.titulo}</h4>
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{tarefa.descricao}</p>
-              <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3" />
-                {format(new Date(tarefa.prazo_entrega), "dd/MM", { locale: ptBR })}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <StaggerList className="space-y-2">
+          {tasks.map(tarefa => (
+            <Card 
+              key={tarefa.id} 
+              className="cursor-pointer hover:shadow-md transition-shadow card-interactive"
+              onClick={() => handleOpenTarefa(tarefa.id)}
+            >
+              <CardContent className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  {getPrioridadeBadge(tarefa.prioridade)}
+                </div>
+                <h4 className="font-medium text-sm line-clamp-2">{tarefa.titulo}</h4>
+                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{tarefa.descricao}</p>
+                <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  {format(new Date(tarefa.prazo_entrega), "dd/MM", { locale: ptBR })}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </StaggerList>
         {tasks.length === 0 && (
           <EmptyState icon={CheckSquare} title="Nenhuma tarefa ainda" description="As tarefas do seu projeto aparecerão aqui quando forem criadas." />
         )}
