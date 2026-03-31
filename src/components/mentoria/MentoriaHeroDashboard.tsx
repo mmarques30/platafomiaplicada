@@ -85,7 +85,7 @@ export function MentoriaHeroDashboard() {
             <span className="text-xs text-muted-foreground">Progresso</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold text-foreground">{progressoGeral}</span>
+            <span className="text-2xl sm:text-3xl font-bold text-foreground">{animatedProgresso}</span>
             <span className="text-xs text-muted-foreground">%</span>
           </div>
         </div>
