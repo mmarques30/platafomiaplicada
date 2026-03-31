@@ -1,15 +1,9 @@
 import { useState } from "react";
-import { MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AnimatePresence } from "framer-motion";
 import { MarIAnaChatDrawer } from "./MarIAnaChatDrawer";
 
-const logoMariana = "/logo-mariana.png?v=10";
-
 export function MarIAnaFloatingButton() {
   const [isOpen, setIsOpen] = useState(false);
-  const [logoError, setLogoError] = useState(false);
 
   return (
     <>
@@ -18,33 +12,13 @@ export function MarIAnaFloatingButton() {
       </AnimatePresence>
 
       {!isOpen && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                data-tour="mariana-button"
-                onClick={() => setIsOpen(true)}
-                size="icon"
-                className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 h-11 w-11 md:h-14 md:w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-[#0D0D0D] hover:bg-[#1a1a1a] p-2"
-              >
-                {logoError ? (
-                  <MessageSquare className="w-5 h-5 md:w-7 md:h-7 text-primary" />
-                ) : (
-                  <img
-                    src={logoMariana}
-                    alt="MarIAna"
-                    className="w-full h-full object-contain"
-                    onError={() => setLogoError(true)}
-                  />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="bg-card border-border">
-              <p className="font-medium">Fale com a MarIAna</p>
-              <p className="text-xs text-muted-foreground">Sua mentora de IA</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <button
+          data-tour="mariana-button"
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 min-w-[110px] h-9 px-4 rounded-[20px] bg-[#AFC040] text-[#0C0F0A] text-[13px] font-medium hover:opacity-[0.88] transition-opacity duration-150"
+        >
+          ✱ MarIAna
+        </button>
       )}
     </>
   );
