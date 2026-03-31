@@ -23,7 +23,7 @@ export function useMentoriaContext({ enabled }: UseMentoriaContextOptions): Ment
   const { contrato } = useContratosBusiness(enabled ? businessUserId : undefined);
   const contratoId = contrato?.id;
 
-  const { data: entregas } = useEntregasBusiness(enabled ? contratoId : undefined);
+  const { entregas } = useEntregasBusiness(enabled ? contratoId : undefined);
   const { sessoes } = useMentoriaSessoes(enabled ? businessUserId : undefined);
   const { data: etapas } = useEtapasBusiness(enabled ? contratoId : undefined);
   const { data: tasks } = useTasksByUser(enabled ? businessUserId : undefined);
