@@ -1,32 +1,26 @@
 
 
-# Substituir classes hardcoded por tokens do design system nos skeletons
+# Substituir spinner genérico por PageSkeleton no MainLayout
 
-## Arquivo: `src/components/shared/PageSkeleton.tsx`
+## Alteração
 
-### SkeletonBlock (linha 3)
-- `bg-white/5` → `bg-muted/60`
+**Arquivo**: `src/components/layout/MainLayout.tsx`
 
-### SkeletonCard (linha 7)
-- `bg-zinc-900/50` → `bg-muted`
-- `border-white/5` → `border-border`
+**Linhas 60–66** — substituir:
+```tsx
+return (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+  </div>
+);
+```
 
-### Dentro das variantes — overrides `bg-white/10` (linhas 53-55, 71-73, 79, 81, 83-84, 86, 104, 107)
-- `bg-white/10` → `bg-muted/40`
+Por:
+```tsx
+return <PageSkeleton variant="dashboard" />;
+```
 
-### Borders inline (linha 81)
-- `border-white/5` → `border-border/50`
+**Import**: Adicionar `import { PageSkeleton } from "@/components/shared/PageSkeleton";` no topo do arquivo.
 
-## Arquivo: `src/components/ui/SkeletonCard.tsx`
-- Já usa tokens corretos (`bg-card/60`, `bg-muted/40`, `border-border`). Nenhuma alteração necessária.
-
-## Resumo de substituições em PageSkeleton
-| De | Para |
-|---|---|
-| `bg-white/5` | `bg-muted/60` |
-| `bg-zinc-900/50` | `bg-muted` |
-| `border-white/5` | `border-border` ou `border-border/50` |
-| `bg-white/10` | `bg-muted/40` |
-
-Nenhuma alteração de estrutura, variantes, props ou lógica.
+Nenhuma outra alteração no arquivo.
 
