@@ -63,6 +63,13 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
     loadHistory();
   }, [user]);
 
+  // Inject proactive message when on mentoria pages and no history
+  useEffect(() => {
+    if (!isLoadingHistory && messages.length === 0 && proactiveMessage && isMentoriaPage) {
+      setMessages([{ role: "assistant", content: proactiveMessage }]);
+    }
+  }, [isLoadingHistory, proactiveMessage, isMentoriaPage]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
