@@ -8,7 +8,7 @@ import { StatusDiagnostico } from "@/components/mentoria/StatusDiagnostico";
 import { ProximaSessao } from "@/components/mentoria/ProximaSessao";
 import { TarefasUrgentes } from "@/components/mentoria/TarefasUrgentes";
 import { NavegacaoRapida } from "@/components/mentoria/NavegacaoRapida";
-import { ResumoProgresso } from "@/components/mentoria/ResumoProgresso";
+
 import { PendenciasUrgentes } from "@/components/mentoria/PendenciasUrgentes";
 import { AcademyRoadmapEducacional } from "@/components/mentoria/AcademyRoadmapEducacional";
 import { AcademyProximoPasso } from "@/components/mentoria/AcademyProximoPasso";
