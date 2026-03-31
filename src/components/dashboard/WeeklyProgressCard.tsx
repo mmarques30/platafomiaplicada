@@ -62,6 +62,8 @@ export function WeeklyProgressCard() {
     setVisible(false);
   };
 
+  const animatedVideoCount = useCountUp(data?.videoCount ?? 0);
+
   if (!visible || !data || (data.videoCount === 0 && !data.trilhaEmAndamento)) {
     return null;
   }
