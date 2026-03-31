@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
@@ -149,11 +149,7 @@ export function AcademyRoadmapEducacional() {
                     {trilha.percentual}% · faltam {trilha.faltamVideos} vídeos
                   </span>
                 </div>
-                <Progress
-                  value={trilha.percentual}
-                  className="h-2 bg-white/5"
-                  indicatorClassName="bg-primary"
-                />
+                <ProgressBar value={trilha.percentual} height={8} />
               </div>
             ))
           )}
@@ -217,11 +213,7 @@ export function AcademyRoadmapEducacional() {
                 Continue a trilha <span className="font-semibold text-primary">{proximoObjetivo.titulo}</span>
               </p>
               <div className="flex items-center gap-3">
-                <Progress
-                  value={proximoObjetivo.percentual}
-                  className="h-2.5 flex-1 bg-white/5"
-                  indicatorClassName="bg-primary"
-                />
+                <ProgressBar value={proximoObjetivo.percentual} height={10} />
                 <span className="text-sm font-medium">{proximoObjetivo.percentual}%</span>
               </div>
               <p className="text-xs text-muted-foreground">

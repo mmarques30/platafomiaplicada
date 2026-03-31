@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Button } from "@/components/ui/button";
 import { useProgressoCertificados } from "@/hooks/useProgressoCertificados";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,7 +56,7 @@ export function ProgressoCertificados() {
                   {trilha.percentual}%
                 </span>
               </div>
-              <Progress value={trilha.percentual} className="h-2" />
+              <ProgressBar value={trilha.percentual} height={8} />
             </div>
             <div className="flex items-center justify-between text-sm">
               <p className="text-muted-foreground">

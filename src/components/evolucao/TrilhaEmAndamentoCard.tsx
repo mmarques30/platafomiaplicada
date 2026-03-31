@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Info } from "lucide-react";
 
@@ -55,7 +55,7 @@ export function TrilhaEmAndamentoCard({
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium">Progresso: {progressoPercent}%</span>
             </div>
-            <Progress value={progressoPercent} className="h-3" />
+            <ProgressBar value={progressoPercent} height={12} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
