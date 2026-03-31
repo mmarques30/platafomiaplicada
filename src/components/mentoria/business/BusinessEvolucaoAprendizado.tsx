@@ -129,7 +129,7 @@ export function BusinessEvolucaoAprendizado() {
         </Card>
 
         {/* Prompts Consumidos */}
-        <Card className="border-aplicada-green-300 bg-aplicada-green-100">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-1 pt-3">
             <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <FileText className="h-3.5 w-3.5" />
