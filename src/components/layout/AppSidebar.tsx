@@ -516,6 +516,7 @@ export function AppSidebar() {
           resetView={resetView}
           collapsed={collapsed}
         />
+      </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
         <SidebarMenu>
