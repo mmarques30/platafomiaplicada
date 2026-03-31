@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Maximize2, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import remarkGfm from "remark-gfm";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useMentoriaContext } from "@/hooks/useMentoriaContext";
 import mariAvatar from "@/assets/mariana-avatar.png";
 import mariAvatarFallback from "@/assets/mari-avatar.jpg";
 

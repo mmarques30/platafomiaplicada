@@ -637,6 +637,11 @@ SEMPRE use links Markdown clicáveis ao mencionar conteúdos da plataforma:
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
+    // Inject mentoria context if provided
+    if (mentoria_context && typeof mentoria_context === "string") {
+      systemPrompt += `\n\n## Contexto da Sessão Atual\n${mentoria_context}`;
+    }
+
     const requestBody2 = {
       model: "google/gemini-2.5-flash",
       messages: [
