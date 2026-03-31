@@ -195,7 +195,7 @@ export function AcademyRoadmapEducacional() {
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
               <Target className={`h-5 w-5 ${totalProjetos > 0 ? "text-primary" : "text-zinc-600"}`} />
-              <span className="text-lg font-bold">{totalProjetos}</span>
+              <span className="text-lg font-bold">{animatedProjetos}</span>
               <span className="text-[11px] text-muted-foreground">Projetos</span>
             </div>
           </div>
