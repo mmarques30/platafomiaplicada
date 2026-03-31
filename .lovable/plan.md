@@ -1,43 +1,47 @@
 
 
-# Remover emojis restantes da plataforma
+# StatusBadge semântico + integração nos 4 componentes
 
-## Escopo
-Arquivos nas áreas `/mentoria`, `/dashboard`, `/skills` e componentes compartilhados usados por essas áreas. Excluir áreas admin e comunidade (fora do escopo solicitado).
+## 1. Novo componente: `src/components/ui/StatusBadge.tsx`
+Componente que aceita `status` string e renderiza badge semântico com os estilos especificados:
 
-## Alterações
+| Status | Fundo | Texto | Label |
+|--------|-------|-------|-------|
+| ativo / concluido / aprovado | rgba(175,192,64,0.12) | #C0DD97 | Ativo / Concluído / Aprovado |
+| em_andamento | rgba(74,159,224,0.12) | #85B7EB | Em andamento |
+| pendente / aguardando | rgba(232,164,60,0.12) | #FAC775 | Pendente |
+| cancelado / bloqueado | rgba(138,142,130,0.12) | #B4B2A9 | Bloqueado / Cancelado |
+| critico / atrasado | rgba(232,104,74,0.12) | #F09595 | Crítico / Atrasado |
 
-### 1. `src/components/mentoria/MateriaisExclusivos.tsx` (linha 132)
-- `🔒 Bloqueado` → Adicionar `<Lock className="h-3 w-3" />` + texto "Bloqueado" (importar Lock de lucide-react)
+Estilo inline: `padding: 2px 10px`, `border-radius: 20px`, `font-size: 11px`, `font-weight: 500`, `display: inline-flex`.
 
-### 2. `src/components/mentoria/business/BusinessEvolucaoAprendizado.tsx` (linha 207)
-- `⭐ Favoritos` → Adicionar `<Star className="h-3 w-3" />` antes de "Favoritos" (importar Star de lucide-react)
-- Nota: é um SelectItem, então usar string com ícone inline via custom render ou simplesmente remover emoji e manter texto "Favoritos"
+Aceita prop opcional `label` para override do texto padrão.
 
-### 3. `src/pages/Cupons.tsx` (linha 75)
-- `🎁 Você tem um cupom especial...` → Adicionar `<Gift className="h-4 w-4 inline" />` (importar Gift de lucide-react)
+## 2. MentoriaTarefas.tsx
+Substituir a função `getStatusBadge` (linhas 91-100) por uso de `<StatusBadge>`. Mapear:
+- `pendente` → status "pendente"
+- `em_andamento` → status "em_andamento"
+- `atrasada` → status "atrasado"
+- `concluida` → status "concluido" (label "Concluída")
 
-### 4. `src/components/shared/ModuloCard.tsx` (linha 33)
-- `🔒 PRO` → `<Lock className="h-3.5 w-3.5" /> PRO` (importar Lock)
+## 3. MentoriaValidacoes.tsx
+Substituir a função `getStatusBadge` (linhas 81-91) por `<StatusBadge>`. Mapear:
+- `pendente` → "pendente"
+- `em_analise` → "em_andamento" (label "Em Análise")
+- `aprovado` → "aprovado"
+- `rejeitado` → "critico" (label "Rejeitado")
+- `revisao_solicitada` → "pendente" (label "Revisão Solicitada")
 
-### 5. `src/components/shared/TrilhaCard.tsx` (linha 22)
-- `🔒 PRO` → `<Lock className="h-4 w-4" /> PRO` (importar Lock)
+## 4. MentoriaEntregas.tsx
+Substituir o uso de Badge genérico no STATUS_CONFIG para usar `<StatusBadge>` no `renderEntregaCard`. O select dropdown mantém a lógica atual (não é badge de status).
 
-### 6. `src/components/shared/TrilhaCardBloqueavel.tsx` (linhas 72, 112)
-- Ambas instâncias de `🔒 PRO` → `<Lock className="h-3.5 w-3.5" /> PRO` (importar Lock)
+## 5. MinhasDuvidas.tsx → AbaDuvidas.tsx
+Substituir o Badge inline (linha 76) por `<StatusBadge>`:
+- `respondida` → "concluido" (label "Respondida")
+- `em_analise` → "em_andamento" (label "Em Análise")
+- default → "pendente" (label "Aguardando")
 
-### 7. `src/hooks/useInstrucaoRecursos.tsx` (linhas 145-153)
-- Mudar `getRecursoIcon` para retornar nomes de ícone (string) em vez de emojis: `'file-text'`, `'image'`, `'video'`, `'clipboard'`, `'link'`, `'paperclip'`
-- Ou remover a função se não for usada no escopo (verificado: usado em RecursosPassoManager admin — fora do escopo, mas a função está no hook compartilhado)
-- Manter a função mas substituir emojis por text labels curtas: `'PDF'`, `'IMG'`, `'VID'`, `'DOC'`, `'LINK'`, `'FILE'`
-
-### 8. `src/components/layout/TopHeader.tsx` (linha 87)
-- `👁️ Visualizando como:` → Adicionar `<Eye className="h-4 w-4 inline" />` (importar Eye de lucide-react)
-
-## Fora do escopo (não alterar)
-- `src/components/admin/*` — área admin
-- `src/components/comunidade/CreatePostModal.tsx` — emoji picker funcional
-- Console logs com emojis (`GerenciarMentoria.tsx`)
-
-## Arquivos editados: 8
+## Arquivos
+- **Novo**: `src/components/ui/StatusBadge.tsx`
+- **Editados**: `MentoriaTarefas.tsx`, `MentoriaValidacoes.tsx`, `MentoriaEntregas.tsx`, `src/components/evolucao/AbaDuvidas.tsx`
 
