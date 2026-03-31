@@ -96,6 +96,9 @@ export default function Configuracoes() {
       <div className="mb-6 md:mb-8" />
 
       <div className="space-y-6">
+        {/* Progresso do Perfil */}
+        <OnboardingProgressCard />
+
         {/* Aparência */}
         <Card>
           <CardHeader>
