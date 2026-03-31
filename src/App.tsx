@@ -69,6 +69,7 @@ import BibliotecaPrompts from "./pages/BibliotecaPrompts";
 import MetodosAplicar from "./pages/MetodosAplicar";
 import Sobre from "./pages/Sobre";
 import OnboardingWelcome from "./pages/OnboardingWelcome";
+import BusinessWelcome from "./pages/BusinessWelcome";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
@@ -144,6 +145,7 @@ function AppContent() {
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route path="/acesso-expirado" element={<AcessoExpirado />} />
         <Route path="/onboarding-welcome" element={<OnboardingWelcome />} />
+        <Route path="/business-welcome" element={<ProtectedRoute><BusinessWelcome /></ProtectedRoute>} />
         <Route path="/sobre" element={<Sobre />} />
 
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>

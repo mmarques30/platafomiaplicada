@@ -44,6 +44,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     novaEquipe: null,
     papelEquipe: "membro",
   });
+  const [mensagemBoasVindas, setMensagemBoasVindas] = useState("");
   
   const createUser = useCreateUser();
 
@@ -90,6 +91,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
       equipeId: selectedPlano === "skills" ? skillsEquipeData.equipeId : null,
       novaEquipe: selectedPlano === "skills" ? skillsEquipeData.novaEquipe : null,
       papelEquipe: selectedPlano === "skills" ? skillsEquipeData.papelEquipe : undefined,
+      mensagemBoasVindas: (selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") ? mensagemBoasVindas || undefined : undefined,
     });
 
     // Resetar form
@@ -99,6 +101,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     setSelectedRoles([]);
     setSelectedPlano("");
     setSkillsLiberado(false);
+    setMensagemBoasVindas("");
     setSkillsEquipeData({
       equipeId: null,
       novaEquipe: null,
@@ -261,21 +264,39 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
             
             {/* Switch para liberar Skills - apenas para Business colaborativo */}
             {(selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") && (
-              <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
-                <div>
-                  <Label htmlFor="skills-liberado-novo" className="text-sm font-medium">
-                    Liberar acesso ao Skills
+              <>
+                <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
+                  <div>
+                    <Label htmlFor="skills-liberado-novo" className="text-sm font-medium">
+                      Liberar acesso ao Skills
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Permite acessar o ambiente Skills além do Business
+                    </p>
+                  </div>
+                  <Switch
+                    id="skills-liberado-novo"
+                    checked={skillsLiberado}
+                    onCheckedChange={setSkillsLiberado}
+                  />
+                </div>
+                <div className="mt-4">
+                  <Label htmlFor="mensagem-boas-vindas" className="text-sm font-medium">
+                    Mensagem de boas-vindas (opcional)
                   </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Permite acessar o ambiente Skills além do Business
+                  <textarea
+                    id="mensagem-boas-vindas"
+                    value={mensagemBoasVindas}
+                    onChange={(e) => setMensagemBoasVindas(e.target.value)}
+                    placeholder="Escreva uma mensagem personalizada para este cliente no primeiro acesso..."
+                    className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    rows={3}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Se não preenchida, uma mensagem padrão será exibida
                   </p>
                 </div>
-                <Switch
-                  id="skills-liberado-novo"
-                  checked={skillsLiberado}
-                  onCheckedChange={setSkillsLiberado}
-                />
-              </div>
+              </>
             )}
           </div>
 
