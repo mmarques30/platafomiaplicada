@@ -185,7 +185,7 @@ export function AcademyRoadmapEducacional() {
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
               <Award className={`h-5 w-5 ${certificadosEmitidos.length > 0 ? "text-primary" : "text-zinc-600"}`} />
-              <span className="text-lg font-bold">{certificadosEmitidos.length}</span>
+              <span className="text-lg font-bold">{animatedCerts}</span>
               <span className="text-[11px] text-muted-foreground">Certificados</span>
             </div>
             <div className="flex flex-col items-center gap-1 p-3 rounded-lg bg-white/5">
