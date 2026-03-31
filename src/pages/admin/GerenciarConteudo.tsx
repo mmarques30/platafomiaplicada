@@ -4,8 +4,9 @@ import { ModulosTab } from "@/components/admin/content/ModulosTab";
 import { VideosTab } from "@/components/admin/content/VideosTab";
 import { ExerciciosTab } from "@/components/admin/exercicios/ExerciciosTab";
 import { CentralTab } from "@/components/admin/content/CentralTab";
+import { CuradoriaIATab } from "@/components/admin/content/CuradoriaIATab";
 import { adminTheme } from "@/components/admin/adminTheme";
-import { Route, Layers, Video, Dumbbell, LayoutGrid } from "lucide-react";
+import { Route, Layers, Video, Dumbbell, LayoutGrid, Sparkles } from "lucide-react";
 
 export default function GerenciarConteudo() {
   return (
