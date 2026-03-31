@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Clock, Package } from "lucide-react";
+import { Eye, Clock, Package, Construction } from "lucide-react";
 
 export function IAplicadaVisaoGeral() {
   return (
