@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, CheckSquare, Clock, CheckCircle, AlertCircle, FileText, Calendar, ExternalLink, Paperclip } from "lucide-react";
+import { ArrowLeft, CheckSquare, ClipboardCheck, Clock, CheckCircle, AlertCircle, FileText, Calendar, ExternalLink, Paperclip } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

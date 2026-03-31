@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { CheckSquare } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
