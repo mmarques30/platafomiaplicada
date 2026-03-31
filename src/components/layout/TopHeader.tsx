@@ -248,9 +248,9 @@ export function TopHeader() {
             onClick={() => navigate("/notificacoes")}
           >
             <Bell className="h-5 w-5" strokeWidth={1.5} />
-            {avisosCount && avisosCount > 0 && (
+            {totalBadgeCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
-                {avisosCount > 9 ? "9+" : avisosCount}
+                {totalBadgeCount > 9 ? "9+" : totalBadgeCount}
               </span>
             )}
           </Button>
