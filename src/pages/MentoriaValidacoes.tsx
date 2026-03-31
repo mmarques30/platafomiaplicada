@@ -80,15 +80,15 @@ export default function MentoriaValidacoes() {
   };
 
   const getStatusBadge = (status: TaskBusiness['status']) => {
-    const config: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-      pendente: { label: 'Pendente', variant: 'outline' },
-      em_analise: { label: 'Em Análise', variant: 'secondary' },
-      aprovado: { label: 'Aprovado', variant: 'default' },
-      rejeitado: { label: 'Rejeitado', variant: 'destructive' },
-      revisao_solicitada: { label: 'Revisão Solicitada', variant: 'secondary' },
+    const map: Record<string, { status: string; label: string }> = {
+      pendente: { status: 'pendente', label: 'Pendente' },
+      em_analise: { status: 'em_andamento', label: 'Em Análise' },
+      aprovado: { status: 'aprovado', label: 'Aprovado' },
+      rejeitado: { status: 'critico', label: 'Rejeitado' },
+      revisao_solicitada: { status: 'pendente', label: 'Revisão Solicitada' },
     };
-    const { label, variant } = config[status] || { label: status, variant: 'outline' };
-    return <Badge variant={variant}>{label}</Badge>;
+    const config = map[status] || { status: 'pendente', label: status };
+    return <StatusBadge status={config.status} label={config.label} />;
   };
 
   const renderTaskCard = (task: TaskBusiness) => {

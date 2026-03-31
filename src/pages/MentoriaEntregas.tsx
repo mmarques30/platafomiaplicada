@@ -121,6 +121,10 @@ export default function MentoriaEntregas() {
                 )}>
                   {entrega.titulo}
                 </h3>
+                <StatusBadge 
+                  status={entrega.status === 'cancelada' ? 'cancelado' : entrega.status === 'concluida' ? 'concluido' : entrega.status} 
+                  label={statusConfig.label} 
+                />
                 <Badge variant={prioridadeConfig.variant} className="text-xs">
                   {prioridadeConfig.label}
                 </Badge>
