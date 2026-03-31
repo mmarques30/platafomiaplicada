@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, ExternalLink, Search, Sparkles } from "lucide-react";
+import { FileText, Download, ExternalLink, Search, Sparkles, Lock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface BonusMentoria {
