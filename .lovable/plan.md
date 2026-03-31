@@ -1,36 +1,32 @@
 
 
-# Substituir Loader2 por PageSkeleton em páginas de mentoria
+# Corrigir botão flutuante da MarIAna — usar foto/avatar
 
-As variantes existentes do `PageSkeleton` são: `dashboard`, `trilhas`, `calendario`, `evolucao`. Como não podemos alterar o componente nem criar novos, cada página receberá a variante mais próxima da sua estrutura visual.
+O botão flutuante atual é um retângulo com texto "✱ MarIAna". O usuário quer que seja a foto da MarIAna (avatar circular flutuante).
 
-## Páginas a alterar (full-page Loader2 → PageSkeleton)
+## Alteração: `src/components/shared/MarIAnaFloatingButton.tsx`
 
-| Arquivo | Variante | Justificativa |
-|---------|----------|---------------|
-| `BusinessDashboard.tsx` (L123-127) | `dashboard` | KPI cards + gráficos |
-| `MentoriaPainelDiagnostico.tsx` (L69-73) | `dashboard` | Painel com cards |
-| `MentoriaProjetos.tsx` (L49-53) | `trilhas` | Grid de cards |
-| `MentoriaDocumentos.tsx` (L88-92) | `evolucao` | Lista de itens |
-| `MentoriaTasksBusiness.tsx` (L218-224) | `evolucao` | Lista de tarefas |
-| `MentoriaEtapasBusiness.tsx` (L55-59) | `evolucao` | Lista de etapas |
-| `MentoriaInstrucoesBusiness.tsx` (L174-178) | `evolucao` | Lista de instruções |
+Importar `mariAvatar` e `mariAvatarFallback`, substituir o `<button>` de texto por um botão circular com a imagem:
 
-## Loader2 mantidos (inline em botões/ações) — sem alteração
+```tsx
+import mariAvatar from "@/assets/mariana-avatar.png";
+import mariAvatarFallback from "@/assets/mari-avatar.jpg";
 
-- `InsightIA.tsx` — botão "Gerando diagnóstico..."
-- `DiagnosticoAcademyPanel.tsx` — botões de gerar/atualizar
-- `AtividadeModal.tsx` — botão "Salvando..."
-- `ProjetoPreparacaoSection.tsx` — botão "Atualizando..."
-- `MentoriaDocumentos.tsx` (L189) — botão "Baixando..."
-- `AcademyProximoPasso.tsx` — loading parcial dentro de card
-- `MentoriaPainelDiagnostico.tsx` (L95-98) — loading dentro de seção de card
+// Substituir o button atual por:
+<button
+  data-tour="mariana-button"
+  onClick={() => setIsOpen(true)}
+  className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full shadow-lg hover:scale-105 transition-transform duration-150 overflow-hidden ring-2 ring-[#AFC040]/50"
+>
+  <img
+    src={mariAvatar}
+    alt="MarIAna"
+    className="w-full h-full object-cover"
+    onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
+  />
+</button>
+```
 
-## Para cada arquivo
-
-Substituir o bloco `Loader2` de loading full-page por `<PageSkeleton variant="..." />`, importar de `@/components/shared/PageSkeleton`, e remover `Loader2` do import se não for mais usado no arquivo.
-
-## Arquivos editados
-
-`BusinessDashboard.tsx`, `MentoriaPainelDiagnostico.tsx`, `MentoriaProjetos.tsx`, `MentoriaDocumentos.tsx`, `MentoriaTasksBusiness.tsx`, `MentoriaEtapasBusiness.tsx`, `MentoriaInstrucoesBusiness.tsx`
+## Arquivo editado
+- `src/components/shared/MarIAnaFloatingButton.tsx`
 
