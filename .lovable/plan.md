@@ -1,48 +1,23 @@
 
-
-# Fluxo de primeiro acesso para Business
+# Banner de dados fictícios no BusinessROIChart
 
 ## Resumo
-Adicionar mensagem de boas-vindas personalizada no cadastro admin de usuários Business, e exibir tela intermediária no primeiro login antes do Dashboard.
+Quando `!contrato?.data_inicio` (sem dados reais), exibir o gráfico com opacidade 40% e um banner sobreposto avisando que são dados de exemplo.
 
----
+## Alteração
 
-## 1. Nova coluna `mensagem_boas_vindas` na tabela `profiles`
-**Migração SQL:**
-```sql
-ALTER TABLE public.profiles ADD COLUMN mensagem_boas_vindas TEXT DEFAULT NULL;
-```
+**Arquivo: `src/components/mentoria/BusinessROIChart.tsx`**
 
-## 2. Campo textarea no painel admin
-**Arquivo: `src/components/admin/NovoUsuarioModal.tsx`**
-- Quando `selectedPlano` for `business_parceria` ou `business_sistemas`, exibir textarea "Mensagem de boas-vindas (opcional)" abaixo dos campos existentes
-- Passar `mensagemBoasVindas` no `createUser.mutateAsync()`
+1. Adicionar flag `const isDadosFicticios = !contrato?.data_inicio`
+2. Importar `Info` do lucide-react
+3. Envolver o `ChartContainer` + legenda em um `div` com `position: relative`
+4. Quando `isDadosFicticios`:
+   - Aplicar `opacity-40` no chart + legenda
+   - Sobrepor um banner centralizado (position absolute, z-10) com:
+     - Fundo: `bg-zinc-900/90 border border-[#E8A43C]/50 rounded-xl`
+     - Ícone `Info` âmbar + texto: "Este é um exemplo do que você verá quando seu projeto iniciar. Os dados reais serão inseridos pela sua mentora."
+     - Texto centralizado, max-w limitado
 
-**Arquivo: `src/hooks/admin/useUsers.tsx`**
-- Adicionar `mensagemBoasVindas` ao `mutationFn` do `useCreateUser`, passando no body da edge function
-
-**Arquivo: `supabase/functions/create-user-admin/index.ts`**
-- Extrair `mensagemBoasVindas` do body
-- Incluir `mensagem_boas_vindas` no `updateData` do profile
-
-## 3. Tela intermediária de boas-vindas Business
-**Novo arquivo: `src/pages/BusinessWelcome.tsx`**
-- Tela fullscreen dark (estilo OnboardingWelcome)
-- Título: "Bem-vindo à sua jornada, [nome]"
-- Mensagem personalizada do admin (ou texto padrão: "Estamos preparando tudo para você...")
-- 3 cards de ação: "Conheça suas etapas" → `/mentoria`, "Veja o roadmap" → `/mentoria` (aba roadmap), "Agende sua primeira sessão" → `/notificacoes/calendario`
-- Botão "Entrar na plataforma" → atualiza `primeiro_acesso: false` + navega para `/`
-
-## 4. Redirect automático no Dashboard
-**Arquivo: `src/pages/Dashboard.tsx`**
-- No bloco de `useMemo` / early return: se `profile.primeiro_acesso === true` e plano é `business_parceria` ou `business_sistemas`, redirecionar para `/business-welcome`
-
-## 5. Rota
-**Arquivo: `src/App.tsx`**
-- Adicionar rota protegida `<Route path="/business-welcome" element={<ProtectedRoute><BusinessWelcome /></ProtectedRoute>} />`
-
-## Arquivos
-- **Migração SQL**: nova coluna `mensagem_boas_vindas`
-- **Novo**: `src/pages/BusinessWelcome.tsx`
-- **Editados**: `NovoUsuarioModal.tsx`, `useUsers.tsx`, `create-user-admin/index.ts`, `Dashboard.tsx`, `App.tsx`
-
+## Detalhe técnico
+- Nenhuma tabela nova, nenhuma query nova — apenas condicional no JSX baseada no `contrato` já carregado
+- 1 arquivo editado
