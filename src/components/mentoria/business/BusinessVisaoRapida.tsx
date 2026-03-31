@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, AlertTriangle, Package, Video, Clock, ExternalLink } from "lucide-react";
-import { differenceInWeeks, format, parseISO } from "date-fns";
+import { differenceInHours, differenceInWeeks, format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
 
