@@ -122,23 +122,42 @@ export function BusinessVisaoRapida() {
                   {format(parseISO(proximaSessao.data_sessao), "dd 'de' MMMM, HH:mm", { locale: ptBR })}
                 </p>
                 <p className="text-xs text-muted-foreground">{proximaSessao.titulo}</p>
-                {proximaSessao.video_url ? (
-                  <a
-                    href={proximaSessao.video_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-                  >
-                    <Video className="h-3.5 w-3.5" />
-                    Entrar na reunião
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Clock className="h-3.5 w-3.5" />
-                    Aguardando link
-                  </span>
-                )}
+                {(() => {
+                  const link = proximaSessao.link_reuniao;
+                  if (!link) {
+                    return (
+                      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5" />
+                        Aguardando link
+                      </span>
+                    );
+                  }
+                  const hoursUntil = differenceInHours(parseISO(proximaSessao.data_sessao), new Date());
+                  if (hoursUntil <= 24) {
+                    return (
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:bg-primary/90 transition-colors"
+                      >
+                        <Video className="h-3.5 w-3.5" />
+                        Entrar na reunião
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    );
+                  }
+                  return (
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+                    >
+                      Link da reunião
+                    </a>
+                  );
+                })()}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">Nenhuma sessão agendada</p>

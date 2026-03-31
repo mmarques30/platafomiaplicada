@@ -157,6 +157,45 @@ export default function MentoriaSessoes() {
                 <TableCell>
                   {getStatusBadge(sessao.status)}
                 </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {(() => {
+                    const now = new Date();
+                    const sessaoDate = new Date(sessao.data_sessao);
+                    const hoursUntil = differenceInHours(sessaoDate, now);
+                    const isUpcoming = sessao.status === "agendada" && sessaoDate > now;
+                    
+                    if (!sessao.link_reuniao || !isUpcoming) return <span className="text-muted-foreground text-xs">-</span>;
+                    
+                    if (hoursUntil <= 24) {
+                      return (
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="h-7 text-xs gap-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(sessao.link_reuniao, "_blank");
+                          }}
+                        >
+                          Entrar
+                          <ExternalLink className="h-3 w-3" />
+                        </Button>
+                      );
+                    }
+                    
+                    return (
+                      <a
+                        href={sessao.link_reuniao}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Link da reunião
+                      </a>
+                    );
+                  })()}
+                </TableCell>
                 <TableCell className="hidden lg:table-cell">
                   <div className="flex gap-1.5">
                     {sessao.video_url && (

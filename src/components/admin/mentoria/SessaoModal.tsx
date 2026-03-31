@@ -133,6 +133,15 @@ export default function SessaoModal({
           </div>
 
           <div>
+            <Label htmlFor="link_reuniao">Link da Reunião (Zoom, Meet, Teams)</Label>
+            <Input
+              id="link_reuniao"
+              {...register("link_reuniao")}
+              placeholder="https://zoom.us/j/... ou https://meet.google.com/..."
+            />
+          </div>
+
+          <div>
             <Label htmlFor="video_url">URL do Vídeo/Gravação</Label>
             <Input
               id="video_url"
