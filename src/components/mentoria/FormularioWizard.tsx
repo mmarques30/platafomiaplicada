@@ -149,11 +149,7 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
     try {
       await finalizarFormulario(data);
       localStorage.removeItem(STEP_KEY);
-      
-      toast({
-        title: "Gerando sua análise personalizada...",
-        description: "Aguarde alguns segundos enquanto a IA analisa seu perfil"
-      });
+      setSubmitted(true);
 
       if (formulario?.id) {
         const { error } = await supabase.functions.invoke('gerar-insight-mentoria', {
@@ -167,16 +163,21 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
             description: "Você pode gerar o insight posteriormente na página de mentoria.",
             variant: "default"
           });
+          // Navigate away since insight failed
+          const destino = effectivePlan === 'academy' ? '/evolucao' : '/mentoria';
+          setTimeout(() => navigate(destino), 1500);
+          return;
         }
-      }
 
-      if (onFinalizado) {
-        onFinalizado();
+        await refetch();
+        setInsightReady(true);
       } else {
-        const destino = effectivePlan === 'academy' ? '/evolucao' : '/mentoria';
-        setTimeout(() => {
+        if (onFinalizado) {
+          onFinalizado();
+        } else {
+          const destino = effectivePlan === 'academy' ? '/evolucao' : '/mentoria';
           navigate(destino);
-        }, 1500);
+        }
       }
     } catch (error) {
       console.error("Erro ao finalizar formulário:", error);
