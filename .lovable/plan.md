@@ -1,39 +1,43 @@
 
 
-# Refatorar AppSidebar — extrair 3 subcomponentes
+# InsightSemanalCard para Business Parceria — Visão Geral
 
-## Análise
+## Contexto
 
-O arquivo tem 677 linhas com 3 blocos claramente isoláveis:
+O insight IA já é armazenado na tabela `formulario_diagnostico` nos campos `insight_ia` (jsonb) e `insight_gerado_em` (timestamp). A edge function `gerar-insight-mentoria` recebe `formulario_id` e atualiza esses campos. O hook `useInsightIA` e o hook `useMentoriaForm` já existem.
 
-1. **Comunidade** (linhas 498–575): menu expansível condicional `!isBusiness`
-2. **Admin** (linhas 583–637): painel admin + botão "Sair da Simulação"
-3. **Business Groups**: NÃO existe no código atual — os grupos hardcoded mencionados no pedido (Minha Jornada, Entregas e Tarefas, Comunicação) não estão presentes no AppSidebar. Os menus Business são filtrados dinamicamente via `getSidebarMenus` + `hiddenByEnvironment` no hook `useMenuConfig`. Não há bloco a extrair para `SidebarBusinessGroups`.
+## Plano
 
-## Plano (2 componentes extraíveis)
+### 1. Novo componente: `src/components/mentoria/business/InsightSemanalCard.tsx`
 
-### 1. `src/components/layout/SidebarComunidadeItem.tsx`
-- Extrair linhas 498–575 (Collapsible de Comunidade com Feed e Sala de Aula)
-- Props: `collapsed`, `expandedMenus`, `toggleMenu`, `isMenuVisible`, `pathname`
-- Renderiza `null` quando recebe `isBusiness={true}`
+- Usa `useBusinessUserId()` para obter o user_id correto (suporta simulação admin)
+- Usa `useMentoriaForm` (ou query direta) para buscar o `formulario_diagnostico` do usuário
+- Verifica se `insight_gerado_em` está nos últimos 7 dias
+- **Com insight recente**: Card com `border-l-4 border-[#AFC040]`, label "INSIGHT DA SEMANA" (uppercase, text-[11px]), texto resumo do insight (campo `analise_perfil` ou `recomendacao_foco`), e data no rodapé
+- **Sem insight recente**: Card com texto "Nenhuma análise esta semana" + botão "Gerar análise" que chama `supabase.functions.invoke('gerar-insight-mentoria', { body: { formulario_id } })`
+- **Durante geração**: Exibe `SkeletonCard variant="list"`
+- **Após geração**: Invalida query para exibir o novo insight sem reload
 
-### 2. `src/components/layout/SidebarAdminSection.tsx`
-- Extrair linhas 583–637 (grupo Administração + grupo Sair da Simulação)
-- Props: `isAdmin`, `isViewingAs`, `resetView`, `collapsed`
+### 2. Editar `src/pages/Mentoria.tsx` (linhas 106-111)
 
-### 3. `SidebarBusinessGroups` — não aplicável
-Os menus Business não são um bloco hardcoded no sidebar — são renderizados pelo mesmo loop dinâmico (`mainMenus.map`). Criar este componente exigiria reestruturar a lógica de renderização, o que contradiz o requisito de não alterar comportamento.
+Inserir `<InsightSemanalCard />` antes de `<BusinessROIChart />` no bloco Business Colaborativo:
 
-### 4. AppSidebar.tsx
-- Substituir os blocos extraídos por `<SidebarComunidadeItem ... />` e `<SidebarAdminSection ... />`
-- Reduz ~100 linhas do arquivo principal
-- Toda lógica de estado, hooks e `effectiveEnvironment` permanece no AppSidebar
+```tsx
+{isBusiness ? (
+  <>
+    <InsightSemanalCard />
+    <BusinessROIChart />
+    <BusinessReportsCard />
+  </>
+)}
+```
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/layout/SidebarComunidadeItem.tsx` | Novo |
-| `src/components/layout/SidebarAdminSection.tsx` | Novo |
-| `src/components/layout/AppSidebar.tsx` | Editado — importa e usa os 2 subcomponentes |
+| `src/components/mentoria/business/InsightSemanalCard.tsx` | Novo |
+| `src/pages/Mentoria.tsx` | Editado — adiciona import + componente |
+
+Nenhum componente existente é alterado. Nenhuma tabela ou migration necessária.
 
