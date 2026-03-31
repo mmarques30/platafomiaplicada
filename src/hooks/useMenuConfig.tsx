@@ -80,7 +80,10 @@ export function useMenuConfig() {
         'skills_entregas', 'skills_painel_lider',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
         'squad', 'squad_lider',
-        'meu_sistema'
+        'meu_sistema',
+        // Ocultar meu_progresso — já coberto pelos Business Groups hardcoded no sidebar
+        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+        'meu_progresso_conteudo', 'meu_progresso_entregas'
       ],
       
       // Business Sistemas: versão mais restrita (cliente apenas acompanha) + Squad + Projeto Skills
