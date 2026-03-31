@@ -77,6 +77,7 @@ export default function MentoriaReports() {
         </Card>
       ) : (
         <div className="space-y-4">
+          {isGenerating && <SkeletonCard variant="list" />}
           {reports.map((report) => (
             <Card key={report.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4 flex items-center justify-between">
