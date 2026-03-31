@@ -1,33 +1,39 @@
 
 
-# DashboardUrgencias — banner compacto de urgência
+# Refatorar AppSidebar — extrair 3 subcomponentes
 
-## O que será feito
+## Análise
 
-Criar um componente `DashboardUrgencias` que aparece entre `WelcomeHeader` e `WeeklyProgressCard` apenas quando houver 1 item urgente. Exibe um banner horizontal compacto (max 48px) com borda esquerda coral e link de ação.
+O arquivo tem 677 linhas com 3 blocos claramente isoláveis:
 
-## Lógica de prioridade (primeiro encontrado = exibido)
+1. **Comunidade** (linhas 498–575): menu expansível condicional `!isBusiness`
+2. **Admin** (linhas 583–637): painel admin + botão "Sair da Simulação"
+3. **Business Groups**: NÃO existe no código atual — os grupos hardcoded mencionados no pedido (Minha Jornada, Entregas e Tarefas, Comunicação) não estão presentes no AppSidebar. Os menus Business são filtrados dinamicamente via `getSidebarMenus` + `hiddenByEnvironment` no hook `useMenuConfig`. Não há bloco a extrair para `SidebarBusinessGroups`.
 
-1. **Sessão em 24h** (Business) — `useMentoriaSessoes`: filtra sessões com `data_sessao` nas próximas 24h e `link_meet` preenchido. Ação: "Acessar sessão" → link_meet.
-2. **Tarefa vencendo em 48h** (Academy) — `useMentoriaTarefas`: filtra tarefas com `prazo_entrega` ≤ 48h e status `pendente`/`em_andamento`. Ação: "Ver tarefa" → `/mentoria/tarefas`.
-3. **Tarefa vencendo em 48h** (Business) — `useTasksByUser`: filtra tasks com `prazo` ≤ 48h e status `pendente`. Ação: "Ver tarefa" → `/mentoria/tarefas-business`.
-4. **Diagnóstico não preenchido** (Academy) — `useMentoriaForm`: se `formulario` é `null` ou `completado === false`. Ação: "Preencher diagnóstico" → `/meu-diagnostico`.
+## Plano (2 componentes extraíveis)
 
-## Componente
+### 1. `src/components/layout/SidebarComunidadeItem.tsx`
+- Extrair linhas 498–575 (Collapsible de Comunidade com Feed e Sala de Aula)
+- Props: `collapsed`, `expandedMenus`, `toggleMenu`, `isMenuVisible`, `pathname`
+- Renderiza `null` quando recebe `isBusiness={true}`
 
-**Novo arquivo**: `src/components/dashboard/DashboardUrgencias.tsx`
+### 2. `src/components/layout/SidebarAdminSection.tsx`
+- Extrair linhas 583–637 (grupo Administração + grupo Sair da Simulação)
+- Props: `isAdmin`, `isViewingAs`, `resetView`, `collapsed`
 
-- Usa hooks existentes (`useMentoriaTarefas`, `useTasksByUser`, `useMentoriaSessoes`, `useMentoriaForm`, `useUserPlan`)
-- Calcula o item mais urgente via `useMemo`
-- Se nenhum item urgente → retorna `null`
-- Renderiza: `div` com `border-l-4 border-[#E8684A]`, `bg-card`, `h-12`, `flex items-center justify-between`, texto descritivo + `Link` de ação
-- Condiciona queries Business somente se `isBusiness`, evitando fetches desnecessários para Academy
+### 3. `SidebarBusinessGroups` — não aplicável
+Os menus Business não são um bloco hardcoded no sidebar — são renderizados pelo mesmo loop dinâmico (`mainMenus.map`). Criar este componente exigiria reestruturar a lógica de renderização, o que contradiz o requisito de não alterar comportamento.
 
-## Integração no Dashboard
+### 4. AppSidebar.tsx
+- Substituir os blocos extraídos por `<SidebarComunidadeItem ... />` e `<SidebarAdminSection ... />`
+- Reduz ~100 linhas do arquivo principal
+- Toda lógica de estado, hooks e `effectiveEnvironment` permanece no AppSidebar
 
-**Editado**: `src/pages/Dashboard.tsx`
+## Arquivos
 
-- Importar `DashboardUrgencias`
-- Inserir `<DashboardUrgencias />` entre `<WelcomeHeader />` e `<WeeklyProgressCard />` (após linha 81, antes de linha 89)
-- Sem alteração em nenhum outro componente
+| Arquivo | Ação |
+|---|---|
+| `src/components/layout/SidebarComunidadeItem.tsx` | Novo |
+| `src/components/layout/SidebarAdminSection.tsx` | Novo |
+| `src/components/layout/AppSidebar.tsx` | Editado — importa e usa os 2 subcomponentes |
 
