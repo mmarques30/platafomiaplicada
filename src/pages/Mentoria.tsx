@@ -13,15 +13,12 @@ import { PendenciasUrgentes } from "@/components/mentoria/PendenciasUrgentes";
 import { AcademyRoadmapEducacional } from "@/components/mentoria/AcademyRoadmapEducacional";
 import { AcademyProximoPasso } from "@/components/mentoria/AcademyProximoPasso";
 
-import { BusinessAcessoRapido } from "@/components/mentoria/business/BusinessAcessoRapido";
 import { BusinessVisaoRapida } from "@/components/mentoria/business/BusinessVisaoRapida";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
 import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
 import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
-import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
-import { IAplicadaRoadmap } from "@/components/mentoria/business/IAplicadaRoadmap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Mentoria() {
@@ -35,7 +32,6 @@ export default function Mentoria() {
   useEffect(() => {
     if (isSkills && !isBusiness) {
       const tab = searchParams.get("tab");
-      // Mapear tabs para rotas Skills
       if (tab === "roadmap") {
         navigate('/skills/roadmap', { replace: true });
       } else {
@@ -44,22 +40,19 @@ export default function Mentoria() {
     }
   }, [isSkills, isBusiness, navigate, searchParams]);
 
-  // Se Skills (sem Business), não renderizar (aguardar redirect)
   if (isSkills && !isBusiness) {
     return null;
   }
   
-  // Mostrar aba Evolução apenas para Business Parceria (não Sistemas)
-  const showEvolucaoTab = isBusiness && !isBusinessSistemas;
+  // Mostrar aba Evolução para todos os planos Business
+  const showEvolucaoTab = isBusiness;
   
-  // Ler tab da URL ou usar padrão
   const tabFromUrl = searchParams.get("tab");
   const validTabs = ["visao-geral", "roadmap", "evolucao-aprendizado"];
   const activeTab = validTabs.includes(tabFromUrl || "") ? tabFromUrl! : "visao-geral";
 
   const handleTabChange = (value: string) => {
     if (value === "visao-geral") {
-      // Remover parâmetro tab quando for visão geral (URL limpa)
       searchParams.delete("tab");
       setSearchParams(searchParams);
     } else {
@@ -69,13 +62,10 @@ export default function Mentoria() {
 
   return (
     <div className="container mx-auto py-4 md:py-8 px-4 max-w-7xl">
-      {/* Hero Dashboard */}
-      <MentoriaHeroDashboard />
+      {/* Hero Dashboard — apenas para Academy */}
+      {!isBusiness && <MentoriaHeroDashboard />}
 
-      {/* Acesso Rápido - Apenas para Business, abaixo do hero */}
-      {isBusiness && <BusinessAcessoRapido />}
-
-      {/* Tabs - Diferente para Business vs Academy */}
+      {/* Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
         <TabsList className={`w-full md:w-auto grid ${showEvolucaoTab ? 'grid-cols-3' : 'grid-cols-2'} md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6`}>
           <TabsTrigger
@@ -100,21 +90,16 @@ export default function Mentoria() {
           )}
         </TabsList>
 
-        {/* Aba Visão Geral - Diferente para cada tipo */}
+        {/* Aba Visão Geral */}
         <TabsContent value="visao-geral" className="mt-0 space-y-4">
-          {isBusinessSistemas ? (
-            <IAplicadaVisaoGeral />
-          ) : isBusiness ? (
+          {isBusiness ? (
             <>
-              {/* Business Colaborativo: Visão Rápida → ROI → Progresso → Reports */}
               <BusinessVisaoRapida />
               <BusinessROIChart />
-              <BusinessProgressoConteudo />
               <BusinessReportsCard />
             </>
           ) : (
             <>
-              {/* Academy: Layout com próximo passo inteligente */}
               <PendenciasUrgentes />
               <AcademyProximoPasso />
               <div className="space-y-2">
@@ -126,22 +111,20 @@ export default function Mentoria() {
           )}
         </TabsContent>
 
-        {/* Aba Roadmap - Diferente para cada tipo */}
+        {/* Aba Roadmap */}
         <TabsContent value="roadmap" className="mt-0 space-y-6">
-          {isBusinessSistemas ? (
-            <IAplicadaRoadmap />
-          ) : isBusiness ? (
+          {isBusiness ? (
             <BusinessExecutiveRoadmap />
           ) : (
             <AcademyRoadmapEducacional />
           )}
         </TabsContent>
 
-        {/* Aba Evolução Aprendizado - Apenas Business Colaborativo */}
+        {/* Aba Evolução Aprendizado — Business */}
         {showEvolucaoTab && (
           <TabsContent value="evolucao-aprendizado" className="mt-0 space-y-6">
             <BusinessProgressoConteudo />
-            <BusinessEvolucaoAprendizado />
+            {!isBusinessSistemas && <BusinessEvolucaoAprendizado />}
           </TabsContent>
         )}
 
