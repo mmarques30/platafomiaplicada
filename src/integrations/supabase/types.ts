@@ -4532,6 +4532,7 @@ export type Database = {
           idade: number | null
           is_visitante: boolean | null
           linkedin: string | null
+          mensagem_boas_vindas: string | null
           nivel_comunidade: number | null
           nome_completo: string
           origem_consultoria: boolean | null
@@ -4565,6 +4566,7 @@ export type Database = {
           idade?: number | null
           is_visitante?: boolean | null
           linkedin?: string | null
+          mensagem_boas_vindas?: string | null
           nivel_comunidade?: number | null
           nome_completo: string
           origem_consultoria?: boolean | null
@@ -4598,6 +4600,7 @@ export type Database = {
           idade?: number | null
           is_visitante?: boolean | null
           linkedin?: string | null
+          mensagem_boas_vindas?: string | null
           nivel_comunidade?: number | null
           nome_completo?: string
           origem_consultoria?: boolean | null
@@ -5197,6 +5200,7 @@ export type Database = {
           etapa_id: string | null
           feedback_entregas: string | null
           id: string
+          link_reuniao: string | null
           notas: string | null
           status: Database["public"]["Enums"]["status_sessao"]
           titulo: string
@@ -5213,6 +5217,7 @@ export type Database = {
           etapa_id?: string | null
           feedback_entregas?: string | null
           id?: string
+          link_reuniao?: string | null
           notas?: string | null
           status?: Database["public"]["Enums"]["status_sessao"]
           titulo: string
@@ -5229,6 +5234,7 @@ export type Database = {
           etapa_id?: string | null
           feedback_entregas?: string | null
           id?: string
+          link_reuniao?: string | null
           notas?: string | null
           status?: Database["public"]["Enums"]["status_sessao"]
           titulo?: string
