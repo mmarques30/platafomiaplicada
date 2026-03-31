@@ -91,6 +91,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
       equipeId: selectedPlano === "skills" ? skillsEquipeData.equipeId : null,
       novaEquipe: selectedPlano === "skills" ? skillsEquipeData.novaEquipe : null,
       papelEquipe: selectedPlano === "skills" ? skillsEquipeData.papelEquipe : undefined,
+      mensagemBoasVindas: (selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") ? mensagemBoasVindas || undefined : undefined,
     });
 
     // Resetar form
