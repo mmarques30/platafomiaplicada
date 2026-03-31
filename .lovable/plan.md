@@ -1,48 +1,27 @@
 
-
-# Redesenhar Roadmap Academy — Jornada Educacional
+# Comunicação do InsightIA no fluxo de diagnóstico
 
 ## Resumo
-Substituir `FaseAtualCard` + `ResumoProgresso` na aba Roadmap do Academy por um novo componente `AcademyRoadmapEducacional` com 4 seções educacionais concretas.
+Dois pontos de comunicação: (1) card explicativo antes do último step do wizard, (2) tela pós-envio com loading animado + exibição dos insights antes de redirecionar.
 
 ## Alterações
 
-### 1. Novo componente: `src/components/mentoria/AcademyRoadmapEducacional.tsx`
-Componente único com 4 seções verticais:
+### 1. Card explicativo antes do último step
+**Arquivo: `src/components/mentoria/steps/academy/AcademyStep4Desafios.tsx`**
+- Adicionar no final do step 4 (penúltimo) um card informativo com ícone Sparkles:
+  - "Ao finalizar, nossa IA vai gerar um diagnóstico personalizado com seus principais gaps e recomendações de onde começar."
+  - Estilo: `bg-primary/5 border border-primary/20 rounded-xl` com ícone Sparkles
 
-**Seção 1 — Diagnóstico**
-- Query em `formulario_diagnostico` (via `useMentoriaForm` existente)
-- Exibe: status preenchido (sim/não), data de preenchimento, insight IA gerado (sim/não com data)
-- Badge verde se completo, amarelo se pendente, com CTA para preencher
+### 2. Tela pós-envio com InsightIA inline
+**Arquivo: `src/components/mentoria/FormularioWizard.tsx`**
+- Adicionar estado `submitted` (boolean) e `insightReady` (boolean)
+- No `onSubmit`, após `finalizarFormulario` e `gerar-insight-mentoria`:
+  - Setar `submitted = true` (mostra tela de loading)
+  - Quando a edge function retorna com sucesso, chamar `refetch()` do formulário e setar `insightReady = true`
+- Quando `submitted && !insightReady`: renderizar card animado "Seu InsightIA está sendo gerado..." com Loader2 spinning + texto motivacional
+- Quando `submitted && insightReady`: renderizar o componente `<InsightIA />` diretamente + botão "Ir para o Dashboard"
+- Remover o `setTimeout` com `navigate` e o toast simples de "Gerando sua análise"
 
-**Seção 2 — Trilhas em Andamento**
-- Reutiliza lógica do `useProgressoCertificados` existente para obter trilhas com progresso
-- Também busca trilhas com 0% mas que o aluno já acessou (via `progresso_videos`)
-- Para cada trilha: nome, barra de progresso (% módulos concluídos), X de Y vídeos
-- CTA "Continuar" por trilha
-
-**Seção 3 — Conquistas Desbloqueadas**
-- Reutiliza lógica da `VitrineConquistas` (hooks `useMinhaEvolucao`, `useSequenciaEstudo`, `useMeusCertificados`)
-- Exibe apenas as desbloqueadas como badges compactos + certificados emitidos
-- Link "Ver todas" para `/evolucao/conquistas`
-
-**Seção 4 — Próximo Objetivo**
-- Lógica: encontrar a trilha com maior % de progresso que ainda não está 100%
-- Exibe: nome da trilha, % atual, quantos vídeos faltam
-- CTA direto "Continuar esta trilha" → `/trilhas/{id}`
-- Se nenhuma trilha iniciada, sugere a primeira trilha disponível
-
-### 2. Atualizar `src/pages/Mentoria.tsx`
-- Linhas 133-138: substituir `<FaseAtualCard />` + `<ResumoProgresso />` por `<AcademyRoadmapEducacional />`
-- Remover imports de `FaseAtualCard` e `ResumoProgresso` (usados apenas aqui no contexto Academy)
-
-## Detalhes técnicos
-- Dados: `formulario_diagnostico`, `progresso_videos`, `trilhas`, `videos`, `certificados` — todas tabelas existentes
-- Hooks reutilizados: `useMentoriaForm`, `useProgressoCertificados`, `useMinhaEvolucao`, `useSequenciaEstudo`, `useMeusCertificados`
-- Nenhuma referência a "mentoria", "candidatura", "Business" ou "fases de processo"
-- Visual: cards com estilo dark consistente, Progress bars, badges de conquista
-
-## Arquivos
-- **Novo**: `src/components/mentoria/AcademyRoadmapEducacional.tsx`
-- **Editado**: `src/pages/Mentoria.tsx`
-
+## Arquivos alterados
+- `src/components/mentoria/steps/academy/AcademyStep4Desafios.tsx` (card explicativo)
+- `src/components/mentoria/FormularioWizard.tsx` (tela pós-envio com insight inline)
