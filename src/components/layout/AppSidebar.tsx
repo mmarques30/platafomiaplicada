@@ -642,7 +642,8 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="group">
               <NavLink 
-                to="/configuracoes" 
+                data-tour="configuracoes"
+                to="/configuracoes"
                 className={({ isActive }) => cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium pl-4",
                   isActive ? "text-primary font-semibold" : "text-sidebar-foreground hover:text-primary"
