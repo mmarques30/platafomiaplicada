@@ -76,7 +76,11 @@ export function MainLayout() {
         <AppSidebar />
         <div className="flex-1 flex flex-col">
           <main className="flex-1 overflow-x-hidden">
-            <Outlet />
+            <AnimatePresence mode="wait">
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
+            </AnimatePresence>
           </main>
         </div>
         {(!isLoading && !isVisitante) && <MarIAnaFloatingButton />}
