@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Card micro-hover animation */
+.card-micro-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-micro-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.4);
+}
+
 /* Auth page subtle animations */
 @keyframes subtle-glow {
   0%, 100% { 
