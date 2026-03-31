@@ -1,36 +1,61 @@
 
 
-# BusinessVisaoRapida — Componente de resumo contextual
+# Notificações automáticas por triggers + integração no sino e página
 
 ## Resumo
-Criar componente `BusinessVisaoRapida` com header contextual + grid de 3 cards (próxima sessão, tarefas críticas, última entrega) e inserir acima do `BusinessROIChart` na aba Visão Geral do Business Parceria.
+Criar 4 triggers no banco para inserir notificações automaticamente quando o admin cria/atualiza entregas, tarefas, sessões e status de entregas. Integrar a tabela `notificacoes` no sino do header e na página de Notificações.
 
-## Alterações
+---
 
-### 1. Novo componente: `src/components/mentoria/business/BusinessVisaoRapida.tsx`
+## 1. Migração SQL — 4 triggers
 
-**Header contextual:**
-- "Olá, [nome] — Semana X da sua jornada" (calcular semana com `differenceInWeeks` entre `contrato.data_inicio` e hoje)
-- Badge de status do contrato (ativo/pausado/concluído) com cor (verde/âmbar/cinza)
-- Barra de progresso geral das etapas (usando `useEtapasBusiness`)
+**Trigger 1: Nova entrega criada (`entregas_business` INSERT)**
+- Resolve `user_id` via JOIN em `contratos_business`
+- Insere: tipo `entrega`, titulo `Nova entrega: [titulo]`, link `/mentoria`
 
-**Grid de 3 cards (`md:grid-cols-3`):**
+**Trigger 2: Tarefa com prioridade alta/crítica (`tarefas_mentoria` INSERT + `tasks_business` INSERT)**
+- Só dispara se `prioridade` IN ('alta', 'critica', 'urgente')
+- Insere: tipo `tarefa`, titulo `Tarefa urgente adicionada: [titulo]`, link `/mentoria/tarefas`
 
-1. **Próxima Sessão** — query `sessoes_mentoria` filtrada por `user_id`, `status = 'agendada'`, `data_sessao > now()`, limit 1. Exibir data formatada + hora. Nota: `sessoes_mentoria` não tem `link_reuniao`, então o botão "Entrar na reunião" só aparece se houver `video_url` (usado como link) — caso contrário, texto "Aguardando link".
+**Trigger 3: Sessão agendada ou horário alterado (`sessoes_mentoria` INSERT + UPDATE de `data_sessao`)**
+- Insere: tipo `sessao`, titulo `Sessão confirmada: [data formatada]`, link `/notificacoes/calendario`
 
-2. **Tarefas Críticas** — filtrar `tarefas_mentoria` do userId onde `prioridade` IN (`alta`, `critica`) e `status` != `concluida`. Exibir contagem + link `/mentoria/tarefas`.
+**Trigger 4: Status de entrega atualizado (`entregas_business` UPDATE de `status`)**
+- Só dispara se `OLD.status IS DISTINCT FROM NEW.status`
+- Resolve `user_id` via `contratos_business`
+- Insere: tipo `entrega`, titulo `Sua entrega "[titulo]" foi marcada como [status]`, link `/mentoria`
 
-3. **Última Entrega** — usar `useEntregasBusiness` (já disponível via `contratoId`), pegar a entrega mais recente com `status = 'concluida'`, exibir título, data de `updated_at` e badge de status.
+Todos os triggers usam `SECURITY DEFINER` para bypassar RLS na inserção em `notificacoes`.
 
-**Dados:** Usa hooks existentes `useContratosBusiness`, `useEtapasBusiness`, `useEntregasBusiness` + query inline para sessões e tarefas (via `useBusinessUserId`).
+---
 
-Estilo: Cards com `bg-card border rounded-xl`, consistente com o dark theme existente.
+## 2. Hook para notificações pessoais
+**Novo arquivo: `src/hooks/useNotificacoesPessoais.tsx`**
+- `useNotificacoesPessoais()` — busca `notificacoes` do user, ordenado por `created_at DESC`
+- `useNotificacoesNaoLidas()` — count de `notificacoes` onde `lida = false`
+- `useMarcarNotificacoesComoLidas()` — mutation que faz UPDATE `lida = true` nos IDs passados
 
-### 2. Editar: `src/pages/Mentoria.tsx`
-- Importar `BusinessVisaoRapida`
-- Inserir `<BusinessVisaoRapida />` acima de `<BusinessROIChart />` no bloco `isBusiness` (linha ~109)
+---
+
+## 3. Atualizar sino no header
+**Arquivo: `src/components/layout/TopHeader.tsx`**
+- Importar `useNotificacoesNaoLidas`
+- Somar `avisosCount + notificacoesNaoLidasCount` no badge do sino
+
+---
+
+## 4. Atualizar página de Notificações
+**Arquivo: `src/pages/Notificacoes.tsx`**
+- Adicionar seção "Notificações" acima dos avisos, listando itens da tabela `notificacoes`
+- Cada item mostra ícone por tipo (entrega/tarefa/sessão), título, mensagem, tempo relativo
+- Items não lidos têm destaque visual (borda primária)
+- Marcar como lidos ao carregar (como já faz com avisos)
+- Manter a seção de Avisos existente abaixo
+
+---
 
 ## Arquivos
-- **Novo**: `src/components/mentoria/business/BusinessVisaoRapida.tsx`
-- **Editado**: `src/pages/Mentoria.tsx`
+- **Migração SQL**: 4 triggers + 4 funções
+- **Novo**: `src/hooks/useNotificacoesPessoais.tsx`
+- **Editados**: `TopHeader.tsx`, `Notificacoes.tsx`
 
