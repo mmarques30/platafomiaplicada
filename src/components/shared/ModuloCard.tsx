@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ModuloCardProps {
@@ -30,7 +30,7 @@ export function ModuloCard({
       <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 relative h-[400px] w-full bg-muted">
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-            🔒 PRO
+            <Lock className="h-3.5 w-3.5" /> PRO
           </div>
         )}
         {!imageLoaded && (

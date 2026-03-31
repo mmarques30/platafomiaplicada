@@ -144,11 +144,11 @@ export function getTipoRecurso(url: string, mimeType?: string): RecursoItem['tip
 
 export function getRecursoIcon(tipo: RecursoItem['tipo']): string {
   switch (tipo) {
-    case 'pdf': return '📄';
-    case 'imagem': return '🖼️';
-    case 'video': return '🎬';
-    case 'documento': return '📋';
-    case 'link': return '🔗';
-    default: return '📎';
+    case 'pdf': return 'PDF';
+    case 'imagem': return 'IMG';
+    case 'video': return 'VID';
+    case 'documento': return 'DOC';
+    case 'link': return 'LINK';
+    default: return 'FILE';
   }
 }
