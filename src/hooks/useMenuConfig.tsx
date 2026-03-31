@@ -96,7 +96,9 @@ export function useMenuConfig() {
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
         'comunidade', 'comunidade_feed', 'comunidade_sala', 'comunidade_sala_aula',
         'ia_copie_use', 'metodos_aplicar',
-        'squad', 'squad_lider'
+        'squad', 'squad_lider',
+        // Ocultar meu_sistema — já coberto pelos Business Groups hardcoded no sidebar
+        'meu_sistema', 'meu_sistema_sistema', 'meu_sistema_entregas', 'meu_sistema_documentos'
       ],
       
       // Academy: usa evolução/diagnóstico/dúvidas soltos, NÃO o grupo "Meu Progresso"
