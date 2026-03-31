@@ -73,8 +73,9 @@ export function MainLayout() {
         "min-h-screen flex w-full bg-background",
         isAdmin && isViewingAs ? "pt-24" : "pt-14"
       )}>
+        <div className="dot-grid-bg" />
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative z-[1]">
           <main className="flex-1 overflow-x-hidden">
             <AnimatePresence mode="wait">
               <PageTransition key={location.pathname}>
