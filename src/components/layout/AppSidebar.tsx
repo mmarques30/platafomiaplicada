@@ -263,9 +263,8 @@ export function AppSidebar() {
                   const childIsActive = location.pathname === childUrl;
                   const ChildIcon = singleChild.icon ? getIconComponent(singleChild.icon) : IconComponent;
                   
-                  // Renderizar Bibliotecas logo após "Aprender"
+                  // Skip Bibliotecas rendering here — it only triggers after 'aprender' in full menu mode
                   const renderBibliotecasAfter = menu.menu_key === 'aprender';
-                  const bibliotecasMenu = renderBibliotecasAfter ? renderBibliotecasSection() : null;
                   
                   return (
                     <>
