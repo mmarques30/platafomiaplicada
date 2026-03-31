@@ -7,11 +7,14 @@ import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
 export default function Trilhas() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
 
-  const showLoading = loadingRole;
+  if (loadingRole) {
+    return <PageSkeleton variant="trilhas" />;
+  }
 
   return (
     <div className="min-h-screen bg-background">

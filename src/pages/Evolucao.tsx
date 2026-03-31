@@ -16,15 +16,17 @@ import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
 
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { isAcademy, isBusiness } = useEffectivePlan(isAdmin, roleLoading);
-  
-  
 
+  if (roleLoading) {
+    return <PageSkeleton variant="evolucao" />;
+  }
 
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">

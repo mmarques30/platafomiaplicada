@@ -9,11 +9,7 @@ export function CalendarioAulas() {
   const { data: proximaAula } = useProximaAula();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageSkeleton variant="calendario" />;
   }
 
   if (!aulas || aulas.length === 0) {
