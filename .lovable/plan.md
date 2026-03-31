@@ -1,34 +1,51 @@
 
-# Criar SkeletonCard e aplicar nos carregamentos
 
-## 1. Novo componente: `src/components/ui/SkeletonCard.tsx`
-Props: `variant` ("kpi" | "list" | "chart"), `count?` (default 1).
+# Hover states sutis em cards clicáveis
 
-| Variante | Altura | Detalhes |
-|----------|--------|----------|
-| kpi | 80px | Barra 3px no topo (cor primária), dois blocos internos lado a lado |
-| list | 48px | Dois blocos inline (um largo, um curto) |
-| chart | 200px | Bloco único interno simulando gráfico |
+## Abordagem
+Criar uma classe CSS utilitária `card-interactive` em `src/index.css` com o padrão de hover/active especificado, e aplicá-la nos cards clicáveis dos 5 contextos listados.
 
-Animação: `@keyframes skeleton-pulse` opacidade 0.4 → 0.8, 1.5s ease-in-out infinite.
-Background: `bg-card` com opacity 0.6, borda `border-border`.
+## 1. Nova classe em `src/index.css`
+Adicionar dentro de `@layer components`:
+```css
+.card-interactive {
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+.card-interactive:hover {
+  border-color: hsl(var(--muted-foreground) / 0.3);
+  transform: scale(1.003);
+}
+.card-interactive:active {
+  transform: scale(0.998);
+}
+```
 
-## 2. Integrações
+## 2. Integrações (apenas adicionar a classe)
 
-### `MentoriaEntregas.tsx` (linhas 68-77)
-Substituir o loading atual por: 4x `SkeletonCard variant="list"` dentro do container existente.
+### `MentoriaEntregas.tsx` (linha ~104)
+No `renderEntregaCard`, o Card não é clicável (sem onClick/cursor-pointer). **Sem alteração** — entregas não são clicáveis.
 
-### `MentoriaSessoes.tsx` (linhas 71-76)
-Substituir o spinner `Loader2` por: 3x `SkeletonCard variant="list"` dentro de container com padding.
+### `MentoriaTarefas.tsx` (linha ~139-141)
+Card kanban: já tem `cursor-pointer`. Adicionar `card-interactive` à className.
 
-### `Mentoria.tsx`
-Não tem loading state próprio (cada sub-componente carrega individualmente) — sem alteração necessária aqui. Os componentes internos da aba Visão Geral já gerenciam seus loadings.
+### `MentoriaSessoes.tsx` (linha ~122-124)
+TableRow com `cursor-pointer`: adicionar `card-interactive` à className da row.
 
-### `Dashboard.tsx` (linhas 37-39)
-O Dashboard já usa `PageSkeleton variant="dashboard"`. Substituir por 4x `SkeletonCard variant="kpi"` dentro do layout existente do `DashboardSkeleton` em `PageSkeleton.tsx`, ou alterar diretamente o fallback no Dashboard.
+### `TrilhaCard.tsx` (linha ~19)
+O wrapper div dentro do Link: adicionar `card-interactive` à className existente.
 
-**Abordagem escolhida**: Manter `PageSkeleton` para o Dashboard mas atualizar o `DashboardSkeleton` em `PageSkeleton.tsx` para usar `SkeletonCard` internamente (4x kpi + 1x chart), garantindo consistência visual.
+### Dashboard — `StatsCard.tsx` (linha ~15)
+Quando `onClick` existe: adicionar `card-interactive` à className condicional.
 
-## Arquivos
-- **Novo**: `src/components/ui/SkeletonCard.tsx`
-- **Editados**: `MentoriaEntregas.tsx`, `MentoriaSessoes.tsx`, `PageSkeleton.tsx`
+### Dashboard — `ConteudoCard.tsx` e `MaterialCard.tsx`
+Cards com `cursor-pointer`: adicionar `card-interactive` à className.
+
+## Arquivos editados
+- `src/index.css` (1 classe nova)
+- `src/pages/MentoriaTarefas.tsx`
+- `src/pages/MentoriaSessoes.tsx`
+- `src/components/shared/TrilhaCard.tsx`
+- `src/components/admin/StatsCard.tsx`
+- `src/components/dashboard/ConteudoCard.tsx`
+- `src/components/dashboard/MaterialCard.tsx`
+
