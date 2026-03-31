@@ -1,47 +1,36 @@
 
 
-# Typing indicator animado no chat da MarIAna
+# Consolidar hover patterns e limpar CSS legado
 
-## Alteração
+## 1. `src/index.css` — Consolidar hovers
 
-Substituir o indicador de loading atual (Loader2 + "Pensando...") nas linhas 393-410 por um typing indicator com 3 dots pulsantes.
+**Remover** (linhas 5-12): `.card-micro-hover` e `.card-micro-hover:hover`
 
-### `src/index.css` — adicionar keyframe `pulse-dot`
-```css
-@keyframes pulse-dot {
-  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-  40% { opacity: 1; transform: scale(1); }
-}
-```
+**Atualizar** (linhas 14-24): `.card-interactive` — mudar `border-color` de `hsl(var(--muted-foreground) / 0.3)` para `rgba(175,192,64,0.25)` conforme especificado.
 
-### `src/components/shared/MarIAnaChatDrawer.tsx` — linhas 393-410
-Substituir o bloco `isLoading && !isStreaming` por:
+**Remover** (linhas 231-242): primeira definição de `.card-enhanced` e `.card-enhanced:hover`
 
-```tsx
-{isLoading && !isStreaming && (
-  <div className="flex justify-start">
-    <div className="flex gap-2 items-start">
-      <img src={mariAvatar} alt="MarIAna" className="w-7 h-7 rounded-full flex-shrink-0"
-        onError={(e) => { e.currentTarget.src = mariAvatarFallback; }} />
-      <div className="bg-muted rounded-lg px-4 py-3 flex items-center gap-1">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="block w-2 h-2 rounded-full bg-muted-foreground"
-            style={{
-              animation: 'pulse-dot 1.4s ease-in-out infinite',
-              animationDelay: `${i * 0.2}s`,
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  </div>
-)}
-```
+**Remover** (linhas 466-472): segunda definição duplicada de `.card-enhanced`
 
-Remover import de `Loader2` se não for usado em outro lugar do arquivo (verificação: não é usado em nenhum outro ponto).
+## 2. `src/App.css` — Limpar todo o arquivo
+
+Esvaziar completamente (ou remover). Todo o conteúdo é legado do template Vite: `.logo`, `.card`, `.read-the-docs`, `logo-spin`.
+
+## 3. Substituir `card-micro-hover` → `card-interactive` nos componentes
+
+- `src/components/dashboard/WeeklyProgressCard.tsx` (linha 72)
+- `src/components/dashboard/NovidadesSemana.tsx` (linha 34)
+- `src/components/dashboard/CentralConteudo.tsx` (linha 28)
+
+## 4. Substituir `card-enhanced` → `card-interactive` nos componentes
+
+- `src/components/shared/ProgressCard.tsx` (linha 28) — único uso encontrado
+
+## 5. Temas: `adminTheme.ts` vs `painelTheme.ts`
+
+Os dois arquivos servem propósitos diferentes — `adminTheme` define tokens para o painel administrativo (tabelas, filtros, stats cards), enquanto `painelTheme` define tokens para o Painel de Diagnóstico do mentorado (com variante Academy/Business). Os tokens não se sobrepõem significativamente. **Manter separados** e adicionar comentário explicativo no topo de cada arquivo clarificando o escopo.
 
 ## Arquivos
-- **Editados**: `src/index.css` (1 keyframe), `src/components/shared/MarIAnaChatDrawer.tsx` (substituir bloco de loading)
+
+- **Editados**: `src/index.css`, `src/App.css`, `WeeklyProgressCard.tsx`, `NovidadesSemana.tsx`, `CentralConteudo.tsx`, `ProgressCard.tsx`, `adminTheme.ts`, `painelTheme.ts`
 
