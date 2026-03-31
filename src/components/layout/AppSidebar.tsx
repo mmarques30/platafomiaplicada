@@ -256,6 +256,47 @@ export function AppSidebar() {
                 const hasSubMenus = subMenus.length > 0;
                 const isExpanded = expandedMenus.includes(menu.menu_key);
                 
+                // For Business: if a parent group has exactly 1 child, render child as flat item
+                if (isBusinessEnv && hasSubMenus && subMenus.length === 1) {
+                  const singleChild = subMenus[0];
+                  const childUrl = singleChild.url || '/';
+                  const childIsActive = location.pathname === childUrl;
+                  const ChildIcon = singleChild.icon ? getIconComponent(singleChild.icon) : IconComponent;
+                  
+                  // Renderizar Bibliotecas logo após "Aprender"
+                  const renderBibliotecasAfter = menu.menu_key === 'aprender';
+                  const bibliotecasMenu = renderBibliotecasAfter ? renderBibliotecasSection() : null;
+                  
+                  return (
+                    <>
+                      <SidebarMenuItem key={menu.menu_key}>
+                        <SidebarMenuButton asChild className="group">
+                          <NavLink
+                            to={childUrl}
+                            end
+                            className={cn(
+                              "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
+                              childIsActive
+                                ? "text-primary font-semibold"
+                                : "text-sidebar-foreground hover:text-primary"
+                            )}
+                          >
+                            <span className={cn(
+                              "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                              childIsActive
+                                ? "bg-primary opacity-100"
+                                : "bg-primary opacity-0 group-hover:opacity-60"
+                            )} />
+                            <ChildIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                            {!collapsed && <span className="text-sm ml-3">{singleChild.label}</span>}
+                          </NavLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      {bibliotecasMenu}
+                    </>
+                  );
+                }
+
                 // Renderizar Bibliotecas logo após "Aprender" (menu_key === 'aprender')
                 const renderBibliotecasAfter = menu.menu_key === 'aprender';
                 
