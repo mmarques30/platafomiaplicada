@@ -9,7 +9,7 @@ const steps: Step[] = [
   {
     target: '[data-tour="trilha-recomendada"]',
     content: "Aqui você encontra os conteúdos e trilhas recomendados para sua jornada. Comece por aqui!",
-    title: "📚 Trilha Recomendada",
+    title: "Trilha Recomendada",
     skipBeacon: true,
     placement: "bottom",
   },
