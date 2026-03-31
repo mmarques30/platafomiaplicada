@@ -110,7 +110,7 @@ export function AppSidebar() {
   const businessGroups = [
     {
       key: 'biz_jornada',
-      label: 'MINHA JORNADA',
+      label: 'Minha Jornada',
       icon: Route,
       items: [
         { label: 'Etapas', url: '/mentoria/etapas-business', parceria: true, sistemas: true },
@@ -120,7 +120,7 @@ export function AppSidebar() {
     },
     {
       key: 'biz_entregas',
-      label: 'ENTREGAS E TAREFAS',
+      label: 'Entregas e Tarefas',
       icon: Package,
       items: [
         { label: 'Entregas', url: '/mentoria/entregas', parceria: true, sistemas: true },
@@ -132,7 +132,7 @@ export function AppSidebar() {
     },
     {
       key: 'biz_comunicacao',
-      label: 'COMUNICAÇÃO',
+      label: 'Comunicação',
       icon: MessageSquare,
       items: [
         { label: 'Sessões', url: '/mentoria/sessoes', parceria: true, sistemas: true },
