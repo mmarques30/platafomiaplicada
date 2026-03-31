@@ -44,6 +44,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     novaEquipe: null,
     papelEquipe: "membro",
   });
+  const [mensagemBoasVindas, setMensagemBoasVindas] = useState("");
   
   const createUser = useCreateUser();
 
