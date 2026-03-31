@@ -1,23 +1,36 @@
 
-# Banner de dados fictícios no BusinessROIChart
+
+# BusinessVisaoRapida — Componente de resumo contextual
 
 ## Resumo
-Quando `!contrato?.data_inicio` (sem dados reais), exibir o gráfico com opacidade 40% e um banner sobreposto avisando que são dados de exemplo.
+Criar componente `BusinessVisaoRapida` com header contextual + grid de 3 cards (próxima sessão, tarefas críticas, última entrega) e inserir acima do `BusinessROIChart` na aba Visão Geral do Business Parceria.
 
-## Alteração
+## Alterações
 
-**Arquivo: `src/components/mentoria/BusinessROIChart.tsx`**
+### 1. Novo componente: `src/components/mentoria/business/BusinessVisaoRapida.tsx`
 
-1. Adicionar flag `const isDadosFicticios = !contrato?.data_inicio`
-2. Importar `Info` do lucide-react
-3. Envolver o `ChartContainer` + legenda em um `div` com `position: relative`
-4. Quando `isDadosFicticios`:
-   - Aplicar `opacity-40` no chart + legenda
-   - Sobrepor um banner centralizado (position absolute, z-10) com:
-     - Fundo: `bg-zinc-900/90 border border-[#E8A43C]/50 rounded-xl`
-     - Ícone `Info` âmbar + texto: "Este é um exemplo do que você verá quando seu projeto iniciar. Os dados reais serão inseridos pela sua mentora."
-     - Texto centralizado, max-w limitado
+**Header contextual:**
+- "Olá, [nome] — Semana X da sua jornada" (calcular semana com `differenceInWeeks` entre `contrato.data_inicio` e hoje)
+- Badge de status do contrato (ativo/pausado/concluído) com cor (verde/âmbar/cinza)
+- Barra de progresso geral das etapas (usando `useEtapasBusiness`)
 
-## Detalhe técnico
-- Nenhuma tabela nova, nenhuma query nova — apenas condicional no JSX baseada no `contrato` já carregado
-- 1 arquivo editado
+**Grid de 3 cards (`md:grid-cols-3`):**
+
+1. **Próxima Sessão** — query `sessoes_mentoria` filtrada por `user_id`, `status = 'agendada'`, `data_sessao > now()`, limit 1. Exibir data formatada + hora. Nota: `sessoes_mentoria` não tem `link_reuniao`, então o botão "Entrar na reunião" só aparece se houver `video_url` (usado como link) — caso contrário, texto "Aguardando link".
+
+2. **Tarefas Críticas** — filtrar `tarefas_mentoria` do userId onde `prioridade` IN (`alta`, `critica`) e `status` != `concluida`. Exibir contagem + link `/mentoria/tarefas`.
+
+3. **Última Entrega** — usar `useEntregasBusiness` (já disponível via `contratoId`), pegar a entrega mais recente com `status = 'concluida'`, exibir título, data de `updated_at` e badge de status.
+
+**Dados:** Usa hooks existentes `useContratosBusiness`, `useEtapasBusiness`, `useEntregasBusiness` + query inline para sessões e tarefas (via `useBusinessUserId`).
+
+Estilo: Cards com `bg-card border rounded-xl`, consistente com o dark theme existente.
+
+### 2. Editar: `src/pages/Mentoria.tsx`
+- Importar `BusinessVisaoRapida`
+- Inserir `<BusinessVisaoRapida />` acima de `<BusinessROIChart />` no bloco `isBusiness` (linha ~109)
+
+## Arquivos
+- **Novo**: `src/components/mentoria/business/BusinessVisaoRapida.tsx`
+- **Editado**: `src/pages/Mentoria.tsx`
+
