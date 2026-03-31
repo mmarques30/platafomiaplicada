@@ -20,7 +20,6 @@ import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
-import { useNotificacoesNaoLidasCount } from "@/hooks/useNotificacoesPessoais";
 import { useProdutosAtivos } from "@/hooks/admin/useProdutos";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { cn } from "@/lib/utils";
@@ -59,8 +58,6 @@ export function TopHeader() {
   const isComunicacoesActive = ['/chat', '/notificacoes', '/avisos'].some(path => location.pathname.startsWith(path));
 
   const { data: avisosCount } = useAvisosAtivosCount();
-  const { data: notifNaoLidasCount } = useNotificacoesNaoLidasCount();
-  const totalBadgeCount = (avisosCount ?? 0) + (notifNaoLidasCount ?? 0);
 
   const handleLogout = async () => {
     await signOut();
@@ -248,9 +245,9 @@ export function TopHeader() {
             onClick={() => navigate("/notificacoes")}
           >
             <Bell className="h-5 w-5" strokeWidth={1.5} />
-            {totalBadgeCount > 0 && (
+            {avisosCount && avisosCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
-                {totalBadgeCount > 9 ? "9+" : totalBadgeCount}
+                {avisosCount > 9 ? "9+" : avisosCount}
               </span>
             )}
           </Button>

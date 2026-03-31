@@ -99,7 +99,6 @@ export function useCreateUser() {
       equipeId,
       novaEquipe,
       papelEquipe,
-      mensagemBoasVindas,
     }: {
       email: string;
       password: string;
@@ -110,7 +109,6 @@ export function useCreateUser() {
       equipeId?: string | null;
       novaEquipe?: { nome: string; empresa: string } | null;
       papelEquipe?: "lider" | "membro";
-      mensagemBoasVindas?: string;
     }) => {
       // Chamar edge function ao invés de fazer diretamente
       const { data, error } = await supabase.functions.invoke("create-user-admin", {
@@ -124,7 +122,6 @@ export function useCreateUser() {
           equipeId,
           novaEquipe,
           papelEquipe,
-          mensagemBoasVindas,
         },
       });
 

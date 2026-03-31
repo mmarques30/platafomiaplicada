@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, EyeOff, Route, Package, Calendar, ListChecks, CheckSquare, ClipboardCheck, FileText, FolderOpen, HelpCircle, BarChart3, Wrench } from "lucide-react";
+import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, Shield, TrendingUp, GraduationCap, Layers, ChevronDown, EyeOff } from "lucide-react";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -42,9 +42,7 @@ export function AppSidebar() {
   const { currentEnvironment } = useEnvironment();
   
   const collapsed = !open;
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([
-    'biz_jornada', 'biz_entregas', 'biz_comunicacao' // Business groups default expanded
-  ]);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [logoError, setLogoError] = useState(false);
 
   const handleLogout = async () => {
@@ -100,50 +98,6 @@ export function AppSidebar() {
   // Detectar se é Business Sistemas (para filtros especiais)
   const isBusinessSistemasEnv = effectiveEnvironment === 'business_sistemas' 
     || effectivePlan === 'business_sistemas';
-  const isBusinessParceriaEnv = effectiveEnvironment === 'business_parceria'
-    || effectivePlan === 'business_parceria';
-  const isBusinessEnv = isBusinessSistemasEnv || isBusinessParceriaEnv || isBusiness;
-
-  // ========== BUSINESS GROUPS (hardcoded) — START ==========
-  // Estes grupos têm prioridade sobre menu_config para Business.
-  // Se adicionar rotas aqui, ocultar no hiddenByEnvironment do useMenuConfig.
-  const businessGroups = [
-    {
-      key: 'biz_jornada',
-      label: 'Minha Jornada',
-      icon: Route,
-      items: [
-        { label: 'Etapas', url: '/mentoria/etapas-business', parceria: true, sistemas: true },
-        { label: 'Roadmap', url: '/mentoria?tab=roadmap', parceria: true, sistemas: false },
-        { label: 'Instruções', url: '/mentoria/instrucoes-business', parceria: true, sistemas: false },
-      ],
-    },
-    {
-      key: 'biz_entregas',
-      label: 'Entregas e Tarefas',
-      icon: Package,
-      items: [
-        { label: 'Entregas', url: '/mentoria/entregas', parceria: true, sistemas: true },
-        { label: 'Tarefas', url: '/mentoria/tarefas', parceria: true, sistemas: false },
-        { label: 'Tasks', url: '/mentoria/tasks-business', parceria: true, sistemas: false },
-        { label: 'Validações', url: '/mentoria/validacoes', parceria: true, sistemas: true },
-        { label: 'Projetos', url: '/mentoria/projetos', parceria: true, sistemas: false },
-      ],
-    },
-    {
-      key: 'biz_comunicacao',
-      label: 'Comunicação',
-      icon: MessageSquare,
-      items: [
-        { label: 'Sessões', url: '/mentoria/sessoes', parceria: true, sistemas: true },
-        { label: 'Dúvidas', url: '/mentoria/duvidas', parceria: true, sistemas: false },
-        { label: 'Documentos', url: '/mentoria/documentos', parceria: true, sistemas: true },
-        { label: 'Recursos', url: '/mentoria/recursos', parceria: true, sistemas: false },
-        { label: 'Reports', url: '/mentoria/reports', parceria: true, sistemas: true },
-      ],
-    },
-  ];
-  // ========== BUSINESS GROUPS (hardcoded) — END ==========
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
@@ -208,13 +162,14 @@ export function AppSidebar() {
     return menu.url || "/";
   };
 
-  // Auto-expandir menu quando rota ativa está em submenu (incluindo 3º nível e business groups)
+  // Auto-expandir menu quando rota ativa está em submenu (incluindo 3º nível)
   useEffect(() => {
     const newExpanded: string[] = [];
     mainMenus.forEach(menu => {
       const subMenus = getSubMenus(menu.menu_key);
       const isInSubRoute = subMenus.some(sub => {
         if (sub.url && location.pathname.startsWith(sub.url)) return true;
+        // Check 3rd-level children
         const thirdLevel = getSubMenus(sub.menu_key);
         return thirdLevel.some(child => child.url && location.pathname.startsWith(child.url));
       });
@@ -222,16 +177,6 @@ export function AppSidebar() {
         newExpanded.push(menu.menu_key);
       }
     });
-    // Auto-expand business groups based on active route
-    if (isBusinessEnv) {
-      businessGroups.forEach(group => {
-        const hasActive = group.items.some(item => {
-          const itemPath = item.url.split('?')[0];
-          return location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
-        });
-        if (hasActive) newExpanded.push(group.key);
-      });
-    }
     if (newExpanded.length > 0) {
       setExpandedMenus(prev => {
         const combined = [...new Set([...prev, ...newExpanded])];
@@ -256,40 +201,6 @@ export function AppSidebar() {
                 const hasSubMenus = subMenus.length > 0;
                 const isExpanded = expandedMenus.includes(menu.menu_key);
                 
-                // For Business: if a parent group has exactly 1 child, render child as flat item
-                if (isBusinessEnv && hasSubMenus && subMenus.length === 1) {
-                  const singleChild = subMenus[0];
-                  const childUrl = singleChild.url || '/';
-                  const childIsActive = location.pathname === childUrl;
-                  const ChildIcon = singleChild.icon ? getIconComponent(singleChild.icon) : IconComponent;
-                  
-                  return (
-                    <SidebarMenuItem key={menu.menu_key}>
-                      <SidebarMenuButton asChild className="group">
-                        <NavLink
-                          to={childUrl}
-                          end
-                          className={cn(
-                            "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
-                            childIsActive
-                              ? "text-primary font-semibold"
-                              : "text-sidebar-foreground hover:text-primary"
-                          )}
-                        >
-                          <span className={cn(
-                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                            childIsActive
-                              ? "bg-primary opacity-100"
-                              : "bg-primary opacity-0 group-hover:opacity-60"
-                          )} />
-                          <ChildIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                          {!collapsed && <span className="text-sm ml-3">{singleChild.label}</span>}
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                }
-
                 // Renderizar Bibliotecas logo após "Aprender" (menu_key === 'aprender')
                 const renderBibliotecasAfter = menu.menu_key === 'aprender';
                 
@@ -581,96 +492,6 @@ export function AppSidebar() {
                     {menuElement}
                     {bibliotecasMenu}
                   </>
-                );
-              })}
-
-              {/* Business Groups - 3 collapsible sections (unified style) */}
-              {isBusinessEnv && businessGroups.map((group) => {
-                const GroupIcon = group.icon;
-                const filteredItems = group.items.filter(item => 
-                  isBusinessSistemasEnv ? item.sistemas : item.parceria
-                );
-                if (filteredItems.length === 0) return null;
-                const isGroupExpanded = expandedMenus.includes(group.key);
-                const hasActiveItem = filteredItems.some(item => {
-                  const itemPath = item.url.split('?')[0];
-                  return location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
-                });
-
-                return (
-                  <Collapsible
-                    key={group.key}
-                    open={isGroupExpanded}
-                    onOpenChange={() => toggleMenu(group.key)}
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <div className="flex items-center w-full">
-                          <div
-                            className={cn(
-                              "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5 cursor-pointer",
-                              hasActiveItem 
-                                ? "text-primary font-semibold" 
-                                : "text-sidebar-foreground hover:text-primary"
-                            )}
-                          >
-                            <span className={cn(
-                              "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                              hasActiveItem 
-                                ? "bg-primary opacity-100" 
-                                : "bg-primary opacity-0 group-hover:opacity-60"
-                            )} />
-                            <GroupIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                            {!collapsed && <span className="text-sm">{group.label}</span>}
-                          </div>
-                          {!collapsed && (
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                toggleMenu(group.key);
-                              }}
-                              className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
-                            >
-                              <ChevronDown 
-                                className={cn(
-                                  "h-4 w-4 transition-transform duration-200 text-sidebar-foreground/60",
-                                  isGroupExpanded && "rotate-180"
-                                )} 
-                                strokeWidth={1.5}
-                              />
-                            </button>
-                          )}
-                        </div>
-                      </CollapsibleTrigger>
-
-                      <CollapsibleContent>
-                        <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                          {filteredItems.map((item) => {
-                            const itemPath = item.url.split('?')[0];
-                            const itemIsActive = location.pathname === itemPath || location.pathname.startsWith(itemPath + '/');
-                            return (
-                              <SidebarMenuItem key={item.url}>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink
-                                    to={item.url}
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      itemIsActive
-                                        ? "text-primary font-semibold"
-                                        : "text-sidebar-foreground/70 hover:text-primary"
-                                    )}
-                                  >
-                                    {!collapsed && <span>{item.label}</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                            );
-                          })}
-                        </SidebarMenu>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
                 );
               })}
 

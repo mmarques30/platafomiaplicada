@@ -16,7 +16,7 @@ const BusinessReportsCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="border-border bg-card">
+      <Card className="border-border/50 bg-card/50">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-medium">Reports</CardTitle>
         </CardHeader>
@@ -29,7 +29,7 @@ const BusinessReportsCard: React.FC = () => {
 
   if (!reports || reports.length === 0) {
     return (
-      <Card className="border-border bg-card">
+      <Card className="border-border/50 bg-card/50">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-medium">Reports</CardTitle>
         </CardHeader>
@@ -63,7 +63,7 @@ const BusinessReportsCard: React.FC = () => {
   );
 
   return (
-    <Card className="border-border bg-card">
+    <Card className="border-border/50 bg-card/50">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-medium">Reports</CardTitle>
       </CardHeader>

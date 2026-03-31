@@ -53,7 +53,6 @@ export default function SessaoModal({
         duracao: sessao.duracao,
         status: sessao.status,
         video_url: sessao.video_url || "",
-        link_reuniao: sessao.link_reuniao || "",
         transcricao_url: sessao.transcricao_url || "",
         transcricao: sessao.transcricao || "",
         notas: sessao.notas || ""
@@ -65,7 +64,6 @@ export default function SessaoModal({
         duracao: undefined,
         status: "agendada",
         video_url: "",
-        link_reuniao: "",
         transcricao_url: "",
         transcricao: "",
         notas: ""
@@ -130,15 +128,6 @@ export default function SessaoModal({
                 <SelectItem value="cancelada">Cancelada</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="link_reuniao">Link da Reunião (Zoom, Meet, Teams)</Label>
-            <Input
-              id="link_reuniao"
-              {...register("link_reuniao")}
-              placeholder="https://zoom.us/j/... ou https://meet.google.com/..."
-            />
           </div>
 
           <div>

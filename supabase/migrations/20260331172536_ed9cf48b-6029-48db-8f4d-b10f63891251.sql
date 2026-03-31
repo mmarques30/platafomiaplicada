@@ -1,1 +1,0 @@
-ALTER TABLE public.sessoes_mentoria ADD COLUMN link_reuniao TEXT DEFAULT NULL;

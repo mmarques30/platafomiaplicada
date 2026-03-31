@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Target, CheckCircle2, TrendingUp, Info } from "lucide-react";
+import { Target, CheckCircle2, TrendingUp } from "lucide-react";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
@@ -77,7 +77,6 @@ export function BusinessROIChart() {
   };
 
   const dados = gerarDadosGrafico();
-  const isDadosFicticios = !contrato?.data_inicio;
   
   // Calcular ROI atual baseado em entregas concluídas
   const totalEntregas = entregas.length || 1;
@@ -105,7 +104,7 @@ export function BusinessROIChart() {
   };
 
   return (
-    <Card className="border-border bg-card">
+    <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -127,79 +126,64 @@ export function BusinessROIChart() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="relative">
-          <div className={isDadosFicticios ? "opacity-40" : ""}>
-            <ChartContainer config={chartConfig} className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={dados} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorRoiProjetado" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorRoiExecutado" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis 
-                    dataKey="mes" 
-                    axisLine={false} 
-                    tickLine={false}
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                  />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false}
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                    tickFormatter={(value) => `${value}%`}
-                  />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Area
-                    type="monotone"
-                    dataKey="roiProjetado"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorRoiProjetado)"
-                    name="Projetado"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="roiExecutado"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorRoiExecutado)"
-                    name="Executado"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-            
-            {/* Legenda */}
-            <div className="flex items-center justify-center gap-6 mt-4 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-primary" />
-                <span>ROI Projetado</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span>ROI Executado</span>
-              </div>
-            </div>
+        <ChartContainer config={chartConfig} className="h-[200px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={dados} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorRoiProjetado" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorRoiExecutado" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <XAxis 
+                dataKey="mes" 
+                axisLine={false} 
+                tickLine={false}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                tickFormatter={(value) => `${value}%`}
+              />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Area
+                type="monotone"
+                dataKey="roiProjetado"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorRoiProjetado)"
+                name="Projetado"
+              />
+              <Area
+                type="monotone"
+                dataKey="roiExecutado"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorRoiExecutado)"
+                name="Executado"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+        
+        {/* Legenda */}
+        <div className="flex items-center justify-center gap-6 mt-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-primary" />
+            <span>ROI Projetado</span>
           </div>
-
-          {isDadosFicticios && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
-              <div className="bg-zinc-900/90 border border-[#E8A43C]/50 rounded-xl px-5 py-4 max-w-sm text-center flex flex-col items-center gap-2">
-                <Info className="h-5 w-5 text-[#E8A43C] shrink-0" />
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Este é um exemplo do que você verá quando seu projeto iniciar. Os dados reais serão inseridos pela sua mentora.
-                </p>
-              </div>
-            </div>
-          )}
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <span>ROI Executado</span>
+          </div>
         </div>
       </CardContent>
     </Card>

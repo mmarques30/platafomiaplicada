@@ -13,7 +13,7 @@ export function BusinessProgressoConteudo() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-border bg-card">
+            <Card key={i} className="border-primary/20">
               <CardHeader className="pb-2">
                 <Skeleton className="h-5 w-32" />
               </CardHeader>
@@ -24,7 +24,7 @@ export function BusinessProgressoConteudo() {
             </Card>
           ))}
         </div>
-        <Card className="border-border bg-card">
+        <Card className="border-primary/20">
           <CardHeader>
             <Skeleton className="h-5 w-40" />
           </CardHeader>
@@ -70,7 +70,7 @@ export function BusinessProgressoConteudo() {
       {/* Cards de Métricas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Videos */}
-        <Card className="border-border bg-card">
+        <Card className="border-primary/20 bg-gradient-to-br from-blue-500/5 to-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
               <Video className="h-4 w-4 text-blue-500" />
@@ -100,7 +100,7 @@ export function BusinessProgressoConteudo() {
         </Card>
 
         {/* Prompts */}
-        <Card className="border-border bg-card">
+        <Card className="border-primary/20 bg-gradient-to-br from-green-500/5 to-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
               <FileText className="h-4 w-4 text-green-500" />
@@ -128,7 +128,7 @@ export function BusinessProgressoConteudo() {
         </Card>
 
         {/* Interações */}
-        <Card className="border-border bg-card">
+        <Card className="border-primary/20 bg-gradient-to-br from-purple-500/5 to-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
               <MousePointerClick className="h-4 w-4 text-purple-500" />
@@ -148,7 +148,7 @@ export function BusinessProgressoConteudo() {
       </div>
 
       {/* Atividade Recente */}
-      <Card className="border-border bg-card">
+      <Card className="border-primary/20">
         <CardHeader>
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <Activity className="h-4 w-4 text-primary" />

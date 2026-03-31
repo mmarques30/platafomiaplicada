@@ -1,84 +1,48 @@
 
 
-# Análise Detalhada do Sidebar — Estado Atual e Propostas
+# Redesenhar Roadmap Academy — Jornada Educacional
 
-## O que o screenshot mostra (Business Parceria)
+## Resumo
+Substituir `FaseAtualCard` + `ResumoProgresso` na aba Roadmap do Academy por um novo componente `AcademyRoadmapEducacional` com 4 seções educacionais concretas.
 
-```text
-┌────────────────────────────────┐
-│ 🏠 Início                     │  ← menu_config (menu_key: 'inicio')
-│ 📖 Aprender            ▾      │  ← menu_config (menu_key: 'aprender'), expansível
-│ 📚 Bibliotecas          ▾      │  ← hardcoded no sidebar (linhas 430-543)
-│ 📈 Meu Progresso        ▾      │  ← menu_config (menu_key: 'meu_progresso') — PROBLEMA
-│ 🗺️ MINHA JORNADA        ▾      │  ← hardcoded Business Group (biz_jornada)
-│ 📦 ENTREGAS E TAREFAS   ▾      │  ← hardcoded Business Group (biz_entregas)
-│ 💬 COMUNICAÇÃO           ▾      │  ← hardcoded Business Group (biz_comunicacao)
-│                                │
-│ ADMINISTRAÇÃO                  │
-│ 🛡️ Painel Admin                │
-└────────────────────────────────┘
-```
+## Alterações
 
-## Problemas Identificados
+### 1. Novo componente: `src/components/mentoria/AcademyRoadmapEducacional.tsx`
+Componente único com 4 seções verticais:
 
-### 1. "Meu Progresso" ainda aparece para Business (GRAVE)
-Apesar de termos adicionado `meu_progresso` ao `hiddenByEnvironment` de `business_parceria`, o screenshot mostra que ele ainda está visível. Causa provável: o `effectiveEnvironment` não está resolvendo para `business_parceria` corretamente (pode estar caindo no fallback `null` quando `currentEnvironment` não está setado), fazendo o filtro não atuar.
+**Seção 1 — Diagnóstico**
+- Query em `formulario_diagnostico` (via `useMentoriaForm` existente)
+- Exibe: status preenchido (sim/não), data de preenchimento, insight IA gerado (sim/não com data)
+- Badge verde se completo, amarelo se pendente, com CTA para preencher
 
-**Correção**: Na lógica de `effectiveEnvironment` (linha 64-96), adicionar fallback para `business_parceria` quando `effectivePlan === 'business_parceria'` — já existe para `business_sistemas` (linha 67) mas falta para parceria.
+**Seção 2 — Trilhas em Andamento**
+- Reutiliza lógica do `useProgressoCertificados` existente para obter trilhas com progresso
+- Também busca trilhas com 0% mas que o aluno já acessou (via `progresso_videos`)
+- Para cada trilha: nome, barra de progresso (% módulos concluídos), X de Y vídeos
+- CTA "Continuar" por trilha
 
-Linha 68, após o bloco `business_sistemas`, adicionar:
-```typescript
-if (effectivePlan === 'business_parceria') {
-  return 'business_parceria';
-}
-```
+**Seção 3 — Conquistas Desbloqueadas**
+- Reutiliza lógica da `VitrineConquistas` (hooks `useMinhaEvolucao`, `useSequenciaEstudo`, `useMeusCertificados`)
+- Exibe apenas as desbloqueadas como badges compactos + certificados emitidos
+- Link "Ver todas" para `/evolucao/conquistas`
 
-### 2. Dois estilos visuais conflitantes no mesmo sidebar
-- **Menus dinâmicos** (Início, Aprender, Bibliotecas, Meu Progresso): ícone 16px + texto 14px + barra lateral ativa preta + chevron no canto
-- **Business Groups** (MINHA JORNADA, ENTREGAS, COMUNICAÇÃO): labels em UPPERCASE 10px tracking-widest + ícone 14px + sem barra lateral ativa
+**Seção 4 — Próximo Objetivo**
+- Lógica: encontrar a trilha com maior % de progresso que ainda não está 100%
+- Exibe: nome da trilha, % atual, quantos vídeos faltam
+- CTA direto "Continuar esta trilha" → `/trilhas/{id}`
+- Se nenhuma trilha iniciada, sugere a primeira trilha disponível
 
-Isso cria uma hierarquia visual confusa — os Business Groups parecem section headers mas são clicáveis/expansíveis como menus.
+### 2. Atualizar `src/pages/Mentoria.tsx`
+- Linhas 133-138: substituir `<FaseAtualCard />` + `<ResumoProgresso />` por `<AcademyRoadmapEducacional />`
+- Remover imports de `FaseAtualCard` e `ResumoProgresso` (usados apenas aqui no contexto Academy)
 
-### 3. Redundância "Aprender" para Business
-O grupo "Aprender" (Trilhas, Calendário) já é filtrado pelo `hiddenByEnvironment` para Business, mas o parent "Aprender" pode aparecer vazio ou com apenas Calendário. Se tem 0-1 subitens, o grupo expansível é desnecessário.
+## Detalhes técnicos
+- Dados: `formulario_diagnostico`, `progresso_videos`, `trilhas`, `videos`, `certificados` — todas tabelas existentes
+- Hooks reutilizados: `useMentoriaForm`, `useProgressoCertificados`, `useMinhaEvolucao`, `useSequenciaEstudo`, `useMeusCertificados`
+- Nenhuma referência a "mentoria", "candidatura", "Business" ou "fases de processo"
+- Visual: cards com estilo dark consistente, Progress bars, badges de conquista
 
-### 4. "Comunidade" oculta para Business (`!isBusiness`)
-Correto pela regra de negócio, mas Business Parceria perde acesso ao Feed. Verificar se isso é intencional.
-
-## Propostas de Melhoria
-
-### Proposta 1: Corrigir o bug de visibilidade (URGENTE)
-Adicionar `business_parceria` ao fallback de `effectiveEnvironment` para que o `hiddenByEnvironment` funcione. Isso elimina "Meu Progresso" para Business Parceria.
-
-### Proposta 2: Unificar estilo visual dos Business Groups
-Mudar os Business Groups para usar o mesmo padrão visual dos menus dinâmicos:
-- Ícone 16px + texto 14px (não uppercase 10px)
-- Barra lateral preta no item ativo
-- Labels em sentence case: "Minha Jornada", "Entregas e Tarefas", "Comunicação"
-
-Isso elimina a dissonância visual entre as duas seções.
-
-### Proposta 3: Simplificar "Aprender" para Business
-Se "Aprender" para Business Parceria tem apenas "Calendário" como subitem visível, renderizá-lo como item direto (sem expansível) ou ocultá-lo e mover Calendário para "Minha Jornada".
-
-### Proposta 4: Refatorar sidebar em componentes (futuro)
-Extrair 3 componentes:
-- `SidebarDynamicMenus` — menus do menu_config
-- `SidebarBusinessGroups` — os 3 grupos hardcoded
-- `SidebarStaticMenus` — Bibliotecas, Comunidade, Admin
-
-Reduz as 807 linhas para ~200 no arquivo principal.
-
-## Ordem de Implementação Sugerida
-
-| Prioridade | Ação | Impacto |
-|---|---|---|
-| 1 | Corrigir effectiveEnvironment para business_parceria | Elimina "Meu Progresso" duplicado |
-| 2 | Unificar estilo visual dos Business Groups | Consistência visual |
-| 3 | Simplificar "Aprender" quando tem ≤1 subitem | UX mais limpa |
-| 4 | Refatorar em componentes | Manutenibilidade (pode ser depois) |
-
-## Arquivos afetados
-- `src/components/layout/AppSidebar.tsx` — fix effectiveEnvironment + estilo Business Groups
-- Nenhuma migração SQL necessária
+## Arquivos
+- **Novo**: `src/components/mentoria/AcademyRoadmapEducacional.tsx`
+- **Editado**: `src/pages/Mentoria.tsx`
 
