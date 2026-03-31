@@ -110,7 +110,7 @@ export function AppSidebar() {
   const businessGroups = [
     {
       key: 'biz_jornada',
-      label: 'MINHA JORNADA',
+      label: 'Minha Jornada',
       icon: Route,
       items: [
         { label: 'Etapas', url: '/mentoria/etapas-business', parceria: true, sistemas: true },
@@ -120,7 +120,7 @@ export function AppSidebar() {
     },
     {
       key: 'biz_entregas',
-      label: 'ENTREGAS E TAREFAS',
+      label: 'Entregas e Tarefas',
       icon: Package,
       items: [
         { label: 'Entregas', url: '/mentoria/entregas', parceria: true, sistemas: true },
@@ -132,7 +132,7 @@ export function AppSidebar() {
     },
     {
       key: 'biz_comunicacao',
-      label: 'COMUNICAÇÃO',
+      label: 'Comunicação',
       icon: MessageSquare,
       items: [
         { label: 'Sessões', url: '/mentoria/sessoes', parceria: true, sistemas: true },
@@ -256,6 +256,40 @@ export function AppSidebar() {
                 const hasSubMenus = subMenus.length > 0;
                 const isExpanded = expandedMenus.includes(menu.menu_key);
                 
+                // For Business: if a parent group has exactly 1 child, render child as flat item
+                if (isBusinessEnv && hasSubMenus && subMenus.length === 1) {
+                  const singleChild = subMenus[0];
+                  const childUrl = singleChild.url || '/';
+                  const childIsActive = location.pathname === childUrl;
+                  const ChildIcon = singleChild.icon ? getIconComponent(singleChild.icon) : IconComponent;
+                  
+                  return (
+                    <SidebarMenuItem key={menu.menu_key}>
+                      <SidebarMenuButton asChild className="group">
+                        <NavLink
+                          to={childUrl}
+                          end
+                          className={cn(
+                            "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
+                            childIsActive
+                              ? "text-primary font-semibold"
+                              : "text-sidebar-foreground hover:text-primary"
+                          )}
+                        >
+                          <span className={cn(
+                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                            childIsActive
+                              ? "bg-primary opacity-100"
+                              : "bg-primary opacity-0 group-hover:opacity-60"
+                          )} />
+                          <ChildIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                          {!collapsed && <span className="text-sm ml-3">{singleChild.label}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
                 // Renderizar Bibliotecas logo após "Aprender" (menu_key === 'aprender')
                 const renderBibliotecasAfter = menu.menu_key === 'aprender';
                 
@@ -550,7 +584,7 @@ export function AppSidebar() {
                 );
               })}
 
-              {/* Business Groups - 3 collapsible sections */}
+              {/* Business Groups - 3 collapsible sections (unified style) */}
               {isBusinessEnv && businessGroups.map((group) => {
                 const GroupIcon = group.icon;
                 const filteredItems = group.items.filter(item => 
@@ -571,27 +605,42 @@ export function AppSidebar() {
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="group w-full pl-4">
-                          <div className={cn(
-                            "flex items-center gap-3 rounded-lg transition-all duration-200 py-2 w-full",
-                            hasActiveItem
-                              ? "text-primary" 
-                              : "text-sidebar-foreground/50 hover:text-sidebar-foreground/80"
-                          )}>
-                            <GroupIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-                            {!collapsed && (
-                              <>
-                                <span className="text-[10px] uppercase tracking-widest font-semibold flex-1 text-left">
-                                  {group.label}
-                                </span>
-                                <ChevronDown className={cn(
-                                  "h-3.5 w-3.5 transition-transform duration-200",
-                                  isGroupExpanded && "rotate-180"
-                                )} />
-                              </>
+                        <div className="flex items-center w-full">
+                          <div
+                            className={cn(
+                              "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5 cursor-pointer",
+                              hasActiveItem 
+                                ? "text-primary font-semibold" 
+                                : "text-sidebar-foreground hover:text-primary"
                             )}
+                          >
+                            <span className={cn(
+                              "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
+                              hasActiveItem 
+                                ? "bg-primary opacity-100" 
+                                : "bg-primary opacity-0 group-hover:opacity-60"
+                            )} />
+                            <GroupIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                            {!collapsed && <span className="text-sm">{group.label}</span>}
                           </div>
-                        </SidebarMenuButton>
+                          {!collapsed && (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                toggleMenu(group.key);
+                              }}
+                              className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
+                            >
+                              <ChevronDown 
+                                className={cn(
+                                  "h-4 w-4 transition-transform duration-200 text-sidebar-foreground/60",
+                                  isGroupExpanded && "rotate-180"
+                                )} 
+                                strokeWidth={1.5}
+                              />
+                            </button>
+                          )}
+                        </div>
                       </CollapsibleTrigger>
 
                       <CollapsibleContent>
@@ -606,7 +655,7 @@ export function AppSidebar() {
                                     to={item.url}
                                     end
                                     className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-4 py-2 text-sm",
+                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                                       itemIsActive
                                         ? "text-primary font-semibold"
                                         : "text-sidebar-foreground/70 hover:text-primary"
