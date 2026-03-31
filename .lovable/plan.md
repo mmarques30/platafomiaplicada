@@ -1,27 +1,48 @@
 
-# Comunicação do InsightIA no fluxo de diagnóstico
+
+# Fluxo de primeiro acesso para Business
 
 ## Resumo
-Dois pontos de comunicação: (1) card explicativo antes do último step do wizard, (2) tela pós-envio com loading animado + exibição dos insights antes de redirecionar.
+Adicionar mensagem de boas-vindas personalizada no cadastro admin de usuários Business, e exibir tela intermediária no primeiro login antes do Dashboard.
 
-## Alterações
+---
 
-### 1. Card explicativo antes do último step
-**Arquivo: `src/components/mentoria/steps/academy/AcademyStep4Desafios.tsx`**
-- Adicionar no final do step 4 (penúltimo) um card informativo com ícone Sparkles:
-  - "Ao finalizar, nossa IA vai gerar um diagnóstico personalizado com seus principais gaps e recomendações de onde começar."
-  - Estilo: `bg-primary/5 border border-primary/20 rounded-xl` com ícone Sparkles
+## 1. Nova coluna `mensagem_boas_vindas` na tabela `profiles`
+**Migração SQL:**
+```sql
+ALTER TABLE public.profiles ADD COLUMN mensagem_boas_vindas TEXT DEFAULT NULL;
+```
 
-### 2. Tela pós-envio com InsightIA inline
-**Arquivo: `src/components/mentoria/FormularioWizard.tsx`**
-- Adicionar estado `submitted` (boolean) e `insightReady` (boolean)
-- No `onSubmit`, após `finalizarFormulario` e `gerar-insight-mentoria`:
-  - Setar `submitted = true` (mostra tela de loading)
-  - Quando a edge function retorna com sucesso, chamar `refetch()` do formulário e setar `insightReady = true`
-- Quando `submitted && !insightReady`: renderizar card animado "Seu InsightIA está sendo gerado..." com Loader2 spinning + texto motivacional
-- Quando `submitted && insightReady`: renderizar o componente `<InsightIA />` diretamente + botão "Ir para o Dashboard"
-- Remover o `setTimeout` com `navigate` e o toast simples de "Gerando sua análise"
+## 2. Campo textarea no painel admin
+**Arquivo: `src/components/admin/NovoUsuarioModal.tsx`**
+- Quando `selectedPlano` for `business_parceria` ou `business_sistemas`, exibir textarea "Mensagem de boas-vindas (opcional)" abaixo dos campos existentes
+- Passar `mensagemBoasVindas` no `createUser.mutateAsync()`
 
-## Arquivos alterados
-- `src/components/mentoria/steps/academy/AcademyStep4Desafios.tsx` (card explicativo)
-- `src/components/mentoria/FormularioWizard.tsx` (tela pós-envio com insight inline)
+**Arquivo: `src/hooks/admin/useUsers.tsx`**
+- Adicionar `mensagemBoasVindas` ao `mutationFn` do `useCreateUser`, passando no body da edge function
+
+**Arquivo: `supabase/functions/create-user-admin/index.ts`**
+- Extrair `mensagemBoasVindas` do body
+- Incluir `mensagem_boas_vindas` no `updateData` do profile
+
+## 3. Tela intermediária de boas-vindas Business
+**Novo arquivo: `src/pages/BusinessWelcome.tsx`**
+- Tela fullscreen dark (estilo OnboardingWelcome)
+- Título: "Bem-vindo à sua jornada, [nome]"
+- Mensagem personalizada do admin (ou texto padrão: "Estamos preparando tudo para você...")
+- 3 cards de ação: "Conheça suas etapas" → `/mentoria`, "Veja o roadmap" → `/mentoria` (aba roadmap), "Agende sua primeira sessão" → `/notificacoes/calendario`
+- Botão "Entrar na plataforma" → atualiza `primeiro_acesso: false` + navega para `/`
+
+## 4. Redirect automático no Dashboard
+**Arquivo: `src/pages/Dashboard.tsx`**
+- No bloco de `useMemo` / early return: se `profile.primeiro_acesso === true` e plano é `business_parceria` ou `business_sistemas`, redirecionar para `/business-welcome`
+
+## 5. Rota
+**Arquivo: `src/App.tsx`**
+- Adicionar rota protegida `<Route path="/business-welcome" element={<ProtectedRoute><BusinessWelcome /></ProtectedRoute>} />`
+
+## Arquivos
+- **Migração SQL**: nova coluna `mensagem_boas_vindas`
+- **Novo**: `src/pages/BusinessWelcome.tsx`
+- **Editados**: `NovoUsuarioModal.tsx`, `useUsers.tsx`, `create-user-admin/index.ts`, `Dashboard.tsx`, `App.tsx`
+
