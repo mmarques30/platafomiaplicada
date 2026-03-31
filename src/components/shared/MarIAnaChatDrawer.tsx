@@ -399,11 +399,17 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
                 className="w-7 h-7 rounded-full flex-shrink-0"
                 onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
               />
-              <div className="bg-muted rounded-lg px-3 py-2 text-muted-foreground text-sm">
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  Pensando...
-                </span>
+              <div className="bg-muted rounded-lg px-4 py-3 flex items-center gap-1">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="block w-2 h-2 rounded-full bg-muted-foreground"
+                    style={{
+                      animation: 'pulse-dot 1.4s ease-in-out infinite',
+                      animationDelay: `${i * 0.2}s`,
+                    }}
+                  />
+                ))}
               </div>
             </div>
           </div>
