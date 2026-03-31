@@ -20,6 +20,7 @@ import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
+import { useNotificacoesNaoLidasCount } from "@/hooks/useNotificacoesPessoais";
 import { useProdutosAtivos } from "@/hooks/admin/useProdutos";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { cn } from "@/lib/utils";
