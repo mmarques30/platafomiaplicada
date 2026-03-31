@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { useTasksByUser } from "@/hooks/useTasksBusiness";
-import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 
 type UrgencyItem = {
   text: string;
@@ -19,10 +18,9 @@ export function DashboardUrgencias() {
 
   const { tarefas } = useMentoriaTarefas(user?.id);
   const { data: tasksBusiness } = useTasksByUser(isBusiness ? user?.id : undefined);
-  const { formulario, isLoading: formLoading } = useMentoriaForm();
 
   const urgency = useMemo<UrgencyItem | null>(() => {
-    if (planLoading || formLoading) return null;
+    if (planLoading) return null;
 
     const now = Date.now();
     const in48h = now + 48 * 60 * 60 * 1000;
@@ -61,17 +59,8 @@ export function DashboardUrgencias() {
       }
     }
 
-    // 3. Diagnostico not filled
-    if (!formulario || formulario.completado === false) {
-      return {
-        text: "Preencha seu diagnóstico para personalizar sua jornada",
-        link: "/meu-diagnostico",
-        linkLabel: "Preencher diagnóstico",
-      };
-    }
-
     return null;
-  }, [tarefas, tasksBusiness, formulario, isBusiness, planLoading, formLoading]);
+  }, [tarefas, tasksBusiness, isBusiness, planLoading]);
 
   if (!urgency) return null;
 
