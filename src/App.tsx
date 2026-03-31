@@ -145,6 +145,7 @@ function AppContent() {
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route path="/acesso-expirado" element={<AcessoExpirado />} />
         <Route path="/onboarding-welcome" element={<OnboardingWelcome />} />
+        <Route path="/welcome-business" element={<ProtectedRoute><BusinessWelcome /></ProtectedRoute>} />
         <Route path="/sobre" element={<Sobre />} />
 
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>

@@ -35,6 +35,17 @@ export function MainLayout() {
     }
   }, [isLoading, environmentContext, navigate]);
 
+  // Redirecionar Business com primeiro_acesso para tela de boas-vindas
+  useEffect(() => {
+    if (
+      !isLoading &&
+      profile?.primeiro_acesso === true &&
+      (profile?.plano_mentoria === "business_parceria" || profile?.plano_mentoria === "business_sistemas")
+    ) {
+      navigate("/welcome-business", { replace: true });
+    }
+  }, [isLoading, profile, navigate]);
+
   // Modal só aparece para mentorados (não visitantes) com senha temporária
   const showPasswordModal = !isLoading && !isVisitante && profile?.senha_temporaria === true;
 
