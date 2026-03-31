@@ -23,6 +23,7 @@ import { PageTransition } from "@/components/ui/PageTransition";
 export function MainLayout() {
   useIdleLogout();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isVisitante, isAdmin, isLoading } = useUserRole();
   const { profile } = useUserProfile();
   const { user, signOut } = useAuth();
