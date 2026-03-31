@@ -13,6 +13,7 @@ import { GraduationCap, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import { MarIAnaFloatingButton } from "@/components/shared/MarIAnaFloatingButton";
+import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNotice";
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
@@ -58,11 +59,7 @@ export function MainLayout() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <PageSkeleton variant="dashboard" />;
   }
 
   // Layout unificado para todos os usuários
