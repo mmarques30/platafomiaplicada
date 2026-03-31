@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Video, ChevronRight } from "lucide-react";
 import { useTrilhasEmAndamento } from "@/hooks/useEvolucao";
 import { useNavigate } from "react-router-dom";
