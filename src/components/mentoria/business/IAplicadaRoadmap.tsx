@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Map, CheckCircle2, Circle, Clock } from "lucide-react";
+import { Map, CheckCircle2, Circle, Clock, Construction } from "lucide-react";
 
 export function IAplicadaRoadmap() {
   return (
