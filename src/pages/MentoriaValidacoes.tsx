@@ -11,6 +11,7 @@ import { useTasksByUser, useRespondTask, TaskBusiness } from "@/hooks/useTasksBu
 import { format, differenceInDays, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 const TIPO_LABELS: Record<string, string> = {
   validacao: 'Validação',
