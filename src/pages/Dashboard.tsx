@@ -4,7 +4,6 @@ import { AlertCircle, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
-import { DashboardCommandStrip } from "@/components/dashboard/DashboardCommandStrip";
 import { AcademyWelcomeCard } from "@/components/dashboard/AcademyWelcomeCard";
 import { PendenciasOnboarding } from "@/components/dashboard/PendenciasOnboarding";
 import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
@@ -79,7 +78,7 @@ export default function Dashboard() {
             )}
 
             <section>
-              <DashboardCommandStrip />
+              <WelcomeHeader />
             </section>
 
             <DashboardUrgencias />
