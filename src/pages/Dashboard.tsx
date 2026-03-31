@@ -17,6 +17,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
+import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
 
 export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
