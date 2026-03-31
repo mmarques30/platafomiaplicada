@@ -15,7 +15,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { X, Save, Crown } from "lucide-react";
+import { X, Save, Crown, Loader2, Sparkles, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { InsightIA } from "./InsightIA";
 import { cn } from "@/lib/utils";
 
 // Academy Steps
