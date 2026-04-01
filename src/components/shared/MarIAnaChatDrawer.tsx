@@ -77,6 +77,24 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
     }
   }, [isLoadingHistory, proactiveMessage, isMentoriaPage]);
 
+  // Welcome message on first ever chat open
+  useEffect(() => {
+    if (!user || isLoadingHistory || messages.length > 0) return;
+    if (localStorage.getItem(`mariana_iniciada_${user.id}`)) return;
+
+    let msg: string;
+    if (effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas') {
+      msg = `Olá, ${firstName}! Sou a MarIAna. Já tenho contexto do seu projeto e vou te acompanhar ao longo da jornada. Se tiver dúvidas sobre suas etapas, sessões ou entregas — é só me chamar.`;
+    } else if (effectivePlan === 'skills') {
+      msg = `Olá, ${firstName}! Sou a MarIAna. Posso te ajudar com diagnósticos da equipe, backlog e roadmap. O que você precisa hoje?`;
+    } else {
+      msg = `Olá, ${firstName}! Sou a MarIAna, sua assistente de IA aqui na plataforma. Estou aqui para te ajudar a tirar o máximo das trilhas e te orientar na jornada. Por onde você quer começar?`;
+    }
+
+    setMessages([{ role: "assistant", content: msg }]);
+    localStorage.setItem(`mariana_iniciada_${user.id}`, 'true');
+  }, [user, isLoadingHistory, messages.length, effectivePlan, firstName]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
