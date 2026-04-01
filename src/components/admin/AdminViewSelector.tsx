@@ -101,6 +101,11 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
               </DropdownMenuItem>
             </>
           )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setShowOnboardingPreview(true)} className="gap-2 cursor-pointer">
+            <Play className="h-4 w-4" />
+            Simular Onboarding
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -111,6 +116,10 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
           onSelect={handleUserSelect}
           planType={selectedPlanForModal}
         />
+      )}
+
+      {showOnboardingPreview && (
+        <OnboardingVideo previewMode onClose={() => setShowOnboardingPreview(false)} />
       )}
     </>
   );
