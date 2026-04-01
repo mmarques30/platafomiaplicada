@@ -15,6 +15,7 @@ import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import { MarIAnaFloatingButton } from "@/components/shared/MarIAnaFloatingButton";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNotice";
+import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -64,37 +65,40 @@ export function MainLayout() {
 
   // Layout unificado para todos os usuários
   return (
-    <SidebarProvider>
-      <TopHeader />
-      <div className={cn(
-        "min-h-screen flex w-full bg-background",
-        isAdmin && isViewingAs ? "pt-24" : "pt-14"
-      )}>
-        <div className="dot-grid-bg" />
-        <AppSidebar />
-        <div className="flex-1 flex flex-col relative z-[1]">
-          <main className="flex-1 overflow-x-hidden">
-            <AnimatePresence mode="wait">
-              <PageTransition key={location.pathname}>
-                <Outlet />
-              </PageTransition>
-            </AnimatePresence>
-          </main>
+    <>
+      <OnboardingVideo />
+      <SidebarProvider>
+        <TopHeader />
+        <div className={cn(
+          "min-h-screen flex w-full bg-background",
+          isAdmin && isViewingAs ? "pt-24" : "pt-14"
+        )}>
+          <div className="dot-grid-bg" />
+          <AppSidebar />
+          <div className="flex-1 flex flex-col relative z-[1]">
+            <main className="flex-1 overflow-x-hidden">
+              <AnimatePresence mode="wait">
+                <PageTransition key={location.pathname}>
+                  <Outlet />
+                </PageTransition>
+              </AnimatePresence>
+            </main>
+          </div>
+          {(!isLoading && !isVisitante) && <MarIAnaFloatingButton />}
+          {(!isLoading && isVisitante) && <VisitorExpirationNotice />}
+          
+          {/* Modal de senha temporária - apenas para mentorados cadastrados pelo admin */}
+          {showPasswordModal && user && (
+            <TrocarSenhaModal 
+              open={showPasswordModal}
+              userId={user.id}
+              onSuccess={() => {
+                queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+              }}
+            />
+          )}
         </div>
-        {(!isLoading && !isVisitante) && <MarIAnaFloatingButton />}
-        {(!isLoading && isVisitante) && <VisitorExpirationNotice />}
-        
-        {/* Modal de senha temporária - apenas para mentorados cadastrados pelo admin */}
-        {showPasswordModal && user && (
-          <TrocarSenhaModal 
-            open={showPasswordModal}
-            userId={user.id}
-            onSuccess={() => {
-              queryClient.invalidateQueries({ queryKey: ["user-profile"] });
-            }}
-          />
-        )}
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </>
   );
 }
