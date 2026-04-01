@@ -18,7 +18,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
-import { ContextStrip } from "@/components/dashboard/ContextStrip";
+
 
 export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
@@ -49,7 +49,6 @@ export default function Dashboard() {
         {isVisitante ? (
           <div className="space-y-6">
             <WelcomeHeader />
-            <ContextStrip />
             <PWAInstallBanner />
             <CentralConteudoGratuito />
             <RankingTickerGratuito />
@@ -81,7 +80,7 @@ export default function Dashboard() {
 
             <section>
               <WelcomeHeader />
-              <ContextStrip />
+              
             </section>
 
             <DashboardUrgencias />
