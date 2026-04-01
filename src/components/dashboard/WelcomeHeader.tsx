@@ -74,8 +74,8 @@ export function WelcomeHeader() {
   console.log('[WelcomeHeader] contrato:', contrato);
   const { data: etapas, isLoading: isLoadingEtapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
   console.log('[WelcomeHeader] etapas:', etapas?.length, 'etapas');
-  const { data: tasks } = useTasksByUser(isBusiness ? businessUserId : undefined);
-  const { sessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
+  const { data: tasks, isLoading: isLoadingTasks } = useTasksByUser(isBusiness ? businessUserId : undefined);
+  const { sessoes, isLoading: isLoadingSessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
 
   // ── Academy KPIs ──
   const { data: academyData } = useQuery({
