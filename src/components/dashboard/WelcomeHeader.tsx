@@ -186,7 +186,12 @@ export function WelcomeHeader() {
   const kpi2Display = hasKpis ? String(kpi2Animated) : "—";
   const kpi3Display = hasKpis ? (kpi3Text ?? (isSkills ? `${kpi3Animated}%` : String(kpi3Animated))) : "—";
 
-  const showKpis = !isVisitante && hasKpis;
+  const isLoadingKpis =
+    (isBusiness && (isLoadingContrato || isLoadingEtapas || isLoadingTasks || isLoadingSessoes))
+    || (isAcademy && isLoadingAcademy)
+    || (isSkills && isLoadingSkills);
+
+  const showKpis = !isVisitante && (hasKpis || isLoadingKpis);
 
   return (
     <div className="w-full mt-2 md:mt-4">
