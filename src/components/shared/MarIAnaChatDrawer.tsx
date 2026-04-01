@@ -33,6 +33,10 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
   const { pathname } = useLocation();
   const isMentoriaPage = pathname.startsWith("/mentoria");
   const { contextText, proactiveMessage } = useMentoriaContext({ enabled: isMentoriaPage });
+  const { profile } = useUserProfile();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { effectivePlan } = useEffectivePlan(isAdmin, roleLoading);
+  const firstName = profile?.nome_completo?.split(' ')?.[0] ?? 'por aqui';
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
