@@ -33,6 +33,8 @@ export function MainLayout() {
   const queryClient = useQueryClient();
   const environmentContext = useEnvironmentSafe();
   const { isViewingAs } = useAdminViewContext();
+  const { effectivePlan } = useEffectivePlan(isAdmin, isLoading);
+  const isBusinessPlan = effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas';
 
   // Redirecionar para seleção de ambiente se não selecionado
   useEffect(() => {
