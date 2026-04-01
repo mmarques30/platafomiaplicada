@@ -81,6 +81,7 @@ export default function Dashboard() {
 
             <section>
               <WelcomeHeader />
+              <ContextStrip />
             </section>
 
             <DashboardUrgencias />
