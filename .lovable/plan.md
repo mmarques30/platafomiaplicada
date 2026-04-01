@@ -1,43 +1,35 @@
 
 
-# Converter inline styles dos KPIs para Tailwind
+# Converter inline styles do OnboardingVideo para Tailwind
 
 ## Alteração
 
-**Arquivo**: `src/components/dashboard/WelcomeHeader.tsx`
+**Arquivo**: `src/components/onboarding/OnboardingVideo.tsx`
 
-### Skeleton (linha 191)
-`style={{ width: 40, height: 22, background: 'rgba(255,255,255,0.06)', borderRadius: 4, animation: '...', margin: '0 auto' }}`
-→ `className="w-10 h-[22px] bg-white/[0.06] rounded animate-[kpiPulse_1.2s_ease-in-out_infinite] mx-auto"`
+### Mapeamento linha a linha
 
-### Container KPI (linhas 230-238)
-`style={{ display: "flex", alignItems: "center", gap: 16, padding: "10px 20px", flexWrap: "wrap" }}`
-→ `className="flex items-center gap-4 px-5 py-2.5 flex-wrap"`
+| Elemento | Inline style atual | Tailwind |
+|---|---|---|
+| Overlay (L38) | `position:'fixed', inset:0, zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.85)', backdropFilter:'blur(8px)'` | `className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-[8px]"` |
+| Card (L39) | `background:'#14160F', borderRadius:16, overflow:'hidden', width:'100%', maxWidth:560, boxShadow:'0 24px 80px rgba(0,0,0,0.6)', border:'1px solid rgba(255,255,255,0.06)'` | `className="bg-[#14160F] rounded-2xl overflow-hidden w-full max-w-[560px] shadow-[0_24px_80px_rgba(0,0,0,0.6)] border border-white/[0.06]"` |
+| Video wrapper (L40) | `position:'relative', paddingBottom:'56.25%', background:'#0C0F0A'` | `className="relative pb-[56.25%] bg-[#0C0F0A]"` |
+| iframe (L43) | `position:'absolute', top:0, left:0, width:'100%', height:'100%', border:'none'` | `className="absolute top-0 left-0 w-full h-full border-none"` |
+| Content area (L48) | `padding:'28px 32px'` | `className="px-8 py-7"` |
+| Label "✱ IAplicada" (L49) | `fontSize:10, fontWeight:600, color:'#AFC040', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8` | `className="text-[10px] font-semibold text-[#AFC040] uppercase tracking-[0.1em] mb-2"` |
+| Título (L50) | `fontSize:21, fontWeight:600, color:'#E2E5DC', marginBottom:8, lineHeight:1.3` | `className="text-[21px] font-semibold text-[#E2E5DC] mb-2 leading-[1.3]"` |
+| Descrição (L51) | `fontSize:14, color:'#6B7060', lineHeight:1.7, marginBottom:28` | `className="text-sm text-[#6B7060] leading-[1.7] mb-7"` |
+| Buttons row (L52) | `display:'flex', alignItems:'center', gap:16` | `className="flex items-center gap-4"` |
+| Botão principal (L53) | cores, padding, border, radius, cursor/opacity dinâmicos | `className="bg-[#AFC040] text-[#0C0F0A] text-sm font-semibold px-8 py-3 rounded-[10px] border-none font-[inherit] transition-opacity duration-150"` + `style` apenas para `cursor` e `opacity` dinâmicos |
+| Botão "Pular" (L56) | transparent, cor, fontSize | `className="bg-transparent text-[#6B7060] text-[13px] border-none cursor-pointer font-[inherit] py-3 px-0"` |
 
-### Cada KPI block (linhas 240, 252, 264)
-`style={{ textAlign: "center", minWidth: 50 }}` → `className="text-center min-w-[50px]"`
+### Cursor/opacity dinâmicos do botão principal
+Manter como `style={{ cursor: entering ? 'not-allowed' : 'pointer', opacity: entering ? 0.7 : 1 }}` ou usar classes condicionais: `${entering ? 'cursor-not-allowed opacity-70' : 'cursor-pointer opacity-100'}`.
 
-### KPI values (linhas 241, 253, 265)
-`style={{ color: "#2CBBA6", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}`
-→ `className="font-bold text-lg leading-tight"` + `style={{ color: "#2CBBA6" }}` (cor mantida inline)
-
-### KPI labels (linhas 244, 256, 268)
-`style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}`
-→ `className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5px]"`
-
-### Dividers (linhas 249, 261)
-`style={{ width: 1, height: 28, background: "rgba(255,255,255,0.1)" }}`
-→ `className="w-px h-7 bg-white/10"`
-
-### CTA button (linhas 273-289)
-`style={{ marginLeft: "auto", background: "hsl(...)", ... }}`
-→ `className="ml-auto bg-primary text-primary-foreground text-[13px] font-medium py-[7px] px-3.5 rounded-lg border-none cursor-pointer whitespace-nowrap"`
-
-### Nenhuma lógica, import ou estrutura JSX alterada.
+### Nenhuma lógica, import ou handler alterado.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/WelcomeHeader.tsx` | Editado — inline styles → Tailwind |
+| `src/components/onboarding/OnboardingVideo.tsx` | Editado — inline styles → Tailwind |
 
