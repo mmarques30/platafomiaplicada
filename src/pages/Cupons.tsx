@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import mariAvatar from "@/assets/mariana-avatar.png";
+import mariAvatar from "@/assets/mari-avatar-new.png";
 import { useVisitorExpiration } from "@/hooks/useVisitorExpiration";
 import { useUserRole } from "@/hooks/useUserRole";
 
