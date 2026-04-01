@@ -1,39 +1,32 @@
 
 
-# Botão "Simular Onboarding" no painel Admin
-
-## Ideia
-
-Adicionar uma opção no `AdminViewSelector` (dropdown "Ver como...") ou um botão dedicado na área admin que abre o `OnboardingVideo` em modo preview — sem alterar o banco de dados.
+# Refatorar JornadaStrip para props-based + atualizar Mentoria.tsx
 
 ## Alterações
 
-### 1. Refatorar `OnboardingVideo` para aceitar modo preview
+### 1. Reescrever `src/components/mentoria/JornadaStrip.tsx`
 
-**Arquivo**: `src/components/onboarding/OnboardingVideo.tsx`
+- Remover todos os hooks internos (useUserRole, useEffectivePlan, useBusinessUserId, useContratosBusiness, useEtapasBusiness, useMentoriaForm, useProgressoCertificados, useProgressoGeral)
+- Componente recebe `estagios` via props (interface `Estagio` com `numero`, `label`, `status`)
+- Manter visual atual (StageCircle com Check icon, Connector, cores `#AFC040`, etc.)
+- Usar `estagio.numero` no círculo em vez de `index + 1`
 
-- Adicionar prop opcional `previewMode?: boolean`
-- Quando `previewMode=true`: exibir o overlay normalmente, mas os botões "Entrar" e "Pular" apenas fecham o modal (sem chamar `supabase.update`)
-- Quando `previewMode=false` (padrão): comportamento atual inalterado
+### 2. Atualizar `src/pages/Mentoria.tsx`
 
-### 2. Adicionar botão de preview no AdminViewSelector
+- Adicionar imports: `useBusinessUserId`, `useContratosBusiness`, `useEtapasBusiness`, `useMentoriaForm`
+- Construir `estagiosBusiness` a partir de `useEtapasBusiness` (mapeando status)
+- Construir `estagiosAcademy` com 4 estágios fixos (Diagnóstico, Trilhas, Conquistas, Certificado) baseados em `useMentoriaForm().formulario?.completado`
+- Substituir `<JornadaStrip />` por renderização condicional:
+  - `{(isBusinessParceria || isBusinessSistemas) && estagiosBusiness && <JornadaStrip estagios={estagiosBusiness} />}`
+  - `{isAcademy && <JornadaStrip estagios={estagiosAcademy} />}`
+- Adicionar `isAcademy` ao destructuring de `useEffectivePlan`
 
-**Arquivo**: `src/components/admin/AdminViewSelector.tsx`
-
-- Adicionar item no dropdown: "👁 Simular Onboarding" com ícone `Play` ou `Video`
-- Ao clicar, seta um estado local `showOnboardingPreview = true`
-- Renderizar `<OnboardingVideo previewMode />` condicionalmente quando ativado
-
-### 3. Nenhuma alteração de banco, rotas ou outros componentes
-
-## Resultado
-
-O admin clica em "Ver como..." → "Simular Onboarding" → vê exatamente o overlay que o usuário novo veria, e ao clicar "Entrar" ou "Pular" o modal fecha sem afetar dados.
+### Nenhuma outra alteração — abas, lógica de auth, roles e planos permanecem intactos.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/onboarding/OnboardingVideo.tsx` | Editado — adiciona `previewMode` prop |
-| `src/components/admin/AdminViewSelector.tsx` | Editado — adiciona opção "Simular Onboarding" |
+| `src/components/mentoria/JornadaStrip.tsx` | Reescrito — props-based |
+| `src/pages/Mentoria.tsx` | Editado — passa dados para JornadaStrip |
 
