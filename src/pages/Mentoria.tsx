@@ -105,7 +105,8 @@ export default function Mentoria() {
       {isBusiness && <BusinessAcessoRapido />}
 
       {/* Jornada Strip - linha de estágios */}
-      <JornadaStrip />
+      {(isBusinessParceria || isBusinessSistemas) && estagiosBusiness && <JornadaStrip estagios={estagiosBusiness} />}
+      {isAcademy && <JornadaStrip estagios={estagiosAcademy} />}
 
       {/* Tabs - Diferente para Business vs Academy */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
