@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { useQueryClient } from '@tanstack/react-query';
 
 const YOUTUBE_VIDEO_ID = 'SEU_ID_AQUI';
 
@@ -12,34 +10,23 @@ interface OnboardingVideoProps {
 
 export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVideoProps) {
   const { profile } = useUserProfile();
-  const queryClient = useQueryClient();
   const [visible, setVisible] = useState(previewMode);
-  const [entering, setEntering] = useState(false);
 
   useEffect(() => {
     if (!previewMode && profile?.primeiro_acesso === true) {
-      setVisible(true);
+      const jaVisto = sessionStorage.getItem('onboarding_video_visto') === 'true';
+      if (!jaVisto) setVisible(true);
     }
   }, [profile, previewMode]);
 
-  const handleEnter = async () => {
+  const handleEnter = () => {
     if (previewMode) {
       setVisible(false);
       onClose?.();
       return;
     }
-    setEntering(true);
-    try {
-      await supabase
-        .from('profiles')
-        .update({ primeiro_acesso: false })
-        .eq('id', profile?.id);
-      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
-    } catch (e) {
-      console.error('Onboarding update error:', e);
-    }
+    sessionStorage.setItem('onboarding_video_visto', 'true');
     setVisible(false);
-    setEntering(false);
   };
 
   if (!visible) return null;
