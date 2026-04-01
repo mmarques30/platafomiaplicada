@@ -61,7 +61,6 @@ export default function Evolucao() {
         {/* ABA 1: MINHA EVOLUÇÃO */}
         <TabsContent value="minha-evolucao" className="space-y-6 mt-6">
           <HeroEvolucao />
-          {isBusiness && <BusinessProgressoConteudo />}
           {isBusiness && <BusinessEvolucaoAprendizado />}
           <TrilhasEmAndamentoCards />
           <VitrineConquistas />
