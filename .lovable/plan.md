@@ -1,28 +1,28 @@
 
 
-# AcademyWelcomeCard — expiração 7 dias + primeira trilha recomendada
+# BusinessWelcome — passos dinâmicos com dados reais
 
-## Alterações
+## Alteração
 
-**Arquivo**: `src/components/dashboard/AcademyWelcomeCard.tsx`
+**Arquivo**: `src/pages/BusinessWelcome.tsx`
 
-### 1. Expiração após 7 dias
-
-Após as guards existentes (`isAcademy`, `isFirstAccess`, `dismissed`), adicionar cálculo de dias desde `created_at` do perfil. Se > 7, retornar `null`.
-
-### 2. Buscar primeira trilha
-
-Adicionar `useQuery` inline para buscar a primeira trilha ordenada por `ordem` (query simples: `supabase.from("trilhas").select("id, titulo").eq("visivel_mentorados", true).order("ordem").limit(1).single()`). O hook roda apenas quando o card seria visível.
-
-### 3. Bloco "Comece por aqui"
-
-Após o grid de ações (linha 95), adicionar o `div` com estilo inline contendo título da trilha e botão "Começar trilha →" que navega para `/trilhas/{id}`.
-
-### Nenhuma outra alteração — dismiss, tour, outros componentes intactos.
+1. Adicionar imports de `useContratosBusiness` e `useEtapasBusiness`
+2. Dentro do componente, após os hooks existentes, adicionar:
+   ```
+   const { contrato } = useContratosBusiness(user?.id);
+   const { data: etapas } = useEtapasBusiness(contrato?.id);
+   const totalEtapas = etapas?.length ?? 0;
+   const primeiraEtapa = etapas?.[0]?.titulo ?? 'sua primeira entrega';
+   ```
+3. Substituir o array `steps` estático (linhas 10-26) por um array computado dentro do componente:
+   - Passo 1: título/descrição dinâmicos baseados em `totalEtapas` e `primeiraEtapa`
+   - Passo 2: "Sua primeira sessão será agendada" / notificação calendário
+   - Passo 3: "A MarIAna já sabe quem você é" / assistente IA com contexto
+4. Layout, botão CTA e `handleEnter` permanecem intactos
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/AcademyWelcomeCard.tsx` | Editado — expiração 7d, query trilha, bloco "Comece por aqui" |
+| `src/pages/BusinessWelcome.tsx` | Editado — steps dinâmicos com hooks de contrato/etapas |
 
