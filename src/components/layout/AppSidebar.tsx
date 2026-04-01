@@ -542,6 +542,14 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
+        {!isVisitante && effectivePlan && (
+          <SidebarUserCard
+            nome={userName}
+            plano={effectivePlan}
+            progresso={userProgress}
+            collapsed={collapsed}
+          />
+        )}
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="group">
