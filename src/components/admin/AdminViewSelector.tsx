@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, User, GraduationCap, Briefcase, Building2, Wrench } from "lucide-react";
+import { Eye, EyeOff, User, GraduationCap, Briefcase, Building2, Wrench, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
 import { useAdminView } from "@/hooks/useAdminView";
 import { AdminViewMode } from "@/contexts/AdminViewContext";
 import { UserSelectorByPlanModal } from "./UserSelectorByPlanModal";
+import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
 
 interface AdminViewSelectorProps {
   isAdmin: boolean;
@@ -29,6 +30,7 @@ const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
   const { viewAs, setViewAs, resetView, canUseViewAs, impersonatedUserName } = useAdminView(isAdmin);
   const [selectedPlanForModal, setSelectedPlanForModal] = useState<PlanType | null>(null);
+  const [showOnboardingPreview, setShowOnboardingPreview] = useState(false);
 
   if (!canUseViewAs) return null;
 
@@ -99,6 +101,11 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
               </DropdownMenuItem>
             </>
           )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setShowOnboardingPreview(true)} className="gap-2 cursor-pointer">
+            <Play className="h-4 w-4" />
+            Simular Onboarding
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -109,6 +116,10 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
           onSelect={handleUserSelect}
           planType={selectedPlanForModal}
         />
+      )}
+
+      {showOnboardingPreview && (
+        <OnboardingVideo previewMode onClose={() => setShowOnboardingPreview(false)} />
       )}
     </>
   );

@@ -5,19 +5,29 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const YOUTUBE_VIDEO_ID = 'SEU_ID_AQUI';
 
-export function OnboardingVideo() {
+interface OnboardingVideoProps {
+  previewMode?: boolean;
+  onClose?: () => void;
+}
+
+export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVideoProps) {
   const { profile } = useUserProfile();
   const queryClient = useQueryClient();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(previewMode);
   const [entering, setEntering] = useState(false);
 
   useEffect(() => {
-    if (profile?.primeiro_acesso === true) {
+    if (!previewMode && profile?.primeiro_acesso === true) {
       setVisible(true);
     }
-  }, [profile]);
+  }, [profile, previewMode]);
 
   const handleEnter = async () => {
+    if (previewMode) {
+      setVisible(false);
+      onClose?.();
+      return;
+    }
     setEntering(true);
     try {
       await supabase
