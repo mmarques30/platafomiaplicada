@@ -7,6 +7,7 @@ import { useIdleLogout } from "@/hooks/useIdleLogout";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useEnvironmentSafe } from "@/hooks/useEnvironment";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { GraduationCap, Users, LogOut } from "lucide-react";
@@ -32,6 +33,8 @@ export function MainLayout() {
   const queryClient = useQueryClient();
   const environmentContext = useEnvironmentSafe();
   const { isViewingAs } = useAdminViewContext();
+  const { effectivePlan } = useEffectivePlan(isAdmin, isLoading);
+  const isBusinessPlan = effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas';
 
   // Redirecionar para seleção de ambiente se não selecionado
   useEffect(() => {
@@ -66,7 +69,7 @@ export function MainLayout() {
   // Layout unificado para todos os usuários
   return (
     <>
-      <OnboardingVideo />
+      {!isBusinessPlan && <OnboardingVideo />}
       <SidebarProvider>
         <TopHeader />
         <div className={cn(
