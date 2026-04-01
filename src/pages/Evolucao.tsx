@@ -9,7 +9,7 @@ import { HeroComunidade } from "@/components/evolucao/HeroComunidade";
 import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndamentoCards";
 import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
 import { BonusEvolucao } from "@/components/evolucao/BonusEvolucao";
-import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
+
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
@@ -61,7 +61,6 @@ export default function Evolucao() {
         {/* ABA 1: MINHA EVOLUÇÃO */}
         <TabsContent value="minha-evolucao" className="space-y-6 mt-6">
           <HeroEvolucao />
-          {isBusiness && <BusinessProgressoConteudo />}
           {isBusiness && <BusinessEvolucaoAprendizado />}
           <TrilhasEmAndamentoCards />
           <VitrineConquistas />
