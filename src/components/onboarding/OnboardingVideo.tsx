@@ -35,25 +35,25 @@ export function OnboardingVideo() {
   if (!visible) return null;
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}>
-      <div style={{ background: '#14160F', borderRadius: 16, overflow: 'hidden', width: '100%', maxWidth: 560, boxShadow: '0 24px 80px rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ position: 'relative', paddingBottom: '56.25%', background: '#0C0F0A' }}>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-[8px]">
+      <div className="bg-[#14160F] rounded-2xl overflow-hidden w-full max-w-[560px] shadow-[0_24px_80px_rgba(0,0,0,0.6)] border border-white/[0.06]">
+        <div className="relative pb-[56.25%] bg-[#0C0F0A]">
           <iframe
             src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?rel=0&modestbranding=1`}
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+            className="absolute top-0 left-0 w-full h-full border-none"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         </div>
-        <div style={{ padding: '28px 32px' }}>
-          <p style={{ fontSize: 10, fontWeight: 600, color: '#AFC040', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>✱ IAplicada</p>
-          <p style={{ fontSize: 21, fontWeight: 600, color: '#E2E5DC', marginBottom: 8, lineHeight: 1.3 }}>Bem-vindo à sua jornada.</p>
-          <p style={{ fontSize: 14, color: '#6B7060', lineHeight: 1.7, marginBottom: 28 }}>Assista ao vídeo acima — preparei uma mensagem especial para você começar com tudo. Quando estiver pronto, clique em entrar.</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <button onClick={handleEnter} disabled={entering} style={{ background: '#AFC040', color: '#0C0F0A', fontSize: 14, fontWeight: 600, padding: '12px 32px', borderRadius: 10, border: 'none', cursor: entering ? 'not-allowed' : 'pointer', opacity: entering ? 0.7 : 1, fontFamily: 'inherit', transition: 'opacity 0.15s' }}>
+        <div className="px-8 py-7">
+          <p className="text-[10px] font-semibold text-[#AFC040] uppercase tracking-[0.1em] mb-2">✱ IAplicada</p>
+          <p className="text-[21px] font-semibold text-[#E2E5DC] mb-2 leading-[1.3]">Bem-vindo à sua jornada.</p>
+          <p className="text-sm text-[#6B7060] leading-[1.7] mb-7">Assista ao vídeo acima — preparei uma mensagem especial para você começar com tudo. Quando estiver pronto, clique em entrar.</p>
+          <div className="flex items-center gap-4">
+            <button onClick={handleEnter} disabled={entering} className={`bg-[#AFC040] text-[#0C0F0A] text-sm font-semibold px-8 py-3 rounded-[10px] border-none font-[inherit] transition-opacity duration-150 ${entering ? 'cursor-not-allowed opacity-70' : 'cursor-pointer opacity-100'}`}>
               {entering ? 'Entrando...' : 'Entrar na plataforma →'}
             </button>
-            <button onClick={handleEnter} disabled={entering} style={{ background: 'transparent', color: '#6B7060', fontSize: 13, border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: '12px 0' }}>
+            <button onClick={handleEnter} disabled={entering} className="bg-transparent text-[#6B7060] text-[13px] border-none cursor-pointer font-[inherit] py-3 px-0">
               Pular
             </button>
           </div>
