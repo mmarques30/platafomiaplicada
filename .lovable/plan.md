@@ -1,19 +1,24 @@
 
 
-# Fallback para YouTube não configurado no OnboardingVideo
+# Condicionar OnboardingVideo para não renderizar para Business
 
 ## Alteração
 
-**Arquivo**: `src/components/onboarding/OnboardingVideo.tsx`
+**Arquivo**: `src/components/layout/MainLayout.tsx`
 
-1. Adicionar constante `VIDEO_CONFIGURADO` após `YOUTUBE_VIDEO_ID`
-2. Substituir o bloco do iframe por condicional: se configurado mostra iframe, senão mostra placeholder com ícone "M" e texto
+1. Adicionar import de `useEffectivePlan` do `@/hooks/useUserPlan`
+2. Dentro do componente, após os hooks existentes, adicionar:
+   ```
+   const { effectivePlan } = useEffectivePlan(isAdmin, isLoading);
+   const isBusinessPlan = effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas';
+   ```
+3. Linha 69: substituir `<OnboardingVideo />` por `{!isBusinessPlan && <OnboardingVideo />}`
 
-Nenhuma outra alteração — `handleEnter`, `useEffect`, `primeiro_acesso` e rodapé permanecem intactos.
+Nenhuma outra alteração.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/onboarding/OnboardingVideo.tsx` | Editado — fallback condicional na área de vídeo |
+| `src/components/layout/MainLayout.tsx` | Editado — condicional Business no OnboardingVideo |
 
