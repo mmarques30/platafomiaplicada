@@ -22,6 +22,7 @@ import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/Busines
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
 import { IAplicadaRoadmap } from "@/components/mentoria/business/IAplicadaRoadmap";
+import { JornadaStrip } from "@/components/mentoria/JornadaStrip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Mentoria() {
@@ -74,6 +75,9 @@ export default function Mentoria() {
 
       {/* Acesso Rápido - Apenas para Business, abaixo do hero */}
       {isBusiness && <BusinessAcessoRapido />}
+
+      {/* Jornada Strip - linha de estágios */}
+      <JornadaStrip />
 
       {/* Tabs - Diferente para Business vs Academy */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
