@@ -188,7 +188,7 @@ export function WelcomeHeader() {
   const showKpis = !isVisitante && (hasKpis || isLoadingKpis);
 
   const kpiSkeleton = (
-    <div style={{ width: 40, height: 22, background: 'rgba(255,255,255,0.06)', borderRadius: 4, animation: 'kpiPulse 1.2s ease-in-out infinite', margin: '0 auto' }} />
+    <div className="w-10 h-[22px] bg-white/[0.06] rounded animate-[kpiPulse_1.2s_ease-in-out_infinite] mx-auto" />
   );
 
   return (
@@ -227,67 +227,53 @@ export function WelcomeHeader() {
         {showKpis && (
           <>
             <div className="border-t border-white/10" />
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                padding: "10px 20px",
-                flexWrap: "wrap",
-              }}
-            >
+            <div className="flex items-center gap-4 px-5 py-2.5 flex-wrap">
               {/* KPI 1 */}
-              <div style={{ textAlign: "center", minWidth: 50 }}>
-                <div style={{ color: "#2CBBA6", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
+              <div className="text-center min-w-[50px]">
+                <div className="font-bold text-lg leading-tight" style={{ color: "#2CBBA6" }}>
                   {isLoadingKpis ? kpiSkeleton : kpi1Display}
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                <div className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5px]">
                   {kpi1Label}
                 </div>
               </div>
 
-              <div style={{ width: 1, height: 28, background: "rgba(255,255,255,0.1)" }} />
+              <div className="w-px h-7 bg-white/10" />
 
               {/* KPI 2 */}
-              <div style={{ textAlign: "center", minWidth: 50 }}>
-                <div style={{ color: "#E8A43C", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
+              <div className="text-center min-w-[50px]">
+                <div className="font-bold text-lg leading-tight" style={{ color: "#E8A43C" }}>
                   {isLoadingKpis ? kpiSkeleton : kpi2Display}
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                <div className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5px]">
                   {kpi2Label}
                 </div>
               </div>
 
-              <div style={{ width: 1, height: 28, background: "rgba(255,255,255,0.1)" }} />
+              <div className="w-px h-7 bg-white/10" />
 
               {/* KPI 3 */}
-              <div style={{ textAlign: "center", minWidth: 50 }}>
-                <div style={{ color: "#AFC040", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
+              <div className="text-center min-w-[50px]">
+                <div className="font-bold text-lg leading-tight" style={{ color: "#AFC040" }}>
                   {isLoadingKpis ? kpiSkeleton : kpi3Display}
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                <div className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5px]">
                   {kpi3Label}
                 </div>
               </div>
 
               <button
                 onClick={() => navigate(ctaHref)}
-                style={{
-                  marginLeft: "auto",
-                  background: "hsl(var(--primary))",
-                  color: "hsl(var(--primary-foreground))",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  padding: "7px 14px",
-                  borderRadius: 8,
-                  border: "none",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
+                className="ml-auto bg-primary text-primary-foreground text-[13px] font-medium py-[7px] px-3.5 rounded-lg border-none cursor-pointer whitespace-nowrap"
               >
                 {ctaLabel} →
               </button>
             </div>
+          </>
+        )}
+      </div>
+    </div>
+    </>
           </>
         )}
       </div>
