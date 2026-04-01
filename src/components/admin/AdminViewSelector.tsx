@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, User, GraduationCap, Briefcase, Building2, Wrench } from "lucide-react";
+import { Eye, EyeOff, User, GraduationCap, Briefcase, Building2, Wrench, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
