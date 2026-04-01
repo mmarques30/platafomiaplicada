@@ -33,7 +33,7 @@ export default function Dashboard() {
   const showTour = useMemo(() => {
     if (loadingProfile) return false;
     if (isVisitante) return false;
-    return profile?.primeiro_acesso === true;
+    return profile?.primeiro_acesso === true && sessionStorage.getItem('onboarding_video_visto') === 'true';
   }, [loadingProfile, isVisitante, profile]);
 
   if (loadingRole) {
