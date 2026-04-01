@@ -76,6 +76,9 @@ export default function Mentoria() {
       {/* Acesso Rápido - Apenas para Business, abaixo do hero */}
       {isBusiness && <BusinessAcessoRapido />}
 
+      {/* Jornada Strip - linha de estágios */}
+      <JornadaStrip />
+
       {/* Tabs - Diferente para Business vs Academy */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
         <TabsList className={`w-full md:w-auto grid ${showEvolucaoTab ? 'grid-cols-3' : 'grid-cols-2'} md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6`}>
