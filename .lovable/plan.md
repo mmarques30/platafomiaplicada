@@ -1,47 +1,32 @@
 
 
-# Substituir layout do AcademyRoadmapEducacional por 4 cards visuais conectados
+# Nav-pill sticky + scroll contínuo para Business Parceria
 
-## Alteração
+## Resumo
 
-**Arquivo**: `src/components/mentoria/AcademyRoadmapEducacional.tsx`
+Para `isBusinessParceria` apenas, substituir o `<Tabs>` por seções contínuas com nav-pill sticky e IntersectionObserver. Academy, Skills e Business Sistemas mantêm as abas inalteradas.
 
-### Dados (derivados dos hooks existentes)
+## Alterações
 
-| Variável | Fonte |
-|---|---|
-| `diagnosticoPreenchido` | `formulario?.completado === true` (já existe como `diagnosticoCompleto`) |
-| `diagnosticoData` | `formulario?.updated_at` formatado |
-| `modulosConcluidos` | `allTrilhas.filter(t => t.percentual === 100).length` |
-| `totalModulos` | `allTrilhas.length` |
-| `conquistasCount` | `totalVideos + certificadosEmitidos.length + totalProjetos` (soma das conquistas existentes) |
-| `certificadoEmitido` | `certificadosEmitidos.length > 0` |
+### Arquivo: `src/pages/Mentoria.tsx`
 
-### JSX — substituir todo o bloco `return` (linhas 62-251)
+1. **Adicionar `useState`** ao import do React (já tem `useEffect`)
 
-Renderizar um `grid grid-cols-1 sm:grid-cols-2 gap-4` com 4 cards, cada um contendo:
-- Label "Estágio XX" em `text-[11px] uppercase tracking-wider`
-- Icone Lucide (ClipboardList, BookOpen, Trophy, Award) com cor condicional (emerald se concluído, amber se atual, muted se próximo)
-- Título do estágio
-- Badge de status (Concluído / Em andamento / Pendente)
-- Meta text descritivo
+2. **Adicionar hook `activeSection`** + `useEffect` com IntersectionObserver para as 3 seções (`visao-geral`, `roadmap`, `evolucao`), com `threshold: 0.3`
 
-### Conectores visuais
-Linha horizontal entre cards no desktop (`hidden sm:block` divider entre cols) e linha vertical no mobile (border-left ou pseudo-element).
+3. **Substituir o bloco de renderização** (linhas 110-173) por condicional:
+   - **Se `isBusinessParceria`**: renderizar nav-pill sticky + 3 `<section id="sec-...">` contínuas com os mesmos componentes internos (`BusinessVisaoGeralGrid`, `BusinessExecutiveRoadmap`, `BusinessEvolucaoAprendizado`)
+   - **Senão**: manter o `<Tabs>` exatamente como está (Academy, Sistemas, etc.)
 
-### Imports
-- Trocar `ClipboardCheck` por `ClipboardList`
-- Remover imports não utilizados (`Clock`, `ArrowRight`, `Flame`, `Star`, `Target`, `Button`, `ProgressBar`, `useCountUp`, `useSequenciaEstudo`, `useNavigate`, `CheckCircle2`)
-- Manter `BookOpen`, `Trophy`, `Award`, `Badge`, `Card`, `CardContent`, `Skeleton`
+4. **Nav-pill**: `div` com `position: sticky`, `top: 64px`, `z-index: 40`, fundo `bg-background/80 backdrop-blur`, contendo 3 botões pill com estilo inline (verde `#AFC040` quando ativo)
 
-### Hooks mantidos (sem alteração)
-`useMentoriaForm`, `useProgressoCertificados`, `useMinhaEvolucao`, `useMeusCertificados`
+5. **Seções**: cada `<section>` com `scroll-mt-28` para compensar header + nav-pill sticky, separadas por `<h2>` de título e os componentes existentes
 
-### Nenhuma outra alteração — outros componentes, auth, roles, planos intactos.
+### Nenhuma outra alteração — componentes filhos, auth, roles, planos, e abas de outros planos permanecem intactos.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/mentoria/AcademyRoadmapEducacional.tsx` | Editado — layout de 4 seções → 4 cards visuais conectados |
+| `src/pages/Mentoria.tsx` | Editado — condicional Business Parceria com scroll contínuo |
 
