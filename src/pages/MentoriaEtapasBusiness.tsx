@@ -95,80 +95,81 @@ export default function MentoriaEtapasBusiness() {
       </Card>
 
       {/* Lista de Etapas */}
-      <div className="space-y-4">
-        {etapas?.map((etapa) => {
-          const stats = getEtapaStats(etapa.id);
-          const statusInfo = statusConfig[etapa.status];
-          
-          return (
-            <Card 
-              key={etapa.id}
-              className={cn(
-                "cursor-pointer transition-all hover:border-primary/50 hover:shadow-md",
-                etapa.status === 'concluida' && "opacity-75"
-              )}
-              onClick={() => navigate(`/mentoria/etapa/${etapa.id}`)}
-            >
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className={cn(
-                        "h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold",
-                        etapa.status === 'concluida' 
-                          ? "bg-emerald-500/20 text-emerald-600" 
-                          : etapa.status === 'em_andamento'
-                          ? "bg-amber-500/20 text-amber-600"
-                          : "bg-muted text-muted-foreground"
-                      )}>
-                        {etapa.status === 'concluida' ? (
-                          <CheckCircle2 className="h-4 w-4" />
-                        ) : (
-                          etapa.numero_etapa
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground">
-                          Fase {etapa.numero_etapa}: {etapa.titulo}
-                        </h3>
-                        {etapa.data_prevista && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                            <Calendar className="h-3 w-3" />
-                            <span>
-                              Previsão: {format(new Date(etapa.data_prevista), "dd MMM yyyy", { locale: ptBR })}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {etapa.objetivo && (
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2 pl-11">
-                        {etapa.objetivo}
-                      </p>
-                    )}
+      <div className="relative">
+        {/* Linha vertical */}
+        <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-border" />
 
-                    <div className="flex items-center gap-4 pl-11">
-                      <div className="text-xs text-muted-foreground">
-                        <span className="font-medium">{stats.totalEntregas}</span> entregas
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        <span className="font-medium">{stats.instrucoesConcluidas}/{stats.totalInstrucoes}</span> instruções
-                      </div>
-                      {stats.totalInstrucoes > 0 && (
-                        <div className="flex-1 max-w-32">
-                          <Progress value={stats.progressoInstrucoes} className="h-1.5" />
-                        </div>
-                      )}
-                    </div>
+        {etapas?.map((etapa, i) => {
+          const stats = getEtapaStats(etapa.id);
+          const isConcluida = etapa.status === 'concluida';
+          const isAtual = etapa.status === 'em_andamento';
+
+          return (
+            <div key={etapa.id} className="relative flex gap-4 pb-8 last:pb-0">
+              {/* Marcador circular */}
+              <div
+                className={cn(
+                  "relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold",
+                  isConcluida
+                    ? "bg-emerald-500/20 text-emerald-500"
+                    : isAtual
+                    ? "bg-amber-500/20 text-amber-500 ring-2 ring-amber-500/40 animate-pulse"
+                    : "bg-muted text-muted-foreground"
+                )}
+              >
+                {isConcluida ? '✓' : i + 1}
+              </div>
+
+              {/* Card da etapa */}
+              <Card
+                className="flex-1 cursor-pointer transition-all hover:border-primary/50 hover:shadow-md"
+                onClick={() => navigate(`/mentoria/etapa/${etapa.id}`)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <h3 className="font-semibold text-foreground">
+                      {etapa.titulo}
+                    </h3>
+                    {isAtual && (
+                      <span className="text-[10px] uppercase tracking-wider text-amber-500 font-semibold whitespace-nowrap">
+                        você está aqui
+                      </span>
+                    )}
                   </div>
 
-                  <Badge className={statusInfo.className}>
-                    {statusInfo.label}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+                  {etapa.objetivo && (
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {etapa.objetivo}
+                    </p>
+                  )}
+
+                  {isAtual && stats.totalInstrucoes > 0 && (
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                        <span>Progresso</span>
+                        <span>{stats.progressoInstrucoes}%</span>
+                      </div>
+                      <Progress value={stats.progressoInstrucoes} className="h-1.5" />
+                    </div>
+                  )}
+
+                  {isConcluida && etapa.data_prevista && (
+                    <p className="text-xs text-muted-foreground">
+                      Concluída em {format(new Date(etapa.data_prevista), "dd/MM/yyyy", { locale: ptBR })}
+                    </p>
+                  )}
+
+                  <div className="flex items-center gap-4 mt-2">
+                    <span className="text-xs text-muted-foreground">
+                      <span className="font-medium">{stats.totalEntregas}</span> entregas
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      <span className="font-medium">{stats.instrucoesConcluidas}/{stats.totalInstrucoes}</span> instruções
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           );
         })}
       </div>
