@@ -30,6 +30,11 @@ import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { useEnvironment } from "@/hooks/useEnvironment";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import * as LucideIcons from "lucide-react";
+import { SidebarUserCard } from "./SidebarUserCard";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
+import { useProgressoGeral } from "@/hooks/useEvolucao";
 
 export function AppSidebar() {
   const { open } = useSidebar();
