@@ -72,7 +72,7 @@ export function WelcomeHeader() {
   console.log('[WelcomeHeader] isBusiness:', isBusiness);
   const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
   console.log('[WelcomeHeader] contrato:', contrato);
-  const { data: etapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
+  const { data: etapas, isLoading: isLoadingEtapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
   console.log('[WelcomeHeader] etapas:', etapas?.length, 'etapas');
   const { data: tasks } = useTasksByUser(isBusiness ? businessUserId : undefined);
   const { sessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
