@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -22,7 +22,31 @@ export function AcademyWelcomeCard({ onStartTour }: AcademyWelcomeCardProps) {
   const isAcademy = profile?.plano_mentoria === "academy";
   const isFirstAccess = profile?.primeiro_acesso === true;
 
-  if (!isAcademy || !isFirstAccess || dismissed) return null;
+  const dataOnboarding = profile?.created_at ? new Date(profile.created_at) : null;
+  const diasDesdeOnboarding = dataOnboarding
+    ? Math.floor((Date.now() - dataOnboarding.getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+
+  const shouldShow = isAcademy && isFirstAccess && !dismissed && diasDesdeOnboarding <= 7;
+
+  const { data: primeiraTrilha } = useQuery({
+    queryKey: ["primeira-trilha-recomendada"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trilhas")
+        .select("id, titulo")
+        .eq("visivel_mentorados", true)
+        .order("ordem")
+        .limit(1)
+        .single();
+      if (error) return null;
+      return data;
+    },
+    enabled: shouldShow,
+    staleTime: 1000 * 60 * 30,
+  });
+
+  if (!shouldShow) return null;
 
   const firstName = profile?.nome_completo?.split(" ")[0] || "aluno";
 
@@ -92,6 +116,16 @@ export function AcademyWelcomeCard({ onStartTour }: AcademyWelcomeCardProps) {
               </Button>
             );
           })}
+        </div>
+        <div style={{ marginTop: 16, padding: '12px 14px', background: 'rgba(175,192,64,0.08)', borderRadius: 10, border: '0.5px solid rgba(175,192,64,0.2)' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#AFC040', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Comece por aqui</p>
+          <p style={{ fontSize: 14, fontWeight: 500, color: 'hsl(var(--foreground))', marginBottom: 10 }}>{primeiraTrilha?.titulo ?? 'Introdução à IA Aplicada'}</p>
+          <button
+            onClick={() => navigate(primeiraTrilha ? `/trilhas/${primeiraTrilha.id}` : '/trilhas')}
+            style={{ background: '#AFC040', color: '#0C0F0A', fontSize: 13, fontWeight: 600, padding: '8px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+          >
+            Começar trilha →
+          </button>
         </div>
       </CardContent>
     </Card>
