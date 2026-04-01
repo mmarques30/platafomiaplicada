@@ -257,7 +257,7 @@ export function WelcomeHeader() {
               {/* KPI 2 */}
               <div style={{ textAlign: "center", minWidth: 50 }}>
                 <div style={{ color: "#E8A43C", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
-                  {kpi2Display}
+                  {isLoadingKpis ? kpiSkeleton : kpi2Display}
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
                   {kpi2Label}
