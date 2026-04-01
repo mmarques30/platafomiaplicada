@@ -1,59 +1,32 @@
 
 
-# Layout grid de 3 linhas na Visão Geral Business Parceria
+# Substituir lista de cards por timeline vertical em MentoriaEtapasBusiness
 
-## Resumo
+## Alteração
 
-Substituir o stack vertical (`InsightSemanalCard → BusinessROIChart → BusinessReportsCard`) por um grid de 3 linhas com KPIs no topo, usando dados dos hooks já disponíveis no projeto.
+**Arquivo**: `src/pages/MentoriaEtapasBusiness.tsx`
 
-## Alterações
+### Substituir bloco de lista (linhas 97-173)
 
-### 1. Criar componente `src/components/mentoria/business/BusinessVisaoGeralGrid.tsx`
+Trocar o `div.space-y-4` com cards por um container `relative` com:
+- Linha vertical absoluta (`absolute left-5 top-0 bottom-0 w-0.5 bg-border`)
+- Cada etapa renderizada como `flex gap-4` com:
+  - **Marcador circular** (40px, `z-10`): verde com `✓` se concluída, amber pulsante se em andamento, muted se pendente
+  - **Card clicável** ao lado com:
+    - Título + badge "você está aqui" se em andamento
+    - Objetivo (descrição) se existir
+    - Barra de progresso de instruções se em andamento e `stats.totalInstrucoes > 0`
+    - Data de previsão se concluída
+    - Stats de entregas/instruções
 
-Componente que encapsula o layout de 3 linhas:
+### Dados mantidos
+Usa os mesmos `etapas`, `getEtapaStats()`, `statusConfig`, `navigate()` — zero alteração em hooks/queries.
 
-- **Linha 1 — 3 KPI cards** (`grid grid-cols-3 gap-4`):
-  - **Próxima Sessão**: usa `useMentoriaSessoes(businessUserId)` para buscar próxima sessão agendada futura. Exibe dia formatado + hora.
-  - **Tarefas Críticas**: usa `useTasksByUser(businessUserId)` para contar tarefas com `prioridade === 'urgente' || 'alta'` e `status !== 'aprovado'`.
-  - **Progresso Geral**: usa `useEtapasBusiness(contrato?.id)` para calcular % de etapas concluídas.
-
-- **Linha 2 — ROI + Reports** (`grid grid-cols-3 gap-4`):
-  - `BusinessROIChart` ocupa `col-span-2`
-  - `BusinessReportsCard` ocupa `col-span-1`
-
-- **Linha 3 — Progresso por fase** (largura total):
-  - `InsightSemanalCard` (ou `BusinessProgressoConteudo` se preferido — manter `InsightSemanalCard` como estava)
-
-### 2. Editar `src/pages/Mentoria.tsx`
-
-- Substituir o bloco `isBusiness` na aba Visão Geral:
-  - De: `<InsightSemanalCard /> <BusinessROIChart /> <BusinessReportsCard />`
-  - Para: `<BusinessVisaoGeralGrid />`
-- Adicionar import do novo componente
-
-### Hooks utilizados (já existentes no projeto)
-
-| Hook | Dado extraído |
-|---|---|
-| `useMentoriaSessoes(userId)` | Próxima sessão agendada (data, hora) |
-| `useTasksByUser(userId)` | Contagem de tarefas críticas |
-| `useEtapasBusiness(contratoId)` | % etapas concluídas |
-| `useBusinessUserId()` | User ID correto (admin ou próprio) |
-| `useContratosBusiness(userId)` | Contrato para obter etapas |
-
-### Estilo dos KPI cards
-
-Cada KPI card será um `Card` com:
-- Label superior: `text-[11px] uppercase tracking-wider text-muted-foreground`
-- Valor central: `text-2xl font-bold`
-- Subtítulo: `text-xs text-muted-foreground`
-
-### Nenhuma alteração em componentes filhos, abas Roadmap/Evolução, auth ou roles.
+### Nenhuma outra alteração — header, progresso geral card, empty state, imports, auth e roles permanecem intactos.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/mentoria/business/BusinessVisaoGeralGrid.tsx` | Criado |
-| `src/pages/Mentoria.tsx` | Editado — substitui bloco Business na aba Visão Geral |
+| `src/pages/MentoriaEtapasBusiness.tsx` | Editado — lista → timeline vertical |
 
