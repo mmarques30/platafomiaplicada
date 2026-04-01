@@ -137,12 +137,7 @@ export default function Mentoria() {
           {isBusinessSistemas ? (
             <IAplicadaVisaoGeral />
           ) : isBusiness ? (
-            <>
-              {/* Business Colaborativo: Insight → ROI → Reports */}
-              <InsightSemanalCard />
-              <BusinessROIChart />
-              <BusinessReportsCard />
-            </>
+            <BusinessVisaoGeralGrid />
           ) : (
             <>
               {/* Academy: Layout com próximo passo inteligente */}
