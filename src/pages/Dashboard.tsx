@@ -49,7 +49,6 @@ export default function Dashboard() {
         {isVisitante ? (
           <div className="space-y-6">
             <WelcomeHeader />
-            <ContextStrip />
             <PWAInstallBanner />
             <CentralConteudoGratuito />
             <RankingTickerGratuito />
