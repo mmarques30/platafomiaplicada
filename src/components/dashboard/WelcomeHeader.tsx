@@ -274,10 +274,5 @@ export function WelcomeHeader() {
       </div>
     </div>
     </>
-          </>
-        )}
-      </div>
-    </div>
-    </>
   );
 }
