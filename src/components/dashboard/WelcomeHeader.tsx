@@ -193,7 +193,13 @@ export function WelcomeHeader() {
 
   const showKpis = !isVisitante && (hasKpis || isLoadingKpis);
 
+  const kpiSkeleton = (
+    <div style={{ width: 40, height: 22, background: 'rgba(255,255,255,0.06)', borderRadius: 4, animation: 'kpiPulse 1.2s ease-in-out infinite', margin: '0 auto' }} />
+  );
+
   return (
+    <>
+    <style>{`@keyframes kpiPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
     <div className="w-full mt-2 md:mt-4">
       <div className="flex flex-col bg-gradient-to-r from-[#0C0F0A] via-[#151814] to-[#0C0F0A] backdrop-blur-sm rounded-lg sm:rounded-xl md:rounded-2xl border border-white/10">
         {/* Top section — original layout */}
