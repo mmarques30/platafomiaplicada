@@ -22,6 +22,7 @@ import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/Busines
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
 import { IAplicadaRoadmap } from "@/components/mentoria/business/IAplicadaRoadmap";
+import { JornadaStrip } from "@/components/mentoria/JornadaStrip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Mentoria() {
