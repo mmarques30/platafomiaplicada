@@ -30,6 +30,11 @@ import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { useEnvironment } from "@/hooks/useEnvironment";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import * as LucideIcons from "lucide-react";
+import { SidebarUserCard } from "./SidebarUserCard";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
+import { useProgressoGeral } from "@/hooks/useEvolucao";
 
 export function AppSidebar() {
   const { open } = useSidebar();
@@ -38,10 +43,28 @@ export function AppSidebar() {
   const { isAdmin, isMentorado, isParceiro, isLoading: roleLoading } = useUserRole();
   const { effectivePlan, isVisitante, isBusiness, isSkills, isAcademy, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading, isParceiro);
   const { isViewingAs, resetView, viewAs } = useAdminViewContext();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { getSidebarMenus, isMenuVisible, isLoading: menuLoading } = useMenuConfig();
   const { isLider: isSkillsLider, isLoading: skillsMembroLoading } = useSkillsMembro();
   const { currentEnvironment } = useEnvironment();
+
+  // Progress data for SidebarUserCard
+  const businessUserId = useBusinessUserId();
+  const { contrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
+  const { data: etapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
+  const { data: progressoGeral } = useProgressoGeral();
+
+  const userName = user?.user_metadata?.nome_completo || user?.email || "";
+  const userProgress = (() => {
+    if (isBusiness && etapas && etapas.length > 0) {
+      const concluidas = etapas.filter((e: any) => e.status === "concluida").length;
+      return Math.round((concluidas / etapas.length) * 100);
+    }
+    if (isAcademy && progressoGeral) {
+      return progressoGeral.percentualConclusao ?? 0;
+    }
+    return 0;
+  })();
   
   const collapsed = !open;
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
@@ -519,6 +542,14 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
+        {!isVisitante && effectivePlan && (
+          <SidebarUserCard
+            nome={userName}
+            plano={effectivePlan}
+            progresso={userProgress}
+            collapsed={collapsed}
+          />
+        )}
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="group">
