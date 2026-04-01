@@ -64,7 +64,8 @@ export function WelcomeHeader() {
   const diaSemana = formatInTimeZone(dataAtual, TIMEZONE, 'EEE', { locale: ptBR });
 
   // ── Business KPIs ──
-  const businessUserId = useBusinessUserId();
+  const rawBusinessUserId = useBusinessUserId();
+  const businessUserId = rawBusinessUserId ?? user?.id;
   console.log('[WelcomeHeader] businessUserId:', businessUserId);
   console.log('[WelcomeHeader] user?.id:', user?.id);
   console.log('[WelcomeHeader] effectivePlan:', effectivePlan);
