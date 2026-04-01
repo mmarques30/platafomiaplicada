@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { MarIAnaChatDrawer } from "./MarIAnaChatDrawer";
-import mariAvatar from "@/assets/mariana-avatar.png";
+import mariAvatar from "@/assets/mari-avatar-new.png";
 import mariAvatarFallback from "@/assets/mari-avatar.jpg";
 
 export function MarIAnaFloatingButton() {

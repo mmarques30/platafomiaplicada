@@ -15,7 +15,7 @@ import { useMentoriaContext } from "@/hooks/useMentoriaContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
-import mariAvatar from "@/assets/mariana-avatar.png";
+import mariAvatar from "@/assets/mari-avatar-new.png";
 import mariAvatarFallback from "@/assets/mari-avatar.jpg";
 
 interface Message {
