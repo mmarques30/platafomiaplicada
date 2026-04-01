@@ -17,7 +17,7 @@ import { BusinessAcessoRapido } from "@/components/mentoria/business/BusinessAce
 import { InsightSemanalCard } from "@/components/mentoria/business/InsightSemanalCard";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
-import { BusinessProgressoConteudo } from "@/components/mentoria/business/BusinessProgressoConteudo";
+
 import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
@@ -143,7 +143,6 @@ export default function Mentoria() {
         {/* Aba Evolução Aprendizado - Apenas Business Colaborativo */}
         {showEvolucaoTab && (
           <TabsContent value="evolucao-aprendizado" className="mt-0 space-y-6">
-            <BusinessProgressoConteudo />
             <BusinessEvolucaoAprendizado />
           </TabsContent>
         )}
