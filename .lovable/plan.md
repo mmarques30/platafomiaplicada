@@ -1,58 +1,30 @@
 
 
-# Loading state para KPIs do WelcomeHeader
+# Criar OnboardingVideo.tsx
 
-## Alteração
+## Ajustes necessários no código fornecido
 
-**Arquivo**: `src/components/dashboard/WelcomeHeader.tsx`
+O hook `useProfile` não existe no projeto. O hook correto é `useUserProfile` de `@/hooks/useUserProfile`. Além disso, ele não expõe `refetch` — será necessário usar `useQueryClient` para invalidar a query `["user-profile"]`.
 
-### 1. Extrair `isLoading` dos hooks existentes
+## Arquivo novo: `src/components/onboarding/OnboardingVideo.tsx`
 
-- Linha 73: `const { contrato }` → `const { contrato, isLoading: isLoadingContrato }`
-- Linha 75: `const { data: etapas }` → `const { data: etapas, isLoading: isLoadingEtapas }`
-- Linha 77: `const { data: tasks }` → `const { data: tasks, isLoading: isLoadingTasks }`
-- Linha 78: `const { sessoes }` → `const { sessoes, isLoading: isLoadingSessoes }`
-- Linha 81: `const { data: academyData }` → `const { data: academyData, isLoading: isLoadingAcademy }`
-- Linha 107: `const { data: skillsData }` → `const { data: skillsData, isLoading: isLoadingSkills }`
+Criar com o código fornecido pelo usuário, mas com estas correções:
 
-### 2. Computar `isLoadingKpis` (após linha 132)
+1. **Import**: `useProfile` → `useUserProfile` de `@/hooks/useUserProfile`
+2. **Import adicional**: `useQueryClient` de `@tanstack/react-query`
+3. **Dentro do componente**: `const { profile, refetch } = useProfile()` → `const { profile } = useUserProfile()` + `const queryClient = useQueryClient()`
+4. **No `handleEnter`**: `await refetch()` → `queryClient.invalidateQueries({ queryKey: ["user-profile"] })`
+5. **Guard**: `profile.id` → `profile?.id` (profile pode ser null)
+6. O JSX do código ficou truncado na mensagem — o overlay container e o iframe do YouTube precisam ser reconstruídos com base no padrão visual descrito (fundo escuro semi-transparente, card centralizado com iframe YouTube + texto + botões)
 
-```ts
-const isLoadingKpis =
-  (isBusiness && (isLoadingContrato || isLoadingEtapas || isLoadingTasks || isLoadingSessoes))
-  || (isAcademy && isLoadingAcademy)
-  || (isSkills && isLoadingSkills);
-```
+### Constante do vídeo
+Manter `YOUTUBE_VIDEO_ID = 'SUBSTITUIR_PELO_ID_DO_VIDEO'` como placeholder.
 
-### 3. Alterar `showKpis` para também mostrar durante loading
-
-```ts
-const showKpis = !isVisitante && (hasKpis || isLoadingKpis);
-```
-
-### 4. Nos 3 valores de KPI (linhas 236-237, 248-249, 260-261), renderizar placeholder quando loading
-
-Substituir `{kpi1Display}` por:
-```tsx
-{isLoadingKpis ? (
-  <div style={{ width: 40, height: 22, background: 'rgba(255,255,255,0.06)', borderRadius: 4, animation: 'kpiPulse 1.2s ease-in-out infinite', margin: '0 auto' }} />
-) : kpi1Display}
-```
-
-Mesmo padrão para kpi2Display e kpi3Display.
-
-### 5. Adicionar keyframe CSS inline via `<style>` no componente (ou usar um `useEffect` para injetar)
-
-Adicionar no topo do return, antes do JSX principal:
-```tsx
-<style>{`@keyframes kpiPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
-```
-
-Nenhuma outra lógica ou JSX alterado.
+### Nenhum outro arquivo alterado.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/WelcomeHeader.tsx` | Editado — loading state nos KPIs |
+| `src/components/onboarding/OnboardingVideo.tsx` | Novo |
 
