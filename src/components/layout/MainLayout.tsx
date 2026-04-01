@@ -7,6 +7,7 @@ import { useIdleLogout } from "@/hooks/useIdleLogout";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useEnvironmentSafe } from "@/hooks/useEnvironment";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { GraduationCap, Users, LogOut } from "lucide-react";
