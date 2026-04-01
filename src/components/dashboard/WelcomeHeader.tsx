@@ -104,7 +104,7 @@ export function WelcomeHeader() {
   });
 
   // ── Skills KPIs ──
-  const { data: skillsData } = useQuery({
+  const { data: skillsData, isLoading: isLoadingSkills } = useQuery({
     queryKey: ["welcome-header-skills", user?.id],
     enabled: isSkills && !!user?.id,
     staleTime: 1000 * 60 * 5,
