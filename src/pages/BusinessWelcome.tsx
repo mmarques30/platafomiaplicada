@@ -6,24 +6,8 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
-
-const steps = [
-  {
-    number: 1,
-    title: "Explore seu roadmap",
-    description: "veja as fases do seu projeto",
-  },
-  {
-    number: 2,
-    title: "Conheça suas etapas",
-    description: "entenda o que será entregue",
-  },
-  {
-    number: 3,
-    title: "Aguarde sua primeira sessão",
-    description: "ela será agendada em breve",
-  },
-];
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 
 export default function BusinessWelcome() {
   const navigate = useNavigate();
@@ -32,7 +16,32 @@ export default function BusinessWelcome() {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
 
+  const { contrato } = useContratosBusiness(user?.id);
+  const { data: etapas } = useEtapasBusiness(contrato?.id);
+  const totalEtapas = etapas?.length ?? 0;
+  const primeiraEtapa = etapas?.[0]?.titulo ?? 'sua primeira entrega';
+
   const firstName = profile?.nome_completo?.split(" ")[0] || "";
+
+  const steps = [
+    {
+      number: 1,
+      title: totalEtapas > 0 ? `Seu projeto tem ${totalEtapas} etapas definidas` : 'Seu roadmap está sendo preparado',
+      description: totalEtapas > 0
+        ? `A primeira se chama "${primeiraEtapa}". Acesse Minha Trajetória para ver o caminho completo.`
+        : 'Em breve você receberá o mapa completo da sua jornada.',
+    },
+    {
+      number: 2,
+      title: 'Sua primeira sessão será agendada',
+      description: 'Você receberá uma notificação quando a data for confirmada. Fique atento ao calendário da plataforma.',
+    },
+    {
+      number: 3,
+      title: 'A MarIAna já sabe quem você é',
+      description: 'Nossa assistente de IA tem contexto do seu projeto. Abra o chat quando tiver dúvidas ou precisar de orientação.',
+    },
+  ];
 
   const handleEnter = async () => {
     if (!user) return;
