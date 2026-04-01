@@ -1,28 +1,21 @@
 
-
-# Adicionar console.log de diagnóstico no WelcomeHeader
+# Fallback para businessUserId no WelcomeHeader
 
 ## Alteração
 
 **Arquivo**: `src/components/dashboard/WelcomeHeader.tsx`
 
-Adicionar 6 `console.log` temporários sem alterar nenhuma lógica ou JSX:
+Linha 68: trocar `const businessUserId = useBusinessUserId();` por:
 
-1. **Após linha 72** (`const businessUserId = useBusinessUserId();`):
-   - `console.log('[WelcomeHeader] businessUserId:', businessUserId);`
-   - `console.log('[WelcomeHeader] user?.id:', user?.id);`
-   - `console.log('[WelcomeHeader] effectivePlan:', effectivePlan);`
-   - `console.log('[WelcomeHeader] isBusiness:', isBusiness);`
+```ts
+const rawBusinessUserId = useBusinessUserId();
+const businessUserId = rawBusinessUserId ?? user?.id;
+```
 
-2. **Após linha 73** (`const { contrato } = useContratosBusiness(...)`):
-   - `console.log('[WelcomeHeader] contrato:', contrato);`
-
-3. **Após linha 74** (`const { data: etapas } = useEtapasBusiness(...)`):
-   - `console.log('[WelcomeHeader] etapas:', etapas?.length, 'etapas');`
+Os console.logs e toda a lógica restante permanecem iguais — apenas o valor de `businessUserId` ganha fallback para `user?.id`.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/WelcomeHeader.tsx` | Editado — adiciona console.log |
-
+| `src/components/dashboard/WelcomeHeader.tsx` | Editado — fallback no businessUserId |
