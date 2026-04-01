@@ -65,8 +65,14 @@ export function WelcomeHeader() {
 
   // ── Business KPIs ──
   const businessUserId = useBusinessUserId();
+  console.log('[WelcomeHeader] businessUserId:', businessUserId);
+  console.log('[WelcomeHeader] user?.id:', user?.id);
+  console.log('[WelcomeHeader] effectivePlan:', effectivePlan);
+  console.log('[WelcomeHeader] isBusiness:', isBusiness);
   const { contrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
+  console.log('[WelcomeHeader] contrato:', contrato);
   const { data: etapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
+  console.log('[WelcomeHeader] etapas:', etapas?.length, 'etapas');
   const { data: tasks } = useTasksByUser(isBusiness ? businessUserId : undefined);
   const { sessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
 
