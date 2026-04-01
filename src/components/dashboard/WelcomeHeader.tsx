@@ -70,15 +70,15 @@ export function WelcomeHeader() {
   console.log('[WelcomeHeader] user?.id:', user?.id);
   console.log('[WelcomeHeader] effectivePlan:', effectivePlan);
   console.log('[WelcomeHeader] isBusiness:', isBusiness);
-  const { contrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
+  const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
   console.log('[WelcomeHeader] contrato:', contrato);
-  const { data: etapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
+  const { data: etapas, isLoading: isLoadingEtapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
   console.log('[WelcomeHeader] etapas:', etapas?.length, 'etapas');
-  const { data: tasks } = useTasksByUser(isBusiness ? businessUserId : undefined);
-  const { sessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
+  const { data: tasks, isLoading: isLoadingTasks } = useTasksByUser(isBusiness ? businessUserId : undefined);
+  const { sessoes, isLoading: isLoadingSessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
 
   // ── Academy KPIs ──
-  const { data: academyData } = useQuery({
+  const { data: academyData, isLoading: isLoadingAcademy } = useQuery({
     queryKey: ["welcome-header-academy", user?.id],
     enabled: isAcademy && !!user?.id,
     staleTime: 1000 * 60 * 5,
@@ -104,7 +104,7 @@ export function WelcomeHeader() {
   });
 
   // ── Skills KPIs ──
-  const { data: skillsData } = useQuery({
+  const { data: skillsData, isLoading: isLoadingSkills } = useQuery({
     queryKey: ["welcome-header-skills", user?.id],
     enabled: isSkills && !!user?.id,
     staleTime: 1000 * 60 * 5,
@@ -186,9 +186,20 @@ export function WelcomeHeader() {
   const kpi2Display = hasKpis ? String(kpi2Animated) : "—";
   const kpi3Display = hasKpis ? (kpi3Text ?? (isSkills ? `${kpi3Animated}%` : String(kpi3Animated))) : "—";
 
-  const showKpis = !isVisitante && hasKpis;
+  const isLoadingKpis =
+    (isBusiness && (isLoadingContrato || isLoadingEtapas || isLoadingTasks || isLoadingSessoes))
+    || (isAcademy && isLoadingAcademy)
+    || (isSkills && isLoadingSkills);
+
+  const showKpis = !isVisitante && (hasKpis || isLoadingKpis);
+
+  const kpiSkeleton = (
+    <div style={{ width: 40, height: 22, background: 'rgba(255,255,255,0.06)', borderRadius: 4, animation: 'kpiPulse 1.2s ease-in-out infinite', margin: '0 auto' }} />
+  );
 
   return (
+    <>
+    <style>{`@keyframes kpiPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
     <div className="w-full mt-2 md:mt-4">
       <div className="flex flex-col bg-gradient-to-r from-[#0C0F0A] via-[#151814] to-[#0C0F0A] backdrop-blur-sm rounded-lg sm:rounded-xl md:rounded-2xl border border-white/10">
         {/* Top section — original layout */}
@@ -234,7 +245,7 @@ export function WelcomeHeader() {
               {/* KPI 1 */}
               <div style={{ textAlign: "center", minWidth: 50 }}>
                 <div style={{ color: "#2CBBA6", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
-                  {kpi1Display}
+                  {isLoadingKpis ? kpiSkeleton : kpi1Display}
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
                   {kpi1Label}
@@ -246,7 +257,7 @@ export function WelcomeHeader() {
               {/* KPI 2 */}
               <div style={{ textAlign: "center", minWidth: 50 }}>
                 <div style={{ color: "#E8A43C", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
-                  {kpi2Display}
+                  {isLoadingKpis ? kpiSkeleton : kpi2Display}
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
                   {kpi2Label}
@@ -258,7 +269,7 @@ export function WelcomeHeader() {
               {/* KPI 3 */}
               <div style={{ textAlign: "center", minWidth: 50 }}>
                 <div style={{ color: "#AFC040", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
-                  {kpi3Display}
+                  {isLoadingKpis ? kpiSkeleton : kpi3Display}
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
                   {kpi3Label}
@@ -287,5 +298,6 @@ export function WelcomeHeader() {
         )}
       </div>
     </div>
+    </>
   );
 }
