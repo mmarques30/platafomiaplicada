@@ -1,66 +1,38 @@
 
 
-# ContextStrip — banner de contexto abaixo do WelcomeHeader
+# Adicionar KPIs ao rodapé do WelcomeHeader
 
 ## O que será feito
 
-Criar `src/components/dashboard/ContextStrip.tsx` e inseri-lo no Dashboard logo após o `<WelcomeHeader />`, sem alterar nenhum componente existente.
+Mover a lógica de KPIs que hoje vive no `ContextStrip` para dentro do card do `WelcomeHeader`, renderizada abaixo de uma linha divisória. O `ContextStrip` separado será removido do Dashboard já que seus KPIs passam a viver no WelcomeHeader.
 
-## Novo componente: `ContextStrip.tsx`
+## Alterações
 
-### Dados e hooks utilizados
+### 1. `src/components/dashboard/WelcomeHeader.tsx` — Editado
 
-| Plano | Hooks | KPIs |
-|---|---|---|
-| **Business** | `useUserRole`, `useEffectivePlan`, `useUserProfile`, `useBusinessUserId`, `useContratosBusiness`, `useEtapasBusiness`, `useTasksByUser`, `useMentoriaSessoes` | % etapas concluídas (ROADMAP), tarefas alta/critica pendentes (CRÍTICAS), dia da próxima sessão (PRÓX. SESSÃO) |
-| **Academy** | `useMinhaEvolucao` (totalVideos semanal — já existe no `WeeklyProgressCard` query, mas usaremos query inline similar), `useTrilhasEmAndamento`, `VitrineConquistas` pattern (conquistas = certificados emitidos + sequência + ferramentas desbloqueadas) | Módulos esta semana (ESTA SEMANA), trilhas em andamento (EM ANDAMENTO), total conquistas (CONQUISTAS) |
-| **Skills** | `useSkillsMembro`, `useSkillsEntregas` | Membros equipe (EQUIPE — query simples `membros_equipe_skills`), entregas pendentes (PENDENTES), % concluídas (PROGRESSO) |
-| **Visitante/null** | Apenas nome + semana, sem KPIs nem botão | — |
+- Importar hooks adicionais: `useUserRole`, `useEffectivePlan`, `useBusinessUserId`, `useContratosBusiness`, `useEtapasBusiness`, `useTasksByUser`, `useMentoriaSessoes`, `useNavigate`, `useCountUp`
+- Reutilizar a mesma lógica de KPIs do ContextStrip (Business/Academy/Skills) com as cores especificadas:
+  - KPI 1: cor `#2CBBA6`
+  - KPI 2: cor `#E8A43C`  
+  - KPI 3: cor `#AFC040`
+- Aplicar `useCountUp(valor, 600)` nos 3 valores numéricos
+- Dentro do card existente (após linha 84, antes do `</div>` de fechamento do card na linha 85), adicionar:
+  - Divider `border-t border-white/10` condicional `!isVisitante`
+  - Row flex com 3 KPIs + botão CTA `#AFC040`
+- Parte superior do card (saudação + data) permanece intacta
 
-### Lógica
+### 2. `src/pages/Dashboard.tsx` — Editado
 
-- `weekNumber` = semanas desde `profile.created_at` (min 1)
-- `displayName` = nome ou email prefix ou "Usuário"
-- `planoLabel` = mapa do effectivePlan
-- KPIs calculados condicionalmente pelo plano efetivo, usando hooks existentes com `enabled` condicional
-- Fallback `"—"` para qualquer valor undefined/null
-- Nunca retorna `null` — sempre renderiza pelo menos a seção esquerda
+- Remover import e uso de `<ContextStrip />` (tanto no bloco visitante quanto no autenticado)
 
-### Detalhe dos KPIs
+### 3. `src/components/dashboard/ContextStrip.tsx` — Pode ser removido ou mantido sem uso
 
-**Business:**
-- KPI 1 (ROADMAP): `etapas.filter(e => e.status === 'concluida').length / etapas.length * 100` arredondado + "%"
-- KPI 2 (CRÍTICAS): `tasks.filter(t => ['alta','urgente'].includes(t.prioridade) && t.status !== 'aprovado').length`
-- KPI 3 (PRÓX. SESSÃO): próxima sessão futura com `status === 'agendada'`, formatada como dia da semana abreviado (`format(date, 'EEE', { locale: ptBR })`)
-
-**Academy:**
-- KPI 1 (ESTA SEMANA): query inline `progresso_videos` com `completado=true` e `updated_at >= 7 dias atrás`, count de `modulo_id` distintos
-- KPI 2 (EM ANDAMENTO): `useTrilhasEmAndamento` → count de trilhas com progresso > 0 e < 100
-- KPI 3 (CONQUISTAS): soma de conquistas desbloqueadas (mesma lógica da `VitrineConquistas` — certificados >= 1, sequência >= 7, vídeos >= 50, etc.)
-
-**Skills:**
-- KPI 1 (EQUIPE): query count `membros_equipe_skills` pela `equipeId` do membro
-- KPI 2 (PENDENTES): `entregas.filter(e => e.status === 'pendente' || e.status === 'em_andamento').length`
-- KPI 3 (PROGRESSO): `entregas concluídas / total * 100` + "%"
-
-### Layout (inline styles conforme pedido)
-
-- Container: `flex`, `items-center`, `justify-between`, dark bg (`#0C0F0A`), rounded, padding, border `white/10`
-- Esquerda: nome (branco bold) + "Semana X · Plano" (muted)
-- Direita: até 3 KPIs verticais (valor bold + label uppercase 11px) separados por dividers, + botão `#AFC040`
-
-## Integração no Dashboard
-
-**Arquivo editado**: `src/pages/Dashboard.tsx`
-
-- Importar `ContextStrip`
-- Adicionar `<ContextStrip />` imediatamente após `<WelcomeHeader />` (linha 81), tanto no bloco visitante quanto no bloco autenticado
-- WelcomeHeader não é tocado
+O arquivo deixa de ser importado. Pode ser deletado para limpeza.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/ContextStrip.tsx` | Novo |
-| `src/pages/Dashboard.tsx` | Editado — adiciona import + componente |
+| `src/components/dashboard/WelcomeHeader.tsx` | Editado — adiciona KPIs no rodapé do card |
+| `src/pages/Dashboard.tsx` | Editado — remove ContextStrip |
 
