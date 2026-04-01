@@ -1,32 +1,19 @@
 
+Diagnóstico rápido:
+- Verifiquei o código atual e a duplicação ainda existe em `src/pages/Mentoria.tsx` na aba `evolucao-aprendizado` (renderiza `BusinessProgressoConteudo` + `BusinessEvolucaoAprendizado` juntos).
+- Em `src/pages/Evolucao.tsx` já está consolidado apenas com `BusinessEvolucaoAprendizado`.
 
-# Remover informações duplicadas na Evolução para Business Parceria
+Plano de ajuste:
+1. Atualizar somente `src/pages/Mentoria.tsx`.
+2. Remover o import de `BusinessProgressoConteudo`.
+3. Na aba `evolucao-aprendizado`, remover `<BusinessProgressoConteudo />` e manter apenas `<BusinessEvolucaoAprendizado />`.
+4. Não alterar cálculo, hooks, filtros, JSX estrutural de outras abas ou outros arquivos.
 
-## Problema
+Resultado esperado:
+- Business Parceria deixa de exibir blocos duplicados na “Evolução Aprendizado”.
+- Layout fica consolidado em um único painel (o componente completo com filtros), igual ao padrão já aplicado em `/evolucao`.
 
-Na página Evolução, para usuários Business, dois componentes são renderizados em sequência:
-
-1. **BusinessProgressoConteudo** — mostra: Vídeos Assistidos, Prompts Consumidos, Interações + Atividade Recente (sem filtros)
-2. **BusinessEvolucaoAprendizado** — mostra: Tempo de Tela, Prompts Consumidos, Ferramentas Criadas + Atividade Recente (com filtros)
-
-Isso gera duplicação visível de métricas (prompts, tempo de vídeo) e duas seções "Atividade Recente" idênticas, como mostrado nos screenshots.
-
-## Solução
-
-Remover o `BusinessProgressoConteudo` da página Evolução, mantendo apenas o `BusinessEvolucaoAprendizado` que é mais completo (possui filtros, expand/collapse, favoritos).
-
-## Alteração
-
-**Arquivo**: `src/pages/Evolucao.tsx`
-
-- Remover o import de `BusinessProgressoConteudo` (linha 13)
-- Remover a renderização `{isBusiness && <BusinessProgressoConteudo />}` (linha 64)
-
-Nenhum outro arquivo alterado. O componente `BusinessProgressoConteudo` continua existindo para uso na página de Mentoria onde ele é renderizado separadamente.
-
-## Arquivos
-
-| Arquivo | Ação |
-|---|---|
-| `src/pages/Evolucao.tsx` | Editado — remove componente duplicado |
-
+Detalhes técnicos:
+- Arquivo: `src/pages/Mentoria.tsx`
+- Mudanças: 2 remoções (1 import + 1 render)
+- Escopo: zero impacto em Academy, Skills, Business Sistemas e demais páginas
