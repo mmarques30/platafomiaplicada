@@ -78,7 +78,7 @@ export function WelcomeHeader() {
   const { sessoes, isLoading: isLoadingSessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
 
   // ── Academy KPIs ──
-  const { data: academyData } = useQuery({
+  const { data: academyData, isLoading: isLoadingAcademy } = useQuery({
     queryKey: ["welcome-header-academy", user?.id],
     enabled: isAcademy && !!user?.id,
     staleTime: 1000 * 60 * 5,
