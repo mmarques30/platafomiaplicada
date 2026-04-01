@@ -1,19 +1,18 @@
 
 
-# Integrar OnboardingVideo no MainLayout
+# Substituir placeholder do YouTube Video ID
 
 ## Alteração
 
-**Arquivo**: `src/components/layout/MainLayout.tsx`
+**Arquivo**: `src/components/onboarding/OnboardingVideo.tsx`
 
-1. Adicionar import no topo: `import { OnboardingVideo } from '@/components/onboarding/OnboardingVideo';`
-2. Envolver o return em `<>...</>` e adicionar `<OnboardingVideo />` antes do `<SidebarProvider>`
+Linha 6: trocar `'SUBSTITUIR_PELO_ID_DO_VIDEO'` por `'SEU_ID_AQUI'`
 
-Nenhum outro arquivo alterado.
+Porém, `'SEU_ID_AQUI'` também é um placeholder. Você tem o ID real do vídeo do YouTube que deseja usar? Preciso do ID correto para fazer a substituição.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/layout/MainLayout.tsx` | Editado — import + inserção do OnboardingVideo |
+| `src/components/onboarding/OnboardingVideo.tsx` | Editado — atualiza VIDEO_ID |
 
