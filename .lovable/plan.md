@@ -1,30 +1,27 @@
 
 
-# Mensagem de boas-vindas automática no MarIAnaChatDrawer
+# Corrigir foto da MarIAna no botão flutuante e no chat
 
-## Alteração
+## Problema
 
-**Arquivo**: `src/components/shared/MarIAnaChatDrawer.tsx`
+O botão flutuante e o chat da MarIAna usam `mariana-avatar.png` como fonte principal e `mari-avatar.jpg` como fallback. A imagem pode estar demorando a carregar (arquivo grande) ou falhando silenciosamente, deixando o botão sem foto visível.
 
-1. **Imports**: Adicionar `useUserProfile` e `useEffectivePlan` + `useUserRole`
-2. **Hooks**: No componente, obter `profile` via `useUserProfile()`, `isAdmin`/`isLoading` via `useUserRole()`, e `effectivePlan` via `useEffectivePlan(isAdmin, isLoading)`
-3. **Nome**: `const firstName = profile?.nome_completo?.split(' ')?.[0] ?? 'por aqui'`
-4. **useEffect de boas-vindas**: Após o useEffect que injeta proactiveMessage (linha 67-71), adicionar novo useEffect que:
-   - Verifica `!isLoadingHistory && messages.length === 0 && user && !localStorage.getItem(\`mariana_iniciada_\${user.id}\`)`
-   - Monta mensagem baseada em `effectivePlan`:
-     - `business_parceria` ou `business_sistemas`: mensagem Business
-     - `skills`: mensagem Skills
-     - Default (Academy): mensagem Academy
-   - Seta `setMessages([{ role: "assistant", content: msg }])`
-   - Seta `localStorage.setItem(\`mariana_iniciada_\${user.id}\`, 'true')`
-   - Não salva no banco
-5. **Prioridade**: A mensagem proativa (mentoria) tem prioridade — o useEffect de boas-vindas só roda se `messages.length === 0` (proactive já teria populado se aplicável)
+## Solução
 
-### Nenhuma outra alteração — envio, histórico, edge function, layout intactos.
+Trocar a imagem principal para `mari-avatar-new.png` (arquivo mais recente disponível em `src/assets/`) e manter `mari-avatar.jpg` como fallback. Aplicar a troca em todos os arquivos que usam o avatar da MarIAna.
 
-## Arquivos
+## Alterações
 
-| Arquivo | Ação |
+### Arquivos afetados (4 arquivos — mesma alteração em todos)
+
+| Arquivo | Alteração |
 |---|---|
-| `src/components/shared/MarIAnaChatDrawer.tsx` | Editado — useEffect de boas-vindas condicional por plano |
+| `src/components/shared/MarIAnaFloatingButton.tsx` | Trocar import de `mariana-avatar.png` → `mari-avatar-new.png` |
+| `src/components/shared/MarIAnaChatDrawer.tsx` | Trocar import de `mariana-avatar.png` → `mari-avatar-new.png` |
+| `src/pages/Chat.tsx` | Trocar import de `mariana-avatar.png` → `mari-avatar-new.png` |
+| `src/pages/Cupons.tsx` | Trocar import de `mariana-avatar.png` → `mari-avatar-new.png` |
+
+Cada alteração é uma única linha de import: `import mariAvatar from "@/assets/mari-avatar-new.png";`
+
+Nenhuma outra alteração — layout, fallback, lógica de chat e onError permanecem intactos.
 
