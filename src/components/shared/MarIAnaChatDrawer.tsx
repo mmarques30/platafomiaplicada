@@ -12,6 +12,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMentoriaContext } from "@/hooks/useMentoriaContext";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useEffectivePlan } from "@/hooks/useUserPlan";
 import mariAvatar from "@/assets/mariana-avatar.png";
 import mariAvatarFallback from "@/assets/mari-avatar.jpg";
 
