@@ -69,7 +69,7 @@ export function MainLayout() {
   // Layout unificado para todos os usuários
   return (
     <>
-      <OnboardingVideo />
+      {!isBusinessPlan && <OnboardingVideo />}
       <SidebarProvider>
         <TopHeader />
         <div className={cn(
