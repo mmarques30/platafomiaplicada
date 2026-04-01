@@ -70,7 +70,7 @@ export function WelcomeHeader() {
   console.log('[WelcomeHeader] user?.id:', user?.id);
   console.log('[WelcomeHeader] effectivePlan:', effectivePlan);
   console.log('[WelcomeHeader] isBusiness:', isBusiness);
-  const { contrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
+  const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
   console.log('[WelcomeHeader] contrato:', contrato);
   const { data: etapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
   console.log('[WelcomeHeader] etapas:', etapas?.length, 'etapas');
