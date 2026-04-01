@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useQueryClient } from '@tanstack/react-query';
 
-const YOUTUBE_VIDEO_ID = 'SUBSTITUIR_PELO_ID_DO_VIDEO';
+const YOUTUBE_VIDEO_ID = 'SEU_ID_AQUI';
 
 export function OnboardingVideo() {
   const { profile } = useUserProfile();
