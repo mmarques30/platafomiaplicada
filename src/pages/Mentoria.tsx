@@ -3,6 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
+import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { MentoriaHeroDashboard } from "@/components/mentoria/MentoriaHeroDashboard";
 import { StatusDiagnostico } from "@/components/mentoria/StatusDiagnostico";
 import { ProximaSessao } from "@/components/mentoria/ProximaSessao";
@@ -29,8 +33,32 @@ export default function Mentoria() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
-  const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills } = useEffectivePlan(isAdmin, roleLoading);
+  const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills, isAcademy } = useEffectivePlan(isAdmin, roleLoading);
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Business stages
+  const businessUserId = useBusinessUserId();
+  const { contrato } = useContratosBusiness(businessUserId);
+  const { data: etapas } = useEtapasBusiness(contrato?.id);
+  const estagiosBusiness = etapas && etapas.length > 0
+    ? etapas.map((e, i) => ({
+        numero: i + 1,
+        label: e.titulo,
+        status: e.status === 'concluida' ? 'concluido' as const
+          : e.status === 'em_andamento' ? 'atual' as const
+          : 'proximo' as const,
+      }))
+    : null;
+
+  // Academy stages
+  const { formulario } = useMentoriaForm();
+  const diagCompleto = formulario?.completado === true;
+  const estagiosAcademy = [
+    { numero: 1, label: 'Diagnóstico', status: diagCompleto ? 'concluido' as const : 'atual' as const },
+    { numero: 2, label: 'Trilhas', status: diagCompleto ? 'atual' as const : 'proximo' as const },
+    { numero: 3, label: 'Conquistas', status: 'proximo' as const },
+    { numero: 4, label: 'Certificado', status: 'proximo' as const },
+  ];
   
   // Redirecionar usuários Skills para suas páginas específicas
   useEffect(() => {
@@ -77,7 +105,8 @@ export default function Mentoria() {
       {isBusiness && <BusinessAcessoRapido />}
 
       {/* Jornada Strip - linha de estágios */}
-      <JornadaStrip />
+      {(isBusinessParceria || isBusinessSistemas) && estagiosBusiness && <JornadaStrip estagios={estagiosBusiness} />}
+      {isAcademy && <JornadaStrip estagios={estagiosAcademy} />}
 
       {/* Tabs - Diferente para Business vs Academy */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
