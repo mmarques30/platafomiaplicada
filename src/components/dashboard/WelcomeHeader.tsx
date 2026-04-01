@@ -262,8 +262,8 @@ export function WelcomeHeader() {
                 onClick={() => navigate(ctaHref)}
                 style={{
                   marginLeft: "auto",
-                  background: "#AFC040",
-                  color: "#0C0F0A",
+                  background: "hsl(var(--primary))",
+                  color: "hsl(var(--primary-foreground))",
                   fontSize: 13,
                   fontWeight: 500,
                   padding: "7px 14px",
