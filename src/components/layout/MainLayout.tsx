@@ -15,6 +15,7 @@ import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import { MarIAnaFloatingButton } from "@/components/shared/MarIAnaFloatingButton";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNotice";
+import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
