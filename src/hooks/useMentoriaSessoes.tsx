@@ -16,6 +16,7 @@ export type SessaoMentoria = {
   feedback_entregas?: string;
   status: "agendada" | "realizada" | "cancelada";
   etapa_id?: string | null;
+  insight_resumo?: string | null;
   created_at: string;
   updated_at: string;
 };
