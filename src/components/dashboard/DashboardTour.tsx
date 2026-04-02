@@ -41,6 +41,8 @@ const steps: Step[] = [
 
 interface DashboardTourProps {
   run: boolean;
+  previewMode?: boolean;
+  onComplete?: () => void;
 }
 
 export function DashboardTour({ run }: DashboardTourProps) {
