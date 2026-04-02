@@ -26,6 +26,7 @@ import Notificacoes from "./pages/Notificacoes";
 import Evolucao from "./pages/Evolucao";
 import EvolucaoConquistas from "./pages/EvolucaoConquistas";
 import EvolucaoCertificados from "./pages/EvolucaoCertificados";
+import MinhaHistoria from "./pages/MinhaHistoria";
 import Ecossistema from "./pages/Ecossistema";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
@@ -163,6 +164,7 @@ function AppContent() {
             <Route path="/evolucao" element={<Evolucao />} />
             <Route path="/evolucao/conquistas" element={<EvolucaoConquistas />} />
             <Route path="/evolucao/certificados" element={<EvolucaoCertificados />} />
+            <Route path="/minha-historia" element={<MinhaHistoria />} />
             <Route path="/meu-diagnostico" element={<MeuDiagnostico />} />
             <Route path="/minhas-duvidas" element={<MinhasDuvidas />} />
             <Route path="/diagnostico/formulario" element={<MentoriaDiagnostico />} />
