@@ -12,6 +12,7 @@ import { useAdminView } from "@/hooks/useAdminView";
 import { AdminViewMode } from "@/contexts/AdminViewContext";
 import { UserSelectorByPlanModal } from "./UserSelectorByPlanModal";
 import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
+import { DashboardTour } from "@/components/dashboard/DashboardTour";
 
 interface AdminViewSelectorProps {
   isAdmin: boolean;
@@ -30,7 +31,7 @@ const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
   const { viewAs, setViewAs, resetView, canUseViewAs, impersonatedUserName } = useAdminView(isAdmin);
   const [selectedPlanForModal, setSelectedPlanForModal] = useState<PlanType | null>(null);
-  const [showOnboardingPreview, setShowOnboardingPreview] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState<'idle' | 'video' | 'tour'>('idle');
 
   if (!canUseViewAs) return null;
 
@@ -102,7 +103,7 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
             </>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setShowOnboardingPreview(true)} className="gap-2 cursor-pointer">
+          <DropdownMenuItem onClick={() => setOnboardingStep('video')} className="gap-2 cursor-pointer">
             <Play className="h-4 w-4" />
             Simular Onboarding
           </DropdownMenuItem>
@@ -118,8 +119,12 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
         />
       )}
 
-      {showOnboardingPreview && (
-        <OnboardingVideo previewMode onClose={() => setShowOnboardingPreview(false)} />
+      {onboardingStep === 'video' && (
+        <OnboardingVideo previewMode onClose={() => setOnboardingStep('tour')} />
+      )}
+
+      {onboardingStep === 'tour' && (
+        <DashboardTour run previewMode onComplete={() => setOnboardingStep('idle')} />
       )}
     </>
   );

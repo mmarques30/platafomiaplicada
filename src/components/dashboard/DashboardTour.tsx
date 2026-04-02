@@ -41,9 +41,11 @@ const steps: Step[] = [
 
 interface DashboardTourProps {
   run: boolean;
+  previewMode?: boolean;
+  onComplete?: () => void;
 }
 
-export function DashboardTour({ run }: DashboardTourProps) {
+export function DashboardTour({ run, previewMode, onComplete }: DashboardTourProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -55,6 +57,10 @@ export function DashboardTour({ run }: DashboardTourProps) {
         type === EVENTS.TOUR_END &&
         (status === STATUS.FINISHED || status === STATUS.SKIPPED)
       ) {
+        if (previewMode) {
+          onComplete?.();
+          return;
+        }
         if (user?.id) {
           await supabase
             .from("profiles")
@@ -64,7 +70,7 @@ export function DashboardTour({ run }: DashboardTourProps) {
         }
       }
     },
-    [user?.id, queryClient]
+    [user?.id, queryClient, previewMode, onComplete]
   );
 
   return (
