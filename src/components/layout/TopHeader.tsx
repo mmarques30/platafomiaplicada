@@ -238,6 +238,23 @@ export function TopHeader() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-primary/20 text-primary' : 'text-white/80 hover:text-white hover:bg-white/10'}`}
+                  onClick={toggleFoco}
+                >
+                  {modoFoco ? <Minimize2 className="h-5 w-5" strokeWidth={1.5} /> : <Maximize2 className="h-5 w-5" strokeWidth={1.5} />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>{modoFoco ? 'Sair do modo foco' : 'Modo foco'}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
                   variant="ghost" 
                   size="icon" 
                   className="h-9 w-9 text-white/80 hover:text-white hover:bg-white/10"

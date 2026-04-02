@@ -609,3 +609,10 @@ iframe:focus {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
+
+/* Modo Foco */
+body.modo-foco [data-sidebar] { display: none !important; }
+body.modo-foco [data-welcome-kpis] { display: none; }
+body.modo-foco [data-ranking-ticker] { display: none; }
+body.modo-foco [data-novidades] { display: none; }
+body.modo-foco main { max-width: 720px; margin: 0 auto; padding: 0 24px; }

@@ -287,7 +287,7 @@ export function WelcomeHeader() {
                 {ctaLabel} →
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

@@ -25,7 +25,7 @@ export function RankingTicker() {
   const topSalvo = data?.topSalvos?.[0];
 
   return (
-    <section className="rounded-lg bg-[#E9EBC6] p-3 sm:p-4 shadow-sm">
+    <section data-ranking-ticker className="rounded-lg bg-[#E9EBC6] p-3 sm:p-4 shadow-sm">
       {/* Métricas */}
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
         {/* Top Aluno */}
