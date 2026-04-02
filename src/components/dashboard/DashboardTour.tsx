@@ -88,7 +88,7 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
 
   return (
     <Joyride
-      steps={steps}
+      steps={visibleSteps}
       run={run}
       continuous
       options={{
