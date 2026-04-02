@@ -14,6 +14,7 @@ import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
+import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
 
 const tipoLabels: Record<string, string> = {
   proposta: "Contrato",
