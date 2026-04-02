@@ -1,28 +1,38 @@
 
 
-# Saudação e tagline adaptativos no WelcomeHeader
-
-## Alteração
-
-**Arquivo**: `src/components/dashboard/WelcomeHeader.tsx`
-
-1. Após `primeiroNome` (linha 58), calcular `diasSemAcesso` via localStorage e `temEntregaUrgente` a partir do `kpi2Raw` já computado (tarefas críticas business) — reposicionar o cálculo da saudação para após os KPIs
-2. Substituir a saudação estática (linha 61) pela lógica contextual:
-   - `temEntregaUrgente` → `"Atenção, {nome}"`
-   - `diasSemAcesso >= 4` → `"Que bom te ver de volta, {nome}"`
-   - default → `"Boa {período}, {nome}!"`
-3. Criar variável `tagline` com a mesma lógica condicional
-4. No JSX (linhas 202-213), substituir `{saudacao}, <span>{primeiroNome}</span>!` por `{saudacao}` (já inclui o nome) e substituir o bloco `aulaAtiva ? ... : "Aplique, replique e domine IA"` por `aulaAtiva ? aula.tema : tagline`
-
-### Detalhe técnico
-- `diasSemAcesso` usa `localStorage.getItem(\`ultimo_acesso_\${user?.id}\`)` (já gravado pelo MarIAnaFloatingButton)
-- `temEntregaUrgente` reutiliza `kpi2Raw > 0` (tarefas críticas já calculadas nos KPIs business), sem precisar de novo hook
-- `periodo` reutiliza a variável `hora` já existente
-- KPIs, data, estrutura e layout permanecem intactos
+# Modo Foco — toggle no TopHeader + CSS global
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/WelcomeHeader.tsx` | Editar — saudação e tagline contextuais |
+| `src/components/layout/TopHeader.tsx` | Editar — estado `modoFoco`, botão Maximize2/Minimize2 antes do RefreshCw |
+| `src/index.css` | Editar — regras `body.modo-foco` no final do arquivo |
+| `src/components/dashboard/WelcomeHeader.tsx` | Editar — adicionar `data-welcome-kpis` no container dos KPIs |
+| `src/components/dashboard/RankingTicker.tsx` | Editar — adicionar `data-ranking-ticker` no wrapper |
+| `src/components/dashboard/NovidadesSemana.tsx` | Editar — adicionar `data-novidades` no wrapper |
+
+## Detalhes técnicos
+
+### TopHeader.tsx
+1. Importar `Maximize2`, `Minimize2` do lucide-react
+2. Estado `modoFoco` com `sessionStorage` e função `toggleFoco` que alterna classe no `document.body`
+3. Inserir botão com Tooltip entre AdminViewSelector/EnvironmentSwitcher e o botão Refresh (linha ~223), com `className="hidden md:flex"` e estilos condicionais conforme especificado
+
+### index.css
+Adicionar ao final:
+```css
+body.modo-foco [data-sidebar] { display: none !important; }
+body.modo-foco [data-welcome-kpis] { display: none; }
+body.modo-foco [data-ranking-ticker] { display: none; }
+body.modo-foco [data-novidades] { display: none; }
+body.modo-foco main { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+```
+
+### Data attributes
+- **WelcomeHeader.tsx**: Localizar o container dos KPIs e adicionar `data-welcome-kpis`
+- **RankingTicker.tsx**: Adicionar `data-ranking-ticker` no elemento raiz
+- **NovidadesSemana.tsx**: Adicionar `data-novidades` no elemento raiz
+
+Nenhuma outra alteração — rotas, auth, layout base e componentes ocultos permanecem intactos.
 
