@@ -252,6 +252,10 @@ export default function MentoriaDocumentos() {
             </div>
           )}
         </TabsContent>
+        {/* Tab Reports */}
+        <TabsContent value="reports" className="mt-4">
+          <BusinessReportsCard />
+        </TabsContent>
       </Tabs>
     </div>
   );
