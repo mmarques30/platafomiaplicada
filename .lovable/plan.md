@@ -1,25 +1,28 @@
 
 
-# Mover Reports para sub-aba de Documentos
+# Ocultar menu Comunidade para Academy e Skills
 
-## Resumo
-Remover o `BusinessReportsCard` da grid de Visão Geral e adicioná-lo como uma terceira aba ("Reports") na página `/mentoria/documentos`.
+## Problema
+O `SidebarComunidadeItem` só esconde o menu para Business. Academy e Skills veem "Comunidade" no sidebar, mas já podem acessá-la trocando para o ambiente Gratuito — é redundante.
 
-## Arquivos
+## Solução
+Mostrar o menu Comunidade **apenas no ambiente Gratuito**. Em qualquer outro ambiente (Academy, Skills, Business), o item fica oculto.
+
+## Arquivo
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/mentoria/business/BusinessVisaoGeralGrid.tsx` | Editar — remover `BusinessReportsCard`, ROI chart ocupa largura total |
-| `src/pages/MentoriaDocumentos.tsx` | Editar — adicionar aba "Reports" com o conteúdo do `BusinessReportsCard` |
+| `src/components/layout/AppSidebar.tsx` | Editar — passar `currentEnvironment` para `SidebarComunidadeItem` |
+| `src/components/layout/SidebarComunidadeItem.tsx` | Editar — trocar `if (isBusiness) return null` por `if (currentEnvironment !== 'gratuito') return null` |
 
-## Detalhes técnicos
+## Detalhe técnico
 
-### BusinessVisaoGeralGrid.tsx
-- Remover import de `BusinessReportsCard`
-- Linha 2 (ROI + Reports): substituir grid 2/3 + 1/3 por `BusinessROIChart` em largura total (sem grid)
+### SidebarComunidadeItem.tsx
+- Substituir prop `isBusiness: boolean` por `currentEnvironment: string | null`
+- Linha 28: `if (currentEnvironment !== 'gratuito') return null;`
+- Assim, Comunidade só aparece quando o usuário está no ambiente Gratuito
 
-### MentoriaDocumentos.tsx
-- Import `BusinessReportsCard`
-- Adicionar terceira `TabsTrigger` "Reports" com ícone `FileText` após "Links Importantes"
-- Adicionar `TabsContent value="reports"` renderizando `<BusinessReportsCard />`
+### AppSidebar.tsx
+- Importar `useEnvironmentSafe` (ou reutilizar se já importado)
+- Passar `currentEnvironment` em vez de `isBusiness` para o componente
 
