@@ -12,6 +12,7 @@ import { useAdminView } from "@/hooks/useAdminView";
 import { AdminViewMode } from "@/contexts/AdminViewContext";
 import { UserSelectorByPlanModal } from "./UserSelectorByPlanModal";
 import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
+import { DashboardTour } from "@/components/dashboard/DashboardTour";
 
 interface AdminViewSelectorProps {
   isAdmin: boolean;
