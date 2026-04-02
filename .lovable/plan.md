@@ -1,27 +1,23 @@
 
 
-# Corrigir foto da MarIAna no botão flutuante e no chat
+# MomentumScore — hook + card no Dashboard
 
-## Problema
+## Arquivos
 
-O botão flutuante e o chat da MarIAna usam `mariana-avatar.png` como fonte principal e `mari-avatar.jpg` como fallback. A imagem pode estar demorando a carregar (arquivo grande) ou falhando silenciosamente, deixando o botão sem foto visível.
-
-## Solução
-
-Trocar a imagem principal para `mari-avatar-new.png` (arquivo mais recente disponível em `src/assets/`) e manter `mari-avatar.jpg` como fallback. Aplicar a troca em todos os arquivos que usam o avatar da MarIAna.
-
-## Alterações
-
-### Arquivos afetados (4 arquivos — mesma alteração em todos)
-
-| Arquivo | Alteração |
+| Arquivo | Ação |
 |---|---|
-| `src/components/shared/MarIAnaFloatingButton.tsx` | Trocar import de `mariana-avatar.png` → `mari-avatar-new.png` |
-| `src/components/shared/MarIAnaChatDrawer.tsx` | Trocar import de `mariana-avatar.png` → `mari-avatar-new.png` |
-| `src/pages/Chat.tsx` | Trocar import de `mariana-avatar.png` → `mari-avatar-new.png` |
-| `src/pages/Cupons.tsx` | Trocar import de `mariana-avatar.png` → `mari-avatar-new.png` |
+| `src/hooks/useMomentumScore.ts` | Criar — hook com cálculo de score 0-100 baseado em localStorage |
+| `src/components/dashboard/MomentumCard.tsx` | Criar — card condicional (coral < 40, verde > 80, null 40-80) |
+| `src/pages/Dashboard.tsx` | Editar — importar e inserir `<MomentumCard />` após `<WelcomeHeader />` na section (linha ~72) |
 
-Cada alteração é uma única linha de import: `import mariAvatar from "@/assets/mari-avatar-new.png";`
+## Detalhes
 
-Nenhuma outra alteração — layout, fallback, lógica de chat e onError permanecem intactos.
+1. **useMomentumScore.ts**: Implementação exata conforme especificado — registra acesso, filtra 30 dias, calcula ptsDias + ptsFreq + ptsTend, retorna score 0-100.
+
+2. **MomentumCard.tsx**: Usa `useAuth` para obter `user.id`, chama `useMomentumScore`. Renderiza card com Tailwind:
+   - `score < 40`: fundo coral (`bg-red-500/10 border-red-500/30`), texto "Que tal retomar hoje?", botão "Continuar" que navega para `/trilhas`
+   - `score > 80`: fundo verde (`bg-primary/10 border-primary/30`), texto "Você está em ótimo ritmo!", mostra acessos da semana
+   - `score 40-80` ou `null`: `return null`
+
+3. **Dashboard.tsx**: Inserir `<MomentumCard />` logo após `<WelcomeHeader />` dentro da `<section>` existente (linha 72). Nenhuma outra alteração.
 
