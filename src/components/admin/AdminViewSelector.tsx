@@ -102,7 +102,7 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
             </>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setShowOnboardingPreview(true)} className="gap-2 cursor-pointer">
+          <DropdownMenuItem onClick={() => setOnboardingStep('video')} className="gap-2 cursor-pointer">
             <Play className="h-4 w-4" />
             Simular Onboarding
           </DropdownMenuItem>
