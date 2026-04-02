@@ -5,7 +5,7 @@ import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useTasksByUser } from "@/hooks/useTasksBusiness";
 import { useProximaAula } from "@/hooks/useCalendarioAulas";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
-import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
+
 import { InsightSemanalCard } from "@/components/mentoria/business/InsightSemanalCard";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
