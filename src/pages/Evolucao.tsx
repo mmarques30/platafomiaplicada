@@ -8,6 +8,7 @@ import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
 import { HeroComunidade } from "@/components/evolucao/HeroComunidade";
 import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndamentoCards";
 import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
+import { RitmoCard } from "@/components/evolucao/RitmoCard";
 import { BonusEvolucao } from "@/components/evolucao/BonusEvolucao";
 
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
@@ -64,6 +65,7 @@ export default function Evolucao() {
           {isBusiness && <BusinessEvolucaoAprendizado />}
           <TrilhasEmAndamentoCards />
           <VitrineConquistas />
+          <RitmoCard />
           {isAcademy && <BonusEvolucao />}
         </TabsContent>
 
