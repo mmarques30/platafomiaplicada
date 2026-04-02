@@ -375,11 +375,14 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild className="group">
                       <NavLink 
                         to={getMenuUrl(menu)} 
-                        data-tour={
-                          getMenuUrl(menu).includes('calendario') ? 'calendario' :
-                          getMenuUrl(menu).includes('evolucao') ? 'evolucao' :
-                          undefined
-                        }
+                         data-tour={
+                           getMenuUrl(menu).includes('calendario') ? 'calendario' :
+                           getMenuUrl(menu).includes('evolucao') ? 'evolucao' :
+                           menu.menu_key === 'meu_progresso' ? 'meu-progresso' :
+                           menu.menu_key === 'projeto_skills' ? 'meu-projeto' :
+                           menu.menu_key === 'meu_sistema' ? 'meu-projeto' :
+                           undefined
+                         }
                         end 
                         className={cn(
                           "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
