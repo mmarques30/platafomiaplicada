@@ -172,7 +172,13 @@ export default function MentoriaSessoes() {
                         Trans.
                       </Badge>
                     )}
-                    {!sessao.video_url && !sessao.transcricao && (
+                    {sessao.insight_resumo && (
+                      <Badge variant="secondary" className="text-xs gap-1 bg-[#2CBBA6]/10 text-[#2CBBA6] border-[#2CBBA6]/30">
+                        <Sparkles className="h-3 w-3" />
+                        Resumo
+                      </Badge>
+                    )}
+                    {!sessao.video_url && !sessao.transcricao && !sessao.insight_resumo && (
                       <span className="text-muted-foreground text-xs">-</span>
                     )}
                   </div>
