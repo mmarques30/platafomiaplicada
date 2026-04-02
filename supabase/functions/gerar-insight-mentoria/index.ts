@@ -120,7 +120,8 @@ serve(async (req) => {
   }
 
   try {
-    const { formulario_id } = await req.json();
+    const body = await req.json();
+    const { formulario_id, sessao_id, user_id: target_user_id, etapa_atual, contexto: sessaoContexto } = body;
     const authHeader = req.headers.get("Authorization");
     
     if (!authHeader) {
@@ -132,6 +133,102 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       { global: { headers: { Authorization: authHeader } } }
     );
+
+    // ===== CODE PATH: SESSÃO DE MENTORIA =====
+    if (sessao_id) {
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY não configurada");
+
+      // Buscar sessão usando service role para acesso admin
+      const serviceClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+
+      const { data: sessao, error: sessaoError } = await serviceClient
+        .from("sessoes_mentoria")
+        .select("*")
+        .eq("id", sessao_id)
+        .single();
+
+      if (sessaoError || !sessao) {
+        console.error("Erro ao buscar sessão:", sessaoError);
+        throw new Error("Sessão não encontrada");
+      }
+
+      // Buscar perfil do mentorado
+      const { data: profile } = await serviceClient
+        .from("profiles")
+        .select("nome_completo, email, plano_mentoria")
+        .eq("id", sessao.user_id)
+        .single();
+
+      const promptSessao = `Você é um mentor especialista em IA aplicada ao trabalho.
+Gere um RESUMO EXECUTIVO conciso da sessão de mentoria com:
+
+1. **Pontos-chave**: 3-4 tópicos principais abordados
+2. **Próximos passos**: 2-3 ações concretas para o mentorado
+3. **Recomendações**: 1-2 sugestões estratégicas
+
+Seja direto, prático e encorajador. Responda em texto corrido (não JSON).`;
+
+      const contextoSessao = `
+SESSÃO DE MENTORIA:
+- Título: ${sessao.titulo}
+- Data: ${sessaoContexto || sessao.data_sessao}
+- Etapa: ${etapa_atual || 'Não definida'}
+- Mentorado: ${profile?.nome_completo || 'Não identificado'}
+- Plano: ${profile?.plano_mentoria || 'Não definido'}
+- Notas da sessão: ${sessao.notas || 'Sem notas'}
+- Transcrição: ${sessao.transcricao ? sessao.transcricao.substring(0, 2000) : 'Sem transcrição'}
+`.trim();
+
+      console.log("Gerando insight para sessão:", sessao_id);
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: promptSessao },
+            { role: "user", content: contextoSessao }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Erro da API de IA:", response.status, errorText);
+        throw new Error("Erro ao gerar insight com IA");
+      }
+
+      const aiData = await response.json();
+      const insightText = aiData.choices[0].message.content;
+
+      // Salvar insight na sessão
+      const { error: updateError } = await serviceClient
+        .from("sessoes_mentoria")
+        .update({ insight_resumo: insightText })
+        .eq("id", sessao_id);
+
+      if (updateError) {
+        console.error("Erro ao salvar insight da sessão:", updateError);
+        throw updateError;
+      }
+
+      console.log("Insight da sessão salvo com sucesso");
+
+      return new Response(
+        JSON.stringify({ insight: insightText }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ===== CODE PATH: FORMULÁRIO DIAGNÓSTICO (original) =====
 
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error("Usuário não encontrado");
