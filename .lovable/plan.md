@@ -1,28 +1,36 @@
 
 
-# Ocultar menu Comunidade para Academy e Skills
+# Simulação completa do Onboarding
 
 ## Problema
-O `SidebarComunidadeItem` só esconde o menu para Business. Academy e Skills veem "Comunidade" no sidebar, mas já podem acessá-la trocando para o ambiente Gratuito — é redundante.
+O "Simular Onboarding" só mostra o overlay de vídeo. Não exibe o tour guiado (DashboardTour) nem o modal de troca de senha — o admin vê a página como se o usuário já tivesse completado tudo.
 
 ## Solução
-Mostrar o menu Comunidade **apenas no ambiente Gratuito**. Em qualquer outro ambiente (Academy, Skills, Business), o item fica oculto.
+Expandir a simulação para reproduzir os 3 passos em sequência:
+1. **Vídeo de boas-vindas** → ao clicar "Entrar na plataforma"…
+2. **Tour guiado** (react-joyride) → ao concluir/pular…
+3. Fim da simulação
 
-## Arquivo
+O modal de senha será excluído da simulação (requer lógica de auth real, pouco valor visual).
+
+## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/layout/AppSidebar.tsx` | Editar — passar `currentEnvironment` para `SidebarComunidadeItem` |
-| `src/components/layout/SidebarComunidadeItem.tsx` | Editar — trocar `if (isBusiness) return null` por `if (currentEnvironment !== 'gratuito') return null` |
+| `src/components/admin/AdminViewSelector.tsx` | Editar — gerenciar estado `onboardingStep` (video → tour → done) |
+| `src/components/dashboard/DashboardTour.tsx` | Editar — aceitar prop `previewMode` para rodar sem alterar banco |
+| `src/components/onboarding/OnboardingVideo.tsx` | Sem alteração (já suporta `previewMode`) |
 
-## Detalhe técnico
+## Detalhes técnicos
 
-### SidebarComunidadeItem.tsx
-- Substituir prop `isBusiness: boolean` por `currentEnvironment: string | null`
-- Linha 28: `if (currentEnvironment !== 'gratuito') return null;`
-- Assim, Comunidade só aparece quando o usuário está no ambiente Gratuito
+### AdminViewSelector.tsx
+- Substituir `showOnboardingPreview` por `onboardingStep: 'idle' | 'video' | 'tour'`
+- Ao clicar "Simular Onboarding": `setOnboardingStep('video')`
+- `OnboardingVideo` com `onClose={() => setOnboardingStep('tour')}`
+- `DashboardTour` com `previewMode` e `onComplete={() => setOnboardingStep('idle')}`
 
-### AppSidebar.tsx
-- Importar `useEnvironmentSafe` (ou reutilizar se já importado)
-- Passar `currentEnvironment` em vez de `isBusiness` para o componente
+### DashboardTour.tsx
+- Adicionar props `previewMode?: boolean` e `onComplete?: () => void`
+- Se `previewMode`: pular a chamada `supabase.update({ primeiro_acesso: false })` e chamar `onComplete?.()` no final
+- Renderizar condicionalmente: se `previewMode`, sempre mostrar (ignorar check de `primeiro_acesso`)
 
