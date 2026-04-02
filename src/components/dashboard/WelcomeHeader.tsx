@@ -58,10 +58,15 @@ export function WelcomeHeader() {
   const primeiroNome = profile?.nome_completo?.split(' ')[0] || 'Usuário';
 
   const hora = parseInt(formatInTimeZone(dataAtual, TIMEZONE, 'HH'));
-  const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
+  const periodo = hora < 12 ? 'manhã' : hora < 18 ? 'tarde' : 'noite';
   const dia = formatInTimeZone(dataAtual, TIMEZONE, 'dd');
   const mes = formatInTimeZone(dataAtual, TIMEZONE, 'MMM', { locale: ptBR }).toUpperCase();
   const diaSemana = formatInTimeZone(dataAtual, TIMEZONE, 'EEE', { locale: ptBR });
+
+  const diasSemAcesso = (() => {
+    const u = localStorage.getItem(`ultimo_acesso_${user?.id}`);
+    return u ? Math.floor((Date.now() - parseInt(u)) / (1000 * 60 * 60 * 24)) : 0;
+  })();
 
   // ── Business KPIs ──
   const rawBusinessUserId = useBusinessUserId();
