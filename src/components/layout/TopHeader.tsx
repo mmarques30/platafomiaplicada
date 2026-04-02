@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library, Eye } from "lucide-react";
+import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library, Eye, Maximize2, Minimize2 } from "lucide-react";
 import logoHeaderDark from "@/assets/logo-header-dark.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -44,6 +44,20 @@ export function TopHeader() {
   
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [modoFoco, setModoFoco] = useState(() => sessionStorage.getItem('modo_foco') === 'true');
+
+  const toggleFoco = () => {
+    const novo = !modoFoco;
+    setModoFoco(novo);
+    sessionStorage.setItem('modo_foco', String(novo));
+    document.body.classList.toggle('modo-foco', novo);
+  };
+
+  // Restaurar classe no body ao montar
+  useEffect(() => {
+    if (modoFoco) document.body.classList.add('modo-foco');
+    return () => document.body.classList.remove('modo-foco');
+  }, []);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -220,6 +234,23 @@ export function TopHeader() {
           {/* Evita badges duplicados: para Admin mantemos apenas o "Ver como..." */}
           {!isAdmin && <EnvironmentSwitcher />}
           {isAdmin && <AdminViewSelector isAdmin={isAdmin} />}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-primary/20 text-primary' : 'text-white/80 hover:text-white hover:bg-white/10'}`}
+                  onClick={toggleFoco}
+                >
+                  {modoFoco ? <Minimize2 className="h-5 w-5" strokeWidth={1.5} /> : <Maximize2 className="h-5 w-5" strokeWidth={1.5} />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>{modoFoco ? 'Sair do modo foco' : 'Modo foco'}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

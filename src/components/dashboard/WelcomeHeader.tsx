@@ -243,7 +243,7 @@ export function WelcomeHeader() {
 
         {/* KPI footer */}
         {showKpis && (
-          <>
+          <div data-welcome-kpis>
             <div className="border-t border-white/10" />
             <div className="flex items-center gap-4 px-5 py-2.5 flex-wrap">
               {/* KPI 1 */}
@@ -287,7 +287,7 @@ export function WelcomeHeader() {
                 {ctaLabel} →
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
