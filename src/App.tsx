@@ -164,6 +164,7 @@ function AppContent() {
             <Route path="/evolucao" element={<Evolucao />} />
             <Route path="/evolucao/conquistas" element={<EvolucaoConquistas />} />
             <Route path="/evolucao/certificados" element={<EvolucaoCertificados />} />
+            <Route path="/minha-historia" element={<MinhaHistoria />} />
             <Route path="/meu-diagnostico" element={<MeuDiagnostico />} />
             <Route path="/minhas-duvidas" element={<MinhasDuvidas />} />
             <Route path="/diagnostico/formulario" element={<MentoriaDiagnostico />} />
