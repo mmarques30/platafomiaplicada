@@ -240,6 +240,7 @@ export function AppSidebar() {
                         <div className="flex items-center w-full">
                           <NavLink
                             to={getMenuUrl(menu)}
+                            data-tour={menu.menu_key === 'aprender' ? 'aprender' : undefined}
                           className={cn(
                             "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
                             isActive 
@@ -402,6 +403,7 @@ export function AppSidebar() {
                     key="bibliotecas_menu"
                     open={expandedMenus.includes('bibliotecas_menu')} 
                     onOpenChange={() => toggleMenu('bibliotecas_menu')}
+                    data-tour="bibliotecas"
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
