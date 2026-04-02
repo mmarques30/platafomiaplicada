@@ -5200,6 +5200,7 @@ export type Database = {
           etapa_id: string | null
           feedback_entregas: string | null
           id: string
+          insight_resumo: string | null
           link_reuniao: string | null
           notas: string | null
           status: Database["public"]["Enums"]["status_sessao"]
@@ -5217,6 +5218,7 @@ export type Database = {
           etapa_id?: string | null
           feedback_entregas?: string | null
           id?: string
+          insight_resumo?: string | null
           link_reuniao?: string | null
           notas?: string | null
           status?: Database["public"]["Enums"]["status_sessao"]
@@ -5234,6 +5236,7 @@ export type Database = {
           etapa_id?: string | null
           feedback_entregas?: string | null
           id?: string
+          insight_resumo?: string | null
           link_reuniao?: string | null
           notas?: string | null
           status?: Database["public"]["Enums"]["status_sessao"]

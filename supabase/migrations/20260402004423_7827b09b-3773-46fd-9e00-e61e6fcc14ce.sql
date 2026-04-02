@@ -1,0 +1,1 @@
+ALTER TABLE public.sessoes_mentoria ADD COLUMN insight_resumo TEXT;

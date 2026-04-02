@@ -16,6 +16,7 @@ export type SessaoMentoria = {
   feedback_entregas?: string;
   status: "agendada" | "realizada" | "cancelada";
   etapa_id?: string | null;
+  insight_resumo?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -142,12 +143,28 @@ export const useMentoriaSessoes = (userId?: string) => {
       if (!data) throw new Error("Sessão não encontrada");
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data: SessaoMentoria) => {
       queryClient.invalidateQueries({ queryKey: ["sessoes-mentoria"] });
       toast({
         title: "Sessão atualizada!",
         description: "As informações foram salvas com sucesso"
       });
+
+      // Gerar insight automaticamente ao marcar como realizada
+      if (data?.status === "realizada" && !data?.insight_resumo) {
+        supabase.functions.invoke("gerar-insight-mentoria", {
+          body: {
+            sessao_id: data.id,
+            user_id: data.user_id,
+            etapa_atual: "",
+            contexto: `Sessão realizada em ${new Date(data.data_sessao).toLocaleDateString("pt-BR")}.`,
+          },
+        }).then(() => {
+          queryClient.invalidateQueries({ queryKey: ["sessoes-mentoria"] });
+        }).catch((err) => {
+          console.error("Erro ao gerar insight:", err);
+        });
+      }
     },
     onError: (error: any) => {
       toast({

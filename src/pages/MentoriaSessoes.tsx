@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Video, FileText, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, Video, FileText, ArrowLeft, Sparkles } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
@@ -172,7 +172,13 @@ export default function MentoriaSessoes() {
                         Trans.
                       </Badge>
                     )}
-                    {!sessao.video_url && !sessao.transcricao && (
+                    {sessao.insight_resumo && (
+                      <Badge variant="secondary" className="text-xs gap-1 bg-[#2CBBA6]/10 text-[#2CBBA6] border-[#2CBBA6]/30">
+                        <Sparkles className="h-3 w-3" />
+                        Resumo
+                      </Badge>
+                    )}
+                    {!sessao.video_url && !sessao.transcricao && !sessao.insight_resumo && (
                       <span className="text-muted-foreground text-xs">-</span>
                     )}
                   </div>
@@ -247,7 +253,16 @@ export default function MentoriaSessoes() {
                 </div>
               )}
 
-              {!selectedSessao.video_url && !selectedSessao.transcricao && !selectedSessao.notas && (
+              {selectedSessao?.insight_resumo && (
+                <div>
+                  <div className="rounded-lg border-2 border-[#2CBBA6] p-4">
+                    <span className="text-xs font-bold tracking-wider text-[#2CBBA6] uppercase">Resumo da Sessão</span>
+                    <p className="whitespace-pre-wrap text-sm mt-2">{selectedSessao.insight_resumo}</p>
+                  </div>
+                </div>
+              )}
+
+              {!selectedSessao.video_url && !selectedSessao.transcricao && !selectedSessao.notas && !selectedSessao.insight_resumo && (
                 <div className="py-8 text-center text-muted-foreground">
                   <FileText className="h-10 w-10 mx-auto mb-3 opacity-50" />
                   <p>Nenhum recurso disponível para esta sessão ainda.</p>
