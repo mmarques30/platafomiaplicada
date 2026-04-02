@@ -1,11 +1,11 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Joyride, STATUS, EVENTS } from "react-joyride";
 import type { Step, EventData, Controls } from "react-joyride";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 
-const steps: Step[] = [
+const allSteps: Step[] = [
   {
     target: '[data-tour="aprender"]',
     content: "Aqui você acessa trilhas, aulas e todo o conteúdo para desenvolver suas habilidades em IA.",
@@ -55,6 +55,13 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  const visibleSteps = useMemo(() => {
+    if (!run) return [];
+    return allSteps.filter(step =>
+      document.querySelector(step.target as string)
+    );
+  }, [run]);
+
   const handleEvent = useCallback(
     async (data: EventData, _controls: Controls) => {
       const { status, type } = data;
@@ -81,7 +88,7 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
 
   return (
     <Joyride
-      steps={steps}
+      steps={visibleSteps}
       run={run}
       continuous
       options={{
