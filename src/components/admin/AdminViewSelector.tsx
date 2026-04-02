@@ -118,8 +118,12 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
         />
       )}
 
-      {showOnboardingPreview && (
-        <OnboardingVideo previewMode onClose={() => setShowOnboardingPreview(false)} />
+      {onboardingStep === 'video' && (
+        <OnboardingVideo previewMode onClose={() => setOnboardingStep('tour')} />
+      )}
+
+      {onboardingStep === 'tour' && (
+        <DashboardTour run previewMode onComplete={() => setOnboardingStep('idle')} />
       )}
     </>
   );
