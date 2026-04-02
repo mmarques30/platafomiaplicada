@@ -94,6 +94,16 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
         next: "Próximo",
         skip: "Pular tour",
       }}
+      styles={{
+        tooltipTitle: {
+          color: '#ffffff',
+          fontSize: 16,
+          fontWeight: 600,
+        },
+        tooltipContent: {
+          color: '#ffffff',
+        },
+      }}
       onEvent={handleEvent}
     />
   );
