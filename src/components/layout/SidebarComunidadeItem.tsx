@@ -25,7 +25,7 @@ export function SidebarComunidadeItem({
   isMenuVisible,
   pathname,
 }: SidebarComunidadeItemProps) {
-  if (isBusiness) return null;
+  if (currentEnvironment !== 'gratuito') return null;
 
   return (
     <Collapsible
