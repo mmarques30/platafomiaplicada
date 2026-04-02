@@ -81,8 +81,9 @@ export default function Dashboard() {
 
             <section>
               <WelcomeHeader />
-              
             </section>
+
+            <BriefingSemanal />
 
             <DashboardUrgencias />
 
