@@ -26,6 +26,7 @@ import Notificacoes from "./pages/Notificacoes";
 import Evolucao from "./pages/Evolucao";
 import EvolucaoConquistas from "./pages/EvolucaoConquistas";
 import EvolucaoCertificados from "./pages/EvolucaoCertificados";
+import MinhaHistoria from "./pages/MinhaHistoria";
 import Ecossistema from "./pages/Ecossistema";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
