@@ -1,26 +1,28 @@
 
 
-# RitmoCard — card de ritmo semanal na aba Evolução
+# BriefingSemanal — card semanal no Dashboard
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/evolucao/RitmoCard.tsx` | Criar — card com cálculo de ritmo semanal |
-| `src/pages/Evolucao.tsx` | Editar — inserir `<RitmoCard />` após `<VitrineConquistas />` (linha 66) |
+| `src/components/dashboard/BriefingSemanal.tsx` | Criar |
+| `src/pages/Dashboard.tsx` | Editar — inserir após `<WelcomeHeader />` (linha 83) |
 
 ## Detalhes técnicos
 
-### RitmoCard.tsx
-- `useQuery` busca `progresso_videos` do usuário com `completado = true`, select `id, created_at`
-- Agrupa por número da semana (últimas 8 semanas) usando `Date` arithmetic
-- `atualMedia` = média módulos/semana das últimas 2 semanas
-- `baseMedia` = média módulos/semana das semanas 3-8
-- `variacaoPct = baseMedia > 0 ? Math.round(((atualMedia - baseMedia) / baseMedia) * 100) : 0`
-- Se menos de 3 semanas com dados: `return null`
-- Layout: `Card` com `border-t-[3px]` colorida (verde/coral/cinza conforme variação), label "SEU RITMO", valor `{atualMedia} módulos/semana`, badge de variação
-- Badge: `> +15%` verde com `↑`, `< -15%` coral com `↓`, else cinza com `→ Ritmo estável`
+### BriefingSemanal.tsx
+1. Verificação de exibição: `ehSegunda` (day === 1) + `jaViu` via localStorage com chave `briefing_{uid}_semana_{weekNum}`
+2. `getWeekNumber` helper conforme especificado pelo usuário
+3. `useEffect` com `supabase.functions.invoke('gerar-curadoria-semanal', { body: { tipos: ['noticia'] } })` — usa token autenticado automaticamente
+4. Se erro (403 para não-admins, ou qualquer falha): return null silenciosamente
+5. Loading: `Skeleton` (3 linhas)
+6. Card: `border-l-4 border-[#AFC040]`, label "BRIEFING DA SEMANA" (tracking-widest, uppercase, text-[10px]), título do primeiro item retornado, corpo (resumo)
+7. Botão "Entendido": `localStorage.setItem(chave, 'true')` + setState para ocultar
 
-### Evolucao.tsx
-- Import `RitmoCard` e inserir `<RitmoCard />` após `<VitrineConquistas />` na aba "minha-evolucao"
+### Dashboard.tsx
+- Import `BriefingSemanal`
+- Inserir `<BriefingSemanal />` na linha 83, após `<WelcomeHeader />`
+
+Nenhuma outra alteração.
 
