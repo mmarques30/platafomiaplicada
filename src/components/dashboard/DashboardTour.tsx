@@ -11,7 +11,19 @@ const allSteps: Step[] = [
     content: "Aqui você acessa trilhas, aulas e todo o conteúdo para desenvolver suas habilidades em IA.",
     title: "Aprender",
     skipBeacon: true,
-    placement: "right",
+    placement: "right" as const,
+  },
+  {
+    target: '[data-tour="meu-progresso"]',
+    content: "Aqui você acompanha o progresso do seu plano, metas e evolução na mentoria.",
+    title: "Meu Progresso",
+    placement: "right" as const,
+  },
+  {
+    target: '[data-tour="meu-projeto"]',
+    content: "Gerencie seu projeto, acompanhe entregas e veja o roadmap de implementação.",
+    title: "Meu Projeto",
+    placement: "right" as const,
   },
   {
     target: '[data-tour="bibliotecas"]',
