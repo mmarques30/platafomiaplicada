@@ -131,6 +131,10 @@ export default function MentoriaDocumentos() {
             <Link2 className="h-4 w-4" />
             Links Importantes ({links.length})
           </TabsTrigger>
+          <TabsTrigger value="reports" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <FileText className="h-4 w-4" />
+            Reports
+          </TabsTrigger>
         </TabsList>
 
         {/* Tab Downloads */}
