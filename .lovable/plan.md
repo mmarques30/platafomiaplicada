@@ -1,36 +1,35 @@
 
 
-# Corrigir cor do título no tour de onboarding
+# Corrigir e expandir tour de onboarding
 
 ## Problema
-No react-joyride v3, a propriedade `textColor` nas `options` aplica-se ao corpo do tooltip, mas o título (heading) pode usar uma cor diferente ou herdar uma cor escura padrão, tornando-o ilegível contra o fundo `#1a1c19`.
+1. O step "Trilha Recomendada" aponta para a Central de Conteúdo no dashboard, mas deveria apontar para o menu "Aprender" (ou "Meu Progresso") no sidebar
+2. Faltam etapas para Bibliotecas e Calendário
 
-## Solução
-Adicionar estilização explícita via prop `styles` do Joyride para garantir que o título fique branco/claro.
-
-## Arquivo
+## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/DashboardTour.tsx` | Editar — adicionar `styles` com `tooltipTitle: { color: '#ffffff' }` |
+| `src/components/layout/AppSidebar.tsx` | Editar — adicionar `data-tour="aprender"` no NavLink do menu colapsável quando `menu_key === 'aprender'`, e `data-tour="bibliotecas"` no bloco de Bibliotecas |
+| `src/components/dashboard/DashboardTour.tsx` | Editar — reorganizar steps do tour |
+| `src/pages/Dashboard.tsx` | Editar — remover `data-tour="trilha-recomendada"` do div da CentralConteudo |
 
-## Detalhe técnico
+## Detalhes técnicos
+
+### AppSidebar.tsx
+- Linha ~241 (NavLink do menu colapsável): adicionar `data-tour={menu.menu_key === 'aprender' ? 'aprender' : undefined}`
+- No bloco de Bibliotecas (~linha 400+): adicionar `data-tour="bibliotecas"` ao elemento raiz
 
 ### DashboardTour.tsx
-Adicionar prop `styles` ao `<Joyride>` (após `options`):
+Substituir os 5 steps atuais por 7 steps:
 
-```tsx
-styles={{
-  tooltipTitle: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 600,
-  },
-  tooltipContent: {
-    color: '#ffffff',
-  },
-}}
-```
+1. **Aprender** → `[data-tour="aprender"]` — "Aqui você acessa trilhas, aulas e todo o conteúdo para desenvolver suas habilidades em IA." (placement: right)
+2. **Bibliotecas** → `[data-tour="bibliotecas"]` — "Explore prompts prontos, ferramentas de IA e materiais de apoio organizados por tema." (placement: right)
+3. **Calendário** → `[data-tour="calendario"]` — "Confira sessões ao vivo, aulas e eventos programados." (placement: right)
+4. **Evolução** → `[data-tour="evolucao"]` — "Acompanhe seu progresso, conquistas e certificados." (placement: right)
+5. **MarIAna** → `[data-tour="mariana-button"]` — "Sou a MarIAna! Clique aqui para ajuda e recomendações." (placement: left)
+6. **Configurações** → `[data-tour="configuracoes"]` — "Personalize perfil, senha e preferências." (placement: right)
 
-Isso força a cor branca tanto no título quanto no conteúdo, independentemente dos defaults do react-joyride v3.
+### Dashboard.tsx
+- Remover `data-tour="trilha-recomendada"` do wrapper da CentralConteudo (já não é usado)
 
