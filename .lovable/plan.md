@@ -1,33 +1,61 @@
 
 
-# Tour pula etapas quando menus não estão visíveis
+# Adicionar etapas do plano ao tour de onboarding
 
 ## Problema
-O react-joyride pula automaticamente steps cujo elemento-alvo (`target`) não existe no DOM. Se o ambiente do usuário oculta "Calendário" ou "Evolução" no sidebar, os steps 3 e 4 simplesmente não aparecem e o tour salta de Bibliotecas direto para MarIAna.
+O tour atual só cobre itens genéricos (Aprender, Bibliotecas, Calendário, Evolução, MarIAna, Configurações). Faltam etapas para menus específicos do plano como "Meu Progresso" / "Minha Trajetória" / "Meu Projeto", que variam conforme o plano do usuário.
 
 ## Solução
-Filtrar os steps dinamicamente com base nos menus visíveis no sidebar. Antes de passar o array de steps ao Joyride, verificar quais `data-tour` targets existem no DOM.
+Adicionar `data-tour` nos menus específicos do plano no sidebar e incluir steps correspondentes no tour. Como o tour já filtra dinamicamente por elementos presentes no DOM, só aparecerão as etapas relevantes para cada plano.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/dashboard/DashboardTour.tsx` | Editar — filtrar steps dinamicamente |
+| `src/components/layout/AppSidebar.tsx` | Editar — adicionar `data-tour` para `meu_progresso`, `minha_trajetoria`, `meu_projeto` nos NavLinks |
+| `src/components/dashboard/DashboardTour.tsx` | Editar — adicionar steps para esses menus |
 
-## Detalhe técnico
+## Detalhes técnicos
 
-### DashboardTour.tsx
-- Mover `steps` para dentro do componente
-- Usar `useMemo` + `useEffect` para filtrar apenas steps cujo `document.querySelector(step.target)` retorna um elemento
-- Isso garante que o tour mostre apenas as etapas relevantes para o ambiente atual, sem saltos
+### AppSidebar.tsx
+Na lógica de `data-tour` dos NavLinks (linhas 373-376), expandir o mapeamento:
 
 ```tsx
-const visibleSteps = useMemo(() => {
-  return allSteps.filter(step => 
-    document.querySelector(step.target as string)
-  );
-}, [run]); // recalcula quando o tour inicia
+data-tour={
+  getMenuUrl(menu).includes('calendario') ? 'calendario' :
+  getMenuUrl(menu).includes('evolucao') ? 'evolucao' :
+  menu.menu_key === 'meu_progresso' ? 'meu-progresso' :
+  menu.menu_key === 'minha_trajetoria' ? 'minha-trajetoria' :
+  menu.menu_key === 'meu_projeto' ? 'meu-projeto' :
+  undefined
+}
 ```
 
-Dessa forma, se o ambiente oculta Calendário e Evolução, o tour mostra: Aprender → Bibliotecas → MarIAna → Configurações, sem saltos.
+Também no NavLink colapsável (linha 243), adicionar mapeamento similar para menus que usem esse formato.
+
+### DashboardTour.tsx
+Adicionar 3 novos steps em `allSteps`, após "Aprender" e antes de "Bibliotecas":
+
+```tsx
+{
+  target: '[data-tour="meu-progresso"]',
+  content: "Aqui você acompanha o progresso do seu plano, metas e evolução na mentoria.",
+  title: "Meu Progresso",
+  placement: "right",
+},
+{
+  target: '[data-tour="minha-trajetoria"]',
+  content: "Visualize sua trajetória completa, marcos alcançados e próximos passos.",
+  title: "Minha Trajetória",
+  placement: "right",
+},
+{
+  target: '[data-tour="meu-projeto"]',
+  content: "Gerencie seu projeto, acompanhe entregas e veja o roadmap de implementação.",
+  title: "Meu Projeto",
+  placement: "right",
+},
+```
+
+A filtragem dinâmica existente (`document.querySelector`) garante que apenas os steps cujos menus existem no DOM do plano atual serão exibidos.
 
