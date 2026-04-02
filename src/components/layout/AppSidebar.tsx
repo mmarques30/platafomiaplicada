@@ -403,6 +403,7 @@ export function AppSidebar() {
                     key="bibliotecas_menu"
                     open={expandedMenus.includes('bibliotecas_menu')} 
                     onOpenChange={() => toggleMenu('bibliotecas_menu')}
+                    data-tour="bibliotecas"
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>

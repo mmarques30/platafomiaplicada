@@ -7,11 +7,17 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const steps: Step[] = [
   {
-    target: '[data-tour="trilha-recomendada"]',
-    content: "Aqui você encontra os conteúdos e trilhas recomendados para sua jornada. Comece por aqui!",
-    title: "Trilha Recomendada",
+    target: '[data-tour="aprender"]',
+    content: "Aqui você acessa trilhas, aulas e todo o conteúdo para desenvolver suas habilidades em IA.",
+    title: "Aprender",
     skipBeacon: true,
-    placement: "bottom",
+    placement: "right",
+  },
+  {
+    target: '[data-tour="bibliotecas"]',
+    content: "Explore prompts prontos, ferramentas de IA e materiais de apoio organizados por tema.",
+    title: "Bibliotecas",
+    placement: "right",
   },
   {
     target: '[data-tour="calendario"]',
@@ -20,16 +26,16 @@ const steps: Step[] = [
     placement: "right",
   },
   {
-    target: '[data-tour="mariana-button"]',
-    content: "Sou a MarIAna! Clique aqui sempre que precisar de ajuda, dicas ou recomendações.",
-    title: "MarIAna — Sua Assistente",
-    placement: "left",
-  },
-  {
     target: '[data-tour="evolucao"]',
     content: "Acompanhe seu progresso, conquistas e certificados na seção de evolução.",
     title: "Sua Evolução",
     placement: "right",
+  },
+  {
+    target: '[data-tour="mariana-button"]',
+    content: "Sou a MarIAna! Clique aqui sempre que precisar de ajuda, dicas ou recomendações.",
+    title: "MarIAna — Sua Assistente",
+    placement: "left",
   },
   {
     target: '[data-tour="configuracoes"]',

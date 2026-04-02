@@ -98,9 +98,7 @@ export default function Dashboard() {
             <PendenciasOnboarding />
 
             {/* Central de Conteúdo - target do tour */}
-            <div data-tour="trilha-recomendada">
-              <CentralConteudo />
-            </div>
+            <CentralConteudo />
 
             <RankingTicker />
 
