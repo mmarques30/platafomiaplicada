@@ -44,6 +44,20 @@ export function TopHeader() {
   
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [modoFoco, setModoFoco] = useState(() => sessionStorage.getItem('modo_foco') === 'true');
+
+  const toggleFoco = () => {
+    const novo = !modoFoco;
+    setModoFoco(novo);
+    sessionStorage.setItem('modo_foco', String(novo));
+    document.body.classList.toggle('modo-foco', novo);
+  };
+
+  // Restaurar classe no body ao montar
+  useEffect(() => {
+    if (modoFoco) document.body.classList.add('modo-foco');
+    return () => document.body.classList.remove('modo-foco');
+  }, []);
   
   useEffect(() => {
     const handleScroll = () => {
