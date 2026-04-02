@@ -5,7 +5,7 @@ import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useTasksByUser } from "@/hooks/useTasksBusiness";
 import { useProximaAula } from "@/hooks/useCalendarioAulas";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
-import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
+
 import { InsightSemanalCard } from "@/components/mentoria/business/InsightSemanalCard";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -79,15 +79,8 @@ export function BusinessVisaoGeralGrid() {
         </Card>
       </div>
 
-      {/* Linha 2 — ROI Chart (2/3) + Reports (1/3) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2">
-          <BusinessROIChart />
-        </div>
-        <div className="md:col-span-1">
-          <BusinessReportsCard />
-        </div>
-      </div>
+      {/* Linha 2 — ROI Chart (largura total) */}
+      <BusinessROIChart />
 
       {/* Linha 3 — Insight semanal (largura total) */}
       <InsightSemanalCard />

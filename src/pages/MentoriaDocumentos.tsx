@@ -14,6 +14,7 @@ import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
+import BusinessReportsCard from "@/components/mentoria/business/BusinessReportsCard";
 
 const tipoLabels: Record<string, string> = {
   proposta: "Contrato",
@@ -129,6 +130,10 @@ export default function MentoriaDocumentos() {
           <TabsTrigger value="links" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <Link2 className="h-4 w-4" />
             Links Importantes ({links.length})
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <FileText className="h-4 w-4" />
+            Reports
           </TabsTrigger>
         </TabsList>
 
@@ -246,6 +251,10 @@ export default function MentoriaDocumentos() {
               })}
             </div>
           )}
+        </TabsContent>
+        {/* Tab Reports */}
+        <TabsContent value="reports" className="mt-4">
+          <BusinessReportsCard />
         </TabsContent>
       </Tabs>
     </div>
