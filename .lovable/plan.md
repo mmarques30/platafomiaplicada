@@ -1,35 +1,33 @@
 
 
-# Corrigir e expandir tour de onboarding
+# Tour pula etapas quando menus não estão visíveis
 
 ## Problema
-1. O step "Trilha Recomendada" aponta para a Central de Conteúdo no dashboard, mas deveria apontar para o menu "Aprender" (ou "Meu Progresso") no sidebar
-2. Faltam etapas para Bibliotecas e Calendário
+O react-joyride pula automaticamente steps cujo elemento-alvo (`target`) não existe no DOM. Se o ambiente do usuário oculta "Calendário" ou "Evolução" no sidebar, os steps 3 e 4 simplesmente não aparecem e o tour salta de Bibliotecas direto para MarIAna.
+
+## Solução
+Filtrar os steps dinamicamente com base nos menus visíveis no sidebar. Antes de passar o array de steps ao Joyride, verificar quais `data-tour` targets existem no DOM.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/layout/AppSidebar.tsx` | Editar — adicionar `data-tour="aprender"` no NavLink do menu colapsável quando `menu_key === 'aprender'`, e `data-tour="bibliotecas"` no bloco de Bibliotecas |
-| `src/components/dashboard/DashboardTour.tsx` | Editar — reorganizar steps do tour |
-| `src/pages/Dashboard.tsx` | Editar — remover `data-tour="trilha-recomendada"` do div da CentralConteudo |
+| `src/components/dashboard/DashboardTour.tsx` | Editar — filtrar steps dinamicamente |
 
-## Detalhes técnicos
-
-### AppSidebar.tsx
-- Linha ~241 (NavLink do menu colapsável): adicionar `data-tour={menu.menu_key === 'aprender' ? 'aprender' : undefined}`
-- No bloco de Bibliotecas (~linha 400+): adicionar `data-tour="bibliotecas"` ao elemento raiz
+## Detalhe técnico
 
 ### DashboardTour.tsx
-Substituir os 5 steps atuais por 7 steps:
+- Mover `steps` para dentro do componente
+- Usar `useMemo` + `useEffect` para filtrar apenas steps cujo `document.querySelector(step.target)` retorna um elemento
+- Isso garante que o tour mostre apenas as etapas relevantes para o ambiente atual, sem saltos
 
-1. **Aprender** → `[data-tour="aprender"]` — "Aqui você acessa trilhas, aulas e todo o conteúdo para desenvolver suas habilidades em IA." (placement: right)
-2. **Bibliotecas** → `[data-tour="bibliotecas"]` — "Explore prompts prontos, ferramentas de IA e materiais de apoio organizados por tema." (placement: right)
-3. **Calendário** → `[data-tour="calendario"]` — "Confira sessões ao vivo, aulas e eventos programados." (placement: right)
-4. **Evolução** → `[data-tour="evolucao"]` — "Acompanhe seu progresso, conquistas e certificados." (placement: right)
-5. **MarIAna** → `[data-tour="mariana-button"]` — "Sou a MarIAna! Clique aqui para ajuda e recomendações." (placement: left)
-6. **Configurações** → `[data-tour="configuracoes"]` — "Personalize perfil, senha e preferências." (placement: right)
+```tsx
+const visibleSteps = useMemo(() => {
+  return allSteps.filter(step => 
+    document.querySelector(step.target as string)
+  );
+}, [run]); // recalcula quando o tour inicia
+```
 
-### Dashboard.tsx
-- Remover `data-tour="trilha-recomendada"` do wrapper da CentralConteudo (já não é usado)
+Dessa forma, se o ambiente oculta Calendário e Evolução, o tour mostra: Aprender → Bibliotecas → MarIAna → Configurações, sem saltos.
 
