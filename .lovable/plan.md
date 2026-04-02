@@ -1,39 +1,28 @@
 
 
-# Insight automático ao marcar sessão como "realizada"
+# Saudação e tagline adaptativos no WelcomeHeader
 
-## Problema
-- A edge function `gerar-insight-mentoria` só aceita `formulario_id` — precisa de um novo code path para sessões
-- Não existe tabela de insights separada nem coluna na `sessoes_mentoria` para armazenar o resumo
-- O usuário pediu "não criar novas tabelas", então adicionaremos uma coluna `insight_resumo` em `sessoes_mentoria`
+## Alteração
 
-## Alterações
+**Arquivo**: `src/components/dashboard/WelcomeHeader.tsx`
 
-### 1. Migration — adicionar coluna `insight_resumo`
-Adicionar `insight_resumo TEXT` à tabela `sessoes_mentoria`.
+1. Após `primeiroNome` (linha 58), calcular `diasSemAcesso` via localStorage e `temEntregaUrgente` a partir do `kpi2Raw` já computado (tarefas críticas business) — reposicionar o cálculo da saudação para após os KPIs
+2. Substituir a saudação estática (linha 61) pela lógica contextual:
+   - `temEntregaUrgente` → `"Atenção, {nome}"`
+   - `diasSemAcesso >= 4` → `"Que bom te ver de volta, {nome}"`
+   - default → `"Boa {período}, {nome}!"`
+3. Criar variável `tagline` com a mesma lógica condicional
+4. No JSX (linhas 202-213), substituir `{saudacao}, <span>{primeiroNome}</span>!` por `{saudacao}` (já inclui o nome) e substituir o bloco `aulaAtiva ? ... : "Aplique, replique e domine IA"` por `aulaAtiva ? aula.tema : tagline`
 
-### 2. Edge function `gerar-insight-mentoria` — novo code path
-No `index.ts`, após o parsing do body, detectar se veio `sessao_id` (em vez de `formulario_id`). Se sim:
-- Buscar sessão, dados do usuário, etapas do contrato
-- Usar prompt simplificado: "Gere um resumo executivo da sessão de mentoria com pontos-chave, próximos passos e recomendações"
-- Retornar `{ insight: "texto" }` e salvar em `sessoes_mentoria.insight_resumo`
-
-### 3. Hook `useMentoriaSessoes.tsx` — invocar após update para "realizada"
-No `onSuccess` do `updateSessao`, verificar se o status mudou para "realizada". Como o `onSuccess` recebe `data` (a sessão atualizada), invocar a edge function em background (fire-and-forget com invalidação posterior).
-
-Ajuste: adicionar `insight_resumo` ao tipo `SessaoMentoria`.
-
-### 4. Página `MentoriaSessoes.tsx` — botão "Ver resumo"
-Para sessões realizadas com `insight_resumo` preenchido:
-- Exibir botão "Ver resumo" na linha da tabela (coluna Recursos)
-- No Dialog de detalhes da sessão, exibir card com borda teal (`border-[#2CBBA6]`), label "RESUMO DA SESSÃO", e o texto do insight
+### Detalhe técnico
+- `diasSemAcesso` usa `localStorage.getItem(\`ultimo_acesso_\${user?.id}\`)` (já gravado pelo MarIAnaFloatingButton)
+- `temEntregaUrgente` reutiliza `kpi2Raw > 0` (tarefas críticas já calculadas nos KPIs business), sem precisar de novo hook
+- `periodo` reutiliza a variável `hora` já existente
+- KPIs, data, estrutura e layout permanecem intactos
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| Migration SQL | Criar — `ALTER TABLE sessoes_mentoria ADD COLUMN insight_resumo TEXT` |
-| `supabase/functions/gerar-insight-mentoria/index.ts` | Editar — novo code path para `sessao_id` |
-| `src/hooks/useMentoriaSessoes.tsx` | Editar — tipo + invocação pós-update |
-| `src/pages/MentoriaSessoes.tsx` | Editar — botão "Ver resumo" + card teal no dialog |
+| `src/components/dashboard/WelcomeHeader.tsx` | Editar — saudação e tagline contextuais |
 
