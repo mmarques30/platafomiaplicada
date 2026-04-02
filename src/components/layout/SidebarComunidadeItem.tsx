@@ -18,7 +18,7 @@ interface SidebarComunidadeItemProps {
 }
 
 export function SidebarComunidadeItem({
-  isBusiness,
+  currentEnvironment,
   collapsed,
   expandedMenus,
   toggleMenu,
