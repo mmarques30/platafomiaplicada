@@ -192,6 +192,19 @@ export function WelcomeHeader() {
 
   const showKpis = !isVisitante && (hasKpis || isLoadingKpis);
 
+  // ── Saudação e tagline adaptativos ──
+  const temEntregaUrgente = isBusiness && kpi2Raw > 0;
+  const saudacao = temEntregaUrgente
+    ? `Atenção, ${primeiroNome}`
+    : diasSemAcesso >= 4
+    ? `Que bom te ver de volta, ${primeiroNome}`
+    : `Boa ${periodo}, ${primeiroNome}!`;
+  const tagline = temEntregaUrgente
+    ? 'Você tem entregas que precisam de atenção agora.'
+    : diasSemAcesso >= 4
+    ? `Faz ${diasSemAcesso} dias desde sua última visita. Por onde quer começar?`
+    : 'Aplique, replique e domine IA';
+
   const kpiSkeleton = (
     <div className="w-10 h-[22px] bg-white/[0.06] rounded animate-[kpiPulse_1.2s_ease-in-out_infinite] mx-auto" />
   );
@@ -205,7 +218,7 @@ export function WelcomeHeader() {
         <div className="flex flex-row items-center justify-between gap-2 sm:gap-3 md:gap-4 px-2.5 sm:px-3 md:px-6 py-2.5 sm:py-3 md:py-5">
           <div className="flex-1 min-w-0 text-left">
             <h1 className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-0.5 md:mb-1">
-              {saudacao}, <span className="text-primary font-bold">{primeiroNome}</span>!
+              {saudacao}
             </h1>
             {aulaAtiva ? (
               <p className="text-[11px] sm:text-xs md:text-base lg:text-lg text-white/70 truncate">
@@ -213,7 +226,7 @@ export function WelcomeHeader() {
               </p>
             ) : (
               <p className="text-[11px] sm:text-xs md:text-base lg:text-lg text-white/70 font-medium">
-                Aplique, replique e domine IA
+                {tagline}
               </p>
             )}
           </div>
