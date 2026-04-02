@@ -253,7 +253,16 @@ export default function MentoriaSessoes() {
                 </div>
               )}
 
-              {!selectedSessao.video_url && !selectedSessao.transcricao && !selectedSessao.notas && (
+              {selectedSessao?.insight_resumo && (
+                <div>
+                  <div className="rounded-lg border-2 border-[#2CBBA6] p-4">
+                    <span className="text-xs font-bold tracking-wider text-[#2CBBA6] uppercase">Resumo da Sessão</span>
+                    <p className="whitespace-pre-wrap text-sm mt-2">{selectedSessao.insight_resumo}</p>
+                  </div>
+                </div>
+              )}
+
+              {!selectedSessao.video_url && !selectedSessao.transcricao && !selectedSessao.notas && !selectedSessao.insight_resumo && (
                 <div className="py-8 text-center text-muted-foreground">
                   <FileText className="h-10 w-10 mx-auto mb-3 opacity-50" />
                   <p>Nenhum recurso disponível para esta sessão ainda.</p>
