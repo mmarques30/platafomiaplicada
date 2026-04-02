@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 
 interface SidebarComunidadeItemProps {
-  isBusiness: boolean;
+  currentEnvironment: string | null;
   collapsed: boolean;
   expandedMenus: string[];
   toggleMenu: (key: string) => void;
