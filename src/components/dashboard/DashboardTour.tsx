@@ -55,6 +55,13 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  const visibleSteps = useMemo(() => {
+    if (!run) return [];
+    return allSteps.filter(step =>
+      document.querySelector(step.target as string)
+    );
+  }, [run]);
+
   const handleEvent = useCallback(
     async (data: EventData, _controls: Controls) => {
       const { status, type } = data;
