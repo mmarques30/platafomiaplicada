@@ -65,6 +65,7 @@ export default function Evolucao() {
           {isBusiness && <BusinessEvolucaoAprendizado />}
           <TrilhasEmAndamentoCards />
           <VitrineConquistas />
+          <RitmoCard />
           {isAcademy && <BonusEvolucao />}
         </TabsContent>
 
