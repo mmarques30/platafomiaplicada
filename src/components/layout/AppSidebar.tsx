@@ -521,7 +521,7 @@ export function AppSidebar() {
               })}
 
               <SidebarComunidadeItem
-                isBusiness={isBusiness}
+                currentEnvironment={currentEnvironment}
                 collapsed={collapsed}
                 expandedMenus={expandedMenus}
                 toggleMenu={toggleMenu}

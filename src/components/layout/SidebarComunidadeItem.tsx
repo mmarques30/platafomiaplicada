@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 
 interface SidebarComunidadeItemProps {
-  isBusiness: boolean;
+  currentEnvironment: string | null;
   collapsed: boolean;
   expandedMenus: string[];
   toggleMenu: (key: string) => void;
@@ -18,14 +18,14 @@ interface SidebarComunidadeItemProps {
 }
 
 export function SidebarComunidadeItem({
-  isBusiness,
+  currentEnvironment,
   collapsed,
   expandedMenus,
   toggleMenu,
   isMenuVisible,
   pathname,
 }: SidebarComunidadeItemProps) {
-  if (isBusiness) return null;
+  if (currentEnvironment !== 'gratuito') return null;
 
   return (
     <Collapsible
