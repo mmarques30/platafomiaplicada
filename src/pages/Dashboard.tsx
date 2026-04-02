@@ -18,6 +18,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
+import { BriefingSemanal } from "@/components/dashboard/BriefingSemanal";
 
 
 export default function Dashboard() {
@@ -80,8 +81,9 @@ export default function Dashboard() {
 
             <section>
               <WelcomeHeader />
-              
             </section>
+
+            <BriefingSemanal />
 
             <DashboardUrgencias />
 
