@@ -1,9 +1,12 @@
+import { useEffect, useRef } from "react";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
+import { useAuth } from "@/hooks/useAuth";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 import { ProjetoOverviewCards } from "@/components/meu-sistema/ProjetoOverviewCards";
 import { GanttEntregas } from "@/components/meu-sistema/GanttEntregas";
 import { TimelineEtapas } from "@/components/meu-sistema/TimelineEtapas";
