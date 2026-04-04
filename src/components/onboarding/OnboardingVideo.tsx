@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useOnboardingTracking } from '@/hooks/useOnboardingTracking';
 
 const YOUTUBE_VIDEO_ID = 'SEU_ID_AQUI';
 const VIDEO_CONFIGURADO = YOUTUBE_VIDEO_ID !== 'SEU_ID_AQUI' && (YOUTUBE_VIDEO_ID as string).length > 5;
@@ -11,6 +12,7 @@ interface OnboardingVideoProps {
 
 export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVideoProps) {
   const { profile } = useUserProfile();
+  const { track } = useOnboardingTracking();
   const [visible, setVisible] = useState(previewMode);
 
   useEffect(() => {
@@ -26,6 +28,7 @@ export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVide
       onClose?.();
       return;
     }
+    track('video_visto');
     sessionStorage.setItem('onboarding_video_visto', 'true');
     setVisible(false);
   };

@@ -4,6 +4,7 @@ import type { Step, EventData, Controls } from "react-joyride";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 
 const allSteps: Step[] = [
   {
@@ -66,6 +67,7 @@ interface DashboardTourProps {
 export function DashboardTour({ run, previewMode, onComplete }: DashboardTourProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { track } = useOnboardingTracking();
 
   const visibleSteps = useMemo(() => {
     if (!run) return [];
@@ -87,6 +89,7 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
           return;
         }
         if (user?.id) {
+          await track('tour_concluido');
           await supabase
             .from("profiles")
             .update({ primeiro_acesso: false })

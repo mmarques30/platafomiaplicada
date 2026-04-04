@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
 import { InsightIA } from "@/components/mentoria/InsightIA";
 import { BusinessDashboard } from "@/components/mentoria/business/BusinessDashboard";
@@ -18,6 +19,15 @@ export default function MentoriaDiagnostico() {
   const { formulario, isLoading, refetch } = useMentoriaForm();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { effectivePlan, isVisitante, isBusiness, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
+  const { track } = useOnboardingTracking();
+  const trackedRef = useRef(false);
+
+  useEffect(() => {
+    if (!planLoading && !isLoading && !trackedRef.current) {
+      trackedRef.current = true;
+      track('diagnostico_iniciado');
+    }
+  }, [planLoading, isLoading, track]);
 
   // Check if accessed via /diagnostico route (Academy-specific)
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');

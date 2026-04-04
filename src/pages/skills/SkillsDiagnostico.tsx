@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -21,6 +22,15 @@ export default function SkillsDiagnostico() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const { diagnostico, isLoading, updateDiagnostico, saveDiagnostico, isSaving } = useSkillsDiagnostico();
+  const { track } = useOnboardingTracking();
+  const trackedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isLoading && !trackedRef.current) {
+      trackedRef.current = true;
+      track('skills_diagnostico_iniciado');
+    }
+  }, [isLoading, track]);
 
   const progress = (currentStep / STEPS.length) * 100;
 

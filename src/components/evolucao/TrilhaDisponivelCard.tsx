@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { PlayCircle } from "lucide-react";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 
 interface TrilhaDisponivelCardProps {
   id: string;
@@ -24,6 +25,7 @@ export function TrilhaDisponivelCard({
   totalVideos,
 }: TrilhaDisponivelCardProps) {
   const navigate = useNavigate();
+  const { track } = useOnboardingTracking();
 
   const formatDuracao = (minutos?: number) => {
     if (!minutos) return "Duração não informada";
@@ -68,7 +70,10 @@ export function TrilhaDisponivelCard({
         
         <Button
           className="flex-shrink-0"
-          onClick={() => navigate(`/trilhas/${id}`)}
+          onClick={() => {
+            track('trilha_iniciada');
+            navigate(`/trilhas/${id}`);
+          }}
         >
           <PlayCircle className="mr-2 h-4 w-4" />
           Iniciar trilha
