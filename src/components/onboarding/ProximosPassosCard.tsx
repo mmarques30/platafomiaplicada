@@ -101,12 +101,13 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
   const nome = profile?.nome_completo?.split(" ")[0] ?? "";
 
   useEffect(() => {
+    if (previewMode) return;
     if (!user?.id) return;
     const chave = `proximos_passos_${user.id}`;
     if (profile?.primeiro_acesso === false && !localStorage.getItem(chave)) {
       setMostrar(true);
     }
-  }, [profile?.primeiro_acesso, user?.id]);
+  }, [profile?.primeiro_acesso, user?.id, previewMode]);
 
   const config = useMemo((): PlanConfig | null => {
     if (!mostrar) return null;
