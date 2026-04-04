@@ -4,6 +4,7 @@ import type { Step, EventData, Controls } from "react-joyride";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 
 const allSteps: Step[] = [
   {
