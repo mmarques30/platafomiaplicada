@@ -32,7 +32,7 @@ const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
   const { viewAs, setViewAs, resetView, canUseViewAs, impersonatedUserName } = useAdminView(isAdmin);
   const [selectedPlanForModal, setSelectedPlanForModal] = useState<PlanType | null>(null);
-  const [onboardingStep, setOnboardingStep] = useState<'idle' | 'video' | 'tour'>('idle');
+  const [onboardingStep, setOnboardingStep] = useState<'idle' | 'video' | 'tour' | 'proximos_passos'>('idle');
 
   if (!canUseViewAs) return null;
 
