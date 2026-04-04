@@ -13,6 +13,7 @@ import { AdminViewMode } from "@/contexts/AdminViewContext";
 import { UserSelectorByPlanModal } from "./UserSelectorByPlanModal";
 import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
 import { DashboardTour } from "@/components/dashboard/DashboardTour";
+import { ProximosPassosCard } from "@/components/onboarding/ProximosPassosCard";
 
 interface AdminViewSelectorProps {
   isAdmin: boolean;
