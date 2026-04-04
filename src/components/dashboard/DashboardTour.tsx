@@ -67,6 +67,7 @@ interface DashboardTourProps {
 export function DashboardTour({ run, previewMode, onComplete }: DashboardTourProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { track } = useOnboardingTracking();
 
   const visibleSteps = useMemo(() => {
     if (!run) return [];
