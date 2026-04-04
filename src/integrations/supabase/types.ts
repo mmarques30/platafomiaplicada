@@ -4090,6 +4090,30 @@ export type Database = {
           },
         ]
       }
+      onboarding_eventos: {
+        Row: {
+          created_at: string | null
+          evento: string
+          id: string
+          plano: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          evento: string
+          id?: string
+          plano?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          evento?: string
+          id?: string
+          plano?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       password_reset_requests: {
         Row: {
           completed_at: string | null
