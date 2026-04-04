@@ -1,33 +1,55 @@
 
 
-# Criar ProximosPassosCard — Modal pós-onboarding
+# Tracking de funil de onboarding
 
 ## Resumo
-Componente modal que aparece uma única vez após o onboarding ser concluído (primeiro_acesso → false). Conteúdo dinâmico por plano, com passos estilizados no tema escuro da marca. Controlado via localStorage.
+Criar tabela `onboarding_eventos`, hook `useOnboardingTracking`, e integrar chamadas de `track()` em 8 componentes/páginas existentes.
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/onboarding/ProximosPassosCard.tsx` | Criar — componente completo com lógica por plano |
-| `src/components/layout/MainLayout.tsx` | Editar — importar e renderizar ProximosPassosCard |
+| Migration SQL | Criar tabela `onboarding_eventos` + RLS |
+| `src/hooks/useOnboardingTracking.ts` | Criar hook |
+| `src/components/onboarding/OnboardingVideo.tsx` | Editar — track `video_visto` |
+| `src/components/dashboard/DashboardTour.tsx` | Editar — track `tour_concluido` |
+| `src/components/onboarding/ProximosPassosCard.tsx` | Editar — track `proximos_passos_vistos` |
+| `src/pages/MentoriaDiagnostico.tsx` | Editar — track `diagnostico_iniciado` |
+| `src/pages/skills/SkillsDiagnostico.tsx` | Editar — track `skills_diagnostico_iniciado` |
+| `src/components/evolucao/TrilhaDisponivelCard.tsx` | Editar — track `trilha_iniciada` |
+| `src/pages/Mentoria.tsx` | Editar — track `roadmap_visitado` (1x via localStorage) |
+| `src/pages/MeuSistema.tsx` | Editar — track `sistema_visitado` (1x via localStorage) |
 
 ## Detalhes técnicos
 
-### ProximosPassosCard.tsx
-- **Controle de exibição**: `useState` + `useEffect` checando `profile?.primeiro_acesso === false` e `localStorage.getItem(`proximos_passos_${user?.id}`)`. Ao fechar, seta localStorage e oculta.
-- **Plano**: usa `useEffectivePlan` para determinar `effectivePlan`
-- **Dados dinâmicos**:
-  - Gratuito: `useQuery` buscando `conteudos` com `visivel_visitantes = true` (limit 3), com skeleton loading
-  - Business Parceria: `useContratosBusiness` + `useEtapasBusiness` para dados reais de etapas
-  - Academy/Skills/Business Sistemas: conteúdo estático conforme especificação
-- **Layout**: overlay fixo z-9998, fundo `#0C0F0A`, dot grid sutil, modal centralizado `#141810` com border radius 20px, max-width 680px
-- **Header**: brand label + título + subtítulo com nome do usuário
-- **Steps**: lista com círculos coloridos por estado (feito/agora/próximo), labels, títulos, descrições, CTAs opcionais com `Link`
-- **Footer**: progresso "X de Y", barra de progresso 3px, botão CTA principal com cores por plano
-- **Cores CTA por plano**: Gratuito/Academy `#AFC040/#0C0F0A`, Skills `#E8A43C/#0C0F0A`, Business `#2CBBA6/#ffffff`
+### Migration
+```sql
+CREATE TABLE onboarding_eventos (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  plano text,
+  evento text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE onboarding_eventos ENABLE ROW LEVEL SECURITY;
+-- Users insert own, admins/equipe read all
+```
 
-### MainLayout.tsx
-- Importar `ProximosPassosCard`
-- Renderizar após o `SidebarProvider` block, antes do fechamento do fragment, passando dependências necessárias (ou o componente busca internamente via hooks)
+### useOnboardingTracking.ts
+- Importa `useAuth` e `useEffectivePlan` (de `useUserPlan`)
+- Expõe `track(evento)` que faz insert silencioso na tabela
+- Tipo `OnboardingEvento` com 8 valores possíveis
+
+### Integrações nos componentes
+Cada componente recebe `const { track } = useOnboardingTracking()` e chama no momento correto:
+- **OnboardingVideo**: `handleEnter` → `track('video_visto')`
+- **DashboardTour**: `TOUR_END` callback → `track('tour_concluido')`
+- **ProximosPassosCard**: `handleClose` → `track('proximos_passos_vistos')`
+- **MentoriaDiagnostico**: `useEffect` no mount (quando form carrega) → `track('diagnostico_iniciado')`
+- **SkillsDiagnostico**: `useEffect` no mount → `track('skills_diagnostico_iniciado')`
+- **TrilhaDisponivelCard**: onClick do botão "Iniciar trilha" → `track('trilha_iniciada')`
+- **Mentoria**: `useEffect` + localStorage `roadmap_visto_${user?.id}` → `track('roadmap_visitado')`
+- **MeuSistema**: `useEffect` + localStorage `sistema_visto_${user?.id}` → `track('sistema_visitado')`
+
+Nenhuma lógica existente é alterada. Apenas chamadas adicionais de tracking.
 
