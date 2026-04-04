@@ -92,7 +92,7 @@ export function ProximosPassosCard() {
     enabled: isGratuito && mostrar,
   });
 
-  const nome = profile?.nome?.split(" ")[0] ?? "";
+  const nome = profile?.nome_completo?.split(" ")[0] ?? "";
 
   useEffect(() => {
     if (!user?.id) return;
