@@ -78,6 +78,7 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
 
+import OnboardingMonitor from "./pages/admin/OnboardingMonitor";
 import GerenciarConteudo from "./pages/admin/GerenciarConteudo";
 import GerenciarBibliotecas from "./pages/admin/GerenciarBibliotecas";
 import GerenciarAvisos from "./pages/admin/GerenciarAvisos";
@@ -257,6 +258,7 @@ function AppContent() {
             <Route path="materiais" element={<GerenciarMateriais />} />
             <Route path="formularios" element={<VisualizarFormularios />} />
             <Route path="minhas-tarefas" element={<MinhasTarefas />} />
+            <Route path="onboarding-monitor" element={<OnboardingMonitor />} />
             <Route path="menus" element={<GerenciarMenus />} />
             <Route path="auditoria" element={<Auditoria />} />
             <Route path="importar-usuarios" element={<ImportarUsuarios />} />
