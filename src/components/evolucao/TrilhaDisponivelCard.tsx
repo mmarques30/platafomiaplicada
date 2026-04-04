@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { PlayCircle } from "lucide-react";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 
 interface TrilhaDisponivelCardProps {
   id: string;
