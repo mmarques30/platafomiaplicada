@@ -103,6 +103,7 @@ export function MainLayout() {
           )}
         </div>
       </SidebarProvider>
+      <ProximosPassosCard />
     </>
   );
 }
