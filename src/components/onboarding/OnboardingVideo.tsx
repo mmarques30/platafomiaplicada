@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useOnboardingTracking } from '@/hooks/useOnboardingTracking';
 
 const YOUTUBE_VIDEO_ID = 'SEU_ID_AQUI';
 const VIDEO_CONFIGURADO = YOUTUBE_VIDEO_ID !== 'SEU_ID_AQUI' && (YOUTUBE_VIDEO_ID as string).length > 5;
