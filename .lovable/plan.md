@@ -1,33 +1,29 @@
 
 
-# Criar Monitor de Onboarding no Admin
+# Adicionar ProximosPassosCard ao simulador de onboarding
 
-## Resumo
-Página admin para acompanhar o funil de onboarding de cada usuário, com KPIs, tabela detalhada, filtros por plano e funil visual de conversão.
+## Problema
+O fluxo "Simular Onboarding" no AdminViewSelector executa apenas vídeo → tour, mas não mostra o card de Próximos Passos (que aparece após o tour). O admin não consegue visualizar essa etapa na simulação.
+
+## Solução
+Expandir o estado `onboardingStep` para incluir uma terceira etapa `'proximos_passos'`, que renderiza o `ProximosPassosCard` em modo preview (sem gravar no localStorage/banco).
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/pages/admin/OnboardingMonitor.tsx` | Criar — página completa |
-| `src/App.tsx` | Editar — importar e adicionar rota `onboarding-monitor` |
-| `src/components/admin/AdminSidebar.tsx` | Editar — adicionar item no grupo "Gestão" |
+| `src/components/onboarding/ProximosPassosCard.tsx` | Editar — adicionar prop `previewMode` que força exibição e desativa persistência |
+| `src/components/admin/AdminViewSelector.tsx` | Editar — adicionar etapa `'proximos_passos'` no fluxo de simulação |
 
-## Detalhes técnicos
+## Detalhes
 
-### OnboardingMonitor.tsx
-- **Queries paralelas**: `profiles` (id, nome_completo, email, plano_mentoria, primeiro_acesso, created_at) e `onboarding_eventos` (user_id, evento, plano, created_at)
-- **Cálculo por usuário**: função `calcularStatus` conforme especificado (status, etapaAtual, diasParado, parado3dias, acaoConcluida)
-- **Filtros pill**: Todos, Academy, Business Parceria, Business Sistemas, Skills, Gratuito, Parados 3+ dias
-- **4 KPI cards** no topo: Total, Completos (%), Em andamento, Parados 3+ dias (coral)
-- **Tabela** com adminTheme: Usuário (iniciais + nome + email), Plano (badge), Status (StatusBadge: completo→verde, em_andamento→âmbar, nao_iniciou→cinza), Parado em, Dias parado (vermelho se ≥3), Ação (Ver perfil/Notificar)
-- **Botão Notificar**: insert em `notificacoes` com tipo 'sistema'
-- **Funil**: barras horizontais proporcionais com cores #AFC040, #2CBBA6, #4A9FE0, #E8A43C, #AFC040
+### ProximosPassosCard.tsx
+- Nova prop opcional `previewMode?: boolean` e `onClose?: () => void`
+- Quando `previewMode=true`: ignora checagem de `primeiro_acesso` e localStorage, exibe direto (`setMostrar(true)`)
+- No `handleClose` com `previewMode`: chama `onClose()` em vez de gravar no localStorage/tracking
 
-### App.tsx
-- Import `OnboardingMonitor` de `./pages/admin/OnboardingMonitor`
-- Rota: `<Route path="onboarding-monitor" element={<OnboardingMonitor />} />` dentro do bloco admin
-
-### AdminSidebar.tsx
-- Adicionar `{ path: "/admin/onboarding-monitor", label: "Monitor de Onboarding" }` no grupo "Gestão"
+### AdminViewSelector.tsx
+- Tipo do state: `'idle' | 'video' | 'tour' | 'proximos_passos'`
+- Quando tour completa: `setOnboardingStep('proximos_passos')` em vez de `'idle'`
+- Renderizar `ProximosPassosCard` quando step === `'proximos_passos'`, com `previewMode` e `onClose={() => setOnboardingStep('idle')}`
 
