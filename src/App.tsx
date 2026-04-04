@@ -258,6 +258,7 @@ function AppContent() {
             <Route path="materiais" element={<GerenciarMateriais />} />
             <Route path="formularios" element={<VisualizarFormularios />} />
             <Route path="minhas-tarefas" element={<MinhasTarefas />} />
+            <Route path="onboarding-monitor" element={<OnboardingMonitor />} />
             <Route path="menus" element={<GerenciarMenus />} />
             <Route path="auditoria" element={<Auditoria />} />
             <Route path="importar-usuarios" element={<ImportarUsuarios />} />

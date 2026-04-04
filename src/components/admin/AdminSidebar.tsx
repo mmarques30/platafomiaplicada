@@ -116,6 +116,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: "/admin/produtos", label: "Produtos" },
       { path: "/admin/minhas-tarefas", label: "Minhas Tarefas" },
+      { path: "/admin/onboarding-monitor", label: "Monitor de Onboarding" },
     ],
   },
   {
