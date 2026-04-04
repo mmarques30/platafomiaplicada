@@ -12,6 +12,7 @@ interface OnboardingVideoProps {
 
 export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVideoProps) {
   const { profile } = useUserProfile();
+  const { track } = useOnboardingTracking();
   const [visible, setVisible] = useState(previewMode);
 
   useEffect(() => {
