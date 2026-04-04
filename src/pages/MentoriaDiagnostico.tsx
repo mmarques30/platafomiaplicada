@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 import { FormularioWizard } from "@/components/mentoria/FormularioWizard";
 import { InsightIA } from "@/components/mentoria/InsightIA";
 import { BusinessDashboard } from "@/components/mentoria/business/BusinessDashboard";
