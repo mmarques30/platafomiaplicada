@@ -19,6 +19,15 @@ export default function MentoriaDiagnostico() {
   const { formulario, isLoading, refetch } = useMentoriaForm();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { effectivePlan, isVisitante, isBusiness, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
+  const { track } = useOnboardingTracking();
+  const trackedRef = useRef(false);
+
+  useEffect(() => {
+    if (!planLoading && !isLoading && !trackedRef.current) {
+      trackedRef.current = true;
+      track('diagnostico_iniciado');
+    }
+  }, [planLoading, isLoading, track]);
 
   // Check if accessed via /diagnostico route (Academy-specific)
   const isAcademyRoute = location.pathname.startsWith('/diagnostico');

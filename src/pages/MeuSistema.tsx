@@ -13,7 +13,20 @@ import { TimelineEtapas } from "@/components/meu-sistema/TimelineEtapas";
 import { Monitor } from "lucide-react";
 
 const MeuSistema = () => {
+  const { user } = useAuth();
+  const { track } = useOnboardingTracking();
+  const trackedRef = useRef(false);
   const businessUserId = useBusinessUserId();
+
+  useEffect(() => {
+    if (!user?.id || trackedRef.current) return;
+    const chave = `sistema_visto_${user.id}`;
+    if (!localStorage.getItem(chave)) {
+      trackedRef.current = true;
+      track('sistema_visitado');
+      localStorage.setItem(chave, 'true');
+    }
+  }, [user?.id, track]);
   const { contrato, isLoading: loadingContrato } = useContratosBusiness(businessUserId);
   const { data: etapas = [], isLoading: loadingEtapas } = useEtapasBusiness(contrato?.id);
   const { entregas, entregasPorEtapa, calcularProgressoEtapa, isLoading: loadingEntregas } = useEntregasBusiness(contrato?.id);

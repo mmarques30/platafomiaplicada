@@ -28,6 +28,7 @@ export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVide
       onClose?.();
       return;
     }
+    track('video_visto');
     sessionStorage.setItem('onboarding_video_visto', 'true');
     setVisible(false);
   };

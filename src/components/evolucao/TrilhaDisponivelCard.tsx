@@ -70,7 +70,10 @@ export function TrilhaDisponivelCard({
         
         <Button
           className="flex-shrink-0"
-          onClick={() => navigate(`/trilhas/${id}`)}
+          onClick={() => {
+            track('trilha_iniciada');
+            navigate(`/trilhas/${id}`);
+          }}
         >
           <PlayCircle className="mr-2 h-4 w-4" />
           Iniciar trilha

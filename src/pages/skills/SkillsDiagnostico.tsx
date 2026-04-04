@@ -22,6 +22,15 @@ export default function SkillsDiagnostico() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const { diagnostico, isLoading, updateDiagnostico, saveDiagnostico, isSaving } = useSkillsDiagnostico();
+  const { track } = useOnboardingTracking();
+  const trackedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isLoading && !trackedRef.current) {
+      trackedRef.current = true;
+      track('skills_diagnostico_iniciado');
+    }
+  }, [isLoading, track]);
 
   const progress = (currentStep / STEPS.length) * 100;
 

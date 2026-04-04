@@ -216,8 +216,11 @@ export function ProximosPassosCard() {
     return null;
   }, [mostrar, effectivePlan, nome, videosGratuitos, etapas, contrato]);
 
+  const { track } = useOnboardingTracking();
+
   const handleClose = () => {
     if (user?.id) {
+      track('proximos_passos_vistos');
       localStorage.setItem(`proximos_passos_${user.id}`, "true");
     }
     setMostrar(false);

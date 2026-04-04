@@ -35,6 +35,18 @@ export default function Mentoria() {
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills, isAcademy } = useEffectivePlan(isAdmin, roleLoading);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { track } = useOnboardingTracking();
+  const trackedRoadmapRef = useRef(false);
+
+  useEffect(() => {
+    if (!user?.id || trackedRoadmapRef.current) return;
+    const chave = `roadmap_visto_${user.id}`;
+    if (!localStorage.getItem(chave)) {
+      trackedRoadmapRef.current = true;
+      track('roadmap_visitado');
+      localStorage.setItem(chave, 'true');
+    }
+  }, [user?.id, track]);
 
   // Business stages
   const businessUserId = useBusinessUserId();

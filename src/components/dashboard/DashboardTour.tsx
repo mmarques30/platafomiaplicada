@@ -89,6 +89,7 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
           return;
         }
         if (user?.id) {
+          await track('tour_concluido');
           await supabase
             .from("profiles")
             .update({ primeiro_acesso: false })
