@@ -25,6 +25,7 @@ export function TrilhaDisponivelCard({
   totalVideos,
 }: TrilhaDisponivelCardProps) {
   const navigate = useNavigate();
+  const { track } = useOnboardingTracking();
 
   const formatDuracao = (minutos?: number) => {
     if (!minutos) return "Duração não informada";
