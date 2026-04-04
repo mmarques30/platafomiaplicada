@@ -63,8 +63,13 @@ function labelColor(status: StepStatus) {
   return "rgba(255,255,255,0.3)";
 }
 
-export function ProximosPassosCard() {
-  const [mostrar, setMostrar] = useState(false);
+interface ProximosPassosCardProps {
+  previewMode?: boolean;
+  onClose?: () => void;
+}
+
+export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: ProximosPassosCardProps = {}) {
+  const [mostrar, setMostrar] = useState(previewMode ?? false);
   const { user } = useAuth();
   const { profile } = useUserProfile();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
