@@ -125,7 +125,11 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
       )}
 
       {onboardingStep === 'tour' && (
-        <DashboardTour run previewMode onComplete={() => setOnboardingStep('idle')} />
+        <DashboardTour run previewMode onComplete={() => setOnboardingStep('proximos_passos')} />
+      )}
+
+      {onboardingStep === 'proximos_passos' && (
+        <ProximosPassosCard previewMode onClose={() => setOnboardingStep('idle')} />
       )}
     </>
   );

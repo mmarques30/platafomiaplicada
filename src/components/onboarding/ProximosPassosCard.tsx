@@ -225,6 +225,11 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
   const { track } = useOnboardingTracking();
 
   const handleClose = () => {
+    if (previewMode) {
+      setMostrar(false);
+      onCloseExternal?.();
+      return;
+    }
     if (user?.id) {
       track('proximos_passos_vistos');
       localStorage.setItem(`proximos_passos_${user.id}`, "true");
