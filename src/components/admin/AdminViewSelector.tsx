@@ -13,6 +13,7 @@ import { AdminViewMode } from "@/contexts/AdminViewContext";
 import { UserSelectorByPlanModal } from "./UserSelectorByPlanModal";
 import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
 import { DashboardTour } from "@/components/dashboard/DashboardTour";
+import { ProximosPassosCard } from "@/components/onboarding/ProximosPassosCard";
 
 interface AdminViewSelectorProps {
   isAdmin: boolean;
@@ -31,7 +32,7 @@ const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
   const { viewAs, setViewAs, resetView, canUseViewAs, impersonatedUserName } = useAdminView(isAdmin);
   const [selectedPlanForModal, setSelectedPlanForModal] = useState<PlanType | null>(null);
-  const [onboardingStep, setOnboardingStep] = useState<'idle' | 'video' | 'tour'>('idle');
+  const [onboardingStep, setOnboardingStep] = useState<'idle' | 'video' | 'tour' | 'proximos_passos'>('idle');
 
   if (!canUseViewAs) return null;
 
@@ -124,7 +125,11 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
       )}
 
       {onboardingStep === 'tour' && (
-        <DashboardTour run previewMode onComplete={() => setOnboardingStep('idle')} />
+        <DashboardTour run previewMode onComplete={() => setOnboardingStep('proximos_passos')} />
+      )}
+
+      {onboardingStep === 'proximos_passos' && (
+        <ProximosPassosCard previewMode onClose={() => setOnboardingStep('idle')} />
       )}
     </>
   );

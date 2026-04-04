@@ -63,8 +63,13 @@ function labelColor(status: StepStatus) {
   return "rgba(255,255,255,0.3)";
 }
 
-export function ProximosPassosCard() {
-  const [mostrar, setMostrar] = useState(false);
+interface ProximosPassosCardProps {
+  previewMode?: boolean;
+  onClose?: () => void;
+}
+
+export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: ProximosPassosCardProps = {}) {
+  const [mostrar, setMostrar] = useState(previewMode ?? false);
   const { user } = useAuth();
   const { profile } = useUserProfile();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
@@ -96,12 +101,13 @@ export function ProximosPassosCard() {
   const nome = profile?.nome_completo?.split(" ")[0] ?? "";
 
   useEffect(() => {
+    if (previewMode) return;
     if (!user?.id) return;
     const chave = `proximos_passos_${user.id}`;
     if (profile?.primeiro_acesso === false && !localStorage.getItem(chave)) {
       setMostrar(true);
     }
-  }, [profile?.primeiro_acesso, user?.id]);
+  }, [profile?.primeiro_acesso, user?.id, previewMode]);
 
   const config = useMemo((): PlanConfig | null => {
     if (!mostrar) return null;
@@ -219,6 +225,11 @@ export function ProximosPassosCard() {
   const { track } = useOnboardingTracking();
 
   const handleClose = () => {
+    if (previewMode) {
+      setMostrar(false);
+      onCloseExternal?.();
+      return;
+    }
     if (user?.id) {
       track('proximos_passos_vistos');
       localStorage.setItem(`proximos_passos_${user.id}`, "true");
