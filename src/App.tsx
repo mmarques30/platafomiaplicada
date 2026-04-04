@@ -78,6 +78,7 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
 
+import OnboardingMonitor from "./pages/admin/OnboardingMonitor";
 import GerenciarConteudo from "./pages/admin/GerenciarConteudo";
 import GerenciarBibliotecas from "./pages/admin/GerenciarBibliotecas";
 import GerenciarAvisos from "./pages/admin/GerenciarAvisos";
