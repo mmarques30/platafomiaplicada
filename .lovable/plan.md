@@ -1,44 +1,29 @@
 
 
-# Resetar onboarding para todos os usuários existentes
+# Fix: ProximosPassosCard aparecendo atrás do header/sidebar
 
-## Como funciona o fluxo atual
+## Problema
+O card de Próximos Passos está renderizando no topo da tela mas não cobre o layout inteiro — o TopHeader (`fixed z-50`) e o conteúdo do dashboard ficam visíveis por baixo/acima do card.
 
-O onboarding é controlado por 3 mecanismos:
-1. **`primeiro_acesso = true`** (banco de dados) → exibe o vídeo de boas-vindas
-2. **`sessionStorage: onboarding_video_visto`** (navegador, temporário) → após vídeo, inicia o tour guiado
-3. **`localStorage: proximos_passos_{userId}`** (navegador, persistente) → controla se o card de Próximos Passos já foi visto
+O ProximosPassosCard é renderizado na linha 106 do `MainLayout.tsx`, fora do `SidebarProvider`, mas o overlay fullscreen (`position: fixed; inset: 0; z-index: 9998`) deveria cobrir tudo.
 
-## O que precisa ser feito
+## Causa provável
+O `z-index: 9998` no style inline deveria ser suficiente, mas o TopHeader com `z-50` (Tailwind) e o container do conteúdo com `relative z-[1]` podem estar em stacking contexts diferentes. Além disso, a renderização dentro do fragment `<>...</>` pode não garantir a sobreposição visual esperada.
 
-### 1. Migration SQL (banco de dados)
-Executar um UPDATE para setar `primeiro_acesso = true` em todos os perfis ativos que não são visitantes e que já completaram o onboarding (`primeiro_acesso = false`):
+## Solução
+Usar um **React Portal** para renderizar o ProximosPassosCard diretamente no `document.body`, garantindo que fique fora de qualquer stacking context do layout.
 
-```sql
-UPDATE profiles
-SET primeiro_acesso = true
-WHERE conta_ativa = true
-  AND is_visitante = false
-  AND primeiro_acesso = false;
-```
-
-Isso faz com que, no próximo login, cada usuário veja: vídeo → tour → próximos passos.
-
-### 2. Versionar a chave do localStorage (ProximosPassosCard)
-O card de Próximos Passos usa `localStorage` com a chave `proximos_passos_{userId}`. Usuários que já viram o card terão essa chave salva no navegador, então o card não apareceria novamente mesmo após o reset.
-
-**Solução**: mudar a chave para incluir uma versão, ex: `proximos_passos_v2_{userId}`. Assim, todos os usuários verão o card novamente após o tour.
+## Arquivo
 
 | Arquivo | Ação |
 |---|---|
-| Migration SQL | Criar — resetar `primeiro_acesso` |
-| `src/components/onboarding/ProximosPassosCard.tsx` | Editar — versionar chave localStorage |
+| `src/components/onboarding/ProximosPassosCard.tsx` | Editar — envolver o render em `createPortal(... , document.body)` |
 
-### Resultado
-Na próxima vez que cada usuário acessar a plataforma, passará pelo fluxo completo: vídeo de boas-vindas → tour guiado → card de próximos passos — como se fosse a primeira vez.
+## Detalhes
 
-### Observações
-- Visitantes não são afetados (já têm fluxo próprio)
-- Usuários Business serão redirecionados para a tela de welcome-business (comportamento existente)
-- O `sessionStorage` é limpo automaticamente ao fechar o navegador, então não precisa de ação
+1. Importar `createPortal` de `react-dom`
+2. No return final (tanto o loading state quanto o modal principal), envolver em `createPortal(..., document.body)`
+3. Isso garante que o overlay é injetado como filho direto do `<body>`, escapando de qualquer stacking context criado por SidebarProvider, TopHeader ou outros wrappers
+
+Nenhuma outra alteração necessária.
 
