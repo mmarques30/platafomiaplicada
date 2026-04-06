@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -164,6 +164,8 @@ export default function OnboardingMonitor() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterKey>("todos");
   const [notifying, setNotifying] = useState<string | null>(null);
+  const [pagina, setPagina] = useState(1);
+  const POR_PAGINA = 20;
 
   const { data: profiles, isLoading: loadingProfiles } = useQuery({
     queryKey: ["onb-profiles"],
@@ -202,6 +204,11 @@ export default function OnboardingMonitor() {
     if (filter === "gratuito") return rows.filter((r) => !r.profile.plano_mentoria);
     return rows.filter((r) => r.profile.plano_mentoria === filter);
   }, [rows, filter]);
+
+  useEffect(() => setPagina(1), [filter]);
+
+  const totalPaginas = Math.ceil(filtered.length / POR_PAGINA);
+  const usuariosPagina = filtered.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 
   // KPIs
   const total = rows.length;
@@ -327,7 +334,7 @@ export default function OnboardingMonitor() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map((row) => {
+                usuariosPagina.map((row) => {
                   const { badgeStatus, label } = STATUS_MAP[row.status];
                   return (
                     <TableRow key={row.profile.id} className={adminTheme.tableRow}>
@@ -388,6 +395,29 @@ export default function OnboardingMonitor() {
             </TableBody>
           </Table>
         </div>
+        {filtered.length > POR_PAGINA && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+            <span className="text-xs text-muted-foreground">
+              {(pagina - 1) * POR_PAGINA + 1}–{Math.min(pagina * POR_PAGINA, filtered.length)} de {filtered.length} usuários
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPagina(p => Math.max(1, p - 1))}
+                disabled={pagina === 1}
+                className="px-3 py-1.5 rounded-md text-xs border border-border bg-card disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted transition-colors"
+              >
+                ← Anterior
+              </button>
+              <button
+                onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+                disabled={pagina === totalPaginas}
+                className="px-3 py-1.5 rounded-md text-xs border border-border bg-card disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted transition-colors"
+              >
+                Próxima →
+              </button>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Funnel */}
