@@ -242,7 +242,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
 
   // Loading state for gratuito
   if (isGratuito && loadingVideos) {
-    return (
+    return createPortal(
       <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", display: "flex", alignItems: "center", justifyContent: "center", overflowY: "auto", padding: "16px 0" }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #AFC040 1px, transparent 1px)", backgroundSize: "28px 28px", opacity: 0.025 }} />
         <div style={{ position: "relative", zIndex: 1, background: "#141810", border: "0.5px solid rgba(175,192,64,0.15)", borderRadius: 20, maxWidth: 680, width: "100%", margin: "auto 16px", maxHeight: "calc(100vh - 32px)", overflowY: "auto", padding: 32 }}>
@@ -259,7 +259,8 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
             </div>
           ))}
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 
