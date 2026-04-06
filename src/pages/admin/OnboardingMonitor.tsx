@@ -205,6 +205,11 @@ export default function OnboardingMonitor() {
     return rows.filter((r) => r.profile.plano_mentoria === filter);
   }, [rows, filter]);
 
+  useEffect(() => setPagina(1), [filter]);
+
+  const totalPaginas = Math.ceil(filtered.length / POR_PAGINA);
+  const usuariosPagina = filtered.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
+
   // KPIs
   const total = rows.length;
   const completos = rows.filter((r) => r.status === "completo").length;
