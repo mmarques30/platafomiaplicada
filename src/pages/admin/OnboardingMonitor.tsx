@@ -164,6 +164,8 @@ export default function OnboardingMonitor() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterKey>("todos");
   const [notifying, setNotifying] = useState<string | null>(null);
+  const [pagina, setPagina] = useState(1);
+  const POR_PAGINA = 20;
 
   const { data: profiles, isLoading: loadingProfiles } = useQuery({
     queryKey: ["onb-profiles"],
