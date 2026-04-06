@@ -242,9 +242,9 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
   // Loading state for gratuito
   if (isGratuito && loadingVideos) {
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", display: "flex", alignItems: "center", justifyContent: "center", overflowY: "auto", padding: "16px 0" }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #AFC040 1px, transparent 1px)", backgroundSize: "28px 28px", opacity: 0.025 }} />
-        <div style={{ position: "relative", zIndex: 1, background: "#141810", border: "0.5px solid rgba(175,192,64,0.15)", borderRadius: 20, maxWidth: 680, width: "100%", margin: "0 16px", overflow: "hidden", padding: 32 }}>
+        <div style={{ position: "relative", zIndex: 1, background: "#141810", border: "0.5px solid rgba(175,192,64,0.15)", borderRadius: 20, maxWidth: 680, width: "100%", margin: "auto 16px", maxHeight: "calc(100vh - 32px)", overflowY: "auto", padding: 32 }}>
           <Skeleton className="h-4 w-32 mb-4" style={{ background: "#2E3229" }} />
           <Skeleton className="h-6 w-full mb-2" style={{ background: "#2E3229" }} />
           <Skeleton className="h-4 w-3/4 mb-6" style={{ background: "#2E3229" }} />
@@ -266,12 +266,12 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
   const total = config.passos.length;
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", display: "flex", alignItems: "center", justifyContent: "center", overflowY: "auto", padding: "16px 0" }}>
       {/* Dot grid */}
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #AFC040 1px, transparent 1px)", backgroundSize: "28px 28px", opacity: 0.025 }} />
 
       {/* Modal */}
-      <div style={{ position: "relative", zIndex: 1, background: "#141810", border: "0.5px solid rgba(175,192,64,0.15)", borderRadius: 20, maxWidth: 680, width: "100%", margin: "0 16px", overflow: "hidden" }}>
+      <div style={{ position: "relative", zIndex: 1, background: "#141810", border: "0.5px solid rgba(175,192,64,0.15)", borderRadius: 20, maxWidth: 680, width: "100%", margin: "auto 16px", maxHeight: "calc(100vh - 32px)", overflowY: "auto" }}>
         {/* Close button */}
         <button
           onClick={handleClose}
