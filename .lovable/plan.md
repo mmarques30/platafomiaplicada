@@ -1,32 +1,19 @@
 
 
-# Fix: ProximosPassosCard cortado no topo
+# Personalizar mensagens de notificação no Monitor de Onboarding
 
-## Problema
-O modal usa `display: flex; align-items: center; justify-content: center` no container fullscreen, mas o card interno tem `overflow: hidden` e nenhum `max-height`. Quando o conteúdo excede a altura da viewport, o card é empurrado para fora do topo (centralização flex com overflow).
+## Resumo
+Substituir a mensagem genérica do botão "Notificar" por mensagens contextuais baseadas na etapa onde o usuário parou no onboarding.
 
-## Solução
-No `src/components/onboarding/ProximosPassosCard.tsx`:
+## Arquivo
 
-1. **Container externo** (linha 269): adicionar `overflow-y: auto` e `padding: "16px 0"` para permitir scroll quando necessário
-2. **Card interno** (linha 274): trocar `overflow: "hidden"` por `overflow: "visible"`, adicionar `maxHeight: "calc(100vh - 32px)"` e `overflowY: "auto"` no card
-3. Manter `margin: "0 16px"` para padding lateral
+| Arquivo | Ação |
+|---|---|
+| `src/pages/admin/OnboardingMonitor.tsx` | Editar |
 
-### Alteração específica (linha 269):
-```tsx
-// Container: adicionar overflowY e padding vertical
-style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", 
-  display: "flex", alignItems: "center", justifyContent: "center",
-  overflowY: "auto", padding: "16px 0" }}
-```
+## Detalhes
 
-### Alteração no card (linha 274):
-```tsx
-style={{ position: "relative", zIndex: 1, background: "#141810", 
-  border: "0.5px solid rgba(175,192,64,0.15)", borderRadius: 20, 
-  maxWidth: 680, width: "100%", margin: "auto 16px",
-  maxHeight: "calc(100vh - 32px)", overflowY: "auto" }}
-```
-
-Mesma correção aplicada ao estado de loading (linhas 245-262).
+1. Adicionar função `getMensagemNotificacao(etapaAtual, nome, plano)` com mensagens específicas para cada etapa (não iniciou, vídeo, tour, próximos passos por plano, fallback)
+2. No `handleNotificar`, passar `row.etapaAtual` e `row.profile.plano_mentoria` — substituir a mensagem fixa pelo retorno da função
+3. Nenhuma outra alteração no componente
 
