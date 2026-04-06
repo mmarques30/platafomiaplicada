@@ -1,21 +1,29 @@
 
-# Fix: Ação principal do plano gratuito/visitante
 
-## Problema
-Linha 80 usa `trilhaIniciada` como critério de conclusão para visitantes (`plano === null`), mas visitantes não têm acesso a trilhas. O critério correto é `video_visto`.
+# Adicionar paginação à tabela do Monitor de Onboarding
 
-## Alteração
+## Resumo
+Paginar a tabela de usuários (20 por página) sem afetar KPIs nem funil, que continuam calculados sobre o total.
 
-**Arquivo**: `src/pages/admin/OnboardingMonitor.tsx`
+## Arquivo
 
-**Linha 80** — trocar `trilhaIniciada` por `videoVisto`:
-```tsx
-// De:
-    trilhaIniciada;
-// Para:
-    videoVisto;
-```
+| Arquivo | Ação |
+|---|---|
+| `src/pages/admin/OnboardingMonitor.tsx` | Editar |
 
-Isso faz com que a última linha do ternário (fallback para `plano === null`) use `videoVisto` em vez de `trilhaIniciada`. A contagem do funil visual ("Ação principal") já deriva de `rows.filter(r => r.acaoConcluida)`, então refletirá automaticamente a correção.
+## Detalhes
 
-Nenhuma outra alteração.
+1. **State**: adicionar `const [pagina, setPagina] = useState(1)` e `const POR_PAGINA = 20` no componente (após linha 166)
+
+2. **Reset ao mudar filtro**: `useEffect(() => setPagina(1), [filter])` — adicionar `useEffect` ao import (linha 1)
+
+3. **Slice**: antes do JSX da tabela, calcular:
+   ```tsx
+   const totalPaginas = Math.ceil(filtered.length / POR_PAGINA);
+   const usuariosPagina = filtered.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
+   ```
+
+4. **Tabela**: linha 330, trocar `filtered.map(...)` por `usuariosPagina.map(...)`
+
+5. **Controles**: após o `</div>` que fecha `tableContainer` (linha 390), antes do `</Card>` (linha 391), inserir bloco de paginação com contagem ("X–Y de Z usuários"), botões "← Anterior" / "Próxima →", com disabled+opacity quando na primeira/última página. Estilo inline conforme especificação do usuário.
+
