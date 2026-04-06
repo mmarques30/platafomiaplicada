@@ -267,7 +267,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
   const feitos = config.passos.filter((p) => p.status === "feito").length;
   const total = config.passos.length;
 
-  return (
+  return createPortal(
     <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", display: "flex", alignItems: "center", justifyContent: "center", overflowY: "auto", padding: "16px 0" }}>
       {/* Dot grid */}
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #AFC040 1px, transparent 1px)", backgroundSize: "28px 28px", opacity: 0.025 }} />
