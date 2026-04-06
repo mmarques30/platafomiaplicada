@@ -375,7 +375,7 @@ export default function OnboardingMonitor() {
                               row.status === "nao_iniciou" && "bg-[#E8A43C] hover:bg-[#d4932e] text-white border-0"
                             )}
                             disabled={notifying === row.profile.id}
-                            onClick={() => handleNotificar(row.profile)}
+                            onClick={() => handleNotificar(row)}
                           >
                             {notifying === row.profile.id ? "Enviando…" : "Notificar"}
                           </Button>
