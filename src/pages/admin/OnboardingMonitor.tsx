@@ -223,14 +223,15 @@ export default function OnboardingMonitor() {
     ];
   }, [eventos, total, rows]);
 
-  const handleNotificar = useCallback(async (profile: Profile) => {
+  const handleNotificar = useCallback(async (row: UserRow) => {
+    const { profile } = row;
     setNotifying(profile.id);
     try {
-      const nome = profile.nome_completo?.split(" ")[0] ?? "usuário";
+      const mensagem = getMensagemNotificacao(row.etapaAtual, profile.nome_completo, profile.plano_mentoria);
       const { error } = await supabase.from("notificacoes").insert({
         user_id: profile.id,
         titulo: "Continue sua configuração",
-        mensagem: `Olá, ${nome}! Vimos que você ainda não concluiu sua configuração inicial. Posso te ajudar?`,
+        mensagem,
         tipo: "sistema",
       });
       if (error) throw error;
