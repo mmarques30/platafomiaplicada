@@ -395,6 +395,29 @@ export default function OnboardingMonitor() {
             </TableBody>
           </Table>
         </div>
+        {filtered.length > POR_PAGINA && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+            <span className="text-xs text-muted-foreground">
+              {(pagina - 1) * POR_PAGINA + 1}–{Math.min(pagina * POR_PAGINA, filtered.length)} de {filtered.length} usuários
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPagina(p => Math.max(1, p - 1))}
+                disabled={pagina === 1}
+                className="px-3 py-1.5 rounded-md text-xs border border-border bg-card disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted transition-colors"
+              >
+                ← Anterior
+              </button>
+              <button
+                onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+                disabled={pagina === totalPaginas}
+                className="px-3 py-1.5 rounded-md text-xs border border-border bg-card disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted transition-colors"
+              >
+                Próxima →
+              </button>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Funnel */}
