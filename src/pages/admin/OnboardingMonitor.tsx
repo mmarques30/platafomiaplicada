@@ -77,7 +77,7 @@ function calcularStatus(profile: Profile, allEvents: Evento[]): Omit<UserRow, "p
     plano === "skills" ? diagnosticoSkills :
     plano === "business_parceria" ? roadmapVisitado :
     plano === "business_sistemas" ? sistemaVisitado :
-    trilhaIniciada;
+    videoVisto;
 
   const etapaAtual =
     acaoConcluida ? "Ação principal concluída" :
