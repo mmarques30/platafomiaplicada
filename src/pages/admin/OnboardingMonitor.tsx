@@ -107,6 +107,24 @@ const STATUS_MAP: Record<StatusOnb, { badgeStatus: string; label: string }> = {
   nao_iniciou: { badgeStatus: "bloqueado", label: "Não iniciou" },
 };
 
+function getMensagemNotificacao(etapaAtual: string, nome: string | null, plano: Plano): string {
+  const firstName = nome?.split(" ")?.[0] ?? "por aqui";
+  const planoLbl = planoLabel(plano);
+  if (etapaAtual.includes("Não iniciou"))
+    return `Olá, ${firstName}! Sua conta está pronta. Que tal começar agora? Temos um vídeo especial esperando por você.`;
+  if (etapaAtual.includes("Vídeo assistido"))
+    return `Olá, ${firstName}! Você assistiu ao vídeo de boas-vindas. O próximo passo é o tour pela plataforma — leva menos de 2 minutos.`;
+  if (etapaAtual.includes("Tour concluído"))
+    return `Olá, ${firstName}! O tour está concluído. Agora veja seus próximos passos personalizados para o plano ${planoLbl}.`;
+  if (etapaAtual.includes("Próximos Passos vistos") && plano === "academy")
+    return `Olá, ${firstName}! Seus próximos passos estão definidos. Que tal começar pelo Diagnóstico de IA? Leva 15 minutos e personaliza toda sua experiência.`;
+  if (etapaAtual.includes("Próximos Passos vistos") && plano === "skills")
+    return `Olá, ${firstName}! O diagnóstico individual do squad está pendente. Cada membro precisa completar o próprio — você é o primeiro passo.`;
+  if (etapaAtual.includes("Próximos Passos vistos") && (plano === "business_parceria" || plano === "business_sistemas"))
+    return `Olá, ${firstName}! Seu projeto está configurado. Explore o Roadmap para ver as etapas e o que será entregue.`;
+  return `Olá, ${firstName}! Estamos aqui se precisar de ajuda para continuar sua jornada na plataforma.`;
+}
+
 type FilterKey = "todos" | "academy" | "business_parceria" | "business_sistemas" | "skills" | "gratuito" | "parados";
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "todos", label: "Todos" },
