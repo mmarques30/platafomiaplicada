@@ -531,7 +531,7 @@ export function AppSidebar() {
               })}
 
               <SidebarComunidadeItem
-                currentEnvironment={currentEnvironment}
+                currentEnvironment={effectiveEnvironment}
                 collapsed={collapsed}
                 expandedMenus={expandedMenus}
                 toggleMenu={toggleMenu}
