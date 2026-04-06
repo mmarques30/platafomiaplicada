@@ -357,6 +357,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
           </Link>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
