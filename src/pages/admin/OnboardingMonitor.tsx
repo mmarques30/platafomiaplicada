@@ -334,7 +334,7 @@ export default function OnboardingMonitor() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map((row) => {
+                usuariosPagina.map((row) => {
                   const { badgeStatus, label } = STATUS_MAP[row.status];
                   return (
                     <TableRow key={row.profile.id} className={adminTheme.tableRow}>
