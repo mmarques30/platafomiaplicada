@@ -103,7 +103,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
   useEffect(() => {
     if (previewMode) return;
     if (!user?.id) return;
-    const chave = `proximos_passos_${user.id}`;
+    const chave = `proximos_passos_v2_${user.id}`;
     if (profile?.primeiro_acesso === false && !localStorage.getItem(chave)) {
       setMostrar(true);
     }
@@ -232,7 +232,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
     }
     if (user?.id) {
       track('proximos_passos_vistos');
-      localStorage.setItem(`proximos_passos_${user.id}`, "true");
+      localStorage.setItem(`proximos_passos_v2_${user.id}`, "true");
     }
     setMostrar(false);
   };
