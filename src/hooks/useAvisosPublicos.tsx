@@ -8,7 +8,8 @@ export const useAvisosPublicos = () => {
   const { effectivePlan, isVisitante } = useEffectivePlan(isAdmin);
   
   // Determinar o "tier" do usuário para filtrar (considera simulação admin)
-  const userTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
+  const rawTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
+  const userTier = rawTier?.startsWith('business') ? 'business' : rawTier;
 
   return useQuery({
     queryKey: ["avisos-publicos", userTier],
@@ -32,7 +33,8 @@ export const useAvisosAtivosCount = () => {
   const { effectivePlan, isVisitante } = useEffectivePlan(isAdmin);
   
   // Determinar o "tier" do usuário para filtrar (considera simulação admin)
-  const userTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
+  const rawTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
+  const userTier = rawTier?.startsWith('business') ? 'business' : rawTier;
 
   return useQuery({
     queryKey: ["avisos-ativos-count", userTier],
