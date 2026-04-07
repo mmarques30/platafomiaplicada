@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useAvisosPublicos, useMarcarAvisosComoLidos } from "@/hooks/useAvisosPublicos";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, Video, FileText, Bot, Wrench, BookOpen, Target, Lightbulb, FileDown, Newspaper, Megaphone, Star, Users, Zap, CircleDot } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PageTitle } from "@/components/shared/PageTitle";
@@ -33,7 +33,38 @@ const getBarColor = (tipo: string | null | undefined): string => {
 const removeEmojis = (text: string): string =>
   text.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, "").trim();
 
-const CATEGORIAS_RESUMO = ["Dicas", "Newsletters", "Notícias", "Vídeos", "Atualizações", "Destaques", "Novidades", "Conteúdos", "Ferramentas", "Eventos"];
+const CATEGORIA_ICONS: Record<string, React.ReactNode> = {
+  "vídeos": <Video className="h-4 w-4 text-primary shrink-0" />,
+  "prompts": <FileText className="h-4 w-4 text-primary shrink-0" />,
+  "ia copie e use": <Bot className="h-4 w-4 text-primary shrink-0" />,
+  "ferramentas de ia": <Wrench className="h-4 w-4 text-primary shrink-0" />,
+  "ferramentas": <Wrench className="h-4 w-4 text-primary shrink-0" />,
+  "módulos": <BookOpen className="h-4 w-4 text-primary shrink-0" />,
+  "trilhas": <Target className="h-4 w-4 text-primary shrink-0" />,
+  "métodos para aplicar": <Lightbulb className="h-4 w-4 text-primary shrink-0" />,
+  "materiais gratuitos": <FileDown className="h-4 w-4 text-primary shrink-0" />,
+  "materiais da central": <FileDown className="h-4 w-4 text-primary shrink-0" />,
+  "newsletters": <Newspaper className="h-4 w-4 text-primary shrink-0" />,
+  "notícias": <Megaphone className="h-4 w-4 text-primary shrink-0" />,
+  "dicas": <Lightbulb className="h-4 w-4 text-primary shrink-0" />,
+  "criadores de conteúdo": <Users className="h-4 w-4 text-primary shrink-0" />,
+  "destaques": <Star className="h-4 w-4 text-primary shrink-0" />,
+  "novidades": <Star className="h-4 w-4 text-primary shrink-0" />,
+  "atualizações": <Zap className="h-4 w-4 text-primary shrink-0" />,
+  "melhorias da plataforma": <Zap className="h-4 w-4 text-primary shrink-0" />,
+  "conteúdos": <BookOpen className="h-4 w-4 text-primary shrink-0" />,
+  "eventos": <Target className="h-4 w-4 text-primary shrink-0" />,
+  "aulas semanais": <Video className="h-4 w-4 text-primary shrink-0" />,
+  "conteúdos do dashboard": <BookOpen className="h-4 w-4 text-primary shrink-0" />,
+};
+
+const getIconForHeader = (cleanText: string): React.ReactNode => {
+  const lower = cleanText.toLowerCase();
+  for (const [key, icon] of Object.entries(CATEGORIA_ICONS)) {
+    if (lower.includes(key)) return icon;
+  }
+  return <CircleDot className="h-4 w-4 text-primary shrink-0" />;
+};
 
 const renderWithBold = (text: string) => {
   const parts = text.split(/\*([^*]+)\*/g);
@@ -46,32 +77,45 @@ const formatarMensagem = (texto: string) => {
   const linhas = texto.split('\n');
   return linhas.map((linha, index) => {
     const trimmed = linha.trim();
-    if (!trimmed) return <div key={index} className="h-2" />;
+    if (!trimmed) return <div key={index} className="h-3" />;
 
     const cleanLine = removeEmojis(trimmed).replace(/:$/, '').trim();
 
-    const isCategoria = CATEGORIAS_RESUMO.some(
-      (cat) => cleanLine.toLowerCase() === cat.toLowerCase()
+    const isHeader = Object.keys(CATEGORIA_ICONS).some(
+      (cat) => cleanLine.toLowerCase().includes(cat)
     ) || (trimmed.endsWith(':') && trimmed.length < 60 && !trimmed.startsWith('•') && !trimmed.startsWith('-'));
 
-    if (isCategoria) {
+    if (isHeader) {
+      const icon = getIconForHeader(cleanLine);
       return (
-        <h4 key={index} className="font-semibold text-foreground mt-4 mb-1.5 text-[15px]">
-          {renderWithBold(trimmed)}
-        </h4>
+        <div key={index} className="flex items-center gap-2 mt-4 mb-1.5">
+          {icon}
+          <h4 className="font-semibold text-foreground text-[15px]">
+            {renderWithBold(removeEmojis(trimmed))}
+          </h4>
+        </div>
       );
     }
 
     const isBullet = trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('–');
 
+    if (isBullet) {
+      const content = trimmed.replace(/^[•\-–]\s*/, '');
+      return (
+        <div key={index} className="flex items-start gap-2 pl-1">
+          <CircleDot className="h-3 w-3 text-muted-foreground mt-1 shrink-0" />
+          <p className="text-sm text-muted-foreground">{renderWithBold(removeEmojis(content))}</p>
+        </div>
+      );
+    }
+
     return (
-      <p key={index} className={`text-sm text-muted-foreground ${isBullet ? 'pl-3' : ''}`}>
-        {renderWithBold(trimmed)}
+      <p key={index} className="text-sm text-muted-foreground">
+        {renderWithBold(removeEmojis(trimmed))}
       </p>
     );
   });
 };
-
 export default function Notificacoes() {
   const { data: avisos, isLoading } = useAvisosPublicos();
   const { mutate: marcarComoLidos } = useMarcarAvisosComoLidos();
