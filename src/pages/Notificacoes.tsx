@@ -139,7 +139,7 @@ export default function Notificacoes() {
                   </div>
                 </CardHeader>
                 <CardContent className="pl-5">
-                  <p className="text-sm whitespace-pre-wrap">{removeEmojis(aviso.mensagem)}</p>
+                  <div className="text-sm space-y-0.5">{formatarMensagem(removeEmojis(aviso.mensagem))}</div>
                   {aviso.data_expiracao && (
                     <p className="text-xs text-muted-foreground mt-3">
                       Válido até: {new Date(aviso.data_expiracao).toLocaleDateString('pt-BR')}
