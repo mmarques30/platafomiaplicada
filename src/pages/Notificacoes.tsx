@@ -35,34 +35,38 @@ const removeEmojis = (text: string): string =>
 
 const CATEGORIAS_RESUMO = ["Dicas", "Newsletters", "Notícias", "Vídeos", "Atualizações", "Destaques", "Novidades", "Conteúdos", "Ferramentas", "Eventos"];
 
+const renderWithBold = (text: string) => {
+  const parts = text.split(/\*([^*]+)\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i} className="font-semibold">{part}</strong> : part
+  );
+};
+
 const formatarMensagem = (texto: string) => {
   const linhas = texto.split('\n');
   return linhas.map((linha, index) => {
     const trimmed = linha.trim();
-    if (!trimmed) return null;
+    if (!trimmed) return <div key={index} className="h-2" />;
+
+    const cleanLine = removeEmojis(trimmed).replace(/:$/, '').trim();
 
     const isCategoria = CATEGORIAS_RESUMO.some(
-      (cat) => trimmed.toLowerCase().replace(/:$/, '') === cat.toLowerCase()
-    );
+      (cat) => cleanLine.toLowerCase() === cat.toLowerCase()
+    ) || (trimmed.endsWith(':') && trimmed.length < 60 && !trimmed.startsWith('•') && !trimmed.startsWith('-'));
 
     if (isCategoria) {
       return (
-        <h4 key={index} className="font-semibold text-foreground mt-3 mb-1 text-sm">
-          {trimmed}
+        <h4 key={index} className="font-semibold text-foreground mt-4 mb-1.5 text-[15px]">
+          {renderWithBold(trimmed)}
         </h4>
       );
     }
 
-    const parts = trimmed.split(/\*([^*]+)\*/g);
-    const formatted = parts.map((part, i) =>
-      i % 2 === 1 ? <strong key={i} className="font-semibold">{part}</strong> : part
-    );
-
     const isBullet = trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('–');
 
     return (
-      <p key={index} className={`text-sm text-muted-foreground ${isBullet ? 'pl-2' : ''}`}>
-        {formatted}
+      <p key={index} className={`text-sm text-muted-foreground ${isBullet ? 'pl-3' : ''}`}>
+        {renderWithBold(trimmed)}
       </p>
     );
   });
@@ -139,7 +143,7 @@ export default function Notificacoes() {
                   </div>
                 </CardHeader>
                 <CardContent className="pl-5">
-                  <div className="text-sm space-y-0.5">{formatarMensagem(removeEmojis(aviso.mensagem))}</div>
+                  <div className="text-sm space-y-0.5">{formatarMensagem(aviso.mensagem)}</div>
                   {aviso.data_expiracao && (
                     <p className="text-xs text-muted-foreground mt-3">
                       Válido até: {new Date(aviso.data_expiracao).toLocaleDateString('pt-BR')}
