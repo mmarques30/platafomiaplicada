@@ -1,31 +1,29 @@
 
 
-# Fix: Avisos não aparecem — mismatch entre tiers
+# Fix: Formatação estruturada do Resumo de Atualizações
 
 ## Problema
-O `AvisoModal` salva `visivel_para` com o valor `"business"`, mas o hook `useAvisosPublicos` filtra usando `effectivePlan`, que para admins retorna `"business_parceria"` e para usuários business retorna `"business_parceria"` ou `"business_sistemas"`. O filtro `.contains("visivel_para", ["business_parceria"])` não encontra `"business"` no array, então o aviso não aparece.
+A mensagem do aviso é renderizada como texto puro (`<p className="text-sm whitespace-pre-wrap">`) na linha 107 do `Notificacoes.tsx`. O conteúdo gerado pela IA contém formatação com `*texto*` (negrito) e categorias como "Dicas", "Newsletters" etc., mas tudo aparece como texto corrido sem estrutura visual.
 
 ## Solução
-Ajustar o `useAvisosPublicos` para normalizar o `userTier` antes de filtrar: se o plano efetivo contém `"business"`, usar `"business"` como tier (que é o valor salvo pelo modal).
+Criar uma função `formatarMensagem` que transforma o texto em JSX estruturado:
+- Linhas que são categorias sozinhas (ex: "Dicas", "Newsletters", "Notícias", "Vídeos") → renderizar como `<h4>` com margem superior
+- Texto entre `*asteriscos*` → renderizar como `<strong>`
+- Linhas normais → renderizar como `<p>`
 
 ## Arquivo
 
 | Arquivo | Ação |
 |---|---|
-| `src/hooks/useAvisosPublicos.tsx` | Editar |
+| `src/pages/Notificacoes.tsx` | Editar |
 
 ## Detalhes
 
-Nas linhas 11 e 35, onde `userTier` é calculado, adicionar normalização:
+1. Adicionar função `formatarMensagem(texto: string)` que:
+   - Divide o texto por `\n`
+   - Detecta linhas de categoria (texto curto sem asteriscos, seguido por itens)
+   - Converte `*texto*` em `<strong>`
+   - Retorna array de elementos JSX com espaçamento adequado
 
-```tsx
-// De:
-const userTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
-
-// Para:
-const rawTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
-const userTier = rawTier?.startsWith('business') ? 'business' : rawTier;
-```
-
-Isso garante que tanto `business_parceria` quanto `business_sistemas` sejam mapeados para `"business"`, que é o valor usado no `AvisoModal`. A mesma correção se aplica nas duas ocorrências (linha 11 para `useAvisosPublicos` e linha 35 para `useAvisosAtivosCount`).
+2. Linha 107: trocar `<p className="text-sm whitespace-pre-wrap">{removeEmojis(aviso.mensagem)}</p>` por `<div className="text-sm space-y-1">{formatarMensagem(removeEmojis(aviso.mensagem))}</div>`
 
