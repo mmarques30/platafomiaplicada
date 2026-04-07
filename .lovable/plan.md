@@ -1,25 +1,31 @@
 
 
-# Fix: Sala de Aula não aparece para visitantes
+# Fix: Avisos não aparecem — mismatch entre tiers
 
 ## Problema
-Na linha 534 do `AppSidebar.tsx`, o `SidebarComunidadeItem` recebe `currentEnvironment` (valor bruto do contexto) em vez de `effectiveEnvironment` (valor calculado que resolve visitantes para `'gratuito'`).
-
-Para visitantes, `currentEnvironment` pode ser `null` porque eles nunca selecionam um ambiente manualmente. A linha 28 do `SidebarComunidadeItem` faz `if (currentEnvironment !== 'gratuito') return null` — como `null !== 'gratuito'`, o componente inteiro não renderiza.
+O `AvisoModal` salva `visivel_para` com o valor `"business"`, mas o hook `useAvisosPublicos` filtra usando `effectivePlan`, que para admins retorna `"business_parceria"` e para usuários business retorna `"business_parceria"` ou `"business_sistemas"`. O filtro `.contains("visivel_para", ["business_parceria"])` não encontra `"business"` no array, então o aviso não aparece.
 
 ## Solução
+Ajustar o `useAvisosPublicos` para normalizar o `userTier` antes de filtrar: se o plano efetivo contém `"business"`, usar `"business"` como tier (que é o valor salvo pelo modal).
 
-**Arquivo**: `src/components/layout/AppSidebar.tsx`
+## Arquivo
 
-**Linha 534**: trocar `currentEnvironment` por `effectiveEnvironment`:
+| Arquivo | Ação |
+|---|---|
+| `src/hooks/useAvisosPublicos.tsx` | Editar |
+
+## Detalhes
+
+Nas linhas 11 e 35, onde `userTier` é calculado, adicionar normalização:
 
 ```tsx
 // De:
-currentEnvironment={currentEnvironment}
+const userTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
 
 // Para:
-currentEnvironment={effectiveEnvironment}
+const rawTier = isVisitante ? 'visitante' : (effectivePlan || 'academy');
+const userTier = rawTier?.startsWith('business') ? 'business' : rawTier;
 ```
 
-Nenhuma outra alteração necessária.
+Isso garante que tanto `business_parceria` quanto `business_sistemas` sejam mapeados para `"business"`, que é o valor usado no `AvisoModal`. A mesma correção se aplica nas duas ocorrências (linha 11 para `useAvisosPublicos` e linha 35 para `useAvisosAtivosCount`).
 
