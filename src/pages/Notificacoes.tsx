@@ -33,6 +33,41 @@ const getBarColor = (tipo: string | null | undefined): string => {
 const removeEmojis = (text: string): string =>
   text.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, "").trim();
 
+const CATEGORIAS_RESUMO = ["Dicas", "Newsletters", "Notícias", "Vídeos", "Atualizações", "Destaques", "Novidades", "Conteúdos", "Ferramentas", "Eventos"];
+
+const formatarMensagem = (texto: string) => {
+  const linhas = texto.split('\n');
+  return linhas.map((linha, index) => {
+    const trimmed = linha.trim();
+    if (!trimmed) return null;
+
+    const isCategoria = CATEGORIAS_RESUMO.some(
+      (cat) => trimmed.toLowerCase().replace(/:$/, '') === cat.toLowerCase()
+    );
+
+    if (isCategoria) {
+      return (
+        <h4 key={index} className="font-semibold text-foreground mt-3 mb-1 text-sm">
+          {trimmed}
+        </h4>
+      );
+    }
+
+    const parts = trimmed.split(/\*([^*]+)\*/g);
+    const formatted = parts.map((part, i) =>
+      i % 2 === 1 ? <strong key={i} className="font-semibold">{part}</strong> : part
+    );
+
+    const isBullet = trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('–');
+
+    return (
+      <p key={index} className={`text-sm text-muted-foreground ${isBullet ? 'pl-2' : ''}`}>
+        {formatted}
+      </p>
+    );
+  });
+};
+
 export default function Notificacoes() {
   const { data: avisos, isLoading } = useAvisosPublicos();
   const { mutate: marcarComoLidos } = useMarcarAvisosComoLidos();
