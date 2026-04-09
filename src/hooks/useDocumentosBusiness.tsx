@@ -96,6 +96,20 @@ export function useDocumentosBusiness(contratoId?: string, paraProcessamentoIA?:
 
   const deleteDocumento = useMutation({
     mutationFn: async (id: string) => {
+      // Buscar o documento para pegar o arquivo_url antes de deletar
+      const { data: doc } = await supabase
+        .from("documentos_business")
+        .select("arquivo_url")
+        .eq("id", id)
+        .single();
+
+      // Remover arquivo do storage se existir
+      if (doc?.arquivo_url) {
+        await supabase.storage
+          .from("contratos-business")
+          .remove([doc.arquivo_url]);
+      }
+
       const { error } = await supabase
         .from("documentos_business")
         .delete()
