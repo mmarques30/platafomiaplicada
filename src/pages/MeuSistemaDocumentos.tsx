@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { FileText, Download, Eye, ChevronDown, ChevronUp, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote } from "lucide-react";
+import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -41,7 +40,6 @@ export default function MeuSistemaDocumentos() {
   const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id, false);
   const { links, isLoading: isLoadingLinks } = useLinksBusiness(contrato?.id);
   const { notas, isLoading: isLoadingNotas } = useNotasProjetoBusiness(contrato?.id);
-  const [contratoOpen, setContratoOpen] = useState(false);
   const [viewingReport, setViewingReport] = useState<{ titulo: string; html: string } | null>(null);
 
   const allLoading = isLoading || isLoadingDocs || isLoadingLinks || isLoadingNotas;
@@ -74,12 +72,36 @@ export default function MeuSistemaDocumentos() {
     downloadUrl(arquivoUrl, titulo);
   };
 
+  const statCards = [
+    { label: "Arquivos", count: arquivosCount, icon: FileText, color: "text-blue-400" },
+    { label: "Anotações", count: notas.length, icon: StickyNote, color: "text-amber-400" },
+    { label: "Links", count: links.length, icon: Link2, color: "text-emerald-400" },
+    { label: "Reports", count: reports.length, icon: FileText, color: "text-purple-400" },
+  ];
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       <PageTitle primary="Documentos" />
 
+      {/* Painel 360 — Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {statCards.map((s) => (
+          <Card key={s.label} className="bg-[#1a1a2e] border-0">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center">
+                <s.icon className={`h-5 w-5 ${s.color}`} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{s.count}</p>
+                <p className="text-xs text-white/60">{s.label}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <Tabs defaultValue="arquivos" className="space-y-4">
-        <TabsList className="bg-muted/40 border-0 rounded-lg p-1">
+        <TabsList className="bg-muted/40 border-0 rounded-lg p-1 flex-wrap h-auto">
           <TabsTrigger value="arquivos" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <FileText className="h-4 w-4" />
             Arquivos ({arquivosCount})
@@ -96,14 +118,18 @@ export default function MeuSistemaDocumentos() {
             <FileText className="h-4 w-4" />
             Reports ({reports.length})
           </TabsTrigger>
+          <TabsTrigger value="contrato" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <Shield className="h-4 w-4" />
+            Contrato
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="arquivos" className="mt-4">
-          <ArquivosProjetoSection contratoId={contrato.id} readOnly />
+          <ArquivosProjetoSection contratoId={contrato.id} />
         </TabsContent>
 
         <TabsContent value="anotacoes" className="mt-4">
-          <NotasProjetoSection contratoId={contrato.id} readOnly />
+          <NotasProjetoSection contratoId={contrato.id} />
         </TabsContent>
 
         <TabsContent value="links" className="space-y-4 mt-4">
@@ -199,18 +225,10 @@ export default function MeuSistemaDocumentos() {
             </div>
           )}
         </TabsContent>
-      </Tabs>
 
-      {/* Dados do Contrato - Collapsible */}
-      <Collapsible open={contratoOpen} onOpenChange={setContratoOpen}>
-        <CollapsibleTrigger asChild>
-          <Button variant="ghost" className="w-full justify-between text-foreground hover:bg-accent/50 h-auto py-3">
-            <span className="text-lg font-semibold">Dados do Contrato</span>
-            {contratoOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <Card className="mt-2 border-border/50">
+        {/* Tab Contrato */}
+        <TabsContent value="contrato" className="mt-4">
+          <Card className="border-border/50">
             <CardContent className="p-4 md:p-6 space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <InfoItem label="Empresa" value={contrato.nome_empresa || contrato.razao_social} />
@@ -258,8 +276,8 @@ export default function MeuSistemaDocumentos() {
               )}
             </CardContent>
           </Card>
-        </CollapsibleContent>
-      </Collapsible>
+        </TabsContent>
+      </Tabs>
 
       {/* Dialog para visualizar report HTML */}
       <Dialog open={!!viewingReport} onOpenChange={() => setViewingReport(null)}>
