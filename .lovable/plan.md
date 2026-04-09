@@ -1,36 +1,37 @@
 
 
-# Ajustar cores e adicionar seção visual em MeuSistemaDocumentos
+# Fix: Conteúdo da página Entregas se adaptar ao espaço disponível (sidebar aberta/fechada)
 
-## 1. Corrigir cores dos stat cards
+## Problema
+Quando o menu lateral está aberto, o conteúdo da página Entregas não se adapta ao espaço reduzido. Os placeholders do empty state não usam o Embla carousel (não têm `ref`), então os 6 cards ficam todos visíveis e estouram a largura. Apenas com o menu fechado o layout fica correto.
 
-Os 4 stat cards no topo usam `bg-[#1a1a2e]` (azul escuro) e cores como `text-blue-400`, `text-purple-400` que não condizem com a marca. O padrão da plataforma usa `bg-[hsl(var(--chart-4))]` (verde da marca) conforme o `ProjetoOverviewCards`.
+## Causa raiz
+1. Os empty states de Telas e Vídeos **não usam `emblaRef`** — os cards ficam em `flex` simples sem controle de scroll
+2. Os cards do empty state usam `w-[calc(33.333%-11px)]` que calcula baseado no container, mas com 6 cards o flex não quebra linha — todos ficam em uma linha só
 
-**Mudança**: Trocar fundo e cores dos ícones para o padrão verde da marca:
-- Fundo dos cards: `bg-[hsl(var(--chart-4))]` (verde escuro da marca)
-- Cores dos ícones: tons de `text-white/70` uniformes (como nos StatCards do overview)
-- Texto: branco com opacidade como no padrão existente
+## Solução
 
-## 2. Adicionar seção visual abaixo das tabs
+**Arquivo**: `src/pages/MeuSistemaEntregas.tsx`
 
-Após o conteúdo das tabs, inserir uma seção de **Resumo do Projeto** com 2-3 cards informativos:
+### 1. Aplicar `emblaRef` nos empty states
+Atribuir `emblaRef` ao container do empty state de Telas e `emblaRefVideos` ao de Vídeos. Isso faz o Embla controlar o scroll e as setas funcionarem nos placeholders também.
 
-- **Evolução das Entregas**: Mini card com progresso visual (barra ou percentual) mostrando entregas concluídas vs total, usando dados do contrato
-- **Atividade Recente**: Timeline compacta dos últimos 5 itens adicionados (arquivos, notas, links) com data e tipo, dando noção de movimentação
-- **Insight do Projeto**: Card com texto dinâmico baseado nos dados disponíveis (ex: "Você tem X anotações e Y arquivos. Seu projeto está Z% concluído." ou dicas como "Adicione anotações para registrar decisões importantes")
+### 2. Trocar largura dos cards para largura fixa compatível com carrossel
+Em vez de `w-[calc(33.333%-11px)]`, usar a mesma largura fixa dos cards reais (`w-[240px] md:w-[300px] lg:w-[340px]` para telas e `w-[220px] md:w-[280px] lg:w-[320px]` para vídeos). Isso garante que os cards não tentem ocupar 33% do container — o Embla controla quantos ficam visíveis.
 
-Esses dados já existem no escopo do componente (`documentos`, `notas`, `links`, `contrato`).
+### 3. Remover `pointer-events-none` parcial
+Manter `opacity-50` nos cards mas permitir que as setas de navegação funcionem normalmente.
 
-## Arquivo
+### Mudanças concretas
 
-| Arquivo | Ação |
-|---|---|
-| `src/pages/MeuSistemaDocumentos.tsx` | Editar — cores dos stat cards + nova seção visual |
+**Empty state Telas (linhas 236-254):**
+- `<div className="overflow-hidden">` → `<div className="overflow-hidden" ref={emblaRef}>`
+- Cards: `w-[calc(33.333%-11px)] min-w-[200px]` → `w-[240px] md:w-[300px] lg:w-[340px]`
 
-## Detalhes técnicos
+**Empty state Vídeos (linhas ~310-340):**
+- `<div className="overflow-hidden">` → `<div className="overflow-hidden" ref={emblaRefVideos}>`
+- Cards: mesma mudança de largura para `w-[220px] md:w-[280px] lg:w-[320px]`
 
-- Usar `contrato.data_inicio`, `contrato.data_fim` para calcular progresso temporal
-- Combinar `documentos`, `notas`, `links` ordenados por `created_at` para timeline de atividade recente
-- Insight textual gerado client-side com lógica condicional simples (sem IA)
-- Cards seguem padrão escuro `bg-[hsl(var(--chart-4))]` com texto branco
+**Tabela de processos (linhas 90-91):**
+- Adicionar `<div className="overflow-x-auto">` envolvendo a `<table>` para que em telas menores a tabela role horizontalmente dentro do container
 
