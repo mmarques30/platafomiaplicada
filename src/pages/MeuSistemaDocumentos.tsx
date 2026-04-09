@@ -506,6 +506,49 @@ export default function MeuSistemaDocumentos() {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog para adicionar/editar link */}
+      <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingLink ? "Editar Link" : "Novo Link"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="link-titulo">Título *</Label>
+              <Input id="link-titulo" placeholder="Ex: Pasta do Google Drive" value={linkForm.titulo} onChange={(e) => setLinkForm(prev => ({ ...prev, titulo: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="link-url">URL *</Label>
+              <Input id="link-url" placeholder="https://..." value={linkForm.url} onChange={(e) => setLinkForm(prev => ({ ...prev, url: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="link-descricao">Descrição (opcional)</Label>
+              <Textarea id="link-descricao" placeholder="Breve descrição do link..." value={linkForm.descricao} onChange={(e) => setLinkForm(prev => ({ ...prev, descricao: e.target.value }))} rows={2} />
+            </div>
+            <div className="space-y-2">
+              <Label>Ícone</Label>
+              <Select value={linkForm.icone} onValueChange={(v) => setLinkForm(prev => ({ ...prev, icone: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {iconeOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      <div className="flex items-center gap-2"><opt.Icon className="h-4 w-4" />{opt.label}</div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLinkDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleSaveLink} disabled={createLink.isPending || updateLink.isPending}>
+              {(createLink.isPending || updateLink.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {editingLink ? "Salvar" : "Adicionar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
