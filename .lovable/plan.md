@@ -1,32 +1,37 @@
 
 
-# Reestruturar MeuSistemaDocumentos (Business Sistemas)
+# Fix: Carrossel de Telas e Vídeos — conter dentro da página com setas
 
 ## Problema
-A página `/meu-sistema/documentos` (`MeuSistemaDocumentos.tsx`) nunca foi atualizada. Ela ainda mostra o layout antigo com uma tabela simples de "Documentos do Projeto" e um collapsible de "Dados do Contrato". As funcionalidades de Arquivos com upload/download visual, Anotações, Links e Reports que já existem em `MentoriaDocumentos.tsx` nunca foram aplicadas aqui.
+Os placeholders do empty state em "Telas do Sistema" e "Vídeos de Instrução" não usam o carrossel Embla. Os 6 cards ficam todos visíveis em uma linha, estourando a largura da página e forçando scroll horizontal.
 
 ## Solução
-Reestruturar `MeuSistemaDocumentos.tsx` usando o mesmo padrão de tabs já implementado em `MentoriaDocumentos.tsx`, adaptado ao visual off-white do ambiente Sistemas:
 
-### 4 Tabs
-1. **Arquivos** — Reutiliza `ArquivosProjetoSection` (cards visuais com ícones por tipo, preview de imagens, download)
-2. **Anotações** — Reutiliza `NotasProjetoSection` em modo `readOnly`
-3. **Links** — Cards com ícones (Drive, Video, etc.) clicáveis, mesmo padrão de `MentoriaDocumentos`
-4. **Reports** — Mantém a seção de reports já existente com visualização HTML
+**Arquivo**: `src/pages/MeuSistemaEntregas.tsx`
 
-### Dados do Contrato
-Mover para um collapsible no final da página (já existe, manter).
+### Telas do Sistema (linhas 236-255)
+- Envolver os placeholders no `emblaRef` existente, igual ao bloco de dados reais (linha 201)
+- Adicionar `overflow-hidden` no container
+- Manter as setas de navegação que já existem no header da seção (linhas 191-197)
 
-## Arquivo a editar
+### Vídeos de Instrução (linhas 336-368)
+- Envolver os placeholders no `emblaRefVideos` existente, igual ao bloco de dados reais (linha 275)
+- Adicionar `overflow-hidden` no container
+- Manter as setas de navegação que já existem no header da seção (linhas 266-272)
 
-| Arquivo | Ação |
-|---|---|
-| `src/pages/MeuSistemaDocumentos.tsx` | Reescrever — substituir layout tabela por tabs com Arquivos/Anotações/Links/Reports + contrato collapsible no final |
+### Mudança concreta
+Nos dois blocos de empty state, trocar:
+```jsx
+<div className="opacity-50 pointer-events-none">
+  <div className="overflow-hidden">
+    <div className="flex gap-4">
+```
+Por:
+```jsx
+<div className="opacity-50 pointer-events-none">
+  <div className="overflow-hidden" ref={emblaRef}> {/* ou emblaRefVideos */}
+    <div className="flex gap-4">
+```
 
-## Detalhes técnicos
-- Importar `useLinksBusiness`, `useNotasProjetoBusiness`, `ArquivosProjetoSection`, `NotasProjetoSection`
-- Tabs com mesmo estilo do `MentoriaDocumentos` (contadores nos labels)
-- Links tab: reutilizar o mesmo render de cards com `getIconComponent`
-- Reports tab: mover a seção de reports existente para dentro da tab
-- Contrato collapsible: manter no final, fora das tabs
+Remover `pointer-events-none` do wrapper para que as setas funcionem, ou manter apenas nos cards internos.
 
