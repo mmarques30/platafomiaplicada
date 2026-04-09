@@ -27,13 +27,13 @@ import { NotasProjetoSection } from "@/components/admin/business/NotasProjetoSec
 import { toast } from "sonner";
 
 const iconeOptions = [
-  { value: "link", Icon: ExternalLink },
-  { value: "drive", Icon: HardDrive },
-  { value: "folder", Icon: FolderOpen },
-  { value: "tool", Icon: Wrench },
-  { value: "video", Icon: Video },
-  { value: "doc", Icon: FileText },
-  { value: "spreadsheet", Icon: Table },
+  { value: "link", label: "Link Genérico", Icon: ExternalLink },
+  { value: "drive", label: "Google Drive", Icon: HardDrive },
+  { value: "folder", label: "Pasta", Icon: FolderOpen },
+  { value: "tool", label: "Ferramenta", Icon: Wrench },
+  { value: "video", label: "Vídeo", Icon: Video },
+  { value: "doc", label: "Documento", Icon: FileText },
+  { value: "spreadsheet", label: "Planilha", Icon: Table },
 ];
 
 const getIconComponent = (icone: string) => {
