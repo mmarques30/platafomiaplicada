@@ -45,9 +45,12 @@ export default function MeuSistemaDocumentos() {
   const userId = useBusinessUserId();
   const { contrato, reports, isLoading, progresso } = useContratosBusiness(userId);
   const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id, false);
-  const { links, isLoading: isLoadingLinks } = useLinksBusiness(contrato?.id);
+  const { links, isLoading: isLoadingLinks, createLink, updateLink, deleteLink } = useLinksBusiness(contrato?.id);
   const { notas, isLoading: isLoadingNotas } = useNotasProjetoBusiness(contrato?.id);
   const [viewingReport, setViewingReport] = useState<{ titulo: string; html: string } | null>(null);
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [editingLink, setEditingLink] = useState<LinkBusiness | null>(null);
+  const [linkForm, setLinkForm] = useState({ titulo: "", url: "", descricao: "", icone: "link" });
 
   const allLoading = isLoading || isLoadingDocs || isLoadingLinks || isLoadingNotas;
 
