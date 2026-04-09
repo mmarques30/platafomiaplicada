@@ -441,11 +441,11 @@ export default function MeuSistemaDocumentos() {
 
 function InfoItem({ label, value, icon }: { label: string; value?: string | null; icon?: React.ReactNode }) {
   return (
-    <div>
+    <div className="bg-muted/30 rounded-lg p-3">
       <p className="text-xs text-muted-foreground flex items-center gap-1">
         {icon} {label}
       </p>
-      <p className="text-sm font-medium text-foreground">{value || "—"}</p>
+      <p className="text-sm font-medium text-foreground mt-0.5">{value || "—"}</p>
     </div>
   );
 }
