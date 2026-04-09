@@ -1,47 +1,38 @@
 
 
-# Reestruturar MeuSistemaDocumentos — Interativo e Visual
+# Fix: Carrossel e Layout da página Entregas — conter cards dentro da página
 
-## Problemas identificados
+## Problema
+Os carrosséis de "Telas do Sistema" e "Vídeos de Instrução" estão estourando a largura da página. Os cards não ficam contidos dentro das dimensões da tela e as setas de navegação não controlam a rolagem corretamente. A página toda fica desproporcional.
 
-1. **Arquivos e Anotações em `readOnly`** — A página passa `readOnly` para `ArquivosProjetoSection` e `NotasProjetoSection`, impedindo o mentorado de fazer upload de arquivos ou criar anotações
-2. **Dados do Contrato como Collapsible** — Fica escondido e pouco acessível. Deveria ser uma sub-aba junto com as outras
-3. **Página pouco interativa** — Falta uma visão 360 do projeto. Abaixo das tabs, poderia ter um resumo visual com contadores e status
+## Causa raiz
+O container pai (`div.p-4.md:p-6.space-y-8`) não tem `overflow-hidden`, então o conteúdo dos carrosséis vaza para fora. Além disso, os cards com `flex-none` e larguras fixas podem ultrapassar o viewport quando o Embla não inicializa corretamente (ex: no empty state onde o ref é compartilhado condicionalmente).
 
 ## Solução
 
-**Arquivo**: `src/pages/MeuSistemaDocumentos.tsx`
+**Arquivo**: `src/pages/MeuSistemaEntregas.tsx`
 
-### 1. Remover `readOnly` dos componentes
-- `ArquivosProjetoSection` → sem `readOnly` (permite upload/delete)
-- `NotasProjetoSection` → sem `readOnly` (permite criar/editar/excluir anotações)
-- Links → manter somente leitura (links são geridos pelo admin)
+### 1. Container principal com overflow controlado
+Adicionar `overflow-hidden` ao wrapper principal da página para impedir qualquer vazamento horizontal.
 
-### 2. Dados do Contrato → Nova tab "Contrato"
-- Remover o `Collapsible` do final da página
-- Adicionar uma 5ª tab "Contrato" com ícone `Shield` após "Reports"
-- Mover todo o conteúdo do contrato (empresa, datas, valores, módulos, garantias) para dentro dessa tab
+### 2. Cada seção de carrossel com overflow-hidden explícito
+Garantir que cada `<section>` de carrossel tenha `overflow-hidden` no nível da seção, não apenas no div interno do Embla.
 
-### 3. Painel de resumo visual abaixo das tabs
-Adicionar uma seção fixa abaixo das tabs com 4 mini-cards de métricas:
-- **Arquivos** — contador com ícone FileText
-- **Anotações** — contador com ícone StickyNote
-- **Links** — contador com ícone Link2
-- **Reports** — contador com ícone FileText
+### 3. Separar refs do empty state
+O problema principal: quando `telas.length === 0`, o `emblaRef` é atribuído ao div do empty state. Mas como o empty state tem `opacity-50` e cards sem interação, o Embla pode não inicializar corretamente. Solução: criar refs dedicados para os empty states OU remover o ref do Embla dos empty states e usar CSS puro (`overflow-x: auto` com `scrollbar-hide` ou simplesmente mostrar apenas 3 cards visíveis com `overflow-hidden` e sem scroll).
 
-Esses cards ficam sempre visíveis independente da tab ativa, dando a visão 360 do estado documental do projeto.
+**Abordagem escolhida**: Manter o Embla nos empty states mas garantir que:
+- O wrapper da seção tenha `overflow-hidden`
+- Os cards usem `min-w-0` para permitir encolhimento
+- O container principal da página tenha `overflow-x-hidden`
 
 ### Mudanças concretas
 
-**Linha 102**: `<ArquivosProjetoSection contratoId={contrato.id} readOnly />` → `<ArquivosProjetoSection contratoId={contrato.id} />`
+**Linha 76**: `<div className="p-4 md:p-6 space-y-8">` → `<div className="p-4 md:p-6 space-y-8 overflow-hidden">`
 
-**Linha 106**: `<NotasProjetoSection contratoId={contrato.id} readOnly />` → `<NotasProjetoSection contratoId={contrato.id} />`
+**Linha 185 (seção Telas)**: `<section className="space-y-3">` → `<section className="space-y-3 overflow-hidden">`
 
-**Linhas 82-98 (TabsList)**: Adicionar 5ª tab "Contrato" com ícone Shield
+**Linha 259 (seção Vídeos)**: `<section className="space-y-3">` → `<section className="space-y-3 overflow-hidden">`
 
-**Após linha 201**: Adicionar `<TabsContent value="contrato">` com o conteúdo que está no Collapsible (linhas 214-261)
-
-**Linhas 204-262**: Remover todo o bloco Collapsible
-
-**Antes das Tabs (após PageTitle)**: Inserir grid de 4 mini stat-cards com contadores (arquivos, notas, links, reports) usando fundo escuro sólido conforme padrão Sistemas
+**Cards flex-none**: Reduzir larguras fixas para serem mais proporcionais em telas menores, usando `max-w` constraints adicionais.
 
