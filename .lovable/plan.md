@@ -1,37 +1,32 @@
 
 
-# Mais mockups placeholder nos carrosséis de Telas e Vídeos
+# Reestruturar MeuSistemaDocumentos (Business Sistemas)
 
 ## Problema
-Quando não há dados reais em "Telas do Sistema" e "Vídeos de Instrução", o carrossel mostra apenas 3 placeholders genéricos, deixando espaço em branco visível na tela.
+A página `/meu-sistema/documentos` (`MeuSistemaDocumentos.tsx`) nunca foi atualizada. Ela ainda mostra o layout antigo com uma tabela simples de "Documentos do Projeto" e um collapsible de "Dados do Contrato". As funcionalidades de Arquivos com upload/download visual, Anotações, Links e Reports que já existem em `MentoriaDocumentos.tsx` nunca foram aplicadas aqui.
 
 ## Solução
+Reestruturar `MeuSistemaDocumentos.tsx` usando o mesmo padrão de tabs já implementado em `MentoriaDocumentos.tsx`, adaptado ao visual off-white do ambiente Sistemas:
 
-**Arquivo**: `src/pages/MeuSistemaEntregas.tsx`
+### 4 Tabs
+1. **Arquivos** — Reutiliza `ArquivosProjetoSection` (cards visuais com ícones por tipo, preview de imagens, download)
+2. **Anotações** — Reutiliza `NotasProjetoSection` em modo `readOnly`
+3. **Links** — Cards com ícones (Drive, Video, etc.) clicáveis, mesmo padrão de `MentoriaDocumentos`
+4. **Reports** — Mantém a seção de reports já existente com visualização HTML
 
-Aumentar os placeholders de 3 para 6 em ambas as seções, com nomes variados e realistas para parecer um carrossel completo.
+### Dados do Contrato
+Mover para um collapsible no final da página (já existe, manter).
 
-### Telas do Sistema (linhas 239-250)
-Trocar `[1, 2, 3].map(...)` por 6 placeholders com nomes descritivos:
-- "Dashboard Principal"
-- "Gestão de Clientes"
-- "Relatórios"
-- "Configurações"
-- "Kanban de Tarefas"
-- "Módulo Financeiro"
+## Arquivo a editar
 
-Cada placeholder usa o ícone `Monitor` existente com o gradiente overlay.
+| Arquivo | Ação |
+|---|---|
+| `src/pages/MeuSistemaDocumentos.tsx` | Reescrever — substituir layout tabela por tabs com Arquivos/Anotações/Links/Reports + contrato collapsible no final |
 
-### Vídeos de Instrução (linhas 339-356)
-Trocar `[1, 2, 3].map(...)` por 6 placeholders com nomes descritivos:
-- "Introdução ao Sistema"
-- "Como Cadastrar Clientes"
-- "Gerando Relatórios"
-- "Configurações Avançadas"
-- "Fluxo de Vendas"
-- "Integrações e APIs"
-
-Cada placeholder usa o ícone `Play` existente com descrição genérica.
-
-Nenhuma mudança no banco ou admin. Apenas visual no empty state do mentorado.
+## Detalhes técnicos
+- Importar `useLinksBusiness`, `useNotasProjetoBusiness`, `ArquivosProjetoSection`, `NotasProjetoSection`
+- Tabs com mesmo estilo do `MentoriaDocumentos` (contadores nos labels)
+- Links tab: reutilizar o mesmo render de cards com `getIconComponent`
+- Reports tab: mover a seção de reports existente para dentro da tab
+- Contrato collapsible: manter no final, fora das tabs
 
