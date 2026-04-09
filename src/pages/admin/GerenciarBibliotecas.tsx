@@ -52,7 +52,7 @@ export default function GerenciarBibliotecas() {
           </TabsTrigger>
           <TabsTrigger value="metodos" className={adminTheme.tabsTrigger}>
             <BookOpen className={adminTheme.tabsIcon} />
-            Métodos
+            Arsenal IA
           </TabsTrigger>
           <TabsTrigger value="formularios" className={adminTheme.tabsTrigger}>
             <FileText className={adminTheme.tabsIcon} />
