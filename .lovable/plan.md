@@ -1,24 +1,38 @@
 
 
-# Remover seção Roadmap do Business Parceria
+# Corrigir botões de "Minha Trajetória" no Business Parceria
 
-## O que será feito
+## Problema
 
-Remover a seção "Roadmap" e o componente `BusinessExecutiveRoadmap` da página de Mentoria para o plano Business Parceria, que usa layout de scroll contínuo.
+No sidebar, o grupo "Minha Trajetória" (meu_progresso) para Business Parceria mostra 4 sub-menus:
+- **Visão Geral** → `/mentoria` ✓ funciona
+- **Roadmap** → `/mentoria?tab=roadmap` ✗ roadmap foi removido da página
+- **Evolução Aprendizado** → `/mentoria?tab=evolucao-aprendizado` ✗ Business Parceria usa scroll contínuo, não abas
+- **Entregas** → `/mentoria/entregas` ✓ funciona
 
-## Arquivo: `src/pages/Mentoria.tsx`
+Os sub-menus "Roadmap" e "Evolução Aprendizado" usam query params de tabs, mas o layout Business Parceria substituiu as tabs por scroll contínuo. Ao clicar, a página não responde porque o parâmetro `tab` não é processado no branch do scroll.
 
-1. **Remover da nav-pill sticky** — reduzir `sectionLabels` e `sectionIds` de 3 para 2 itens: `['Visão Geral', 'Evolução']` e `['visao-geral', 'evolucao']`
+## Solução
 
-2. **Remover a seção roadmap** — apagar o bloco inteiro (linhas 177-180):
-   ```
-   <section id="sec-roadmap">
-     <h2>Roadmap</h2>
-     <BusinessExecutiveRoadmap />
-   </section>
-   ```
+**Arquivo**: `src/hooks/useMenuConfig.tsx`
 
-3. **Remover do IntersectionObserver** — atualizar o array `sectionIds` na linha 80 de `['visao-geral', 'roadmap', 'evolucao']` para `['visao-geral', 'evolucao']`
+Adicionar `meu_progresso_roadmap` à lista `hiddenByEnvironment.business_parceria` (linha 77), já que a seção Roadmap foi removida.
 
-4. **Limpar import** — remover `BusinessExecutiveRoadmap` (linha 25) se não for usado em outro lugar
+Manter `meu_progresso_conteudo` (Evolução Aprendizado) visível, mas corrigir a navegação.
+
+**Arquivo**: `src/pages/Mentoria.tsx`
+
+Adicionar um `useEffect` que detecta `?tab=evolucao-aprendizado` quando `isBusinessParceria` e faz scroll automático para `#sec-evolucao`, removendo o param da URL. Assim o link do sidebar funciona corretamente com o layout de scroll contínuo.
+
+```
+useEffect(() => {
+  if (isBusinessParceria && searchParams.get("tab") === "evolucao-aprendizado") {
+    searchParams.delete("tab");
+    setSearchParams(searchParams, { replace: true });
+    setTimeout(() => {
+      document.getElementById("sec-evolucao")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }
+}, [isBusinessParceria, searchParams]);
+```
 
