@@ -27,7 +27,7 @@ export interface ContratoBusiness {
   created_at: string;
   updated_at: string;
   // Campos adicionais do banco
-  modulos_selecionados?: Array<{ nome: string; descricao?: string }> | null;
+  modulos_selecionados?: Array<string | { nome: string; descricao?: string }> | null;
   fases_projeto?: Array<{ nome: string; descricao?: string }> | null;
   contexto_transformacao?: string | null;
   dores_mapeadas?: string[] | null;
