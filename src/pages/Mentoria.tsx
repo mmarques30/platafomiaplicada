@@ -147,7 +147,7 @@ export default function Mentoria() {
       {isBusiness && <BusinessAcessoRapido />}
 
       {/* Jornada Strip - linha de estágios */}
-      {(isBusinessParceria || isBusinessSistemas) && estagiosBusiness && <JornadaStrip estagios={estagiosBusiness} />}
+      {isBusinessSistemas && estagiosBusiness && <JornadaStrip estagios={estagiosBusiness} />}
       {isAcademy && <JornadaStrip estagios={estagiosAcademy} />}
 
       {/* Business Parceria: scroll contínuo com nav-pill sticky */}
