@@ -1,60 +1,107 @@
 
 
-# Transformar Métodos em Arsenal IA
+# Transformar "Minhas Dúvidas" em Painel Estratégico Academy
+
+## Contexto
+
+A página `MinhasDuvidas` (rota `/minhas-duvidas`) hoje é uma central de dúvidas genérica com FAQ estático e lista de tickets. Para o Academy, isso é pouco útil. A proposta é transformá-la num **painel estratégico de acompanhamento** baseado no diagnóstico da IA (`insight_ia` da tabela `formulario_diagnostico`), onde o mentorado:
+
+- Acompanha seus **objetivos do diagnóstico** com status de progresso
+- Gerencia **tarefas pessoais** vinculadas a esses objetivos
+- Recebe **alertas inteligentes** baseados no conteúdo consumido vs. necessidades do diagnóstico
+- Visualiza trilhas e ferramentas recomendadas com progresso real
 
 ## Banco de dados
 
-**Migration** — adicionar 4 colunas à tabela `metodos_aplicar`:
+**Migration** — nova tabela para tarefas/metas pessoais do Academy:
 
 ```sql
-ALTER TABLE metodos_aplicar ADD COLUMN tipo text DEFAULT 'skill';
-ALTER TABLE metodos_aplicar ADD COLUMN ferramenta text;
-ALTER TABLE metodos_aplicar ADD COLUMN nivel text DEFAULT 'intermediario';
-ALTER TABLE metodos_aplicar ADD COLUMN imagem_url text;
+CREATE TABLE public.metas_academy (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  titulo text NOT NULL,
+  descricao text,
+  tipo text DEFAULT 'tarefa', -- tarefa, meta, projeto
+  status text DEFAULT 'pendente', -- pendente, em_andamento, concluida
+  prioridade text DEFAULT 'media', -- baixa, media, alta
+  prazo date,
+  objetivo_vinculado text, -- referência ao objetivo do insight_ia
+  etapa_vinculada integer, -- número da etapa do insight_ia
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE public.metas_academy ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own metas" ON public.metas_academy
+  FOR ALL TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
 ```
 
-- `tipo`: skill | prompt_master | artigo | documento
-- `ferramenta`: Claude, ChatGPT, Gemini, Copilot, Perplexity, Midjourney
-- `nivel`: iniciante, intermediario, avancado
-
-## Arquivos a modificar
+## Arquivos a criar/modificar
 
 | Arquivo | Ação |
 |---|---|
-| `src/lib/metodosCategories.ts` | Reescrever — exportar constantes de tipos, ferramentas e níveis |
-| `src/components/admin/bibliotecas/MetodoModal.tsx` | Adicionar campos: tipo, ferramenta, nível, imagem_url |
-| `src/components/admin/bibliotecas/MetodosTab.tsx` | Atualizar filtros (tipo + ferramenta), renomear label |
-| `src/pages/MetodosAplicar.tsx` | Reescrever completo — hub visual com 2 abas |
-| `src/pages/admin/GerenciarBibliotecas.tsx` | Label da aba Métodos → "Arsenal IA" |
-| `src/components/layout/AppSidebar.tsx` | Label do menu lateral → "Arsenal IA" |
+| `src/pages/MinhasDuvidas.tsx` | Reescrever completo — painel estratégico |
+| `src/hooks/useMetasAcademy.tsx` | Novo — CRUD de metas/tarefas pessoais |
+| `src/components/academy/PainelEstrategico.tsx` | Novo — componente principal do painel |
+| `src/components/academy/MetaModal.tsx` | Novo — modal criar/editar meta |
+| `src/components/academy/AlertasInteligentes.tsx` | Novo — alertas baseados em diagnóstico vs progresso |
 
-## Página do usuário (MetodosAplicar.tsx)
+## Estrutura da página
 
-**Header**: PageTitle primary="Arsenal" secondary="IA" com subtítulo descritivo
+### Header
+`PageTitle primary="Meu" secondary="Plano"` + subtítulo "Acompanhe seu progresso estratégico baseado no diagnóstico"
 
-### Aba Skills (default)
-- Grid de 6 cards grandes, um por ferramenta (Claude, ChatGPT, Gemini, Copilot, Perplexity, Midjourney)
-- Cada card mostra ícone/logo da ferramenta, nome e contagem de skills disponíveis
-- Ao clicar numa ferramenta, filtra e exibe os cards de skills daquela ferramenta abaixo
-- Cards de skill: título, descrição curta, badge de nível, botão "Acessar"
+### Stat Cards (topo)
+4 cards compactos:
+- **Objetivos definidos** (contagem do `insight_ia.objetivos`)
+- **Tarefas pendentes** (da tabela `metas_academy`)
+- **Progresso em trilhas** (% de vídeos concluídos das `trilhas_recomendadas`)
+- **Ferramentas exploradas** (contagem de ferramentas usadas vs recomendadas)
 
-### Aba Biblioteca
-- Sub-filtro por tipo: Prompt Masters, Artigos, Documentos
-- Cards visuais com título, descrição, badge de tipo, botão acessar
-- Aba Materiais mantida como está (terceira aba)
+### Alertas Inteligentes
+Seção condicional que cruza:
+- Trilhas recomendadas pelo diagnóstico vs progresso real em `progresso_videos`
+- Ferramentas prioritárias vs ferramentas já acessadas
+- Prazos de tarefas próximos
+- Se está na etapa certa do roadmap baseado no tempo decorrido
 
-## Admin (MetodoModal.tsx)
+Exemplos de alertas:
+- "Você completou 3 de 8 vídeos da trilha recomendada 'Fundamentos de IA'"
+- "A ferramenta Claude foi recomendada como prioridade 1, explore a seção Arsenal IA"
+- "Você tem 2 tarefas vencendo esta semana"
 
-Novos campos no formulário:
-- **Tipo** (select): Skill, Prompt Master, Artigo, Documento
-- **Ferramenta** (select, visível quando tipo = Skill): 6 ferramentas
-- **Nível** (select): Iniciante, Intermediário, Avançado
-- **Imagem URL** (input opcional)
+### Tabs
+1. **Objetivos** (default) — cards dos objetivos do diagnóstico (curto/médio/longo prazo) com checkbox de progresso manual
+2. **Minhas Tarefas** — lista de tarefas pessoais com criação, edição, status, prioridade. Kanban simples (Pendente, Em andamento, Concluída)
+3. **Roadmap** — etapas de evolução do diagnóstico com indicador de "você está aqui" baseado no progresso
+4. **Dúvidas** — mantém a `AbaDuvidas` existente para quem ainda quiser enviar dúvidas
+
+## Hook useMetasAcademy
+
+```typescript
+// CRUD completo na tabela metas_academy
+// - listagem filtrada por status
+// - createMeta, updateMeta, deleteMeta mutations
+// - contagem por status para stat cards
+```
+
+## Alertas Inteligentes (lógica)
+
+O componente `AlertasInteligentes` recebe:
+- `insight_ia` do diagnóstico (trilhas recomendadas, ferramentas, etapas)
+- Progresso real de vídeos (`progresso_videos`)
+- Metas pendentes
+
+Cruza os dados e gera até 5 alertas priorizados com ícone, mensagem e CTA (link para trilha, Arsenal IA, ou tarefas).
 
 ## Detalhes técnicos
 
-- Rota permanece `/metodos-aplicar` para não quebrar links
-- Hooks existentes continuam funcionando, passam a incluir novos campos
-- Campo `categoria` mantido para compatibilidade, filtro principal agora é `tipo` + `ferramenta`
-- Sidebar label muda de "Métodos" para "Arsenal IA"
+- Rota permanece `/minhas-duvidas` para não quebrar menu_config
+- O hook `useMentoriaForm` é reutilizado para puxar o `insight_ia`
+- Progresso de trilhas usa query em `progresso_videos` filtrado por `user_id`
+- Se o diagnóstico não foi feito, mostra CTA para preencher (redireciona para `/diagnostico/formulario`)
+- A aba Dúvidas mantém `AbaDuvidas` original para compatibilidade
 
