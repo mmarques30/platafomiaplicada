@@ -2,11 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+export type TipoDocumento = 'proposta' | 'transcricao' | 'anexo' | 'solucao' | 'logo' | 'imagem' | 'outro';
+
 export interface DocumentoBusiness {
   id: string;
   contrato_id: string;
   titulo: string;
-  tipo: 'proposta' | 'transcricao' | 'anexo' | 'solucao' | 'outro';
+  tipo: TipoDocumento;
   arquivo_url?: string;
   conteudo_texto?: string;
   processado: boolean;
