@@ -71,14 +71,14 @@ export default function MentoriaSessoes() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-6xl space-y-3">
+      <div className="p-4 md:p-6 space-y-3">
         <SkeletonCard variant="list" count={3} />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="p-4 md:p-6 space-y-6">
       <Button
         variant="ghost"
         onClick={() => navigate("/mentoria")}
