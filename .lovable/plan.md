@@ -1,37 +1,47 @@
 
 
-# Fix: Carrossel de Telas e Vídeos — conter dentro da página com setas
+# Reestruturar MeuSistemaDocumentos — Interativo e Visual
 
-## Problema
-Os placeholders do empty state em "Telas do Sistema" e "Vídeos de Instrução" não usam o carrossel Embla. Os 6 cards ficam todos visíveis em uma linha, estourando a largura da página e forçando scroll horizontal.
+## Problemas identificados
+
+1. **Arquivos e Anotações em `readOnly`** — A página passa `readOnly` para `ArquivosProjetoSection` e `NotasProjetoSection`, impedindo o mentorado de fazer upload de arquivos ou criar anotações
+2. **Dados do Contrato como Collapsible** — Fica escondido e pouco acessível. Deveria ser uma sub-aba junto com as outras
+3. **Página pouco interativa** — Falta uma visão 360 do projeto. Abaixo das tabs, poderia ter um resumo visual com contadores e status
 
 ## Solução
 
-**Arquivo**: `src/pages/MeuSistemaEntregas.tsx`
+**Arquivo**: `src/pages/MeuSistemaDocumentos.tsx`
 
-### Telas do Sistema (linhas 236-255)
-- Envolver os placeholders no `emblaRef` existente, igual ao bloco de dados reais (linha 201)
-- Adicionar `overflow-hidden` no container
-- Manter as setas de navegação que já existem no header da seção (linhas 191-197)
+### 1. Remover `readOnly` dos componentes
+- `ArquivosProjetoSection` → sem `readOnly` (permite upload/delete)
+- `NotasProjetoSection` → sem `readOnly` (permite criar/editar/excluir anotações)
+- Links → manter somente leitura (links são geridos pelo admin)
 
-### Vídeos de Instrução (linhas 336-368)
-- Envolver os placeholders no `emblaRefVideos` existente, igual ao bloco de dados reais (linha 275)
-- Adicionar `overflow-hidden` no container
-- Manter as setas de navegação que já existem no header da seção (linhas 266-272)
+### 2. Dados do Contrato → Nova tab "Contrato"
+- Remover o `Collapsible` do final da página
+- Adicionar uma 5ª tab "Contrato" com ícone `Shield` após "Reports"
+- Mover todo o conteúdo do contrato (empresa, datas, valores, módulos, garantias) para dentro dessa tab
 
-### Mudança concreta
-Nos dois blocos de empty state, trocar:
-```jsx
-<div className="opacity-50 pointer-events-none">
-  <div className="overflow-hidden">
-    <div className="flex gap-4">
-```
-Por:
-```jsx
-<div className="opacity-50 pointer-events-none">
-  <div className="overflow-hidden" ref={emblaRef}> {/* ou emblaRefVideos */}
-    <div className="flex gap-4">
-```
+### 3. Painel de resumo visual abaixo das tabs
+Adicionar uma seção fixa abaixo das tabs com 4 mini-cards de métricas:
+- **Arquivos** — contador com ícone FileText
+- **Anotações** — contador com ícone StickyNote
+- **Links** — contador com ícone Link2
+- **Reports** — contador com ícone FileText
 
-Remover `pointer-events-none` do wrapper para que as setas funcionem, ou manter apenas nos cards internos.
+Esses cards ficam sempre visíveis independente da tab ativa, dando a visão 360 do estado documental do projeto.
+
+### Mudanças concretas
+
+**Linha 102**: `<ArquivosProjetoSection contratoId={contrato.id} readOnly />` → `<ArquivosProjetoSection contratoId={contrato.id} />`
+
+**Linha 106**: `<NotasProjetoSection contratoId={contrato.id} readOnly />` → `<NotasProjetoSection contratoId={contrato.id} />`
+
+**Linhas 82-98 (TabsList)**: Adicionar 5ª tab "Contrato" com ícone Shield
+
+**Após linha 201**: Adicionar `<TabsContent value="contrato">` com o conteúdo que está no Collapsible (linhas 214-261)
+
+**Linhas 204-262**: Remover todo o bloco Collapsible
+
+**Antes das Tabs (após PageTitle)**: Inserir grid de 4 mini stat-cards com contadores (arquivos, notas, links, reports) usando fundo escuro sólido conforme padrão Sistemas
 
