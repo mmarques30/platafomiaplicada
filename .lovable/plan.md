@@ -1,24 +1,36 @@
 
-# Adicionar funcionalidade de Links para o cliente em MeuSistemaDocumentos
 
-## Problema
-Na página do cliente (`MeuSistemaDocumentos`), a aba Links é somente leitura — o cliente consegue adicionar arquivos e anotações, mas não consegue adicionar links. Falta o botão "Novo Link" e o dialog de criação/edição.
+# Elevar MentoriaDocumentos ao mesmo nível de MeuSistemaDocumentos
+
+## Situação atual
+
+A página `MentoriaDocumentos.tsx` (Business Parceria) é básica: tem apenas tabs de Arquivos, Anotações, Links e Reports, sem stat cards, sem aba Contrato, sem seção de Evolução/Atividade/Insights. Já a página `MeuSistemaDocumentos.tsx` (Business Sistemas) tem tudo isso.
 
 ## Solução
 
-**Arquivo**: `src/pages/MeuSistemaDocumentos.tsx`
+Reescrever `MentoriaDocumentos.tsx` trazendo todas as seções que existem em `MeuSistemaDocumentos.tsx`, mantendo a funcionalidade de CRUD de links que já foi adicionada:
 
-Adicionar na aba Links a mesma funcionalidade que já existe no painel admin (`DocumentosBusinessManager`):
+1. **Stat cards** no topo (Arquivos, Anotações, Links, Reports) com o padrão verde da marca
+2. **Aba Contrato** com dados da empresa, detalhes do contrato, módulos e garantias (3 cards organizados)
+3. **Aba Reports** com cards de visualizar/baixar (igual ao Sistemas)
+4. **Seção inferior** com 3 cards: Evolução das Entregas (progress bars), Atividade Recente (timeline), Insights do Projeto
+5. **Manter** todo o CRUD de links já implementado (criar, editar, excluir)
+6. **Remover** botão "Voltar para Mentoria" e usar `PageTitle` consistente
 
-1. **Botão "Novo Link"** acima da lista de links
-2. **Dialog de criação/edição** com campos: Título, URL, Descrição (opcional), Ícone (seletor)
-3. **Botões de editar e excluir** em cada card de link (com AlertDialog de confirmação para exclusão)
-4. Usar as mutations `createLink`, `updateLink`, `deleteLink` já disponíveis no hook `useLinksBusiness` (que já são importados mas não utilizados)
+## Arquivo
 
-### Mudanças concretas
-- Importar `createLink`, `updateLink`, `deleteLink` do `useLinksBusiness` (atualmente só importa `links` e `isLoading`)
-- Adicionar estado local para o dialog e formulário de link
-- Adicionar botão "Novo Link" no topo da aba Links
-- Adicionar botões de ação (editar, excluir, abrir) em cada card de link
-- Adicionar Dialog e AlertDialog para criação/edição/exclusão
-- Importar componentes necessários: `Dialog`, `Input`, `Label`, `Select`, `AlertDialog`, `Loader2`, `Plus`, `Edit2`, `Trash2`
+| Arquivo | Acao |
+|---|---|
+| `src/pages/MentoriaDocumentos.tsx` | Reescrever com a mesma estrutura do MeuSistemaDocumentos |
+
+## Detalhes tecnicos
+
+- Importar `reports`, `progresso` do `useContratosBusiness` (atualmente so usa `contrato` e `isLoading`)
+- Adicionar `useDocumentosBusiness` para contagem de arquivos
+- Reutilizar componentes: `PageTitle`, `ProgressBar`, `Badge`, `ScrollArea`
+- Adicionar aba "Contrato" com `InfoItem` local (mesmo pattern do Sistemas)
+- Adicionar seção de 3 cards abaixo das tabs: Evolução, Atividade Recente, Insights
+- Cronograma calculado com `differenceInDays` (mesmo do Sistemas)
+- Dialog de visualização de report HTML (mesmo do Sistemas)
+- Manter link CRUD intacto (dialog, alertdialog, mutations)
+
