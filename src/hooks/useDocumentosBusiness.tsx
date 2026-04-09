@@ -2,11 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+export type TipoDocumento = 'proposta' | 'transcricao' | 'anexo' | 'solucao' | 'logo' | 'imagem' | 'outro';
+
 export interface DocumentoBusiness {
   id: string;
   contrato_id: string;
   titulo: string;
-  tipo: 'proposta' | 'transcricao' | 'anexo' | 'solucao' | 'outro';
+  tipo: TipoDocumento;
   arquivo_url?: string;
   conteudo_texto?: string;
   processado: boolean;
@@ -18,7 +20,7 @@ export interface DocumentoBusiness {
 export interface DocumentoInput {
   contrato_id: string;
   titulo: string;
-  tipo: 'proposta' | 'transcricao' | 'anexo' | 'solucao' | 'outro';
+  tipo: TipoDocumento;
   arquivo_url?: string;
   conteudo_texto?: string;
   para_processamento_ia?: boolean;
@@ -94,6 +96,20 @@ export function useDocumentosBusiness(contratoId?: string, paraProcessamentoIA?:
 
   const deleteDocumento = useMutation({
     mutationFn: async (id: string) => {
+      // Buscar o documento para pegar o arquivo_url antes de deletar
+      const { data: doc } = await supabase
+        .from("documentos_business")
+        .select("arquivo_url")
+        .eq("id", id)
+        .single();
+
+      // Remover arquivo do storage se existir
+      if (doc?.arquivo_url) {
+        await supabase.storage
+          .from("contratos-business")
+          .remove([doc.arquivo_url]);
+      }
+
       const { error } = await supabase
         .from("documentos_business")
         .delete()
