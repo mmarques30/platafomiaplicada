@@ -3852,10 +3852,14 @@ export type Database = {
           created_at: string | null
           descricao: string
           exemplo: string | null
+          ferramenta: string | null
           ferramentas_recomendadas: Json | null
           id: string
+          imagem_url: string | null
           link_documento: string | null
+          nivel: string | null
           template: string | null
+          tipo: string | null
           titulo: string
           updated_at: string | null
         }
@@ -3866,10 +3870,14 @@ export type Database = {
           created_at?: string | null
           descricao: string
           exemplo?: string | null
+          ferramenta?: string | null
           ferramentas_recomendadas?: Json | null
           id?: string
+          imagem_url?: string | null
           link_documento?: string | null
+          nivel?: string | null
           template?: string | null
+          tipo?: string | null
           titulo: string
           updated_at?: string | null
         }
@@ -3880,10 +3888,14 @@ export type Database = {
           created_at?: string | null
           descricao?: string
           exemplo?: string | null
+          ferramenta?: string | null
           ferramentas_recomendadas?: Json | null
           id?: string
+          imagem_url?: string | null
           link_documento?: string | null
+          nivel?: string | null
           template?: string | null
+          tipo?: string | null
           titulo?: string
           updated_at?: string | null
         }
