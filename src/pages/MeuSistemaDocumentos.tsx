@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useDocumentosBusiness } from "@/hooks/useDocumentosBusiness";
-import { useLinksBusiness } from "@/hooks/useLinksBusiness";
+import { useLinksBusiness, LinkBusiness } from "@/hooks/useLinksBusiness";
 import { useNotasProjetoBusiness } from "@/hooks/useNotasProjetoBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { downloadUrl } from "@/lib/download";
