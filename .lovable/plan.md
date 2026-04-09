@@ -1,37 +1,26 @@
 
 
-# Reorganizar aba Contrato em MeuSistemaDocumentos
+# Fix: Conteúdo de Entregas ultrapassando a página com sidebar aberta
 
-## Problema
-A aba "Contrato" exibe todas as informações em uma lista corrida com `Separator` genéricos, sem títulos de seção claros. Fica visualmente confuso e difícil de localizar informações específicas.
+## Causa raiz
+
+No `MainLayout.tsx`, o container que envolve o `<main>` é um flex item (`flex-1`) mas **não tem `min-w-0`**. Em flexbox, itens têm `min-width: auto` por padrão, o que impede que encolham abaixo da largura intrínseca do conteúdo. Quando o sidebar abre e reduz o espaço disponível, esse div se recusa a encolher, empurrando o conteúdo para fora da tela.
+
+Mesmo com `overflow-x-hidden` no `<main>` e `overflow-hidden` na página de Entregas, o problema persiste porque o container pai não permite o encolhimento.
 
 ## Solução
 
-**Arquivo**: `src/pages/MeuSistemaDocumentos.tsx` (linhas 260-308)
+**Arquivo**: `src/components/layout/MainLayout.tsx` (linha 82)
 
-Reorganizar o conteúdo da aba Contrato em **seções visuais distintas** com títulos e cards separados:
+Adicionar `min-w-0` ao div que envolve o `<main>`:
 
-### Estrutura proposta
+```
+// De:
+<div className="flex-1 flex flex-col relative z-[1]">
 
-Substituir o card único por **3 cards empilhados**, cada um com título de seção:
+// Para:
+<div className="flex-1 flex flex-col relative z-[1] min-w-0">
+```
 
-1. **Dados da Empresa** — Card com ícone `Building2` e título "Dados da Empresa"
-   - Grid 2 colunas: Empresa, CNPJ, Representante, Email, Setor, Endereço
-
-2. **Detalhes do Contrato** — Card com ícone `Calendar` e título "Detalhes do Contrato"
-   - Grid 3 colunas: Início, Fim, Duração, Valor, Entrada, Parcelas
-
-3. **Módulos e Garantias** — Card com ícone `Package` e título "Módulos e Garantias"
-   - Badges de módulos + lista de garantias (só aparece se houver dados)
-
-### Estilo dos cards
-- Cada card com `CardHeader` contendo título com ícone (padrão `text-sm font-medium`)
-- Fundo neutro padrão do card (`border-border/50`)
-- `InfoItem` existente reutilizado, com fundo sutil `bg-muted/30 rounded-lg p-3` em cada item para dar destaque visual
-- Espaçamento `space-y-4` entre os cards
-
-### Mudança concreta
-- Linhas 260-308: substituir o card único por 3 cards com headers e grids organizados
-- Importar `Building2` do lucide-react
-- `InfoItem` ganha fundo `bg-muted/30 rounded-lg p-3` para cada campo ficar visualmente delimitado
+Essa única mudança resolve o problema na raiz. O flex item passa a aceitar encolher quando o sidebar ocupa espaço, e o `overflow-x-hidden` já existente no `<main>` corta qualquer conteúdo que transborde. Funciona para a página de Entregas e qualquer outra página que tenha conteúdo largo.
 
