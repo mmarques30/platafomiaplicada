@@ -1,71 +1,63 @@
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { StaggerList } from "@/components/ui/StaggerList";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { SkeletonCard } from "@/components/ui/SkeletonCard";
-import { ArrowLeft, Package, Clock, CheckCircle2, AlertCircle, PlayCircle, Layers, ChevronDown, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useContratosBusiness } from "@/hooks/useContratosBusiness";
-import { useEntregasBusiness, EntregaBusiness } from "@/hooks/useEntregasBusiness";
-import { useEtapasBusiness, EtapaBusiness } from "@/hooks/useEtapasBusiness";
-import { useBusinessUserId } from "@/hooks/useBusinessUserId";
-import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { ExternalLink, FileText, Play, Monitor, Video, ChevronLeft, ChevronRight, ArrowLeft, Package } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-
-const STATUS_CONFIG = {
-  pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const, color: "text-muted-foreground" },
-  em_andamento: { label: "Em Andamento", icon: PlayCircle, variant: "default" as const, color: "text-amber-600" },
-  concluida: { label: "Concluída", icon: CheckCircle2, variant: "outline" as const, color: "text-green-600" },
-  cancelada: { label: "Cancelada", icon: AlertCircle, variant: "destructive" as const, color: "text-destructive" },
-};
-
-const PRIORIDADE_CONFIG = {
-  baixa: { label: "Baixa", variant: "secondary" as const },
-  media: { label: "Média", variant: "default" as const },
-  alta: { label: "Alta", variant: "destructive" as const },
-  critica: { label: "Crítica", variant: "destructive" as const },
-};
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useContratosBusiness } from "@/hooks/useContratosBusiness";
+import { useBusinessUserId } from "@/hooks/useBusinessUserId";
+import { useEntregasBusinessView } from "@/hooks/useEntregasBusinessView";
+import { getGoogleDriveEmbedUrl, isGoogleDriveUrl } from "@/lib/google-drive";
+import { supabase } from "@/integrations/supabase/client";
+import { downloadUrl } from "@/lib/download";
+import { toast } from "sonner";
+import { Lens } from "@/components/ui/lens";
+import useEmblaCarousel from "embla-carousel-react";
+import { motion } from "framer-motion";
+import { SkeletonCard } from "@/components/ui/SkeletonCard";
 
 export default function MentoriaEntregas() {
   const navigate = useNavigate();
-  const businessUserId = useBusinessUserId();
-  const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(businessUserId);
-  const { entregas, entregasPorEtapa, calcularProgressoEtapa, isLoading: isLoadingEntregas, updateEntrega } = useEntregasBusiness(contrato?.id);
-  const { data: etapas = [] } = useEtapasBusiness(contrato?.id);
-  
-  // Inicializar com primeira etapa aberta
-  const [openEtapas, setOpenEtapas] = useState<string[]>(() => {
-    const firstEtapaWithEntregas = etapas.find(e => entregasPorEtapa[e.id]?.length > 0);
-    return firstEtapaWithEntregas ? [firstEtapaWithEntregas.id] : [];
-  });
+  const userId = useBusinessUserId();
+  const { contrato, isLoading: loadingContrato } = useContratosBusiness(userId);
+  const { processos, telas, videos, isLoading: loadingEntregas } = useEntregasBusinessView(contrato?.id);
 
-  const isLoading = isLoadingContrato || isLoadingEntregas;
+  const [selectedTela, setSelectedTela] = useState<any | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
+  const [showAllProcessos, setShowAllProcessos] = useState(false);
 
-  const toggleEtapa = (etapaId: string) => {
-    setOpenEtapas(prev => 
-      prev.includes(etapaId) 
-        ? prev.filter(id => id !== etapaId)
-        : [...prev, etapaId]
-    );
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
+  const [emblaRefVideos, emblaApiVideos] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const scrollPrevVideos = useCallback(() => emblaApiVideos?.scrollPrev(), [emblaApiVideos]);
+  const scrollNextVideos = useCallback(() => emblaApiVideos?.scrollNext(), [emblaApiVideos]);
+
+  const isLoading = loadingContrato || loadingEntregas;
+
+  const handleDownloadProcesso = async (processo: any) => {
+    if (processo.url) {
+      window.open(processo.url, "_blank");
+      return;
+    }
+    if (processo.arquivo_path) {
+      try {
+        const { data } = await supabase.storage
+          .from("contratos-business")
+          .createSignedUrl(processo.arquivo_path, 3600);
+        if (data?.signedUrl) {
+          downloadUrl(data.signedUrl, processo.titulo);
+        } else {
+          toast.error("Não foi possível gerar link de download");
+        }
+      } catch {
+        toast.error("Erro ao baixar documento");
+      }
+    }
   };
-
-  const handleStatusChange = (entregaId: string, newStatus: EntregaBusiness['status']) => {
-    updateEntrega.mutate({ id: entregaId, status: newStatus });
-  };
-
-  // Ordenar etapas por numero_etapa
-  const etapasOrdenadas = [...etapas].sort((a, b) => a.numero_etapa - b.numero_etapa);
-
-  // Entregas sem etapa
-  const entregasSemEtapa = entregasPorEtapa['sem_etapa'] || [];
 
   if (isLoading) {
     return (
@@ -94,168 +86,8 @@ export default function MentoriaEntregas() {
     );
   }
 
-  const renderEntregaCard = (entrega: EntregaBusiness) => {
-    const statusConfig = STATUS_CONFIG[entrega.status];
-    const prioridadeConfig = PRIORIDADE_CONFIG[entrega.prioridade];
-    const StatusIcon = statusConfig.icon;
-
-    return (
-      <Card 
-        key={entrega.id} 
-        className={cn(
-          "border-l-4 transition-all",
-          entrega.status === 'concluida' && "border-l-green-500 bg-green-50/30 dark:bg-green-950/10",
-          entrega.status === 'em_andamento' && "border-l-amber-500 bg-amber-50/30 dark:bg-amber-950/10",
-          entrega.status === 'pendente' && "border-l-muted-foreground/30",
-          entrega.status === 'cancelada' && "border-l-destructive opacity-60"
-        )}
-      >
-        <CardContent className="py-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <StatusIcon className={cn("h-5 w-5", statusConfig.color)} />
-                <h3 className={cn(
-                  "font-semibold text-lg",
-                  entrega.status === 'concluida' && "line-through text-muted-foreground"
-                )}>
-                  {entrega.titulo}
-                </h3>
-                <StatusBadge 
-                  status={entrega.status === 'cancelada' ? 'cancelado' : entrega.status === 'concluida' ? 'concluido' : entrega.status} 
-                  label={statusConfig.label} 
-                />
-                <Badge variant={prioridadeConfig.variant} className="text-xs">
-                  {prioridadeConfig.label}
-                </Badge>
-              </div>
-              
-              {entrega.descricao && (
-                <p className="text-sm text-muted-foreground mb-3">
-                  {entrega.descricao}
-                </p>
-              )}
-              
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                {entrega.modulo_relacionado && (
-                  <span className="bg-muted px-2 py-1 rounded-md">
-                    {entrega.modulo_relacionado}
-                  </span>
-                )}
-                {entrega.prazo_previsto && (
-                  <span className="bg-muted px-2 py-1 rounded-md">
-                    Prazo: {format(parseISO(entrega.prazo_previsto), "dd/MM/yyyy", { locale: ptBR })}
-                  </span>
-                )}
-              </div>
-            </div>
-            
-            {/* Status Selector */}
-            <div className="flex items-center gap-2 lg:min-w-[180px]">
-              <Select
-                value={entrega.status}
-                onValueChange={(value) => handleStatusChange(entrega.id, value as EntregaBusiness['status'])}
-                disabled={updateEntrega.isPending}
-              >
-                <SelectTrigger className={cn(
-                  "w-full",
-                  entrega.status === 'concluida' && "border-green-500 text-green-600",
-                  entrega.status === 'em_andamento' && "border-amber-500 text-amber-600"
-                )}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-background border shadow-lg z-50">
-                  {Object.entries(STATUS_CONFIG).map(([key, config]) => {
-                    const Icon = config.icon;
-                    return (
-                      <SelectItem key={key} value={key}>
-                        <div className="flex items-center gap-2">
-                          <Icon className={cn("h-4 w-4", config.color)} />
-                          {config.label}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
-  const renderEtapaSection = (etapa: EtapaBusiness) => {
-    const entregasEtapa = entregasPorEtapa[etapa.id] || [];
-    if (entregasEtapa.length === 0) return null;
-
-    const isOpen = openEtapas.includes(etapa.id);
-    const progresso = calcularProgressoEtapa(etapa.id);
-    const concluidas = entregasEtapa.filter(e => e.status === 'concluida').length;
-
-    return (
-      <Collapsible 
-        key={etapa.id} 
-        open={isOpen}
-        onOpenChange={() => toggleEtapa(etapa.id)}
-      >
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
-          <CollapsibleTrigger className="w-full">
-            <div className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
-              <div className="flex items-center gap-3 flex-1">
-                {isOpen ? (
-                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                )}
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Layers className="h-4 w-4 text-primary" />
-                </div>
-                <div className="text-left flex-1">
-                  <h3 className="font-semibold text-foreground">
-                    Fase {etapa.numero_etapa}: {etapa.titulo}
-                  </h3>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-xs text-muted-foreground">
-                      {concluidas}/{entregasEtapa.length} entregas concluídas
-                    </span>
-                    {etapa.data_prevista && (
-                      <span className="text-xs text-muted-foreground">
-                        Prazo: {format(parseISO(etapa.data_prevista), "dd/MM", { locale: ptBR })}
-                      </span>
-                    )}
-                  </div>
-                  <Progress value={progresso} className="h-2 mt-2 max-w-md" />
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge 
-                  variant="outline" 
-                  className={cn(
-                    "text-xs",
-                    progresso === 100 && "bg-green-500/10 text-green-700 border-green-500/30",
-                    progresso > 0 && progresso < 100 && "bg-amber-500/10 text-amber-700 border-amber-500/30",
-                    progresso === 0 && "bg-muted text-muted-foreground border-border"
-                  )}
-                >
-                  {progresso}%
-                </Badge>
-              </div>
-            </div>
-          </CollapsibleTrigger>
-          
-          <CollapsibleContent>
-            <div className="border-t border-border p-4 space-y-3">
-              {entregasEtapa.map(renderEntregaCard)}
-            </div>
-          </CollapsibleContent>
-        </div>
-      </Collapsible>
-    );
-  };
-
   return (
-    <div className="container mx-auto py-8 px-4 space-y-6">
+    <div className="p-4 md:p-6 space-y-8 overflow-hidden min-w-0">
       <Button
         variant="ghost"
         size="sm"
@@ -266,34 +98,345 @@ export default function MentoriaEntregas() {
         Voltar
       </Button>
 
-      <div className="mb-8">
-        <PageTitle primary="Minhas" secondary="Entregas" />
-        <p className="text-muted-foreground text-lg mt-2">
-          {entregas.length} entrega{entregas.length !== 1 ? 's' : ''} no total
-        </p>
-      </div>
+      <PageTitle primary="Minhas" secondary="Entregas" />
 
-      {entregas.length === 0 ? (
-        <EmptyState icon={Package} title="Nenhuma entrega ainda" description="As entregas definidas pela sua mentora aparecerão aqui." />
-      ) : (
-        <StaggerList className="space-y-4">
-          {/* Entregas agrupadas por Fase */}
-          {etapasOrdenadas.map(renderEtapaSection)}
+      {/* Guia de Ferramentas */}
+      <section className="space-y-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Guia de Ferramentas</h2>
+            <Badge variant="secondary" className="text-xs">{processos.length}</Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">Documentos · SOPs · Links de referência</p>
+        </div>
+        {processos.length > 0 ? (
+          <div className="space-y-2">
+            <div className="rounded-lg border border-border overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2 w-10">Tipo</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2">Título</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2 hidden sm:table-cell">Descrição</th>
+                    <th className="text-right font-medium text-muted-foreground px-4 py-2 w-24">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(showAllProcessos ? processos : processos.slice(0, 4)).map((p) => (
+                    <tr key={p.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="rounded-lg bg-primary/10 p-1.5 w-fit">
+                          {p.tipo === "link" ? (
+                            <ExternalLink className="h-4 w-4 text-primary" />
+                          ) : (
+                            <FileText className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-foreground">{p.titulo}</td>
+                      <td className="px-4 py-3 text-muted-foreground text-xs line-clamp-1 hidden sm:table-cell">{p.descricao || "—"}</td>
+                      <td className="px-4 py-3 text-right">
+                        <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => handleDownloadProcesso(p)}>
+                          {p.tipo === "link" ? (
+                            <><ExternalLink className="h-3 w-3 mr-1" /> Acessar</>
+                          ) : (
+                            <><FileText className="h-3 w-3 mr-1" /> Baixar</>
+                          )}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {processos.length > 4 && (
+              <div className="flex justify-center">
+                <Button variant="ghost" size="sm" className="text-xs" onClick={() => setShowAllProcessos(!showAllProcessos)}>
+                  {showAllProcessos ? "Ver menos" : `Ver mais (${processos.length - 4})`}
+                </Button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="opacity-50 pointer-events-none">
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2 w-10">Tipo</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2">Título</th>
+                    <th className="text-left font-medium text-muted-foreground px-4 py-2 hidden sm:table-cell">Descrição</th>
+                    <th className="text-right font-medium text-muted-foreground px-4 py-2 w-24">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { titulo: "Guia de Implementação IA", tipo: "link", descricao: "Passo a passo para aplicar IA no seu negócio" },
+                    { titulo: "Template de Automação", tipo: "arquivo", descricao: "Modelo pronto para replicar" },
+                  ].map((p, i) => (
+                    <tr key={i} className="border-b border-border/50 last:border-0">
+                      <td className="px-4 py-3">
+                        <div className="rounded-lg bg-primary/10 p-1.5 w-fit">
+                          {p.tipo === "link" ? (
+                            <ExternalLink className="h-4 w-4 text-primary" />
+                          ) : (
+                            <FileText className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-foreground">{p.titulo}</td>
+                      <td className="px-4 py-3 text-muted-foreground text-xs hidden sm:table-cell">{p.descricao}</td>
+                      <td className="px-4 py-3 text-right">
+                        <Button variant="outline" size="sm" className="text-xs h-7" disabled>
+                          {p.tipo === "link" ? (
+                            <><ExternalLink className="h-3 w-3 mr-1" /> Acessar</>
+                          ) : (
+                            <><FileText className="h-3 w-3 mr-1" /> Baixar</>
+                          )}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-center text-muted-foreground mt-3">Nenhum guia de ferramenta ainda.</p>
+          </div>
+        )}
+      </section>
 
-          {/* Entregas sem fase associada */}
-          {entregasSemEtapa.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-muted-foreground flex items-center gap-2">
-                <Package className="h-5 w-5" />
-                Outras Entregas ({entregasSemEtapa.length})
-              </h2>
-              <div className="grid gap-3">
-                {entregasSemEtapa.map(renderEntregaCard)}
+      {/* Vídeos Passo a Passo */}
+      <section className="space-y-3 overflow-hidden">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Vídeos Passo a Passo</h2>
+            <Badge variant="secondary" className="text-xs">{videos.length}</Badge>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollPrevVideos}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollNextVideos}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        {videos.length > 0 ? (
+          <div className="overflow-hidden" ref={emblaRefVideos}>
+            <div className="flex gap-4">
+              {videos.map((video) => (
+                <motion.div
+                  key={video.id}
+                  className="flex-none w-[220px] md:w-[280px] lg:w-[320px]"
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  <Card
+                    className="cursor-pointer border-border/50 overflow-hidden hover:shadow-lg transition-shadow"
+                    onClick={() => setSelectedVideo(video)}
+                  >
+                    <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
+                      {video.thumbnail_url ? (
+                        <div className="relative w-full h-full">
+                          <img src={video.thumbnail_url} alt={video.titulo} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                            <div className="rounded-full bg-white/90 p-3 shadow-lg">
+                              <Play className="h-6 w-6 text-primary fill-primary" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : video.video_url && isGoogleDriveUrl(video.video_url) ? (
+                        <div className="relative w-full h-full">
+                          <iframe
+                            src={getGoogleDriveEmbedUrl(video.video_url) || ""}
+                            className="w-full h-full pointer-events-none"
+                            allow="autoplay"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <div className="rounded-full bg-white/90 p-3 shadow-lg">
+                              <Play className="h-6 w-6 text-primary fill-primary" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted">
+                          <div className="text-center">
+                            <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
+                            <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
+                          </div>
+                        </div>
+                      )}
+                    </Lens>
+                    <CardContent className="p-3">
+                      <p className="font-medium text-sm text-foreground truncate">{video.titulo}</p>
+                      {video.descricao && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{video.descricao}</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="opacity-50">
+            <div className="overflow-hidden" ref={emblaRefVideos}>
+              <div className="flex gap-4">
+                {[
+                  { nome: "Como configurar a ferramenta", desc: "Passo a passo inicial" },
+                  { nome: "Criando seu primeiro fluxo", desc: "Automação na prática" },
+                  { nome: "Integrações avançadas", desc: "Conectando ferramentas" },
+                  { nome: "Otimizando resultados", desc: "Dicas e boas práticas" },
+                ].map((v, i) => (
+                  <div key={i} className="flex-none w-[220px] md:w-[280px] lg:w-[320px]">
+                    <Card className="border-border/50 overflow-hidden">
+                      <div className="aspect-video bg-muted flex items-center justify-center">
+                        <div className="text-center">
+                          <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
+                          <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
+                        </div>
+                      </div>
+                      <CardContent className="p-3">
+                        <p className="font-medium text-sm text-foreground truncate">{v.nome}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{v.desc}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ))}
               </div>
             </div>
+            <p className="text-xs text-center text-muted-foreground mt-3">Nenhum vídeo de instrução ainda.</p>
+          </div>
+        )}
+      </section>
+
+      {/* Guias e Recursos */}
+      <section className="space-y-3 overflow-hidden">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Guias e Recursos</h2>
+            <Badge variant="secondary" className="text-xs">{telas.length}</Badge>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollPrev}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={scrollNext}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        {telas.length > 0 ? (
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex gap-4">
+              {telas.map((tela) => (
+                <motion.div
+                  key={tela.id}
+                  className="flex-none w-[240px] md:w-[300px] lg:w-[340px]"
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  <div
+                    className="relative cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group border border-border/50"
+                    onClick={() => setSelectedTela(tela)}
+                  >
+                    {tela.screenshot_url ? (
+                      <div className="aspect-video bg-muted">
+                        <img
+                          src={tela.screenshot_url}
+                          alt={tela.titulo}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-muted flex items-center justify-center">
+                        <Monitor className="h-10 w-10 text-muted-foreground/40" />
+                      </div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8">
+                      <p className="text-white text-sm font-medium truncate">{tela.titulo}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="opacity-50">
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex gap-4">
+                {["Guia Visual de Ferramentas", "Print do Fluxo Completo", "Referência de Configuração", "Modelo de Dashboard"].map((nome, i) => (
+                  <div key={i} className="flex-none w-[240px] md:w-[300px] lg:w-[340px]">
+                    <div className="relative rounded-xl overflow-hidden shadow-md border border-border/50">
+                      <div className="aspect-video bg-muted flex items-center justify-center">
+                        <Monitor className="h-10 w-10 text-muted-foreground/40" />
+                      </div>
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8">
+                        <p className="text-white text-sm font-medium truncate">{nome}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-xs text-center text-muted-foreground mt-3">Nenhum guia ou recurso visual ainda.</p>
+          </div>
+        )}
+      </section>
+
+      {/* Dialog: Guia/Recurso Visual */}
+      <Dialog open={!!selectedTela} onOpenChange={() => setSelectedTela(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{selectedTela?.titulo}</DialogTitle>
+          </DialogHeader>
+          {selectedTela?.screenshot_url && (
+            <div className="rounded-lg overflow-hidden border border-border">
+              <img
+                src={selectedTela.screenshot_url}
+                alt={selectedTela.titulo}
+                className="w-full object-contain max-h-[50vh]"
+              />
+            </div>
           )}
-        </StaggerList>
-      )}
+          {selectedTela?.link_sistema && (
+            <Button onClick={() => window.open(selectedTela.link_sistema, "_blank")} className="w-full">
+              <ExternalLink className="h-4 w-4 mr-2" /> Acessar Recurso
+            </Button>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog: Vídeo */}
+      <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{selectedVideo?.titulo}</DialogTitle>
+          </DialogHeader>
+          {selectedVideo?.video_url && (
+            <div className="aspect-video rounded-lg overflow-hidden bg-black">
+              {isGoogleDriveUrl(selectedVideo.video_url) ? (
+                <iframe
+                  src={getGoogleDriveEmbedUrl(selectedVideo.video_url) || ""}
+                  className="w-full h-full"
+                  allow="autoplay; fullscreen"
+                  allowFullScreen
+                />
+              ) : (
+                <iframe
+                  src={selectedVideo.video_url}
+                  className="w-full h-full"
+                  allow="autoplay; fullscreen"
+                  allowFullScreen
+                />
+              )}
+            </div>
+          )}
+          {selectedVideo?.descricao && (
+            <p className="text-sm text-muted-foreground">{selectedVideo.descricao}</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
