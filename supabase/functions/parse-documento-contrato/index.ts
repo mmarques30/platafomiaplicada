@@ -32,14 +32,46 @@ serve(async (req) => {
       );
     }
 
-    // For PDF and DOCX, use Lovable AI to extract text
+    const mimeType = fileType || (fileName.endsWith('.pdf') ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+
+    // For DOCX files, extract text using mammoth
+    if (mimeType.includes('wordprocessingml') || fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
+      console.log('Extracting text from DOCX using mammoth...');
+      try {
+        const mammoth = await import("npm:mammoth@1.8.0");
+        const binaryStr = atob(fileBase64);
+        const bytes = new Uint8Array(binaryStr.length);
+        for (let i = 0; i < binaryStr.length; i++) {
+          bytes[i] = binaryStr.charCodeAt(i);
+        }
+        const result = await mammoth.extractRawText({ buffer: bytes });
+        const textoExtraido = result.value;
+
+        if (!textoExtraido || textoExtraido.trim().length === 0) {
+          throw new Error('Não foi possível extrair texto do documento DOCX');
+        }
+
+        console.log(`DOCX text extracted, length: ${textoExtraido.length} chars`);
+        return new Response(
+          JSON.stringify({ texto: textoExtraido }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (mammothError: unknown) {
+        console.error('Mammoth extraction failed:', mammothError);
+        const msg = mammothError instanceof Error ? mammothError.message : 'Erro ao extrair texto do DOCX';
+        return new Response(
+          JSON.stringify({ error: msg }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // For PDF, use Lovable AI to extract text via image_url
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY não configurada');
     }
 
-    // Create a data URL from the base64
-    const mimeType = fileType || (fileName.endsWith('.pdf') ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     const dataUrl = `data:${mimeType};base64,${fileBase64}`;
 
     const systemPrompt = `Você é um assistente especializado em extrair texto de documentos.

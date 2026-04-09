@@ -247,7 +247,7 @@ export default function MeuSistemaDocumentos() {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <InfoItem label="Início" value={formatDate(contrato.data_inicio)} icon={<Calendar className="h-3.5 w-3.5" />} />
                 <InfoItem label="Fim" value={formatDate(contrato.data_fim)} icon={<Calendar className="h-3.5 w-3.5" />} />
-                <InfoItem label="Duração" value={`${contrato.tempo_consultoria_meses} meses`} />
+                <InfoItem label="Duração" value={contrato.tempo_consultoria_meses ? `${contrato.tempo_consultoria_meses} meses` : undefined} />
                 <InfoItem label="Valor" value={formatCurrency(contrato.valor_contrato)} icon={<DollarSign className="h-3.5 w-3.5" />} />
                 <InfoItem label="Entrada" value={formatCurrency(contrato.valor_entrada ?? null)} />
                 <InfoItem label="Parcelas" value={contrato.numero_parcelas ? `${contrato.numero_parcelas}x ${formatCurrency(contrato.valor_parcela ?? null)}` : "—"} />
