@@ -336,7 +336,14 @@ export default function MeuSistemaEntregas() {
           <div className="opacity-50 pointer-events-none">
             <div className="overflow-hidden">
               <div className="flex gap-4">
-                {[1, 2, 3].map((i) => (
+{[
+                    { nome: "Introdução ao Sistema", desc: "Visão geral das funcionalidades" },
+                    { nome: "Como Cadastrar Clientes", desc: "Passo a passo do cadastro" },
+                    { nome: "Gerando Relatórios", desc: "Exportação e análise de dados" },
+                    { nome: "Configurações Avançadas", desc: "Personalizando o sistema" },
+                    { nome: "Fluxo de Vendas", desc: "Pipeline e gestão comercial" },
+                    { nome: "Integrações e APIs", desc: "Conectando com outros sistemas" },
+                  ].map((video, i) => (
                   <motion.div key={i} className="flex-none w-[220px] md:w-[280px] lg:w-[320px]">
                     <Card className="border-border/50 overflow-hidden">
                       <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
@@ -348,8 +355,8 @@ export default function MeuSistemaEntregas() {
                         </div>
                       </Lens>
                       <CardContent className="p-3">
-                        <p className="font-medium text-sm text-foreground truncate">Vídeo de exemplo {i}</p>
-                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">Descrição do vídeo de instrução</p>
+                        <p className="font-medium text-sm text-foreground truncate">{video.nome}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{video.desc}</p>
                       </CardContent>
                     </Card>
                   </motion.div>
