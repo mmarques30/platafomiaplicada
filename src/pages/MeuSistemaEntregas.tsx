@@ -234,10 +234,10 @@ export default function MeuSistemaEntregas() {
           </div>
         ) : (
           <div className="opacity-50">
-            <div className="overflow-hidden">
-              <div className="flex gap-4" style={{ width: "100%" }}>
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex gap-4">
                 {["Dashboard Principal", "Gestão de Clientes", "Relatórios", "Configurações", "Kanban de Tarefas", "Módulo Financeiro"].map((nome, i) => (
-                  <div key={i} className="flex-none w-[calc(33.333%-11px)] min-w-[200px]">
+                  <div key={i} className="flex-none w-[240px] md:w-[300px] lg:w-[340px]">
                     <div className="relative rounded-xl overflow-hidden shadow-md border border-border/50">
                       <div className="aspect-video bg-muted flex items-center justify-center">
                         <Monitor className="h-10 w-10 text-muted-foreground/40" />
