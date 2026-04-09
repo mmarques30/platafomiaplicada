@@ -182,7 +182,7 @@ export default function MeuSistemaEntregas() {
       </section>
 
       {/* Telas do Sistema */}
-      <section className="space-y-3">
+      <section className="space-y-3 overflow-hidden">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-foreground">Telas do Sistema</h2>
