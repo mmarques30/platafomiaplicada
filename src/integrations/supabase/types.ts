@@ -4010,6 +4010,50 @@ export type Database = {
           },
         ]
       }
+      notas_projeto_business: {
+        Row: {
+          categoria: string | null
+          conteudo: string | null
+          contrato_id: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          ordem: number | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          categoria?: string | null
+          conteudo?: string | null
+          contrato_id: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          ordem?: number | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Update: {
+          categoria?: string | null
+          conteudo?: string | null
+          contrato_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          ordem?: number | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notas_projeto_business_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_business"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notificacoes: {
         Row: {
           created_at: string | null
