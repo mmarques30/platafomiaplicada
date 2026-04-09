@@ -1,32 +1,17 @@
 
 
-# Recriar página de Entregas do Business Parceria
+# Fix: Largura da página Sessões de Mentoria
 
-## O que será feito
+## Problema
 
-Reescrever `MentoriaEntregas.tsx` com uma visão simplificada e visual, similar à de `MeuSistemaEntregas`, adaptada ao ecossistema Business Parceria. A página terá 3 seções:
+A página `MentoriaSessoes.tsx` usa `container mx-auto max-w-6xl` (linhas 74, 81), limitando a largura a ~1152px e centralizando o conteúdo. As demais páginas do Business Parceria (Entregas, Documentos, Tarefas) usam `p-4 md:p-6` sem `container` nem `max-w`, ocupando toda a largura disponível.
 
-1. **Guia de Ferramentas** — tabela com documentos/SOPs/links de ferramentas ensinadas (dados de `processos_mapeados_business`)
-2. **Vídeos Passo a Passo** — carousel com cards de vídeos para replicar (dados de `videos_instrucao_business`)  
-3. **Guias e Recursos** — carousel com prints, screenshots e links de referência (dados de `telas_sistema_business`)
+## Solução
 
-Cada seção terá placeholder visual (opaco) quando sem dados, exatamente como no Business Sistemas.
+**Arquivo**: `src/pages/MentoriaSessoes.tsx`
 
-## Arquivo
+Substituir o wrapper `container mx-auto max-w-6xl` por `p-4 md:p-6` nas duas ocorrencias (loading state na linha 74 e conteudo principal na linha 81), alinhando com o padrão das demais páginas.
 
-| Arquivo | Ação |
-|---|---|
-| `src/pages/MentoriaEntregas.tsx` | Reescrever — substituir visão de etapas/status por visão de recursos |
-
-## Detalhes técnicos
-
-- Trocar o hook `useEntregasBusiness` por `useEntregasBusinessView` (que já retorna `processos`, `telas`, `videos`)
-- Manter `useContratosBusiness` + `useBusinessUserId` para obter o `contrato.id`
-- Usar Embla carousel para vídeos e telas (mesmo padrão do Sistemas)
-- Dialog para visualizar vídeo (embed Google Drive ou player) e tela (zoom com Lens)
-- Seção "Guia de Ferramentas": tabela compacta com ícone de tipo, título, descrição, botão Acessar/Baixar
-- Seção "Vídeos": cards com thumbnail, play overlay, título
-- Seção "Guias e Recursos": cards com screenshot/placeholder, título
-- Layout `overflow-hidden` + `min-w-0` para respeitar sidebar
-- Importar componentes: `Lens`, `useEmblaCarousel`, `getGoogleDriveEmbedUrl`, `PageTitle`
+- Linha 74: `container mx-auto py-8 px-4 max-w-6xl` → `p-4 md:p-6`
+- Linha 81: `container mx-auto py-8 px-4 max-w-6xl` → `p-4 md:p-6 space-y-6`
 
