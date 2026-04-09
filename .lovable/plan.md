@@ -1,39 +1,32 @@
 
 
-# Transformar página de Tarefas do mentorado em gerenciador completo
+# Recriar página de Entregas do Business Parceria
 
-## Situação atual
+## O que será feito
 
-A página `MentoriaTarefasDetalhes.tsx` (rota `/mentoria/tarefas`) é **somente leitura** para o mentorado Business Parceria. Ela mostra tarefas em tabela/kanban mas sem possibilidade de criar, editar, alterar status ou excluir. Apenas o admin consegue gerenciar tarefas via `TarefasAdmin`.
+Reescrever `MentoriaEntregas.tsx` com uma visão simplificada e visual, similar à de `MeuSistemaEntregas`, adaptada ao ecossistema Business Parceria. A página terá 3 seções:
 
-## Solução
+1. **Guia de Ferramentas** — tabela com documentos/SOPs/links de ferramentas ensinadas (dados de `processos_mapeados_business`)
+2. **Vídeos Passo a Passo** — carousel com cards de vídeos para replicar (dados de `videos_instrucao_business`)  
+3. **Guias e Recursos** — carousel com prints, screenshots e links de referência (dados de `telas_sistema_business`)
 
-Adicionar funcionalidades de CRUD completo na página do mentorado, permitindo:
+Cada seção terá placeholder visual (opaco) quando sem dados, exatamente como no Business Sistemas.
 
-1. **Botão "Nova Tarefa"** no header ao lado do toggle de visualização
-2. **Modal de criação/edição** reutilizando o `TarefaModal` existente (campos: título, descrição, tipo, prioridade, prazo, link externo)
-3. **Ações em cada tarefa**: editar, alterar status (dropdown), enviar entrega (upload), excluir (com confirmação)
-4. **Cards do Kanban clicáveis** para abrir edição
-5. **Drag-like status change** — botões rápidos de "Iniciar", "Concluir" em cada card/linha
+## Arquivo
 
-### Mudanças concretas
+| Arquivo | Ação |
+|---|---|
+| `src/pages/MentoriaEntregas.tsx` | Reescrever — substituir visão de etapas/status por visão de recursos |
 
-**Arquivo**: `src/pages/MentoriaTarefasDetalhes.tsx`
+## Detalhes técnicos
 
-- Importar `createTarefa`, `updateTarefa`, `deleteTarefa`, `uploadEntrega` do `useMentoriaTarefas` (atualmente só importa `tarefas` e `isLoading`)
-- Importar `TarefaModal` de `@/components/admin/mentoria/TarefaModal`
-- Importar `AlertDialog` para confirmação de exclusão
-- Adicionar `useAuth` para obter `user.id`
-- Adicionar estado local para modal e tarefa em edição
-- Adicionar botão "Nova Tarefa" no header
-- Na tabela: adicionar coluna "Ações" com botões de editar, mudar status, e excluir
-- No kanban: adicionar botão de ação em cada card (editar, mudar status)
-- Adicionar upload de entrega funcional (botão "Enviar" que abre file input)
-
-### Detalhes técnicos
-
-- `TarefaModal` já aceita `userId` como prop e funciona tanto para criar quanto editar
-- As mutations `createTarefa`, `updateTarefa`, `deleteTarefa` já existem no hook `useMentoriaTarefas`
-- Upload usa `uploadEntrega` do mesmo hook com bucket `entregas-mentoria`
-- O formulário simplificado para o mentorado omitirá campos de sessão/projeto (que são mais relevantes para o admin)
+- Trocar o hook `useEntregasBusiness` por `useEntregasBusinessView` (que já retorna `processos`, `telas`, `videos`)
+- Manter `useContratosBusiness` + `useBusinessUserId` para obter o `contrato.id`
+- Usar Embla carousel para vídeos e telas (mesmo padrão do Sistemas)
+- Dialog para visualizar vídeo (embed Google Drive ou player) e tela (zoom com Lens)
+- Seção "Guia de Ferramentas": tabela compacta com ícone de tipo, título, descrição, botão Acessar/Baixar
+- Seção "Vídeos": cards com thumbnail, play overlay, título
+- Seção "Guias e Recursos": cards com screenshot/placeholder, título
+- Layout `overflow-hidden` + `min-w-0` para respeitar sidebar
+- Importar componentes: `Lens`, `useEmblaCarousel`, `getGoogleDriveEmbedUrl`, `PageTitle`
 
