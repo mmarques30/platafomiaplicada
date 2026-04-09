@@ -1,82 +1,49 @@
 
 
-# Reestruturação da Seção de Documentos — Business/Business iAplicada
+# Fix: Importação de Contrato e Dados Desconfigurados na View do Mentorado
 
-## Resumo
+## Problema 1: Erro "add function" ao importar contrato DOCX
 
-Transformar a aba "Documentos" de uma listagem simples de arquivos e links em um hub documental completo com 3 seções: **Arquivos do Projeto** (upload/download de logos, PDFs, imagens), **Anotações** (editor tipo Notion por projeto), e **Links Importantes** (já existente). Aplicar tanto no painel admin quanto na visão do mentorado.
+A edge function `parse-documento-contrato` tenta enviar arquivos DOCX diretamente para o Gemini via `image_url`, mas o Gemini retorna erro 400: **"Unsupported MIME type: application/vnd.openxmlformats-officedocument.wordprocessingml.document"**. O Gemini só aceita imagens e PDFs via `image_url`, não DOCX.
 
-## Novas tabelas no banco
+**Solução**: Para arquivos DOCX, usar a biblioteca `mammoth` (disponível via npm/esm) no edge function para converter o DOCX em texto puro antes de enviar ao Gemini. Fluxo:
+- PDF → continua usando `image_url` (já funciona)
+- DOCX → extrair texto com `mammoth` → enviar como texto puro ao Gemini
+- TXT → continua decodificando direto (já funciona)
 
-| Tabela | Propósito |
-|---|---|
-| `notas_projeto_business` | Anotações estilo Notion por contrato — rich text, por projeto/seção |
+## Problema 2: Dados desconfigurados na view do mentorado
 
-```sql
-CREATE TABLE public.notas_projeto_business (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  contrato_id UUID REFERENCES contratos_business(id) ON DELETE CASCADE NOT NULL,
-  titulo TEXT NOT NULL DEFAULT 'Sem título',
-  conteudo TEXT DEFAULT '',  -- markdown/rich text
-  categoria TEXT DEFAULT 'geral',  -- 'geral', 'reuniao', 'decisao', 'tecnico'
-  ordem INTEGER DEFAULT 0,
-  created_by UUID REFERENCES auth.users(id),
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
+A interface `ContratoBusiness` define `modulos_selecionados` como `Array<{ nome: string; descricao?: string }>`, mas no banco os dados são **strings simples** (ex: `["CRM", "Financeiro"]`). Quando o código tenta renderizar `{m.nome || m}`, funciona por fallback, mas a tipagem está incorreta.
 
--- RLS
-ALTER TABLE notas_projeto_business ENABLE ROW LEVEL SECURITY;
--- Admin full access
-CREATE POLICY "Admin full access notas" ON notas_projeto_business
-  FOR ALL TO authenticated
-  USING (has_role(auth.uid(), 'admin'));
--- User read own notes
-CREATE POLICY "User read own notas" ON notas_projeto_business
-  FOR SELECT TO authenticated
-  USING (contrato_id IN (SELECT id FROM contratos_business WHERE user_id = auth.uid()));
-```
+O problema mais provável de "valor, exclamação" é que os valores numéricos (como `valor_contrato: 8997.00`) estão sendo exibidos com formatação inconsistente, ou campos nulos mostram artefatos visuais. Além disso, `tempo_consultoria_meses` renderiza como template string `` `${contrato.tempo_consultoria_meses} meses` `` — se for `null` ou `undefined`, mostra "undefined meses".
 
-Atualizar `documentos_business` para aceitar novos tipos de arquivo (imagens, logos):
-- Adicionar tipo `'imagem'` e `'logo'` ao campo `tipo` (já é TEXT livre, sem enum, então basta usar no código)
+**Solução**: Adicionar guards de null/undefined em todos os campos renderizados no `MeuSistemaDocumentos.tsx` e corrigir a tipagem de `modulos_selecionados`.
 
-## Alterações no bucket de storage
-
-O bucket `contratos-business` já existe e suporta qualquer tipo de arquivo. Ampliar os `accept` no upload para incluir `.png,.jpg,.jpeg,.gif,.svg,.webp,.zip`.
-
-## Arquivos a criar/editar
+## Arquivos a editar
 
 | Arquivo | Ação |
 |---|---|
-| **Migration SQL** | Criar tabela `notas_projeto_business` |
-| `src/hooks/useNotasProjetoBusiness.ts` | **Criar** — hook CRUD para notas |
-| `src/components/admin/business/DocumentosBusinessManager.tsx` | **Editar** — reestruturar em 3 sub-abas: Arquivos, Anotações, Links |
-| `src/components/admin/business/NotasProjetoSection.tsx` | **Criar** — componente de anotações estilo Notion (criar/editar/excluir notas em markdown) |
-| `src/components/admin/business/ArquivosProjetoSection.tsx` | **Criar** — seção de upload/gerenciamento de arquivos expandida (aceita imagens, PDFs, logos, zip) |
-| `src/pages/MentoriaDocumentos.tsx` | **Editar** — reestruturar com as mesmas 3 abas (Arquivos, Anotações, Links) na visão do mentorado |
+| `supabase/functions/parse-documento-contrato/index.ts` | **Editar** — usar mammoth para DOCX, manter image_url para PDF |
+| `src/pages/MeuSistemaDocumentos.tsx` | **Editar** — adicionar guards de null em todos os campos, corrigir formatação |
+| `src/hooks/useContratosBusiness.tsx` | **Editar** — corrigir tipo de `modulos_selecionados` para `Array<string | { nome: string }>` |
 
-## Detalhes da interface
+## Detalhes técnicos
 
-### Admin (`DocumentosBusinessManager`)
-Substituir as 2 tabs atuais (Documentos / Links) por 3:
+### Edge Function — DOCX handling
+```typescript
+// Para DOCX: converter para texto com mammoth
+import mammoth from "npm:mammoth@1.8.0";
 
-1. **Arquivos** — Upload expandido aceitando PDF, DOCX, imagens (PNG/JPG/SVG), ZIP. Tipos: Contrato, Anexo, Solução, Logo, Imagem, Outro. Grid visual com preview de imagens e ícones por tipo.
+if (mimeType.includes('wordprocessingml') || fileName.endsWith('.docx')) {
+  const buffer = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
+  const result = await mammoth.extractRawText({ buffer });
+  return new Response(JSON.stringify({ texto: result.value }), { headers: ... });
+}
+// Para PDF: continua usando image_url com Gemini
+```
 
-2. **Anotações** — Lista de notas com título editável e conteúdo em textarea (markdown). Categorias: Geral, Reunião, Decisão, Técnico. Botão "Nova Anotação" cria uma nota vazia. Cada nota é um card expansível com editor inline.
-
-3. **Links** — Mantém o comportamento atual sem alterações.
-
-### Mentorado (`MentoriaDocumentos`)
-Substituir as 3 tabs atuais (Downloads / Links / Reports) por 4:
-
-1. **Arquivos** — Downloads + visualização de imagens/logos
-2. **Anotações** — Leitura das notas criadas pelo admin (somente leitura)
-3. **Links** — Mantém comportamento atual
-4. **Reports** — Mantém comportamento atual
-
-### Hook `useNotasProjetoBusiness`
-- `useQuery` para listar notas por `contrato_id`
-- `createNota` mutation
-- `updateNota` mutation (título + conteúdo)
-- `deleteNota` mutation
+### MeuSistemaDocumentos — Guards
+- `tempo_consultoria_meses`: mostrar "—" se null
+- `valor_contrato`, `valor_entrada`, `valor_parcela`: usar `formatCurrency` que já trata null
+- Todos os InfoItem já usam `value || "—"`, mas template strings como `` `${x} meses` `` precisam de guard
 
