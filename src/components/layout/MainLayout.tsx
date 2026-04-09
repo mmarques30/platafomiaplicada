@@ -79,7 +79,7 @@ export function MainLayout() {
         )}>
           <div className="dot-grid-bg" />
           <AppSidebar />
-          <div className="flex-1 flex flex-col relative z-[1]">
+          <div className="flex-1 flex flex-col relative z-[1] min-w-0">
             <main className="flex-1 overflow-x-hidden">
               <AnimatePresence mode="wait">
                 <PageTransition key={location.pathname}>
