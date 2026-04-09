@@ -1,76 +1,52 @@
-import { useState, useMemo } from "react";
-import { Download, Eye, ChevronDown, ChevronUp, Calendar, Shield, DollarSign, Package } from "lucide-react";
+import { useState } from "react";
+import { FileText, Download, Eye, ChevronDown, ChevronUp, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useDocumentosBusiness } from "@/hooks/useDocumentosBusiness";
+import { useLinksBusiness } from "@/hooks/useLinksBusiness";
+import { useNotasProjetoBusiness } from "@/hooks/useNotasProjetoBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { downloadUrl } from "@/lib/download";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { toast } from "sonner";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { ArquivosProjetoSection } from "@/components/admin/business/ArquivosProjetoSection";
+import { NotasProjetoSection } from "@/components/admin/business/NotasProjetoSection";
 
-const tipoLabel: Record<string, string> = {
-  proposta: "Proposta",
-  transcricao: "Transcrição",
-  anexo: "Anexo",
-  solucao: "Solução",
-  outro: "Outro",
-};
+const iconeOptions = [
+  { value: "link", Icon: ExternalLink },
+  { value: "drive", Icon: HardDrive },
+  { value: "folder", Icon: FolderOpen },
+  { value: "tool", Icon: Wrench },
+  { value: "video", Icon: Video },
+  { value: "doc", Icon: FileText },
+  { value: "spreadsheet", Icon: Table },
+];
 
-const tipoBadgeVariant: Record<string, "default" | "secondary" | "outline"> = {
-  proposta: "default",
-  transcricao: "secondary",
-  anexo: "outline",
-  solucao: "default",
-  outro: "secondary",
+const getIconComponent = (icone: string) => {
+  const found = iconeOptions.find(o => o.value === icone);
+  return found?.Icon || ExternalLink;
 };
 
 export default function MeuSistemaDocumentos() {
   const userId = useBusinessUserId();
   const { contrato, reports, isLoading } = useContratosBusiness(userId);
-  const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id);
-  const [contratoOpen, setContratoOpen] = useState(true);
+  const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id, false);
+  const { links, isLoading: isLoadingLinks } = useLinksBusiness(contrato?.id);
+  const { notas, isLoading: isLoadingNotas } = useNotasProjetoBusiness(contrato?.id);
+  const [contratoOpen, setContratoOpen] = useState(false);
   const [viewingReport, setViewingReport] = useState<{ titulo: string; html: string } | null>(null);
-  const [filtroTipo, setFiltroTipo] = useState("todos");
 
-  const documentosFiltrados = useMemo(() => {
-    let filtered = documentos;
-    if (filtroTipo !== "todos") {
-      filtered = filtered.filter((d) => d.tipo === filtroTipo);
-    }
-    return filtered.sort((a, b) => new Date(b.created_at || "").getTime() - new Date(a.created_at || "").getTime());
-  }, [documentos, filtroTipo]);
-  const handleDownloadDoc = async (arquivoUrl: string, titulo: string) => {
-    try {
-      const { data } = await supabase.storage
-        .from("contratos-business")
-        .createSignedUrl(arquivoUrl, 3600);
+  const allLoading = isLoading || isLoadingDocs || isLoadingLinks || isLoadingNotas;
 
-      if (data?.signedUrl) {
-        downloadUrl(data.signedUrl, titulo);
-      } else {
-        toast.error("Não foi possível gerar link de download");
-      }
-    } catch {
-      toast.error("Erro ao baixar documento");
-    }
-  };
-
-  const handleDownloadReport = (arquivoUrl: string, titulo: string) => {
-    downloadUrl(arquivoUrl, titulo);
-  };
-
-  if (isLoading || isLoadingDocs) {
+  if (allLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -92,133 +68,138 @@ export default function MeuSistemaDocumentos() {
   const formatCurrency = (v: number | null) =>
     v != null ? v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—";
 
+  const arquivosCount = documentos.filter((d) => d.arquivo_url).length;
+
+  const handleDownloadReport = (arquivoUrl: string, titulo: string) => {
+    downloadUrl(arquivoUrl, titulo);
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       <PageTitle primary="Documentos" />
 
-      {/* Reports */}
-      {reports.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">Reports</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {reports.map((report) => (
-              <Card key={report.id} className="border-border/50">
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">{report.titulo}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(report.data_envio)}
-                        {report.periodo_referencia && ` · ${report.periodo_referencia}`}
-                      </p>
-                    </div>
-                    {report.gerado_por_ia && (
-                      <Badge variant="secondary" className="text-[10px] shrink-0">IA</Badge>
-                    )}
-                  </div>
-                  {report.resumo_executivo && (
-                    <p className="text-xs text-muted-foreground line-clamp-2">{report.resumo_executivo}</p>
-                  )}
-                  <div className="flex gap-2 pt-1">
-                    {report.conteudo_html && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-7"
-                        onClick={() => setViewingReport({ titulo: report.titulo, html: report.conteudo_html! })}
-                      >
-                        <Eye className="h-3 w-3 mr-1" /> Ver
-                      </Button>
-                    )}
-                    {report.arquivo_url && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-7"
-                        onClick={() => handleDownloadReport(report.arquivo_url!, report.titulo)}
-                      >
-                        <Download className="h-3 w-3 mr-1" /> Baixar
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
+      <Tabs defaultValue="arquivos" className="space-y-4">
+        <TabsList className="bg-muted/40 border-0 rounded-lg p-1">
+          <TabsTrigger value="arquivos" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <FileText className="h-4 w-4" />
+            Arquivos ({arquivosCount})
+          </TabsTrigger>
+          <TabsTrigger value="anotacoes" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <StickyNote className="h-4 w-4" />
+            Anotações ({notas.length})
+          </TabsTrigger>
+          <TabsTrigger value="links" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <Link2 className="h-4 w-4" />
+            Links ({links.length})
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <FileText className="h-4 w-4" />
+            Reports ({reports.length})
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Documentos do Projeto - Tabela */}
-      {documentos.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-semibold text-foreground">Documentos do Projeto</h2>
-            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-              <SelectTrigger className="w-[160px] h-8 text-xs">
-                <SelectValue placeholder="Filtrar tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos</SelectItem>
-                {Object.entries(tipoLabel).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Card className="border-border/50">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead className="text-right">Ação</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {documentosFiltrados.map((doc) => (
-                  <TableRow key={doc.id}>
-                    <TableCell className="font-medium text-sm">{doc.titulo}</TableCell>
-                    <TableCell>
-                      <Badge variant={tipoBadgeVariant[doc.tipo] || "secondary"} className="text-[10px]">
-                        {tipoLabel[doc.tipo] || doc.tipo}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatDate(doc.created_at)}</TableCell>
-                    <TableCell className="text-right">
-                      {doc.arquivo_url && (
+        <TabsContent value="arquivos" className="mt-4">
+          <ArquivosProjetoSection contratoId={contrato.id} readOnly />
+        </TabsContent>
+
+        <TabsContent value="anotacoes" className="mt-4">
+          <NotasProjetoSection contratoId={contrato.id} readOnly />
+        </TabsContent>
+
+        <TabsContent value="links" className="space-y-4 mt-4">
+          {links.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Link2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">Nenhum link disponível</h3>
+                <p className="text-muted-foreground">Links importantes aparecerão aqui quando forem adicionados.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {links.map((link) => {
+                const IconComponent = getIconComponent(link.icone);
+                return (
+                  <Card key={link.id} className="hover:shadow-md transition-shadow cursor-pointer group" onClick={() => window.open(link.url, "_blank")}>
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                          <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                            <IconComponent className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-base mb-1 truncate group-hover:text-primary transition-colors">{link.titulo}</h3>
+                            {link.descricao && <p className="text-sm text-muted-foreground truncate">{link.descricao}</p>}
+                          </div>
+                        </div>
+                        <ExternalLink className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-4 mt-4">
+          {reports.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">Nenhum report disponível</h3>
+                <p className="text-muted-foreground">Reports do projeto aparecerão aqui quando forem gerados.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {reports.map((report) => (
+                <Card key={report.id} className="border-border/50">
+                  <CardContent className="p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">{report.titulo}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(report.data_envio)}
+                          {report.periodo_referencia && ` · ${report.periodo_referencia}`}
+                        </p>
+                      </div>
+                      {report.gerado_por_ia && (
+                        <Badge variant="secondary" className="text-[10px] shrink-0">IA</Badge>
+                      )}
+                    </div>
+                    {report.resumo_executivo && (
+                      <p className="text-xs text-muted-foreground line-clamp-2">{report.resumo_executivo}</p>
+                    )}
+                    <div className="flex gap-2 pt-1">
+                      {report.conteudo_html && (
                         <Button
                           variant="outline"
                           size="sm"
                           className="text-xs h-7"
-                          onClick={() => handleDownloadDoc(doc.arquivo_url!, doc.titulo)}
+                          onClick={() => setViewingReport({ titulo: report.titulo, html: report.conteudo_html! })}
+                        >
+                          <Eye className="h-3 w-3 mr-1" /> Ver
+                        </Button>
+                      )}
+                      {report.arquivo_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs h-7"
+                          onClick={() => handleDownloadReport(report.arquivo_url!, report.titulo)}
                         >
                           <Download className="h-3 w-3 mr-1" /> Baixar
                         </Button>
                       )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {documentosFiltrados.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-6">
-                      Nenhum documento encontrado para este filtro.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </Card>
-        </section>
-      )}
-
-      {reports.length === 0 && documentos.length === 0 && (
-        <Card className="border-dashed">
-          <CardContent className="p-8 text-center text-muted-foreground">
-            <p>Nenhum documento ou report disponível ainda.</p>
-          </CardContent>
-        </Card>
-      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Dados do Contrato - Collapsible */}
       <Collapsible open={contratoOpen} onOpenChange={setContratoOpen}>
@@ -231,7 +212,6 @@ export default function MeuSistemaDocumentos() {
         <CollapsibleContent>
           <Card className="mt-2 border-border/50">
             <CardContent className="p-4 md:p-6 space-y-4">
-              {/* Empresa */}
               <div className="grid gap-3 sm:grid-cols-2">
                 <InfoItem label="Empresa" value={contrato.nome_empresa || contrato.razao_social} />
                 <InfoItem label="CNPJ" value={contrato.cnpj} />
@@ -240,10 +220,7 @@ export default function MeuSistemaDocumentos() {
                 <InfoItem label="Setor" value={contrato.setor_atuacao} />
                 <InfoItem label="Endereço" value={contrato.endereco} />
               </div>
-
               <Separator />
-
-              {/* Datas e Valores */}
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <InfoItem label="Início" value={formatDate(contrato.data_inicio)} icon={<Calendar className="h-3.5 w-3.5" />} />
                 <InfoItem label="Fim" value={formatDate(contrato.data_fim)} icon={<Calendar className="h-3.5 w-3.5" />} />
@@ -252,10 +229,7 @@ export default function MeuSistemaDocumentos() {
                 <InfoItem label="Entrada" value={formatCurrency(contrato.valor_entrada ?? null)} />
                 <InfoItem label="Parcelas" value={contrato.numero_parcelas ? `${contrato.numero_parcelas}x ${formatCurrency(contrato.valor_parcela ?? null)}` : "—"} />
               </div>
-
               <Separator />
-
-              {/* Módulos */}
               {contrato.modulos_selecionados && (contrato.modulos_selecionados as any[]).length > 0 && (
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
@@ -268,8 +242,6 @@ export default function MeuSistemaDocumentos() {
                   </div>
                 </div>
               )}
-
-              {/* Garantias */}
               {contrato.garantias && (contrato.garantias as string[]).length > 0 && (
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
