@@ -3844,6 +3844,51 @@ export type Database = {
         }
         Relationships: []
       }
+      metas_academy: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          etapa_vinculada: number | null
+          id: string
+          objetivo_vinculado: string | null
+          prazo: string | null
+          prioridade: string | null
+          status: string | null
+          tipo: string | null
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          etapa_vinculada?: number | null
+          id?: string
+          objetivo_vinculado?: string | null
+          prazo?: string | null
+          prioridade?: string | null
+          status?: string | null
+          tipo?: string | null
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          etapa_vinculada?: number | null
+          id?: string
+          objetivo_vinculado?: string | null
+          prazo?: string | null
+          prioridade?: string | null
+          status?: string | null
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       metodos_aplicar: {
         Row: {
           ativo: boolean | null
