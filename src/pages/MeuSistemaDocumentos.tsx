@@ -258,9 +258,16 @@ export default function MeuSistemaDocumentos() {
           )}
         </TabsContent>
 
-        <TabsContent value="contrato" className="mt-4">
+        <TabsContent value="contrato" className="mt-4 space-y-4">
+          {/* Dados da Empresa */}
           <Card className="border-border/50">
-            <CardContent className="p-4 md:p-6 space-y-4">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-primary" />
+                Dados da Empresa
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
               <div className="grid gap-3 sm:grid-cols-2">
                 <InfoItem label="Empresa" value={contrato.nome_empresa || contrato.razao_social} />
                 <InfoItem label="CNPJ" value={contrato.cnpj} />
@@ -269,44 +276,65 @@ export default function MeuSistemaDocumentos() {
                 <InfoItem label="Setor" value={contrato.setor_atuacao} />
                 <InfoItem label="Endereço" value={contrato.endereco} />
               </div>
-              <Separator />
+            </CardContent>
+          </Card>
+
+          {/* Detalhes do Contrato */}
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Detalhes do Contrato
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                <InfoItem label="Início" value={formatDate(contrato.data_inicio)} icon={<Calendar className="h-3.5 w-3.5" />} />
-                <InfoItem label="Fim" value={formatDate(contrato.data_fim)} icon={<Calendar className="h-3.5 w-3.5" />} />
+                <InfoItem label="Início" value={formatDate(contrato.data_inicio)} />
+                <InfoItem label="Fim" value={formatDate(contrato.data_fim)} />
                 <InfoItem label="Duração" value={contrato.tempo_consultoria_meses ? `${contrato.tempo_consultoria_meses} meses` : undefined} />
-                <InfoItem label="Valor" value={formatCurrency(contrato.valor_contrato)} icon={<DollarSign className="h-3.5 w-3.5" />} />
+                <InfoItem label="Valor" value={formatCurrency(contrato.valor_contrato)} />
                 <InfoItem label="Entrada" value={formatCurrency(contrato.valor_entrada ?? null)} />
                 <InfoItem label="Parcelas" value={contrato.numero_parcelas ? `${contrato.numero_parcelas}x ${formatCurrency(contrato.valor_parcela ?? null)}` : "—"} />
               </div>
-              <Separator />
-              {contrato.modulos_selecionados && (contrato.modulos_selecionados as any[]).length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                    <Package className="h-3.5 w-3.5" /> Módulos Contratados
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {(contrato.modulos_selecionados as any[]).map((m: any, i: number) => (
-                      <Badge key={i} variant="outline" className="text-xs">{m.nome || m}</Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {contrato.garantias && (contrato.garantias as string[]).length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                    <Shield className="h-3.5 w-3.5" /> Garantias
-                  </p>
-                  <ul className="text-sm text-foreground space-y-1">
-                    {(contrato.garantias as string[]).map((g, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-primary mt-0.5">•</span> {g}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </CardContent>
           </Card>
+
+          {/* Módulos e Garantias */}
+          {((contrato.modulos_selecionados && (contrato.modulos_selecionados as any[]).length > 0) ||
+            (contrato.garantias && (contrato.garantias as string[]).length > 0)) && (
+            <Card className="border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Package className="h-4 w-4 text-primary" />
+                  Módulos e Garantias
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-4">
+                {contrato.modulos_selecionados && (contrato.modulos_selecionados as any[]).length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-2">Módulos Contratados</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(contrato.modulos_selecionados as any[]).map((m: any, i: number) => (
+                        <Badge key={i} variant="outline" className="text-xs">{m.nome || m}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {contrato.garantias && (contrato.garantias as string[]).length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-2">Garantias</p>
+                    <ul className="text-sm text-foreground space-y-1">
+                      {(contrato.garantias as string[]).map((g, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" /> {g}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
 
