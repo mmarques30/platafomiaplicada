@@ -1,36 +1,39 @@
 
 
-# Elevar MentoriaDocumentos ao mesmo nível de MeuSistemaDocumentos
+# Transformar página de Tarefas do mentorado em gerenciador completo
 
 ## Situação atual
 
-A página `MentoriaDocumentos.tsx` (Business Parceria) é básica: tem apenas tabs de Arquivos, Anotações, Links e Reports, sem stat cards, sem aba Contrato, sem seção de Evolução/Atividade/Insights. Já a página `MeuSistemaDocumentos.tsx` (Business Sistemas) tem tudo isso.
+A página `MentoriaTarefasDetalhes.tsx` (rota `/mentoria/tarefas`) é **somente leitura** para o mentorado Business Parceria. Ela mostra tarefas em tabela/kanban mas sem possibilidade de criar, editar, alterar status ou excluir. Apenas o admin consegue gerenciar tarefas via `TarefasAdmin`.
 
 ## Solução
 
-Reescrever `MentoriaDocumentos.tsx` trazendo todas as seções que existem em `MeuSistemaDocumentos.tsx`, mantendo a funcionalidade de CRUD de links que já foi adicionada:
+Adicionar funcionalidades de CRUD completo na página do mentorado, permitindo:
 
-1. **Stat cards** no topo (Arquivos, Anotações, Links, Reports) com o padrão verde da marca
-2. **Aba Contrato** com dados da empresa, detalhes do contrato, módulos e garantias (3 cards organizados)
-3. **Aba Reports** com cards de visualizar/baixar (igual ao Sistemas)
-4. **Seção inferior** com 3 cards: Evolução das Entregas (progress bars), Atividade Recente (timeline), Insights do Projeto
-5. **Manter** todo o CRUD de links já implementado (criar, editar, excluir)
-6. **Remover** botão "Voltar para Mentoria" e usar `PageTitle` consistente
+1. **Botão "Nova Tarefa"** no header ao lado do toggle de visualização
+2. **Modal de criação/edição** reutilizando o `TarefaModal` existente (campos: título, descrição, tipo, prioridade, prazo, link externo)
+3. **Ações em cada tarefa**: editar, alterar status (dropdown), enviar entrega (upload), excluir (com confirmação)
+4. **Cards do Kanban clicáveis** para abrir edição
+5. **Drag-like status change** — botões rápidos de "Iniciar", "Concluir" em cada card/linha
 
-## Arquivo
+### Mudanças concretas
 
-| Arquivo | Acao |
-|---|---|
-| `src/pages/MentoriaDocumentos.tsx` | Reescrever com a mesma estrutura do MeuSistemaDocumentos |
+**Arquivo**: `src/pages/MentoriaTarefasDetalhes.tsx`
 
-## Detalhes tecnicos
+- Importar `createTarefa`, `updateTarefa`, `deleteTarefa`, `uploadEntrega` do `useMentoriaTarefas` (atualmente só importa `tarefas` e `isLoading`)
+- Importar `TarefaModal` de `@/components/admin/mentoria/TarefaModal`
+- Importar `AlertDialog` para confirmação de exclusão
+- Adicionar `useAuth` para obter `user.id`
+- Adicionar estado local para modal e tarefa em edição
+- Adicionar botão "Nova Tarefa" no header
+- Na tabela: adicionar coluna "Ações" com botões de editar, mudar status, e excluir
+- No kanban: adicionar botão de ação em cada card (editar, mudar status)
+- Adicionar upload de entrega funcional (botão "Enviar" que abre file input)
 
-- Importar `reports`, `progresso` do `useContratosBusiness` (atualmente so usa `contrato` e `isLoading`)
-- Adicionar `useDocumentosBusiness` para contagem de arquivos
-- Reutilizar componentes: `PageTitle`, `ProgressBar`, `Badge`, `ScrollArea`
-- Adicionar aba "Contrato" com `InfoItem` local (mesmo pattern do Sistemas)
-- Adicionar seção de 3 cards abaixo das tabs: Evolução, Atividade Recente, Insights
-- Cronograma calculado com `differenceInDays` (mesmo do Sistemas)
-- Dialog de visualização de report HTML (mesmo do Sistemas)
-- Manter link CRUD intacto (dialog, alertdialog, mutations)
+### Detalhes técnicos
+
+- `TarefaModal` já aceita `userId` como prop e funciona tanto para criar quanto editar
+- As mutations `createTarefa`, `updateTarefa`, `deleteTarefa` já existem no hook `useMentoriaTarefas`
+- Upload usa `uploadEntrega` do mesmo hook com bucket `entregas-mentoria`
+- O formulário simplificado para o mentorado omitirá campos de sessão/projeto (que são mais relevantes para o admin)
 
