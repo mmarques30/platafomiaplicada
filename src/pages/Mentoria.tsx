@@ -77,7 +77,7 @@ export default function Mentoria() {
 
   useEffect(() => {
     if (!isBusinessParceria) return;
-    const sectionIds = ['visao-geral', 'evolucao'];
+    const sectionIds = ['visao-geral', 'roadmap', 'evolucao'];
     const observers = sectionIds.map(id => {
       const el = document.getElementById(`sec-${id}`);
       if (!el) return null;
@@ -135,8 +135,8 @@ export default function Mentoria() {
     }
   };
 
-  const sectionLabels = ['Visão Geral', 'Evolução'];
-  const sectionIds = ['visao-geral', 'evolucao'];
+  const sectionLabels = ['Visão Geral', 'Roadmap', 'Evolução'];
+  const sectionIds = ['visao-geral', 'roadmap', 'evolucao'];
 
   return (
     <div className="container mx-auto py-4 md:py-8 px-4 max-w-7xl">
@@ -185,7 +185,10 @@ export default function Mentoria() {
             <BusinessVisaoGeralGrid />
           </section>
 
-
+          <section id="sec-roadmap" className="scroll-mt-28 mt-10 space-y-4">
+            <h2 className="text-lg font-semibold text-foreground">Roadmap</h2>
+            <AcademyRoadmapEducacional />
+          </section>
 
           <section id="sec-evolucao" className="scroll-mt-28 mt-10 space-y-4">
             <h2 className="text-lg font-semibold text-foreground">Evolução Aprendizado</h2>
