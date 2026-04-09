@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useCreateMetodo, useUpdateMetodo } from "@/hooks/admin/useBibliotecas";
 import { FerramentasSelectorHibrido } from "./FerramentasSelectorHibrido";
-import { METODOS_CATEGORIAS } from "@/lib/metodosCategories";
+import { METODOS_CATEGORIAS, ARSENAL_TIPOS, ARSENAL_FERRAMENTAS, ARSENAL_NIVEIS } from "@/lib/metodosCategories";
 
 interface MetodoModalProps {
   open: boolean;
@@ -24,6 +24,9 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
   const updateMetodo = useUpdateMetodo();
   
   const categoriaValue = watch("categoria");
+  const tipoValue = watch("tipo");
+  const ferramentaValue = watch("ferramenta");
+  const nivelValue = watch("nivel");
 
   useEffect(() => {
     if (metodo) {
@@ -34,7 +37,12 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
         titulo: "",
         descricao: "",
         categoria: "",
+        tipo: "skill",
+        ferramenta: "",
+        nivel: "intermediario",
+        imagem_url: "",
         link_documento: "",
+        template: "",
         comentarios: "",
         ferramentas_recomendadas: [],
         ativo: true,
@@ -47,6 +55,7 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
     const metodoData = {
       ...data,
       ferramentas_recomendadas: ferramentasRecomendadas,
+      ferramenta: data.tipo === "skill" ? data.ferramenta || null : null,
     };
 
     if (metodo) {
@@ -63,9 +72,67 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{metodo ? "Editar" : "Novo"} Método</DialogTitle>
+          <DialogTitle>{metodo ? "Editar" : "Novo"} Item — Arsenal IA</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Tipo */}
+          <div>
+            <Label>Tipo *</Label>
+            <Select
+              value={tipoValue || "skill"}
+              onValueChange={(value) => setValue("tipo", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                {ARSENAL_TIPOS.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Ferramenta (só para skills) */}
+          {tipoValue === "skill" && (
+            <div>
+              <Label>Ferramenta *</Label>
+              <Select
+                value={ferramentaValue || ""}
+                onValueChange={(value) => setValue("ferramenta", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a ferramenta" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ARSENAL_FERRAMENTAS.map((f) => (
+                    <SelectItem key={f.value} value={f.value}>
+                      {f.icon} {f.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Nível */}
+          <div>
+            <Label>Nível</Label>
+            <Select
+              value={nivelValue || "intermediario"}
+              onValueChange={(value) => setValue("nivel", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o nível" />
+              </SelectTrigger>
+              <SelectContent>
+                {ARSENAL_NIVEIS.map((n) => (
+                  <SelectItem key={n.value} value={n.value}>{n.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div>
             <Label htmlFor="titulo">Título *</Label>
             <Input id="titulo" {...register("titulo", { required: true })} />
@@ -77,7 +144,7 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
           </div>
 
           <div>
-            <Label htmlFor="categoria">Categoria *</Label>
+            <Label htmlFor="categoria">Categoria</Label>
             <Select
               value={categoriaValue || ""}
               onValueChange={(value) => setValue("categoria", value)}
@@ -87,9 +154,7 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
               </SelectTrigger>
               <SelectContent>
                 {METODOS_CATEGORIAS.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -101,11 +166,8 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
               id="template" 
               {...register("template")} 
               rows={5}
-              placeholder="Cole aqui o prompt de personalização, template ou instruções do método..."
+              placeholder="Cole aqui o prompt, template ou instruções..."
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              Conteúdo do prompt ou template que será usado diretamente na plataforma
-            </p>
           </div>
 
           <div>
@@ -116,8 +178,18 @@ export function MetodoModal({ open, onOpenChange, metodo }: MetodoModalProps) {
               placeholder="https://docs.google.com/..." 
               {...register("link_documento")} 
             />
+          </div>
+
+          <div>
+            <Label htmlFor="imagem_url">URL da Imagem (opcional)</Label>
+            <Input 
+              id="imagem_url" 
+              type="url"
+              placeholder="https://..." 
+              {...register("imagem_url")} 
+            />
             <p className="text-xs text-muted-foreground mt-1">
-              Link para documento externo (Google Docs, Notion, PDF, etc.), se houver
+              Imagem de capa para exibição na biblioteca
             </p>
           </div>
 

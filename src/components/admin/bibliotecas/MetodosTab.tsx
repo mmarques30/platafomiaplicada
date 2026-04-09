@@ -8,7 +8,7 @@ import { useMetodosAdmin, useDeleteMetodo } from "@/hooks/admin/useBibliotecas";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FilterBar } from "../content/FilterBar";
-import { METODOS_CATEGORIAS } from "@/lib/metodosCategories";
+import { ARSENAL_TIPOS, ARSENAL_FERRAMENTAS } from "@/lib/metodosCategories";
 
 export function MetodosTab() {
   const { data: metodos, isLoading } = useMetodosAdmin();
@@ -17,8 +17,8 @@ export function MetodosTab() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const deleteMetodo = useDeleteMetodo();
   
-  const [categoriaFilter, setCategoriaFilter] = useState('todas');
-  const [documentoFilter, setDocumentoFilter] = useState('todos');
+  const [tipoFilter, setTipoFilter] = useState('todos');
+  const [ferramentaFilter, setFerramentaFilter] = useState('todas');
   const [statusFilter, setStatusFilter] = useState('todos');
 
   const handleEdit = (metodo: any) => {
@@ -40,17 +40,15 @@ export function MetodosTab() {
 
   const filteredMetodos = useMemo(() => {
     return metodos?.filter(m => {
-      const matchesCategoria = categoriaFilter === 'todas' || m.categoria === categoriaFilter;
-      const matchesDocumento = documentoFilter === 'todos' || 
-        (documentoFilter === 'com_documento' && m.link_documento) || 
-        (documentoFilter === 'sem_documento' && !m.link_documento);
+      const matchesTipo = tipoFilter === 'todos' || (m.tipo || 'skill') === tipoFilter;
+      const matchesFerramenta = ferramentaFilter === 'todas' || m.ferramenta === ferramentaFilter;
       const matchesStatus = statusFilter === 'todos' || 
         (statusFilter === 'ativo' && m.ativo) || 
         (statusFilter === 'inativo' && !m.ativo);
       
-      return matchesCategoria && matchesDocumento && matchesStatus;
+      return matchesTipo && matchesFerramenta && matchesStatus;
     }) || [];
-  }, [metodos, categoriaFilter, documentoFilter, statusFilter]);
+  }, [metodos, tipoFilter, ferramentaFilter, statusFilter]);
 
   if (isLoading) {
     return (
@@ -67,27 +65,26 @@ export function MetodosTab() {
       <FilterBar
         filters={[
           {
-            id: 'categoria',
-            label: 'Categoria',
-            placeholder: 'Todas as categorias',
+            id: 'tipo',
+            label: 'Tipo',
+            placeholder: 'Todos os tipos',
             options: [
-              { value: 'todas', label: 'Todas as categorias' },
-              ...METODOS_CATEGORIAS.map(c => ({ value: c, label: c }))
+              { value: 'todos', label: 'Todos os tipos' },
+              ...ARSENAL_TIPOS.map(t => ({ value: t.value, label: t.label }))
             ],
-            value: categoriaFilter,
-            onChange: setCategoriaFilter
+            value: tipoFilter,
+            onChange: setTipoFilter
           },
           {
-            id: 'documento',
-            label: 'Documento',
-            placeholder: 'Todos',
+            id: 'ferramenta',
+            label: 'Ferramenta',
+            placeholder: 'Todas',
             options: [
-              { value: 'todos', label: 'Todos' },
-              { value: 'com_documento', label: 'Com Documento' },
-              { value: 'sem_documento', label: 'Sem Documento' }
+              { value: 'todas', label: 'Todas as ferramentas' },
+              ...ARSENAL_FERRAMENTAS.map(f => ({ value: f.value, label: `${f.icon} ${f.label}` }))
             ],
-            value: documentoFilter,
-            onChange: setDocumentoFilter
+            value: ferramentaFilter,
+            onChange: setFerramentaFilter
           },
           {
             id: 'status',
@@ -107,7 +104,7 @@ export function MetodosTab() {
         actionButton={
           <Button onClick={handleNew}>
             <Plus className="mr-2 h-4 w-4" />
-            Novo Método
+            Novo Item
           </Button>
         }
       />
@@ -115,81 +112,78 @@ export function MetodosTab() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[220px]">Título</TableHead>
-            <TableHead className="w-[150px]">Categoria</TableHead>
-            <TableHead className="w-[100px]">Documento</TableHead>
-            <TableHead className="w-[100px]">Exemplo</TableHead>
-            <TableHead className="w-[100px]">Status</TableHead>
+            <TableHead className="w-[200px]">Título</TableHead>
+            <TableHead className="w-[100px]">Tipo</TableHead>
+            <TableHead className="w-[120px]">Ferramenta</TableHead>
+            <TableHead className="w-[100px]">Nível</TableHead>
+            <TableHead className="w-[80px]">Doc</TableHead>
+            <TableHead className="w-[80px]">Status</TableHead>
             <TableHead className="w-[100px]">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredMetodos?.map((metodo) => (
-            <TableRow key={metodo.id}>
-              <TableCell className="w-[220px] font-medium">{metodo.titulo}</TableCell>
-              <TableCell className="w-[150px]">
-                <Badge variant="outline" className="whitespace-nowrap">{metodo.categoria}</Badge>
-              </TableCell>
-              <TableCell className="w-[100px]">
-                {metodo.link_documento ? (
-                  <a 
-                    href={metodo.link_documento} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-primary hover:underline"
-                  >
-                    <FileText className="h-4 w-4" />
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </TableCell>
-              <TableCell className="w-[100px]">
-                {metodo.exemplo ? (
-                  <Badge variant="default" className="whitespace-nowrap">Sim</Badge>
-                ) : (
-                  <Badge variant="secondary" className="whitespace-nowrap">Não</Badge>
-                )}
-              </TableCell>
-              <TableCell className="w-[100px]">
-                {metodo.ativo ? (
-                  <Badge variant="default" className="whitespace-nowrap">Ativo</Badge>
-                ) : (
-                  <Badge variant="destructive" className="whitespace-nowrap">Inativo</Badge>
-                )}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(metodo)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => setDeleteId(metodo.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+          {filteredMetodos?.map((metodo) => {
+            const tipoLabel = ARSENAL_TIPOS.find(t => t.value === (metodo.tipo || 'skill'))?.label || metodo.tipo;
+            const ferramentaInfo = ARSENAL_FERRAMENTAS.find(f => f.value === metodo.ferramenta);
+            return (
+              <TableRow key={metodo.id}>
+                <TableCell className="font-medium">{metodo.titulo}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="whitespace-nowrap">{tipoLabel}</Badge>
+                </TableCell>
+                <TableCell>
+                  {ferramentaInfo ? (
+                    <Badge variant="outline" className="whitespace-nowrap">
+                      {ferramentaInfo.icon} {ferramentaInfo.label}
+                    </Badge>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary" className="whitespace-nowrap capitalize">{metodo.nivel || 'intermediario'}</Badge>
+                </TableCell>
+                <TableCell>
+                  {metodo.link_documento ? (
+                    <a href={metodo.link_documento} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                      <FileText className="h-4 w-4" />
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {metodo.ativo ? (
+                    <Badge variant="default" className="whitespace-nowrap">Ativo</Badge>
+                  ) : (
+                    <Badge variant="destructive" className="whitespace-nowrap">Inativo</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(metodo)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => setDeleteId(metodo.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
 
-      <MetodoModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        metodo={editingMetodo}
-      />
+      <MetodoModal open={isModalOpen} onOpenChange={setIsModalOpen} metodo={editingMetodo} />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja deletar este método? Esta ação não pode ser desfeita.
+              Tem certeza que deseja deletar este item? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

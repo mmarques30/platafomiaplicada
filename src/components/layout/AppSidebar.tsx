@@ -511,7 +511,7 @@ export function AppSidebar() {
                                         : "text-sidebar-foreground/70 hover:text-primary"
                                     )}
                                   >
-                                    {!collapsed && <span>Métodos</span>}
+                                    {!collapsed && <span>Arsenal IA</span>}
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
