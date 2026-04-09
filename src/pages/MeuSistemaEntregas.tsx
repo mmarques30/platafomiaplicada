@@ -87,7 +87,7 @@ export default function MeuSistemaEntregas() {
         </div>
         {processos.length > 0 ? (
           <div className="space-y-2">
-            <div className="rounded-lg border border-border overflow-hidden">
+            <div className="rounded-lg border border-border overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-muted/50 border-b border-border">
