@@ -174,10 +174,7 @@ export default function Mentoria() {
             <BusinessVisaoGeralGrid />
           </section>
 
-          <section id="sec-roadmap" className="scroll-mt-28 mt-10 space-y-4">
-            <h2 className="text-lg font-semibold text-foreground">Roadmap</h2>
-            <BusinessExecutiveRoadmap />
-          </section>
+
 
           <section id="sec-evolucao" className="scroll-mt-28 mt-10 space-y-4">
             <h2 className="text-lg font-semibold text-foreground">Evolução Aprendizado</h2>
