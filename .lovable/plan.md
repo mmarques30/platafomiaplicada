@@ -1,24 +1,21 @@
 
 
-# Adicionar CRUD de Links na página Documentos do Business Systems
+# Liberar Bibliotecas completas para Business Sistemas
 
 ## Problema
 
-Na página `MeuSistemaDocumentos.tsx` (Business Systems), a aba de Links é somente leitura — o mentorado consegue ver os links mas não tem botão para adicionar, editar ou remover. A funcionalidade já existe implementada na página `MentoriaDocumentos.tsx` (Business Parceria).
+No `AppSidebar.tsx`, os submenus "IA Copie e Use" (linha 483) e "Arsenal IA" (linha 501) têm a condição `!isBusinessSistemasEnv`, que os oculta para usuários do Business Sistemas. Apenas Prompts e Ferramentas aparecem.
 
 ## Solução
 
-Replicar a mesma lógica de CRUD de links que já funciona em `MentoriaDocumentos.tsx` para `MeuSistemaDocumentos.tsx`.
+**Arquivo**: `src/components/layout/AppSidebar.tsx`
 
-## Arquivo: `src/pages/MeuSistemaDocumentos.tsx`
+Remover a condição `!isBusinessSistemasEnv &&` das linhas 483 e 501, liberando os 4 submenus de Bibliotecas para o Business Sistemas (mesmo comportamento do Business Parceria):
 
-Alterações:
-1. Importar componentes de Dialog, AlertDialog, Input, Label, Select, toast e ícones (Plus, Edit2, Trash2)
-2. Alterar o import do `useLinksBusiness` para incluir `createLink`, `updateLink`, `deleteLink` e o tipo `LinkBusiness`
-3. Adicionar states: `linkDialogOpen`, `editingLink`, `linkForm`
-4. Adicionar handlers: `handleOpenLinkDialog`, `handleSaveLink`, `handleDeleteLink`
-5. Na aba Links: adicionar botão "Novo Link" no topo + botões de editar/remover em cada card de link
-6. Adicionar o Dialog de formulário de link (título, URL, descrição, ícone) no final do JSX
+- Prompts (já visível)
+- Ferramentas (já visível)
+- IA "Copie e Use" (bloqueado → liberar)
+- Arsenal IA (bloqueado → liberar)
 
-Toda a lógica será copiada diretamente do pattern já funcional em `MentoriaDocumentos.tsx`, garantindo consistência entre as duas páginas.
+Também remover `'ia_copie_use'` e `'metodos_aplicar'` do filtro `BIBLIOTECAS_KEYS` na linha 152 que exclui esses itens dos menus dinâmicos, caso esse filtro também esteja afetando a visibilidade — mas na verdade esse filtro é para evitar duplicação com o menu estático. Portanto, o ajuste principal são apenas as 2 linhas (483 e 501).
 
