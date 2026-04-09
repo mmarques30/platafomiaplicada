@@ -73,7 +73,7 @@ export default function MeuSistemaEntregas() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-8">
+    <div className="p-4 md:p-6 space-y-8 overflow-hidden">
       <PageTitle primary="Entregas" />
 
       {/* Processos Mapeados */}
@@ -182,7 +182,7 @@ export default function MeuSistemaEntregas() {
       </section>
 
       {/* Telas do Sistema */}
-      <section className="space-y-3">
+      <section className="space-y-3 overflow-hidden">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-foreground">Telas do Sistema</h2>
@@ -234,10 +234,10 @@ export default function MeuSistemaEntregas() {
           </div>
         ) : (
           <div className="opacity-50">
-            <div className="overflow-hidden" ref={emblaRef}>
-              <div className="flex gap-4">
-{["Dashboard Principal", "Gestão de Clientes", "Relatórios", "Configurações", "Kanban de Tarefas", "Módulo Financeiro"].map((nome, i) => (
-                  <motion.div key={i} className="flex-none w-[240px] md:w-[300px] lg:w-[340px]">
+            <div className="overflow-hidden">
+              <div className="flex gap-4" style={{ width: "100%" }}>
+                {["Dashboard Principal", "Gestão de Clientes", "Relatórios", "Configurações", "Kanban de Tarefas", "Módulo Financeiro"].map((nome, i) => (
+                  <div key={i} className="flex-none w-[calc(33.333%-11px)] min-w-[200px]">
                     <div className="relative rounded-xl overflow-hidden shadow-md border border-border/50">
                       <div className="aspect-video bg-muted flex items-center justify-center">
                         <Monitor className="h-10 w-10 text-muted-foreground/40" />
@@ -246,7 +246,7 @@ export default function MeuSistemaEntregas() {
                         <p className="text-white text-sm font-medium truncate">{nome}</p>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -256,7 +256,7 @@ export default function MeuSistemaEntregas() {
       </section>
 
       {/* Vídeos de Instrução */}
-      <section className="space-y-3">
+      <section className="space-y-3 overflow-hidden">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-foreground">Vídeos de Instrução</h2>
@@ -334,32 +334,30 @@ export default function MeuSistemaEntregas() {
           </div>
         ) : (
           <div className="opacity-50">
-            <div className="overflow-hidden" ref={emblaRefVideos}>
-              <div className="flex gap-4">
-{[
-                    { nome: "Introdução ao Sistema", desc: "Visão geral das funcionalidades" },
-                    { nome: "Como Cadastrar Clientes", desc: "Passo a passo do cadastro" },
-                    { nome: "Gerando Relatórios", desc: "Exportação e análise de dados" },
-                    { nome: "Configurações Avançadas", desc: "Personalizando o sistema" },
-                    { nome: "Fluxo de Vendas", desc: "Pipeline e gestão comercial" },
-                    { nome: "Integrações e APIs", desc: "Conectando com outros sistemas" },
-                  ].map((video, i) => (
-                  <motion.div key={i} className="flex-none w-[220px] md:w-[280px] lg:w-[320px]">
+            <div className="overflow-hidden">
+              <div className="flex gap-4" style={{ width: "100%" }}>
+                {[
+                  { nome: "Introdução ao Sistema", desc: "Visão geral das funcionalidades" },
+                  { nome: "Como Cadastrar Clientes", desc: "Passo a passo do cadastro" },
+                  { nome: "Gerando Relatórios", desc: "Exportação e análise de dados" },
+                  { nome: "Configurações Avançadas", desc: "Personalizando o sistema" },
+                  { nome: "Fluxo de Vendas", desc: "Pipeline e gestão comercial" },
+                  { nome: "Integrações e APIs", desc: "Conectando com outros sistemas" },
+                ].map((video, i) => (
+                  <div key={i} className="flex-none w-[calc(33.333%-11px)] min-w-[180px]">
                     <Card className="border-border/50 overflow-hidden">
-                      <Lens zoomFactor={1.4} lensSize={140} className="aspect-video bg-muted">
-                        <div className="w-full h-full flex items-center justify-center bg-muted">
-                          <div className="text-center">
-                            <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
-                            <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
-                          </div>
+                      <div className="aspect-video bg-muted flex items-center justify-center">
+                        <div className="text-center">
+                          <Play className="h-10 w-10 text-muted-foreground/40 mx-auto" />
+                          <p className="text-xs text-muted-foreground mt-1">Vídeo</p>
                         </div>
-                      </Lens>
+                      </div>
                       <CardContent className="p-3">
                         <p className="font-medium text-sm text-foreground truncate">{video.nome}</p>
                         <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{video.desc}</p>
                       </CardContent>
                     </Card>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
