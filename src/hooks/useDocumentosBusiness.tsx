@@ -20,7 +20,7 @@ export interface DocumentoBusiness {
 export interface DocumentoInput {
   contrato_id: string;
   titulo: string;
-  tipo: 'proposta' | 'transcricao' | 'anexo' | 'solucao' | 'outro';
+  tipo: TipoDocumento;
   arquivo_url?: string;
   conteudo_texto?: string;
   para_processamento_ia?: boolean;
