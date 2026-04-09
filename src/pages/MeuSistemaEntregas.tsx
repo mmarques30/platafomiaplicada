@@ -333,8 +333,8 @@ export default function MeuSistemaEntregas() {
             </div>
           </div>
         ) : (
-          <div className="opacity-50 pointer-events-none">
-            <div className="overflow-hidden">
+          <div className="opacity-50">
+            <div className="overflow-hidden" ref={emblaRefVideos}>
               <div className="flex gap-4">
 {[
                     { nome: "Introdução ao Sistema", desc: "Visão geral das funcionalidades" },
