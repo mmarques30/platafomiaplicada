@@ -75,7 +75,39 @@ export default function MeuSistemaDocumentos() {
     return { percentual, diasRestantes: Math.max(0, differenceInDays(fim, hoje)) };
   }, [contrato]);
 
-  if (allLoading) {
+  // Link CRUD handlers
+  const handleOpenLinkDialog = (link?: LinkBusiness) => {
+    if (link) {
+      setEditingLink(link);
+      setLinkForm({ titulo: link.titulo, url: link.url, descricao: link.descricao || "", icone: link.icone });
+    } else {
+      setEditingLink(null);
+      setLinkForm({ titulo: "", url: "", descricao: "", icone: "link" });
+    }
+    setLinkDialogOpen(true);
+  };
+
+  const handleSaveLink = async () => {
+    if (!linkForm.titulo || !linkForm.url) {
+      toast.error("Preencha título e URL");
+      return;
+    }
+    try {
+      if (editingLink) {
+        await updateLink.mutateAsync({ id: editingLink.id, titulo: linkForm.titulo, url: linkForm.url, descricao: linkForm.descricao || undefined, icone: linkForm.icone });
+      } else {
+        await createLink.mutateAsync({ contrato_id: contrato!.id, titulo: linkForm.titulo, url: linkForm.url, descricao: linkForm.descricao || undefined, icone: linkForm.icone });
+      }
+      setLinkDialogOpen(false);
+    } catch (error) {
+      console.error("Erro ao salvar link:", error);
+    }
+  };
+
+  const handleDeleteLink = async (id: string) => {
+    try { await deleteLink.mutateAsync(id); } catch (error) { console.error("Erro ao excluir link:", error); }
+  };
+
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
