@@ -73,7 +73,7 @@ export default function MeuSistemaEntregas() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-8">
+    <div className="p-4 md:p-6 space-y-8 overflow-hidden">
       <PageTitle primary="Entregas" />
 
       {/* Processos Mapeados */}
