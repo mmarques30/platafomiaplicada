@@ -1,21 +1,24 @@
 
 
-# Liberar Bibliotecas completas para Business Sistemas
+# Remover seção Roadmap do Business Parceria
 
-## Problema
+## O que será feito
 
-No `AppSidebar.tsx`, os submenus "IA Copie e Use" (linha 483) e "Arsenal IA" (linha 501) têm a condição `!isBusinessSistemasEnv`, que os oculta para usuários do Business Sistemas. Apenas Prompts e Ferramentas aparecem.
+Remover a seção "Roadmap" e o componente `BusinessExecutiveRoadmap` da página de Mentoria para o plano Business Parceria, que usa layout de scroll contínuo.
 
-## Solução
+## Arquivo: `src/pages/Mentoria.tsx`
 
-**Arquivo**: `src/components/layout/AppSidebar.tsx`
+1. **Remover da nav-pill sticky** — reduzir `sectionLabels` e `sectionIds` de 3 para 2 itens: `['Visão Geral', 'Evolução']` e `['visao-geral', 'evolucao']`
 
-Remover a condição `!isBusinessSistemasEnv &&` das linhas 483 e 501, liberando os 4 submenus de Bibliotecas para o Business Sistemas (mesmo comportamento do Business Parceria):
+2. **Remover a seção roadmap** — apagar o bloco inteiro (linhas 177-180):
+   ```
+   <section id="sec-roadmap">
+     <h2>Roadmap</h2>
+     <BusinessExecutiveRoadmap />
+   </section>
+   ```
 
-- Prompts (já visível)
-- Ferramentas (já visível)
-- IA "Copie e Use" (bloqueado → liberar)
-- Arsenal IA (bloqueado → liberar)
+3. **Remover do IntersectionObserver** — atualizar o array `sectionIds` na linha 80 de `['visao-geral', 'roadmap', 'evolucao']` para `['visao-geral', 'evolucao']`
 
-Também remover `'ia_copie_use'` e `'metodos_aplicar'` do filtro `BIBLIOTECAS_KEYS` na linha 152 que exclui esses itens dos menus dinâmicos, caso esse filtro também esteja afetando a visibilidade — mas na verdade esse filtro é para evitar duplicação com o menu estático. Portanto, o ajuste principal são apenas as 2 linhas (483 e 501).
+4. **Limpar import** — remover `BusinessExecutiveRoadmap` (linha 25) se não for usado em outro lugar
 
