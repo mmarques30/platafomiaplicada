@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, Trash2, ChevronDown, ChevronRight, StickyNote, Loader2, Save } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Plus, Trash2, ChevronDown, ChevronRight, StickyNote, Loader2, Save, List, ListOrdered, Smile, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useNotasProjetoBusiness, NotaProjeto } from "@/hooks/useNotasProjetoBusiness";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const categoriaLabels: Record<string, string> = {
   geral: "Geral",
@@ -24,26 +27,99 @@ const categoriaColors: Record<string, string> = {
   tecnico: "bg-emerald-500/10 text-emerald-600",
 };
 
+const emojiGroups = [
+  { label: "Geral", emojis: ["✅", "❌", "⚠️", "💡", "🔥", "⭐", "❗", "❓", "👍", "👎", "🎯", "📌"] },
+  { label: "Status", emojis: ["🟢", "🟡", "🔴", "🔵", "⏳", "🔄", "✔️", "🚫", "📊", "📈", "📉", "🏁"] },
+  { label: "Objetos", emojis: ["📁", "📎", "📝", "📅", "💬", "🔗", "🔑", "⚙️", "🛠️", "📢", "💰", "🤝"] },
+];
+
 interface NotasProjetoSectionProps {
   contratoId: string;
   readOnly?: boolean;
 }
 
-function NotaCard({ nota, readOnly, onUpdate, onDelete }: {
+function NotaCard({ nota, readOnly, autoOpen, onUpdate, onDelete }: {
   nota: NotaProjeto;
   readOnly?: boolean;
+  autoOpen?: boolean;
   onUpdate: (id: string, updates: Partial<{ titulo: string; conteudo: string; categoria: string }>) => void;
   onDelete: (id: string) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(autoOpen || false);
   const [titulo, setTitulo] = useState(nota.titulo);
   const [conteudo, setConteudo] = useState(nota.conteudo || "");
   const [categoria, setCategoria] = useState(nota.categoria || "geral");
   const [dirty, setDirty] = useState(false);
+  const [isOrganizing, setIsOrganizing] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSave = () => {
     onUpdate(nota.id, { titulo, conteudo, categoria });
     setDirty(false);
+  };
+
+  const insertAtCursor = (text: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setConteudo(prev => prev + text);
+      setDirty(true);
+      return;
+    }
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newValue = conteudo.substring(0, start) + text + conteudo.substring(end);
+    setConteudo(newValue);
+    setDirty(true);
+    setTimeout(() => {
+      textarea.focus();
+      const pos = start + text.length;
+      textarea.setSelectionRange(pos, pos);
+    }, 0);
+  };
+
+  const handleBullet = () => {
+    const textarea = textareaRef.current;
+    const pos = textarea?.selectionStart ?? conteudo.length;
+    const needsNewline = pos > 0 && conteudo[pos - 1] !== "\n";
+    insertAtCursor((needsNewline ? "\n" : "") + "• ");
+  };
+
+  const handleNumbered = () => {
+    const textarea = textareaRef.current;
+    const pos = textarea?.selectionStart ?? conteudo.length;
+    const linesBefore = conteudo.substring(0, pos).split("\n");
+    let lastNum = 0;
+    for (let i = linesBefore.length - 1; i >= 0; i--) {
+      const match = linesBefore[i].match(/^(\d+)\.\s/);
+      if (match) { lastNum = parseInt(match[1]); break; }
+      if (linesBefore[i].trim()) break;
+    }
+    const needsNewline = pos > 0 && conteudo[pos - 1] !== "\n";
+    insertAtCursor((needsNewline ? "\n" : "") + `${lastNum + 1}. `);
+  };
+
+  const handleOrganize = async () => {
+    if (!conteudo.trim()) {
+      toast.error("Escreva algo antes de organizar");
+      return;
+    }
+    setIsOrganizing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("organizar-nota", {
+        body: { conteudo },
+      });
+      if (error) throw error;
+      if (data?.resultado) {
+        setConteudo(data.resultado);
+        setDirty(true);
+        toast.success("Texto organizado!");
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erro ao organizar texto");
+    } finally {
+      setIsOrganizing(false);
+    }
   };
 
   return (
@@ -88,7 +164,59 @@ function NotaCard({ nota, readOnly, onUpdate, onDelete }: {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Toolbar de formatação */}
+                <div className="flex items-center gap-1 border border-border/50 rounded-md px-2 py-1 bg-muted/20">
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleBullet} title="Bullet point">
+                    <List className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleNumbered} title="Lista numerada">
+                    <ListOrdered className="h-3.5 w-3.5" />
+                  </Button>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Emojis">
+                        <Smile className="h-3.5 w-3.5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-2" align="start">
+                      {emojiGroups.map((group) => (
+                        <div key={group.label} className="mb-2">
+                          <p className="text-xs font-medium text-muted-foreground mb-1">{group.label}</p>
+                          <div className="grid grid-cols-6 gap-1">
+                            {group.emojis.map((emoji) => (
+                              <button
+                                key={emoji}
+                                className="h-8 w-8 flex items-center justify-center rounded hover:bg-muted/50 text-base transition-colors"
+                                onClick={() => insertAtCursor(emoji)}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </PopoverContent>
+                  </Popover>
+
+                  <div className="h-4 w-px bg-border/50 mx-1" />
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs gap-1"
+                    onClick={handleOrganize}
+                    disabled={isOrganizing || !conteudo.trim()}
+                    title="Organizar texto com IA"
+                  >
+                    {isOrganizing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                    Organizar
+                  </Button>
+                </div>
+
                 <Textarea
+                  ref={textareaRef}
                   value={conteudo}
                   onChange={(e) => { setConteudo(e.target.value); setDirty(true); }}
                   placeholder="Escreva suas anotações aqui... (suporta texto livre)"
@@ -116,12 +244,10 @@ function NotaCard({ nota, readOnly, onUpdate, onDelete }: {
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
-                  {dirty && (
-                    <Button size="sm" onClick={handleSave} className="h-7 text-xs">
-                      <Save className="h-3.5 w-3.5 mr-1" />
-                      Salvar
-                    </Button>
-                  )}
+                  <Button size="sm" onClick={handleSave} disabled={!dirty} className="h-7 text-xs">
+                    <Save className="h-3.5 w-3.5 mr-1" />
+                    Salvar
+                  </Button>
                 </div>
               </>
             )}
@@ -134,9 +260,17 @@ function NotaCard({ nota, readOnly, onUpdate, onDelete }: {
 
 export function NotasProjetoSection({ contratoId, readOnly = false }: NotasProjetoSectionProps) {
   const { notas, isLoading, createNota, updateNota, deleteNota } = useNotasProjetoBusiness(contratoId);
+  const [lastCreatedId, setLastCreatedId] = useState<string | null>(null);
 
   const handleCreate = () => {
-    createNota.mutate({ contrato_id: contratoId, titulo: "Nova anotação", categoria: "geral" });
+    createNota.mutate(
+      { contrato_id: contratoId, titulo: "Nova anotação", categoria: "geral" },
+      {
+        onSuccess: (data: any) => {
+          if (data?.id) setLastCreatedId(data.id);
+        },
+      }
+    );
   };
 
   const handleUpdate = (id: string, updates: Partial<{ titulo: string; conteudo: string; categoria: string }>) => {
@@ -183,6 +317,7 @@ export function NotasProjetoSection({ contratoId, readOnly = false }: NotasProje
               key={nota.id}
               nota={nota}
               readOnly={readOnly}
+              autoOpen={nota.id === lastCreatedId}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
             />
