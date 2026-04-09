@@ -1,52 +1,24 @@
 
+# Adicionar funcionalidade de Links para o cliente em MeuSistemaDocumentos
 
-# Fix: Anotações — botão salvar, formatação rica e organização por IA
-
-## Problemas identificados
-
-1. **Ao criar uma nova anotação**, ela aparece fechada (Collapsible). O usuário precisa clicar para expandir, e o botão Salvar só aparece após editar — fluxo confuso
-2. **Sem ferramentas de formatação** — não há como inserir emojis, bullet points ou listas numeradas
-3. **Sem botão de organização automática** — o usuário quer um botão que estruture o texto escrito de forma mais organizada
+## Problema
+Na página do cliente (`MeuSistemaDocumentos`), a aba Links é somente leitura — o cliente consegue adicionar arquivos e anotações, mas não consegue adicionar links. Falta o botão "Novo Link" e o dialog de criação/edição.
 
 ## Solução
 
-**Arquivo**: `src/components/admin/business/NotasProjetoSection.tsx`
+**Arquivo**: `src/pages/MeuSistemaDocumentos.tsx`
 
-### 1. Auto-abrir nota recém-criada + botão Salvar sempre visível em modo edição
+Adicionar na aba Links a mesma funcionalidade que já existe no painel admin (`DocumentosBusinessManager`):
 
-- Passar um prop `autoOpen` para `NotaCard` quando a nota acabou de ser criada
-- O botão **Salvar** ficará sempre visível quando a nota estiver aberta em modo edição (não apenas quando `dirty`). Quando não houver alterações, ficará desabilitado
-
-### 2. Barra de formatação com emojis, bullets e números
-
-Adicionar uma toolbar acima do `Textarea` com botões:
-- **Bullet point** (`•`) — insere `• ` no cursor
-- **Lista numerada** (`1.`) — insere `1. ` no cursor  
-- **Emoji picker** — popover com emojis comuns (categorias: geral, status, objetos) que insere no cursor
-
-A inserção será feita manipulando o valor do textarea na posição do cursor (`selectionStart`).
-
-### 3. Botão "Organizar com IA"
-
-- Ícone de varinha/sparkles com label "Organizar"
-- Ao clicar, envia o conteúdo atual para o Lovable AI Gateway (modelo `google/gemini-2.5-flash-lite`) com prompt para:
-  - Estruturar o texto em tópicos
-  - Corrigir ortografia
-  - Manter o conteúdo original, apenas reorganizar
-- Substitui o conteúdo do textarea com o resultado e marca como `dirty`
-- Loading state no botão durante processamento
+1. **Botão "Novo Link"** acima da lista de links
+2. **Dialog de criação/edição** com campos: Título, URL, Descrição (opcional), Ícone (seletor)
+3. **Botões de editar e excluir** em cada card de link (com AlertDialog de confirmação para exclusão)
+4. Usar as mutations `createLink`, `updateLink`, `deleteLink` já disponíveis no hook `useLinksBusiness` (que já são importados mas não utilizados)
 
 ### Mudanças concretas
-
-| Arquivo | Ação |
-|---|---|
-| `src/components/admin/business/NotasProjetoSection.tsx` | Editar — toolbar, auto-open, salvar visível, botão IA |
-| `supabase/functions/organizar-nota/index.ts` | Criar — edge function para chamar IA e organizar texto |
-
-### Detalhes técnicos
-
-- Edge function recebe `{ conteudo: string }` e retorna `{ resultado: string }`
-- Usa Lovable AI Gateway para processar o texto
-- Emoji picker implementado como Popover com grid de emojis comuns (sem dependência externa)
-- `useRef` no textarea para controlar posição do cursor na inserção de formatação
-
+- Importar `createLink`, `updateLink`, `deleteLink` do `useLinksBusiness` (atualmente só importa `links` e `isLoading`)
+- Adicionar estado local para o dialog e formulário de link
+- Adicionar botão "Novo Link" no topo da aba Links
+- Adicionar botões de ação (editar, excluir, abrir) em cada card de link
+- Adicionar Dialog e AlertDialog para criação/edição/exclusão
+- Importar componentes necessários: `Dialog`, `Input`, `Label`, `Select`, `AlertDialog`, `Loader2`, `Plus`, `Edit2`, `Trash2`
