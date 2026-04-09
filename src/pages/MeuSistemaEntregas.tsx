@@ -233,8 +233,8 @@ export default function MeuSistemaEntregas() {
             </div>
           </div>
         ) : (
-          <div className="opacity-50 pointer-events-none">
-            <div className="overflow-hidden">
+          <div className="opacity-50">
+            <div className="overflow-hidden" ref={emblaRef}>
               <div className="flex gap-4">
 {["Dashboard Principal", "Gestão de Clientes", "Relatórios", "Configurações", "Kanban de Tarefas", "Módulo Financeiro"].map((nome, i) => (
                   <motion.div key={i} className="flex-none w-[240px] md:w-[300px] lg:w-[340px]">
@@ -333,8 +333,8 @@ export default function MeuSistemaEntregas() {
             </div>
           </div>
         ) : (
-          <div className="opacity-50 pointer-events-none">
-            <div className="overflow-hidden">
+          <div className="opacity-50">
+            <div className="overflow-hidden" ref={emblaRefVideos}>
               <div className="flex gap-4">
 {[
                     { nome: "Introdução ao Sistema", desc: "Visão geral das funcionalidades" },
