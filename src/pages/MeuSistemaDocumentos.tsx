@@ -205,23 +205,30 @@ export default function MeuSistemaDocumentos() {
         </TabsContent>
 
         <TabsContent value="links" className="space-y-4 mt-4">
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => handleOpenLinkDialog()}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Link
+            </Button>
+          </div>
+
           {links.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <Link2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">Nenhum link disponível</h3>
-                <p className="text-muted-foreground">Links importantes aparecerão aqui quando forem adicionados.</p>
+                <h3 className="text-lg font-medium mb-2">Nenhum link adicionado</h3>
+                <p className="text-muted-foreground">Adicione links importantes como Drive, ferramentas e outros recursos.</p>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {links.map((link) => {
                 const IconComponent = getIconComponent(link.icone);
                 return (
-                  <Card key={link.id} className="hover:shadow-md transition-shadow cursor-pointer group" onClick={() => window.open(link.url, "_blank")}>
+                  <Card key={link.id} className="hover:shadow-md transition-shadow group">
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <div className="flex items-center gap-4 flex-1 min-w-0 cursor-pointer" onClick={() => window.open(link.url, "_blank")}>
                           <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                             <IconComponent className="h-6 w-6 text-primary" />
                           </div>
@@ -230,7 +237,31 @@ export default function MeuSistemaDocumentos() {
                             {link.descricao && <p className="text-sm text-muted-foreground truncate">{link.descricao}</p>}
                           </div>
                         </div>
-                        <ExternalLink className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <Button variant="ghost" size="icon" onClick={() => window.open(link.url, "_blank")} className="h-8 w-8">
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleOpenLinkDialog(link)} className="h-8 w-8">
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Remover link?</AlertDialogTitle>
+                                <AlertDialogDescription>O link "{link.titulo}" será removido da lista.</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteLink(link.id)}>Remover</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
