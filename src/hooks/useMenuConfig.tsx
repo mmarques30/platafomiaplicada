@@ -76,6 +76,7 @@ export function useMenuConfig() {
       // Business Parceria: oculta menus Academy-only e Skills-only + Squad + Projeto Skills
       business_parceria: [
         'trilhas', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+        'meu_progresso_roadmap',
         'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
         'skills_entregas', 'skills_painel_lider',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',

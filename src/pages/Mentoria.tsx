@@ -90,6 +90,17 @@ export default function Mentoria() {
     return () => observers.forEach(obs => obs?.disconnect());
   }, [isBusinessParceria]);
 
+  // Business Parceria: interceptar tabs e fazer scroll
+  useEffect(() => {
+    if (isBusinessParceria && searchParams.get("tab") === "evolucao-aprendizado") {
+      searchParams.delete("tab");
+      setSearchParams(searchParams, { replace: true });
+      setTimeout(() => {
+        document.getElementById("sec-evolucao")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, [isBusinessParceria, searchParams, setSearchParams]);
+
   // Redirecionar usuários Skills para suas páginas específicas
   useEffect(() => {
     if (isSkills && !isBusiness) {
