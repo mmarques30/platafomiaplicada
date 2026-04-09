@@ -334,8 +334,8 @@ export default function MeuSistemaEntregas() {
           </div>
         ) : (
           <div className="opacity-50">
-            <div className="overflow-hidden">
-              <div className="flex gap-4" style={{ width: "100%" }}>
+            <div className="overflow-hidden" ref={emblaRefVideos}>
+              <div className="flex gap-4">
                 {[
                   { nome: "Introdução ao Sistema", desc: "Visão geral das funcionalidades" },
                   { nome: "Como Cadastrar Clientes", desc: "Passo a passo do cadastro" },
@@ -344,7 +344,7 @@ export default function MeuSistemaEntregas() {
                   { nome: "Fluxo de Vendas", desc: "Pipeline e gestão comercial" },
                   { nome: "Integrações e APIs", desc: "Conectando com outros sistemas" },
                 ].map((video, i) => (
-                  <div key={i} className="flex-none w-[calc(33.333%-11px)] min-w-[180px]">
+                  <div key={i} className="flex-none w-[220px] md:w-[280px] lg:w-[320px]">
                     <Card className="border-border/50 overflow-hidden">
                       <div className="aspect-video bg-muted flex items-center justify-center">
                         <div className="text-center">
