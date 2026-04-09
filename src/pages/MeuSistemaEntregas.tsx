@@ -236,14 +236,14 @@ export default function MeuSistemaEntregas() {
           <div className="opacity-50 pointer-events-none">
             <div className="overflow-hidden">
               <div className="flex gap-4">
-                {[1, 2, 3].map((i) => (
+{["Dashboard Principal", "Gestão de Clientes", "Relatórios", "Configurações", "Kanban de Tarefas", "Módulo Financeiro"].map((nome, i) => (
                   <motion.div key={i} className="flex-none w-[240px] md:w-[300px] lg:w-[340px]">
                     <div className="relative rounded-xl overflow-hidden shadow-md border border-border/50">
                       <div className="aspect-video bg-muted flex items-center justify-center">
                         <Monitor className="h-10 w-10 text-muted-foreground/40" />
                       </div>
                       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8">
-                        <p className="text-white text-sm font-medium truncate">Tela de exemplo {i}</p>
+                        <p className="text-white text-sm font-medium truncate">{nome}</p>
                       </div>
                     </div>
                   </motion.div>
