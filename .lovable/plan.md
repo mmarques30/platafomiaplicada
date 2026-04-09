@@ -1,37 +1,37 @@
 
 
-# Fix: Conteúdo da página Entregas se adaptar ao espaço disponível (sidebar aberta/fechada)
+# Reorganizar aba Contrato em MeuSistemaDocumentos
 
 ## Problema
-Quando o menu lateral está aberto, o conteúdo da página Entregas não se adapta ao espaço reduzido. Os placeholders do empty state não usam o Embla carousel (não têm `ref`), então os 6 cards ficam todos visíveis e estouram a largura. Apenas com o menu fechado o layout fica correto.
-
-## Causa raiz
-1. Os empty states de Telas e Vídeos **não usam `emblaRef`** — os cards ficam em `flex` simples sem controle de scroll
-2. Os cards do empty state usam `w-[calc(33.333%-11px)]` que calcula baseado no container, mas com 6 cards o flex não quebra linha — todos ficam em uma linha só
+A aba "Contrato" exibe todas as informações em uma lista corrida com `Separator` genéricos, sem títulos de seção claros. Fica visualmente confuso e difícil de localizar informações específicas.
 
 ## Solução
 
-**Arquivo**: `src/pages/MeuSistemaEntregas.tsx`
+**Arquivo**: `src/pages/MeuSistemaDocumentos.tsx` (linhas 260-308)
 
-### 1. Aplicar `emblaRef` nos empty states
-Atribuir `emblaRef` ao container do empty state de Telas e `emblaRefVideos` ao de Vídeos. Isso faz o Embla controlar o scroll e as setas funcionarem nos placeholders também.
+Reorganizar o conteúdo da aba Contrato em **seções visuais distintas** com títulos e cards separados:
 
-### 2. Trocar largura dos cards para largura fixa compatível com carrossel
-Em vez de `w-[calc(33.333%-11px)]`, usar a mesma largura fixa dos cards reais (`w-[240px] md:w-[300px] lg:w-[340px]` para telas e `w-[220px] md:w-[280px] lg:w-[320px]` para vídeos). Isso garante que os cards não tentem ocupar 33% do container — o Embla controla quantos ficam visíveis.
+### Estrutura proposta
 
-### 3. Remover `pointer-events-none` parcial
-Manter `opacity-50` nos cards mas permitir que as setas de navegação funcionem normalmente.
+Substituir o card único por **3 cards empilhados**, cada um com título de seção:
 
-### Mudanças concretas
+1. **Dados da Empresa** — Card com ícone `Building2` e título "Dados da Empresa"
+   - Grid 2 colunas: Empresa, CNPJ, Representante, Email, Setor, Endereço
 
-**Empty state Telas (linhas 236-254):**
-- `<div className="overflow-hidden">` → `<div className="overflow-hidden" ref={emblaRef}>`
-- Cards: `w-[calc(33.333%-11px)] min-w-[200px]` → `w-[240px] md:w-[300px] lg:w-[340px]`
+2. **Detalhes do Contrato** — Card com ícone `Calendar` e título "Detalhes do Contrato"
+   - Grid 3 colunas: Início, Fim, Duração, Valor, Entrada, Parcelas
 
-**Empty state Vídeos (linhas ~310-340):**
-- `<div className="overflow-hidden">` → `<div className="overflow-hidden" ref={emblaRefVideos}>`
-- Cards: mesma mudança de largura para `w-[220px] md:w-[280px] lg:w-[320px]`
+3. **Módulos e Garantias** — Card com ícone `Package` e título "Módulos e Garantias"
+   - Badges de módulos + lista de garantias (só aparece se houver dados)
 
-**Tabela de processos (linhas 90-91):**
-- Adicionar `<div className="overflow-x-auto">` envolvendo a `<table>` para que em telas menores a tabela role horizontalmente dentro do container
+### Estilo dos cards
+- Cada card com `CardHeader` contendo título com ícone (padrão `text-sm font-medium`)
+- Fundo neutro padrão do card (`border-border/50`)
+- `InfoItem` existente reutilizado, com fundo sutil `bg-muted/30 rounded-lg p-3` em cada item para dar destaque visual
+- Espaçamento `space-y-4` entre os cards
+
+### Mudança concreta
+- Linhas 260-308: substituir o card único por 3 cards com headers e grids organizados
+- Importar `Building2` do lucide-react
+- `InfoItem` ganha fundo `bg-muted/30 rounded-lg p-3` para cada campo ficar visualmente delimitado
 
