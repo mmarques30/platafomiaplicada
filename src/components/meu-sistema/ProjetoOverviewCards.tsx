@@ -160,10 +160,14 @@ export function ProjetoOverviewCards({
   const progressoEntregasRounded = Math.round(progressoEntregas);
 
   let saude: { label: string; trend: "positive" | "negative" | "neutral"; changeText: string };
-  if (progressoEntregas > cronogramaPercentual + 10) {
+  if (totalEntregas === 0) {
+    saude = { label: "Novo", trend: "neutral", changeText: "Nenhuma entrega cadastrada" };
+  } else if (progressoEntregas > cronogramaPercentual + 10) {
     saude = { label: "Avançado", trend: "positive", changeText: `+${Math.round(progressoEntregas - cronogramaPercentual)}% à frente do cronograma` };
-  } else if (progressoEntregas >= cronogramaPercentual) {
+  } else if (progressoEntregas >= cronogramaPercentual - 10) {
     saude = { label: "Saudável", trend: "positive", changeText: "Alinhado ao cronograma" };
+  } else if (cronogramaPercentual <= 15) {
+    saude = { label: "Saudável", trend: "neutral", changeText: "Projeto em fase inicial" };
   } else {
     saude = { label: "Em Risco", trend: "negative", changeText: `${Math.round(progressoEntregas - cronogramaPercentual)}% atrasado vs cronograma` };
   }
