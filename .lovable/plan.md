@@ -1,26 +1,39 @@
 
+# Restaurar seção Roadmap no scroll contínuo do Business Parceria
 
-# Remover JornadaStrip do Business Parceria (manter Roadmap)
+## Problema
+
+No plano anterior, a seção Roadmap foi removida do layout de scroll contínuo do Business Parceria. A JornadaStrip (linha do tempo com círculos numerados) foi corretamente removida, mas o Roadmap (componente `BusinessExecutiveRoadmap` ou equivalente) precisa voltar como seção no scroll.
 
 ## O que será feito
 
-Remover apenas o componente `JornadaStrip` (linha do tempo com círculos numerados e conectores) da página de Mentoria para o Business Parceria. O Roadmap **não** será tocado.
+**Arquivo**: `src/pages/Mentoria.tsx`
 
-## Arquivo: `src/pages/Mentoria.tsx`
-
-**Linha 150** — alterar a condição de renderização do JornadaStrip para excluir Business Parceria:
+1. **Restaurar a seção Roadmap entre Visão Geral e Evolução** no bloco `isBusinessParceria`:
 
 ```tsx
-// De:
-{(isBusinessParceria || isBusinessSistemas) && estagiosBusiness && <JornadaStrip estagios={estagiosBusiness} />}
+<section id="sec-visao-geral" className="scroll-mt-28 mt-6 space-y-4">
+  <h2>Visão Geral</h2>
+  <BusinessVisaoGeralGrid />
+</section>
 
-// Para:
-{isBusinessSistemas && estagiosBusiness && <JornadaStrip estagios={estagiosBusiness} />}
+{/* ADICIONAR DE VOLTA */}
+<section id="sec-roadmap" className="scroll-mt-28 mt-10 space-y-4">
+  <h2>Roadmap</h2>
+  <AcademyRoadmapEducacional />  {/* ou BusinessExecutiveRoadmap se existir */}
+</section>
+
+<section id="sec-evolucao" className="scroll-mt-28 mt-10 space-y-4">
+  ...
+</section>
 ```
 
-Isso remove a strip de estágios apenas do Business Parceria, mantendo-a para Business Sistemas e Academy.
+2. **Atualizar nav-pills** — restaurar "Roadmap" nos arrays:
+   - `sectionLabels`: `['Visão Geral', 'Roadmap', 'Evolução']`
+   - `sectionIds`: `['visao-geral', 'roadmap', 'evolucao']`
 
-## Sobre o Roadmap
+3. **Atualizar IntersectionObserver** — incluir `'roadmap'` no array de IDs observados (linha 80)
 
-Nenhuma alteração — o Roadmap permanecerá acessível. Para Business Parceria ele não aparece como aba (usa scroll contínuo), mas o submenu "Roadmap" no sidebar pode ser reativado se necessário. Se quiser que o Roadmap volte como seção no scroll contínuo, posso fazer isso num passo seguinte.
+4. **Reativar submenu no sidebar** — remover `'meu_progresso_roadmap'` da lista `hiddenByEnvironment.business_parceria` em `useMenuConfig.tsx`
 
+O componente de Roadmap usado será o mesmo que aparece na aba Roadmap para outros ambientes (provavelmente `AcademyRoadmapEducacional` ou `BusinessExecutiveRoadmap`, dependendo do que existia antes da remoção).
