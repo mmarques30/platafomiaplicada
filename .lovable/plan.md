@@ -1,49 +1,59 @@
 
 
-# Fix: Importação de Contrato e Dados Desconfigurados na View do Mentorado
+# Fix: Documentos Business — Storage e Download
 
-## Problema 1: Erro "add function" ao importar contrato DOCX
+## Problemas identificados
 
-A edge function `parse-documento-contrato` tenta enviar arquivos DOCX diretamente para o Gemini via `image_url`, mas o Gemini retorna erro 400: **"Unsupported MIME type: application/vnd.openxmlformats-officedocument.wordprocessingml.document"**. O Gemini só aceita imagens e PDFs via `image_url`, não DOCX.
+1. **Falta política de INSERT no storage** — O bucket `contratos-business` não tem política de INSERT. Admins não conseguem fazer upload de arquivos. Só existem políticas de SELECT e UPDATE.
 
-**Solução**: Para arquivos DOCX, usar a biblioteca `mammoth` (disponível via npm/esm) no edge function para converter o DOCX em texto puro antes de enviar ao Gemini. Fluxo:
-- PDF → continua usando `image_url` (já funciona)
-- DOCX → extrair texto com `mammoth` → enviar como texto puro ao Gemini
-- TXT → continua decodificando direto (já funciona)
+2. **Falta política de DELETE no storage** — Quando o admin exclui um documento, o registro é removido do banco mas o arquivo permanece no storage (sem DELETE policy).
 
-## Problema 2: Dados desconfigurados na view do mentorado
+3. **Download para mentorado** — O download usa `createSignedUrl`, que requer SELECT no storage. A política de SELECT existe mas depende de um JOIN com `documentos_business` + `contratos_business`. Isso funciona, mas se o `arquivo_url` salvo não bater com o padrão `{contrato_id}/%`, pode falhar silenciosamente.
 
-A interface `ContratoBusiness` define `modulos_selecionados` como `Array<{ nome: string; descricao?: string }>`, mas no banco os dados são **strings simples** (ex: `["CRM", "Financeiro"]`). Quando o código tenta renderizar `{m.nome || m}`, funciona por fallback, mas a tipagem está incorreta.
+4. **Delete do documento não apaga o arquivo do storage** — O `deleteDocumento` no hook só deleta o registro no banco, não remove o arquivo do bucket.
 
-O problema mais provável de "valor, exclamação" é que os valores numéricos (como `valor_contrato: 8997.00`) estão sendo exibidos com formatação inconsistente, ou campos nulos mostram artefatos visuais. Além disso, `tempo_consultoria_meses` renderiza como template string `` `${contrato.tempo_consultoria_meses} meses` `` — se for `null` ou `undefined`, mostra "undefined meses".
+## Solução
 
-**Solução**: Adicionar guards de null/undefined em todos os campos renderizados no `MeuSistemaDocumentos.tsx` e corrigir a tipagem de `modulos_selecionados`.
+### 1. Migration — Adicionar políticas de storage
 
-## Arquivos a editar
+```sql
+-- INSERT: admins podem fazer upload
+CREATE POLICY "Admins podem inserir contratos"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'contratos-business'
+  AND EXISTS (
+    SELECT 1 FROM user_roles
+    WHERE user_id = auth.uid() AND role = 'admin'
+  )
+);
+
+-- DELETE: admins podem deletar
+CREATE POLICY "Admins podem deletar contratos"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'contratos-business'
+  AND EXISTS (
+    SELECT 1 FROM user_roles
+    WHERE user_id = auth.uid() AND role = 'admin'
+  )
+);
+```
+
+### 2. Hook `useDocumentosBusiness` — Deletar arquivo do storage junto com o registro
+
+No `deleteDocumento`, antes de deletar o registro, buscar o `arquivo_url` e chamar `supabase.storage.from("contratos-business").remove([arquivo_url])`.
+
+### 3. Tipo do `DocumentoBusiness` e `DocumentoInput` — Adicionar `'logo' | 'imagem'`
+
+Atualizar os tipos TypeScript para incluir os novos tipos que já são usados na UI.
+
+## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `supabase/functions/parse-documento-contrato/index.ts` | **Editar** — usar mammoth para DOCX, manter image_url para PDF |
-| `src/pages/MeuSistemaDocumentos.tsx` | **Editar** — adicionar guards de null em todos os campos, corrigir formatação |
-| `src/hooks/useContratosBusiness.tsx` | **Editar** — corrigir tipo de `modulos_selecionados` para `Array<string | { nome: string }>` |
-
-## Detalhes técnicos
-
-### Edge Function — DOCX handling
-```typescript
-// Para DOCX: converter para texto com mammoth
-import mammoth from "npm:mammoth@1.8.0";
-
-if (mimeType.includes('wordprocessingml') || fileName.endsWith('.docx')) {
-  const buffer = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
-  const result = await mammoth.extractRawText({ buffer });
-  return new Response(JSON.stringify({ texto: result.value }), { headers: ... });
-}
-// Para PDF: continua usando image_url com Gemini
-```
-
-### MeuSistemaDocumentos — Guards
-- `tempo_consultoria_meses`: mostrar "—" se null
-- `valor_contrato`, `valor_entrada`, `valor_parcela`: usar `formatCurrency` que já trata null
-- Todos os InfoItem já usam `value || "—"`, mas template strings como `` `${x} meses` `` precisam de guard
+| Migration SQL | Criar políticas INSERT e DELETE no storage |
+| `src/hooks/useDocumentosBusiness.tsx` | Editar — adicionar tipos `logo`/`imagem`, deletar arquivo do storage no delete |
 
