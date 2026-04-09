@@ -480,7 +480,7 @@ export function AppSidebar() {
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
                           )}
-                          {!isBusinessSistemasEnv && isMenuVisible('ia_copie_use') && (
+                          {isMenuVisible('ia_copie_use') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
@@ -498,7 +498,7 @@ export function AppSidebar() {
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
                           )}
-                          {!isBusinessSistemasEnv && isMenuVisible('metodos_aplicar') && (
+                          {isMenuVisible('metodos_aplicar') && (
                               <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="group">
                                   <NavLink 
