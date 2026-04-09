@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote } from "lucide-react";
+import { useState, useMemo } from "react";
+import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,13 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useDocumentosBusiness } from "@/hooks/useDocumentosBusiness";
 import { useLinksBusiness } from "@/hooks/useLinksBusiness";
 import { useNotasProjetoBusiness } from "@/hooks/useNotasProjetoBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { downloadUrl } from "@/lib/download";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { ArquivosProjetoSection } from "@/components/admin/business/ArquivosProjetoSection";
@@ -36,13 +37,34 @@ const getIconComponent = (icone: string) => {
 
 export default function MeuSistemaDocumentos() {
   const userId = useBusinessUserId();
-  const { contrato, reports, isLoading } = useContratosBusiness(userId);
+  const { contrato, reports, isLoading, progresso } = useContratosBusiness(userId);
   const { documentos, isLoading: isLoadingDocs } = useDocumentosBusiness(contrato?.id, false);
   const { links, isLoading: isLoadingLinks } = useLinksBusiness(contrato?.id);
   const { notas, isLoading: isLoadingNotas } = useNotasProjetoBusiness(contrato?.id);
   const [viewingReport, setViewingReport] = useState<{ titulo: string; html: string } | null>(null);
 
   const allLoading = isLoading || isLoadingDocs || isLoadingLinks || isLoadingNotas;
+
+  // Atividade recente — combina arquivos, notas e links ordenados por data
+  const atividadeRecente = useMemo(() => {
+    const items: { tipo: string; titulo: string; data: string; icon: typeof FileText }[] = [];
+    documentos.filter(d => d.arquivo_url).forEach(d => items.push({ tipo: "Arquivo", titulo: d.titulo, data: d.created_at || "", icon: FileText }));
+    notas.forEach(n => items.push({ tipo: "Anotação", titulo: n.titulo, data: n.created_at || "", icon: StickyNote }));
+    links.forEach(l => items.push({ tipo: "Link", titulo: l.titulo, data: l.created_at || "", icon: Link2 }));
+    return items.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).slice(0, 5);
+  }, [documentos, notas, links]);
+
+  // Progresso temporal do contrato
+  const cronograma = useMemo(() => {
+    if (!contrato?.data_inicio || !contrato?.data_fim) return null;
+    const inicio = new Date(contrato.data_inicio);
+    const fim = new Date(contrato.data_fim);
+    const hoje = new Date();
+    const totalDias = differenceInDays(fim, inicio) || 1;
+    const diasPassados = Math.max(0, differenceInDays(hoje, inicio));
+    const percentual = Math.min(100, Math.round((diasPassados / totalDias) * 100));
+    return { percentual, diasRestantes: Math.max(0, differenceInDays(fim, hoje)) };
+  }, [contrato]);
 
   if (allLoading) {
     return (
@@ -67,29 +89,38 @@ export default function MeuSistemaDocumentos() {
     v != null ? v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—";
 
   const arquivosCount = documentos.filter((d) => d.arquivo_url).length;
+  const totalItens = arquivosCount + notas.length + links.length;
 
   const handleDownloadReport = (arquivoUrl: string, titulo: string) => {
     downloadUrl(arquivoUrl, titulo);
   };
 
   const statCards = [
-    { label: "Arquivos", count: arquivosCount, icon: FileText, color: "text-blue-400" },
-    { label: "Anotações", count: notas.length, icon: StickyNote, color: "text-amber-400" },
-    { label: "Links", count: links.length, icon: Link2, color: "text-emerald-400" },
-    { label: "Reports", count: reports.length, icon: FileText, color: "text-purple-400" },
+    { label: "Arquivos", count: arquivosCount, icon: FileText },
+    { label: "Anotações", count: notas.length, icon: StickyNote },
+    { label: "Links", count: links.length, icon: Link2 },
+    { label: "Reports", count: reports.length, icon: FileText },
   ];
+
+  // Insights dinâmicos
+  const insights: string[] = [];
+  if (totalItens === 0) insights.push("Comece adicionando arquivos e anotações para organizar seu projeto.");
+  if (notas.length === 0 && totalItens > 0) insights.push("Adicione anotações para registrar decisões importantes do projeto.");
+  if (arquivosCount > 0 && notas.length > 0) insights.push(`Você tem ${arquivosCount} arquivo(s) e ${notas.length} anotação(ões) registrados.`);
+  if (progresso.percentual > 0) insights.push(`Seu projeto está ${progresso.percentual}% concluído com base nas entregas.`);
+  if (progresso.percentual === 0 && (contrato.entregas_esperadas || []).length > 0) insights.push("Nenhuma entrega foi concluída ainda. Acompanhe o progresso na aba Entregas.");
 
   return (
     <div className="p-4 md:p-6 space-y-6">
       <PageTitle primary="Documentos" />
 
-      {/* Painel 360 — Stat Cards */}
+      {/* Stat Cards — padrão verde da marca */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {statCards.map((s) => (
-          <Card key={s.label} className="bg-[#1a1a2e] border-0">
+          <Card key={s.label} className="bg-[hsl(var(--chart-4))] border-0">
             <CardContent className="p-4 flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center">
-                <s.icon className={`h-5 w-5 ${s.color}`} />
+                <s.icon className="h-5 w-5 text-white/70" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">{s.count}</p>
@@ -150,8 +181,8 @@ export default function MeuSistemaDocumentos() {
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4 flex-1 min-w-0">
-                          <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                            <IconComponent className="h-6 w-6 text-blue-600" />
+                          <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <IconComponent className="h-6 w-6 text-primary" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-base mb-1 truncate group-hover:text-primary transition-colors">{link.titulo}</h3>
@@ -226,7 +257,6 @@ export default function MeuSistemaDocumentos() {
           )}
         </TabsContent>
 
-        {/* Tab Contrato */}
         <TabsContent value="contrato" className="mt-4">
           <Card className="border-border/50">
             <CardContent className="p-4 md:p-6 space-y-4">
@@ -278,6 +308,89 @@ export default function MeuSistemaDocumentos() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Resumo do Projeto */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {/* Evolução das Entregas */}
+        <Card className="border-border/50">
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              Evolução das Entregas
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{progresso.modulosConcluidos} de {(contrato.entregas_esperadas || []).length} concluídas</span>
+                <span className="font-medium text-foreground">{progresso.percentual}%</span>
+              </div>
+              <ProgressBar value={progresso.percentual} color="hsl(var(--primary))" height={8} />
+            </div>
+            {cronograma && (
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Cronograma</span>
+                  <span className="font-medium text-foreground">{cronograma.percentual}%</span>
+                </div>
+                <ProgressBar value={cronograma.percentual} color="hsl(var(--chart-4))" height={6} />
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {cronograma.diasRestantes} dias restantes
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Atividade Recente */}
+        <Card className="border-border/50">
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Clock className="h-4 w-4 text-primary" />
+              Atividade Recente
+            </div>
+            {atividadeRecente.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-4 text-center">Nenhuma atividade registrada ainda.</p>
+            ) : (
+              <div className="space-y-2">
+                {atividadeRecente.map((item, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <div className="h-6 w-6 rounded bg-muted flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <item.icon className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium text-foreground truncate">{item.titulo}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {item.tipo} · {item.data ? format(new Date(item.data), "dd/MM", { locale: ptBR }) : "—"}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Insights do Projeto */}
+        <Card className="border-border/50">
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Lightbulb className="h-4 w-4 text-primary" />
+              Insights do Projeto
+            </div>
+            <div className="space-y-2">
+              {insights.map((text, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-muted-foreground">{text}</p>
+                </div>
+              ))}
+              {insights.length === 0 && (
+                <p className="text-xs text-muted-foreground py-4 text-center">Adicione itens ao projeto para gerar insights.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Dialog para visualizar report HTML */}
       <Dialog open={!!viewingReport} onOpenChange={() => setViewingReport(null)}>
