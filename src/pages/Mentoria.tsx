@@ -22,7 +22,7 @@ import { BusinessAcessoRapido } from "@/components/mentoria/business/BusinessAce
 
 import { BusinessVisaoGeralGrid } from "@/components/mentoria/business/BusinessVisaoGeralGrid";
 
-import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
+
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
 import { IAplicadaRoadmap } from "@/components/mentoria/business/IAplicadaRoadmap";
@@ -77,7 +77,7 @@ export default function Mentoria() {
 
   useEffect(() => {
     if (!isBusinessParceria) return;
-    const sectionIds = ['visao-geral', 'roadmap', 'evolucao'];
+    const sectionIds = ['visao-geral', 'evolucao'];
     const observers = sectionIds.map(id => {
       const el = document.getElementById(`sec-${id}`);
       if (!el) return null;
@@ -124,8 +124,8 @@ export default function Mentoria() {
     }
   };
 
-  const sectionLabels = ['Visão Geral', 'Roadmap', 'Evolução'];
-  const sectionIds = ['visao-geral', 'roadmap', 'evolucao'];
+  const sectionLabels = ['Visão Geral', 'Evolução'];
+  const sectionIds = ['visao-geral', 'evolucao'];
 
   return (
     <div className="container mx-auto py-4 md:py-8 px-4 max-w-7xl">
