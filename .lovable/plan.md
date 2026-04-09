@@ -1,40 +1,36 @@
 
 
-# Fix: Lógica de Saúde do Projeto mostrando "atrasado" em projeto recém-criado
+# Ajustar cores e adicionar seção visual em MeuSistemaDocumentos
 
-## Problema
+## 1. Corrigir cores dos stat cards
 
-A lógica compara `progressoEntregas` (0% quando não há entregas concluídas) com `cronogramaPercentual` (% do tempo já decorrido desde `data_inicio`). Em um projeto recém-cadastrado, mesmo que tenha passado apenas 1 dia de um contrato de 6 meses, o cronograma já marca ~1% e como entregas = 0%, o sistema diz "-1% atrasado". É uma comparação injusta porque no início de um projeto não se espera ter entregas concluídas.
+Os 4 stat cards no topo usam `bg-[#1a1a2e]` (azul escuro) e cores como `text-blue-400`, `text-purple-400` que não condizem com a marca. O padrão da plataforma usa `bg-[hsl(var(--chart-4))]` (verde da marca) conforme o `ProjetoOverviewCards`.
 
-## Solução
+**Mudança**: Trocar fundo e cores dos ícones para o padrão verde da marca:
+- Fundo dos cards: `bg-[hsl(var(--chart-4))]` (verde escuro da marca)
+- Cores dos ícones: tons de `text-white/70` uniformes (como nos StatCards do overview)
+- Texto: branco com opacidade como no padrão existente
 
-**Arquivo**: `src/components/meu-sistema/ProjetoOverviewCards.tsx` (linhas 162-169)
+## 2. Adicionar seção visual abaixo das tabs
 
-Adicionar uma **zona de tolerância** proporcional ao início do projeto:
+Após o conteúdo das tabs, inserir uma seção de **Resumo do Projeto** com 2-3 cards informativos:
 
-- Se o cronograma está abaixo de 15% (início do projeto), o status padrão é **"Saudável"** desde que não haja atraso grave (entregas muito abaixo do esperado)
-- Aplicar uma margem de tolerância de 10% antes de classificar como "Em Risco"
-- Quando `totalEntregas === 0` (nenhuma entrega cadastrada), mostrar **"Novo"** com trend neutro em vez de calcular atraso
+- **Evolução das Entregas**: Mini card com progresso visual (barra ou percentual) mostrando entregas concluídas vs total, usando dados do contrato
+- **Atividade Recente**: Timeline compacta dos últimos 5 itens adicionados (arquivos, notas, links) com data e tipo, dando noção de movimentação
+- **Insight do Projeto**: Card com texto dinâmico baseado nos dados disponíveis (ex: "Você tem X anotações e Y arquivos. Seu projeto está Z% concluído." ou dicas como "Adicione anotações para registrar decisões importantes")
 
-### Lógica revisada
+Esses dados já existem no escopo do componente (`documentos`, `notas`, `links`, `contrato`).
 
-```typescript
-let saude;
-if (totalEntregas === 0) {
-  // Projeto sem entregas cadastradas ainda
-  saude = { label: "Novo", trend: "neutral", changeText: "Nenhuma entrega cadastrada" };
-} else if (progressoEntregas > cronogramaPercentual + 10) {
-  saude = { label: "Avançado", trend: "positive", changeText: `+${...}% à frente` };
-} else if (progressoEntregas >= cronogramaPercentual - 10) {
-  // Tolerância de 10% para considerar saudável
-  saude = { label: "Saudável", trend: "positive", changeText: "Alinhado ao cronograma" };
-} else if (cronogramaPercentual <= 15) {
-  // Início do projeto — não marcar como risco
-  saude = { label: "Saudável", trend: "neutral", changeText: "Projeto em fase inicial" };
-} else {
-  saude = { label: "Em Risco", trend: "negative", changeText: `${...}% atrasado` };
-}
-```
+## Arquivo
 
-Isso evita que um projeto recém-criado apareça como "Em Risco" quando é esperado que não tenha entregas concluídas ainda.
+| Arquivo | Ação |
+|---|---|
+| `src/pages/MeuSistemaDocumentos.tsx` | Editar — cores dos stat cards + nova seção visual |
+
+## Detalhes técnicos
+
+- Usar `contrato.data_inicio`, `contrato.data_fim` para calcular progresso temporal
+- Combinar `documentos`, `notas`, `links` ordenados por `created_at` para timeline de atividade recente
+- Insight textual gerado client-side com lógica condicional simples (sem IA)
+- Cards seguem padrão escuro `bg-[hsl(var(--chart-4))]` com texto branco
 
