@@ -1,26 +1,52 @@
 
 
-# Fix: Conteúdo de Entregas ultrapassando a página com sidebar aberta
+# Fix: Anotações — botão salvar, formatação rica e organização por IA
 
-## Causa raiz
+## Problemas identificados
 
-No `MainLayout.tsx`, o container que envolve o `<main>` é um flex item (`flex-1`) mas **não tem `min-w-0`**. Em flexbox, itens têm `min-width: auto` por padrão, o que impede que encolham abaixo da largura intrínseca do conteúdo. Quando o sidebar abre e reduz o espaço disponível, esse div se recusa a encolher, empurrando o conteúdo para fora da tela.
-
-Mesmo com `overflow-x-hidden` no `<main>` e `overflow-hidden` na página de Entregas, o problema persiste porque o container pai não permite o encolhimento.
+1. **Ao criar uma nova anotação**, ela aparece fechada (Collapsible). O usuário precisa clicar para expandir, e o botão Salvar só aparece após editar — fluxo confuso
+2. **Sem ferramentas de formatação** — não há como inserir emojis, bullet points ou listas numeradas
+3. **Sem botão de organização automática** — o usuário quer um botão que estruture o texto escrito de forma mais organizada
 
 ## Solução
 
-**Arquivo**: `src/components/layout/MainLayout.tsx` (linha 82)
+**Arquivo**: `src/components/admin/business/NotasProjetoSection.tsx`
 
-Adicionar `min-w-0` ao div que envolve o `<main>`:
+### 1. Auto-abrir nota recém-criada + botão Salvar sempre visível em modo edição
 
-```
-// De:
-<div className="flex-1 flex flex-col relative z-[1]">
+- Passar um prop `autoOpen` para `NotaCard` quando a nota acabou de ser criada
+- O botão **Salvar** ficará sempre visível quando a nota estiver aberta em modo edição (não apenas quando `dirty`). Quando não houver alterações, ficará desabilitado
 
-// Para:
-<div className="flex-1 flex flex-col relative z-[1] min-w-0">
-```
+### 2. Barra de formatação com emojis, bullets e números
 
-Essa única mudança resolve o problema na raiz. O flex item passa a aceitar encolher quando o sidebar ocupa espaço, e o `overflow-x-hidden` já existente no `<main>` corta qualquer conteúdo que transborde. Funciona para a página de Entregas e qualquer outra página que tenha conteúdo largo.
+Adicionar uma toolbar acima do `Textarea` com botões:
+- **Bullet point** (`•`) — insere `• ` no cursor
+- **Lista numerada** (`1.`) — insere `1. ` no cursor  
+- **Emoji picker** — popover com emojis comuns (categorias: geral, status, objetos) que insere no cursor
+
+A inserção será feita manipulando o valor do textarea na posição do cursor (`selectionStart`).
+
+### 3. Botão "Organizar com IA"
+
+- Ícone de varinha/sparkles com label "Organizar"
+- Ao clicar, envia o conteúdo atual para o Lovable AI Gateway (modelo `google/gemini-2.5-flash-lite`) com prompt para:
+  - Estruturar o texto em tópicos
+  - Corrigir ortografia
+  - Manter o conteúdo original, apenas reorganizar
+- Substitui o conteúdo do textarea com o resultado e marca como `dirty`
+- Loading state no botão durante processamento
+
+### Mudanças concretas
+
+| Arquivo | Ação |
+|---|---|
+| `src/components/admin/business/NotasProjetoSection.tsx` | Editar — toolbar, auto-open, salvar visível, botão IA |
+| `supabase/functions/organizar-nota/index.ts` | Criar — edge function para chamar IA e organizar texto |
+
+### Detalhes técnicos
+
+- Edge function recebe `{ conteudo: string }` e retorna `{ resultado: string }`
+- Usa Lovable AI Gateway para processar o texto
+- Emoji picker implementado como Popover com grid de emojis comuns (sem dependência externa)
+- `useRef` no textarea para controlar posição do cursor na inserção de formatação
 
