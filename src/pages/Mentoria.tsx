@@ -26,6 +26,7 @@ import { BusinessVisaoGeralGrid } from "@/components/mentoria/business/BusinessV
 import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
 import { IAplicadaVisaoGeral } from "@/components/mentoria/business/IAplicadaVisaoGeral";
 import { IAplicadaRoadmap } from "@/components/mentoria/business/IAplicadaRoadmap";
+import { BusinessExecutiveRoadmap } from "@/components/mentoria/business/BusinessExecutiveRoadmap";
 import { JornadaStrip } from "@/components/mentoria/JornadaStrip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -92,11 +93,19 @@ export default function Mentoria() {
 
   // Business Parceria: interceptar tabs e fazer scroll
   useEffect(() => {
-    if (isBusinessParceria && searchParams.get("tab") === "evolucao-aprendizado") {
+    if (!isBusinessParceria) return;
+    const tab = searchParams.get("tab");
+    if (tab === "evolucao-aprendizado") {
       searchParams.delete("tab");
       setSearchParams(searchParams, { replace: true });
       setTimeout(() => {
         document.getElementById("sec-evolucao")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    } else if (tab === "roadmap") {
+      searchParams.delete("tab");
+      setSearchParams(searchParams, { replace: true });
+      setTimeout(() => {
+        document.getElementById("sec-roadmap")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     }
   }, [isBusinessParceria, searchParams, setSearchParams]);
@@ -187,7 +196,7 @@ export default function Mentoria() {
 
           <section id="sec-roadmap" className="scroll-mt-28 mt-10 space-y-4">
             <h2 className="text-lg font-semibold text-foreground">Roadmap</h2>
-            <AcademyRoadmapEducacional />
+            <BusinessExecutiveRoadmap />
           </section>
 
           <section id="sec-evolucao" className="scroll-mt-28 mt-10 space-y-4">
