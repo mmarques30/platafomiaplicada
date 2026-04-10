@@ -1,25 +1,37 @@
 
 
-# Remover `readOnly` das seções de Arquivos e Anotações no Business Parceria
+# Notificações para Admin quando mentorados adicionam documentos, notas e links
 
 ## Problema
 
-Na página de Documentos do Business Parceria (`MentoriaDocumentos.tsx`), as abas **Arquivos** e **Anotações** estão com a prop `readOnly` ativada, impedindo mentorados de criar, editar ou excluir itens. Isso contradiz a regra de que mentorados possuem autonomia total sobre seus próprios arquivos, notas e links.
+Quando mentorados/empresas adicionam documentos, anotações ou links no painel de Documentos, o admin não recebe nenhuma notificação.
 
-A página equivalente do Business Sistemas (`MeuSistemaDocumentos.tsx`) já funciona corretamente — sem `readOnly`.
+## Solução
 
-## Correção
+Criar 3 triggers de banco de dados (SECURITY DEFINER) que notificam todos os admins automaticamente quando um mentorado insere um novo registro nas tabelas:
 
-**Arquivo**: `src/pages/MentoriaDocumentos.tsx`
+1. **`documentos_business`** — quando um documento/arquivo é adicionado
+2. **`notas_projeto_business`** — quando uma anotação é criada
+3. **`links_business`** — quando um link é adicionado
 
-- **Linha 201**: Remover `readOnly` de `<ArquivosProjetoSection contratoId={contrato.id} readOnly />`
-- **Linha 205**: Remover `readOnly` de `<NotasProjetoSection contratoId={contrato.id} readOnly />`
+Cada trigger:
+- Busca o `nome_empresa` do contrato associado (via `contrato_id → contratos_business`)
+- Busca todos os `user_id` com role `admin` na tabela `user_roles`
+- Insere uma notificação para cada admin na tabela `notificacoes` com tipo, título e mensagem descritivos
+- Inclui link direto para o painel de mentoria do usuário (`/admin/mentoria?user=<user_id>`)
+- **Ignora** inserções feitas pelo próprio admin (compara `auth.uid()` com os admin_ids)
 
-Resultado:
-```tsx
-<ArquivosProjetoSection contratoId={contrato.id} />
-<NotasProjetoSection contratoId={contrato.id} />
-```
+## Migração SQL
 
-Isso libera criação, edição e exclusão de arquivos e anotações para mentorados do Business Parceria, igualando o comportamento ao Business Sistemas.
+Uma única migração com 3 funções + 3 triggers:
+
+- `notificar_admin_novo_documento()` → trigger ON INSERT em `documentos_business`
+- `notificar_admin_nova_nota()` → trigger ON INSERT em `notas_projeto_business`
+- `notificar_admin_novo_link()` → trigger ON INSERT em `links_business`
+
+Cada função segue o mesmo padrão já existente em `notificar_nova_duvida()` e `notificar_novo_visitante()`.
+
+## Nenhuma alteração de frontend
+
+O sistema de notificações existente (sino no header + página `/notificacoes`) já exibe notificações da tabela `notificacoes`. As novas notificações aparecerão automaticamente.
 
