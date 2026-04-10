@@ -198,11 +198,11 @@ export default function MentoriaDocumentos() {
         </TabsList>
 
         <TabsContent value="arquivos" className="mt-4">
-          <ArquivosProjetoSection contratoId={contrato.id} readOnly />
+          <ArquivosProjetoSection contratoId={contrato.id} />
         </TabsContent>
 
         <TabsContent value="anotacoes" className="mt-4">
-          <NotasProjetoSection contratoId={contrato.id} readOnly />
+          <NotasProjetoSection contratoId={contrato.id} />
         </TabsContent>
 
         <TabsContent value="links" className="space-y-4 mt-4">
