@@ -105,7 +105,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
     if (previewMode) return;
     if (!user?.id) return;
     const chave = `proximos_passos_v2_${user.id}`;
-    if (profile?.primeiro_acesso === false && !localStorage.getItem(chave)) {
+    if (profile?.primeiro_acesso === false && profile?.senha_temporaria !== true && !localStorage.getItem(chave)) {
       setMostrar(true);
     }
   }, [profile?.primeiro_acesso, user?.id, previewMode]);
