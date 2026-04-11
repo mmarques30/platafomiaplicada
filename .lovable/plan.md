@@ -1,37 +1,41 @@
 
 
-# Notificações para Admin quando mentorados adicionam documentos, notas e links
+# Corrigir tela "congelada" para novos usuários Business
 
-## Problema
+## Diagnóstico
 
-Quando mentorados/empresas adicionam documentos, anotações ou links no painel de Documentos, o admin não recebe nenhuma notificação.
+Encontrei a causa raiz. Veja o estado da Uiara no banco:
+- `primeiro_acesso: false` (já passou pelo BusinessWelcome)
+- `senha_temporaria: true` (nunca conseguiu trocar a senha)
 
-## Solução
+Quando ela faz login, **dois modais aparecem ao mesmo tempo**:
 
-Criar 3 triggers de banco de dados (SECURITY DEFINER) que notificam todos os admins automaticamente quando um mentorado insere um novo registro nas tabelas:
+1. **TrocarSenhaModal** — Dialog Radix com `modal={true}`, que **trava o foco** (focus trap) e impede interação com qualquer elemento fora dele
+2. **ProximosPassosCard** — Portal com `z-index: 9998`, que fica **visualmente por cima** do TrocarSenhaModal
 
-1. **`documentos_business`** — quando um documento/arquivo é adicionado
-2. **`notas_projeto_business`** — quando uma anotação é criada
-3. **`links_business`** — quando um link é adicionado
+Resultado: ela **vê** o ProximosPassosCard mas **não consegue clicar** em nada (X, CTAs) porque o focus trap do Dialog Radix bloqueia a interação. O sistema parece "congelado".
 
-Cada trigger:
-- Busca o `nome_empresa` do contrato associado (via `contrato_id → contratos_business`)
-- Busca todos os `user_id` com role `admin` na tabela `user_roles`
-- Insere uma notificação para cada admin na tabela `notificacoes` com tipo, título e mensagem descritivos
-- Inclui link direto para o painel de mentoria do usuário (`/admin/mentoria?user=<user_id>`)
-- **Ignora** inserções feitas pelo próprio admin (compara `auth.uid()` com os admin_ids)
+Outros usuários afetados (mesmo padrão `primeiro_acesso=false` + `senha_temporaria=true`): nenhum além da Uiara no momento. Porém, vários têm `primeiro_acesso=true` + `senha_temporaria=true` (Nathalia, Raquel, Alcir, B&Z, Moises, Quadra, Gilberto) — esses passariam pelo mesmo bug ao concluírem o BusinessWelcome.
 
-## Migração SQL
+## Correção
 
-Uma única migração com 3 funções + 3 triggers:
+**Arquivo**: `src/components/onboarding/ProximosPassosCard.tsx`
 
-- `notificar_admin_novo_documento()` → trigger ON INSERT em `documentos_business`
-- `notificar_admin_nova_nota()` → trigger ON INSERT em `notas_projeto_business`
-- `notificar_admin_novo_link()` → trigger ON INSERT em `links_business`
+Na condição do `useEffect` (linha 108), adicionar verificação de `senha_temporaria`:
 
-Cada função segue o mesmo padrão já existente em `notificar_nova_duvida()` e `notificar_novo_visitante()`.
+```tsx
+// De:
+if (profile?.primeiro_acesso === false && !localStorage.getItem(chave)) {
 
-## Nenhuma alteração de frontend
+// Para:
+if (profile?.primeiro_acesso === false && profile?.senha_temporaria !== true && !localStorage.getItem(chave)) {
+```
 
-O sistema de notificações existente (sino no header + página `/notificacoes`) já exibe notificações da tabela `notificacoes`. As novas notificações aparecerão automaticamente.
+Isso garante que o ProximosPassosCard só aparece **após** a troca de senha obrigatória, eliminando o conflito entre os dois modais. A sequência correta para novos usuários Business passa a ser:
+
+1. Login → BusinessWelcome (primeiro_acesso=true)
+2. Clica "Entrar" → volta ao MainLayout (primeiro_acesso=false)
+3. TrocarSenhaModal aparece sozinho → troca a senha (senha_temporaria=false)
+4. ProximosPassosCard aparece sozinho → fecha normalmente
+5. Acessa o sistema sem bloqueios
 
