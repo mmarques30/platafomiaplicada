@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Joyride, STATUS, EVENTS } from "react-joyride";
 import type { Step, EventData, Controls } from "react-joyride";
 import { supabase } from "@/integrations/supabase/client";
