@@ -27,7 +27,10 @@ interface VisaoGeralTabProps {
       totalUsuarios: number;
       usuariosAtivos: number;
       usuariosAtivos7d: number;
+      usuariosAtivos30d: number;
       usuariosInativos: number;
+      novosUsuarios7d: number;
+      novosUsuarios30d: number;
     };
     tendencias: {
       novosUsuarios: { direction: 'up' | 'down' | 'stable'; value: number };
@@ -109,7 +112,7 @@ export function VisaoGeralTab({ data }: VisaoGeralTabProps) {
           />
           <StatsCard
             title="Novos (7d)"
-            value={data.crescimento.usuariosAtivos7d > 0 ? `+${data.tendencias.novosUsuarios.value > 0 ? data.tendencias.novosUsuarios.value : 0}` : "0"}
+            value={data.crescimento.novosUsuarios7d}
             description="vs. 7 dias anteriores"
             icon={TrendingUp}
             trend={data.tendencias.novosUsuarios}
