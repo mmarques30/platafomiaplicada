@@ -105,7 +105,12 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
     if (previewMode) return;
     if (!user?.id) return;
     const chave = `proximos_passos_v2_${user.id}`;
-    if (profile?.primeiro_acesso === false && profile?.senha_temporaria !== true && !localStorage.getItem(chave)) {
+    const jaViuVideo = sessionStorage.getItem('onboarding_video_visto') === 'true';
+    if (
+      profile?.senha_temporaria !== true &&
+      !localStorage.getItem(chave) &&
+      (profile?.primeiro_acesso === false || jaViuVideo)
+    ) {
       setMostrar(true);
     }
   }, [profile?.primeiro_acesso, user?.id, previewMode]);
