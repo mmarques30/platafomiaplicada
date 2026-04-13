@@ -6160,6 +6160,54 @@ export type Database = {
           },
         ]
       }
+      webhook_lia_logs: {
+        Row: {
+          bill_id: string | null
+          created_at: string | null
+          customer_email: string | null
+          customer_name: string | null
+          entity_type: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          offer_id: string | null
+          offer_name: string | null
+          payload: Json
+          status: string
+          user_created_id: string | null
+        }
+        Insert: {
+          bill_id?: string | null
+          created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          entity_type?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          offer_id?: string | null
+          offer_name?: string | null
+          payload: Json
+          status?: string
+          user_created_id?: string | null
+        }
+        Update: {
+          bill_id?: string | null
+          created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          entity_type?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          offer_id?: string | null
+          offer_name?: string | null
+          payload?: Json
+          status?: string
+          user_created_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       historico_completo: {
