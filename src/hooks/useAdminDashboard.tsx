@@ -8,16 +8,14 @@ export function useAdminDashboard() {
     queryFn: async () => {
       const now = new Date();
       const sevenDaysAgo = subDays(now, 7).toISOString();
-      const fourteenDaysAgo = subDays(now, 14).toISOString();
       const thirtyDaysAgo = subDays(now, 30).toISOString();
-      const sixtyDaysAgo = subDays(now, 60).toISOString();
 
       // Buscar usuários (excluir visitantes)
       const { data: users, error: usersError } = await supabase
         .from("profiles")
         .select("id, nome_completo, plano_mentoria, created_at, conta_ativa, data_conversao, ultimo_acesso")
         .eq("is_visitante", false);
-
+      
       if (usersError) throw usersError;
 
       // Buscar visitantes separadamente
@@ -25,7 +23,7 @@ export function useAdminDashboard() {
         .from("profiles")
         .select("id, nome_completo, created_at, conta_ativa")
         .eq("is_visitante", true);
-
+      
       if (visitantesError) throw visitantesError;
 
       // Buscar tarefas atrasadas
@@ -35,7 +33,7 @@ export function useAdminDashboard() {
         .lt("prazo_entrega", now.toISOString())
         .neq("status", "concluida")
         .order("prazo_entrega", { ascending: true });
-
+      
       if (tarefasError) throw tarefasError;
 
       // Buscar dúvidas pendentes
@@ -44,7 +42,7 @@ export function useAdminDashboard() {
         .select("id, titulo, created_at, prioridade")
         .eq("status", "pendente")
         .order("created_at", { ascending: true });
-
+      
       if (duvidasError) throw duvidasError;
 
       // Buscar diagnósticos incompletos
@@ -53,21 +51,21 @@ export function useAdminDashboard() {
         .select("id, user_id, created_at")
         .eq("completado", false)
         .order("created_at", { ascending: false });
-
+      
       if (diagnosticosError) throw diagnosticosError;
 
       // Buscar tarefas por status
       const { data: todasTarefas, error: todasTarefasError } = await supabase
         .from("tarefas_mentoria")
         .select("id, status");
-
+      
       if (todasTarefasError) throw todasTarefasError;
 
       // Buscar projetos por status
       const { data: projetos, error: projetosError } = await supabase
         .from("projetos_mentoria")
         .select("id, status");
-
+      
       if (projetosError) throw projetosError;
 
       // Buscar sessões agendadas
@@ -77,14 +75,14 @@ export function useAdminDashboard() {
         .eq("status", "agendada")
         .gte("data_sessao", now.toISOString())
         .order("data_sessao", { ascending: true });
-
+      
       if (sessoesError) throw sessoesError;
 
       // Buscar progresso de vídeos para engajamento
       const { data: progressoVideos, error: progressoError } = await supabase
         .from("progresso_videos")
         .select("user_id, completado, created_at, updated_at");
-
+      
       if (progressoError) throw progressoError;
 
       // Buscar conteúdo ativo
@@ -92,79 +90,63 @@ export function useAdminDashboard() {
         .from("trilhas")
         .select("id")
         .eq("ativo", true);
-
+      
       if (trilhasError) throw trilhasError;
 
       const { data: modulos, error: modulosError } = await supabase
         .from("modulos")
         .select("id")
         .eq("ativo", true);
-
+      
       if (modulosError) throw modulosError;
 
       const { data: videos, error: videosError } = await supabase
         .from("videos")
         .select("id")
         .eq("ativo", true);
-
+      
       if (videosError) throw videosError;
 
       const { data: ferramentas, error: ferramentasError } = await supabase
         .from("ferramentas_ia")
         .select("id")
         .eq("ativo", true);
-
+      
       if (ferramentasError) throw ferramentasError;
 
       // Buscar avaliações de vídeos
       const { data: ratings, error: ratingsError } = await supabase
         .from("video_ratings")
         .select("rating");
-
+      
       if (ratingsError) throw ratingsError;
 
-      // Buscar métricas da Mari (chat_messages) — apenas últimos 60 dias para performance
-      const { data: chatMessages, error: chatError } = await supabase
-        .from("chat_messages")
-        .select("user_id, role, created_at")
-        .gte("created_at", sixtyDaysAgo);
-
-      // Não bloquear dashboard se tabela chat_messages falhar
-      const chatData = chatError ? [] : (chatMessages || []);
-
-      // Calcular distribuição por plano (separando business_parceria e business_sistemas)
+      // Calcular distribuição por plano
       const distribuicaoPlanos = {
         academy: users?.filter(u => u.plano_mentoria === "academy").length || 0,
         skills: users?.filter(u => u.plano_mentoria === "skills").length || 0,
-        business_parceria: users?.filter(u => u.plano_mentoria === "business_parceria").length || 0,
-        business_sistemas: users?.filter(u => u.plano_mentoria === "business_sistemas").length || 0,
+        business: users?.filter(u => u.plano_mentoria === "business").length || 0,
         sem_plano: users?.filter(u => !u.plano_mentoria).length || 0,
       };
 
-      // Calcular novos usuários (período atual e anterior para tendências)
+      // Calcular novos usuários
       const novosUsuarios7d = users?.filter(u => u.created_at && new Date(u.created_at) >= new Date(sevenDaysAgo)).length || 0;
-      const novosUsuarios7dAnterior = users?.filter(u =>
-        u.created_at && new Date(u.created_at) >= new Date(fourteenDaysAgo) && new Date(u.created_at) < new Date(sevenDaysAgo)
-      ).length || 0;
       const novosUsuarios30d = users?.filter(u => u.created_at && new Date(u.created_at) >= new Date(thirtyDaysAgo)).length || 0;
-      const novosUsuarios30dAnterior = users?.filter(u =>
-        u.created_at && new Date(u.created_at) >= new Date(sixtyDaysAgo) && new Date(u.created_at) < new Date(thirtyDaysAgo)
-      ).length || 0;
 
       // Calcular conversões de visitantes (baseado em data_conversao)
-      const conversoes7d = users?.filter(u =>
+      const conversoes7d = users?.filter(u => 
         u.data_conversao && new Date(u.data_conversao) >= new Date(sevenDaysAgo)
       ).length || 0;
-      const conversoes30d = users?.filter(u =>
+      const conversoes30d = users?.filter(u => 
         u.data_conversao && new Date(u.data_conversao) >= new Date(thirtyDaysAgo)
       ).length || 0;
 
       // Calcular métricas de visitantes
       const totalVisitantes = visitantes?.length || 0;
-      const novosVisitantes7d = visitantes?.filter(v =>
+      const novosVisitantes7d = visitantes?.filter(v => 
         v.created_at && new Date(v.created_at) >= new Date(sevenDaysAgo)
       ).length || 0;
-      const novosVisitantes30d = visitantes?.filter(v =>
+      const novosVisitantes30d = visitantes?.filter(v => 
         v.created_at && new Date(v.created_at) >= new Date(thirtyDaysAgo)
       ).length || 0;
 
@@ -174,20 +156,12 @@ export function useAdminDashboard() {
         : 0;
 
       // Calcular usuários ativos (baseado em ultimo_acesso)
-      const usuariosAtivos7d = users?.filter(u =>
+      const usuariosAtivos7d = users?.filter(u => 
         u.ultimo_acesso && new Date(u.ultimo_acesso) >= new Date(sevenDaysAgo)
       ).length || 0;
-      const usuariosAtivos7dAnterior = users?.filter(u =>
-        u.ultimo_acesso && new Date(u.ultimo_acesso) >= new Date(fourteenDaysAgo) && new Date(u.ultimo_acesso) < new Date(sevenDaysAgo)
-      ).length || 0;
 
-      const usuariosAtivos30d = users?.filter(u =>
+      const usuariosAtivos30d = users?.filter(u => 
         u.ultimo_acesso && new Date(u.ultimo_acesso) >= new Date(thirtyDaysAgo)
-      ).length || 0;
-
-      // Usuários inativos (conta ativa mas sem acesso nos últimos 30 dias)
-      const usuariosInativos = users?.filter(u =>
-        u.conta_ativa && (!u.ultimo_acesso || new Date(u.ultimo_acesso) < new Date(thirtyDaysAgo))
       ).length || 0;
 
       // Top 5 usuários mais engajados
@@ -229,61 +203,19 @@ export function useAdminDashboard() {
       // Calcular projetos em andamento
       const projetosEmAndamento = projetos?.filter(p => p.status === "em_andamento" || p.status === "planejamento").length || 0;
 
-      // Calcular métricas da Mari
-      const totalMensagensMari = chatData.length;
-      const mensagensUsuario = chatData.filter(m => m.role === "user");
-      const mensagensAssistant = chatData.filter(m => m.role === "assistant");
-      const usuariosUsandoMari = new Set(chatData.map(m => m.user_id)).size;
-      const mensagensMari7d = chatData.filter(m =>
-        m.created_at && new Date(m.created_at) >= new Date(sevenDaysAgo)
-      ).length;
-      const mensagensMari7dAnterior = chatData.filter(m =>
-        m.created_at && new Date(m.created_at) >= new Date(fourteenDaysAgo) && new Date(m.created_at) < new Date(sevenDaysAgo)
-      ).length;
-      const usuariosMari7d = new Set(
-        chatData.filter(m => m.created_at && new Date(m.created_at) >= new Date(sevenDaysAgo)).map(m => m.user_id)
-      ).size;
-      const mediaConversasPorUsuario = usuariosUsandoMari > 0
-        ? Math.round(mensagensUsuario.length / usuariosUsandoMari)
-        : 0;
-
-      // Função helper para calcular tendência
-      const calcTendencia = (atual: number, anterior: number): 'up' | 'down' | 'stable' => {
-        if (anterior === 0 && atual > 0) return 'up';
-        if (anterior === 0 && atual === 0) return 'stable';
-        const diff = ((atual - anterior) / anterior) * 100;
-        if (diff > 5) return 'up';
-        if (diff < -5) return 'down';
-        return 'stable';
-      };
-
-      const calcVariacao = (atual: number, anterior: number): number => {
-        if (anterior === 0) return atual > 0 ? 100 : 0;
-        return Math.round(((atual - anterior) / anterior) * 100);
-      };
-
       return {
         alertas: {
           tarefasAtrasadas: tarefasAtrasadas?.length || 0,
           duvidasPendentes: duvidasPendentes?.length || 0,
           diagnosticosIncompletos: diagnosticosIncompletos?.length || 0,
-          total: (tarefasAtrasadas?.length || 0) + (duvidasPendentes?.length || 0) + (diagnosticosIncompletos?.length || 0),
         },
         crescimento: {
           novosUsuarios7d,
-          novosUsuarios7dAnterior,
           novosUsuarios30d,
-          novosUsuarios30dAnterior,
           usuariosAtivos7d,
-          usuariosAtivos7dAnterior,
           usuariosAtivos30d,
           totalUsuarios: users?.length || 0,
           usuariosAtivos: users?.filter(u => u.conta_ativa).length || 0,
-          usuariosInativos,
-          tendenciaNovoUsuarios7d: calcTendencia(novosUsuarios7d, novosUsuarios7dAnterior),
-          tendenciaAtivos7d: calcTendencia(usuariosAtivos7d, usuariosAtivos7dAnterior),
-          variacaoNovoUsuarios7d: calcVariacao(novosUsuarios7d, novosUsuarios7dAnterior),
-          variacaoAtivos7d: calcVariacao(usuariosAtivos7d, usuariosAtivos7dAnterior),
         },
         visitantes: {
           total: totalVisitantes,
@@ -307,23 +239,8 @@ export function useAdminDashboard() {
           mediaAvaliacoes,
         },
         topUsuarios,
-        mari: {
-          totalMensagens: totalMensagensMari,
-          mensagensUsuario: mensagensUsuario.length,
-          mensagensAssistant: mensagensAssistant.length,
-          usuariosUsandoMari,
-          mensagens7d: mensagensMari7d,
-          mensagens7dAnterior: mensagensMari7dAnterior,
-          usuariosMari7d,
-          mediaConversasPorUsuario,
-          tendenciaMensagens7d: calcTendencia(mensagensMari7d, mensagensMari7dAnterior),
-          variacaoMensagens7d: calcVariacao(mensagensMari7d, mensagensMari7dAnterior),
-          taxaAdocao: (users?.length || 0) > 0
-            ? Math.round((usuariosUsandoMari / (users?.length || 1)) * 100)
-            : 0,
-        },
       };
     },
-    refetchInterval: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000, // Atualiza a cada 5 minutos
   });
 }

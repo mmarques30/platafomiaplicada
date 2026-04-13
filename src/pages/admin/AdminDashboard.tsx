@@ -5,12 +5,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { VisaoGeralTab } from "@/components/admin/dashboard/VisaoGeralTab";
 import { UsuariosTab } from "@/components/admin/dashboard/UsuariosTab";
 import { EngajamentoTab } from "@/components/admin/dashboard/EngajamentoTab";
-import { ResumoTab } from "@/components/admin/dashboard/ResumoTab";
+import { PaginaGratuitaTab } from "@/components/admin/dashboard/PaginaGratuitaTab";
+import { ConteudoTab } from "@/components/admin/dashboard/ConteudoTab";
+import { MentoriaTab } from "@/components/admin/dashboard/MentoriaTab";
 import { adminTheme } from "@/components/admin/adminTheme";
+import { ResumoTab } from "@/components/admin/dashboard/ResumoTab";
 import {
   LayoutDashboard,
   Users,
   TrendingUp,
+  Video,
+  GraduationCap,
+  Eye,
   FileText,
 } from "lucide-react";
 
@@ -54,19 +60,31 @@ export default function AdminDashboard() {
         <TabsList className={adminTheme.tabsList}>
           <TabsTrigger value="visao-geral" className={adminTheme.tabsTrigger}>
             <LayoutDashboard className={adminTheme.tabsIcon} />
-            Visao Geral
+            Visão Geral
           </TabsTrigger>
           <TabsTrigger value="usuarios" className={adminTheme.tabsTrigger}>
             <Users className={adminTheme.tabsIcon} />
-            Usuarios & Conversao
+            Usuários
           </TabsTrigger>
           <TabsTrigger value="engajamento" className={adminTheme.tabsTrigger}>
             <TrendingUp className={adminTheme.tabsIcon} />
             Engajamento
           </TabsTrigger>
+          <TabsTrigger value="pagina-gratuita" className={adminTheme.tabsTrigger}>
+            <Eye className={adminTheme.tabsIcon} />
+            Página Gratuita
+          </TabsTrigger>
+          <TabsTrigger value="conteudo" className={adminTheme.tabsTrigger}>
+            <Video className={adminTheme.tabsIcon} />
+            Conteúdo
+          </TabsTrigger>
+          <TabsTrigger value="mentoria" className={adminTheme.tabsTrigger}>
+            <GraduationCap className={adminTheme.tabsIcon} />
+            Mentoria
+          </TabsTrigger>
           <TabsTrigger value="resumo" className={adminTheme.tabsTrigger}>
             <FileText className={adminTheme.tabsIcon} />
-            Resumo IA
+            Resumo
           </TabsTrigger>
         </TabsList>
 
@@ -80,6 +98,18 @@ export default function AdminDashboard() {
 
         <TabsContent value="engajamento" className={adminTheme.tabsContent}>
           <EngajamentoTab />
+        </TabsContent>
+
+        <TabsContent value="pagina-gratuita" className={adminTheme.tabsContent}>
+          <PaginaGratuitaTab />
+        </TabsContent>
+
+        <TabsContent value="conteudo" className={adminTheme.tabsContent}>
+          <ConteudoTab data={data} />
+        </TabsContent>
+
+        <TabsContent value="mentoria" className={adminTheme.tabsContent}>
+          <MentoriaTab data={data} />
         </TabsContent>
 
         <TabsContent value="resumo" className={adminTheme.tabsContent}>

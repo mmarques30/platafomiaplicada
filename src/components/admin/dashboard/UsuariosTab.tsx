@@ -5,17 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   Users,
   TrendingUp,
   UserPlus,
   UserCheck,
-  FolderKanban,
-  CheckSquare,
-  Calendar,
-  Target,
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -45,15 +49,6 @@ interface UsuariosTabProps {
       conversoes30d: number;
       taxaConversao: number;
     };
-    mentoria: {
-      projetosEmAndamento: number;
-      tarefasPorStatus: {
-        pendente: number;
-        em_andamento: number;
-        concluida: number;
-      };
-      sessoesAgendadas: number;
-    };
     topUsuarios: TopUsuario[];
   };
 }
@@ -69,14 +64,22 @@ export function UsuariosTab({ data }: UsuariosTabProps) {
   const novosVisitantes = periodo === "7d" ? data.visitantes.novos7d : data.visitantes.novos30d;
   const conversoes = periodo === "7d" ? data.visitantes.conversoes7d : data.visitantes.conversoes30d;
 
-  const totalTarefas =
-    data.mentoria.tarefasPorStatus.pendente +
-    data.mentoria.tarefasPorStatus.em_andamento +
-    data.mentoria.tarefasPorStatus.concluida;
-
-  const taxaConclusao = totalTarefas > 0
-    ? Math.round((data.mentoria.tarefasPorStatus.concluida / totalTarefas) * 100)
-    : 0;
+  // Dados simulados para o gráfico (em produção viria do hook)
+  const chartData = periodo === "7d" 
+    ? [
+        { dia: "Seg", novos: Math.round(novosUsuarios / 7), ativos: Math.round(usuariosAtivos / 3) },
+        { dia: "Ter", novos: Math.round(novosUsuarios / 6), ativos: Math.round(usuariosAtivos / 2.5) },
+        { dia: "Qua", novos: Math.round(novosUsuarios / 5), ativos: Math.round(usuariosAtivos / 2) },
+        { dia: "Qui", novos: Math.round(novosUsuarios / 4), ativos: Math.round(usuariosAtivos / 1.8) },
+        { dia: "Sex", novos: Math.round(novosUsuarios / 5), ativos: Math.round(usuariosAtivos / 1.5) },
+        { dia: "Sáb", novos: Math.round(novosUsuarios / 8), ativos: Math.round(usuariosAtivos / 3) },
+        { dia: "Dom", novos: Math.round(novosUsuarios / 10), ativos: Math.round(usuariosAtivos / 4) },
+      ]
+    : Array.from({ length: 4 }, (_, i) => ({
+        dia: `Semana ${i + 1}`,
+        novos: Math.round(novosUsuarios / 4),
+        ativos: Math.round(usuariosAtivos / 2),
+      }));
 
   return (
     <div className="space-y-6">
@@ -93,30 +96,68 @@ export function UsuariosTab({ data }: UsuariosTabProps) {
       {/* Cards de Métricas */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="Novos Usuarios"
+          title="Novos Usuários"
           value={novosUsuarios}
-          description={`Ultimos ${periodo === "7d" ? "7" : "30"} dias`}
+          description={`Últimos ${periodo === "7d" ? "7" : "30"} dias`}
           icon={UserPlus}
         />
         <StatsCard
-          title="Usuarios Ativos"
+          title="Usuários Ativos"
           value={usuariosAtivos}
-          description={`Ultimos ${periodo === "7d" ? "7" : "30"} dias`}
+          description={`Últimos ${periodo === "7d" ? "7" : "30"} dias`}
           icon={UserCheck}
         />
         <StatsCard
-          title="Total de Usuarios"
+          title="Total de Usuários"
           value={data.crescimento.totalUsuarios}
           description={`${data.crescimento.usuariosAtivos} contas ativas`}
           icon={Users}
         />
         <StatsCard
-          title="Taxa de Retencao"
+          title="Taxa de Retenção"
           value={`${data.crescimento.totalUsuarios > 0 ? Math.round((usuariosAtivos / data.crescimento.totalUsuarios) * 100) : 0}%`}
           description="Ativos / Total"
           icon={TrendingUp}
         />
       </div>
+
+      {/* Gráfico de Evolução */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Evolução de Usuários</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="dia" className="text-xs" />
+                <YAxis className="text-xs" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--background))', 
+                    border: '1px solid hsl(var(--border))' 
+                  }} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="novos" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={2}
+                  name="Novos"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="ativos" 
+                  stroke="hsl(var(--chart-2))" 
+                  strokeWidth={2}
+                  name="Ativos"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Visitantes */}
       <div>
@@ -132,135 +173,60 @@ export function UsuariosTab({ data }: UsuariosTabProps) {
           <StatsCard
             title="Novos Visitantes"
             value={novosVisitantes}
-            description={`Ultimos ${periodo === "7d" ? "7" : "30"} dias`}
+            description={`Últimos ${periodo === "7d" ? "7" : "30"} dias`}
             icon={UserPlus}
           />
           <StatsCard
-            title="Conversoes"
+            title="Conversões"
             value={conversoes}
-            description={`${data.visitantes.taxaConversao}% taxa de conversao`}
+            description={`${data.visitantes.taxaConversao}% taxa de conversão`}
             icon={TrendingUp}
           />
         </div>
       </div>
 
-      {/* Mentoria */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">Mentoria</h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="Projetos em Andamento"
-            value={data.mentoria.projetosEmAndamento}
-            description="Planejamento + Em andamento"
-            icon={FolderKanban}
-          />
-          <StatsCard
-            title="Tarefas Pendentes"
-            value={data.mentoria.tarefasPorStatus.pendente}
-            description={`${data.mentoria.tarefasPorStatus.em_andamento} em andamento`}
-            icon={CheckSquare}
-          />
-          <StatsCard
-            title="Tarefas Concluidas"
-            value={data.mentoria.tarefasPorStatus.concluida}
-            description="Total concluido"
-            icon={CheckSquare}
-          />
-          <StatsCard
-            title="Sessoes Agendadas"
-            value={data.mentoria.sessoesAgendadas}
-            description="Proximas sessoes"
-            icon={Calendar}
-          />
-        </div>
-      </div>
-
-      {/* Taxa de Conclusão + Top Usuários */}
-      <div className="grid gap-4 md:grid-cols-2">
+      {/* Top Usuários */}
+      {data.topUsuarios.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Taxa de Conclusao de Tarefas
-            </CardTitle>
+            <CardTitle className="text-lg">Top Usuários Engajados</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <span className="text-4xl font-bold">{taxaConclusao}%</span>
-              <p className="text-sm text-muted-foreground mt-1">
-                {data.mentoria.tarefasPorStatus.concluida} de {totalTarefas} tarefas
-              </p>
-            </div>
-            <Progress value={taxaConclusao} className="h-3" />
-            <div className="space-y-2 pt-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span className="text-sm">Pendentes</span>
-                </div>
-                <span className="font-medium">{data.mentoria.tarefasPorStatus.pendente}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500" />
-                  <span className="text-sm">Em Andamento</span>
-                </div>
-                <span className="font-medium">{data.mentoria.tarefasPorStatus.em_andamento}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
-                  <span className="text-sm">Concluidas</span>
-                </div>
-                <span className="font-medium">{data.mentoria.tarefasPorStatus.concluida}</span>
-              </div>
-            </div>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Usuário</TableHead>
+                  <TableHead className="text-center">Vídeos Assistidos</TableHead>
+                  <TableHead className="text-center">Concluídos</TableHead>
+                  <TableHead className="text-right">Último Acesso</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.topUsuarios.map((usuario, index) => (
+                  <TableRow key={usuario.userId}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="w-6 h-6 flex items-center justify-center p-0">
+                          {index + 1}
+                        </Badge>
+                        {usuario.nome}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">{usuario.videosAssistidos}</TableCell>
+                    <TableCell className="text-center">{usuario.videosConcluidos}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {usuario.ultimoAcesso 
+                        ? format(new Date(usuario.ultimoAcesso), "dd/MM/yyyy", { locale: ptBR })
+                        : "-"
+                      }
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
-
-        {/* Top Usuários */}
-        {data.topUsuarios.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Top Usuarios Engajados</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Usuario</TableHead>
-                    <TableHead className="text-center">Videos</TableHead>
-                    <TableHead className="text-center">Concluidos</TableHead>
-                    <TableHead className="text-right">Ultimo Acesso</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.topUsuarios.map((usuario, index) => (
-                    <TableRow key={usuario.userId}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="w-6 h-6 flex items-center justify-center p-0">
-                            {index + 1}
-                          </Badge>
-                          <span className="truncate max-w-[120px]">{usuario.nome}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">{usuario.videosAssistidos}</TableCell>
-                      <TableCell className="text-center">{usuario.videosConcluidos}</TableCell>
-                      <TableCell className="text-right text-muted-foreground text-sm">
-                        {usuario.ultimoAcesso
-                          ? format(new Date(usuario.ultimoAcesso), "dd/MM/yyyy", { locale: ptBR })
-                          : "-"
-                        }
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      )}
     </div>
   );
 }
