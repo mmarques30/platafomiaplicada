@@ -326,6 +326,38 @@ Deno.serve(async (req) => {
     const action = isExistingUser ? 'promovido de visitante' : 'criado'
     console.log(`User ${action} complete - by admin:`, user.id)
 
+    // Enviar email de boas-vindas via Zapier (Business ou Academy)
+    const isBusiness = effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'business_sistemas';
+    const isAcademy = effectivePlanoMentoria === 'academy';
+    const zapierUrl = isBusiness
+      ? Deno.env.get('ZAPIER_WEBHOOK_URL_BUSINESS')
+      : isAcademy
+        ? Deno.env.get('ZAPIER_WEBHOOK_URL')
+        : null;
+
+    if (zapierUrl) {
+      try {
+        await fetch(zapierUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            nome: nomeCompleto,
+            senha: password,
+            plano: effectivePlanoMentoria,
+            plano_label: isBusiness
+              ? (effectivePlanoMentoria === 'business_sistemas' ? 'Business Sistemas' : 'Business Parceria')
+              : 'Academy',
+            plataforma_url: 'https://platafomiaplicada.lovable.app',
+            acao: isExistingUser ? 'existing_user_updated' : 'new_user_created',
+          }),
+        });
+        console.log('Dados enviados para Zapier:', effectivePlanoMentoria)
+      } catch (zapierError) {
+        console.error('Erro ao enviar para Zapier (nao-bloqueante):', zapierError)
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
