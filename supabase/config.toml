@@ -109,3 +109,8 @@ verify_jwt = false
 
 [functions.gerar-curadoria-semanal]
 verify_jwt = true
+
+# Webhook da Lia para compras - nao requer JWT (chamada externa)
+# Autenticacao via x-webhook-secret header (env: LIA_WEBHOOK_SECRET)
+[functions.webhook-lia-compra]
+verify_jwt = false
