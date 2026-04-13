@@ -1,39 +1,66 @@
 
 
-# Corrigir tela de boas-vindas travada para novos usuários
+# Corrigir onboarding travado quando usuário não segue a ordem exata
 
-## Diagnóstico
+## Problema
 
-O problema é o mesmo padrão que já corrigimos no ProximosPassosCard: **dois modais aparecem simultaneamente e o focus trap do Radix Dialog bloqueia os cliques**.
+O onboarding tem uma cadeia sequencial rígida:
 
-Para novos usuários Academy (criados pelo webhook), o profile tem `primeiro_acesso: true` E `senha_temporaria: true`. Isso faz com que:
+```text
+OnboardingVideo → DashboardTour → ProximosPassosCard
+```
 
-1. **OnboardingVideo** apareça (z-index 9999) — visível na tela
-2. **TrocarSenhaModal** apareça (Radix Dialog com `modal={true}`) — invisível por baixo, mas com **focus trap ativo**
+Cada etapa depende da anterior ter sido concluída de forma específica:
 
-O focus trap do Radix captura todos os cliques, tornando os botões "Entrar na plataforma" e "Pular" do OnboardingVideo completamente inertes. O usuário fica preso.
+1. **OnboardingVideo** — seta `sessionStorage('onboarding_video_visto')`
+2. **DashboardTour** — só roda se `primeiro_acesso=true` E `sessionStorage` existe. Quando termina, seta `primeiro_acesso=false`
+3. **ProximosPassosCard** — só aparece se `primeiro_acesso=false`
+
+Se o usuário navega para o diagnóstico (ou qualquer outra página) **durante o tour**, o componente `DashboardTour` é desmontado sem disparar o evento `TOUR_END`. Isso significa que `primeiro_acesso` nunca vira `false`, e o **ProximosPassosCard nunca aparece**. O tour também re-inicia toda vez que volta ao Dashboard, mas pode falhar silenciosamente se os elementos do sidebar ainda não estiverem no DOM.
+
+Adicionalmente, `useTrocarSenha` seta `primeiro_acesso: false` diretamente, pulando vídeo, tour e próximos passos completamente para usuários do webhook.
 
 ## Correção
 
-**Arquivo**: `src/components/onboarding/OnboardingVideo.tsx`
+### 1. DashboardTour — tratar unmount como tour concluído
 
-Adicionar a mesma verificação que já existe no ProximosPassosCard: não mostrar o vídeo se `senha_temporaria === true`.
+**Arquivo**: `src/components/dashboard/DashboardTour.tsx`
 
+Adicionar um `useEffect` de cleanup que, ao desmontar o componente (usuário navegou para outra página), marca o tour como concluído (`primeiro_acesso: false`). Isso desbloqueia o ProximosPassosCard.
+
+### 2. useTrocarSenha — não setar `primeiro_acesso: false`
+
+**Arquivo**: `src/hooks/useTrocarSenha.tsx`
+
+Remover `primeiro_acesso: false` do update de troca de senha. A troca de senha deve apenas limpar `senha_temporaria`. O fluxo de onboarding (vídeo → tour → próximos passos) deve seguir seu próprio ciclo independente.
+
+### 3. ProximosPassosCard — fallback para primeiro_acesso=true
+
+**Arquivo**: `src/components/onboarding/ProximosPassosCard.tsx`
+
+Relaxar a condição de exibição: mostrar também quando `primeiro_acesso=true` E o vídeo já foi visto E o tour já teve chance de rodar (sessionStorage tem flag de vídeo). Isso garante que mesmo que o tour falhe, o card aparece.
+
+Condição atualizada:
 ```typescript
-// Linha 18-23, alterar o useEffect:
-useEffect(() => {
-  if (!previewMode && profile?.primeiro_acesso === true && profile?.senha_temporaria !== true) {
-    const jaVisto = sessionStorage.getItem('onboarding_video_visto') === 'true';
-    if (!jaVisto) setVisible(true);
-  }
-}, [profile, previewMode]);
+// Mostrar se:
+// - primeiro_acesso=false (tour concluído normalmente) OU
+// - primeiro_acesso=true E vídeo já visto (tour foi pulado/interrompido)
+// E sem senha temporária pendente
+// E não foi dismissado antes
+const jaViuVideo = sessionStorage.getItem('onboarding_video_visto') === 'true';
+if (
+  profile?.senha_temporaria !== true &&
+  !localStorage.getItem(chave) &&
+  (profile?.primeiro_acesso === false || jaViuVideo)
+) {
+  setMostrar(true);
+}
 ```
 
-## Sequência correta após a correção
+## Resultado esperado
 
-1. Login → MainLayout carrega
-2. TrocarSenhaModal aparece sozinho → troca a senha (`senha_temporaria` = false)
-3. OnboardingVideo aparece sozinho → clica "Entrar" → dismiss
-4. ProximosPassosCard aparece → fecha normalmente
-5. Usuário acessa o sistema
+- Usuário pode explorar livremente após o vídeo sem ficar preso
+- Tour aparece quando volta ao Dashboard (se ainda não foi concluído)
+- ProximosPassosCard aparece mesmo que o tour tenha sido interrompido
+- Troca de senha não pula o fluxo de onboarding
 
