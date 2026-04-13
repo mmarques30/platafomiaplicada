@@ -1,23 +1,32 @@
 
 
-# Fix: Edge Function "delete-user" bloqueada por CORS
+# Fix: Exclusão de usuários bloqueada por foreign keys
 
 ## Problema
 
-A Edge Function `delete-user` usa `getCorsHeaders()` que restringe origens a `platafomiaplicada.lovable.app` e `ocwpsanqtfubixerjive.supabase.co`. Quando você acessa pelo preview do Lovable (URL diferente), o browser bloqueia a requisição por CORS antes mesmo de ela chegar na função.
+O erro "Database error deleting user" acontece porque duas tabelas têm foreign keys para `auth.users` **sem `ON DELETE CASCADE`**. Quando o Supabase tenta deletar o usuário, o PostgreSQL bloqueia porque existem registros referenciando esse user.
 
-Além disso, os headers permitidos não incluem todos os que o SDK do Supabase envia (`x-supabase-client-platform`, `x-supabase-client-platform-version`, etc.), o que também pode causar falha no preflight.
+Tabelas com problema:
+- `notas_projeto_business.created_by` → sem ON DELETE
+- `webhook_lia_logs.user_created_id` → sem ON DELETE
 
 ## Correção
 
-**Arquivo**: `supabase/functions/delete-user/index.ts`
+Uma migration SQL para alterar as duas foreign keys, adicionando `ON DELETE SET NULL`:
 
-Substituir o uso de `getCorsHeaders()` pelo import padrão do SDK (`corsHeaders` do `@supabase/supabase-js/cors`) que usa `Access-Control-Allow-Origin: *` e inclui todos os headers necessários. A autenticação já é validada via token JWT no código, então a restrição de CORS por origem é redundante.
+```sql
+ALTER TABLE notas_projeto_business
+  DROP CONSTRAINT notas_projeto_business_created_by_fkey,
+  ADD CONSTRAINT notas_projeto_business_created_by_fkey
+    FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE SET NULL;
 
-Alterações:
-1. Trocar o import de `getCorsHeaders` para usar `corsHeaders` do SDK
-2. Remover a chamada dinâmica `getCorsHeaders(req)` e usar `corsHeaders` diretamente
-3. Adicionar `Access-Control-Allow-Methods` no preflight
+ALTER TABLE webhook_lia_logs
+  DROP CONSTRAINT webhook_lia_logs_user_created_id_fkey,
+  ADD CONSTRAINT webhook_lia_logs_user_created_id_fkey
+    FOREIGN KEY (user_created_id) REFERENCES auth.users(id) ON DELETE SET NULL;
+```
 
-Isso alinha o `delete-user` com o padrão recomendado para Edge Functions e resolve o erro "Failed to send a request".
+Usamos `SET NULL` ao invés de `CASCADE` para preservar os registros de notas e logs mesmo após exclusão do usuário.
+
+Nenhuma alteração de código é necessária - apenas a migration no banco.
 
