@@ -2,13 +2,24 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { subDays } from "date-fns";
 
+function calcTrend(current: number, previous: number): { direction: 'up' | 'down' | 'stable'; value: number } {
+  if (previous === 0 && current === 0) return { direction: 'stable', value: 0 };
+  if (previous === 0) return { direction: 'up', value: 100 };
+  const change = Math.round(((current - previous) / previous) * 100);
+  if (change > 0) return { direction: 'up', value: change };
+  if (change < 0) return { direction: 'down', value: Math.abs(change) };
+  return { direction: 'stable', value: 0 };
+}
+
 export function useAdminDashboard() {
   return useQuery({
     queryKey: ["admin-dashboard"],
     queryFn: async () => {
       const now = new Date();
       const sevenDaysAgo = subDays(now, 7).toISOString();
+      const fourteenDaysAgo = subDays(now, 14).toISOString();
       const thirtyDaysAgo = subDays(now, 30).toISOString();
+      const sixtyDaysAgo = subDays(now, 60).toISOString();
 
       // Buscar usuários (excluir visitantes)
       const { data: users, error: usersError } = await supabase
@@ -121,11 +132,27 @@ export function useAdminDashboard() {
       
       if (ratingsError) throw ratingsError;
 
-      // Calcular distribuição por plano
+      // Métricas da Mari (chat_messages) - com try/catch para não bloquear
+      let mariData: { user_id: string; created_at: string | null; role: string }[] = [];
+      try {
+        const { data: chatMessages, error: chatError } = await supabase
+          .from("chat_messages")
+          .select("user_id, created_at, role")
+          .gte("created_at", sixtyDaysAgo);
+        
+        if (!chatError && chatMessages) {
+          mariData = chatMessages;
+        }
+      } catch {
+        // silently fail - don't block dashboard
+      }
+
+      // Calcular distribuição por plano (separando business)
       const distribuicaoPlanos = {
         academy: users?.filter(u => u.plano_mentoria === "academy").length || 0,
         skills: users?.filter(u => u.plano_mentoria === "skills").length || 0,
-        business: users?.filter(u => u.plano_mentoria === "business").length || 0,
+        business_parceria: users?.filter(u => u.plano_mentoria === "business_parceria").length || 0,
+        business_sistemas: users?.filter(u => u.plano_mentoria === "business_sistemas").length || 0,
         sem_plano: users?.filter(u => !u.plano_mentoria).length || 0,
       };
 
@@ -133,7 +160,12 @@ export function useAdminDashboard() {
       const novosUsuarios7d = users?.filter(u => u.created_at && new Date(u.created_at) >= new Date(sevenDaysAgo)).length || 0;
       const novosUsuarios30d = users?.filter(u => u.created_at && new Date(u.created_at) >= new Date(thirtyDaysAgo)).length || 0;
 
-      // Calcular conversões de visitantes (baseado em data_conversao)
+      // Calcular novos usuários do período anterior (14d a 7d atrás)
+      const novosUsuariosPrev7d = users?.filter(u => 
+        u.created_at && new Date(u.created_at) >= new Date(fourteenDaysAgo) && new Date(u.created_at) < new Date(sevenDaysAgo)
+      ).length || 0;
+
+      // Calcular conversões de visitantes
       const conversoes7d = users?.filter(u => 
         u.data_conversao && new Date(u.data_conversao) >= new Date(sevenDaysAgo)
       ).length || 0;
@@ -150,12 +182,12 @@ export function useAdminDashboard() {
         v.created_at && new Date(v.created_at) >= new Date(thirtyDaysAgo)
       ).length || 0;
 
-      // Taxa de conversão real (conversões / total que existia)
+      // Taxa de conversão real
       const taxaConversao = (totalVisitantes + conversoes30d) > 0
         ? Math.round((conversoes30d / (totalVisitantes + conversoes30d)) * 100)
         : 0;
 
-      // Calcular usuários ativos (baseado em ultimo_acesso)
+      // Calcular usuários ativos
       const usuariosAtivos7d = users?.filter(u => 
         u.ultimo_acesso && new Date(u.ultimo_acesso) >= new Date(sevenDaysAgo)
       ).length || 0;
@@ -163,6 +195,22 @@ export function useAdminDashboard() {
       const usuariosAtivos30d = users?.filter(u => 
         u.ultimo_acesso && new Date(u.ultimo_acesso) >= new Date(thirtyDaysAgo)
       ).length || 0;
+
+      // Usuários ativos no período anterior (14d a 7d atrás)
+      const usuariosAtivosPrev7d = users?.filter(u => 
+        u.ultimo_acesso && new Date(u.ultimo_acesso) >= new Date(fourteenDaysAgo) && new Date(u.ultimo_acesso) < new Date(sevenDaysAgo)
+      ).length || 0;
+
+      // Usuários inativos (conta_ativa=true mas sem acesso em 30d)
+      const usuariosInativos = users?.filter(u => 
+        u.conta_ativa === true && (!u.ultimo_acesso || new Date(u.ultimo_acesso) < new Date(thirtyDaysAgo))
+      ).length || 0;
+
+      // Tendências
+      const tendencias = {
+        novosUsuarios: calcTrend(novosUsuarios7d, novosUsuariosPrev7d),
+        usuariosAtivos: calcTrend(usuariosAtivos7d, usuariosAtivosPrev7d),
+      };
 
       // Top 5 usuários mais engajados
       const userEngagement = progressoVideos?.reduce((acc, p) => {
@@ -203,6 +251,20 @@ export function useAdminDashboard() {
       // Calcular projetos em andamento
       const projetosEmAndamento = projetos?.filter(p => p.status === "em_andamento" || p.status === "planejamento").length || 0;
 
+      // Calcular métricas da Mari
+      const mariUsuariosUnicos = new Set(mariData.map(m => m.user_id));
+      const mariMensagens7d = mariData.filter(m => 
+        m.created_at && new Date(m.created_at) >= new Date(sevenDaysAgo)
+      ).length;
+      const totalMariUsuarios = mariUsuariosUnicos.size;
+      const totalUsuariosCount = users?.length || 0;
+      const taxaAdocaoMari = totalUsuariosCount > 0 
+        ? Math.round((totalMariUsuarios / totalUsuariosCount) * 100) 
+        : 0;
+      const mediaMensagensPorUsuario = totalMariUsuarios > 0
+        ? Math.round(mariData.length / totalMariUsuarios)
+        : 0;
+
       return {
         alertas: {
           tarefasAtrasadas: tarefasAtrasadas?.length || 0,
@@ -214,9 +276,11 @@ export function useAdminDashboard() {
           novosUsuarios30d,
           usuariosAtivos7d,
           usuariosAtivos30d,
-          totalUsuarios: users?.length || 0,
+          totalUsuarios: totalUsuariosCount,
           usuariosAtivos: users?.filter(u => u.conta_ativa).length || 0,
+          usuariosInativos,
         },
+        tendencias,
         visitantes: {
           total: totalVisitantes,
           novos7d: novosVisitantes7d,
@@ -239,8 +303,14 @@ export function useAdminDashboard() {
           mediaAvaliacoes,
         },
         topUsuarios,
+        mari: {
+          totalUsuarios: totalMariUsuarios,
+          mensagens7d: mariMensagens7d,
+          taxaAdocao: taxaAdocaoMari,
+          mediaMensagensPorUsuario,
+        },
       };
     },
-    refetchInterval: 5 * 60 * 1000, // Atualiza a cada 5 minutos
+    refetchInterval: 5 * 60 * 1000,
   });
 }
