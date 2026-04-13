@@ -38,7 +38,7 @@ serve(async (req) => {
     if (mimeType.includes('wordprocessingml') || fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
       console.log('Extracting text from DOCX using mammoth...');
       try {
-        const mammoth = await import("npm:mammoth@1.8.0");
+        const mammoth = await import("https://esm.sh/mammoth@1.8.0");
         const binaryStr = atob(fileBase64);
         const bytes = new Uint8Array(binaryStr.length);
         for (let i = 0; i < binaryStr.length; i++) {
