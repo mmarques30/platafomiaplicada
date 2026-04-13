@@ -73,6 +73,7 @@ import OnboardingWelcome from "./pages/OnboardingWelcome";
 import BusinessWelcome from "./pages/BusinessWelcome";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 import { MainLayout } from "./components/layout/MainLayout";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -276,19 +277,21 @@ function AppContent() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <AdminViewProvider>
-            <EnvironmentProvider>
-              <AppContent />
-            </EnvironmentProvider>
-          </AdminViewProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <TooltipProvider>
+          <BrowserRouter>
+            <AdminViewProvider>
+              <EnvironmentProvider>
+                <AppContent />
+              </EnvironmentProvider>
+            </AdminViewProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
