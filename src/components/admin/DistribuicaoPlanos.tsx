@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 interface DistribuicaoPlanosProps {
   distribuicao: {
     academy: number;
     skills: number;
-    business: number;
+    business_parceria: number;
+    business_sistemas: number;
     sem_plano: number;
   };
 }
@@ -13,14 +14,16 @@ interface DistribuicaoPlanosProps {
 const COLORS = {
   academy: "#22c55e",
   skills: "#f59e0b",
-  business: "#8b5cf6",
+  business_parceria: "#8b5cf6",
+  business_sistemas: "#6366f1",
   sem_plano: "#6b7280",
 };
 
 const LABELS = {
   academy: "Academy",
   skills: "Skills",
-  business: "Business Parceria",
+  business_parceria: "Business Parceria",
+  business_sistemas: "Business Sistemas",
   sem_plano: "Sem Plano",
 };
 
