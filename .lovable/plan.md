@@ -1,41 +1,21 @@
 
 
-# Corrigir tela "congelada" para novos usuários Business
+# Criar tabela `webhook_lia_logs` para registrar eventos de webhook da Lia
 
-## Diagnóstico
+## O que será feito
 
-Encontrei a causa raiz. Veja o estado da Uiara no banco:
-- `primeiro_acesso: false` (já passou pelo BusinessWelcome)
-- `senha_temporaria: true` (nunca conseguiu trocar a senha)
+Criar uma migração SQL com a tabela `webhook_lia_logs` exatamente como especificado, incluindo:
+- Tabela com colunas: `id`, `event_type`, `entity_type`, `payload`, `customer_email`, `customer_name`, `offer_id`, `offer_name`, `bill_id`, `status`, `error_message`, `user_created_id`, `created_at`
+- 3 índices (email, status, created_at DESC)
+- RLS habilitado com 2 policies:
+  - `Service role full access` — acesso total para edge functions
+  - `Authenticated users can read logs` — leitura para usuários autenticados
 
-Quando ela faz login, **dois modais aparecem ao mesmo tempo**:
+## Migração SQL
 
-1. **TrocarSenhaModal** — Dialog Radix com `modal={true}`, que **trava o foco** (focus trap) e impede interação com qualquer elemento fora dele
-2. **ProximosPassosCard** — Portal com `z-index: 9998`, que fica **visualmente por cima** do TrocarSenhaModal
+Uma única migração contendo exatamente o SQL fornecido, sem alterações.
 
-Resultado: ela **vê** o ProximosPassosCard mas **não consegue clicar** em nada (X, CTAs) porque o focus trap do Dialog Radix bloqueia a interação. O sistema parece "congelado".
+## Observação de segurança
 
-Outros usuários afetados (mesmo padrão `primeiro_acesso=false` + `senha_temporaria=true`): nenhum além da Uiara no momento. Porém, vários têm `primeiro_acesso=true` + `senha_temporaria=true` (Nathalia, Raquel, Alcir, B&Z, Moises, Quadra, Gilberto) — esses passariam pelo mesmo bug ao concluírem o BusinessWelcome.
-
-## Correção
-
-**Arquivo**: `src/components/onboarding/ProximosPassosCard.tsx`
-
-Na condição do `useEffect` (linha 108), adicionar verificação de `senha_temporaria`:
-
-```tsx
-// De:
-if (profile?.primeiro_acesso === false && !localStorage.getItem(chave)) {
-
-// Para:
-if (profile?.primeiro_acesso === false && profile?.senha_temporaria !== true && !localStorage.getItem(chave)) {
-```
-
-Isso garante que o ProximosPassosCard só aparece **após** a troca de senha obrigatória, eliminando o conflito entre os dois modais. A sequência correta para novos usuários Business passa a ser:
-
-1. Login → BusinessWelcome (primeiro_acesso=true)
-2. Clica "Entrar" → volta ao MainLayout (primeiro_acesso=false)
-3. TrocarSenhaModal aparece sozinho → troca a senha (senha_temporaria=false)
-4. ProximosPassosCard aparece sozinho → fecha normalmente
-5. Acessa o sistema sem bloqueios
+A policy de SELECT permite leitura para **qualquer** usuário autenticado. Conforme indicado no SQL, a verificação de admin será feita no frontend. Se preferir restringir no banco para apenas admins, posso ajustar usando `has_role(auth.uid(), 'admin')`.
 
