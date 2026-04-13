@@ -16,7 +16,7 @@ export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVide
   const [visible, setVisible] = useState(previewMode);
 
   useEffect(() => {
-    if (!previewMode && profile?.primeiro_acesso === true) {
+    if (!previewMode && profile?.primeiro_acesso === true && profile?.senha_temporaria !== true) {
       const jaVisto = sessionStorage.getItem('onboarding_video_visto') === 'true';
       if (!jaVisto) setVisible(true);
     }
