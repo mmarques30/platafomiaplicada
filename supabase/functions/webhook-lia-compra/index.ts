@@ -319,7 +319,31 @@ Deno.serve(async (req) => {
       console.log("Role aluno_trilha ja existia");
     }
 
-    // 13. Atualizar log com sucesso
+    // 13. Enviar dados para o Zapier (email de boas-vindas)
+    const zapierWebhookUrl = Deno.env.get("ZAPIER_WEBHOOK_URL");
+    if (zapierWebhookUrl && userAction !== "already_has_academy") {
+      try {
+        await fetch(zapierWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: customerEmail,
+            nome: customerName || customerEmail.split("@")[0],
+            senha: DEFAULT_PASSWORD,
+            plano: "Academy",
+            telefone: customerPhone,
+            offer_name: offerName,
+            plataforma_url: "https://platafomiaplicada.lovable.app",
+            acao: userAction,
+          }),
+        });
+        console.log("Dados enviados para Zapier com sucesso");
+      } catch (zapierError) {
+        console.error("Erro ao enviar para Zapier (nao-bloqueante):", zapierError);
+      }
+    }
+
+    // 14. Atualizar log com sucesso
     if (logId) {
       await supabaseAdmin
         .from("webhook_lia_logs")
