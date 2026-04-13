@@ -123,12 +123,14 @@ export function useAdminDashboard() {
 
       if (ratingsError) throw ratingsError;
 
-      // Buscar métricas da Mari (chat_messages)
+      // Buscar métricas da Mari (chat_messages) — apenas últimos 60 dias para performance
       const { data: chatMessages, error: chatError } = await supabase
         .from("chat_messages")
-        .select("user_id, role, created_at");
+        .select("user_id, role, created_at")
+        .gte("created_at", sixtyDaysAgo);
 
-      if (chatError) throw chatError;
+      // Não bloquear dashboard se tabela chat_messages falhar
+      const chatData = chatError ? [] : (chatMessages || []);
 
       // Calcular distribuição por plano (separando business_parceria e business_sistemas)
       const distribuicaoPlanos = {
@@ -228,18 +230,18 @@ export function useAdminDashboard() {
       const projetosEmAndamento = projetos?.filter(p => p.status === "em_andamento" || p.status === "planejamento").length || 0;
 
       // Calcular métricas da Mari
-      const totalMensagensMari = chatMessages?.length || 0;
-      const mensagensUsuario = chatMessages?.filter(m => m.role === "user") || [];
-      const mensagensAssistant = chatMessages?.filter(m => m.role === "assistant") || [];
-      const usuariosUsandoMari = new Set(chatMessages?.map(m => m.user_id)).size;
-      const mensagensMari7d = chatMessages?.filter(m =>
+      const totalMensagensMari = chatData.length;
+      const mensagensUsuario = chatData.filter(m => m.role === "user");
+      const mensagensAssistant = chatData.filter(m => m.role === "assistant");
+      const usuariosUsandoMari = new Set(chatData.map(m => m.user_id)).size;
+      const mensagensMari7d = chatData.filter(m =>
         m.created_at && new Date(m.created_at) >= new Date(sevenDaysAgo)
-      ).length || 0;
-      const mensagensMari7dAnterior = chatMessages?.filter(m =>
+      ).length;
+      const mensagensMari7dAnterior = chatData.filter(m =>
         m.created_at && new Date(m.created_at) >= new Date(fourteenDaysAgo) && new Date(m.created_at) < new Date(sevenDaysAgo)
-      ).length || 0;
+      ).length;
       const usuariosMari7d = new Set(
-        chatMessages?.filter(m => m.created_at && new Date(m.created_at) >= new Date(sevenDaysAgo)).map(m => m.user_id)
+        chatData.filter(m => m.created_at && new Date(m.created_at) >= new Date(sevenDaysAgo)).map(m => m.user_id)
       ).size;
       const mediaConversasPorUsuario = usuariosUsandoMari > 0
         ? Math.round(mensagensUsuario.length / usuariosUsandoMari)
