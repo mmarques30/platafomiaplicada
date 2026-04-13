@@ -1,21 +1,39 @@
 
 
-# Criar tabela `webhook_lia_logs` para registrar eventos de webhook da Lia
+# Corrigir tela de boas-vindas travada para novos usuários
 
-## O que será feito
+## Diagnóstico
 
-Criar uma migração SQL com a tabela `webhook_lia_logs` exatamente como especificado, incluindo:
-- Tabela com colunas: `id`, `event_type`, `entity_type`, `payload`, `customer_email`, `customer_name`, `offer_id`, `offer_name`, `bill_id`, `status`, `error_message`, `user_created_id`, `created_at`
-- 3 índices (email, status, created_at DESC)
-- RLS habilitado com 2 policies:
-  - `Service role full access` — acesso total para edge functions
-  - `Authenticated users can read logs` — leitura para usuários autenticados
+O problema é o mesmo padrão que já corrigimos no ProximosPassosCard: **dois modais aparecem simultaneamente e o focus trap do Radix Dialog bloqueia os cliques**.
 
-## Migração SQL
+Para novos usuários Academy (criados pelo webhook), o profile tem `primeiro_acesso: true` E `senha_temporaria: true`. Isso faz com que:
 
-Uma única migração contendo exatamente o SQL fornecido, sem alterações.
+1. **OnboardingVideo** apareça (z-index 9999) — visível na tela
+2. **TrocarSenhaModal** apareça (Radix Dialog com `modal={true}`) — invisível por baixo, mas com **focus trap ativo**
 
-## Observação de segurança
+O focus trap do Radix captura todos os cliques, tornando os botões "Entrar na plataforma" e "Pular" do OnboardingVideo completamente inertes. O usuário fica preso.
 
-A policy de SELECT permite leitura para **qualquer** usuário autenticado. Conforme indicado no SQL, a verificação de admin será feita no frontend. Se preferir restringir no banco para apenas admins, posso ajustar usando `has_role(auth.uid(), 'admin')`.
+## Correção
+
+**Arquivo**: `src/components/onboarding/OnboardingVideo.tsx`
+
+Adicionar a mesma verificação que já existe no ProximosPassosCard: não mostrar o vídeo se `senha_temporaria === true`.
+
+```typescript
+// Linha 18-23, alterar o useEffect:
+useEffect(() => {
+  if (!previewMode && profile?.primeiro_acesso === true && profile?.senha_temporaria !== true) {
+    const jaVisto = sessionStorage.getItem('onboarding_video_visto') === 'true';
+    if (!jaVisto) setVisible(true);
+  }
+}, [profile, previewMode]);
+```
+
+## Sequência correta após a correção
+
+1. Login → MainLayout carrega
+2. TrocarSenhaModal aparece sozinho → troca a senha (`senha_temporaria` = false)
+3. OnboardingVideo aparece sozinho → clica "Entrar" → dismiss
+4. ProximosPassosCard aparece → fecha normalmente
+5. Usuário acessa o sistema
 
