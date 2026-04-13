@@ -1,5 +1,19 @@
 project_id = "ocwpsanqtfubixerjive"
 
+# TODO: As funcoes abaixo com verify_jwt = false precisam ser revisadas.
+# Funcoes que nao verificam auth manualmente devem ter auth adicionada no codigo
+# antes de habilitar verify_jwt = true:
+# - parse-documento-contrato, parse-contrato-texto, parse-aditivo-contrato
+# - gerar-metadados-material, extrair-texto-documento, organizar-backlog
+# - processar-contrato-skills, consolidar-diagnosticos-skills
+# - gerar-entregas-skills, associar-membros-skills, gerar-metricas-skills
+# - personalizar-projeto-skills, regenerar-instrucoes-entrega
+#
+# Funcoes legitimamente publicas (nao precisam de JWT):
+# - api-visitantes (usa API key propria)
+# - verificar-google-login (pre-autenticacao)
+# - process-visitor-expirations (cron job)
+
 [functions.create-user-admin]
 verify_jwt = true
 
@@ -10,7 +24,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.gerar-insight-mentoria]
-verify_jwt = false
+verify_jwt = true
 
 [functions.gerar-objetivos-diagnostico]
 verify_jwt = true
@@ -43,7 +57,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.formatar-texto-conteudo]
-verify_jwt = false
+verify_jwt = true
 
 [functions.process-visitor-expirations]
 verify_jwt = false
@@ -55,16 +69,16 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.processar-diagnostico-skills]
-verify_jwt = false
+verify_jwt = true
 
 [functions.processar-contrato-skills]
 verify_jwt = false
 
 [functions.gerar-projetos-skills]
-verify_jwt = false
+verify_jwt = true
 
 [functions.gerar-report-skills]
-verify_jwt = false
+verify_jwt = true
 
 [functions.consolidar-diagnosticos-skills]
 verify_jwt = false
@@ -88,10 +102,15 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.gerar-resumo-atualizacoes]
-verify_jwt = false
+verify_jwt = true
 
 [functions.parse-aditivo-contrato]
 verify_jwt = false
 
 [functions.gerar-curadoria-semanal]
+verify_jwt = true
+
+# Webhook da Lia para compras - nao requer JWT (chamada externa)
+# Autenticacao via x-webhook-secret header (env: LIA_WEBHOOK_SECRET)
+[functions.webhook-lia-compra]
 verify_jwt = false

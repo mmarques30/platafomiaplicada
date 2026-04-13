@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2, Building2, Loader2, Plus, Edit2, Trash2 } from "lucide-react";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -502,7 +503,7 @@ export default function MentoriaDocumentos() {
           <ScrollArea className="max-h-[60vh]">
             <div
               className="prose prose-sm dark:prose-invert max-w-none p-4"
-              dangerouslySetInnerHTML={{ __html: viewingReport?.html || "" }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(viewingReport?.html || "") }}
             />
           </ScrollArea>
         </DialogContent>
