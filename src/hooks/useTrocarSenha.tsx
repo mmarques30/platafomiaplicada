@@ -23,7 +23,6 @@ export function useTrocarSenha() {
         .from('profiles')
         .update({
           senha_temporaria: false,
-          primeiro_acesso: false,
           senha_alterada_em: new Date().toISOString()
         })
         .eq('id', userId);

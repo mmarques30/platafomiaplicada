@@ -76,6 +76,22 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
     );
   }, [run]);
 
+  // Se o componente desmontar durante o tour (usuário navegou), marcar como concluído
+  useEffect(() => {
+    if (!run || previewMode) return;
+    return () => {
+      if (user?.id) {
+        supabase
+          .from("profiles")
+          .update({ primeiro_acesso: false })
+          .eq("id", user.id)
+          .then(() => {
+            queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+          });
+      }
+    };
+  }, [run, previewMode, user?.id, queryClient]);
+
   const handleEvent = useCallback(
     async (data: EventData, _controls: Controls) => {
       const { status, type } = data;
