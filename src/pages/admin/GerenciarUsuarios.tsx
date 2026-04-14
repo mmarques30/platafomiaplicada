@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUsers, useDeleteUser, useUpdateOnboardingStatus } from "@/hooks/admin/useUsers";
 import { useUsersAuthProviders } from "@/hooks/admin/useUsersAuthProviders";
@@ -24,11 +24,14 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Users, Download } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Users, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { exportUsersToCSV } from "@/lib/exportUsers";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 import { adminTheme } from "@/components/admin/adminTheme";
+
+type SortField = "nome_completo" | "email" | "plano_mentoria" | "created_at" | "updated_at";
+type SortDirection = "asc" | "desc";
 
 export default function GerenciarUsuários() {
   const navigate = useNavigate();
@@ -39,29 +42,103 @@ export default function GerenciarUsuários() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [planoFilter, setPlanoFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [sortField, setSortField] = useState<SortField>("updated_at");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [novoUsuarioOpen, setNovoUsuarioOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [deletingUser, setDeletingUser] = useState<{ id: string; nome: string } | null>(null);
 
-  const filteredUsers = users?.filter((user) => {
-    const matchesSearch =
-      user.nome_completo.toLowerCase().includes(search.toLowerCase()) ||
-      user.id.toLowerCase().includes(search.toLowerCase()) ||
-      (user.email && user.email.toLowerCase().includes(search.toLowerCase()));
-    
-    const matchesRole =
-      roleFilter === "all" ||
-      (roleFilter === "none" && user.roles.length === 0) ||
-      user.roles.some(r => r === roleFilter);
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
 
-    const userPlano = (user as any).plano_mentoria;
-    const matchesPlano =
-      planoFilter === "all" ||
-      (planoFilter === "none" && !userPlano) ||
-      userPlano === planoFilter;
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 ml-1 opacity-40" />;
+    return sortDirection === "asc" 
+      ? <ArrowUp className="h-3 w-3 ml-1" /> 
+      : <ArrowDown className="h-3 w-3 ml-1" />;
+  };
 
-    return matchesSearch && matchesRole && matchesPlano;
-  });
+  const filteredAndSortedUsers = useMemo(() => {
+    if (!users) return [];
+
+    const now = new Date();
+    const filtered = users.filter((user) => {
+      const matchesSearch =
+        user.nome_completo.toLowerCase().includes(search.toLowerCase()) ||
+        user.id.toLowerCase().includes(search.toLowerCase()) ||
+        (user.email && user.email.toLowerCase().includes(search.toLowerCase()));
+      
+      const matchesRole =
+        roleFilter === "all" ||
+        (roleFilter === "none" && user.roles.length === 0) ||
+        user.roles.some(r => r === roleFilter);
+
+      const userPlano = (user as any).plano_mentoria;
+      const matchesPlano =
+        planoFilter === "all" ||
+        (planoFilter === "none" && !userPlano) ||
+        userPlano === planoFilter;
+
+      let matchesDate = true;
+      if (dateFilter !== "all") {
+        const updatedAt = (user as any).updated_at ? new Date((user as any).updated_at) : null;
+        const createdAt = user.created_at ? new Date(user.created_at) : null;
+        const referenceDate = updatedAt || createdAt;
+        
+        if (dateFilter === "7d") {
+          matchesDate = !!referenceDate && referenceDate >= subDays(now, 7);
+        } else if (dateFilter === "30d") {
+          matchesDate = !!referenceDate && referenceDate >= subDays(now, 30);
+        } else if (dateFilter === "90d") {
+          matchesDate = !!referenceDate && referenceDate >= subDays(now, 90);
+        }
+      }
+
+      return matchesSearch && matchesRole && matchesPlano && matchesDate;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      let valA: any, valB: any;
+      switch (sortField) {
+        case "nome_completo":
+          valA = a.nome_completo.toLowerCase();
+          valB = b.nome_completo.toLowerCase();
+          break;
+        case "email":
+          valA = ((a as any).email || "").toLowerCase();
+          valB = ((b as any).email || "").toLowerCase();
+          break;
+        case "plano_mentoria":
+          valA = (a as any).plano_mentoria || "";
+          valB = (b as any).plano_mentoria || "";
+          break;
+        case "created_at":
+          valA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          valB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          break;
+        case "updated_at":
+          valA = (a as any).updated_at ? new Date((a as any).updated_at).getTime() : 0;
+          valB = (b as any).updated_at ? new Date((b as any).updated_at).getTime() : 0;
+          break;
+        default:
+          valA = 0;
+          valB = 0;
+      }
+      if (valA < valB) return sortDirection === "asc" ? -1 : 1;
+      if (valA > valB) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return filtered;
+  }, [users, search, roleFilter, planoFilter, dateFilter, sortField, sortDirection]);
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
@@ -145,15 +222,15 @@ export default function GerenciarUsuários() {
         <div className={adminTheme.pageTitleWrapper}>
           <Users className={adminTheme.pageIcon} />
           <h1 className={adminTheme.pageTitle}>Gerenciar Usuários</h1>
-          <Badge variant="secondary" className="text-xs">{filteredUsers?.length || 0}</Badge>
+          <Badge variant="secondary" className="text-xs">{filteredAndSortedUsers.length}</Badge>
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={() => filteredUsers && exportUsersToCSV(filteredUsers as any)}
+            onClick={() => filteredAndSortedUsers.length > 0 && exportUsersToCSV(filteredAndSortedUsers as any)}
             variant="outline"
             size="sm"
             className={adminTheme.buttonSm}
-            disabled={!filteredUsers || filteredUsers.length === 0}
+            disabled={filteredAndSortedUsers.length === 0}
           >
             <Download className="h-3.5 w-3.5 mr-1.5" />
             Exportar
@@ -211,27 +288,49 @@ export default function GerenciarUsuários() {
             <SelectItem value="none">Sem Plano</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={dateFilter} onValueChange={setDateFilter}>
+          <SelectTrigger className={adminTheme.filterSelect}>
+            <SelectValue placeholder="Período" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todo período</SelectItem>
+            <SelectItem value="7d">Últimos 7 dias</SelectItem>
+            <SelectItem value="30d">Últimos 30 dias</SelectItem>
+            <SelectItem value="90d">Últimos 90 dias</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className={adminTheme.tableContainer}>
         <Table>
           <TableHeader className={adminTheme.tableHeader}>
             <TableRow>
-              <TableHead className={adminTheme.tableHeaderCell}>Nome</TableHead>
-              <TableHead className={adminTheme.tableHeaderCell}>Email</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("nome_completo")}>
+                <span className="flex items-center">Nome{getSortIcon("nome_completo")}</span>
+              </TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("email")}>
+                <span className="flex items-center">Email{getSortIcon("email")}</span>
+              </TableHead>
               <TableHead className={adminTheme.tableHeaderCell}>Roles</TableHead>
-              <TableHead className={adminTheme.tableHeaderCell}>Plano</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("plano_mentoria")}>
+                <span className="flex items-center">Plano{getSortIcon("plano_mentoria")}</span>
+              </TableHead>
               <TableHead className={adminTheme.tableHeaderCell}>Login</TableHead>
               <TableHead className={adminTheme.tableHeaderCell}>Status</TableHead>
               <TableHead className={adminTheme.tableHeaderCell}>Expira em</TableHead>
-              <TableHead className={adminTheme.tableHeaderCell}>Cadastro</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("created_at")}>
+                <span className="flex items-center">Cadastro{getSortIcon("created_at")}</span>
+              </TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("updated_at")}>
+                <span className="flex items-center">Atualização{getSortIcon("updated_at")}</span>
+              </TableHead>
               <TableHead className={`${adminTheme.tableHeaderCell} text-center`}>Email</TableHead>
               <TableHead className={`${adminTheme.tableHeaderCell} text-center`}>WhatsApp</TableHead>
               <TableHead className={`${adminTheme.tableHeaderCell} text-right`}>Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers?.map((user) => (
+            {filteredAndSortedUsers.map((user) => (
               <TableRow key={user.id} className={adminTheme.tableRow}>
                 <TableCell className={`${adminTheme.tableCell} font-medium`}>{user.nome_completo}</TableCell>
                 <TableCell className={adminTheme.tableCell}>
@@ -321,6 +420,11 @@ export default function GerenciarUsuários() {
                 <TableCell className={adminTheme.tableCell}>
                   <span className="text-xs">
                     {user.created_at ? format(new Date(user.created_at), "dd/MM/yyyy") : "-"}
+                  </span>
+                </TableCell>
+                <TableCell className={adminTheme.tableCell}>
+                  <span className="text-xs">
+                    {(user as any).updated_at ? format(new Date((user as any).updated_at), "dd/MM/yyyy") : "-"}
                   </span>
                 </TableCell>
                 <TableCell className={adminTheme.tableCell}>
