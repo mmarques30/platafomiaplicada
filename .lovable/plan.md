@@ -2,17 +2,33 @@
 
 ## Diagnóstico
 
-Os logs da Edge Function mostram claramente: **"Webhook secret invalido"**. A Lia **está enviando** os webhooks, mas a função está rejeitando porque a Lia não envia o header `x-webhook-secret` nem `Authorization` com o valor esperado.
+O erro **"Database error deleting user"** ocorre porque 6 tabelas referenciam `profiles` com foreign keys configuradas como **NO ACTION** (padrão), o que impede a exclusão quando há dados relacionados.
 
-## Plano de Correção
+Tabelas bloqueadoras:
+- `backlog_skills.colaborador_id`
+- `candidaturas_mentoria.admin_responsavel`
+- `duvidas_mentoria.respondida_por`
+- `melhorias_plataforma.created_by`
+- `premiacoes_comunidade.vencedor_id`
+- `subtarefas_entregas_skills.responsavel_id`
 
-**Arquivo:** `supabase/functions/webhook-lia-compra/index.ts`
+## Plano
 
-**Alteração:** Remover a validação do `LIA_WEBHOOK_SECRET` via headers, já que a Lia não envia esse header. Em vez disso, validar a autenticidade pelo formato do payload (presença de `entity: "bill"`, `event: "paid"`, e campos obrigatórios como `data.contact.email`).
+**Uma migration** para alterar essas 6 foreign keys de `NO ACTION` para `ON DELETE SET NULL` (preserva os registros históricos, apenas remove a referência ao usuário deletado):
 
-Mudança específica:
-- Remover o bloco que valida `x-webhook-secret` / `authorization` header (linhas ~30-41)
-- Opcionalmente, manter um log do IP ou outro identificador para auditoria
+```sql
+-- backlog_skills.colaborador_id
+ALTER TABLE backlog_skills DROP CONSTRAINT ..., ADD CONSTRAINT ... REFERENCES profiles(id) ON DELETE SET NULL;
 
-**Depois de corrigido:** Reprocessar manualmente o payload do Magno (`magno.fg@hotmail.com`) invocando a function com o payload fornecido.
+-- candidaturas_mentoria.admin_responsavel  
+-- duvidas_mentoria.respondida_por
+-- melhorias_plataforma.created_by
+-- premiacoes_comunidade.vencedor_id
+-- subtarefas_entregas_skills.responsavel_id
+-- (mesmo padrão para todas)
+```
+
+Isso segue o mesmo padrão já aplicado anteriormente em `notas_projeto_business` e `webhook_lia_logs` (conforme o memory de integridade de exclusão de usuários).
+
+Nenhuma alteração de código é necessária — apenas a migration no banco.
 
