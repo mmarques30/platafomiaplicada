@@ -1,47 +1,18 @@
 
 
-## Problema
+## Diagnóstico
 
-A edge function `create-user-admin` tem o mesmo bug do `webhook-lia-compra`: usa `listUsers()` (limite 1000) para buscar usuários existentes quando o email já está cadastrado. Além disso, a comparação é case-sensitive (`===` ao invés de `.toLowerCase()`), o que causa falha quando o email digitado tem capitalização diferente.
+Os logs da Edge Function mostram claramente: **"Webhook secret invalido"**. A Lia **está enviando** os webhooks, mas a função está rejeitando porque a Lia não envia o header `x-webhook-secret` nem `Authorization` com o valor esperado.
 
-O erro nos logs confirma: `"Email existe mas usuário não encontrado"` para `Luciane.correia@gmail.com`.
+## Plano de Correção
 
-## Correção
+**Arquivo:** `supabase/functions/webhook-lia-compra/index.ts`
 
-**Arquivo**: `supabase/functions/create-user-admin/index.ts` (linhas 104-109)
+**Alteração:** Remover a validação do `LIA_WEBHOOK_SECRET` via headers, já que a Lia não envia esse header. Em vez disso, validar a autenticidade pelo formato do payload (presença de `entity: "bill"`, `event: "paid"`, e campos obrigatórios como `data.contact.email`).
 
-Substituir o bloco `listUsers()` por busca direta na tabela `profiles`:
+Mudança específica:
+- Remover o bloco que valida `x-webhook-secret` / `authorization` header (linhas ~30-41)
+- Opcionalmente, manter um log do IP ou outro identificador para auditoria
 
-```typescript
-// ANTES (bugado):
-const { data: listData } = await supabaseAdmin.auth.admin.listUsers()
-const existingUser = listData.users.find(u => u.email === email)
-if (!existingUser) throw new Error('Email existe mas usuário não encontrado')
-userId = existingUser.id
-
-// DEPOIS (corrigido):
-const { data: profileData } = await supabaseAdmin
-  .from('profiles')
-  .select('id')
-  .eq('email', email.toLowerCase())
-  .maybeSingle()
-
-if (profileData) {
-  userId = profileData.id
-} else {
-  // Fallback: listUsers com comparação case-insensitive
-  const { data: listData } = await supabaseAdmin.auth.admin.listUsers()
-  const existingUser = listData?.users.find(
-    u => u.email?.toLowerCase() === email.toLowerCase()
-  )
-  if (!existingUser) throw new Error('Email existe mas usuário não encontrado no auth nem em profiles')
-  userId = existingUser.id
-}
-```
-
-Depois do fix, re-deploy da function.
-
-## Resultado esperado
-
-Criar/promover usuários existentes funcionará independentemente do número total de usuários no sistema e da capitalização do email.
+**Depois de corrigido:** Reprocessar manualmente o payload do Magno (`magno.fg@hotmail.com`) invocando a function com o payload fornecido.
 
