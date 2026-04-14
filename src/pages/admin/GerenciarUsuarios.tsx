@@ -222,15 +222,15 @@ export default function GerenciarUsuários() {
         <div className={adminTheme.pageTitleWrapper}>
           <Users className={adminTheme.pageIcon} />
           <h1 className={adminTheme.pageTitle}>Gerenciar Usuários</h1>
-          <Badge variant="secondary" className="text-xs">{filteredUsers?.length || 0}</Badge>
+          <Badge variant="secondary" className="text-xs">{filteredAndSortedUsers.length}</Badge>
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={() => filteredUsers && exportUsersToCSV(filteredUsers as any)}
+            onClick={() => filteredAndSortedUsers.length > 0 && exportUsersToCSV(filteredAndSortedUsers as any)}
             variant="outline"
             size="sm"
             className={adminTheme.buttonSm}
-            disabled={!filteredUsers || filteredUsers.length === 0}
+            disabled={filteredAndSortedUsers.length === 0}
           >
             <Download className="h-3.5 w-3.5 mr-1.5" />
             Exportar
@@ -288,27 +288,49 @@ export default function GerenciarUsuários() {
             <SelectItem value="none">Sem Plano</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={dateFilter} onValueChange={setDateFilter}>
+          <SelectTrigger className={adminTheme.filterSelect}>
+            <SelectValue placeholder="Período" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todo período</SelectItem>
+            <SelectItem value="7d">Últimos 7 dias</SelectItem>
+            <SelectItem value="30d">Últimos 30 dias</SelectItem>
+            <SelectItem value="90d">Últimos 90 dias</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className={adminTheme.tableContainer}>
         <Table>
           <TableHeader className={adminTheme.tableHeader}>
             <TableRow>
-              <TableHead className={adminTheme.tableHeaderCell}>Nome</TableHead>
-              <TableHead className={adminTheme.tableHeaderCell}>Email</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("nome_completo")}>
+                <span className="flex items-center">Nome{getSortIcon("nome_completo")}</span>
+              </TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("email")}>
+                <span className="flex items-center">Email{getSortIcon("email")}</span>
+              </TableHead>
               <TableHead className={adminTheme.tableHeaderCell}>Roles</TableHead>
-              <TableHead className={adminTheme.tableHeaderCell}>Plano</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("plano_mentoria")}>
+                <span className="flex items-center">Plano{getSortIcon("plano_mentoria")}</span>
+              </TableHead>
               <TableHead className={adminTheme.tableHeaderCell}>Login</TableHead>
               <TableHead className={adminTheme.tableHeaderCell}>Status</TableHead>
               <TableHead className={adminTheme.tableHeaderCell}>Expira em</TableHead>
-              <TableHead className={adminTheme.tableHeaderCell}>Cadastro</TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("created_at")}>
+                <span className="flex items-center">Cadastro{getSortIcon("created_at")}</span>
+              </TableHead>
+              <TableHead className={`${adminTheme.tableHeaderCell} cursor-pointer select-none`} onClick={() => handleSort("updated_at")}>
+                <span className="flex items-center">Atualização{getSortIcon("updated_at")}</span>
+              </TableHead>
               <TableHead className={`${adminTheme.tableHeaderCell} text-center`}>Email</TableHead>
               <TableHead className={`${adminTheme.tableHeaderCell} text-center`}>WhatsApp</TableHead>
               <TableHead className={`${adminTheme.tableHeaderCell} text-right`}>Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers?.map((user) => (
+            {filteredAndSortedUsers.map((user) => (
               <TableRow key={user.id} className={adminTheme.tableRow}>
                 <TableCell className={`${adminTheme.tableCell} font-medium`}>{user.nome_completo}</TableCell>
                 <TableCell className={adminTheme.tableCell}>
@@ -398,6 +420,11 @@ export default function GerenciarUsuários() {
                 <TableCell className={adminTheme.tableCell}>
                   <span className="text-xs">
                     {user.created_at ? format(new Date(user.created_at), "dd/MM/yyyy") : "-"}
+                  </span>
+                </TableCell>
+                <TableCell className={adminTheme.tableCell}>
+                  <span className="text-xs">
+                    {(user as any).updated_at ? format(new Date((user as any).updated_at), "dd/MM/yyyy") : "-"}
                   </span>
                 </TableCell>
                 <TableCell className={adminTheme.tableCell}>
