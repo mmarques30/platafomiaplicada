@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUsers, useDeleteUser, useUpdateOnboardingStatus } from "@/hooks/admin/useUsers";
 import { useUsersAuthProviders } from "@/hooks/admin/useUsersAuthProviders";
@@ -24,11 +24,14 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Users, Download } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Users, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { exportUsersToCSV } from "@/lib/exportUsers";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 import { adminTheme } from "@/components/admin/adminTheme";
+
+type SortField = "nome_completo" | "email" | "plano_mentoria" | "created_at" | "updated_at";
+type SortDirection = "asc" | "desc";
 
 export default function GerenciarUsuários() {
   const navigate = useNavigate();
@@ -39,29 +42,103 @@ export default function GerenciarUsuários() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [planoFilter, setPlanoFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [sortField, setSortField] = useState<SortField>("updated_at");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [novoUsuarioOpen, setNovoUsuarioOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [deletingUser, setDeletingUser] = useState<{ id: string; nome: string } | null>(null);
 
-  const filteredUsers = users?.filter((user) => {
-    const matchesSearch =
-      user.nome_completo.toLowerCase().includes(search.toLowerCase()) ||
-      user.id.toLowerCase().includes(search.toLowerCase()) ||
-      (user.email && user.email.toLowerCase().includes(search.toLowerCase()));
-    
-    const matchesRole =
-      roleFilter === "all" ||
-      (roleFilter === "none" && user.roles.length === 0) ||
-      user.roles.some(r => r === roleFilter);
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
 
-    const userPlano = (user as any).plano_mentoria;
-    const matchesPlano =
-      planoFilter === "all" ||
-      (planoFilter === "none" && !userPlano) ||
-      userPlano === planoFilter;
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 ml-1 opacity-40" />;
+    return sortDirection === "asc" 
+      ? <ArrowUp className="h-3 w-3 ml-1" /> 
+      : <ArrowDown className="h-3 w-3 ml-1" />;
+  };
 
-    return matchesSearch && matchesRole && matchesPlano;
-  });
+  const filteredAndSortedUsers = useMemo(() => {
+    if (!users) return [];
+
+    const now = new Date();
+    const filtered = users.filter((user) => {
+      const matchesSearch =
+        user.nome_completo.toLowerCase().includes(search.toLowerCase()) ||
+        user.id.toLowerCase().includes(search.toLowerCase()) ||
+        (user.email && user.email.toLowerCase().includes(search.toLowerCase()));
+      
+      const matchesRole =
+        roleFilter === "all" ||
+        (roleFilter === "none" && user.roles.length === 0) ||
+        user.roles.some(r => r === roleFilter);
+
+      const userPlano = (user as any).plano_mentoria;
+      const matchesPlano =
+        planoFilter === "all" ||
+        (planoFilter === "none" && !userPlano) ||
+        userPlano === planoFilter;
+
+      let matchesDate = true;
+      if (dateFilter !== "all") {
+        const updatedAt = (user as any).updated_at ? new Date((user as any).updated_at) : null;
+        const createdAt = user.created_at ? new Date(user.created_at) : null;
+        const referenceDate = updatedAt || createdAt;
+        
+        if (dateFilter === "7d") {
+          matchesDate = !!referenceDate && referenceDate >= subDays(now, 7);
+        } else if (dateFilter === "30d") {
+          matchesDate = !!referenceDate && referenceDate >= subDays(now, 30);
+        } else if (dateFilter === "90d") {
+          matchesDate = !!referenceDate && referenceDate >= subDays(now, 90);
+        }
+      }
+
+      return matchesSearch && matchesRole && matchesPlano && matchesDate;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      let valA: any, valB: any;
+      switch (sortField) {
+        case "nome_completo":
+          valA = a.nome_completo.toLowerCase();
+          valB = b.nome_completo.toLowerCase();
+          break;
+        case "email":
+          valA = ((a as any).email || "").toLowerCase();
+          valB = ((b as any).email || "").toLowerCase();
+          break;
+        case "plano_mentoria":
+          valA = (a as any).plano_mentoria || "";
+          valB = (b as any).plano_mentoria || "";
+          break;
+        case "created_at":
+          valA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          valB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          break;
+        case "updated_at":
+          valA = (a as any).updated_at ? new Date((a as any).updated_at).getTime() : 0;
+          valB = (b as any).updated_at ? new Date((b as any).updated_at).getTime() : 0;
+          break;
+        default:
+          valA = 0;
+          valB = 0;
+      }
+      if (valA < valB) return sortDirection === "asc" ? -1 : 1;
+      if (valA > valB) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return filtered;
+  }, [users, search, roleFilter, planoFilter, dateFilter, sortField, sortDirection]);
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
