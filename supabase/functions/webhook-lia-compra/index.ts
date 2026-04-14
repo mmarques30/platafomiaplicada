@@ -22,18 +22,8 @@ Deno.serve(async (req) => {
   });
 
   try {
-    // 1. Validar webhook secret (se configurado)
-    if (webhookSecret) {
-      const receivedSecret = req.headers.get("x-webhook-secret")
-        || req.headers.get("authorization")?.replace("Bearer ", "");
-      if (receivedSecret !== webhookSecret) {
-        console.error("Webhook secret invalido");
-        return new Response(
-          JSON.stringify({ error: "Unauthorized" }),
-          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-    }
+    // 1. Log de auditoria (secret removido - Lia nao envia headers de auth)
+    console.log("Webhook recebido de:", req.headers.get("x-forwarded-for") || "IP desconhecido");
 
     // 2. Parsear o payload do webhook
     const payload = await req.json();
