@@ -173,12 +173,28 @@ Deno.serve(async (req) => {
       ) {
         console.log("Email ja existe, buscando usuario existente:", customerEmail);
 
-        const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-        if (listError) throw listError;
+        // Buscar direto na tabela profiles pelo email (evita limite de 1000 do listUsers)
+        const { data: profileData, error: profileSearchError } = await supabaseAdmin
+          .from("profiles")
+          .select("id")
+          .eq("email", customerEmail)
+          .maybeSingle();
 
-        const existingUser = listData.users.find(
-          (u) => u.email?.toLowerCase() === customerEmail
-        );
+        let existingUser: { id: string } | null = null;
+
+        if (profileSearchError || !profileData) {
+          // Fallback: tenta listUsers para casos raros
+          console.log("Profile nao encontrado por email, tentando listUsers como fallback");
+          const { data: listData } = await supabaseAdmin.auth.admin.listUsers();
+          const foundUser = listData?.users.find(u => u.email?.toLowerCase() === customerEmail);
+          if (!foundUser) {
+            throw new Error("Email reportado como existente mas usuario nao encontrado no auth nem em profiles");
+          }
+          existingUser = { id: foundUser.id };
+        } else {
+          existingUser = { id: profileData.id };
+        }
+
         if (!existingUser) {
           throw new Error("Email reportado como existente mas usuario nao encontrado");
         }
