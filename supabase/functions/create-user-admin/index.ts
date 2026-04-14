@@ -101,14 +101,25 @@ Deno.serve(async (req) => {
       if ((userError as any).code === 'email_exists' || userError.message?.includes('already been registered')) {
         console.log('Email já existe, tentando promover usuário existente:', email)
         
-        // Buscar usuário existente
-        const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers()
-        if (listError) throw listError
-        
-        const existingUser = listData.users.find(u => u.email === email)
-        if (!existingUser) throw new Error('Email existe mas usuário não encontrado')
-        
-        userId = existingUser.id
+        // Buscar usuário existente via profiles (evita limite de 1000 do listUsers)
+        const { data: profileData } = await supabaseAdmin
+          .from('profiles')
+          .select('id')
+          .eq('email', email.toLowerCase())
+          .maybeSingle()
+
+        if (profileData) {
+          userId = profileData.id
+        } else {
+          // Fallback: listUsers com comparação case-insensitive
+          const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers()
+          if (listError) throw listError
+          const existingUser = listData?.users.find(
+            u => u.email?.toLowerCase() === email.toLowerCase()
+          )
+          if (!existingUser) throw new Error('Email existe mas usuário não encontrado no auth nem em profiles')
+          userId = existingUser.id
+        }
         isExistingUser = true
 
         // Verificar se já tem plano ativo (não é visitante) - proteger contra sobrescrita
