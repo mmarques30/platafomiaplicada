@@ -19,6 +19,8 @@ export type MaterialGratuito = {
 export function useMateriaisGratuitos(limit?: number) {
   return useQuery({
     queryKey: ['materiais-gratuitos-home', limit],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       let query = supabase
         .from('materiais_gratuitos')

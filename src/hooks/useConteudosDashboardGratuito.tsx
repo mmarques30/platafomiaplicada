@@ -5,6 +5,8 @@ import { TipoConteudo, ConteudoDashboard } from "./useConteudosDashboard";
 export function useConteudosDashboardGratuito(tipo?: TipoConteudo) {
   return useQuery({
     queryKey: ['conteudos-dashboard-gratuito', tipo],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       let query = supabase
         .from('conteudos_dashboard')
