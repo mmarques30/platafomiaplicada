@@ -494,7 +494,12 @@ export function GeracaoEntregasModal({
       ]);
 
       const entregasExistentesPorTitulo = new Map<string, { id: string; status: string }>();
-      (entregasExistentes || []).forEach(e => entregasExistentesPorTitulo.set(e.titulo, { id: e.id, status: e.status }));
+      // Normalizar título para evitar duplicatas por diferenças de caixa/pontuação
+      const normalizarTitulo = (t: string) =>
+        (t || "").toLowerCase().trim().replace(/[.,;:!?]+$/g, "").replace(/\s+/g, " ");
+      (entregasExistentes || []).forEach(e =>
+        entregasExistentesPorTitulo.set(normalizarTitulo(e.titulo), { id: e.id, status: e.status })
+      );
 
       const tasksExistentesPorTitulo = new Map<string, { id: string; status: string }>();
       (tasksExistentes || []).forEach(t => tasksExistentesPorTitulo.set(t.titulo, { id: t.id, status: t.status }));
@@ -516,23 +521,38 @@ export function GeracaoEntregasModal({
       setSaveProgress({ etapa: 'Sincronizando fases', current: 0, total: etapas.length });
       const etapasMap: Record<number, string> = {};
       const etapasExistentesPorNumero = new Map<number, string>();
-      (secoesExistentes || []).forEach(s => etapasExistentesPorNumero.set(s.numero_etapa, s.id));
+      const etapasExistentesPorTitulo = new Map<string, { id: string; numero: number }>();
+      (secoesExistentes || []).forEach(s => {
+        etapasExistentesPorNumero.set(s.numero_etapa, s.id);
+        etapasExistentesPorTitulo.set(normalizarTitulo(s.titulo), { id: s.id, numero: s.numero_etapa });
+      });
+
+      // Renumerar "etapa 0" para 1 (evita entregas órfãs com etapa_id null)
+      const etapasNormalizadas = etapas.map(e => e.numero === 0 ? { ...e, numero: 1 } : e);
 
       const etapasParaCriar: any[] = [];
       const etapaUpdates: any[] = [];
 
-      for (const etapa of etapas) {
-        const idExistente = etapasExistentesPorNumero.get(etapa.numero);
+      for (const etapa of etapasNormalizadas) {
+        // 1º tenta casar por TÍTULO normalizado, 2º por número
+        const matchPorTitulo = etapasExistentesPorTitulo.get(normalizarTitulo(etapa.titulo));
+        const idExistente = matchPorTitulo?.id ?? etapasExistentesPorNumero.get(etapa.numero);
         if (idExistente) {
           etapasMap[etapa.numero] = idExistente;
+          // Se casou por número, também guarda o id no número original do banco
+          if (matchPorTitulo) etapasMap[matchPorTitulo.numero] = idExistente;
           if (etapa.selecionada) {
-            etapaUpdates.push(
-              supabase.from("etapas_business").update({
-                titulo: etapa.titulo,
-                objetivo: etapa.objetivo || null,
-              }).eq("id", idExistente)
-            );
-            totalAtualizados++;
+            // IMPORTANTE: NÃO sobrescrever o título de etapas existentes.
+            // Em contratos Business iAplicada, o título da fase é "verdade do admin"
+            // e a IA não deve substituí-lo. Atualizamos apenas o objetivo se vier preenchido.
+            if (etapa.objetivo && etapa.objetivo.trim().length > 0) {
+              etapaUpdates.push(
+                supabase.from("etapas_business").update({
+                  objetivo: etapa.objetivo,
+                }).eq("id", idExistente)
+              );
+              totalAtualizados++;
+            }
           }
         } else if (etapa.selecionada) {
           etapasParaCriar.push({
@@ -567,7 +587,7 @@ export function GeracaoEntregasModal({
       const numeroEntregaParaTituloNovo = new Map<number, string>();
 
       for (const entrega of entregasSelecionadas) {
-        const existente = entregasExistentesPorTitulo.get(entrega.titulo);
+        const existente = entregasExistentesPorTitulo.get(normalizarTitulo(entrega.titulo));
         if (existente) {
           entregasMap[entrega.numero_entrega] = existente.id;
           if (modoImportacao === 'atualizar' && existente.status !== 'concluida') {
@@ -581,9 +601,12 @@ export function GeracaoEntregasModal({
             totalAtualizados++;
           }
         } else {
+          // Garantir mapeamento para etapa válida (etapa 0 já foi renumerada para 1 acima)
+          const numeroEtapaSeguro = entrega.etapa_numero === 0 ? 1 : entrega.etapa_numero;
+          const etapaIdSeguro = etapasMap[numeroEtapaSeguro] || etapasMap[1] || Object.values(etapasMap)[0] || null;
           entregasParaCriar.push({
             contrato_id: contratoId,
-            etapa_id: etapasMap[entrega.etapa_numero] || null,
+            etapa_id: etapaIdSeguro,
             titulo: entrega.titulo,
             descricao: entrega.descricao,
             modulo_relacionado: entrega.modulo_relacionado,
