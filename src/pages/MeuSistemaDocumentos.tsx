@@ -57,6 +57,18 @@ export default function MeuSistemaDocumentos() {
 
   const allLoading = isLoading || isLoadingDocs || isLoadingLinks || isLoadingNotas;
 
+  // Estado expandir/recolher seção de documentos (persistido por contrato)
+  const storageKey = contrato?.id ? `documentos-projeto-expandido-${contrato.id}` : null;
+  const [documentosExpandido, setDocumentosExpandido] = useState(true);
+  useEffect(() => {
+    if (!storageKey) return;
+    const saved = localStorage.getItem(storageKey);
+    if (saved !== null) setDocumentosExpandido(saved === "true");
+  }, [storageKey]);
+  useEffect(() => {
+    if (storageKey) localStorage.setItem(storageKey, String(documentosExpandido));
+  }, [storageKey, documentosExpandido]);
+
   // Atividade recente — combina arquivos, notas e links ordenados por data
   const atividadeRecente = useMemo(() => {
     const items: { tipo: string; titulo: string; data: string; icon: typeof FileText }[] = [];
