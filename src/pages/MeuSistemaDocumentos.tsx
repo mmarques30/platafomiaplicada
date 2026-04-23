@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2, Building2, Plus, Edit2, Trash2, Loader2 } from "lucide-react";
+import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2, Building2, Plus, Edit2, Trash2, Loader2, AlertCircle, Info } from "lucide-react";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ export default function MeuSistemaDocumentos() {
     documentos.filter(d => d.arquivo_url).forEach(d => items.push({ tipo: "Arquivo", titulo: d.titulo, data: d.created_at || "", icon: FileText }));
     notas.forEach(n => items.push({ tipo: "Anotação", titulo: n.titulo, data: n.created_at || "", icon: StickyNote }));
     links.forEach(l => items.push({ tipo: "Link", titulo: l.titulo, data: l.created_at || "", icon: Link2 }));
-    return items.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).slice(0, 5);
+    return items.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).slice(0, 4);
   }, [documentos, notas, links]);
 
   // Progresso temporal do contrato
@@ -169,13 +169,37 @@ export default function MeuSistemaDocumentos() {
     { label: "Reports", count: reports.length, icon: FileText },
   ];
 
-  // Insights dinâmicos
-  const insights: string[] = [];
-  if (totalItens === 0) insights.push("Comece adicionando arquivos e anotações para organizar seu projeto.");
-  if (notas.length === 0 && totalItens > 0) insights.push("Adicione anotações para registrar decisões importantes do projeto.");
-  if (arquivosCount > 0 && notas.length > 0) insights.push(`Você tem ${arquivosCount} arquivo(s) e ${notas.length} anotação(ões) registrados.`);
-  if (progresso.percentual > 0) insights.push(`Seu projeto está ${progresso.percentual}% concluído com base nas entregas.`);
-  if (progresso.percentual === 0 && (contrato.entregas_esperadas || []).length > 0) insights.push("Nenhuma entrega foi concluída ainda. Acompanhe o progresso na aba Entregas.");
+  // Saúde do projeto (progresso vs cronograma)
+  const saudeProjeto: { label: string; classe: string } = (() => {
+    if (!cronograma) return { label: "Sem cronograma definido", classe: "bg-muted text-muted-foreground border-transparent" };
+    if (progresso.percentual >= cronograma.percentual) return { label: "No prazo", classe: "bg-emerald-500/15 text-emerald-600 border-transparent" };
+    if (progresso.percentual >= cronograma.percentual - 15) return { label: "Atenção", classe: "bg-amber-500/15 text-amber-600 border-transparent" };
+    return { label: "Atrasado", classe: "bg-destructive/15 text-destructive border-transparent" };
+  })();
+
+  // Insights dinâmicos (Painel do Projeto)
+  const insights: { label: string; valor: string; tipo: "info" | "warning" | "success" }[] = [];
+  if (progresso.percentual === 100) {
+    insights.push({ label: "Todas as entregas concluídas", valor: "100%", tipo: "success" });
+  } else if (progresso.percentual > 0) {
+    insights.push({ label: "Entregas concluídas", valor: `${progresso.percentual}%`, tipo: "info" });
+  } else if ((contrato.entregas_esperadas || []).length > 0) {
+    insights.push({ label: "Nenhuma entrega concluída", valor: "0%", tipo: "warning" });
+  }
+  if (cronograma) {
+    if (cronograma.diasRestantes <= 30) {
+      insights.push({ label: "Prazo se aproximando", valor: `${cronograma.diasRestantes} dias`, tipo: "warning" });
+    } else {
+      insights.push({ label: "Prazo restante", valor: `${cronograma.diasRestantes} dias`, tipo: "info" });
+    }
+  }
+  insights.push({ label: "Documentos no projeto", valor: String(totalItens), tipo: "info" });
+  if (notas.length === 0) {
+    insights.push({ label: "Nenhuma anotação registrada", valor: "Registre decisões", tipo: "warning" });
+  }
+  if (reports && reports.length > 0) {
+    insights.push({ label: "Reports gerados", valor: String(reports.length), tipo: "success" });
+  }
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -446,10 +470,21 @@ export default function MeuSistemaDocumentos() {
         {/* Evolução das Entregas */}
         <Card className="border-border/50">
           <CardContent className="p-5 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              Evolução das Entregas
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                Evolução das Entregas
+              </div>
+              {cronograma && (
+                <Badge variant="outline" className="gap-1 text-[10px] font-medium">
+                  <Clock className="h-3 w-3" />
+                  {cronograma.diasRestantes}d
+                </Badge>
+              )}
             </div>
+            <Badge className={`text-[11px] font-medium ${saudeProjeto.classe}`}>
+              {saudeProjeto.label}
+            </Badge>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>{progresso.modulosConcluidos} de {(contrato.entregas_esperadas || []).length} concluídas</span>
@@ -464,10 +499,6 @@ export default function MeuSistemaDocumentos() {
                   <span className="font-medium text-foreground">{cronograma.percentual}%</span>
                 </div>
                 <ProgressBar value={cronograma.percentual} color="hsl(var(--chart-4))" height={6} />
-                <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {cronograma.diasRestantes} dias restantes
-                </p>
               </div>
             )}
           </CardContent>
@@ -481,7 +512,11 @@ export default function MeuSistemaDocumentos() {
               Atividade Recente
             </div>
             {atividadeRecente.length === 0 ? (
-              <p className="text-xs text-muted-foreground py-4 text-center">Nenhuma atividade registrada ainda.</p>
+              <div className="flex flex-col items-center justify-center py-6 text-center gap-1">
+                <Clock className="h-6 w-6 text-muted-foreground/40 mb-1" />
+                <p className="text-xs font-medium text-foreground">Nenhuma atividade ainda</p>
+                <p className="text-[11px] text-muted-foreground">Adicione um arquivo, anotação ou link para começar.</p>
+              </div>
             ) : (
               <div className="space-y-2">
                 {atividadeRecente.map((item, i) => (
@@ -492,7 +527,7 @@ export default function MeuSistemaDocumentos() {
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-medium text-foreground truncate">{item.titulo}</p>
                       <p className="text-[10px] text-muted-foreground">
-                        {item.tipo} · {item.data ? format(new Date(item.data), "dd/MM", { locale: ptBR }) : "—"}
+                        {item.tipo} · {item.data ? format(new Date(item.data), "dd/MM HH:mm", { locale: ptBR }) : "—"}
                       </p>
                     </div>
                   </div>
@@ -502,24 +537,32 @@ export default function MeuSistemaDocumentos() {
           </CardContent>
         </Card>
 
-        {/* Insights do Projeto */}
+        {/* Painel do Projeto */}
         <Card className="border-border/50">
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground">
               <Lightbulb className="h-4 w-4 text-primary" />
-              Insights do Projeto
+              Painel do Projeto
             </div>
-            <div className="space-y-2">
-              {insights.map((text, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-muted-foreground">{text}</p>
-                </div>
-              ))}
-              {insights.length === 0 && (
-                <p className="text-xs text-muted-foreground py-4 text-center">Adicione itens ao projeto para gerar insights.</p>
-              )}
-            </div>
+            {insights.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-4 text-center">Adicione itens ao projeto para gerar insights.</p>
+            ) : (
+              <div className="divide-y divide-border/50">
+                {insights.map((item, i) => {
+                  const Icon = item.tipo === "success" ? CheckCircle2 : item.tipo === "warning" ? AlertCircle : Info;
+                  const cor = item.tipo === "success" ? "text-emerald-500" : item.tipo === "warning" ? "text-amber-500" : "text-sky-500";
+                  return (
+                    <div key={i} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Icon className={`h-3.5 w-3.5 flex-shrink-0 ${cor}`} />
+                        <span className="text-xs text-foreground truncate">{item.label}</span>
+                      </div>
+                      <span className="text-xs font-semibold text-foreground flex-shrink-0">{item.valor}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
