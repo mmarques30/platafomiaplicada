@@ -1,32 +1,54 @@
 
 
-## Diagnóstico: por que o preview está em branco
+## Diagnóstico dos dois pontos
 
-O log do servidor confirma o que aconteceu:
+### 1. "A visão não foi alterada" — é cache do navegador
 
-1. Às **14:43** houve um **erro de sintaxe** em `MentoriaDocumentos.tsx` e `MeuSistemaDocumentos.tsx` (tag JSX desbalanceada perto da linha 660). O Vite mostrou o overlay vermelho de erro e o preview ficou em branco.
-2. Vários HMR updates seguintes (até **15:05**) corrigiram o código — agora `tsc --noEmit` passa sem erros e os arquivos estão íntegros.
-3. **Porém o seu navegador ainda está com o estado quebrado em cache** (overlay de erro do Vite + módulos antigos). O HMR não consegue se recuperar sozinho de um erro de parse fatal — exige um reload manual.
+Confirmei no código: `src/pages/MentoriaDocumentos.tsx` (linha 504) e `src/pages/MeuSistemaDocumentos.tsx` **já estão usando** `<ProjetoResumoDashboard>`, que tem:
+- 4 KPIs (Progresso, Saúde, Prazo, Documentação)
+- Gráfico radial Progresso × Cronograma
+- Donut de composição da documentação
+- Timeline visual de Atividade Recente
+- Painel de Insights estilizado
 
-### O que fazer agora (sem alteração de código)
+A screenshot que você enviou mostra a **versão antiga** (3 cards simples: "Evolução das Entregas", "Atividade Recente", "Insights do Projeto"). Esses textos **não existem mais nos arquivos** (busca só achou 2 ocorrências dentro do componente novo, em contexto diferente).
 
-**Faça um hard reload no preview**:
+**Causa**: o Service Worker do PWA + cache HTTP estão servindo o bundle JavaScript anterior. O HMR já tentou atualizar várias vezes mas o SW segura. Há inclusive um erro de runtime no log: `Failed to update a ServiceWorker... script resource is behind a redirect`.
 
-- **Mac**: `Cmd + Shift + R`
-- **Windows/Linux**: `Ctrl + Shift + R`
-- Ou clique no ícone de reload do iframe do preview no Lovable.
+**Solução**: hard reload + descartar SW. Não é alteração de código; é interação no navegador:
+- **Mac**: `Cmd + Shift + R` (uma vez); se continuar, abrir DevTools → Application → Service Workers → "Unregister" → recarregar.
+- **Windows**: `Ctrl + Shift + R`; mesma rota no DevTools se persistir.
 
-Isso deve resolver imediatamente — o build está saudável no servidor.
+Se você confirmar que continua igual após esse procedimento, eu investigo se há algum bypass de Suspense/lazy ou se algum admin override está renderizando outra página.
 
-### Se mesmo após o hard reload continuar em branco
+### 2. "A data ainda aparece em Visão Geral"
 
-Aí sim haverá algo a investigar. Me avise e eu vou:
+Confirmei no banco: **toda etapa de contrato Business tem `data_prevista` preenchida automaticamente** quando o admin cria o contrato (intervalos mensais a partir de `data_inicio`). Hoje, em `BusinessVisaoGeralGrid.tsx`, o KPI "Próxima Sessão" pega a primeira `data_prevista` futura — mas isso é a **data calculada**, não uma data **aprovada por você**.
 
-1. Abrir o console do navegador no preview (`browser--read_console_logs`) para capturar o erro de runtime exato.
-2. Verificar `src/pages/MentoriaDocumentos.tsx` e `src/pages/MeuSistemaDocumentos.tsx` em torno da linha 577–588 (estrutura `function InfoItem` que apareceu no erro original) para garantir que não restou nenhuma divergência sutil.
-3. Conferir se o `ErrorBoundary` global não está engolindo um crash silencioso vindo de uma das telas que editei nas últimas mudanças (`BusinessVisaoGeralGrid`, `EntregasBusinessManager`, `GeracaoEntregasModal`).
+Sua regra é clara: **só aparece data se você aprovou**. Como não existe campo `aprovada_pelo_admin` em `etapas_business`, a única fonte de "data aprovada por você" hoje é a tabela `sessoes_mentoria` (você cria/edita manualmente cada sessão com data, hora e link de reunião).
 
-### Resumo
+### Plano de correção
 
-Não há nada quebrado no código atualmente. O preview em branco é resíduo do erro de sintaxe anterior preso no navegador. **Hard reload deve resolver.**
+**Mudar a fonte do KPI "Próxima Sessão" de `etapas_business.data_prevista` para `sessoes_mentoria`** em `src/components/mentoria/business/BusinessVisaoGeralGrid.tsx`:
+
+1. Adicionar `useMentoriaSessoes(businessUserId)` (hook já existente).
+2. Filtrar sessões com `status = 'agendada'` e `data_sessao > now()`.
+3. Pegar a mais próxima.
+4. Exibir:
+   - Valor: `format(data_sessao, "dd MMM", { locale: ptBR })` + hora `HH'h'mm`.
+   - Sub-label: título da sessão truncado (ex: "Encontro 2: ..."), ou "Aguardando agendamento" se não houver.
+5. Se não houver nenhuma sessão agendada → exibir `—` no valor e "Aguardando agendamento" no sub-label. **Não cair de volta** para `etapas_business`.
+
+Remover totalmente o uso de `useEtapasBusiness` para o KPI de próxima sessão (continua sendo usado para `progressoGeralPct`).
+
+### Arquivo editado
+
+- `src/components/mentoria/business/BusinessVisaoGeralGrid.tsx` — única alteração.
+
+### Resultado esperado
+
+- O KPI "Próxima Sessão" só mostra data quando você (admin) **agendou explicitamente** uma sessão em `sessoes_mentoria`.
+- Enquanto não houver sessão agendada, o card mostra `—` + "Aguardando agendamento" — sem mais "vazar" datas calculadas do contrato.
+- O KPI "Progresso Geral" continua funcionando igual (etapas).
+- Para o problema #1, basta o hard reload + reset do Service Worker; nenhum código a mexer ali.
 
