@@ -128,20 +128,26 @@ export function useDocumentosBusiness(contratoId?: string, paraProcessamentoIA?:
   });
 
   const uploadDocumento = async (file: File, contratoId: string, tipo: DocumentoInput['tipo']) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${contratoId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    
-    // Usar o bucket correto para documentos business
-    const { error: uploadError } = await supabase.storage
-      .from("contratos-business")
-      .upload(fileName, file);
-
-    if (uploadError) {
-      toast.error("Erro ao fazer upload do arquivo");
-      throw uploadError;
+    const MAX = 25 * 1024 * 1024; // 25MB
+    if (file.size > MAX) {
+      throw new Error(`Arquivo muito grande (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo permitido: 25MB.`);
     }
 
-    // Retornar o path relativo (não a URL pública) para uso com signed URLs
+    const fileName = `${contratoId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("contratos-business")
+      .upload(fileName, file, {
+        contentType: file.type || 'application/octet-stream',
+        upsert: true,
+        cacheControl: '3600',
+      });
+
+    if (uploadError) {
+      console.error('Upload storage error:', uploadError);
+      throw new Error(uploadError.message || 'Falha ao enviar arquivo para o storage');
+    }
+
     return fileName;
   };
 
