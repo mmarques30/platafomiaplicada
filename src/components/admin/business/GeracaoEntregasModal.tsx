@@ -926,6 +926,14 @@ export function GeracaoEntregasModal({
                 onToggleEntregaSelect={toggleEntregaSelecionada}
                 onToggleInstrucao={toggleInstrucaoSelecionada}
                 onToggleTask={toggleTaskSelecionada}
+                onUpdateEtapa={updateEtapa}
+                onRemoveEtapa={removeEtapa}
+                onAddEntrega={addEntrega}
+                onUpdateEntrega={updateEntrega}
+                onRemoveEntrega={removeEntrega}
+                onUpdateInstrucao={updateInstrucao}
+                onRemoveInstrucao={removeInstrucao}
+                onAddInstrucao={addInstrucao}
                 getAcaoBadge={getAcaoBadge}
                 getAcaoItem={getAcaoItem}
                 getPrioridadeBadge={getPrioridadeBadge}
@@ -934,6 +942,16 @@ export function GeracaoEntregasModal({
               />
             );
           })}
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={addEtapa}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Nova fase
+          </Button>
         </div>
 
         {/* Drag Overlay */}
