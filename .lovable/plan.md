@@ -1,97 +1,65 @@
 
 
-## Diagnóstico
+## Plano: Reformular seção "Resumo do Projeto"
 
-### Por que não dá pra editar
-Hoje o `GeracaoEntregasModal` só permite **selecionar** (checkbox) e **arrastar** (drag & drop) entregas entre fases. Os campos `titulo`, `descricao`, `prompt_sugerido`, `dicas`, `prioridade`, `responsavel` e o objetivo da fase chegam da IA e vão direto pro banco — sem nenhum input editável.
+Aplicar exatamente as mesmas alterações em `src/pages/MeuSistemaDocumentos.tsx` e `src/pages/MentoriaDocumentos.tsx`. Nenhum outro arquivo será tocado.
 
-### Por que demora tanto pra salvar
-No `handleSalvar` (linhas 387–681), pra cada item selecionado o código faz:
-1. Um `SELECT` pra checar se já existe
-2. Um `INSERT` ou `UPDATE` separado
+### 1. Card "Evolução das Entregas"
 
-Para o seu caso (5 fases · 13 entregas · 409 instruções) isso vira **~850 round-trips sequenciais** ao banco. Cada um custa 50–150ms de latência. Conta: ~60 a 120 segundos só de rede, antes de qualquer processamento.
+- Calcular `saudeProjeto` comparando `progresso.percentual` vs `cronograma.percentual`:
+  - sem `cronograma` → badge cinza "Sem cronograma definido"
+  - `progresso >= cronograma` → badge verde "No prazo"
+  - `progresso >= cronograma - 15` → badge amarelo "Atenção"
+  - caso contrário → badge vermelho "Atrasado"
+- Mover "X dias restantes" para um badge destacado no topo do card (ao lado do título), usando `Clock` + `bg-muted`.
+- Manter as duas barras de progresso (entregas + cronograma) abaixo.
 
-Além disso:
-- Tudo é feito em loop `for ... of` com `await` dentro → 100% serial, sem paralelismo
-- Sem progresso visual (usuário só vê "Salvando..." parado)
-- Sem batch insert (`.insert([...])` aceita arrays e faz 1 round-trip pra N linhas)
+### 2. Card "Atividade Recente"
 
-## Plano
+- Reduzir o `slice` de 5 para 4 itens no `useMemo` de `atividadeRecente`.
+- Trocar formato de data para `"dd/MM HH:mm"` via date-fns.
+- Estado vazio mais amigável e contextual:
+  - Ícone `Clock` cinza centralizado + "Nenhuma atividade ainda" + linha secundária "Adicione um arquivo, anotação ou link para começar."
 
-### 1. Edição inline no modal (`GeracaoEntregasModal.tsx` + `DroppableFase.tsx`)
+### 3. Card "Insights do Projeto" → "Painel do Projeto"
 
-Tornar editável **antes de salvar**:
+Substituir o array `insights: string[]` (frases hardcoded) por um array tipado:
 
-**Por fase:**
-- Título da fase (input)
-- Objetivo (textarea pequena)
+```ts
+const insights: { label: string; valor: string; tipo: "info" | "warning" | "success" }[] = [];
+```
 
-**Por entrega:**
-- Título (input)
-- Descrição (textarea)
-- Prioridade (select: baixa/média/alta/urgente)
-- Módulo relacionado (input)
-- Botão "remover entrega" (ao invés de só desmarcar)
+Calcular dinamicamente:
+- Completude das entregas (success/info/warning conforme `progresso.percentual`)
+- Cronograma (`warning` se ≤30 dias, senão `info`)
+- Total de documentos (`totalArquivos + totalNotas + totalLinks`)
+- Aviso se `totalNotas === 0`
+- Reports gerados (`success`) se `reports.length > 0`
 
-**Por instrução (passo):**
-- Título (input)
-- Descrição (textarea)
-- Prompt sugerido (textarea)
-- Dicas (textarea)
-- Responsável (select: você/mentor/conjunto)
-- Ferramenta (select)
-- Botão "remover passo"
+Renderização: cada linha com
+- Bolinha/ícone colorido à esquerda (`CheckCircle2` verde para success, `AlertCircle` amarelo para warning, `Info` azul para info)
+- `label` em texto normal (text-foreground)
+- `valor` em negrito alinhado à direita (`font-semibold text-foreground`)
+- Layout: `flex items-center justify-between`, divisores sutis entre linhas
 
-**Adicionar manualmente:**
-- Botão "+ Nova entrega" dentro de cada fase
-- Botão "+ Novo passo" dentro de cada entrega
-- Botão "+ Nova fase" no topo
+Renomear título do card para **"Painel do Projeto"** mantendo o ícone `Lightbulb`.
 
-UI: cada item ganha um ícone de lápis (`Pencil`) que expande para edição inline. Dois cliques = pronto. Nada de modal aninhado.
+### Detalhes técnicos
 
-### 2. Salvamento rápido com batch + paralelismo (`GeracaoEntregasModal.tsx → handleSalvar`)
+- Imports adicionais por arquivo: `AlertCircle`, `Info` de `lucide-react`.
+- Tipagem dos itens de `atividadeRecente` ganha campo opcional `data` já formatável (mantém `created_at` cru e formata na renderização).
+- Cores dos insights via classes Tailwind:
+  - success → `text-emerald-500`
+  - warning → `text-amber-500`
+  - info → `text-sky-500`
+- Badge de saúde usa o componente existente `Badge` com `variant` + classes utilitárias (verde/vermelho/cinza/âmbar) para evitar criar variantes novas.
+- Badge de "dias restantes" no topo: `<Badge variant="outline">` com ícone `Clock`.
+- Toda lógica derivada (insights, saúde, totais) calculada antes do `return`, dentro do componente, usando os dados já disponíveis (`contrato`, `progresso`, `cronograma`, `documentos`, `notas`, `links`, `reports`).
 
-Reescrever o pipeline:
+### Resultado esperado
 
-**a) Pré-carregar dados existentes em 1 query por tabela:**
-- 1 `SELECT id,titulo,status FROM entregas_business WHERE contrato_id = ?`
-- 1 `SELECT id,titulo,status,entrega_id FROM instrucoes_etapa WHERE entrega_id IN (...)`
-- 1 `SELECT id,titulo,status FROM tasks_business WHERE contrato_id = ?`
-
-Construir Maps em memória (`titulo → registro`). Zero SELECT dentro do loop.
-
-**b) Batch inserts:**
-- Acumular todas as novas entregas num array → 1 `.insert([entrega1, entrega2, ...])`
-- Mesmo para instruções, tasks e backlog
-- 4 inserts grandes ao invés de 800 individuais
-
-**c) Updates em paralelo com `Promise.all`:**
-- Os updates ainda precisam ser por linha, mas podem rodar em paralelo (chunks de 20)
-
-**d) Feedback de progresso:**
-- Trocar "Salvando..." por barra de progresso real: "Salvando entregas (3/13)..."
-- Um `useState` com `{etapa: 'entregas', current: N, total: M}`
-
-**Ganho esperado:** de ~60–120s para **3–8s** no seu caso real.
-
-### 3. Pequenas melhorias de UX
-
-- Botão "Pré-visualizar SQL" (opcional, debug)
-- Toast com resumo após salvar: "13 entregas, 409 passos criados em 4.2s"
-- Manter o botão "Cancelar" funcional durante o save (abort controller)
-
-## Arquivos a editar
-
-1. `src/components/admin/business/GeracaoEntregasModal.tsx` — novos handlers de edit/add/remove em estado local + reescrita do `handleSalvar` com batch/paralelo + barra de progresso.
-2. `src/components/admin/business/DroppableFase.tsx` — props de edição, botões de lápis/lixeira/adicionar, inputs inline.
-3. (Possível) `src/components/admin/business/EntregaEditavel.tsx` — extrair card editável de entrega pra manter o `DroppableFase` legível.
-
-Sem migration de banco. Sem mudança em edge function.
-
-## Resultado esperado
-
-- Você revisa, edita título/descrição/prompt/dicas de qualquer item, adiciona ou remove entregas/passos diretamente no modal antes de clicar em **Salvar**.
-- Salvamento de 400+ itens cai de ~1–2 minutos para poucos segundos, com barra de progresso real.
-- Possibilidade de cancelar no meio sem deixar dados pela metade (transação por bloco).
+- Card 1 mostra imediatamente se o projeto está saudável, com prazo destacado.
+- Card 2 lista 4 atividades recentes com data + hora e estado vazio amigável.
+- Card 3 (renomeado para "Painel do Projeto") apresenta métricas reais com hierarquia visual clara (label à esquerda, valor à direita, ícone colorido por tipo).
+- Sem mudanças em hooks, rotas ou outros arquivos.
 
