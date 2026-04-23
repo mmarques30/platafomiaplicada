@@ -1,84 +1,32 @@
 
 
-## Diagnóstico: por que as entregas "somem" depois de processadas
+## Diagnóstico: por que o preview está em branco
 
-Investiguei o banco de dados e os logs. As entregas **estão sendo salvas com sucesso pela IA**, mas há **3 problemas combinados** que fazem com que elas desapareçam ou pareçam ter sumido.
+O log do servidor confirma o que aconteceu:
 
-### O que confirmei nos dados
+1. Às **14:43** houve um **erro de sintaxe** em `MentoriaDocumentos.tsx` e `MeuSistemaDocumentos.tsx` (tag JSX desbalanceada perto da linha 660). O Vite mostrou o overlay vermelho de erro e o preview ficou em branco.
+2. Vários HMR updates seguintes (até **15:05**) corrigiram o código — agora `tsc --noEmit` passa sem erros e os arquivos estão íntegros.
+3. **Porém o seu navegador ainda está com o estado quebrado em cache** (overlay de erro do Vite + módulos antigos). O HMR não consegue se recuperar sozinho de um erro de parse fatal — exige um reload manual.
 
-| Cliente | Etapas | Entregas no DB | Notificações de "nova entrega" hoje |
-|---|---|---|---|
-| **Claudia De Meo** (Business iAplicada) | 6 | **0** | **13 entregas × 2 vezes** (=26 inserts) |
-| **Raquel Tetti** | — | — | **15 entregas × 2 vezes** (=30 inserts) |
-| Uiara (UMAS) | 6 | 31 | (anterior, intactas) |
+### O que fazer agora (sem alteração de código)
 
-Conclusão: a IA processou, gerou as entregas corretamente, **as entregas foram inseridas no banco** (cada uma 2 vezes hoje, confirmado pelas notificações automáticas) — e depois **alguém apagou todas** entre os ciclos. Hoje o contador está em zero.
+**Faça um hard reload no preview**:
 
-### Causa #1 — Botão "Limpar Tudo" apaga TUDO sem aviso suficiente
+- **Mac**: `Cmd + Shift + R`
+- **Windows/Linux**: `Ctrl + Shift + R`
+- Ou clique no ícone de reload do iframe do preview no Lovable.
 
-Em `src/components/admin/business/EntregasBusinessManager.tsx` (linhas 65-84) existe um botão **"Limpar Tudo"** que executa:
+Isso deve resolver imediatamente — o build está saudável no servidor.
 
-```ts
-supabase.from("entregas_business").delete().eq("contrato_id", contratoId);
-```
+### Se mesmo após o hard reload continuar em branco
 
-Isso apaga **todas** as entregas do contrato (não só a última importação). O texto do diálogo diz apenas "Esta ação irá remover permanentemente todas as entregas". O fluxo real do usuário é:
+Aí sim haverá algo a investigar. Me avise e eu vou:
 
-1. Processa → 13 entregas criadas
-2. Vê duplicatas/algo estranho → clica "Limpar Tudo" pra "limpar a importação"
-3. Reprocessa → 13 entregas criadas de novo
-4. Volta a ver duplicatas → clica "Limpar Tudo" de novo → **fica em zero**
+1. Abrir o console do navegador no preview (`browser--read_console_logs`) para capturar o erro de runtime exato.
+2. Verificar `src/pages/MentoriaDocumentos.tsx` e `src/pages/MeuSistemaDocumentos.tsx` em torno da linha 577–588 (estrutura `function InfoItem` que apareceu no erro original) para garantir que não restou nenhuma divergência sutil.
+3. Conferir se o `ErrorBoundary` global não está engolindo um crash silencioso vindo de uma das telas que editei nas últimas mudanças (`BusinessVisaoGeralGrid`, `EntregasBusinessManager`, `GeracaoEntregasModal`).
 
-### Causa #2 — IA sobrescreve os títulos das etapas existentes
+### Resumo
 
-Em `GeracaoEntregasModal.tsx` (linhas 524-549), o `handleSalvar` casa etapas **pelo número** (`numero_etapa`), não pelo título. Como o contrato Business iAplicada já vem com etapas pré-criadas ("Diagnóstico e Alinhamento Estratégico", "Infraestrutura de Dados…", etc.), e a IA devolve etapas genéricas ("Kickoff", "MVP — Importação", "Dashboard"…), o save **silenciosamente sobrescreve os títulos originais** da fase 1, 2, 3, 4.
-
-O usuário perde os títulos personalizados que ele/admin definiu no contrato sem ser avisado.
-
-### Causa #3 — Entregas com `etapa_numero=0` ficam órfãs
-
-A IA às vezes retorna "Etapa 0: Kickoff" (numeração começando em zero). O save faz `etapasMap[etapa.numero] || null`, e como não existe etapa 0 no DB, todas as entregas dessa fase entram com `etapa_id = null` — ficam soltas, sem aparecer no Gantt agrupado por fase.
-
----
-
-## Plano de correção
-
-### 1. Tornar "Limpar Tudo" muito mais explícito e seguro
-
-Em `EntregasBusinessManager.tsx`:
-- Mudar o texto do diálogo para mostrar **a quantidade exata** que será deletada e os nomes (até 5, com "…+N mais"):
-  > "Esta ação vai apagar permanentemente as **13 entregas** deste contrato (Documentação do Projeto, Identidade Visual De Meo, …+10 mais) e todas as instruções vinculadas. Esta ação **não pode ser desfeita**."
-- Adicionar uma **confirmação por digitação**: o usuário precisa digitar o nome do cliente (ou "LIMPAR") para habilitar o botão de confirmação.
-- Trocar o ícone/texto do botão de `"Limpar Tudo"` para `"Apagar todas as entregas"` (mais claro).
-
-### 2. Modo "Atualizar" no save: NÃO sobrescrever títulos de etapas existentes
-
-Em `GeracaoEntregasModal.tsx` (`handleSalvar`, bloco "ETAPAS — atualizar/criar"):
-- Quando uma etapa existente é encontrada por número, **NÃO atualizar `titulo`** — preservar o que o admin já configurou. Atualizar apenas `objetivo` se estiver vazio.
-- Comentário no código explicando que títulos de etapas em contratos Business iAplicada são "verdade do admin" e não devem ser substituídos pela IA.
-
-### 3. Mapear etapas por título (com fallback por número) e tratar etapa 0
-
-Em `handleSalvar`:
-- Construir `etapasExistentesPorTitulo` além de `etapasExistentesPorNumero`. Tentar primeiro casar por título normalizado; só cair pra número se não achar.
-- Se a IA retornar `etapa_numero = 0`, **renumerar para 1** antes do mapeamento (ou criar uma "Etapa 0 — Kickoff" se realmente não existir nada).
-- Nunca permitir que entrega seja inserida com `etapa_id = null` em modo "atualizar" — se não conseguir mapear, criar a etapa nova automaticamente.
-
-### 4. Evitar inserts duplicados em re-importação
-
-Hoje o match de duplicata é só pelo `titulo` exato. Se a IA gerar o mesmo título com pontuação diferente ("Identidade Visual De Meo" vs "Identidade Visual de Meo."), entra como nova. Vou normalizar o título (lowercase + trim + sem pontuação final) na chave do `entregasExistentesPorTitulo` Map.
-
-### Arquivos que serão editados
-
-1. `src/components/admin/business/EntregasBusinessManager.tsx` — diálogo de "Limpar Tudo" com confirmação por digitação + texto claro mostrando quantas serão apagadas.
-2. `src/components/admin/business/GeracaoEntregasModal.tsx` — `handleSalvar`: não sobrescrever título de etapa existente, mapear etapas por título com fallback, tratar `etapa_numero = 0`, normalizar título de entrega no match de duplicata.
-
-### Resultado esperado
-
-- O botão "Limpar Tudo" fica claro o suficiente para impedir cliques acidentais (causa principal do "sumiço").
-- Reimportar o mesmo documento não duplica nem apaga as entregas existentes — apenas atualiza descrição/prioridade quando estiver em modo "atualizar".
-- Os títulos das etapas configuradas no contrato (Business iAplicada) não são mais sobrescritos pela IA.
-- Entregas geradas pela IA sempre ficam vinculadas a uma etapa válida.
-
-Sem mudanças em hooks, banco, edge functions ou outros arquivos.
+Não há nada quebrado no código atualmente. O preview em branco é resíduo do erro de sintaxe anterior preso no navegador. **Hard reload deve resolver.**
 
