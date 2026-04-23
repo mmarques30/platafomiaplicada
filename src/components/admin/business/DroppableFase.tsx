@@ -119,12 +119,21 @@ export function DroppableFase({
   onToggleEntregaSelect,
   onToggleInstrucao,
   onToggleTask,
+  onUpdateEtapa,
+  onRemoveEtapa,
+  onAddEntrega,
+  onUpdateEntrega,
+  onRemoveEntrega,
+  onUpdateInstrucao,
+  onRemoveInstrucao,
+  onAddInstrucao,
   getAcaoBadge,
   getAcaoItem,
   getPrioridadeBadge,
   getResponsavelBadge,
   getProgressColor,
 }: DroppableFaseProps) {
+  const [editingFase, setEditingFase] = useState(false);
   const { isOver, setNodeRef } = useDroppable({
     id: `fase-${etapa.numero}`,
     data: { faseNumero: etapa.numero },
