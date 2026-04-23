@@ -1,65 +1,55 @@
 
 
-## Redesenhar "Resumo do Projeto" com gráficos + cards
+## Corrigir crash "Algo deu errado" ao sair da simulação
 
-### O problema
-Hoje os 3 cards (Evolução, Atividade, Painel) só mostram texto e barras de progresso simples. As métricas não se destacam visualmente e o usuário não consegue "ler" a saúde do projeto em 1 segundo.
+### Causa raiz
 
-### Nova estrutura (2 linhas)
+Em `src/pages/MentoriaDocumentos.tsx` e `src/pages/MeuSistemaDocumentos.tsx`, o hook:
 
-**Linha 1 — Hero metrics (4 cards compactos KPI)**
-Substitui a leitura puramente textual por números grandes + ícone + delta visual.
-
-```
-┌──────────────┬──────────────┬──────────────┬──────────────┐
-│ Progresso    │ Saúde        │ Prazo        │ Documentação │
-│ 0%           │ Atenção      │ 350d         │ 4 itens      │
-│ 0/7 entregas │ -4% vs plano │ até DD/MM/AA │ 3 arq · 1 lnk│
-└──────────────┴──────────────┴──────────────┴──────────────┘
+```tsx
+const [downloadingReportId, setDownloadingReportId] = useState<string | null>(null);
 ```
 
-**Linha 2 — Visualizações (3 colunas)**
+está declarado **na linha 152**, ou seja, **depois** dos dois `return` antecipados (`if (allLoading)` na linha 127 e `if (!contrato)` na linha 135).
 
-- **Coluna A (col-span-2): "Progresso vs Cronograma"** — gráfico `RadialBarChart` (recharts) com 2 anéis concêntricos:
-  - anel externo = % entregas concluídas (cor primary)
-  - anel interno = % cronograma decorrido (cor chart-4)
-  - número grande no centro com o % de entregas
-  - Legenda lateral com os 2 valores e o "delta" (saúde do projeto)
-  - Abaixo: mini barra horizontal mostrando timeline (início → hoje → fim) com marcador da posição atual
+Isso viola as **Rules of Hooks** do React: o número e a ordem de hooks deve ser idêntico em todos os renders.
 
-- **Coluna B (col-span-1): "Composição da Documentação"** — `PieChart` (donut) com fatias para Arquivos / Anotações / Links / Reports, cada uma com cores chart-1..chart-4. Legenda com contagens.
+### Por que só quebra ao sair da simulação
 
-**Linha 3 — Atividade + Painel (2 colunas)**
+- Durante a simulação como Business: `contrato` está carregado, os early-returns não disparam, o `useState` da linha 152 roda normalmente.
+- Ao clicar em **"Sair da Simulação"**: `useBusinessUserId` muda → `useContratosBusiness` refaz a query → `isLoading = true` → componente entra no early-return da linha 127 → o `useState` da linha 152 **não é chamado nesse render** → React detecta divergência na ordem de hooks → exceção → `ErrorBoundary` mostra "Algo deu errado".
 
-- **Atividade Recente (col-span-2)** — timeline vertical estilizada (já existe, mantém 4 itens com `dd/MM HH:mm`), mas com:
-  - linha vertical conectando os ícones (visual de timeline real)
-  - badge de tipo colorido por categoria (arquivo=azul, nota=âmbar, link=verde, report=roxo)
-  - empty state mantido
+### Correção
 
-- **Painel do Projeto (col-span-1)** — mantém a lista atual de insights (já está bom), mas:
-  - cabeçalho ganha um mini "score" agregado (ex.: "3 OK · 2 alertas")
-  - linhas com fundo sutil colorido por tipo (success/warning/info) ao invés de só ícone
+Mover o `useState` de `downloadingReportId` para **junto dos outros `useState`**, antes dos early-returns. Mesma correção, idêntica, em ambos os arquivos.
 
-### Detalhes técnicos
+**Antes** (linha ~152, depois dos returns):
+```tsx
+if (allLoading) { return <Spinner/>; }
+if (!contrato)  { return <Empty/>; }
+// ...
+const [downloadingReportId, setDownloadingReportId] = useState<string | null>(null); // ❌ hook depois de return
+```
 
-- **Biblioteca:** `recharts` (já instalada e usada em `VideoAnalyticsCharts.tsx`).
-- **Cores:** usar tokens HSL existentes (`hsl(var(--primary))`, `hsl(var(--chart-1..4))`, `hsl(var(--muted))`).
-- **Responsivo:** em mobile (`< md`), tudo vira coluna única; em `md` o grid muda para 2 colunas; em `lg` aplica o grid de 4/3/3 descrito acima.
-- **Componente reutilizável:** criar `src/components/business/ProjetoResumoDashboard.tsx` recebendo props `{ contrato, progresso, cronograma, atividadeRecente, insights, documentos, notas, links, reports }` para evitar duplicar 200 linhas em ambas as páginas.
-- **Datas:** `format(new Date(...), "dd/MM/yyyy")` via `date-fns/ptBR` (já importado).
-- **Sem mudanças em:** hooks, banco, edge functions, rotas.
+**Depois** (junto aos outros estados, linha ~58):
+```tsx
+const [viewingReport, setViewingReport] = useState(...);
+const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+const [editingLink, setEditingLink] = useState(...);
+const [linkForm, setLinkForm] = useState(...);
+const [downloadingReportId, setDownloadingReportId] = useState<string | null>(null); // ✅ antes dos returns
+```
+
+A linha 152 fica removida (a função `handleDownloadReport` e os usos de `downloadingReportId` permanecem inalterados — só a declaração do estado muda de lugar).
 
 ### Arquivos editados
 
-1. **Criar** `src/components/business/ProjetoResumoDashboard.tsx` — todo o novo bloco (KPIs + radial + donut + timeline + painel).
-2. **Editar** `src/pages/MentoriaDocumentos.tsx` — substituir as ~100 linhas do bloco "Resumo do Projeto" por `<ProjetoResumoDashboard {...props} />`.
-3. **Editar** `src/pages/MeuSistemaDocumentos.tsx` — mesma substituição idêntica.
+1. `src/pages/MentoriaDocumentos.tsx` — mover `useState` de `downloadingReportId` para junto dos demais `useState` (após linha 57).
+2. `src/pages/MeuSistemaDocumentos.tsx` — mesma alteração idêntica.
 
 ### Resultado esperado
 
-- Visão executiva: 4 KPIs no topo dão leitura imediata (progresso, saúde, prazo, docs).
-- Gráficos radiais e donut tornam a comparação progresso×cronograma e a composição da documentação intuitivas.
-- Timeline visual da atividade recente substitui a lista plana.
-- Painel de insights ganha hierarquia visual com fundos sutis.
-- Zero duplicação de código entre as duas páginas (componente único compartilhado).
+- Clicar em "Sair da Simulação" deixa de disparar o ErrorBoundary "Algo deu errado".
+- A página de Documentos volta corretamente ao estado de loading e depois renderiza a visão do admin (sem contrato), exibindo "Nenhum contrato ativo encontrado".
+- Nenhuma outra funcionalidade afetada (download de reports continua funcionando exatamente como antes).
 
