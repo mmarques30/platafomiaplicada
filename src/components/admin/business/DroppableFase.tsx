@@ -185,6 +185,24 @@ export function DroppableFase({
             {totais.porcentagem}%
           </span>
           {getAcaoBadge(getAcaoItem('etapa', etapa.titulo))}
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 w-7 p-0"
+            onClick={(e) => { e.stopPropagation(); setEditingFase(v => !v); }}
+            title="Editar fase"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+            onClick={(e) => { e.stopPropagation(); if (confirm('Remover esta fase e suas entregas?')) onRemoveEtapa(etapa.numero); }}
+            title="Remover fase"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
         </div>
         
         {/* Barra de Progresso */}
@@ -206,6 +224,29 @@ export function DroppableFase({
         </div>
       )}
 
+      {/* Edição inline da fase */}
+      {editingFase && (
+        <div className={`px-4 py-3 space-y-2 border-t ${cores.bg}`}>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Título da fase</label>
+            <Input
+              value={etapa.titulo}
+              onChange={(e) => onUpdateEtapa(etapa.numero, { titulo: e.target.value })}
+              className="mt-1 h-8 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Objetivo</label>
+            <Textarea
+              value={etapa.objetivo || ''}
+              onChange={(e) => onUpdateEtapa(etapa.numero, { objetivo: e.target.value })}
+              className="mt-1 min-h-[50px] text-sm"
+              placeholder="Objetivo da fase (opcional)"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Entregas da FASE */}
       {isExpanded && (
         <div className={`p-3 space-y-3 ${cores.bg}`}>
@@ -221,6 +262,11 @@ export function DroppableFase({
                 onToggleSelect={() => onToggleEntregaSelect(entrega.numero_entrega)}
                 onToggleInstrucao={onToggleInstrucao}
                 onToggleTask={onToggleTask}
+                onUpdateEntrega={onUpdateEntrega}
+                onRemoveEntrega={onRemoveEntrega}
+                onUpdateInstrucao={onUpdateInstrucao}
+                onRemoveInstrucao={onRemoveInstrucao}
+                onAddInstrucao={onAddInstrucao}
                 getAcaoBadge={getAcaoBadge}
                 getAcaoItem={getAcaoItem}
                 getPrioridadeBadge={getPrioridadeBadge}
@@ -228,10 +274,20 @@ export function DroppableFase({
               />
             ))}
           </SortableContext>
-          
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => onAddEntrega(etapa.numero)}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Nova entrega nesta fase
+          </Button>
+
           {entregas.length === 0 && (
-            <div className="p-4 text-center text-sm text-muted-foreground border-2 border-dashed rounded-lg">
-              Arraste entregas para esta fase
+            <div className="p-3 text-center text-xs text-muted-foreground border-2 border-dashed rounded-lg">
+              Arraste entregas para esta fase ou crie uma nova acima
             </div>
           )}
         </div>
