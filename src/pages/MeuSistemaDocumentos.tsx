@@ -235,8 +235,29 @@ export default function MeuSistemaDocumentos() {
         ))}
       </div>
 
-      <Tabs defaultValue="arquivos" className="space-y-4">
-        <TabsList className="bg-muted/40 border-0 rounded-lg p-1 flex-wrap h-auto">
+      <Collapsible open={documentosExpandido} onOpenChange={setDocumentosExpandido} className="border border-border/60 rounded-lg bg-card">
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className="w-full flex items-center justify-between gap-4 px-4 py-3 hover:bg-muted/40 transition-colors rounded-t-lg"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <FolderOpen className="h-4 w-4 text-primary" />
+              </div>
+              <div className="text-left min-w-0">
+                <h2 className="text-sm font-semibold text-foreground">Documentos do Projeto</h2>
+                <p className="text-xs text-muted-foreground truncate">
+                  {arquivosCount} {arquivosCount === 1 ? "arquivo" : "arquivos"} · {notas.length} {notas.length === 1 ? "anotação" : "anotações"} · {links.length} {links.length === 1 ? "link" : "links"} · {reports.length} {reports.length === 1 ? "report" : "reports"}
+                </p>
+              </div>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform flex-shrink-0 ${documentosExpandido ? "rotate-180" : ""}`} />
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="px-4 pb-4 pt-2">
+        <Tabs defaultValue="arquivos" className="space-y-4">
+          <TabsList className="bg-muted/40 border-0 rounded-lg p-1 flex-wrap h-auto">
           <TabsTrigger value="arquivos" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <FileText className="h-4 w-4" />
             Arquivos ({arquivosCount})
