@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FileText, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, Loader2, Edit2, Plus, Trash2, StickyNote } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, Loader2, Edit2, Plus, Trash2, StickyNote, ChevronDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useLinksBusiness, LinkBusiness } from "@/hooks/useLinksBusiness";
 import { useDocumentosBusiness } from "@/hooks/useDocumentosBusiness";
 import { useNotasProjetoBusiness } from "@/hooks/useNotasProjetoBusiness";
@@ -47,6 +48,18 @@ export function DocumentosBusinessManager({ contratoId, userId, userName }: Docu
   const [editingLink, setEditingLink] = useState<LinkBusiness | null>(null);
   const [linkForm, setLinkForm] = useState({ titulo: "", url: "", descricao: "", icone: "link" });
 
+  const storageKey = `documentos-admin-expandido-${contratoId}`;
+  const [documentosExpandido, setDocumentosExpandido] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const stored = window.localStorage.getItem(storageKey);
+    return stored === null ? true : stored === "true";
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(storageKey, String(documentosExpandido));
+    }
+  }, [storageKey, documentosExpandido]);
+
   const handleOpenLinkDialog = (link?: LinkBusiness) => {
     if (link) {
       setEditingLink(link);
@@ -83,15 +96,31 @@ export function DocumentosBusinessManager({ contratoId, userId, userName }: Docu
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FolderOpen className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Documentos e Links</h2>
-        </div>
-        {userName && <Badge variant="outline" className="text-xs">{userName}</Badge>}
-      </div>
-
-      <Tabs defaultValue="arquivos" className="space-y-4">
+      <Collapsible open={documentosExpandido} onOpenChange={setDocumentosExpandido} className="border border-border/60 rounded-lg bg-card">
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className="w-full flex items-center justify-between gap-4 px-4 py-3 hover:bg-muted/40 transition-colors rounded-t-lg"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <FolderOpen className="h-4 w-4 text-primary" />
+              </div>
+              <div className="text-left min-w-0">
+                <h2 className="text-sm font-semibold text-foreground">Documentos e Links</h2>
+                <p className="text-xs text-muted-foreground truncate">
+                  {arquivosCount} {arquivosCount === 1 ? "arquivo" : "arquivos"} · {notas.length} {notas.length === 1 ? "anotação" : "anotações"} · {links.length} {links.length === 1 ? "link" : "links"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {userName && <Badge variant="outline" className="text-xs">{userName}</Badge>}
+              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${documentosExpandido ? "rotate-180" : ""}`} />
+            </div>
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="px-4 pb-4 pt-2">
+          <Tabs defaultValue="arquivos" className="space-y-4">
         <TabsList className="bg-muted/40 border-0 rounded-lg p-1">
           <TabsTrigger value="arquivos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <FileText className="h-3.5 w-3.5" />
@@ -181,7 +210,9 @@ export function DocumentosBusinessManager({ contratoId, userId, userName }: Docu
             </div>
           )}
         </TabsContent>
-      </Tabs>
+          </Tabs>
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Dialog para adicionar/editar link */}
       <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>

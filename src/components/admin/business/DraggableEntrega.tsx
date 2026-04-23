@@ -190,10 +190,19 @@ export function DraggableEntrega({
           size="sm"
           variant="ghost"
           className="h-7 w-7 p-0"
-          onClick={(e) => { e.stopPropagation(); setEditingHeader(v => !v); }}
-          title="Editar entrega"
+          onClick={(e) => {
+            e.stopPropagation();
+            const next = !editingHeader;
+            setEditingHeader(next);
+            if (next) {
+              // garantir que o usuário veja o conteúdo e não perca a seleção
+              if (!isExpanded) onToggleExpand();
+              if (!entrega.selecionada) onUpdateEntrega(entrega.numero_entrega, { selecionada: true });
+            }
+          }}
+          title={editingHeader ? "Fechar edição" : "Editar entrega"}
         >
-          <Pencil className="h-3.5 w-3.5" />
+          {editingHeader ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
         </Button>
         <Button
           size="sm"
@@ -209,6 +218,9 @@ export function DraggableEntrega({
       {/* Edição inline da entrega */}
       {editingHeader && (
         <div className="px-3 pb-3 space-y-2 border-t bg-muted/20 pt-3">
+          <div className="text-xs text-muted-foreground bg-primary/5 border border-primary/20 rounded px-2 py-1.5">
+            Editando entrega — as alterações serão salvas quando você clicar em <strong>Salvar Selecionados</strong> no final do modal.
+          </div>
           <div>
             <label className="text-xs font-medium text-muted-foreground">Título</label>
             <Input
@@ -250,6 +262,11 @@ export function DraggableEntrega({
                 placeholder="Opcional"
               />
             </div>
+          </div>
+          <div className="flex justify-end">
+            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingHeader(false)}>
+              <Check className="h-3 w-3 mr-1" /> Pronto
+            </Button>
           </div>
         </div>
       )}

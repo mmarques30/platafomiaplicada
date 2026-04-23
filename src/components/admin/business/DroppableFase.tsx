@@ -1,6 +1,6 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { ChevronDown, ChevronRight, FolderOpen, Zap, Pencil, Trash2, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, FolderOpen, Zap, Pencil, Trash2, Plus, Check, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -190,9 +190,9 @@ export function DroppableFase({
             variant="ghost"
             className="h-7 w-7 p-0"
             onClick={(e) => { e.stopPropagation(); setEditingFase(v => !v); }}
-            title="Editar fase"
+            title={editingFase ? "Fechar edição" : "Editar fase"}
           >
-            <Pencil className="h-3.5 w-3.5" />
+            {editingFase ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
           </Button>
           <Button
             size="sm"
@@ -243,6 +243,11 @@ export function DroppableFase({
               className="mt-1 min-h-[50px] text-sm"
               placeholder="Objetivo da fase (opcional)"
             />
+          </div>
+          <div className="flex justify-end">
+            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingFase(false)}>
+              <Check className="h-3 w-3 mr-1" /> Pronto
+            </Button>
           </div>
         </div>
       )}
