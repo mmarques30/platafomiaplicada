@@ -1,93 +1,66 @@
 
-Diagnóstico
-- O backend está recebendo o texto, mas o parser só reconhece as fases. Os logs da função `processar-documentos-business` mostram exatamente isso: `Âncoras encontradas: 5 fases, 0 entregas`.
-- A causa principal é inconsistente no pre-parser:
-  - `regexFase` aceita prefixos de Markdown/heading (`# FASE ...`).
-  - `regexEntrega` e a extração de `PASSO` não aceitam esses prefixos.
-- Como os documentos importados vêm muitas vezes como Markdown ou HTML convertido para Markdown (`## ENTREGA ...`, `### PASSO ...`), o sistema detecta a fase mas ignora entregas e passos.
-- O resultado final vira “nenhuma entrega” mesmo com estrutura válida.
 
-O que será corrigido
-1. Fortalecer o parser principal em `supabase/functions/processar-documentos-business/index.ts`
-   - Normalizar o texto antes das regex:
-     - remover ruído visual comum (`**`, bullets, tabs, espaços duplicados, NBSP)
-     - preservar quebras de linha
-     - manter headings Markdown como estrutura válida
-   - Atualizar os padrões para aceitar texto puro e Markdown:
-     - `FASE 1: ...`
-     - `# FASE 1: ...`
-     - `## ENTREGA 1: ...`
-     - `### PASSO 1: ...`
-     - também aceitar `MÓDULO`, `ETAPA`, `TAREFA`, `STEP`
-   - Ajustar a extração de passos para capturar corretamente blocos que vêm com:
-     - título na primeira linha
-     - descrição em linhas seguintes
-     - metadados na mesma linha ou em linha separada (`Responsável`, `Status`, `DICA`, `Prompt`)
+## Diagnóstico
 
-2. Adicionar fallback determinístico quando houver fases mas zero entregas
-   - Se o parser encontrar fases e não encontrar entregas, rodar um segundo extrator linha a linha.
-   - Esse fallback vai:
-     - manter a fase atual em contexto
-     - detectar `ENTREGA X` mesmo com `##`, `-`, `*` ou texto formatado
-     - detectar `PASSO X` mesmo com `###` ou prefixos visuais
-     - montar entregas/passos sem depender da IA
-   - Isso garante extração confiável para:
-     - texto colado
-     - `.md`
-     - HTML convertido em Markdown
-     - PDF cujo texto venha com headings/linhas limpas
+Investiguei o fluxo de upload em `DocumentosUploadSection.handleFileUpload` + `useDocumentosBusiness.uploadDocumento` + edge function `extrair-texto-documento`. Encontrei 5 causas reais que fazem o upload "não funcionar":
 
-3. Melhorar a robustez do resultado final
-   - Garantir que, quando houver âncoras literais suficientes, o backend sempre devolva:
-     - `etapas`
-     - `entregas`
-     - `instrucoes`
-   - Evitar cair em resposta vazia quando o documento já está claramente estruturado.
-   - Preservar ordenação do documento de cima para baixo, sem reembaralhar entregas entre fases.
+### 1. Upload falha silenciosamente quando o storage rejeita
+`uploadDocumento` faz `supabase.storage.from("contratos-business").upload(...)` sem `contentType` explícito e sem `upsert`. Quando o bucket retorna 400/403 (ex.: RLS, MIME type não detectado, arquivo já existente em retry), o `try/catch` cai num `toast.error("Erro ao processar arquivo")` genérico — sem mostrar o motivo real ao usuário, e sem permitir continuar processando o texto.
 
-4. Melhorar o feedback no frontend em `src/components/admin/business/DocumentosUploadSection.tsx`
-   - Se o backend retornar fases mas zero entregas, mostrar mensagem útil em vez de erro genérico.
-   - Exemplo de feedback:
-     - “Foram detectadas 5 fases, mas nenhuma entrega. O documento parece estar formatado em Markdown/HTML e será reprocessado com parser compatível.”
-   - Opcionalmente exibir contagem do retorno para facilitar suporte: fases, entregas, passos.
+### 2. Pipeline trava se o upload falhar, mesmo com texto extraível
+Hoje `handleFileUpload` faz primeiro o upload do binário e só depois extrai texto. Se o upload falhar por qualquer motivo (storage offline, MIME bloqueado, arquivo muito grande), o documento inteiro é descartado — mesmo que pudéssemos ter extraído texto e gerado entregas só com o conteúdo.
 
-5. Validação obrigatória com o seu caso real
-   - Validar com o texto que você colou.
-   - Resultado esperado desse caso:
-     - 5 fases
-     - 13 entregas
-     - 60 passos
-   - Validar também estes formatos:
-     - texto colado puro
-     - arquivo `.md`
-     - HTML convertido via `extrair-texto-documento`
-     - PDF com conteúdo equivalente
+### 3. Arquivos médios/grandes quebram no `btoa`
+`extrairTextoDocumento` converte ArrayBuffer com `btoa(String.fromCharCode(...new Uint8Array(buffer)))`. Para arquivos a partir de ~5–8MB isso estoura `Maximum call stack size exceeded` no Chrome. O usuário vê apenas "erro ao processar".
 
-Arquivos a ajustar
-- `supabase/functions/processar-documentos-business/index.ts`
-- `src/components/admin/business/DocumentosUploadSection.tsx`
+### 4. Timeout do `functions.invoke` em PDFs via Gemini
+PDFs grandes podem levar 30–90s no Gemini. O cliente `supabase-js` tem timeout default ~30s no `invoke`, então mesmo extrações que funcionam no servidor voltam como erro de fetch no frontend.
 
-Resultado esperado
-- O mesmo conteúdo que hoje falha passará a gerar as entregas corretamente.
-- A ordem ficará fiel ao documento.
-- Markdown, HTML e texto simples passarão a funcionar com a mesma lógica.
-- Quando houver problema real de estrutura, a interface vai informar exatamente o que foi detectado.
+### 5. `.doc` e `.ppt` antigos retornam 400 sem feedback amigável
+A edge function retorna erro técnico, e o frontend mostra "Erro ao processar arquivo" — usuário não sabe que precisa converter para `.docx`/`.pptx`.
 
-Detalhes técnicos
-- O ponto crítico é alinhar `regexEntrega` e a extração de `PASSO` com o mesmo nível de tolerância já usado em `regexFase`.
-- Exemplo de direção do ajuste:
-```ts
-const prefixoEstrutural = String.raw`(?:^|\n)\s*(?:[#>*-]+\s*)*`;
+## Plano de correção
 
-const regexEntrega = new RegExp(
-  `${prefixoEstrutural}(?:ENTREGA|MÓDULO|MODULO)\\s*(\\d+)\\s*[:\\-–.]\\s*(.+?)(?=\\n|$)`,
-  "gi"
-);
+### A. Tornar o upload resiliente e informativo
+Em `src/hooks/useDocumentosBusiness.tsx → uploadDocumento`:
+- Adicionar `contentType: file.type || 'application/octet-stream'` e `upsert: true` no `.upload(...)`.
+- Validar tamanho antes (limite 25MB) e retornar erro claro.
+- Retornar erro estruturado (mensagem do Supabase) em vez de `throw` cru.
 
-const regexPasso = new RegExp(
-  `${prefixoEstrutural}(?:PASSO|TAREFA|STEP)\\s*(\\d{1,2})\\s*[:\\-–.]\\s*([\\s\\S]*?)(?=\\n\\s*(?:[#>*-]+\\s*)*(?:PASSO|TAREFA|STEP)\\s*\\d|\\n\\s*(?:[#>*-]+\\s*)*(?:ENTREGA|MÓDULO|MODULO)\\s*\\d|$)`,
-  "gi"
-);
-```
+### B. Desacoplar upload da extração no frontend
+Em `src/components/admin/business/DocumentosUploadSection.tsx → handleFileUpload`:
+- Tentar **primeiro** extrair texto (que é o que importa para gerar entregas).
+- Tentar o upload **em paralelo** mas tolerar falha — se falhar, salvar o documento só com `conteudo_texto`, `arquivo_url = null` e mostrar warning ("Texto extraído, mas o arquivo binário não pôde ser armazenado").
+- Mostrar mensagens de erro específicas vindas da edge function (em vez de "Erro ao processar arquivo").
+- Adicionar feedback de progresso por etapa: "Lendo arquivo → Extraindo texto → Salvando".
 
-Sem migration de banco. A correção é no parser da função + melhoria de feedback no frontend + redeploy da função.
+### C. Conversão base64 segura para arquivos grandes
+Substituir o `btoa(String.fromCharCode(...))` por uma conversão em chunks (loop de 32KB) ou usar `FileReader.readAsDataURL` + split do prefixo. Suporta arquivos até 25MB sem estourar a stack.
+
+### D. Aumentar timeout de invocação para extrair-texto
+No componente, substituir `supabase.functions.invoke` por `fetch` direto com `AbortController` de 180s para a chamada de extração (mantém invoke normal para o resto). Garante que PDFs grandes via Gemini cheguem ao fim.
+
+### E. Mensagens claras para formatos não suportados
+- Detectar `.doc`/`.ppt` no frontend antes do upload e mostrar: "Formato antigo. Converta para .docx/.pptx no Word/PowerPoint e tente novamente."
+- Para tipos completamente desconhecidos: aceitar mas avisar que a IA tentará leitura genérica.
+
+### F. Logs e telemetria mínima
+- Console.log estruturado em cada etapa (já existe parcial — padronizar).
+- Em caso de falha, mostrar no toast o `error.message` real retornado pela edge function (não engolir).
+
+## Arquivos editados
+
+1. `src/hooks/useDocumentosBusiness.tsx` — `uploadDocumento` com `contentType`, `upsert`, validação de tamanho e erro estruturado.
+2. `src/components/admin/business/DocumentosUploadSection.tsx` — `handleFileUpload` desacoplado, conversão base64 em chunks, fetch com timeout estendido, mensagens específicas, validação prévia de `.doc`/`.ppt`.
+3. `supabase/functions/extrair-texto-documento/index.ts` — pequena melhoria: aceitar payloads de até 25MB, log de tipo recebido, e retornar mensagem amigável em vez de só `error: ...`.
+
+Sem migration de banco. Redeploy da edge function ao final.
+
+## Resultado esperado
+
+- Qualquer documento aceito (txt, md, html, docx, pdf, pptx) passa a processar de fato.
+- Arquivos grandes (até 25MB) não quebram mais por estouro de stack ou timeout.
+- Quando o upload do binário falhar, o texto ainda é extraído e o documento fica disponível para geração de entregas.
+- Usuário vê mensagens reais de erro ("arquivo > 25MB", "converta .doc para .docx", "Gemini falhou ao ler PDF") em vez do genérico "Erro ao processar arquivo".
+- `.doc`/`.ppt` recebem orientação clara antes mesmo de tentar enviar.
+
