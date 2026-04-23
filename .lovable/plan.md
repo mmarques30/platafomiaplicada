@@ -2,65 +2,96 @@
 
 ## Diagnóstico
 
-Investiguei o fluxo de upload em `DocumentosUploadSection.handleFileUpload` + `useDocumentosBusiness.uploadDocumento` + edge function `extrair-texto-documento`. Encontrei 5 causas reais que fazem o upload "não funcionar":
+### Por que não dá pra editar
+Hoje o `GeracaoEntregasModal` só permite **selecionar** (checkbox) e **arrastar** (drag & drop) entregas entre fases. Os campos `titulo`, `descricao`, `prompt_sugerido`, `dicas`, `prioridade`, `responsavel` e o objetivo da fase chegam da IA e vão direto pro banco — sem nenhum input editável.
 
-### 1. Upload falha silenciosamente quando o storage rejeita
-`uploadDocumento` faz `supabase.storage.from("contratos-business").upload(...)` sem `contentType` explícito e sem `upsert`. Quando o bucket retorna 400/403 (ex.: RLS, MIME type não detectado, arquivo já existente em retry), o `try/catch` cai num `toast.error("Erro ao processar arquivo")` genérico — sem mostrar o motivo real ao usuário, e sem permitir continuar processando o texto.
+### Por que demora tanto pra salvar
+No `handleSalvar` (linhas 387–681), pra cada item selecionado o código faz:
+1. Um `SELECT` pra checar se já existe
+2. Um `INSERT` ou `UPDATE` separado
 
-### 2. Pipeline trava se o upload falhar, mesmo com texto extraível
-Hoje `handleFileUpload` faz primeiro o upload do binário e só depois extrai texto. Se o upload falhar por qualquer motivo (storage offline, MIME bloqueado, arquivo muito grande), o documento inteiro é descartado — mesmo que pudéssemos ter extraído texto e gerado entregas só com o conteúdo.
+Para o seu caso (5 fases · 13 entregas · 409 instruções) isso vira **~850 round-trips sequenciais** ao banco. Cada um custa 50–150ms de latência. Conta: ~60 a 120 segundos só de rede, antes de qualquer processamento.
 
-### 3. Arquivos médios/grandes quebram no `btoa`
-`extrairTextoDocumento` converte ArrayBuffer com `btoa(String.fromCharCode(...new Uint8Array(buffer)))`. Para arquivos a partir de ~5–8MB isso estoura `Maximum call stack size exceeded` no Chrome. O usuário vê apenas "erro ao processar".
+Além disso:
+- Tudo é feito em loop `for ... of` com `await` dentro → 100% serial, sem paralelismo
+- Sem progresso visual (usuário só vê "Salvando..." parado)
+- Sem batch insert (`.insert([...])` aceita arrays e faz 1 round-trip pra N linhas)
 
-### 4. Timeout do `functions.invoke` em PDFs via Gemini
-PDFs grandes podem levar 30–90s no Gemini. O cliente `supabase-js` tem timeout default ~30s no `invoke`, então mesmo extrações que funcionam no servidor voltam como erro de fetch no frontend.
+## Plano
 
-### 5. `.doc` e `.ppt` antigos retornam 400 sem feedback amigável
-A edge function retorna erro técnico, e o frontend mostra "Erro ao processar arquivo" — usuário não sabe que precisa converter para `.docx`/`.pptx`.
+### 1. Edição inline no modal (`GeracaoEntregasModal.tsx` + `DroppableFase.tsx`)
 
-## Plano de correção
+Tornar editável **antes de salvar**:
 
-### A. Tornar o upload resiliente e informativo
-Em `src/hooks/useDocumentosBusiness.tsx → uploadDocumento`:
-- Adicionar `contentType: file.type || 'application/octet-stream'` e `upsert: true` no `.upload(...)`.
-- Validar tamanho antes (limite 25MB) e retornar erro claro.
-- Retornar erro estruturado (mensagem do Supabase) em vez de `throw` cru.
+**Por fase:**
+- Título da fase (input)
+- Objetivo (textarea pequena)
 
-### B. Desacoplar upload da extração no frontend
-Em `src/components/admin/business/DocumentosUploadSection.tsx → handleFileUpload`:
-- Tentar **primeiro** extrair texto (que é o que importa para gerar entregas).
-- Tentar o upload **em paralelo** mas tolerar falha — se falhar, salvar o documento só com `conteudo_texto`, `arquivo_url = null` e mostrar warning ("Texto extraído, mas o arquivo binário não pôde ser armazenado").
-- Mostrar mensagens de erro específicas vindas da edge function (em vez de "Erro ao processar arquivo").
-- Adicionar feedback de progresso por etapa: "Lendo arquivo → Extraindo texto → Salvando".
+**Por entrega:**
+- Título (input)
+- Descrição (textarea)
+- Prioridade (select: baixa/média/alta/urgente)
+- Módulo relacionado (input)
+- Botão "remover entrega" (ao invés de só desmarcar)
 
-### C. Conversão base64 segura para arquivos grandes
-Substituir o `btoa(String.fromCharCode(...))` por uma conversão em chunks (loop de 32KB) ou usar `FileReader.readAsDataURL` + split do prefixo. Suporta arquivos até 25MB sem estourar a stack.
+**Por instrução (passo):**
+- Título (input)
+- Descrição (textarea)
+- Prompt sugerido (textarea)
+- Dicas (textarea)
+- Responsável (select: você/mentor/conjunto)
+- Ferramenta (select)
+- Botão "remover passo"
 
-### D. Aumentar timeout de invocação para extrair-texto
-No componente, substituir `supabase.functions.invoke` por `fetch` direto com `AbortController` de 180s para a chamada de extração (mantém invoke normal para o resto). Garante que PDFs grandes via Gemini cheguem ao fim.
+**Adicionar manualmente:**
+- Botão "+ Nova entrega" dentro de cada fase
+- Botão "+ Novo passo" dentro de cada entrega
+- Botão "+ Nova fase" no topo
 
-### E. Mensagens claras para formatos não suportados
-- Detectar `.doc`/`.ppt` no frontend antes do upload e mostrar: "Formato antigo. Converta para .docx/.pptx no Word/PowerPoint e tente novamente."
-- Para tipos completamente desconhecidos: aceitar mas avisar que a IA tentará leitura genérica.
+UI: cada item ganha um ícone de lápis (`Pencil`) que expande para edição inline. Dois cliques = pronto. Nada de modal aninhado.
 
-### F. Logs e telemetria mínima
-- Console.log estruturado em cada etapa (já existe parcial — padronizar).
-- Em caso de falha, mostrar no toast o `error.message` real retornado pela edge function (não engolir).
+### 2. Salvamento rápido com batch + paralelismo (`GeracaoEntregasModal.tsx → handleSalvar`)
 
-## Arquivos editados
+Reescrever o pipeline:
 
-1. `src/hooks/useDocumentosBusiness.tsx` — `uploadDocumento` com `contentType`, `upsert`, validação de tamanho e erro estruturado.
-2. `src/components/admin/business/DocumentosUploadSection.tsx` — `handleFileUpload` desacoplado, conversão base64 em chunks, fetch com timeout estendido, mensagens específicas, validação prévia de `.doc`/`.ppt`.
-3. `supabase/functions/extrair-texto-documento/index.ts` — pequena melhoria: aceitar payloads de até 25MB, log de tipo recebido, e retornar mensagem amigável em vez de só `error: ...`.
+**a) Pré-carregar dados existentes em 1 query por tabela:**
+- 1 `SELECT id,titulo,status FROM entregas_business WHERE contrato_id = ?`
+- 1 `SELECT id,titulo,status,entrega_id FROM instrucoes_etapa WHERE entrega_id IN (...)`
+- 1 `SELECT id,titulo,status FROM tasks_business WHERE contrato_id = ?`
 
-Sem migration de banco. Redeploy da edge function ao final.
+Construir Maps em memória (`titulo → registro`). Zero SELECT dentro do loop.
+
+**b) Batch inserts:**
+- Acumular todas as novas entregas num array → 1 `.insert([entrega1, entrega2, ...])`
+- Mesmo para instruções, tasks e backlog
+- 4 inserts grandes ao invés de 800 individuais
+
+**c) Updates em paralelo com `Promise.all`:**
+- Os updates ainda precisam ser por linha, mas podem rodar em paralelo (chunks de 20)
+
+**d) Feedback de progresso:**
+- Trocar "Salvando..." por barra de progresso real: "Salvando entregas (3/13)..."
+- Um `useState` com `{etapa: 'entregas', current: N, total: M}`
+
+**Ganho esperado:** de ~60–120s para **3–8s** no seu caso real.
+
+### 3. Pequenas melhorias de UX
+
+- Botão "Pré-visualizar SQL" (opcional, debug)
+- Toast com resumo após salvar: "13 entregas, 409 passos criados em 4.2s"
+- Manter o botão "Cancelar" funcional durante o save (abort controller)
+
+## Arquivos a editar
+
+1. `src/components/admin/business/GeracaoEntregasModal.tsx` — novos handlers de edit/add/remove em estado local + reescrita do `handleSalvar` com batch/paralelo + barra de progresso.
+2. `src/components/admin/business/DroppableFase.tsx` — props de edição, botões de lápis/lixeira/adicionar, inputs inline.
+3. (Possível) `src/components/admin/business/EntregaEditavel.tsx` — extrair card editável de entrega pra manter o `DroppableFase` legível.
+
+Sem migration de banco. Sem mudança em edge function.
 
 ## Resultado esperado
 
-- Qualquer documento aceito (txt, md, html, docx, pdf, pptx) passa a processar de fato.
-- Arquivos grandes (até 25MB) não quebram mais por estouro de stack ou timeout.
-- Quando o upload do binário falhar, o texto ainda é extraído e o documento fica disponível para geração de entregas.
-- Usuário vê mensagens reais de erro ("arquivo > 25MB", "converta .doc para .docx", "Gemini falhou ao ler PDF") em vez do genérico "Erro ao processar arquivo".
-- `.doc`/`.ppt` recebem orientação clara antes mesmo de tentar enviar.
+- Você revisa, edita título/descrição/prompt/dicas de qualquer item, adiciona ou remove entregas/passos diretamente no modal antes de clicar em **Salvar**.
+- Salvamento de 400+ itens cai de ~1–2 minutos para poucos segundos, com barra de progresso real.
+- Possibilidade de cancelar no meio sem deixar dados pela metade (transação por bloco).
 
