@@ -48,6 +48,8 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
   const [ativasOpen, setAtivasOpen] = useState(true);
   const [backlogOpen, setBacklogOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
+  const [clearConfirmText, setClearConfirmText] = useState("");
 
   const [formData, setFormData] = useState<Partial<EntregaInput>>({
     titulo: "",
@@ -75,6 +77,8 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
       queryClient.invalidateQueries({ queryKey: ["entregas-business", contratoId] });
       queryClient.invalidateQueries({ queryKey: ["instrucoes-etapa"] });
       toast.success("Todas as entregas foram removidas");
+      setClearDialogOpen(false);
+      setClearConfirmText("");
     } catch (error) {
       console.error("Erro ao limpar:", error);
       toast.error("Erro ao limpar entregas");
@@ -293,26 +297,53 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
         </div>
         <div className="flex items-center gap-2">
           {entregas.length > 0 && (
-            <AlertDialog>
+            <AlertDialog open={clearDialogOpen} onOpenChange={(open) => {
+              setClearDialogOpen(open);
+              if (!open) setClearConfirmText("");
+            }}>
               <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
                   <Trash2 className="h-4 w-4 mr-1" />
-                  Limpar Tudo
+                  Apagar todas as entregas
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Limpar todas as entregas?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Esta ação irá remover permanentemente todas as entregas e suas instruções associadas. 
-                    Esta ação não pode ser desfeita.
+                  <AlertDialogTitle className="text-destructive">⚠️ Apagar todas as entregas?</AlertDialogTitle>
+                  <AlertDialogDescription asChild>
+                    <div className="space-y-3 text-sm">
+                      <p>
+                        Esta ação vai apagar permanentemente as <strong className="text-destructive">{entregas.length} entregas</strong> deste contrato
+                        {entregas.length > 0 && (
+                          <> ({entregas.slice(0, 5).map(e => e.titulo).join(", ")}{entregas.length > 5 ? `, …+${entregas.length - 5} mais` : ""})</>
+                        )} e <strong>todas as instruções vinculadas</strong>.
+                      </p>
+                      <p className="text-destructive font-medium">
+                        Esta ação não pode ser desfeita.
+                      </p>
+                      <div className="pt-2">
+                        <label className="block text-xs text-muted-foreground mb-1">
+                          Para confirmar, digite <strong>LIMPAR</strong> abaixo:
+                        </label>
+                        <Input
+                          value={clearConfirmText}
+                          onChange={(e) => setClearConfirmText(e.target.value)}
+                          placeholder="LIMPAR"
+                          autoFocus
+                        />
+                      </div>
+                    </div>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleClearAll} disabled={isClearing} className="bg-destructive text-destructive-foreground">
+                  <AlertDialogAction
+                    onClick={(e) => { e.preventDefault(); handleClearAll(); }}
+                    disabled={isClearing || clearConfirmText.trim().toUpperCase() !== "LIMPAR"}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
                     {isClearing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                    Sim, limpar tudo
+                    Sim, apagar tudo
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
