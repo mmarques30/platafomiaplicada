@@ -1660,7 +1660,99 @@ serve(async (req) => {
     const ancoras = extrairAncorasLiterais(texto);
     
     const temFases = ancoras.fases.length > 0;
-    const temEntregas = ancoras.entregas.length > 0;
+    let temEntregas = ancoras.entregas.length > 0;
+
+    // FALLBACK DETERMINÍSTICO: se temos fases mas NENHUMA entrega,
+    // varre o texto linha a linha tolerando qualquer ruído de formatação.
+    if (temFases && !temEntregas) {
+      console.log("⚠️  Fases detectadas sem entregas — acionando fallback linha a linha");
+      const linhas = texto.split("\n");
+      let faseAtualNumero = ancoras.fases[0]?.numero ?? 1;
+      let contadorEntrega = 1;
+      let contadorPassoNaEntrega = 0;
+      let entregaAtualNumero: number | null = null;
+      let bufferConteudoPasso: string[] = [];
+      let passoAtual: { numero: number; titulo: string; entregaNumero: number } | null = null;
+
+      const flushPasso = () => {
+        if (!passoAtual) return;
+        const conteudoCompleto = bufferConteudoPasso.join("\n").trim();
+        const ferramenta = detectarFerramenta(conteudoCompleto);
+        const responsavel = detectarResponsavel(conteudoCompleto);
+        const promptRaw = extrairPrompt(conteudoCompleto);
+        const dicasRaw = extrairDicas(conteudoCompleto);
+        ancoras.passos.push({
+          numero: passoAtual.numero,
+          titulo: passoAtual.titulo,
+          entregaNumero: passoAtual.entregaNumero,
+          conteudo_completo: formatarTextoEmParagrafos(conteudoCompleto),
+          descricao: formatarDescricaoInstrucao(conteudoCompleto),
+          prompt_sugerido: promptRaw ? formatarPromptSugerido(promptRaw) : undefined,
+          dicas: dicasRaw ? formatarDicas(dicasRaw) : undefined,
+          ferramenta,
+          responsavel,
+        });
+        passoAtual = null;
+        bufferConteudoPasso = [];
+      };
+
+      const limparPrefixo = (linha: string) =>
+        linha.replace(/^[ \t]*(?:[#>]+[ \t]*)*(?:[\*\-\u2022\u25CF]+[ \t]*)*/, "");
+
+      for (const linhaRaw of linhas) {
+        const linhaLimpa = limparPrefixo(linhaRaw).trim();
+
+        const mFase = linhaLimpa.match(/^(?:FASE|ETAPA)\s*(\d+)\s*[:\-–.]\s*(.+)$/i);
+        if (mFase) {
+          flushPasso();
+          faseAtualNumero = parseInt(mFase[1]);
+          entregaAtualNumero = null;
+          contadorPassoNaEntrega = 0;
+          continue;
+        }
+
+        const mEntrega = linhaLimpa.match(/^(?:ENTREGA|MÓDULO|MODULO)\s*(\d+)\s*[:\-–.]\s*(.+)$/i);
+        if (mEntrega) {
+          flushPasso();
+          const titulo = mEntrega[2].trim().replace(/\*+/g, "").trim();
+          if (titulo.length > 2) {
+            entregaAtualNumero = contadorEntrega;
+            ancoras.entregas.push({
+              numero: contadorEntrega,
+              titulo,
+              faseNumero: faseAtualNumero,
+            });
+            console.log(`  [fallback] ENTREGA ${contadorEntrega}: ${titulo} (Fase ${faseAtualNumero})`);
+            contadorEntrega++;
+            contadorPassoNaEntrega = 0;
+          }
+          continue;
+        }
+
+        const mPasso = linhaLimpa.match(/^(?:PASSO|TAREFA|STEP)\s*(\d{1,2})\s*[:\-–.]\s*(.+)$/i);
+        if (mPasso && entregaAtualNumero !== null) {
+          flushPasso();
+          contadorPassoNaEntrega++;
+          const tituloPasso = mPasso[2].trim().replace(/\*+/g, "").trim();
+          passoAtual = {
+            numero: contadorPassoNaEntrega,
+            titulo: formatarTitulo(tituloPasso),
+            entregaNumero: entregaAtualNumero,
+          };
+          bufferConteudoPasso = [tituloPasso];
+          continue;
+        }
+
+        // Linha de conteúdo do passo atual
+        if (passoAtual && linhaLimpa.length > 0) {
+          bufferConteudoPasso.push(linhaLimpa);
+        }
+      }
+      flushPasso();
+
+      temEntregas = ancoras.entregas.length > 0;
+      console.log(`  [fallback] Resultado: ${ancoras.entregas.length} entregas, ${ancoras.passos.length} passos`);
+    }
     
     console.log(`\nÂncoras encontradas: ${temFases ? ancoras.fases.length : 0} fases, ${temEntregas ? ancoras.entregas.length : 0} entregas`);
     console.log(`Passos com detalhes: ${ancoras.passos.length}`);
