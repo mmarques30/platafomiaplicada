@@ -1054,12 +1054,27 @@ export function GeracaoEntregasModal({
         </ScrollArea>
 
         <DialogFooter className="flex justify-between items-center">
-          <div className="text-sm text-muted-foreground space-x-3">
-            {isNewFormat && <span>{totalEtapas} fases</span>}
-            <span>{totalEntregas} entregas</span>
-            {isNewFormat && <span>{totalInstrucoes} instruções</span>}
-            {isNewFormat && <span>{totalTasks} tasks</span>}
-            {totalBacklog > 0 && <span>{totalBacklog} backlog</span>}
+          <div className="flex-1 mr-4">
+            {saveProgress ? (
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{saveProgress.etapa}</span>
+                  <span>{saveProgress.current}/{saveProgress.total}</span>
+                </div>
+                <Progress
+                  value={saveProgress.total > 0 ? (saveProgress.current / saveProgress.total) * 100 : 0}
+                  className="h-1.5"
+                />
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground space-x-3">
+                {isNewFormat && <span>{totalEtapas} fases</span>}
+                <span>{totalEntregas} entregas</span>
+                {isNewFormat && <span>{totalInstrucoes} instruções</span>}
+                {isNewFormat && <span>{totalTasks} tasks</span>}
+                {totalBacklog > 0 && <span>{totalBacklog} backlog</span>}
+              </div>
+            )}
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
