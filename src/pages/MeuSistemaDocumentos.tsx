@@ -55,6 +55,7 @@ export default function MeuSistemaDocumentos() {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<LinkBusiness | null>(null);
   const [linkForm, setLinkForm] = useState({ titulo: "", url: "", descricao: "", icone: "link" });
+  const [downloadingReportId, setDownloadingReportId] = useState<string | null>(null);
 
   const allLoading = isLoading || isLoadingDocs || isLoadingLinks || isLoadingNotas;
 
@@ -148,8 +149,6 @@ export default function MeuSistemaDocumentos() {
 
   const arquivosCount = documentos.filter((d) => d.arquivo_url).length;
   const totalItens = arquivosCount + notas.length + links.length;
-
-  const [downloadingReportId, setDownloadingReportId] = useState<string | null>(null);
 
   const handleDownloadReport = async (arquivoUrl: string, titulo: string, reportId: string) => {
     try {
