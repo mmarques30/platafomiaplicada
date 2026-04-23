@@ -139,6 +139,7 @@ export function GeracaoEntregasModal({
   const [expandedEntregas, setExpandedEntregas] = useState<number[]>([]);
   const [expandedConjuntas, setExpandedConjuntas] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveProgress, setSaveProgress] = useState<{ etapa: string; current: number; total: number } | null>(null);
   const [activeEntrega, setActiveEntrega] = useState<EntregaSelecionada | null>(null);
   const [dadosExistentes, setDadosExistentes] = useState<DadosExistentes>({
     etapas: [],
@@ -350,6 +351,80 @@ export function GeracaoEntregasModal({
     ));
   };
 
+  // ===== Handlers de edição (estado local, antes de salvar) =====
+  const updateEtapa = (numero: number, patch: Partial<EtapaSelecionada>) => {
+    setEtapas(prev => prev.map(e => e.numero === numero ? { ...e, ...patch } : e));
+  };
+
+  const removeEtapa = (numero: number) => {
+    const entregasDaFase = entregas.filter(e => e.etapa_numero === numero).map(e => e.numero_entrega);
+    setEtapas(prev => prev.filter(e => e.numero !== numero));
+    setEntregas(prev => prev.filter(e => e.etapa_numero !== numero));
+    setInstrucoes(prev => prev.filter(i => !entregasDaFase.includes(i.entrega_numero)));
+    setTasks(prev => prev.filter(t => !entregasDaFase.includes(t.entrega_numero)));
+  };
+
+  const addEtapa = () => {
+    const proximoNumero = etapas.length > 0 ? Math.max(...etapas.map(e => e.numero)) + 1 : 1;
+    setEtapas(prev => [...prev, {
+      numero: proximoNumero,
+      titulo: `Nova Fase ${proximoNumero}`,
+      objetivo: '',
+      selecionada: true,
+    }]);
+    setExpandedEtapas(prev => [...prev, proximoNumero]);
+  };
+
+  const addEntrega = (etapaNumero: number) => {
+    const proximoNumero = entregas.length > 0 ? Math.max(...entregas.map(e => e.numero_entrega)) + 1 : 1;
+    setEntregas(prev => [...prev, {
+      etapa_numero: etapaNumero,
+      numero_entrega: proximoNumero,
+      titulo: 'Nova entrega',
+      descricao: '',
+      tipo: 'ativa',
+      prioridade: 'media',
+      selecionada: true,
+    }]);
+    setExpandedEntregas(prev => [...prev, proximoNumero]);
+  };
+
+  const updateEntrega = (numeroEntrega: number, patch: Partial<EntregaSelecionada>) => {
+    setEntregas(prev => prev.map(e => e.numero_entrega === numeroEntrega ? { ...e, ...patch } : e));
+  };
+
+  const removeEntrega = (numeroEntrega: number) => {
+    setEntregas(prev => prev.filter(e => e.numero_entrega !== numeroEntrega));
+    setInstrucoes(prev => prev.filter(i => i.entrega_numero !== numeroEntrega));
+    setTasks(prev => prev.filter(t => t.entrega_numero !== numeroEntrega));
+  };
+
+  const updateInstrucao = (entregaNumero: number, ordem: number, patch: Partial<InstrucaoSelecionada>) => {
+    setInstrucoes(prev => prev.map(i =>
+      i.entrega_numero === entregaNumero && i.ordem === ordem ? { ...i, ...patch } : i
+    ));
+  };
+
+  const removeInstrucao = (entregaNumero: number, ordem: number) => {
+    setInstrucoes(prev => prev.filter(i => !(i.entrega_numero === entregaNumero && i.ordem === ordem)));
+  };
+
+  const addInstrucao = (entregaNumero: number) => {
+    const existentes = instrucoes.filter(i => i.entrega_numero === entregaNumero);
+    const proximaOrdem = existentes.length > 0 ? Math.max(...existentes.map(i => i.ordem)) + 1 : 1;
+    setInstrucoes(prev => [...prev, {
+      entrega_numero: entregaNumero,
+      titulo: 'Novo passo',
+      descricao: '',
+      prompt_sugerido: '',
+      responsavel: 'voce',
+      ferramenta: 'outro',
+      dicas: '',
+      ordem: proximaOrdem,
+      selecionada: true,
+    }]);
+  };
+
   const handleBacklogChange = (items: BacklogItemEditable[]) => {
     setBacklog(items);
   };
@@ -386,6 +461,7 @@ export function GeracaoEntregasModal({
 
   const handleSalvar = async () => {
     setIsSaving(true);
+    const t0 = performance.now();
 
     try {
       // Buscar user_id do contrato
@@ -404,108 +480,110 @@ export function GeracaoEntregasModal({
 
       let totalCriados = 0;
       let totalAtualizados = 0;
-      let novasEtapasBacklog = 0;
 
-      // 1. Carregar seções EXISTENTES do contrato (já criadas automaticamente)
+      // ====== 1. PRÉ-CARREGAR DADOS EXISTENTES (3 queries paralelas) ======
+      setSaveProgress({ etapa: 'Carregando dados existentes', current: 0, total: 1 });
+      const [
+        { data: secoesExistentes },
+        { data: entregasExistentes },
+        { data: tasksExistentes },
+      ] = await Promise.all([
+        supabase.from("etapas_business").select("id, numero_etapa, titulo").eq("contrato_id", contratoId).order("numero_etapa"),
+        supabase.from("entregas_business").select("id, titulo, status").eq("contrato_id", contratoId),
+        supabase.from("tasks_business").select("id, titulo, status").eq("contrato_id", contratoId),
+      ]);
+
+      const entregasExistentesPorTitulo = new Map<string, { id: string; status: string }>();
+      (entregasExistentes || []).forEach(e => entregasExistentesPorTitulo.set(e.titulo, { id: e.id, status: e.status }));
+
+      const tasksExistentesPorTitulo = new Map<string, { id: string; status: string }>();
+      (tasksExistentes || []).forEach(t => tasksExistentesPorTitulo.set(t.titulo, { id: t.id, status: t.status }));
+
+      // Carregar instruções existentes só das entregas que aparecem na importação
+      const idsEntregasExistentes = (entregasExistentes || []).map(e => e.id);
+      let instrucoesExistentes: { id: string; titulo: string; entrega_id: string; status: string }[] = [];
+      if (idsEntregasExistentes.length > 0) {
+        const { data } = await supabase
+          .from("instrucoes_etapa")
+          .select("id, titulo, entrega_id, status")
+          .in("entrega_id", idsEntregasExistentes);
+        instrucoesExistentes = data || [];
+      }
+      const instrucoesExistentesPorChave = new Map<string, { id: string; status: string }>();
+      instrucoesExistentes.forEach(i => instrucoesExistentesPorChave.set(`${i.entrega_id}::${i.titulo}`, { id: i.id, status: i.status }));
+
+      // ====== 2. ETAPAS — atualizar/criar ======
+      setSaveProgress({ etapa: 'Sincronizando fases', current: 0, total: etapas.length });
       const etapasMap: Record<number, string> = {};
-      
-      const { data: secoesExistentes } = await supabase
-        .from("etapas_business")
-        .select("id, numero_etapa")
-        .eq("contrato_id", contratoId)
-        .order("numero_etapa", { ascending: true });
+      const etapasExistentesPorNumero = new Map<number, string>();
+      (secoesExistentes || []).forEach(s => etapasExistentesPorNumero.set(s.numero_etapa, s.id));
 
-      if (secoesExistentes && secoesExistentes.length > 0) {
-        // Mapear seções existentes por numero_etapa E atualizar com dados do documento
-        for (const secao of secoesExistentes) {
-          etapasMap[secao.numero_etapa] = secao.id;
-          
-          // Encontrar a fase correspondente do documento importado
-          const faseDocumento = etapas.find(e => e.numero === secao.numero_etapa);
-          
-          if (faseDocumento && faseDocumento.selecionada) {
-            // Atualizar a seção existente com informações ricas do documento
-            const { error } = await supabase
-              .from("etapas_business")
-              .update({
-                titulo: faseDocumento.titulo,
-                objetivo: faseDocumento.objetivo || null,
-              })
-              .eq("id", secao.id);
+      const etapasParaCriar: any[] = [];
+      const etapaUpdates: any[] = [];
 
-            if (!error) {
-              console.log(`Seção ${secao.numero_etapa} atualizada: ${faseDocumento.titulo}`);
-              totalAtualizados++;
-            }
-          }
-        }
-        console.log(`${secoesExistentes.length} seções existentes mapeadas`);
-      } else {
-        // Fallback: Se não houver seções, criar baseado nas etapas do documento (modo legado)
-        console.warn("Nenhuma seção existente encontrada, criando baseado no documento");
-        const etapasSelecionadas = etapas.filter(e => e.selecionada);
-        for (const etapa of etapasSelecionadas) {
-          if (modoImportacao === 'nova') {
-            const { data: novaEtapa, error } = await supabase
-              .from("etapas_business")
-              .insert({
-                contrato_id: contratoId,
-                numero_etapa: etapa.numero,
+      for (const etapa of etapas) {
+        const idExistente = etapasExistentesPorNumero.get(etapa.numero);
+        if (idExistente) {
+          etapasMap[etapa.numero] = idExistente;
+          if (etapa.selecionada) {
+            etapaUpdates.push(
+              supabase.from("etapas_business").update({
                 titulo: etapa.titulo,
-                objetivo: etapa.objetivo,
-                status: 'pendente',
-              })
-              .select()
-              .single();
-
-            if (error) throw error;
-            etapasMap[etapa.numero] = novaEtapa.id;
-            totalCriados++;
+                objetivo: etapa.objetivo || null,
+              }).eq("id", idExistente)
+            );
+            totalAtualizados++;
           }
+        } else if (etapa.selecionada) {
+          etapasParaCriar.push({
+            contrato_id: contratoId,
+            numero_etapa: etapa.numero,
+            titulo: etapa.titulo,
+            objetivo: etapa.objetivo || null,
+            status: 'pendente',
+          });
         }
       }
 
-      // 2. Processar Entregas (atualizar se não concluída)
-      const entregasMap: Record<number, string> = {};
-      
-      for (const entrega of entregasSelecionadas) {
-        const etapaId = etapasMap[entrega.etapa_numero] || null;
-        
-        // Verificar se já existe
-        const { data: entregaExistente } = await supabase
-          .from("entregas_business")
-          .select("id, status")
-          .eq("contrato_id", contratoId)
-          .eq("titulo", entrega.titulo)
-          .maybeSingle();
+      // Executar updates de etapas em paralelo
+      if (etapaUpdates.length > 0) await Promise.all(etapaUpdates);
 
-        if (entregaExistente) {
-          entregasMap[entrega.numero_entrega] = entregaExistente.id;
-          
-          // Modo atualizar: atualizar campos se NÃO estiver concluída
-          if (modoImportacao === 'atualizar' && entregaExistente.status !== 'concluida') {
-            const { error } = await supabase
-              .from("entregas_business")
-              .update({
+      // Inserir novas etapas (batch)
+      if (etapasParaCriar.length > 0) {
+        const { data: novasEtapas, error } = await supabase
+          .from("etapas_business")
+          .insert(etapasParaCriar)
+          .select("id, numero_etapa");
+        if (error) throw error;
+        (novasEtapas || []).forEach(e => { etapasMap[e.numero_etapa] = e.id; });
+        totalCriados += novasEtapas?.length || 0;
+      }
+
+      // ====== 3. ENTREGAS — batch insert + parallel updates ======
+      setSaveProgress({ etapa: 'Sincronizando entregas', current: 0, total: entregasSelecionadas.length });
+      const entregasMap: Record<number, string> = {};
+      const entregasParaCriar: any[] = [];
+      const entregaUpdates: any[] = [];
+      const numeroEntregaParaTituloNovo = new Map<number, string>();
+
+      for (const entrega of entregasSelecionadas) {
+        const existente = entregasExistentesPorTitulo.get(entrega.titulo);
+        if (existente) {
+          entregasMap[entrega.numero_entrega] = existente.id;
+          if (modoImportacao === 'atualizar' && existente.status !== 'concluida') {
+            entregaUpdates.push(
+              supabase.from("entregas_business").update({
                 descricao: entrega.descricao,
                 prioridade: entrega.prioridade === 'urgente' ? 'critica' : entrega.prioridade,
                 modulo_relacionado: entrega.modulo_relacionado,
-                // NÃO atualizar: status, etapa_id (mantém o acordado)
-              })
-              .eq("id", entregaExistente.id);
-
-            if (error) throw error;
+              }).eq("id", existente.id)
+            );
             totalAtualizados++;
           }
-          continue;
-        }
-        
-        // Criar nova entrega
-        const { data: novaEntrega, error } = await supabase
-          .from("entregas_business")
-          .insert({
+        } else {
+          entregasParaCriar.push({
             contrato_id: contratoId,
-            etapa_id: etapaId,
+            etapa_id: etapasMap[entrega.etapa_numero] || null,
             titulo: entrega.titulo,
             descricao: entrega.descricao,
             modulo_relacionado: entrega.modulo_relacionado,
@@ -514,53 +592,61 @@ export function GeracaoEntregasModal({
             ordem: entrega.numero_entrega,
             numero_entrega: entrega.numero_entrega,
             tem_instrucoes: instrucoesSelecionadas.some(i => i.entrega_numero === entrega.numero_entrega),
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-        entregasMap[entrega.numero_entrega] = novaEntrega.id;
-        totalCriados++;
+          });
+          numeroEntregaParaTituloNovo.set(entrega.numero_entrega, entrega.titulo);
+        }
       }
 
-      // 3. Processar Instruções (atualizar se não concluída)
+      // Updates em paralelo (chunks de 20)
+      for (let i = 0; i < entregaUpdates.length; i += 20) {
+        await Promise.all(entregaUpdates.slice(i, i + 20));
+        setSaveProgress({ etapa: 'Sincronizando entregas', current: Math.min(i + 20, entregaUpdates.length), total: entregasSelecionadas.length });
+      }
+
+      // Batch insert das novas entregas
+      if (entregasParaCriar.length > 0) {
+        const { data: novasEntregas, error } = await supabase
+          .from("entregas_business")
+          .insert(entregasParaCriar)
+          .select("id, titulo");
+        if (error) throw error;
+        const tituloParaId = new Map<string, string>();
+        (novasEntregas || []).forEach(e => tituloParaId.set(e.titulo, e.id));
+        numeroEntregaParaTituloNovo.forEach((titulo, num) => {
+          const id = tituloParaId.get(titulo);
+          if (id) entregasMap[num] = id;
+        });
+        totalCriados += novasEntregas?.length || 0;
+      }
+
+      // ====== 4. INSTRUÇÕES — batch insert + parallel updates ======
+      setSaveProgress({ etapa: 'Sincronizando instruções', current: 0, total: instrucoesSelecionadas.length });
+      const instrucoesParaCriar: any[] = [];
+      const instrucaoUpdates: any[] = [];
+
       for (const instrucao of instrucoesSelecionadas) {
-        const entregaId = entregasMap[instrucao.entrega_numero] || null;
+        const entregaId = entregasMap[instrucao.entrega_numero];
+        if (!entregaId) continue;
         const entrega = entregasSelecionadas.find(e => e.numero_entrega === instrucao.entrega_numero);
         const etapaId = entrega ? etapasMap[entrega.etapa_numero] : null;
 
-        // Verificar se já existe
-        const { data: instrucaoExistente } = await supabase
-          .from("instrucoes_etapa")
-          .select("id, status")
-          .eq("entrega_id", entregaId)
-          .eq("titulo", instrucao.titulo)
-          .maybeSingle();
+        const chave = `${entregaId}::${instrucao.titulo}`;
+        const existente = instrucoesExistentesPorChave.get(chave);
 
-        if (instrucaoExistente) {
-          // Modo atualizar: atualizar campos se NÃO estiver concluída
-          if (modoImportacao === 'atualizar' && instrucaoExistente.status !== 'concluida') {
-            const { error } = await supabase
-              .from("instrucoes_etapa")
-              .update({
+        if (existente) {
+          if (modoImportacao === 'atualizar' && existente.status !== 'concluida') {
+            instrucaoUpdates.push(
+              supabase.from("instrucoes_etapa").update({
                 descricao: instrucao.descricao,
                 prompt_sugerido: instrucao.prompt_sugerido || null,
                 dicas: instrucao.dicas,
                 ferramenta: normalizarFerramenta(instrucao.ferramenta),
-                // Manter: status, ordem original, responsavel
-              })
-              .eq("id", instrucaoExistente.id);
-
-            if (error) throw error;
+              }).eq("id", existente.id)
+            );
             totalAtualizados++;
           }
-          continue;
-        }
-
-        // Criar nova instrução
-        const { error } = await supabase
-          .from("instrucoes_etapa")
-          .insert({
+        } else {
+          instrucoesParaCriar.push({
             etapa_id: etapaId,
             entrega_id: entregaId,
             titulo: instrucao.titulo,
@@ -573,46 +659,46 @@ export function GeracaoEntregasModal({
             status: 'pendente',
             gerado_por_ia: true,
           });
-
-        if (error) throw error;
-        totalCriados++;
+        }
       }
 
-      // 4. Processar Tasks (atualizar se não concluída)
+      for (let i = 0; i < instrucaoUpdates.length; i += 20) {
+        await Promise.all(instrucaoUpdates.slice(i, i + 20));
+        setSaveProgress({ etapa: 'Sincronizando instruções', current: Math.min(i + 20, instrucaoUpdates.length), total: instrucoesSelecionadas.length });
+      }
+
+      // Batch insert (em chunks de 200 para evitar payload gigante)
+      for (let i = 0; i < instrucoesParaCriar.length; i += 200) {
+        const chunk = instrucoesParaCriar.slice(i, i + 200);
+        const { error } = await supabase.from("instrucoes_etapa").insert(chunk);
+        if (error) throw error;
+        totalCriados += chunk.length;
+        setSaveProgress({ etapa: 'Criando instruções', current: Math.min(i + 200, instrucoesParaCriar.length), total: instrucoesParaCriar.length });
+      }
+
+      // ====== 5. TASKS — batch insert + parallel updates ======
+      setSaveProgress({ etapa: 'Sincronizando tasks', current: 0, total: tasksSelecionadas.length });
+      const tasksParaCriar: any[] = [];
+      const taskUpdates: any[] = [];
+
       for (const task of tasksSelecionadas) {
         const entregaId = entregasMap[task.entrega_numero] || null;
         const entrega = entregasSelecionadas.find(e => e.numero_entrega === task.entrega_numero);
         const etapaId = entrega ? etapasMap[entrega.etapa_numero] : null;
+        const existente = tasksExistentesPorTitulo.get(task.titulo);
 
-        // Verificar se já existe
-        const { data: taskExistente } = await supabase
-          .from("tasks_business")
-          .select("id, status")
-          .eq("contrato_id", contratoId)
-          .eq("titulo", task.titulo)
-          .maybeSingle();
-
-        if (taskExistente) {
-          // Modo atualizar: atualizar campos se NÃO estiver concluída
-          if (modoImportacao === 'atualizar' && taskExistente.status !== 'concluida' && taskExistente.status !== 'concluido') {
-            const { error } = await supabase
-              .from("tasks_business")
-              .update({
+        if (existente) {
+          if (modoImportacao === 'atualizar' && existente.status !== 'concluida' && existente.status !== 'concluido') {
+            taskUpdates.push(
+              supabase.from("tasks_business").update({
                 prioridade: task.prioridade,
                 instrucoes_validacao: task.instrucoes_validacao,
-              })
-              .eq("id", taskExistente.id);
-
-            if (error) throw error;
+              }).eq("id", existente.id)
+            );
             totalAtualizados++;
           }
-          continue;
-        }
-
-        // Criar nova task
-        const { error } = await supabase
-          .from("tasks_business")
-          .insert({
+        } else {
+          tasksParaCriar.push({
             contrato_id: contratoId,
             user_id: contrato.user_id,
             entrega_id: entregaId,
@@ -623,38 +709,39 @@ export function GeracaoEntregasModal({
             instrucoes_validacao: task.instrucoes_validacao,
             status: 'pendente',
           });
-
-        if (error) throw error;
-        totalCriados++;
+        }
       }
 
-      // 5. Processar Backlog (sempre adicionar novos)
-      for (const item of backlogSelecionado) {
-        // Verificar se já existe
-        const { data: backlogExistente } = await supabase
-          .from("entregas_business")
-          .select("id")
-          .eq("contrato_id", contratoId)
-          .eq("titulo", item.titulo)
-          .maybeSingle();
+      for (let i = 0; i < taskUpdates.length; i += 20) {
+        await Promise.all(taskUpdates.slice(i, i + 20));
+      }
 
-        if (backlogExistente) continue; // Já existe, pular
+      if (tasksParaCriar.length > 0) {
+        const { error } = await supabase.from("tasks_business").insert(tasksParaCriar);
+        if (error) throw error;
+        totalCriados += tasksParaCriar.length;
+      }
 
-        const { error } = await supabase
-          .from("entregas_business")
-          .insert({
+      // ====== 6. BACKLOG — batch insert apenas dos novos ======
+      if (backlogSelecionado.length > 0) {
+        setSaveProgress({ etapa: 'Adicionando backlog', current: 0, total: backlogSelecionado.length });
+        const backlogParaCriar = backlogSelecionado
+          .filter(item => !entregasExistentesPorTitulo.has(item.titulo))
+          .map(item => ({
             contrato_id: contratoId,
             titulo: item.titulo,
             descricao: item.descricao,
-            tipo: 'backlog',
+            tipo: 'backlog' as const,
             prioridade: item.prioridade || 'baixa',
             justificativa_backlog: item.categoria || 'Pós-MVP',
             ordem: 999,
             tem_instrucoes: false,
-          });
-
-        if (error) throw error;
-        totalCriados++;
+          }));
+        if (backlogParaCriar.length > 0) {
+          const { error } = await supabase.from("entregas_business").insert(backlogParaCriar);
+          if (error) throw error;
+          totalCriados += backlogParaCriar.length;
+        }
       }
 
       // Invalidar queries
@@ -662,21 +749,20 @@ export function GeracaoEntregasModal({
       queryClient.invalidateQueries({ queryKey: ["entregas-business", contratoId] });
       queryClient.invalidateQueries({ queryKey: ["instrucoes-etapa"] });
       queryClient.invalidateQueries({ queryKey: ["tasks-business", contratoId] });
-      
-      // Mensagem de sucesso
+
+      const segundos = ((performance.now() - t0) / 1000).toFixed(1);
       const mensagens: string[] = [];
       if (totalCriados > 0) mensagens.push(`${totalCriados} criados`);
       if (totalAtualizados > 0) mensagens.push(`${totalAtualizados} atualizados`);
-      if (novasEtapasBacklog > 0) mensagens.push(`${novasEtapasBacklog} novas fases em backlog`);
-      
-      toast.success(`Itens processados: ${mensagens.join(', ')}`);
+      toast.success(`${mensagens.join(', ') || 'Nada a salvar'} em ${segundos}s`);
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
       console.error("Erro ao salvar:", error);
-      toast.error("Erro ao salvar dados");
+      toast.error(`Erro ao salvar: ${(error as Error).message || 'desconhecido'}`);
     } finally {
       setIsSaving(false);
+      setSaveProgress(null);
     }
   };
 
@@ -851,6 +937,14 @@ export function GeracaoEntregasModal({
                 onToggleEntregaSelect={toggleEntregaSelecionada}
                 onToggleInstrucao={toggleInstrucaoSelecionada}
                 onToggleTask={toggleTaskSelecionada}
+                onUpdateEtapa={updateEtapa}
+                onRemoveEtapa={removeEtapa}
+                onAddEntrega={addEntrega}
+                onUpdateEntrega={updateEntrega}
+                onRemoveEntrega={removeEntrega}
+                onUpdateInstrucao={updateInstrucao}
+                onRemoveInstrucao={removeInstrucao}
+                onAddInstrucao={addInstrucao}
                 getAcaoBadge={getAcaoBadge}
                 getAcaoItem={getAcaoItem}
                 getPrioridadeBadge={getPrioridadeBadge}
@@ -859,6 +953,16 @@ export function GeracaoEntregasModal({
               />
             );
           })}
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={addEtapa}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Nova fase
+          </Button>
         </div>
 
         {/* Drag Overlay */}
@@ -950,12 +1054,27 @@ export function GeracaoEntregasModal({
         </ScrollArea>
 
         <DialogFooter className="flex justify-between items-center">
-          <div className="text-sm text-muted-foreground space-x-3">
-            {isNewFormat && <span>{totalEtapas} fases</span>}
-            <span>{totalEntregas} entregas</span>
-            {isNewFormat && <span>{totalInstrucoes} instruções</span>}
-            {isNewFormat && <span>{totalTasks} tasks</span>}
-            {totalBacklog > 0 && <span>{totalBacklog} backlog</span>}
+          <div className="flex-1 mr-4">
+            {saveProgress ? (
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{saveProgress.etapa}</span>
+                  <span>{saveProgress.current}/{saveProgress.total}</span>
+                </div>
+                <Progress
+                  value={saveProgress.total > 0 ? (saveProgress.current / saveProgress.total) * 100 : 0}
+                  className="h-1.5"
+                />
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground space-x-3">
+                {isNewFormat && <span>{totalEtapas} fases</span>}
+                <span>{totalEntregas} entregas</span>
+                {isNewFormat && <span>{totalInstrucoes} instruções</span>}
+                {isNewFormat && <span>{totalTasks} tasks</span>}
+                {totalBacklog > 0 && <span>{totalBacklog} backlog</span>}
+              </div>
+            )}
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
