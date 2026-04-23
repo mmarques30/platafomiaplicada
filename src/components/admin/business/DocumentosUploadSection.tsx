@@ -301,6 +301,28 @@ export function DocumentosUploadSection({
           
           <CollapsibleContent>
             <CardContent className="pt-0 pb-4 space-y-4">
+              {/* Guia de formato ideal */}
+              <Alert className="border-blue-500/30 bg-blue-500/5">
+                <Info className="h-4 w-4 text-blue-600" />
+                <AlertTitle className="text-xs font-semibold">Formato recomendado para melhor extração</AlertTitle>
+                <AlertDescription className="text-xs space-y-1.5 mt-1.5">
+                  <p>Para entregas geradas com hierarquia perfeita, use <strong>Markdown (.md)</strong> ou texto com marcadores:</p>
+                  <pre className="bg-muted/50 p-2 rounded text-[10px] overflow-x-auto">{`FASE 1: Nome da Fase
+  ENTREGA 1: Nome da Entrega
+    PASSO 1: Nome do Passo
+      Descrição...
+      Prompt: "..." (opcional)
+      DICA: ...
+  ENTREGA 2: ...
+FASE 2: ...`}</pre>
+                  <p className="text-muted-foreground">
+                    <strong>Aceita:</strong> .md (ideal), .txt, .docx, .pdf, .html, .pptx ·
+                    <strong> HTML:</strong> use H1=Fase, H2=Entrega, H3=Passo ·
+                    <strong> Múltiplos arquivos:</strong> processados separadamente, sem duplicação.
+                  </p>
+                </AlertDescription>
+              </Alert>
+
               {/* Upload controls */}
               <div className="flex items-center gap-2">
                 <Select value={tipo} onValueChange={(v: any) => setTipo(v)}>
