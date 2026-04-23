@@ -351,6 +351,80 @@ export function GeracaoEntregasModal({
     ));
   };
 
+  // ===== Handlers de edição (estado local, antes de salvar) =====
+  const updateEtapa = (numero: number, patch: Partial<EtapaSelecionada>) => {
+    setEtapas(prev => prev.map(e => e.numero === numero ? { ...e, ...patch } : e));
+  };
+
+  const removeEtapa = (numero: number) => {
+    const entregasDaFase = entregas.filter(e => e.etapa_numero === numero).map(e => e.numero_entrega);
+    setEtapas(prev => prev.filter(e => e.numero !== numero));
+    setEntregas(prev => prev.filter(e => e.etapa_numero !== numero));
+    setInstrucoes(prev => prev.filter(i => !entregasDaFase.includes(i.entrega_numero)));
+    setTasks(prev => prev.filter(t => !entregasDaFase.includes(t.entrega_numero)));
+  };
+
+  const addEtapa = () => {
+    const proximoNumero = etapas.length > 0 ? Math.max(...etapas.map(e => e.numero)) + 1 : 1;
+    setEtapas(prev => [...prev, {
+      numero: proximoNumero,
+      titulo: `Nova Fase ${proximoNumero}`,
+      objetivo: '',
+      selecionada: true,
+    }]);
+    setExpandedEtapas(prev => [...prev, proximoNumero]);
+  };
+
+  const addEntrega = (etapaNumero: number) => {
+    const proximoNumero = entregas.length > 0 ? Math.max(...entregas.map(e => e.numero_entrega)) + 1 : 1;
+    setEntregas(prev => [...prev, {
+      etapa_numero: etapaNumero,
+      numero_entrega: proximoNumero,
+      titulo: 'Nova entrega',
+      descricao: '',
+      tipo: 'ativa',
+      prioridade: 'media',
+      selecionada: true,
+    }]);
+    setExpandedEntregas(prev => [...prev, proximoNumero]);
+  };
+
+  const updateEntrega = (numeroEntrega: number, patch: Partial<EntregaSelecionada>) => {
+    setEntregas(prev => prev.map(e => e.numero_entrega === numeroEntrega ? { ...e, ...patch } : e));
+  };
+
+  const removeEntrega = (numeroEntrega: number) => {
+    setEntregas(prev => prev.filter(e => e.numero_entrega !== numeroEntrega));
+    setInstrucoes(prev => prev.filter(i => i.entrega_numero !== numeroEntrega));
+    setTasks(prev => prev.filter(t => t.entrega_numero !== numeroEntrega));
+  };
+
+  const updateInstrucao = (entregaNumero: number, ordem: number, patch: Partial<InstrucaoSelecionada>) => {
+    setInstrucoes(prev => prev.map(i =>
+      i.entrega_numero === entregaNumero && i.ordem === ordem ? { ...i, ...patch } : i
+    ));
+  };
+
+  const removeInstrucao = (entregaNumero: number, ordem: number) => {
+    setInstrucoes(prev => prev.filter(i => !(i.entrega_numero === entregaNumero && i.ordem === ordem)));
+  };
+
+  const addInstrucao = (entregaNumero: number) => {
+    const existentes = instrucoes.filter(i => i.entrega_numero === entregaNumero);
+    const proximaOrdem = existentes.length > 0 ? Math.max(...existentes.map(i => i.ordem)) + 1 : 1;
+    setInstrucoes(prev => [...prev, {
+      entrega_numero: entregaNumero,
+      titulo: 'Novo passo',
+      descricao: '',
+      prompt_sugerido: '',
+      responsavel: 'voce',
+      ferramenta: 'outro',
+      dicas: '',
+      ordem: proximaOrdem,
+      selecionada: true,
+    }]);
+  };
+
   const handleBacklogChange = (items: BacklogItemEditable[]) => {
     setBacklog(items);
   };
