@@ -3,7 +3,6 @@ import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useTasksByUser } from "@/hooks/useTasksBusiness";
-import { useProximaAula } from "@/hooks/useCalendarioAulas";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 
 import { InsightSemanalCard } from "@/components/mentoria/business/InsightSemanalCard";
@@ -15,13 +14,28 @@ export function BusinessVisaoGeralGrid() {
   const { contrato } = useContratosBusiness(businessUserId);
   const { data: etapas } = useEtapasBusiness(contrato?.id);
   const { data: tasks } = useTasksByUser(businessUserId);
-  const { data: proximaAula } = useProximaAula();
 
-  // KPI: Próxima Sessão
-  const proximaSessaoLabel = proximaAula?.data_aula
-    ? format(new Date(proximaAula.data_aula), "dd MMM", { locale: ptBR })
+  // KPI: Próxima Sessão — baseada na próxima etapa prevista do contrato
+  const hojeISO = new Date().toISOString().slice(0, 10);
+  const proximaEtapa = etapas
+    ? [...etapas]
+        .filter(
+          (e) =>
+            e.data_prevista &&
+            e.status !== "concluida" &&
+            e.data_prevista >= hojeISO
+        )
+        .sort((a, b) =>
+          (a.data_prevista ?? "").localeCompare(b.data_prevista ?? "")
+        )[0]
+    : undefined;
+
+  const proximaSessaoLabel = proximaEtapa?.data_prevista
+    ? format(new Date(proximaEtapa.data_prevista), "dd MMM", { locale: ptBR })
     : null;
-  const proximaSessaoHora = proximaAula?.horario ?? null;
+  const proximaSessaoSub = proximaEtapa
+    ? `Etapa ${proximaEtapa.numero_etapa}`
+    : "";
 
   // KPI: Tarefas Críticas
   const tarefasCriticasCount = tasks
@@ -54,7 +68,7 @@ export function BusinessVisaoGeralGrid() {
             {proximaSessaoLabel ?? "—"}
           </span>
           <span className="text-xs text-muted-foreground">
-            {proximaSessaoHora ?? ""}
+            {proximaSessaoSub}
           </span>
         </Card>
 
