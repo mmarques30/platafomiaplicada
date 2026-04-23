@@ -169,13 +169,37 @@ export default function MeuSistemaDocumentos() {
     { label: "Reports", count: reports.length, icon: FileText },
   ];
 
-  // Insights dinâmicos
-  const insights: string[] = [];
-  if (totalItens === 0) insights.push("Comece adicionando arquivos e anotações para organizar seu projeto.");
-  if (notas.length === 0 && totalItens > 0) insights.push("Adicione anotações para registrar decisões importantes do projeto.");
-  if (arquivosCount > 0 && notas.length > 0) insights.push(`Você tem ${arquivosCount} arquivo(s) e ${notas.length} anotação(ões) registrados.`);
-  if (progresso.percentual > 0) insights.push(`Seu projeto está ${progresso.percentual}% concluído com base nas entregas.`);
-  if (progresso.percentual === 0 && (contrato.entregas_esperadas || []).length > 0) insights.push("Nenhuma entrega foi concluída ainda. Acompanhe o progresso na aba Entregas.");
+  // Saúde do projeto (progresso vs cronograma)
+  const saudeProjeto: { label: string; classe: string } = (() => {
+    if (!cronograma) return { label: "Sem cronograma definido", classe: "bg-muted text-muted-foreground border-transparent" };
+    if (progresso.percentual >= cronograma.percentual) return { label: "No prazo", classe: "bg-emerald-500/15 text-emerald-600 border-transparent" };
+    if (progresso.percentual >= cronograma.percentual - 15) return { label: "Atenção", classe: "bg-amber-500/15 text-amber-600 border-transparent" };
+    return { label: "Atrasado", classe: "bg-destructive/15 text-destructive border-transparent" };
+  })();
+
+  // Insights dinâmicos (Painel do Projeto)
+  const insights: { label: string; valor: string; tipo: "info" | "warning" | "success" }[] = [];
+  if (progresso.percentual === 100) {
+    insights.push({ label: "Todas as entregas concluídas", valor: "100%", tipo: "success" });
+  } else if (progresso.percentual > 0) {
+    insights.push({ label: "Entregas concluídas", valor: `${progresso.percentual}%`, tipo: "info" });
+  } else if ((contrato.entregas_esperadas || []).length > 0) {
+    insights.push({ label: "Nenhuma entrega concluída", valor: "0%", tipo: "warning" });
+  }
+  if (cronograma) {
+    if (cronograma.diasRestantes <= 30) {
+      insights.push({ label: "Prazo se aproximando", valor: `${cronograma.diasRestantes} dias`, tipo: "warning" });
+    } else {
+      insights.push({ label: "Prazo restante", valor: `${cronograma.diasRestantes} dias`, tipo: "info" });
+    }
+  }
+  insights.push({ label: "Documentos no projeto", valor: String(totalItens), tipo: "info" });
+  if (notas.length === 0) {
+    insights.push({ label: "Nenhuma anotação registrada", valor: "Registre decisões", tipo: "warning" });
+  }
+  if (reports && reports.length > 0) {
+    insights.push({ label: "Reports gerados", valor: String(reports.length), tipo: "success" });
+  }
 
   return (
     <div className="p-4 md:p-6 space-y-6">
