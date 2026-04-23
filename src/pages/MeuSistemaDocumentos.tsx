@@ -498,6 +498,8 @@ export default function MeuSistemaDocumentos() {
           )}
         </TabsContent>
       </Tabs>
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Resumo do Projeto */}
       <div className="grid gap-4 md:grid-cols-3">
