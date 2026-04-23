@@ -26,6 +26,7 @@ import { ptBR } from "date-fns/locale";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { ArquivosProjetoSection } from "@/components/admin/business/ArquivosProjetoSection";
 import { NotasProjetoSection } from "@/components/admin/business/NotasProjetoSection";
+import { ProjetoResumoDashboard } from "@/components/business/ProjetoResumoDashboard";
 import { toast } from "sonner";
 
 const iconeOptions = [
