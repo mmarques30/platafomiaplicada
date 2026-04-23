@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2, Building2, Plus, Edit2, Trash2, Loader2, AlertCircle, Info } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2, Building2, Plus, Edit2, Trash2, Loader2, AlertCircle, Info, ChevronDown } from "lucide-react";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -55,6 +56,18 @@ export default function MeuSistemaDocumentos() {
   const [linkForm, setLinkForm] = useState({ titulo: "", url: "", descricao: "", icone: "link" });
 
   const allLoading = isLoading || isLoadingDocs || isLoadingLinks || isLoadingNotas;
+
+  // Estado expandir/recolher seção de documentos (persistido por contrato)
+  const storageKey = contrato?.id ? `documentos-projeto-expandido-${contrato.id}` : null;
+  const [documentosExpandido, setDocumentosExpandido] = useState(true);
+  useEffect(() => {
+    if (!storageKey) return;
+    const saved = localStorage.getItem(storageKey);
+    if (saved !== null) setDocumentosExpandido(saved === "true");
+  }, [storageKey]);
+  useEffect(() => {
+    if (storageKey) localStorage.setItem(storageKey, String(documentosExpandido));
+  }, [storageKey, documentosExpandido]);
 
   // Atividade recente — combina arquivos, notas e links ordenados por data
   const atividadeRecente = useMemo(() => {
@@ -222,8 +235,29 @@ export default function MeuSistemaDocumentos() {
         ))}
       </div>
 
-      <Tabs defaultValue="arquivos" className="space-y-4">
-        <TabsList className="bg-muted/40 border-0 rounded-lg p-1 flex-wrap h-auto">
+      <Collapsible open={documentosExpandido} onOpenChange={setDocumentosExpandido} className="border border-border/60 rounded-lg bg-card">
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className="w-full flex items-center justify-between gap-4 px-4 py-3 hover:bg-muted/40 transition-colors rounded-t-lg"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <FolderOpen className="h-4 w-4 text-primary" />
+              </div>
+              <div className="text-left min-w-0">
+                <h2 className="text-sm font-semibold text-foreground">Documentos do Projeto</h2>
+                <p className="text-xs text-muted-foreground truncate">
+                  {arquivosCount} {arquivosCount === 1 ? "arquivo" : "arquivos"} · {notas.length} {notas.length === 1 ? "anotação" : "anotações"} · {links.length} {links.length === 1 ? "link" : "links"} · {reports.length} {reports.length === 1 ? "report" : "reports"}
+                </p>
+              </div>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform flex-shrink-0 ${documentosExpandido ? "rotate-180" : ""}`} />
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="px-4 pb-4 pt-2">
+        <Tabs defaultValue="arquivos" className="space-y-4">
+          <TabsList className="bg-muted/40 border-0 rounded-lg p-1 flex-wrap h-auto">
           <TabsTrigger value="arquivos" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <FileText className="h-4 w-4" />
             Arquivos ({arquivosCount})
@@ -464,6 +498,8 @@ export default function MeuSistemaDocumentos() {
           )}
         </TabsContent>
       </Tabs>
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Resumo do Projeto */}
       <div className="grid gap-4 md:grid-cols-3">
