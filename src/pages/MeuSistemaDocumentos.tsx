@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2, Building2, Plus, Edit2, Trash2, Loader2 } from "lucide-react";
+import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2, Building2, Plus, Edit2, Trash2, Loader2, AlertCircle, Info } from "lucide-react";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ export default function MeuSistemaDocumentos() {
     documentos.filter(d => d.arquivo_url).forEach(d => items.push({ tipo: "Arquivo", titulo: d.titulo, data: d.created_at || "", icon: FileText }));
     notas.forEach(n => items.push({ tipo: "Anotação", titulo: n.titulo, data: n.created_at || "", icon: StickyNote }));
     links.forEach(l => items.push({ tipo: "Link", titulo: l.titulo, data: l.created_at || "", icon: Link2 }));
-    return items.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).slice(0, 5);
+    return items.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).slice(0, 4);
   }, [documentos, notas, links]);
 
   // Progresso temporal do contrato
