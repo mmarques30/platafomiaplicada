@@ -208,6 +208,12 @@ export function DocumentosUploadSection({
       const tasks = resultado.tasks || [];
       const backlog = resultado.backlog || [];
 
+      if (etapas.length > 0 && entregas.length === 0) {
+        toast.warning(
+          `${item.titulo}: ${etapas.length} fases detectadas, mas 0 entregas. Verifique se o documento usa "ENTREGA N:" em linhas próprias.`
+        );
+      }
+
       // Mapas locais → global
       const mapaEtapas = new Map<number, number>();
       etapas.forEach((e) => {
