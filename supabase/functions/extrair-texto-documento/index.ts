@@ -245,13 +245,21 @@ serve(async (req) => {
 
     if (!fileBase64 || !fileName) {
       return new Response(
-        JSON.stringify({ error: 'Arquivo e nome são obrigatórios' }),
+        JSON.stringify({ error: 'Arquivo e nome são obrigatórios.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // Limite de payload: 25MB de arquivo bruto ≈ ~34MB em base64
+    if (fileBase64.length > 36_000_000) {
+      return new Response(
+        JSON.stringify({ error: 'Arquivo excede o limite de 25MB para extração de texto.' }),
+        { status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const fileNameLower = fileName.toLowerCase();
-    console.log(`Extraindo texto de: ${fileName}, tipo: ${fileType}, tamanho base64: ${fileBase64.length}`);
+    console.log(`[extrair-texto] file=${fileName} type=${fileType || 'desconhecido'} base64Len=${fileBase64.length}`);
 
     let textoExtraido = '';
 
