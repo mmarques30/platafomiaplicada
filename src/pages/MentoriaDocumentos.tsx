@@ -19,6 +19,7 @@ import { useLinksBusiness, LinkBusiness } from "@/hooks/useLinksBusiness";
 import { useNotasProjetoBusiness } from "@/hooks/useNotasProjetoBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { downloadUrl } from "@/lib/download";
+import { supabase } from "@/integrations/supabase/client";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PageTitle } from "@/components/shared/PageTitle";
@@ -134,8 +135,30 @@ export default function MentoriaDocumentos() {
   const arquivosCount = documentos.filter((d) => d.arquivo_url).length;
   const totalItens = arquivosCount + notas.length + links.length;
 
-  const handleDownloadReport = (arquivoUrl: string, titulo: string) => {
-    downloadUrl(arquivoUrl, titulo);
+  const [downloadingReportId, setDownloadingReportId] = useState<string | null>(null);
+
+  const handleDownloadReport = async (arquivoUrl: string, titulo: string, reportId: string) => {
+    try {
+      setDownloadingReportId(reportId);
+      let urlFinal = arquivoUrl;
+      if (!/^https?:\/\//i.test(arquivoUrl)) {
+        const path = arquivoUrl.replace(/^\/+/, "");
+        const { data, error } = await supabase
+          .storage
+          .from("contratos-business")
+          .createSignedUrl(path, 3600);
+        if (error || !data?.signedUrl) {
+          throw error || new Error("Falha ao gerar URL de download");
+        }
+        urlFinal = data.signedUrl;
+      }
+      await downloadUrl(urlFinal, titulo);
+    } catch (err) {
+      console.error("Erro ao baixar report:", err);
+      toast.error("Não foi possível baixar este report.");
+    } finally {
+      setDownloadingReportId(null);
+    }
   };
 
   const statCards = [
@@ -318,9 +341,15 @@ export default function MentoriaDocumentos() {
                           variant="outline"
                           size="sm"
                           className="text-xs h-7"
-                          onClick={() => handleDownloadReport(report.arquivo_url!, report.titulo)}
+                          disabled={downloadingReportId === report.id}
+                          onClick={() => handleDownloadReport(report.arquivo_url!, report.titulo, report.id)}
                         >
-                          <Download className="h-3 w-3 mr-1" /> Baixar
+                          {downloadingReportId === report.id ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <Download className="h-3 w-3 mr-1" />
+                          )}
+                          Baixar
                         </Button>
                       )}
                     </div>

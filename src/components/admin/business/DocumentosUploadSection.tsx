@@ -26,6 +26,8 @@ import { useProcessarDocumentos, ResultadoProcessamento } from "@/hooks/useProce
 import { GeracaoEntregasModal } from "./GeracaoEntregasModal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export type ModoImportacao = 'nova' | 'atualizar';
 
@@ -164,25 +166,95 @@ export function DocumentosUploadSection({
   };
 
   const handleProcessar = async () => {
-    const textosParaProcessar = documentos
+    // Construir fila: 1 documento por vez (preserva hierarquia + evita duplicação)
+    const fila: { titulo: string; texto: string }[] = documentos
       .filter(d => !d.processado && d.conteudo_texto)
-      .map(d => d.conteudo_texto)
-      .join("\n\n---\n\n");
+      .map(d => ({ titulo: d.titulo, texto: d.conteudo_texto as string }));
 
-    const textoFinal = texto.trim() 
-      ? `${textosParaProcessar}\n\n---\n\n${texto}` 
-      : textosParaProcessar;
+    if (texto.trim()) {
+      fila.push({ titulo: "Texto colado", texto: texto.trim() });
+    }
 
-    if (!textoFinal.trim()) {
+    if (fila.length === 0) return;
+
+    // Acumulador com renumeração global
+    const merged: ResultadoProcessamento = {
+      etapas: [],
+      entregas: [],
+      instrucoes: [],
+      tasks: [],
+      backlog: [],
+      entregas_sugeridas: [],
+      instrucoes_sugeridas: [],
+      backlog_sugerido: [],
+    };
+
+    let etapaOffset = 0;
+    let entregaOffset = 0;
+
+    for (let i = 0; i < fila.length; i++) {
+      const item = fila[i];
+      toast.info(`Processando ${i + 1}/${fila.length}: ${item.titulo}`);
+
+      const resultado = await processarDocumento(item.texto, modulosContratados);
+      if (!resultado) {
+        toast.error(`Falha ao processar: ${item.titulo}`);
+        continue;
+      }
+
+      const etapas = resultado.etapas || [];
+      const entregas = resultado.entregas || [];
+      const instrucoes = resultado.instrucoes || [];
+      const tasks = resultado.tasks || [];
+      const backlog = resultado.backlog || [];
+
+      // Mapas locais → global
+      const mapaEtapas = new Map<number, number>();
+      etapas.forEach((e) => {
+        const novoNumero = etapaOffset + e.numero;
+        mapaEtapas.set(e.numero, novoNumero);
+        merged.etapas.push({ ...e, numero: novoNumero });
+      });
+
+      const mapaEntregas = new Map<number, number>();
+      entregas.forEach((en) => {
+        const novoNumero = entregaOffset + en.numero_entrega;
+        mapaEntregas.set(en.numero_entrega, novoNumero);
+        merged.entregas.push({
+          ...en,
+          numero_entrega: novoNumero,
+          etapa_numero: mapaEtapas.get(en.etapa_numero) ?? en.etapa_numero,
+        });
+      });
+
+      instrucoes.forEach((ins) => {
+        merged.instrucoes.push({
+          ...ins,
+          entrega_numero: mapaEntregas.get(ins.entrega_numero) ?? ins.entrega_numero,
+        });
+      });
+
+      tasks.forEach((t) => {
+        merged.tasks.push({
+          ...t,
+          entrega_numero: mapaEntregas.get(t.entrega_numero) ?? t.entrega_numero,
+        });
+      });
+
+      backlog.forEach((b) => merged.backlog.push(b));
+
+      etapaOffset += etapas.length;
+      entregaOffset += entregas.length;
+    }
+
+    if (merged.entregas.length === 0 && merged.backlog.length === 0) {
+      toast.error("Nenhuma entrega foi gerada a partir dos documentos.");
       return;
     }
 
-    const resultado = await processarDocumento(textoFinal, modulosContratados);
-    
-    if (resultado) {
-      setResultadoIA(resultado);
-      setModalOpen(true);
-    }
+    toast.success(`${merged.entregas.length} entregas geradas de ${fila.length} documento(s)`);
+    setResultadoIA(merged);
+    setModalOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -229,6 +301,28 @@ export function DocumentosUploadSection({
           
           <CollapsibleContent>
             <CardContent className="pt-0 pb-4 space-y-4">
+              {/* Guia de formato ideal */}
+              <Alert className="border-blue-500/30 bg-blue-500/5">
+                <Info className="h-4 w-4 text-blue-600" />
+                <AlertTitle className="text-xs font-semibold">Formato recomendado para melhor extração</AlertTitle>
+                <AlertDescription className="text-xs space-y-1.5 mt-1.5">
+                  <p>Para entregas geradas com hierarquia perfeita, use <strong>Markdown (.md)</strong> ou texto com marcadores:</p>
+                  <pre className="bg-muted/50 p-2 rounded text-[10px] overflow-x-auto">{`FASE 1: Nome da Fase
+  ENTREGA 1: Nome da Entrega
+    PASSO 1: Nome do Passo
+      Descrição...
+      Prompt: "..." (opcional)
+      DICA: ...
+  ENTREGA 2: ...
+FASE 2: ...`}</pre>
+                  <p className="text-muted-foreground">
+                    <strong>Aceita:</strong> .md (ideal), .txt, .docx, .pdf, .html, .pptx ·
+                    <strong> HTML:</strong> use H1=Fase, H2=Entrega, H3=Passo ·
+                    <strong> Múltiplos arquivos:</strong> processados separadamente, sem duplicação.
+                  </p>
+                </AlertDescription>
+              </Alert>
+
               {/* Upload controls */}
               <div className="flex items-center gap-2">
                 <Select value={tipo} onValueChange={(v: any) => setTipo(v)}>

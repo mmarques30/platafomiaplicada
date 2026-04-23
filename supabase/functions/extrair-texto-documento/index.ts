@@ -6,6 +6,92 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Converte HTML em Markdown preservando hierarquia (H1=#, H2=##, H3=###, li=-, etc.)
+// Detecta H1/H2/H3 que mencionam Fase/Etapa/Entrega/Módulo/Passo e prefixa com marcadores
+// reconhecidos pelo pre-parser (FASE N:, ENTREGA N:, PASSO N:).
+function htmlParaMarkdown(htmlRaw: string): string {
+  let html = htmlRaw
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
+    .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '')
+    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '');
+
+  const stripInner = (s: string) =>
+    s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+
+  // Contadores para auto-numeração
+  let faseCount = 0;
+  let entregaCount = 0;
+  let passoCount = 0;
+
+  // Substituir headings preservando hierarquia
+  html = html.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_m, inner) => {
+    const t = stripInner(inner);
+    if (!t) return '\n';
+    faseCount++;
+    entregaCount = 0;
+    passoCount = 0;
+    const tipo = /fase|etapa|m[oó]dulo/i.test(t) ? '' : `FASE ${faseCount}: `;
+    return `\n\n# ${tipo}${t}\n`;
+  });
+
+  html = html.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_m, inner) => {
+    const t = stripInner(inner);
+    if (!t) return '\n';
+    entregaCount++;
+    passoCount = 0;
+    const tipo = /entrega|m[oó]dulo|sprint/i.test(t) ? '' : `ENTREGA ${entregaCount}: `;
+    return `\n\n## ${tipo}${t}\n`;
+  });
+
+  html = html.replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, (_m, inner) => {
+    const t = stripInner(inner);
+    if (!t) return '\n';
+    passoCount++;
+    const tipo = /passo|tarefa|step/i.test(t) ? '' : `PASSO ${passoCount}: `;
+    return `\n\n### ${tipo}${t}\n`;
+  });
+
+  html = html.replace(/<h[4-6][^>]*>([\s\S]*?)<\/h[4-6]>/gi, (_m, inner) => {
+    const t = stripInner(inner);
+    return t ? `\n#### ${t}\n` : '\n';
+  });
+
+  // Listas
+  html = html.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (_m, inner) => {
+    const t = stripInner(inner);
+    return t ? `\n- ${t}` : '';
+  });
+
+  // Negrito / ênfase → manter como marcador
+  html = html
+    .replace(/<(strong|b)[^>]*>([\s\S]*?)<\/(strong|b)>/gi, '**$2**')
+    .replace(/<(em|i)[^>]*>([\s\S]*?)<\/(em|i)>/gi, '*$2*')
+    .replace(/<code[^>]*>([\s\S]*?)<\/code>/gi, '`$1`');
+
+  // Quebras estruturais
+  html = html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|tr|blockquote|section|article)>/gi, '\n');
+
+  // Strip remaining tags
+  let texto = html
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  return texto;
+}
+
 // Função para extrair texto de DOCX manualmente (parsing XML interno)
 async function extrairTextoDOCX(fileBase64: string): Promise<string> {
   console.log('Extraindo texto de DOCX (parsing XML interno)...');
@@ -184,26 +270,8 @@ serve(async (req) => {
       const htmlBytes = new Uint8Array(htmlBinStr.length);
       for (let i = 0; i < htmlBinStr.length; i++) { htmlBytes[i] = htmlBinStr.charCodeAt(i); }
       const htmlRaw = new TextDecoder('utf-8').decode(htmlBytes);
-      // Remover blocos não-conteúdo ANTES de strip de tags
-      textoExtraido = htmlRaw
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-        .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
-        .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '')
-        .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
-        // Preservar quebras de linha antes de remover tags
-        .replace(/<br\s*\/?>/gi, '\n')
-        .replace(/<\/(p|div|h[1-6]|li|tr|blockquote)>/gi, '\n')
-        .replace(/<[^>]*>/g, '')
-        .replace(/&nbsp;/g, ' ')
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/\n{3,}/g, '\n\n')
-        .trim();
-      console.log(`HTML extraído: ${textoExtraido.length} caracteres`);
+      textoExtraido = htmlParaMarkdown(htmlRaw);
+      console.log(`HTML→Markdown extraído: ${textoExtraido.length} caracteres`);
     }
     
     // ===== DOCX - USAR MAMMOTH (EXTRAÇÃO NATIVA) =====
