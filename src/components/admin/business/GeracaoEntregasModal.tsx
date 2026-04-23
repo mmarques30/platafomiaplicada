@@ -519,7 +519,7 @@ export function GeracaoEntregasModal({
       (secoesExistentes || []).forEach(s => etapasExistentesPorNumero.set(s.numero_etapa, s.id));
 
       const etapasParaCriar: any[] = [];
-      const etapaUpdates: Promise<any>[] = [];
+      const etapaUpdates: any[] = [];
 
       for (const etapa of etapas) {
         const idExistente = etapasExistentesPorNumero.get(etapa.numero);
@@ -563,7 +563,7 @@ export function GeracaoEntregasModal({
       setSaveProgress({ etapa: 'Sincronizando entregas', current: 0, total: entregasSelecionadas.length });
       const entregasMap: Record<number, string> = {};
       const entregasParaCriar: any[] = [];
-      const entregaUpdates: Promise<any>[] = [];
+      const entregaUpdates: any[] = [];
       const numeroEntregaParaTituloNovo = new Map<number, string>();
 
       for (const entrega of entregasSelecionadas) {
@@ -622,7 +622,7 @@ export function GeracaoEntregasModal({
       // ====== 4. INSTRUÇÕES — batch insert + parallel updates ======
       setSaveProgress({ etapa: 'Sincronizando instruções', current: 0, total: instrucoesSelecionadas.length });
       const instrucoesParaCriar: any[] = [];
-      const instrucaoUpdates: Promise<any>[] = [];
+      const instrucaoUpdates: any[] = [];
 
       for (const instrucao of instrucoesSelecionadas) {
         const entregaId = entregasMap[instrucao.entrega_numero];
@@ -679,7 +679,7 @@ export function GeracaoEntregasModal({
       // ====== 5. TASKS — batch insert + parallel updates ======
       setSaveProgress({ etapa: 'Sincronizando tasks', current: 0, total: tasksSelecionadas.length });
       const tasksParaCriar: any[] = [];
-      const taskUpdates: Promise<any>[] = [];
+      const taskUpdates: any[] = [];
 
       for (const task of tasksSelecionadas) {
         const entregaId = entregasMap[task.entrega_numero] || null;
