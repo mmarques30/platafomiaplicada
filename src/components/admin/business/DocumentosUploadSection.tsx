@@ -56,40 +56,63 @@ export function DocumentosUploadSection({
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Função para extrair texto de arquivos binários (DOCX, PDF, PPTX)
+  // Conversão segura de ArrayBuffer → base64 (chunks de 32KB, evita stack overflow)
+  const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
+    const bytes = new Uint8Array(buffer);
+    const CHUNK = 0x8000; // 32KB
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      const sub = bytes.subarray(i, i + CHUNK);
+      binary += String.fromCharCode.apply(null, sub as unknown as number[]);
+    }
+    return btoa(binary);
+  };
+
+  // Chama edge function de extração via fetch direto (timeout 180s)
   const extrairTextoDocumento = async (file: File): Promise<string | null> => {
+    const arrayBuffer = await file.arrayBuffer();
+    const base64 = arrayBufferToBase64(arrayBuffer);
+    console.log(`[upload] Extraindo texto de ${file.name} (${file.size} bytes, base64=${base64.length})`);
+
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extrair-texto-documento`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 180_000);
+
     try {
-      // Converter arquivo para base64
-      const arrayBuffer = await file.arrayBuffer();
-      const base64 = btoa(
-        new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-      );
-
-      console.log(`Extraindo texto de ${file.name}, tamanho: ${file.size} bytes`);
-
-      const { data, error } = await supabase.functions.invoke('extrair-texto-documento', {
-        body: {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({
           fileBase64: base64,
           fileName: file.name,
           fileType: file.type,
-        },
+        }),
+        signal: controller.signal,
       });
 
-      if (error) {
-        console.error('Erro na extração:', error);
-        throw error;
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        const msg = data?.error || `HTTP ${resp.status}`;
+        throw new Error(msg);
       }
 
       if (data.fallback) {
-        console.warn('Extração retornou fallback - documento não legível');
+        console.warn('[upload] Extração retornou fallback');
         return null;
       }
-
-      console.log(`Texto extraído: ${data.texto?.length || 0} caracteres`);
       return data.texto || null;
-    } catch (error) {
-      console.error('Erro ao extrair texto:', error);
-      return null;
+    } catch (err: any) {
+      if (err?.name === 'AbortError') {
+        throw new Error('Tempo esgotado ao extrair texto (>180s). Tente um arquivo menor ou converta para .md/.txt.');
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
@@ -97,55 +120,78 @@ export function DocumentosUploadSection({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const lower = file.name.toLowerCase();
+
+    // Validação prévia: formato antigo
+    if (lower.endsWith('.doc') || lower.endsWith('.ppt')) {
+      toast.error('Formato antigo não suportado. Converta para .docx/.pptx no Word/PowerPoint e tente novamente.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // Validação prévia: tamanho
+    const MAX = 25 * 1024 * 1024;
+    if (file.size > MAX) {
+      toast.error(`Arquivo muito grande (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo: 25MB.`);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setIsExtracting(true);
+    let conteudoTexto = '';
+    let arquivoUrl: string | null = null;
+
     try {
-      setIsExtracting(true);
-      const url = await uploadDocumento(file, contratoId, tipo);
-      
-      let conteudoTexto = "";
-      
-      // Para arquivos de texto, extrair conteúdo diretamente
-      if (file.type === "text/plain" || file.name.endsWith(".md") || file.name.endsWith(".txt")) {
-        conteudoTexto = await file.text();
-        console.log(`Texto direto extraído: ${conteudoTexto.length} caracteres`);
-      }
-      // Para DOCX, PDF, PPTX - usar Edge Function com Gemini
-      else if (
-        file.name.endsWith(".docx") || 
-        file.name.endsWith(".doc") ||
-        file.name.endsWith(".pdf") ||
-        file.name.endsWith(".pptx") ||
-        file.name.endsWith(".ppt") ||
-        file.name.endsWith(".html") ||
-        file.name.endsWith(".htm")
-      ) {
-        toast.info("Extraindo texto do documento...");
-        const textoExtraido = await extrairTextoDocumento(file);
-        
-        if (textoExtraido && textoExtraido.length > 50) {
-          conteudoTexto = textoExtraido;
-          toast.success(`Texto extraído: ${textoExtraido.length} caracteres`);
+      // 1) Extrair texto PRIMEIRO (é o que importa para gerar entregas)
+      toast.info('Lendo arquivo...');
+      try {
+        if (file.type === 'text/plain' || lower.endsWith('.md') || lower.endsWith('.txt')) {
+          conteudoTexto = await file.text();
+          console.log(`[upload] Texto direto: ${conteudoTexto.length} chars`);
         } else {
-          // Fallback: salvar sem texto extraído
-          toast.warning("Não foi possível extrair texto automaticamente. O arquivo foi salvo.");
-          conteudoTexto = "";
+          toast.info('Extraindo texto (pode levar até 3 min para PDFs grandes)...');
+          const extraido = await extrairTextoDocumento(file);
+          if (extraido && extraido.length > 20) {
+            conteudoTexto = extraido;
+            toast.success(`Texto extraído: ${extraido.length} caracteres`);
+          } else {
+            toast.warning('Não foi possível extrair texto automaticamente.');
+          }
         }
+      } catch (extractErr: any) {
+        console.error('[upload] Falha na extração:', extractErr);
+        toast.error(`Extração falhou: ${extractErr?.message || 'erro desconhecido'}`);
       }
 
+      // 2) Tentar upload do binário (tolera falha)
+      try {
+        toast.info('Salvando arquivo...');
+        arquivoUrl = await uploadDocumento(file, contratoId, tipo);
+      } catch (uploadErr: any) {
+        console.error('[upload] Falha no upload do binário:', uploadErr);
+        toast.warning(`Arquivo binário não armazenado: ${uploadErr?.message || 'erro'}. ${conteudoTexto ? 'Texto extraído será salvo.' : ''}`);
+      }
+
+      // 3) Se não temos nem texto nem arquivo, abortar
+      if (!conteudoTexto && !arquivoUrl) {
+        toast.error('Não foi possível processar o documento (sem texto e sem upload).');
+        return;
+      }
+
+      // 4) Salvar registro
       await createDocumento.mutateAsync({
         contrato_id: contratoId,
         titulo: file.name,
         tipo,
-        arquivo_url: url,
+        arquivo_url: arquivoUrl || undefined,
         conteudo_texto: conteudoTexto || undefined,
         para_processamento_ia: true,
       });
 
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (error) {
-      console.error("Erro no upload:", error);
-      toast.error("Erro ao processar arquivo");
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (error: any) {
+      console.error('[upload] Erro inesperado:', error);
+      toast.error(`Erro: ${error?.message || 'falha ao processar arquivo'}`);
     } finally {
       setIsExtracting(false);
     }
