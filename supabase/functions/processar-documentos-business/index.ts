@@ -667,6 +667,18 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
     conjuntas: [],
     backlog: [],
   };
+
+  // 0a. NORMALIZAÇÃO — remove ruídos comuns que quebram as regex de âncora
+  //     (NBSP, zero-width, tabs, bullets, asteriscos de markdown bold, espaços múltiplos)
+  texto = texto
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\u00A0/g, " ")          // NBSP -> espaço
+    .replace(/[\u200B-\u200D\uFEFF]/g, "") // zero-width
+    .replace(/\t/g, " ")
+    .replace(/^[ \t]*[\*\-\u2022\u25CF\u25E6\u25AA\u25B8\u25BA\u2023]+[ \t]*/gm, "") // bullets no início da linha
+    .replace(/\*\*/g, "")              // markdown bold
+    .replace(/__/g, "");               // markdown bold alternativo
   
   // 0. PROJETOS - Detectar seções de projeto como agrupadores de fase
   const regexProjeto = /(?:^|\n)\s*#*\s*(?:\d+\.\s*)?PROJETO\s+(.+?)(?:\s*[-–]\s*(.+?))?(?=\n|$)/gi;
@@ -681,8 +693,14 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
     }
   }
   
-  // 1. FASES - Padrões: "FASE 1:", "FASE 1 -", "FASE 1.", "# FASE 1"
-  const regexFase = /(?:^|\n)[\s#]*(?:FASE|ETAPA)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
+  // Prefixo estrutural tolerante a Markdown (#, ##, ###), citações (>), bullets (*, -)
+  const PREFIXO = String.raw`(?:^|\n)[ \t]*(?:[#>]+[ \t]*)*`;
+
+  // 1. FASES - Aceita: "FASE 1:", "# FASE 1:", "## FASE 1 -", "FASE 1."
+  const regexFase = new RegExp(
+    `${PREFIXO}(?:FASE|ETAPA)\\s*(\\d+)\\s*[:\\-–.]\\s*(.+?)(?=\\n|$)`,
+    "gi"
+  );
   let matchFase;
   while ((matchFase = regexFase.exec(texto)) !== null) {
     const numero = parseInt(matchFase[1]);
@@ -693,7 +711,9 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
     
     if (titulo.length > 2 && !ancoras.fases.some(f => f.numero === numero)) {
       const startPos = matchFase.index;
-      const nextFaseMatch = texto.substring(startPos + matchFase[0].length).match(/(?:^|\n)[\s#]*(?:FASE|ETAPA)\s*\d+\s*[:\-–.]/i);
+      const nextFaseMatch = texto.substring(startPos + matchFase[0].length).match(
+        new RegExp(`${PREFIXO}(?:FASE|ETAPA)\\s*\\d+\\s*[:\\-–.]`, "i")
+      );
       const endPos = nextFaseMatch 
         ? startPos + matchFase[0].length + (nextFaseMatch.index || 0)
         : texto.length;
@@ -747,8 +767,11 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
     }
   }
   
-  // 2. ENTREGAS - Padrões expandidos: "ENTREGA 1:", "Módulo 3 -"
-  const regexEntrega = /(?:^|\n)\s*(?:ENTREGA|MÓDULO|MODULO)\s*(\d+)\s*[:\-–.]\s*(.+?)(?=\n|$)/gi;
+  // 2. ENTREGAS - Aceita Markdown: "## ENTREGA 1:", "ENTREGA 1 -", "Módulo 3."
+  const regexEntrega = new RegExp(
+    `${PREFIXO}(?:ENTREGA|MÓDULO|MODULO)\\s*(\\d+)\\s*[:\\-–.]\\s*(.+?)(?=\\n|$)`,
+    "gi"
+  );
   let matchEntrega;
   let contadorEntregaGlobal = 1;
   
@@ -809,7 +832,11 @@ function extrairAncorasLiterais(texto: string): AncorasLiterais {
       const textoEntrega = entregaMatch[0];
       
       // Regex que captura PASSO + TODO conteúdo até próximo PASSO ou fim
-      const regexPassoCompleto = /PASSO\s*(\d{1,2})\s*[:\-–]\s*([\s\S]*?)(?=\nPASSO\s*\d{1,2}\s*[:\-–]|\n(?:ENTREGA|MÓDULO|MODULO)\s*\d|☐|$)/gi;
+      // Aceita Markdown ("### PASSO 1:") e sinônimos (TAREFA, STEP)
+      const regexPassoCompleto = new RegExp(
+        `${PREFIXO}(?:PASSO|TAREFA|STEP)\\s*(\\d{1,2})\\s*[:\\-–.]\\s*([\\s\\S]*?)(?=\\n[ \\t]*(?:[#>]+[ \\t]*)*(?:PASSO|TAREFA|STEP)\\s*\\d{1,2}\\s*[:\\-–.]|\\n[ \\t]*(?:[#>]+[ \\t]*)*(?:ENTREGA|MÓDULO|MODULO)\\s*\\d|\\n[ \\t]*(?:[#>]+[ \\t]*)*(?:FASE|ETAPA)\\s*\\d|☐|$)`,
+        "gi"
+      );
       
       let mp;
       while ((mp = regexPassoCompleto.exec(textoEntrega)) !== null) {
@@ -1633,7 +1660,99 @@ serve(async (req) => {
     const ancoras = extrairAncorasLiterais(texto);
     
     const temFases = ancoras.fases.length > 0;
-    const temEntregas = ancoras.entregas.length > 0;
+    let temEntregas = ancoras.entregas.length > 0;
+
+    // FALLBACK DETERMINÍSTICO: se temos fases mas NENHUMA entrega,
+    // varre o texto linha a linha tolerando qualquer ruído de formatação.
+    if (temFases && !temEntregas) {
+      console.log("⚠️  Fases detectadas sem entregas — acionando fallback linha a linha");
+      const linhas = texto.split("\n");
+      let faseAtualNumero = ancoras.fases[0]?.numero ?? 1;
+      let contadorEntrega = 1;
+      let contadorPassoNaEntrega = 0;
+      let entregaAtualNumero: number | null = null;
+      let bufferConteudoPasso: string[] = [];
+      let passoAtual: { numero: number; titulo: string; entregaNumero: number } | null = null;
+
+      const flushPasso = () => {
+        if (!passoAtual) return;
+        const conteudoCompleto = bufferConteudoPasso.join("\n").trim();
+        const ferramenta = detectarFerramenta(conteudoCompleto);
+        const responsavel = detectarResponsavel(conteudoCompleto);
+        const promptRaw = extrairPrompt(conteudoCompleto);
+        const dicasRaw = extrairDicas(conteudoCompleto);
+        ancoras.passos.push({
+          numero: passoAtual.numero,
+          titulo: passoAtual.titulo,
+          entregaNumero: passoAtual.entregaNumero,
+          conteudo_completo: formatarTextoEmParagrafos(conteudoCompleto),
+          descricao: formatarDescricaoInstrucao(conteudoCompleto),
+          prompt_sugerido: promptRaw ? formatarPromptSugerido(promptRaw) : undefined,
+          dicas: dicasRaw ? formatarDicas(dicasRaw) : undefined,
+          ferramenta,
+          responsavel,
+        });
+        passoAtual = null;
+        bufferConteudoPasso = [];
+      };
+
+      const limparPrefixo = (linha: string) =>
+        linha.replace(/^[ \t]*(?:[#>]+[ \t]*)*(?:[\*\-\u2022\u25CF]+[ \t]*)*/, "");
+
+      for (const linhaRaw of linhas) {
+        const linhaLimpa = limparPrefixo(linhaRaw).trim();
+
+        const mFase = linhaLimpa.match(/^(?:FASE|ETAPA)\s*(\d+)\s*[:\-–.]\s*(.+)$/i);
+        if (mFase) {
+          flushPasso();
+          faseAtualNumero = parseInt(mFase[1]);
+          entregaAtualNumero = null;
+          contadorPassoNaEntrega = 0;
+          continue;
+        }
+
+        const mEntrega = linhaLimpa.match(/^(?:ENTREGA|MÓDULO|MODULO)\s*(\d+)\s*[:\-–.]\s*(.+)$/i);
+        if (mEntrega) {
+          flushPasso();
+          const titulo = mEntrega[2].trim().replace(/\*+/g, "").trim();
+          if (titulo.length > 2) {
+            entregaAtualNumero = contadorEntrega;
+            ancoras.entregas.push({
+              numero: contadorEntrega,
+              titulo,
+              faseNumero: faseAtualNumero,
+            });
+            console.log(`  [fallback] ENTREGA ${contadorEntrega}: ${titulo} (Fase ${faseAtualNumero})`);
+            contadorEntrega++;
+            contadorPassoNaEntrega = 0;
+          }
+          continue;
+        }
+
+        const mPasso = linhaLimpa.match(/^(?:PASSO|TAREFA|STEP)\s*(\d{1,2})\s*[:\-–.]\s*(.+)$/i);
+        if (mPasso && entregaAtualNumero !== null) {
+          flushPasso();
+          contadorPassoNaEntrega++;
+          const tituloPasso = mPasso[2].trim().replace(/\*+/g, "").trim();
+          passoAtual = {
+            numero: contadorPassoNaEntrega,
+            titulo: formatarTitulo(tituloPasso),
+            entregaNumero: entregaAtualNumero,
+          };
+          bufferConteudoPasso = [tituloPasso];
+          continue;
+        }
+
+        // Linha de conteúdo do passo atual
+        if (passoAtual && linhaLimpa.length > 0) {
+          bufferConteudoPasso.push(linhaLimpa);
+        }
+      }
+      flushPasso();
+
+      temEntregas = ancoras.entregas.length > 0;
+      console.log(`  [fallback] Resultado: ${ancoras.entregas.length} entregas, ${ancoras.passos.length} passos`);
+    }
     
     console.log(`\nÂncoras encontradas: ${temFases ? ancoras.fases.length : 0} fases, ${temEntregas ? ancoras.entregas.length : 0} entregas`);
     console.log(`Passos com detalhes: ${ancoras.passos.length}`);
