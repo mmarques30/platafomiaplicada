@@ -1,9 +1,13 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { ChevronDown, ChevronRight, FolderOpen, Zap } from "lucide-react";
+import { ChevronDown, ChevronRight, FolderOpen, Zap, Pencil, Trash2, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 import { DraggableEntrega } from "./DraggableEntrega";
 
 interface EtapaSelecionada {
@@ -34,6 +38,7 @@ interface InstrucaoSelecionada {
   entrega_numero: number;
   titulo: string;
   descricao?: string;
+  prompt_sugerido?: string;
   responsavel: string;
   ferramenta?: string;
   dicas?: string;
@@ -83,6 +88,14 @@ interface DroppableFaseProps {
   onToggleEntregaSelect: (numero: number) => void;
   onToggleInstrucao: (entregaNumero: number, ordem: number) => void;
   onToggleTask: (entregaNumero: number, titulo: string) => void;
+  onUpdateEtapa: (numero: number, patch: Partial<EtapaSelecionada>) => void;
+  onRemoveEtapa: (numero: number) => void;
+  onAddEntrega: (etapaNumero: number) => void;
+  onUpdateEntrega: (numeroEntrega: number, patch: Partial<EntregaSelecionada>) => void;
+  onRemoveEntrega: (numeroEntrega: number) => void;
+  onUpdateInstrucao: (entregaNumero: number, ordem: number, patch: Partial<InstrucaoSelecionada>) => void;
+  onRemoveInstrucao: (entregaNumero: number, ordem: number) => void;
+  onAddInstrucao: (entregaNumero: number) => void;
   getAcaoBadge: (acao: string) => React.ReactNode;
   getAcaoItem: (tipo: 'etapa' | 'entrega', titulo: string) => string;
   getPrioridadeBadge: (prioridade: string) => React.ReactNode;
