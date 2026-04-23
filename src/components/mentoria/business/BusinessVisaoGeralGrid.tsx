@@ -3,6 +3,7 @@ import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useTasksByUser } from "@/hooks/useTasksBusiness";
+import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { BusinessROIChart } from "@/components/mentoria/BusinessROIChart";
 
 import { InsightSemanalCard } from "@/components/mentoria/business/InsightSemanalCard";
@@ -14,28 +15,35 @@ export function BusinessVisaoGeralGrid() {
   const { contrato } = useContratosBusiness(businessUserId);
   const { data: etapas } = useEtapasBusiness(contrato?.id);
   const { data: tasks } = useTasksByUser(businessUserId);
+  const { sessoes } = useMentoriaSessoes(businessUserId);
 
-  // KPI: Próxima Sessão — baseada na próxima etapa prevista do contrato
-  const hojeISO = new Date().toISOString().slice(0, 10);
-  const proximaEtapa = etapas
-    ? [...etapas]
+  // KPI: Próxima Sessão — apenas sessões explicitamente agendadas pelo admin
+  const agora = new Date();
+  const proximaSessao = sessoes
+    ? [...sessoes]
         .filter(
-          (e) =>
-            e.data_prevista &&
-            e.status !== "concluida" &&
-            e.data_prevista >= hojeISO
+          (s) =>
+            s.status === "agendada" &&
+            s.data_sessao &&
+            new Date(s.data_sessao) > agora
         )
-        .sort((a, b) =>
-          (a.data_prevista ?? "").localeCompare(b.data_prevista ?? "")
+        .sort(
+          (a, b) =>
+            new Date(a.data_sessao).getTime() -
+            new Date(b.data_sessao).getTime()
         )[0]
     : undefined;
 
-  const proximaSessaoLabel = proximaEtapa?.data_prevista
-    ? format(new Date(proximaEtapa.data_prevista), "dd MMM", { locale: ptBR })
+  const proximaSessaoLabel = proximaSessao
+    ? format(new Date(proximaSessao.data_sessao), "dd MMM 'às' HH'h'mm", {
+        locale: ptBR,
+      })
     : null;
-  const proximaSessaoSub = proximaEtapa
-    ? `Etapa ${proximaEtapa.numero_etapa}`
-    : "";
+  const proximaSessaoSub = proximaSessao
+    ? proximaSessao.titulo.length > 40
+      ? `${proximaSessao.titulo.slice(0, 40)}…`
+      : proximaSessao.titulo
+    : "Aguardando agendamento";
 
   // KPI: Tarefas Críticas
   const tarefasCriticasCount = tasks
