@@ -1,54 +1,69 @@
 
 
-## Diagnóstico dos dois pontos
+## Diagnóstico dos dois problemas
 
-### 1. "A visão não foi alterada" — é cache do navegador
+### 1. "Removeu o expandir/recolher de Documentos"
 
-Confirmei no código: `src/pages/MentoriaDocumentos.tsx` (linha 504) e `src/pages/MeuSistemaDocumentos.tsx` **já estão usando** `<ProjetoResumoDashboard>`, que tem:
-- 4 KPIs (Progresso, Saúde, Prazo, Documentação)
-- Gráfico radial Progresso × Cronograma
-- Donut de composição da documentação
-- Timeline visual de Atividade Recente
-- Painel de Insights estilizado
+Os Collapsibles que adicionamos **continuam intactos** em `MentoriaDocumentos.tsx` (linha 237) e `MeuSistemaDocumentos.tsx` (linha 238) — visão do mentorado.
 
-A screenshot que você enviou mostra a **versão antiga** (3 cards simples: "Evolução das Entregas", "Atividade Recente", "Insights do Projeto"). Esses textos **não existem mais nos arquivos** (busca só achou 2 ocorrências dentro do componente novo, em contexto diferente).
+O que está sem Collapsible é o painel **administrativo** em `src/components/admin/business/DocumentosBusinessManager.tsx` (linha 84-108) — usado quando você acessa Admin → Mentoria → ver mentorado. Esse nunca recebeu o tratamento. Você está vendo essa tela e por isso parece que "sumiu".
 
-**Causa**: o Service Worker do PWA + cache HTTP estão servindo o bundle JavaScript anterior. O HMR já tentou atualizar várias vezes mas o SW segura. Há inclusive um erro de runtime no log: `Failed to update a ServiceWorker... script resource is behind a redirect`.
+### 2. "Não consigo editar entrega gerada por IA antes de salvar"
 
-**Solução**: hard reload + descartar SW. Não é alteração de código; é interação no navegador:
-- **Mac**: `Cmd + Shift + R` (uma vez); se continuar, abrir DevTools → Application → Service Workers → "Unregister" → recarregar.
-- **Windows**: `Ctrl + Shift + R`; mesma rota no DevTools se persistir.
+Inspecionei o modal `GeracaoEntregasModal` → `DroppableFase` → `DraggableEntrega`:
 
-Se você confirmar que continua igual após esse procedimento, eu investigo se há algum bypass de Suspense/lazy ou se algum admin override está renderizando outra página.
+- Ao clicar no ícone de lápis da entrega (`DraggableEntrega.tsx` linha 189-197), o painel de edição abre **fora** do bloco `isExpanded` (linha 210-255). Ou seja: se a entrega estiver **recolhida**, o painel de edição abre colado no header, mas não tem botão **"Concluir/Fechar"** — só fecha clicando de novo no lápis (que vira um X só dentro do bloco de instrução, não da entrega).
+- Mesma coisa na edição da **Fase** (`DroppableFase.tsx` linha 228-248): abre o editor inline mas sem botão de "Pronto"/"Fechar" — e o lápis dela nem muda de ícone.
+- Pior: os campos de edição da entrega usam o handler `onUpdateEntrega` que dispara em **cada keystroke**. O React re-renderiza a árvore inteira do modal a cada letra, e em contratos com muitas entregas isso fica visivelmente travado, dando a sensação de "não consegue editar".
+- Também não há feedback visual de que a edição "pegou" (o título no header só atualiza ao fechar).
 
-### 2. "A data ainda aparece em Visão Geral"
+O botão "Salvar Selecionados" no rodapé do modal funciona normalmente — ele apenas exige que pelo menos uma fase ou entrega esteja **selecionada (checkbox marcado)**. Se durante a edição você desmarca a entrega sem querer, o botão fica desabilitado.
 
-Confirmei no banco: **toda etapa de contrato Business tem `data_prevista` preenchida automaticamente** quando o admin cria o contrato (intervalos mensais a partir de `data_inicio`). Hoje, em `BusinessVisaoGeralGrid.tsx`, o KPI "Próxima Sessão" pega a primeira `data_prevista` futura — mas isso é a **data calculada**, não uma data **aprovada por você**.
+---
 
-Sua regra é clara: **só aparece data se você aprovou**. Como não existe campo `aprovada_pelo_admin` em `etapas_business`, a única fonte de "data aprovada por você" hoje é a tabela `sessoes_mentoria` (você cria/edita manualmente cada sessão com data, hora e link de reunião).
+## Plano de correção
 
-### Plano de correção
+### Parte A — Voltar o expandir/recolher também no painel admin
 
-**Mudar a fonte do KPI "Próxima Sessão" de `etapas_business.data_prevista` para `sessoes_mentoria`** em `src/components/mentoria/business/BusinessVisaoGeralGrid.tsx`:
+Em `src/components/admin/business/DocumentosBusinessManager.tsx`:
 
-1. Adicionar `useMentoriaSessoes(businessUserId)` (hook já existente).
-2. Filtrar sessões com `status = 'agendada'` e `data_sessao > now()`.
-3. Pegar a mais próxima.
-4. Exibir:
-   - Valor: `format(data_sessao, "dd MMM", { locale: ptBR })` + hora `HH'h'mm`.
-   - Sub-label: título da sessão truncado (ex: "Encontro 2: ..."), ou "Aguardando agendamento" se não houver.
-5. Se não houver nenhuma sessão agendada → exibir `—` no valor e "Aguardando agendamento" no sub-label. **Não cair de volta** para `etapas_business`.
+- Envolver o bloco `<Tabs defaultValue="arquivos">` (linhas 94-108 + conteúdo) num `<Collapsible>`, idêntico ao padrão usado em `MentoriaDocumentos.tsx`:
+  - Header clicável com ícone `FolderOpen`, título "Documentos e Links" e contagem resumida (`X arquivos · Y anotações · Z links`).
+  - Estado `documentosExpandido` com `useState(true)`, persistido em `localStorage` por `contratoId` (chave `documentos-admin-expandido-${contratoId}`).
+  - `ChevronDown` rotacionando.
+- Manter o restante (Tabs, Arquivos, Anotações, Links) exatamente como está dentro do `<CollapsibleContent>`.
 
-Remover totalmente o uso de `useEtapasBusiness` para o KPI de próxima sessão (continua sendo usado para `progressoGeralPct`).
+### Parte B — Tornar a edição inline de entrega/fase usável
 
-### Arquivo editado
+Em `src/components/admin/business/DraggableEntrega.tsx`:
 
-- `src/components/mentoria/business/BusinessVisaoGeralGrid.tsx` — única alteração.
+1. **Adicionar botão "Pronto" (com ícone Check) no rodapé do bloco de edição da entrega** (linha 254, fim do `editingHeader`), idêntico ao já existente no editor de instrução (linha 374-378). Ao clicar, fecha o editor (`setEditingHeader(false)`).
+2. **Adicionar um banner sutil** acima dos campos: "Editando entrega — as alterações serão salvas quando você clicar em **Salvar Selecionados** no final do modal." Isso elimina a confusão de "clico em editar e não tem onde salvar".
+3. **Mover o painel de edição da entrega para dentro do bloco `isExpanded`** OU forçar `setIsExpanded(true)` ao abrir a edição. Hoje, se a entrega está fechada, o painel abre numa posição estranha entre o header e nada. Vou abrir automaticamente.
+4. **Trocar o ícone do botão lápis para X quando `editingHeader=true`** (igual já é feito no editor de instrução, linha 312). Sinal visual claro de "fechar".
+
+Em `src/components/admin/business/DroppableFase.tsx`:
+
+5. Mesmo tratamento: adicionar **botão "Pronto"** no fim do editor inline da fase (linha 247) e **trocar o lápis por X** quando `editingFase=true`.
+
+### Parte C — Garantir que o usuário não perca seleção ao editar
+
+Em `DraggableEntrega.tsx`:
+
+6. Quando o usuário abre o editor (`setEditingHeader(true)`), **forçar `entrega.selecionada = true`** chamando `onUpdateEntrega(numero_entrega, { selecionada: true })`. Garante que o item editado nunca fique desmarcado por engano e o botão "Salvar Selecionados" continue habilitado.
+
+### Arquivos editados
+
+1. `src/components/admin/business/DocumentosBusinessManager.tsx` — adicionar Collapsible no admin.
+2. `src/components/admin/business/DraggableEntrega.tsx` — botão "Pronto", banner, forçar expansão e seleção, ícone X.
+3. `src/components/admin/business/DroppableFase.tsx` — botão "Pronto" + ícone X no editor de fase.
 
 ### Resultado esperado
 
-- O KPI "Próxima Sessão" só mostra data quando você (admin) **agendou explicitamente** uma sessão em `sessoes_mentoria`.
-- Enquanto não houver sessão agendada, o card mostra `—` + "Aguardando agendamento" — sem mais "vazar" datas calculadas do contrato.
-- O KPI "Progresso Geral" continua funcionando igual (etapas).
-- Para o problema #1, basta o hard reload + reset do Service Worker; nenhum código a mexer ali.
+- O painel admin de Documentos volta a ter o mesmo comportamento de expandir/recolher do mentorado.
+- Editar uma entrega gerada pela IA antes de salvar fica óbvio: clica no lápis → abre o painel → digita → clica em **Pronto** → continua editando outras → clica em **Salvar Selecionados** no final.
+- Mesma experiência ao editar fases.
+- Não dá mais para "perder" uma entrega da seleção só por estar editando.
+
+Sem alterações em hooks, banco ou edge functions.
 
