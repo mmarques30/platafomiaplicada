@@ -139,6 +139,7 @@ export function GeracaoEntregasModal({
   const [expandedEntregas, setExpandedEntregas] = useState<number[]>([]);
   const [expandedConjuntas, setExpandedConjuntas] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveProgress, setSaveProgress] = useState<{ etapa: string; current: number; total: number } | null>(null);
   const [activeEntrega, setActiveEntrega] = useState<EntregaSelecionada | null>(null);
   const [dadosExistentes, setDadosExistentes] = useState<DadosExistentes>({
     etapas: [],
