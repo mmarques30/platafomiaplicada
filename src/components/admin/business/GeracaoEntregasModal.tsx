@@ -440,6 +440,16 @@ export function GeracaoEntregasModal({
     return <Badge variant="outline" className={`text-xs ${c.className}`}>{c.label}</Badge>;
   };
 
+  // Normaliza qualquer variação para o conjunto aceito pelo banco em entregas_business
+  const normalizarPrioridadeEntrega = (p?: string): 'baixa' | 'media' | 'alta' | 'urgente' => {
+    const v = (p || '').toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (v === 'baixa' || v === 'low') return 'baixa';
+    if (v === 'media' || v === 'medium' || v === 'normal') return 'media';
+    if (v === 'alta' || v === 'high') return 'alta';
+    if (v === 'urgente' || v === 'urgent' || v === 'critica' || v === 'critical' || v === 'criticа') return 'urgente';
+    return 'media';
+  };
+
   const getResponsavelBadge = (responsavel: string) => {
     const config: Record<string, { label: string; className: string }> = {
       'voce': { label: 'Você', className: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30' },
