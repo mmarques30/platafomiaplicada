@@ -1490,7 +1490,7 @@ function processarMVPeConjuntas(ancoras: AncorasLiterais, texto: string): {
       titulo: 'MVP - Escopo Acordado',
       descricao: 'Entregas prioritárias do primeiro release',
       tipo: 'ativa' as const,
-      prioridade: 'critica',
+      prioridade: 'urgente',
       modulo_relacionado: null,
       responsavel: 'conjunto',
       is_mvp: true,

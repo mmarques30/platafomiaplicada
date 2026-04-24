@@ -91,7 +91,8 @@ export function BusinessEntregasSection({
 
   const getPrioridadeBadge = (prioridade: string) => {
     const prioridadeMap: Record<string, { label: string; className: string }> = {
-      'critica': { label: 'Crítica', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
+      'urgente': { label: 'Urgente', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
+      'critica': { label: 'Urgente', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
       'alta': { label: 'Alta', className: 'bg-orange-500/10 text-orange-700 border-orange-500/30' },
       'media': { label: 'Média', className: 'bg-blue-500/10 text-blue-700 border-blue-500/30' },
       'baixa': { label: 'Baixa', className: 'bg-gray-500/10 text-gray-600 border-gray-500/30' },

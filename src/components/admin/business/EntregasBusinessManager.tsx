@@ -27,7 +27,7 @@ const PRIORIDADE_CONFIG = {
   baixa: { label: "Baixa", variant: "outline" as const },
   media: { label: "Média", variant: "secondary" as const },
   alta: { label: "Alta", variant: "default" as const },
-  critica: { label: "Crítica", variant: "destructive" as const },
+  urgente: { label: "Urgente", variant: "destructive" as const },
 };
 
 const STATUS_CONFIG = {
@@ -462,7 +462,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
                     <SelectItem value="baixa">Baixa</SelectItem>
                     <SelectItem value="media">Média</SelectItem>
                     <SelectItem value="alta">Alta</SelectItem>
-                    <SelectItem value="critica">Crítica</SelectItem>
+                    <SelectItem value="urgente">Urgente</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

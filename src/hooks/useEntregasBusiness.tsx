@@ -11,7 +11,7 @@ export interface EntregaBusiness {
   modulo_relacionado?: string;
   tipo: 'ativa' | 'backlog' | 'futura';
   status: 'pendente' | 'em_andamento' | 'concluida' | 'cancelada';
-  prioridade: 'baixa' | 'media' | 'alta' | 'critica';
+  prioridade: 'baixa' | 'media' | 'alta' | 'urgente';
   ordem: number;
   numero_entrega?: number;
   prazo_previsto?: string;
@@ -29,7 +29,7 @@ export interface EntregaInput {
   modulo_relacionado?: string;
   tipo?: 'ativa' | 'backlog' | 'futura';
   status?: 'pendente' | 'em_andamento' | 'concluida' | 'cancelada';
-  prioridade?: 'baixa' | 'media' | 'alta' | 'critica';
+  prioridade?: 'baixa' | 'media' | 'alta' | 'urgente';
   ordem?: number;
   numero_entrega?: number;
   prazo_previsto?: string;
