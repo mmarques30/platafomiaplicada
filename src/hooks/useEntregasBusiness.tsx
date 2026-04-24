@@ -48,7 +48,10 @@ export function useEntregaById(entregaId?: string) {
         .eq('id', entregaId)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("[useEntregaById] erro ao carregar entrega:", error);
+        return null;
+      }
       return data as EntregaBusiness | null;
     },
     enabled: !!entregaId,
@@ -66,7 +69,10 @@ export function useEntregasByEtapa(etapaId?: string) {
         .eq('etapa_id', etapaId)
         .order('numero_entrega', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("[useEntregasByEtapa] erro ao carregar entregas da etapa:", error);
+        return [];
+      }
       return data as EntregaBusiness[];
     },
     enabled: !!etapaId,
@@ -88,7 +94,10 @@ export function useEntregasBusiness(contratoId?: string) {
         .order("ordem", { ascending: true })
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("[useEntregasBusiness] erro ao carregar entregas:", error);
+        return [];
+      }
       return data as EntregaBusiness[];
     },
     enabled: !!contratoId,
