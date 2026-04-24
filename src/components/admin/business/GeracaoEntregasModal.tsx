@@ -604,7 +604,7 @@ export function GeracaoEntregasModal({
             entregaUpdates.push(
               supabase.from("entregas_business").update({
                 descricao: entrega.descricao,
-                prioridade: entrega.prioridade === 'urgente' ? 'critica' : entrega.prioridade,
+                prioridade: normalizarPrioridadeEntrega(entrega.prioridade),
                 modulo_relacionado: entrega.modulo_relacionado,
               }).eq("id", existente.id)
             );
@@ -621,7 +621,7 @@ export function GeracaoEntregasModal({
             descricao: entrega.descricao,
             modulo_relacionado: entrega.modulo_relacionado,
             tipo: entrega.tipo,
-            prioridade: entrega.prioridade === 'urgente' ? 'critica' : entrega.prioridade,
+            prioridade: normalizarPrioridadeEntrega(entrega.prioridade),
             ordem: entrega.numero_entrega,
             numero_entrega: entrega.numero_entrega,
             tem_instrucoes: instrucoesSelecionadas.some(i => i.entrega_numero === entrega.numero_entrega),
@@ -765,7 +765,7 @@ export function GeracaoEntregasModal({
             titulo: item.titulo,
             descricao: item.descricao,
             tipo: 'backlog' as const,
-            prioridade: item.prioridade || 'baixa',
+            prioridade: normalizarPrioridadeEntrega(item.prioridade) || 'baixa',
             justificativa_backlog: item.categoria || 'Pós-MVP',
             ordem: 999,
             tem_instrucoes: false,
