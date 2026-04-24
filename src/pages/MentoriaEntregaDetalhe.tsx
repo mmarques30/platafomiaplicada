@@ -12,6 +12,7 @@ import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { normalizeEntregaPrioridade, normalizeEntregaStatus } from "@/lib/business-entregas-normalizers";
 
 const STATUS_CONFIG = {
   pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const, color: "text-muted-foreground" },
@@ -83,8 +84,10 @@ export default function MentoriaEntregaDetalhe() {
     );
   }
 
-  const statusConfig = STATUS_CONFIG[entrega.status] ?? STATUS_CONFIG.pendente;
-  const prioridadeConfig = PRIORIDADE_CONFIG[entrega.prioridade] ?? PRIORIDADE_CONFIG.media;
+  const statusNormalizado = normalizeEntregaStatus(entrega.status);
+  const prioridadeNormalizada = normalizeEntregaPrioridade(entrega.prioridade);
+  const statusConfig = STATUS_CONFIG[statusNormalizado] ?? STATUS_CONFIG.pendente;
+  const prioridadeConfig = PRIORIDADE_CONFIG[prioridadeNormalizada] ?? PRIORIDADE_CONFIG.media;
   const StatusIcon = statusConfig.icon;
 
   return (
@@ -137,14 +140,14 @@ export default function MentoriaEntregaDetalhe() {
             
             <div className="w-full sm:w-48">
               <Select
-                value={entrega.status}
+                value={statusNormalizado}
                 onValueChange={handleStatusChange}
                 disabled={updateEntrega.isPending}
               >
                 <SelectTrigger className={cn(
                   "w-full",
-                  entrega.status === 'concluida' && "border-green-500 text-green-600",
-                  entrega.status === 'em_andamento' && "border-amber-500 text-amber-600"
+                  statusNormalizado === 'concluida' && "border-green-500 text-green-600",
+                  statusNormalizado === 'em_andamento' && "border-amber-500 text-amber-600"
                 )}>
                   <SelectValue />
                 </SelectTrigger>
