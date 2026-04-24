@@ -73,7 +73,7 @@ const PendenciasValidacao: React.FC = () => {
   };
 
   const renderTaskCard = (task: TaskBusiness, showActions = true) => {
-    const prioridadeConfig = PRIORIDADE_CONFIG[task.prioridade];
+    const prioridadeConfig = PRIORIDADE_CONFIG[task.prioridade] ?? PRIORIDADE_CONFIG.media;
     const prazoInfo = getPrazoInfo(task.prazo);
     const isExpanded = expandedTask === task.id;
     const isRevisao = task.status === 'revisao_solicitada';

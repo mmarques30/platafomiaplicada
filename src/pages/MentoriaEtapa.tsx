@@ -28,7 +28,7 @@ const PRIORIDADE_CONFIG = {
   baixa: { label: "Baixa", variant: "secondary" as const },
   media: { label: "Média", variant: "default" as const },
   alta: { label: "Alta", variant: "destructive" as const },
-  critica: { label: "Crítica", variant: "destructive" as const },
+  urgente: { label: "Urgente", variant: "destructive" as const },
 };
 
 export default function MentoriaEtapa() {
@@ -89,7 +89,7 @@ export default function MentoriaEtapa() {
 
   const renderEntregaCard = (entrega: EntregaBusiness) => {
     const statusConfig = STATUS_CONFIG[entrega.status];
-    const prioridadeConfig = PRIORIDADE_CONFIG[entrega.prioridade];
+    const prioridadeConfig = PRIORIDADE_CONFIG[entrega.prioridade] ?? PRIORIDADE_CONFIG.media;
     const StatusIcon = statusConfig.icon;
 
     return (
