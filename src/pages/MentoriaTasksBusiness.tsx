@@ -107,7 +107,7 @@ export default function MentoriaTasksBusiness() {
   };
 
   const renderTaskCard = (task: TaskBusiness) => {
-    const statusConfig = STATUS_CONFIG[task.status];
+    const statusConfig = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.pendente;
     const prioridadeConfig = PRIORIDADE_CONFIG[task.prioridade] ?? PRIORIDADE_CONFIG.media;
     const entregaNome = getEntregaNome(task.entrega_id);
     const etapaNome = getEtapaNome(task.etapa_id);
