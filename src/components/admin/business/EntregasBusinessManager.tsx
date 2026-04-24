@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { DocumentosUploadSection } from "./DocumentosUploadSection";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { normalizeEntregaPrioridade, normalizeEntregaStatus } from "@/lib/business-entregas-normalizers";
 
 interface EntregasBusinessManagerProps {
   contratoId: string;
@@ -99,6 +100,9 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
 
   const handleOpenModal = (entrega?: EntregaBusiness) => {
     if (entrega) {
+      const prioridadeNormalizada = normalizeEntregaPrioridade(entrega.prioridade);
+      const statusNormalizado = normalizeEntregaStatus(entrega.status);
+
       setEditingEntrega(entrega);
       setFormData({
         titulo: entrega.titulo,
@@ -106,8 +110,8 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
         modulo_relacionado: entrega.modulo_relacionado || "",
         etapa_id: entrega.etapa_id || "",
         tipo: entrega.tipo,
-        status: entrega.status,
-        prioridade: entrega.prioridade,
+        status: statusNormalizado,
+        prioridade: prioridadeNormalizada,
         prazo_previsto: entrega.prazo_previsto || "",
         tem_instrucoes: entrega.tem_instrucoes,
         justificativa_backlog: entrega.justificativa_backlog || "",
@@ -163,8 +167,8 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
   };
 
   const renderEntregaCard = (entrega: EntregaBusiness) => {
-    const prioridade = PRIORIDADE_CONFIG[entrega.prioridade as keyof typeof PRIORIDADE_CONFIG] ?? PRIORIDADE_CONFIG.media;
-    const status = STATUS_CONFIG[entrega.status];
+    const prioridade = PRIORIDADE_CONFIG[normalizeEntregaPrioridade(entrega.prioridade)];
+    const status = STATUS_CONFIG[normalizeEntregaStatus(entrega.status)] ?? STATUS_CONFIG.pendente;
     const StatusIcon = status.icon;
     const etapaNome = getEtapaNome(entrega.etapa_id);
 
