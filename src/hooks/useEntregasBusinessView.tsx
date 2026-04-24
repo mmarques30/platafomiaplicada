@@ -10,8 +10,11 @@ export function useEntregasBusinessView(contratoId: string | undefined) {
         .select("*")
         .eq("contrato_id", contratoId!)
         .order("ordem", { ascending: true });
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error("[useEntregasBusinessView] erro ao carregar processos:", error);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!contratoId,
   });
@@ -24,8 +27,11 @@ export function useEntregasBusinessView(contratoId: string | undefined) {
         .select("*")
         .eq("contrato_id", contratoId!)
         .order("ordem", { ascending: true });
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error("[useEntregasBusinessView] erro ao carregar telas:", error);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!contratoId,
   });
@@ -38,8 +44,11 @@ export function useEntregasBusinessView(contratoId: string | undefined) {
         .select("*")
         .eq("contrato_id", contratoId!)
         .order("ordem", { ascending: true });
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error("[useEntregasBusinessView] erro ao carregar vídeos:", error);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!contratoId,
   });
