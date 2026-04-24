@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { normalizeEntregaPrioridade, normalizeEntregaStatus } from "@/lib/business-entregas-normalizers";
 
 export interface EntregaBusiness {
   id: string;
@@ -37,6 +38,12 @@ export interface EntregaInput {
   justificativa_backlog?: string;
 }
 
+const normalizeEntregaBusiness = (data: any): EntregaBusiness => ({
+  ...data,
+  status: normalizeEntregaStatus(data?.status),
+  prioridade: normalizeEntregaPrioridade(data?.prioridade),
+});
+
 // Hook para buscar uma entrega específica por ID
 export function useEntregaById(entregaId?: string) {
   return useQuery({
@@ -52,7 +59,7 @@ export function useEntregaById(entregaId?: string) {
         console.error("[useEntregaById] erro ao carregar entrega:", error);
         return null;
       }
-      return data as EntregaBusiness | null;
+      return data ? normalizeEntregaBusiness(data) : null;
     },
     enabled: !!entregaId,
   });
@@ -73,7 +80,7 @@ export function useEntregasByEtapa(etapaId?: string) {
         console.error("[useEntregasByEtapa] erro ao carregar entregas da etapa:", error);
         return [];
       }
-      return data as EntregaBusiness[];
+      return (data ?? []).map(normalizeEntregaBusiness);
     },
     enabled: !!etapaId,
   });
@@ -98,7 +105,7 @@ export function useEntregasBusiness(contratoId?: string) {
         console.error("[useEntregasBusiness] erro ao carregar entregas:", error);
         return [];
       }
-      return data as EntregaBusiness[];
+      return (data ?? []).map(normalizeEntregaBusiness);
     },
     enabled: !!contratoId,
   });
