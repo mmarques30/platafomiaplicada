@@ -248,11 +248,11 @@ export function DocumentosUploadSection({
         continue;
       }
 
-      const etapas = resultado.etapas || [];
-      const entregas = resultado.entregas || [];
-      const instrucoes = resultado.instrucoes || [];
-      const tasks = resultado.tasks || [];
-      const backlog = resultado.backlog || [];
+      const etapas = Array.isArray(resultado.etapas) ? resultado.etapas : [];
+      const entregas = Array.isArray(resultado.entregas) ? resultado.entregas : [];
+      const instrucoes = Array.isArray(resultado.instrucoes) ? resultado.instrucoes : [];
+      const tasks = Array.isArray(resultado.tasks) ? resultado.tasks : [];
+      const backlog = Array.isArray(resultado.backlog) ? resultado.backlog : [];
 
       if (etapas.length > 0 && entregas.length === 0) {
         toast.warning(
