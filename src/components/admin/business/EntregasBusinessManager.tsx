@@ -167,7 +167,7 @@ export function EntregasBusinessManager({ contratoId, userId, userName }: Entreg
   };
 
   const renderEntregaCard = (entrega: EntregaBusiness) => {
-    const prioridade = PRIORIDADE_CONFIG[normalizeEntregaPrioridade(entrega.prioridade)];
+    const prioridade = PRIORIDADE_CONFIG[normalizeEntregaPrioridade(entrega.prioridade)] ?? PRIORIDADE_CONFIG.media;
     const status = STATUS_CONFIG[normalizeEntregaStatus(entrega.status)] ?? STATUS_CONFIG.pendente;
     const StatusIcon = status.icon;
     const etapaNome = getEtapaNome(entrega.etapa_id);

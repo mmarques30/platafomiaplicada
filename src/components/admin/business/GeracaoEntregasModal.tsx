@@ -223,27 +223,33 @@ export function GeracaoEntregasModal({
     if (!resultado) return;
 
     if (isNewFormat) {
-      // Formato novo com estrutura hierárquica
-      setEtapas(resultado.etapas.map(e => ({ ...e, selecionada: true })));
-      setEntregas(resultado.entregas.map(e => ({ ...e, selecionada: true })));
-      setInstrucoes(resultado.instrucoes.map(i => ({ ...i, selecionada: true })));
-      setTasks(resultado.tasks.map(t => ({ ...t, selecionada: true })));
-      
+      // Formato novo com estrutura hierárquica (defensivo contra campos ausentes/null)
+      const etapasArr = Array.isArray(resultado.etapas) ? resultado.etapas : [];
+      const entregasArr = Array.isArray(resultado.entregas) ? resultado.entregas : [];
+      const instrucoesArr = Array.isArray(resultado.instrucoes) ? resultado.instrucoes : [];
+      const tasksArr = Array.isArray(resultado.tasks) ? resultado.tasks : [];
+      const backlogArr = Array.isArray(resultado.backlog) ? resultado.backlog : [];
+
+      setEtapas(etapasArr.map(e => ({ ...e, selecionada: true })));
+      setEntregas(entregasArr.map(e => ({ ...e, selecionada: true })));
+      setInstrucoes(instrucoesArr.map(i => ({ ...i, selecionada: true })));
+      setTasks(tasksArr.map(t => ({ ...t, selecionada: true })));
+
       // Backlog: converter para formato do editor com origem
-      const backlogItems: BacklogItemEditable[] = resultado.backlog.map(b => ({
+      const backlogItems: BacklogItemEditable[] = backlogArr.map(b => ({
         titulo: b.titulo,
         descricao: b.descricao || '',
-        categoria: (b.justificativa?.includes('Melhorias') ? 'Melhorias Futuras' : 
+        categoria: (b.justificativa?.includes('Melhorias') ? 'Melhorias Futuras' :
                    b.justificativa?.includes('Débito') ? 'Débito Técnico' : 'Pós-MVP') as BacklogItemEditable['categoria'],
         prioridade: 'media' as const,
         selecionado: true,
         origem: 'auto' as const
       }));
       setBacklog(backlogItems);
-      
+
       // Expandir primeira etapa
-      if (resultado.etapas.length > 0) {
-        setExpandedEtapas([resultado.etapas[0].numero]);
+      if (etapasArr.length > 0) {
+        setExpandedEtapas([etapasArr[0].numero]);
       }
     } else {
       // Formato antigo - converter para novo
