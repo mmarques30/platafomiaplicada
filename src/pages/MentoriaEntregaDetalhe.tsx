@@ -83,7 +83,7 @@ export default function MentoriaEntregaDetalhe() {
     );
   }
 
-  const statusConfig = STATUS_CONFIG[entrega.status];
+  const statusConfig = STATUS_CONFIG[entrega.status] ?? STATUS_CONFIG.pendente;
   const prioridadeConfig = PRIORIDADE_CONFIG[entrega.prioridade] ?? PRIORIDADE_CONFIG.media;
   const StatusIcon = statusConfig.icon;
 
