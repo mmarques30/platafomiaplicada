@@ -40,18 +40,6 @@ export function CentralConteudo() {
 
       {/* Content */}
       <div className="relative z-10 p-3 sm:p-5 md:p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
-          <div>
-            <h2 className="text-base sm:text-xl md:text-2xl font-bold text-foreground">
-              Central de Conteudo
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
-              Fique por dentro das novidades e aplique hoje
-            </p>
-          </div>
-        </div>
-
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="w-full">
           <TabsList className="w-full md:w-auto grid grid-cols-4 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 md:mb-6 border border-primary/30 dark:border-primary/40">

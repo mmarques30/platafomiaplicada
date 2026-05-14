@@ -44,31 +44,18 @@ export function NovidadesSemana() {
         <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20" strokeWidth={1.5} />
       </div>
 
-      <div className="relative z-10 space-y-2 sm:space-y-3 md:space-y-4">
-        {/* Title section */}
-        <div className="space-y-0.5 sm:space-y-1 md:space-y-2">
-          <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
-            NOVIDADES
-          </h2>
-          <p className="text-primary text-[10px] sm:text-xs md:text-base font-semibold tracking-wider uppercase">
-            Produtividade Real. Sem Enrolação. Além do Óbvio
+      <div className="relative z-10 space-y-3 md:space-y-4">
+        <h3 className="font-serif-display text-xl leading-tight text-foreground md:text-3xl">
+          {novidades.titulo}
+        </h3>
+        <div className="whitespace-pre-wrap text-sm font-light leading-relaxed text-foreground/85 md:text-base">
+          {novidades.mensagem}
+        </div>
+        {novidades.created_at && (
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Publicado em {new Date(novidades.created_at).toLocaleDateString('pt-BR')}
           </p>
-        </div>
-
-        {/* Content */}
-        <div className="mt-2 sm:mt-4 md:mt-8 space-y-2 sm:space-y-3 md:space-y-4">
-          <h3 className="text-base sm:text-lg md:text-2xl font-bold text-foreground">
-            {novidades.titulo}
-          </h3>
-          <div className="text-xs sm:text-sm md:text-base text-foreground/80 whitespace-pre-wrap leading-relaxed">
-            {novidades.mensagem}
-          </div>
-          {novidades.created_at && (
-            <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground mt-2 sm:mt-3 md:mt-4 font-medium">
-              Publicado em {new Date(novidades.created_at).toLocaleDateString('pt-BR')}
-            </p>
-          )}
-        </div>
+        )}
       </div>
     </Card>
   );

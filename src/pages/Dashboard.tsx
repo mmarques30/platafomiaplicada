@@ -19,6 +19,7 @@ import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
 import { BriefingSemanal } from "@/components/dashboard/BriefingSemanal";
+import { SectionHeader } from "@/components/dashboard/SectionHeader";
 
 
 export default function Dashboard() {
@@ -46,9 +47,9 @@ export default function Dashboard() {
       {/* Tour guiado no primeiro acesso */}
       {showTour && <DashboardTour run={showTour} />}
 
-      <main className="container py-3 md:py-6 px-3 md:px-4 space-y-4 md:space-y-6 lg:space-y-8">
+      <main className="container space-y-10 px-3 py-4 md:space-y-14 md:px-4 md:py-8">
         {isVisitante ? (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <WelcomeHeader />
             <PWAInstallBanner />
             <CentralConteudoGratuito />
@@ -62,8 +63,8 @@ export default function Dashboard() {
                 <AlertDescription className="flex items-center justify-between">
                   <div className="flex-1">
                     <strong className="text-primary">Senha temporária detectada:</strong> Por segurança, recomendamos que você{" "}
-                    <Link 
-                      to="/configuracoes" 
+                    <Link
+                      to="/configuracoes"
                       className="underline font-semibold text-primary hover:text-primary/80 transition-colors"
                     >
                       altere sua senha em Configurações
@@ -79,30 +80,45 @@ export default function Dashboard() {
               </Alert>
             )}
 
-            <section>
-              <WelcomeHeader />
+            <WelcomeHeader />
+
+            {/* 01 — PRA HOJE */}
+            <section className="space-y-6">
+              <SectionHeader
+                index={1}
+                eyebrow="Pra hoje"
+                title={<>O que <em className="font-serif-italic text-primary">precisa rodar</em> agora.</>}
+                description="Briefing da semana, alertas e atalhos pro que destrava primeiro."
+              />
+              <div className="space-y-4 md:space-y-6">
+                <BriefingSemanal />
+                <DashboardUrgencias />
+                <PWAInstallBanner />
+                <AcademyWelcomeCard />
+                <WeeklyProgressCard />
+                <PendenciasOnboarding />
+              </div>
             </section>
 
-            <BriefingSemanal />
+            {/* 02 — APRENDER NA SEMANA */}
+            <section className="space-y-6">
+              <SectionHeader
+                index={2}
+                eyebrow="Central de conteúdo"
+                title={<>Aplique a IA <em className="font-serif-italic text-primary">na sua rotina</em>.</>}
+                description="Materiais, vídeos e templates pra destravar workflows hoje — não no próximo tri."
+              />
+              <CentralConteudo />
+              <RankingTicker />
+            </section>
 
-            <DashboardUrgencias />
-
-            <PWAInstallBanner />
-
-            {/* Card de boas-vindas Academy no primeiro acesso */}
-            <AcademyWelcomeCard />
-
-            {/* Card semanal de progresso */}
-            <WeeklyProgressCard />
-
-            <PendenciasOnboarding />
-
-            {/* Central de Conteúdo - target do tour */}
-            <CentralConteudo />
-
-            <RankingTicker />
-
-            <section>
+            {/* 03 — NA COMUNIDADE */}
+            <section className="space-y-6">
+              <SectionHeader
+                index={3}
+                eyebrow="Na comunidade"
+                title={<>O que <em className="font-serif-italic text-primary">rolou na semana</em>.</>}
+              />
               <NovidadesSemana />
             </section>
           </>
