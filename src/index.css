@@ -121,17 +121,16 @@
     --brand-ink: 0 0% 4%;             /* #0A0A0A - preto profundo da LP */
     --brand-hairline: 60 20% 90%;     /* #EAEAE0 - bordas sutis */
     
-    /* Sidebar: Off-White Neutro #F5F5F3 (sem tom verde) */
-    --sidebar-background: 60 5% 96%;
-    --sidebar-foreground: 72 6% 18%;
-    --sidebar-primary: 73 55% 47%;
+    /* Sidebar: mesma paleta da LP — espelhando --brand-cream-soft / --brand-hairline */
+    --sidebar-background: 60 45% 95%;       /* #F7F6E8 - creme suave (= topbar) */
+    --sidebar-foreground: 0 0% 4%;          /* preto profundo da LP */
+    --sidebar-primary: 73 58% 27%;          /* brand-strong (active pill) */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 60 5% 93%;
-    --sidebar-accent-foreground: 72 6% 18%;
-    --sidebar-border: 60 5% 88%;
-    --sidebar-ring: 73 55% 47%;
-    /* Active indicator: brand green */
-    --sidebar-active: 73 55% 47%;
+    --sidebar-accent: 60 20% 90%;           /* hairline como hover */
+    --sidebar-accent-foreground: 0 0% 4%;
+    --sidebar-border: 60 20% 90%;           /* = --brand-hairline */
+    --sidebar-ring: 73 58% 27%;
+    --sidebar-active: 73 58% 27%;           /* = --brand-strong */
     
     --complexity-high: 0 100% 65%;
     --complexity-medium: 35 90% 55%;

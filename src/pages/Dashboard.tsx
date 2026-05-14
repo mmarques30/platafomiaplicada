@@ -103,14 +103,9 @@ export default function Dashboard() {
 
             <WelcomeHeader />
 
-            {/* 01 — PRA HOJE */}
-            <section className="space-y-6">
-              <SectionHeader
-                index={1}
-                eyebrow="Pra hoje"
-                title={<>O que <em className="font-serif-italic text-primary">precisa rodar</em> agora.</>}
-                description="Briefing da semana, alertas e atalhos pro que destrava primeiro."
-              />
+            {/* 01 — Pra hoje */}
+            <section className="space-y-4 md:space-y-5">
+              <SectionHeader index={1} eyebrow="Pra hoje" title="Pra hoje" />
               <div className="space-y-4 md:space-y-6">
                 <BriefingSemanal />
                 <DashboardUrgencias />
@@ -121,26 +116,17 @@ export default function Dashboard() {
               </div>
             </section>
 
-            {/* 02 — APRENDER NA SEMANA */}
-            <section className="space-y-6">
-              <SectionHeader
-                index={2}
-                eyebrow="Central de conteúdo"
-                title={<>Aplique a IA <em className="font-serif-italic text-primary">na sua rotina</em>.</>}
-                description="Materiais, vídeos e templates pra destravar workflows hoje — não no próximo tri."
-              />
+            {/* 02 — Aprender na semana */}
+            <section className="space-y-4 md:space-y-5">
+              <SectionHeader index={2} eyebrow="Central de conteúdo" title="Aprender na semana" />
               <CentralConteudo />
               <RankingTicker />
             </section>
 
-            {/* 03 — NA COMUNIDADE — só renderiza se há novidade publicada */}
+            {/* 03 — Na comunidade (só se há novidade publicada) */}
             {novidadesSemana && (
-              <section className="space-y-6">
-                <SectionHeader
-                  index={3}
-                  eyebrow="Na comunidade"
-                  title={<>O que <em className="font-serif-italic text-primary">rolou na semana</em>.</>}
-                />
+              <section className="space-y-4 md:space-y-5">
+                <SectionHeader index={3} eyebrow="Na comunidade" title="Na comunidade" />
                 <NovidadesSemana />
               </section>
             )}

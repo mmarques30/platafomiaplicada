@@ -37,22 +37,22 @@ export function SectionHeader({
   const indexPadded = String(index).padStart(2, "0");
 
   return (
-    <header className={cn("flex flex-col gap-3 md:flex-row md:items-end md:justify-between", className)}>
-      <div className="space-y-3">
-        <div className="lp-eyebrow">
-          <span className="font-mono text-primary">{indexPadded}</span>
-          <span>—</span>
-          <span>{eyebrow}</span>
-        </div>
-        <h2 className="font-serif-display text-3xl leading-[1.05] tracking-tight text-foreground md:text-4xl">
+    <header className={cn("flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between md:gap-4", className)}>
+      <div className="flex items-baseline gap-3">
+        <span className="font-mono text-xs font-medium text-brand-strong">{indexPadded}</span>
+        <span className="hidden h-px w-6 bg-foreground/30 md:inline-block" />
+        <h2 className="text-base font-semibold tracking-tight text-foreground md:text-lg">
           {title}
         </h2>
-        {description ? (
-          <p className="max-w-prose text-sm font-light text-muted-foreground md:text-base">
-            {description}
-          </p>
-        ) : null}
+        <span className="hidden text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground md:inline">
+          {eyebrow}
+        </span>
       </div>
+      {description ? (
+        <p className="text-xs font-light text-muted-foreground md:text-sm">
+          {description}
+        </p>
+      ) : null}
       {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
     </header>
   );

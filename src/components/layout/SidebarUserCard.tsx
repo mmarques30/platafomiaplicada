@@ -32,7 +32,7 @@ export function SidebarUserCard({ nome, plano, progresso, collapsed }: SidebarUs
           <span className="text-sm font-medium text-sidebar-foreground truncate">
             {nome.split(" ")[0]}
           </span>
-          <span className="text-[11px] font-medium text-primary">
+          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-brand-strong">
             {planoLabel[plano] ?? plano}
           </span>
         </div>
