@@ -235,16 +235,16 @@ export function AdminSidebar() {
                           className={cn(
                             "relative font-medium transition-colors duration-200 pl-4",
                             isActive
-                              ? "text-primary font-semibold"
-                              : "text-sidebar-foreground hover:text-primary"
+                              ? "text-foreground font-semibold"
+                              : "text-foreground/75 hover:text-foreground"
                           )}
                         >
                           <span
                             className={cn(
                               "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                               isActive
-                                ? "bg-aplicada-green-700 opacity-100"
-                                : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                                ? "bg-brand-strong opacity-100"
+                                : "bg-brand-strong opacity-0 group-hover:opacity-60"
                             )}
                           />
                           <Icon className="h-4 w-4" />
@@ -270,16 +270,16 @@ export function AdminSidebar() {
                           className={cn(
                             "group relative w-full font-medium transition-colors duration-200 pl-4",
                             groupActive
-                              ? "text-primary font-semibold"
-                              : "text-sidebar-foreground hover:text-primary"
+                              ? "text-foreground font-semibold"
+                              : "text-foreground/75 hover:text-foreground"
                           )}
                         >
                           <span
                             className={cn(
                               "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                               groupActive
-                                ? "bg-aplicada-green-700 opacity-100"
-                                : "bg-aplicada-green-400 opacity-0 group-hover:opacity-60"
+                                ? "bg-brand-strong opacity-100"
+                                : "bg-brand-strong opacity-0 group-hover:opacity-60"
                             )}
                           />
                           <Icon className="h-4 w-4" />
@@ -304,8 +304,8 @@ export function AdminSidebar() {
                                     className={cn(
                                       "relative font-medium transition-colors duration-200 pl-2 text-sm",
                                       isItemActive
-                                        ? "text-primary font-semibold"
-                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                        ? "text-foreground font-semibold"
+                                        : "text-muted-foreground hover:text-foreground"
                                     )}
                                   >
                                     <span>{item.label}</span>
@@ -331,10 +331,10 @@ export function AdminSidebar() {
             <SidebarMenuButton asChild tooltip="Voltar para o Site">
               <Button
                 variant="ghost"
-                className="relative w-full justify-start text-sidebar-foreground hover:text-primary font-medium transition-colors pl-4 group"
+                className="relative w-full justify-start text-foreground/75 hover:text-foreground font-medium transition-colors pl-4 group"
                 onClick={() => navigate("/")}
               >
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-aplicada-green-400 opacity-0 group-hover:opacity-60 transition-all duration-200" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-brand-strong opacity-0 group-hover:opacity-60 transition-all duration-200" />
                 <ArrowLeft className="h-4 w-4" />
                 <span>Voltar para o Site</span>
               </Button>

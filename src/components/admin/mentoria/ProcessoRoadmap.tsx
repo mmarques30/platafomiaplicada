@@ -85,14 +85,14 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
       {/* Header de Progresso - Compacto */}
       <div className="bg-[#E9EBC6]/20 border border-[#E9EBC6]/50 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-[#0D0D0D]/70">Progresso Geral</span>
-          <span className="text-2xl font-bold text-[#0D0D0D]">{progressoGeral}%</span>
+          <span className="text-sm font-medium text-foreground/70">Progresso Geral</span>
+          <span className="text-2xl font-bold text-foreground">{progressoGeral}%</span>
         </div>
         
         {/* Barra de Progresso */}
-        <div className="w-full bg-[#0D0D0D]/10 rounded-full h-2.5 overflow-hidden mb-3">
+        <div className="w-full bg-foreground/10 rounded-full h-2.5 overflow-hidden mb-3">
           <div 
-            className="h-full bg-[#0D0D0D] rounded-full transition-all duration-500"
+            className="h-full bg-foreground rounded-full transition-all duration-500"
             style={{ width: `${progressoGeral}%` }}
           />
         </div>
@@ -100,11 +100,11 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
         {/* Stats inline */}
         <div className="flex items-center gap-4 text-sm flex-wrap">
           <span className="text-green-600 font-medium">{fasesConcluidas} concluídas</span>
-          <span className="text-[#0D0D0D]/40">•</span>
-          <span className="text-[#0D0D0D] font-medium">
+          <span className="text-foreground/40">•</span>
+          <span className="text-foreground font-medium">
             {faseAtual ? `Fase ${faseAtual.fase_numero} atual` : "Nenhuma em andamento"}
           </span>
-          <span className="text-[#0D0D0D]/40">•</span>
+          <span className="text-foreground/40">•</span>
           <span className="text-amber-600 font-medium">
             {fases.length - fasesConcluidas - (faseAtual ? 1 : 0)} restantes
           </span>
@@ -114,7 +114,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
       {/* Tabela de Fases */}
       <div className="bg-[#E9EBC6]/15 border border-[#E9EBC6]/40 rounded-xl overflow-hidden">
         {/* Header da Tabela */}
-        <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-[#E9EBC6]/30 border-b text-sm font-medium text-[#0D0D0D]">
+        <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-[#E9EBC6]/30 border-b text-sm font-medium text-foreground">
           <div className="col-span-1">#</div>
           <div className="col-span-3">Fase</div>
           <div className="col-span-5 hidden sm:block">Descrição</div>
@@ -135,7 +135,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
               <div 
                 className={cn(
                   "grid grid-cols-12 gap-2 px-4 py-3 items-center text-sm transition-colors cursor-pointer hover:bg-[#E9EBC6]/10",
-                  isAtual && "bg-[#E9EBC6]/20 border-l-4 border-l-[#0D0D0D]",
+                  isAtual && "bg-[#E9EBC6]/20 border-l-4 border-l-foreground",
                   isConcluida && "bg-green-50/50"
                 )}
                 onClick={() => handleRowClick(fase.id)}
@@ -144,8 +144,8 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                 <div className={cn(
                   "col-span-1 font-bold",
                   isConcluida && "text-green-600",
-                  isAtual && "text-[#0D0D0D]",
-                  isPendente && "text-[#0D0D0D]/40"
+                  isAtual && "text-foreground",
+                  isPendente && "text-foreground/40"
                 )}>
                   {fase.fase_numero}
                 </div>
@@ -153,14 +153,14 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                 {/* Indicador + Nome */}
                 <div className="col-span-3 flex items-center gap-2">
                   {isConcluida && <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />}
-                  {isAtual && <div className="w-2 h-2 rounded-full bg-[#0D0D0D] animate-pulse shrink-0" />}
-                  {isPendente && <Circle className="h-4 w-4 text-[#0D0D0D]/30 shrink-0" />}
+                  {isAtual && <div className="w-2 h-2 rounded-full bg-foreground animate-pulse shrink-0" />}
+                  {isPendente && <Circle className="h-4 w-4 text-foreground/30 shrink-0" />}
                   
                   <span className={cn(
                     "font-medium truncate",
                     isConcluida && "text-green-700",
-                    isAtual && "text-[#0D0D0D] font-semibold",
-                    isPendente && "text-[#0D0D0D]/60"
+                    isAtual && "text-foreground font-semibold",
+                    isPendente && "text-foreground/60"
                   )}>
                     {fase.nome_fase}
                   </span>
@@ -170,8 +170,8 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                 <div className={cn(
                   "col-span-5 truncate hidden sm:block",
                   isConcluida && "text-green-600/70",
-                  isAtual && "text-[#0D0D0D]/80",
-                  isPendente && "text-[#0D0D0D]/40"
+                  isAtual && "text-foreground/80",
+                  isPendente && "text-foreground/40"
                 )}>
                   {fase.descricao || "—"}
                 </div>
@@ -183,8 +183,8 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                     className={cn(
                       "text-xs",
                       isConcluida && "bg-green-600 text-white border-green-600",
-                      isAtual && "bg-[#0D0D0D] text-white border-[#0D0D0D]",
-                      isPendente && "border-[#0D0D0D]/30 text-[#0D0D0D]/60"
+                      isAtual && "bg-foreground text-white border-foreground",
+                      isPendente && "border-foreground/30 text-foreground/60"
                     )}
                   >
                     {isConcluida ? "Concluída" : isAtual ? "Em Andamento" : "Pendente"}
@@ -192,7 +192,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                 </div>
 
                 {/* Expand indicator */}
-                <div className="col-span-1 flex justify-center text-[#0D0D0D]/40">
+                <div className="col-span-1 flex justify-center text-foreground/40">
                   {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </div>
               </div>
@@ -203,11 +203,11 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Datas */}
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium text-[#0D0D0D]/80">
+                      <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                         <Calendar className="h-4 w-4" />
                         Datas
                       </div>
-                      <div className="text-sm space-y-1 text-[#0D0D0D]/60">
+                      <div className="text-sm space-y-1 text-foreground/60">
                         <p>Início: {fase.data_inicio ? format(new Date(fase.data_inicio), "dd/MM/yyyy", { locale: ptBR }) : "—"}</p>
                         <p>Conclusão: {fase.data_conclusao ? format(new Date(fase.data_conclusao), "dd/MM/yyyy", { locale: ptBR }) : "—"}</p>
                       </div>
@@ -216,12 +216,12 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                     {/* Sessão */}
                     {fase.sessao && (
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm font-medium text-[#0D0D0D]/80">
+                        <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                           <Calendar className="h-4 w-4" />
                           Sessão
                         </div>
-                        <div className="text-sm space-y-1 text-[#0D0D0D]/60">
-                          <p className="font-medium text-[#0D0D0D]/80">{fase.sessao.titulo}</p>
+                        <div className="text-sm space-y-1 text-foreground/60">
+                          <p className="font-medium text-foreground/80">{fase.sessao.titulo}</p>
                           {fase.sessao.data_sessao && (
                             <p>{format(new Date(fase.sessao.data_sessao), "dd/MM/yyyy", { locale: ptBR })}</p>
                           )}
@@ -232,12 +232,12 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                     {/* Projeto */}
                     {fase.projeto && (
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm font-medium text-[#0D0D0D]/80">
+                        <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                           <Folder className="h-4 w-4" />
                           Projeto
                         </div>
-                        <div className="text-sm space-y-1 text-[#0D0D0D]/60">
-                          <p className="font-medium text-[#0D0D0D]/80">{fase.projeto.titulo}</p>
+                        <div className="text-sm space-y-1 text-foreground/60">
+                          <p className="font-medium text-foreground/80">{fase.projeto.titulo}</p>
                           <p className="truncate">{fase.projeto.objetivo_projeto}</p>
                         </div>
                         
@@ -251,7 +251,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                               setEditingProjeto(fase.projeto as ProjetoMentoria);
                               setProjetoModalOpen(true);
                             }}
-                            className="mt-2 border-[#0D0D0D]/20 text-[#0D0D0D]/80 hover:bg-[#E9EBC6]/20"
+                            className="mt-2 border-foreground/20 text-foreground/80 hover:bg-[#E9EBC6]/20"
                           >
                             <Pencil className="h-3 w-3 mr-1" />
                             Editar Projeto
@@ -264,7 +264,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                   {/* Tarefas */}
                   {fase.tarefas && fase.tarefas.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30">
-                      <div className="flex items-center gap-2 text-sm font-medium text-[#0D0D0D]/80 mb-2">
+                      <div className="flex items-center gap-2 text-sm font-medium text-foreground/80 mb-2">
                         <ListTodo className="h-4 w-4" />
                         Tarefas ({fase.tarefas.filter(t => t.concluida).length}/{fase.tarefas.length})
                       </div>
@@ -274,19 +274,19 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                             key={tarefa.id} 
                             className={cn(
                               "text-sm px-2 py-1 rounded flex items-center gap-2",
-                              tarefa.concluida ? "text-green-700 bg-green-50" : "text-[#0D0D0D]/60"
+                              tarefa.concluida ? "text-green-700 bg-green-50" : "text-foreground/60"
                             )}
                           >
                             {tarefa.concluida ? (
                               <CheckCircle2 className="h-3 w-3 text-green-600 shrink-0" />
                             ) : (
-                              <Circle className="h-3 w-3 text-[#0D0D0D]/30 shrink-0" />
+                              <Circle className="h-3 w-3 text-foreground/30 shrink-0" />
                             )}
                             <span className="truncate">{tarefa.titulo}</span>
                           </div>
                         ))}
                         {fase.tarefas.length > 4 && (
-                          <div className="text-xs text-[#0D0D0D]/40">
+                          <div className="text-xs text-foreground/40">
                             +{fase.tarefas.length - 4} tarefas...
                           </div>
                         )}
@@ -297,7 +297,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                   {/* Observações */}
                   {fase.observacoes && (
                     <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30">
-                      <p className="text-sm text-[#0D0D0D]/60">
+                      <p className="text-sm text-foreground/60">
                         <span className="font-medium">Observações:</span> {fase.observacoes}
                       </p>
                     </div>
@@ -313,7 +313,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                           e.stopPropagation();
                           handleEditFase(fase);
                         }}
-                        className="border-[#0D0D0D]/20 text-[#0D0D0D]/80 hover:bg-[#E9EBC6]/20"
+                        className="border-foreground/20 text-foreground/80 hover:bg-[#E9EBC6]/20"
                       >
                         <Pencil className="h-3 w-3 mr-1" />
                         Editar Fase

@@ -16,7 +16,7 @@ export function AdminLayout() {
       <div className="flex min-h-screen w-full pt-14 md:pt-0">
         <AdminSidebar />
         <SidebarInset>
-          <main className="flex-1 p-8">
+          <main className="flex-1 px-4 py-6 md:px-6 md:py-8 lg:px-10 lg:py-10">
             <AnimatePresence mode="wait">
               <PageTransition key={location.pathname}>
                 <Outlet />

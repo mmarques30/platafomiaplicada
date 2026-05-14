@@ -162,7 +162,7 @@ export function RespostasDiagnosticoDrawer({
       <SheetContent className="w-full sm:max-w-2xl">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <User className="h-5 w-5 text-aplicada-green-700" />
+            <User className="h-5 w-5 text-brand-strong" />
             Respostas: {titulo}
             <Badge variant="secondary">{respostas.length} total</Badge>
           </SheetTitle>
@@ -171,7 +171,7 @@ export function RespostasDiagnosticoDrawer({
         <ScrollArea className="h-[calc(100vh-120px)] mt-6 pr-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-aplicada-green-700" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-strong" />
             </div>
           ) : respostas.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
@@ -198,12 +198,12 @@ export function RespostasDiagnosticoDrawer({
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            isBusiness ? 'bg-primary/10' : 'bg-aplicada-green-700/10'
+                            isBusiness ? 'bg-primary/10' : 'bg-brand-strong/10'
                           }`}>
                             {isBusiness ? (
                               <Building2 className="h-5 w-5 text-primary" />
                             ) : (
-                              <User className="h-5 w-5 text-aplicada-green-700" />
+                              <User className="h-5 w-5 text-brand-strong" />
                             )}
                           </div>
                           <div className="text-left">
@@ -284,7 +284,7 @@ export function RespostasDiagnosticoDrawer({
                             <Button 
                               size="sm" 
                               onClick={() => handleVerDetalhes(resposta.user_id)}
-                              className="bg-aplicada-green-700 hover:bg-aplicada-green-800"
+                              className="bg-brand-strong hover:bg-brand-strong/90"
                             >
                               <Eye className="h-4 w-4 mr-2" />
                               Ver Diagnóstico Completo
