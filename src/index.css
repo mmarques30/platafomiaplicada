@@ -121,12 +121,13 @@
     --brand-ink: 0 0% 4%;             /* #0A0A0A - preto profundo da LP */
     --brand-hairline: 60 20% 90%;     /* #EAEAE0 - bordas sutis */
     
-    /* Sidebar: mesma paleta da LP — espelhando --brand-cream-soft / --brand-hairline */
-    --sidebar-background: 60 45% 95%;       /* #F7F6E8 - creme suave (= topbar) */
+    /* Sidebar: branco puro pra diferenciar do topbar creme.
+       Topbar = chrome (creme), Sidebar+Main = conteúdo (branco). */
+    --sidebar-background: 0 0% 100%;        /* branco puro (= main bg) */
     --sidebar-foreground: 0 0% 4%;          /* preto profundo da LP */
     --sidebar-primary: 73 58% 27%;          /* brand-strong (active pill) */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 60 20% 90%;           /* hairline como hover */
+    --sidebar-accent: 60 20% 95%;           /* hover sutil */
     --sidebar-accent-foreground: 0 0% 4%;
     --sidebar-border: 60 20% 90%;           /* = --brand-hairline */
     --sidebar-ring: 73 58% 27%;
