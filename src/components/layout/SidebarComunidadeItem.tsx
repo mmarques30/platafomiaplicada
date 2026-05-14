@@ -44,8 +44,8 @@ export function SidebarComunidadeItem({
             <div className={cn(
               "flex items-center gap-3 rounded-lg transition-all duration-200 font-medium py-2.5 w-full",
               (pathname === '/comunidade' || pathname === '/videos-bonus')
-                ? "text-primary font-semibold"
-                : "text-sidebar-foreground hover:text-primary"
+                ? "text-foreground font-semibold"
+                : "text-foreground/75 hover:text-foreground"
             )}>
               <LucideIcons.Users className="h-4 w-4 shrink-0" strokeWidth={1.5} />
               {!collapsed && (
@@ -72,8 +72,8 @@ export function SidebarComunidadeItem({
                     className={cn(
                       "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                       pathname === '/comunidade'
-                        ? "text-primary font-semibold"
-                        : "text-sidebar-foreground/70 hover:text-primary"
+                        ? "text-foreground font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     {!collapsed && <span>Feed</span>}
@@ -90,8 +90,8 @@ export function SidebarComunidadeItem({
                     className={cn(
                       "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                       pathname === '/videos-bonus'
-                        ? "text-primary font-semibold"
-                        : "text-sidebar-foreground/70 hover:text-primary"
+                        ? "text-foreground font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     {!collapsed && <span>Sala de Aula</span>}

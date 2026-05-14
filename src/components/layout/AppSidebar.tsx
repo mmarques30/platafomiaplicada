@@ -249,8 +249,8 @@ export function AppSidebar() {
                           className={cn(
                             "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
                             isActive 
-                              ? "text-primary font-semibold" 
-                              : "text-sidebar-foreground hover:text-primary"
+                              ? "text-foreground font-semibold"
+                              : "text-foreground/75 hover:text-foreground"
                           )}
                         >
                           <span className={cn(
@@ -305,8 +305,8 @@ export function AppSidebar() {
                                         className={cn(
                                           "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                                           subIsActive 
-                                            ? "text-primary font-semibold" 
-                                            : "text-sidebar-foreground/70 hover:text-primary"
+                                            ? "text-foreground font-semibold"
+                                            : "text-muted-foreground hover:text-foreground"
                                         )}
                                       >
                                         {!collapsed && <span>{subMenu.label}</span>}
@@ -333,8 +333,8 @@ export function AppSidebar() {
                                             className={cn(
                                               "rounded-lg transition-all duration-200 font-medium pl-6 py-2 text-sm",
                                               childIsActive 
-                                                ? "text-primary font-semibold" 
-                                                : "text-sidebar-foreground/70 hover:text-primary"
+                                                ? "text-foreground font-semibold" 
+                                                : "text-muted-foreground hover:text-foreground"
                                             )}
                                           >
                                             {!collapsed && <span>{child.label}</span>}
@@ -357,8 +357,8 @@ export function AppSidebar() {
                                   className={cn(
                                     "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                                     subIsActive 
-                                      ? "text-primary font-semibold" 
-                                      : "text-sidebar-foreground/70 hover:text-primary"
+                                      ? "text-foreground font-semibold" 
+                                      : "text-muted-foreground hover:text-foreground"
                                   )}
                                 >
                                   {!collapsed && <span>{subMenu.label}</span>}
@@ -387,8 +387,8 @@ export function AppSidebar() {
                         className={cn(
                           "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                           isActive 
-                            ? "text-primary font-semibold" 
-                            : "text-sidebar-foreground hover:text-primary"
+                            ? "text-foreground font-semibold" 
+                            : "text-foreground/75 hover:text-foreground"
                         )}
                       >
                         <span className={cn(
@@ -425,8 +425,8 @@ export function AppSidebar() {
                           <div className={cn(
                             "flex items-center gap-3 rounded-lg transition-all duration-200 font-medium py-2.5 w-full",
                             ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
-                              ? "text-primary font-semibold" 
-                              : "text-sidebar-foreground hover:text-primary"
+                              ? "text-foreground font-semibold"
+                              : "text-foreground/75 hover:text-foreground"
                           )}>
                             <LucideIcons.Library className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                             {!collapsed && (
@@ -453,8 +453,8 @@ export function AppSidebar() {
                                     className={cn(
                                       "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                                       location.pathname === '/biblioteca-prompts'
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                        ? "text-foreground font-semibold" 
+                                        : "text-muted-foreground hover:text-foreground"
                                     )}
                                   >
                                     {!collapsed && <span>Prompts</span>}
@@ -471,8 +471,8 @@ export function AppSidebar() {
                                     className={cn(
                                       "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                                       location.pathname === '/biblioteca-ferramentas'
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                        ? "text-foreground font-semibold" 
+                                        : "text-muted-foreground hover:text-foreground"
                                     )}
                                   >
                                     {!collapsed && <span>Ferramentas</span>}
@@ -489,8 +489,8 @@ export function AppSidebar() {
                                     className={cn(
                                       "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                                       location.pathname === '/ia-copie-use'
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                        ? "text-foreground font-semibold" 
+                                        : "text-muted-foreground hover:text-foreground"
                                     )}
                                   >
                                     {!collapsed && <span>IA "Copie e Use"</span>}
@@ -507,8 +507,8 @@ export function AppSidebar() {
                                     className={cn(
                                       "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
                                       location.pathname === '/metodos-aplicar'
-                                        ? "text-primary font-semibold" 
-                                        : "text-sidebar-foreground/70 hover:text-primary"
+                                        ? "text-foreground font-semibold" 
+                                        : "text-muted-foreground hover:text-foreground"
                                     )}
                                   >
                                     {!collapsed && <span>Arsenal IA</span>}
@@ -568,7 +568,7 @@ export function AppSidebar() {
                 to="/configuracoes"
                 className={({ isActive }) => cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium pl-4",
-                  isActive ? "text-primary font-semibold" : "text-sidebar-foreground hover:text-primary"
+                  isActive ? "text-foreground font-semibold" : "text-foreground/75 hover:text-foreground"
                 )}
               >
                 {({ isActive }) => (

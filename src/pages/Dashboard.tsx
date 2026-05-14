@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, X } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -38,6 +40,25 @@ export default function Dashboard() {
     return profile?.primeiro_acesso === true && sessionStorage.getItem('onboarding_video_visto') === 'true';
   }, [loadingProfile, isVisitante, profile]);
 
+  /* Espelha a query do NovidadesSemana — TanStack faz dedup pela mesma key.
+     Usado pra esconder a section 03 inteira quando não há novidade publicada,
+     evitando título órfão sobre conteúdo nulo. */
+  const { data: novidadesSemana } = useQuery({
+    queryKey: ["novidades-semana"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("avisos")
+        .select("id")
+        .eq("tipo", "novidades")
+        .eq("ativo", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !isVisitante,
+  });
+
   if (loadingRole) {
     return <PageSkeleton variant="dashboard" />;
   }
@@ -47,7 +68,7 @@ export default function Dashboard() {
       {/* Tour guiado no primeiro acesso */}
       {showTour && <DashboardTour run={showTour} />}
 
-      <main className="mx-auto w-full max-w-[1600px] space-y-10 px-4 py-2 md:space-y-14 md:px-8 md:py-4 lg:px-12">
+      <main className="mx-auto w-full max-w-[1600px] space-y-10 px-4 pb-10 md:space-y-14 md:px-8 md:pb-16 lg:px-12">
         {isVisitante ? (
           <div className="space-y-8">
             <WelcomeHeader />
@@ -112,15 +133,17 @@ export default function Dashboard() {
               <RankingTicker />
             </section>
 
-            {/* 03 — NA COMUNIDADE */}
-            <section className="space-y-6">
-              <SectionHeader
-                index={3}
-                eyebrow="Na comunidade"
-                title={<>O que <em className="font-serif-italic text-primary">rolou na semana</em>.</>}
-              />
-              <NovidadesSemana />
-            </section>
+            {/* 03 — NA COMUNIDADE — só renderiza se há novidade publicada */}
+            {novidadesSemana && (
+              <section className="space-y-6">
+                <SectionHeader
+                  index={3}
+                  eyebrow="Na comunidade"
+                  title={<>O que <em className="font-serif-italic text-primary">rolou na semana</em>.</>}
+                />
+                <NovidadesSemana />
+              </section>
+            )}
           </>
         )}
       </main>

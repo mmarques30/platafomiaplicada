@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library, Eye, Maximize2, Minimize2 } from "lucide-react";
-import logoHeaderDark from "@/assets/logo-header-dark.png";
+import logoHeaderLight from "@/assets/logo-iaplicada.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -116,9 +116,9 @@ export function TopHeader() {
         </div>
       )}
       
-      <header 
+      <header
         className={cn(
-          "fixed z-50 w-full border-b border-white/10 bg-[#0D0D0D] transition-transform duration-300 ease-in-out",
+          "fixed z-50 w-full border-b border-brand-hairline bg-brand-cream-soft transition-transform duration-300 ease-in-out",
           isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0",
           isAdmin && isViewingAs ? "top-10" : "top-0"
         )}
@@ -128,15 +128,15 @@ export function TopHeader() {
         <div className="relative h-14 w-full">
         {/* LEFT: SidebarTrigger + Logo + Mobile Menu */}
         <div className="absolute left-0 top-0 h-full flex items-center gap-2 ml-1 md:ml-2">
-          <SidebarTrigger className="h-10 w-10 md:h-8 md:w-8 text-white hover:text-white hover:bg-white/20 bg-white/10 rounded-md transition-colors" />
+          <SidebarTrigger className="h-10 w-10 md:h-8 md:w-8 text-foreground hover:text-foreground hover:bg-foreground/10 bg-foreground/5 rounded-md transition-colors" />
           <Link to="/" className="hidden sm:block">
-            <img 
-              src={logoHeaderDark} 
-              alt="IAplicada" 
+            <img
+              src={logoHeaderLight}
+              alt="IAplicada"
               className="h-5 md:h-6 w-auto opacity-90 hover:opacity-100 transition-opacity"
             />
           </Link>
-          
+
         </div>
 
         {/* CENTER: Horizontal Navigation - centralizado na viewport com posição absoluta */}
@@ -146,7 +146,7 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium transition-colors",
-              isActive ? "text-primary" : "text-white/60 hover:text-white"
+              isActive ? "text-brand-strong font-semibold" : "text-foreground/60 hover:text-foreground"
             )}
           >
             Página Inicial
@@ -160,7 +160,7 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isCursosActive ? "text-primary" : "text-white/60 hover:text-white"
+                    isCursosActive ? "text-brand-strong font-semibold" : "text-foreground/60 hover:text-foreground"
                   )}
                 >
                   Cursos
@@ -206,7 +206,7 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isComunicacoesActive ? "text-primary" : "text-white/60 hover:text-white"
+                    isComunicacoesActive ? "text-brand-strong font-semibold" : "text-foreground/60 hover:text-foreground"
                   )}
                 >
                   Comunicações
@@ -240,7 +240,7 @@ export function TopHeader() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-primary/20 text-primary' : 'text-white/80 hover:text-white hover:bg-white/10'}`}
+                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-brand-strong/10 text-brand-strong' : 'text-foreground/70 hover:text-foreground hover:bg-foreground/5'}`}
                   onClick={toggleFoco}
                 >
                   {modoFoco ? <Minimize2 className="h-5 w-5" strokeWidth={1.5} /> : <Maximize2 className="h-5 w-5" strokeWidth={1.5} />}
@@ -257,7 +257,7 @@ export function TopHeader() {
                 <Button
                   variant="ghost" 
                   size="icon" 
-                  className="h-9 w-9 text-white/80 hover:text-white hover:bg-white/10"
+                  className="h-9 w-9 text-foreground/70 hover:text-foreground hover:bg-foreground/5"
                   onClick={forceFullAppReload}
                 >
                   <RefreshCw className="h-5 w-5" strokeWidth={1.5} />
@@ -272,12 +272,12 @@ export function TopHeader() {
           <Button
             variant="ghost" 
             size="icon" 
-            className="relative h-9 w-9 text-white/80 hover:text-white hover:bg-white/10"
+            className="relative h-9 w-9 text-foreground/70 hover:text-foreground hover:bg-foreground/5"
             onClick={() => navigate("/notificacoes")}
           >
             <Bell className="h-5 w-5" strokeWidth={1.5} />
             {avisosCount && avisosCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-brand-strong flex items-center justify-center text-[10px] font-semibold text-brand-strong-foreground">
                 {avisosCount > 9 ? "9+" : avisosCount}
               </span>
             )}
@@ -285,17 +285,17 @@ export function TopHeader() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 h-auto px-2 py-1.5 hover:bg-white/10">
-                <Avatar className="h-8 w-8 border border-white/20">
+              <Button variant="ghost" className="gap-2 h-auto px-2 py-1.5 hover:bg-foreground/5">
+                <Avatar className="h-8 w-8 border border-brand-hairline">
                   <AvatarImage src={profile?.avatar_url || ""} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
                     {getInitials(user?.email, profile?.nome_completo)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden md:block text-sm font-medium text-white">
+                <span className="hidden md:block text-sm font-medium text-foreground">
                   {firstName}
                 </span>
-                <ChevronDown className="h-4 w-4 text-white/60" strokeWidth={1.5} />
+                <ChevronDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52 bg-popover border-border">
