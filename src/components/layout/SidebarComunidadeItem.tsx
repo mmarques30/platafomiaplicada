@@ -38,8 +38,8 @@ export function SidebarComunidadeItem({
             <span className={cn(
               "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
               (pathname === '/comunidade' || pathname === '/videos-bonus')
-                ? "bg-[#0D0D0D] opacity-100"
-                : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                ? "bg-brand-strong opacity-100"
+                : "bg-brand-strong opacity-0 group-hover:opacity-50"
             )} />
             <div className={cn(
               "flex items-center gap-3 rounded-lg transition-all duration-200 font-medium py-2.5 w-full",

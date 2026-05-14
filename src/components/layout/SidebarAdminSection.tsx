@@ -68,8 +68,8 @@ export function SidebarAdminSection({
                     <span className={cn(
                       "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                       isActive
-                        ? "bg-[#0D0D0D] opacity-100"
-                        : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                        ? "bg-brand-strong opacity-100"
+                        : "bg-brand-strong opacity-0 group-hover:opacity-50"
                     )} />
                     <Shield className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                     {!collapsed && <span className="text-sm">Painel Admin</span>}
