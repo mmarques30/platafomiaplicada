@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Sora', 'system-ui', 'sans-serif'],
+        serif: ['Fraunces', 'Georgia', 'serif'],
       },
       letterSpacing: {
         tighter: '-0.02em',
@@ -64,6 +65,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
           active: "hsl(var(--sidebar-active))",
+        },
+        /* LP Academy tokens */
+        brand: {
+          cream: "hsl(var(--brand-cream))",
+          "cream-soft": "hsl(var(--brand-cream-soft))",
+          strong: "hsl(var(--brand-strong))",
+          "strong-foreground": "hsl(var(--brand-strong-foreground))",
+          ink: "hsl(var(--brand-ink))",
+          hairline: "hsl(var(--brand-hairline))",
         },
         /* IAplicada Brand Colors - Full palette */
         aplicada: {

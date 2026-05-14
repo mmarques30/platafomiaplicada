@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -108,8 +110,16 @@
     --border: 73 20% 85%;
     --input: 73 20% 85%;
     --ring: 73 55% 47%;
-    
+
     --radius: 0.75rem;
+
+    /* Brand tokens espelhando academy.iaplicada.com (LP) */
+    --brand-cream: 60 50% 90%;        /* #F0EFD9 - fundo creme do topo */
+    --brand-cream-soft: 60 45% 95%;   /* #F7F6E8 - creme suave/transições */
+    --brand-strong: 73 58% 27%;       /* #5C6F1D - verde escuro de CTA sólido */
+    --brand-strong-foreground: 0 0% 100%;
+    --brand-ink: 0 0% 4%;             /* #0A0A0A - preto profundo da LP */
+    --brand-hairline: 60 20% 90%;     /* #EAEAE0 - bordas sutis */
     
     /* Sidebar: Off-White Neutro #F5F5F3 (sem tom verde) */
     --sidebar-background: 60 5% 96%;
@@ -424,6 +434,31 @@
   .brand-text strong,
   .brand-text b {
     color: hsl(73 54% 39%);
+  }
+
+  /* Fraunces serif (display) - LP Academy */
+  .font-serif-display {
+    font-family: 'Fraunces', 'Sora', serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 96;
+    letter-spacing: -0.02em;
+  }
+
+  .font-serif-italic {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-variation-settings: "opsz" 72;
+  }
+
+  /* Section eyebrow estilo "01 — O PROBLEMA" da LP */
+  .lp-eyebrow {
+    @apply inline-flex items-center gap-3 text-[11px] font-medium tracking-[0.18em] uppercase text-muted-foreground;
+  }
+  .lp-eyebrow::before {
+    content: "";
+    width: 24px;
+    height: 1px;
+    background-color: hsl(var(--foreground) / 0.4);
   }
 
   /* Sora font weight utilities */

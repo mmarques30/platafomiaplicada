@@ -15,7 +15,8 @@ import { useCountUp } from "@/hooks/useCountUp";
 import { formatInTimeZone } from "date-fns-tz";
 import { format, isFuture, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar } from "lucide-react";
+import { Calendar, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const TIMEZONE = 'America/Sao_Paulo';
 
@@ -206,91 +207,79 @@ export function WelcomeHeader() {
     : 'Aplique, replique e domine IA';
 
   const kpiSkeleton = (
-    <div className="w-10 h-[22px] bg-white/[0.06] rounded animate-[kpiPulse_1.2s_ease-in-out_infinite] mx-auto" />
+    <div className="mx-auto h-[26px] w-12 animate-[kpiPulse_1.2s_ease-in-out_infinite] rounded bg-foreground/[0.06]" />
   );
 
   return (
     <>
-    <style>{`@keyframes kpiPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
-    <div className="w-full mt-2 md:mt-4">
-      <div className="flex flex-col bg-gradient-to-r from-[#0C0F0A] via-[#151814] to-[#0C0F0A] backdrop-blur-sm rounded-lg sm:rounded-xl md:rounded-2xl border border-white/10">
-        {/* Top section — original layout */}
-        <div className="flex flex-row items-center justify-between gap-2 sm:gap-3 md:gap-4 px-2.5 sm:px-3 md:px-6 py-2.5 sm:py-3 md:py-5">
-          <div className="flex-1 min-w-0 text-left">
-            <h1 className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-0.5 md:mb-1">
-              {saudacao}
-            </h1>
-            {aulaAtiva ? (
-              <p className="text-[11px] sm:text-xs md:text-base lg:text-lg text-white/70 truncate">
-                <span className="font-semibold text-white">Aula:</span> {aulaAtiva.tema}
+      <style>{`@keyframes kpiPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
+      <div className="w-full">
+        <div className="flex flex-col gap-6 rounded-2xl border border-brand-hairline bg-brand-cream-soft px-5 py-6 md:px-8 md:py-8">
+          {/* Top: saudação + data */}
+          <div className="flex flex-row items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="lp-eyebrow mb-3">
+                <span>HOJE</span>
               </p>
-            ) : (
-              <p className="text-[11px] sm:text-xs md:text-base lg:text-lg text-white/70 font-medium">
-                {tagline}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0">
-            <div className="bg-primary rounded-md sm:rounded-lg md:rounded-xl p-1 sm:p-1.5 md:p-3 flex items-center justify-center shadow-sm">
-              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-6 md:h-6 text-primary-foreground" strokeWidth={2.5} />
+              <h1 className="font-serif-display text-2xl leading-[1.05] tracking-tight text-foreground md:text-4xl">
+                {saudacao}
+              </h1>
+              {aulaAtiva ? (
+                <p className="mt-3 max-w-prose text-sm font-light text-muted-foreground md:text-base">
+                  <span className="font-medium text-foreground">Aula:</span> {aulaAtiva.tema}
+                </p>
+              ) : (
+                <p className="mt-3 max-w-prose text-sm font-light text-muted-foreground md:text-base">
+                  {tagline}
+                </p>
+              )}
             </div>
-            <div className="flex flex-col items-start leading-tight">
-              <span className="text-base sm:text-lg md:text-2xl font-bold text-white">{dia}</span>
-              <span className="text-[9px] sm:text-[10px] md:text-sm text-white/70 font-medium uppercase tracking-wide">{diaSemana}, {mes}</span>
+            <div className="flex flex-shrink-0 items-center gap-3 border-l border-brand-hairline pl-4 md:pl-6">
+              <Calendar className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <div className="flex flex-col leading-tight">
+                <span className="font-serif-display text-2xl text-foreground md:text-3xl">{dia}</span>
+                <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  {diaSemana} · {mes}
+                </span>
+              </div>
             </div>
           </div>
+
+          {/* KPIs + CTA */}
+          {showKpis && (
+            <div data-welcome-kpis className="border-t border-brand-hairline pt-5">
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+                <KpiCell label={kpi1Label} value={isLoadingKpis ? kpiSkeleton : kpi1Display} />
+                <span className="hidden h-8 w-px bg-brand-hairline sm:block" />
+                <KpiCell label={kpi2Label} value={isLoadingKpis ? kpiSkeleton : kpi2Display} />
+                <span className="hidden h-8 w-px bg-brand-hairline sm:block" />
+                <KpiCell label={kpi3Label} value={isLoadingKpis ? kpiSkeleton : kpi3Display} />
+
+                <Button
+                  onClick={() => navigate(ctaHref)}
+                  variant="default"
+                  size="sm"
+                  className="ml-auto bg-brand-strong text-brand-strong-foreground hover:bg-brand-strong/90"
+                >
+                  {ctaLabel}
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" strokeWidth={1.75} />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
+    </>
+  );
+}
 
-        {/* KPI footer */}
-        {showKpis && (
-          <div data-welcome-kpis>
-            <div className="border-t border-white/10" />
-            <div className="flex items-center gap-4 px-5 py-2.5 flex-wrap">
-              {/* KPI 1 */}
-              <div className="text-center min-w-[50px]">
-                <div className="font-bold text-lg leading-tight" style={{ color: "#2CBBA6" }}>
-                  {isLoadingKpis ? kpiSkeleton : kpi1Display}
-                </div>
-                <div className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5px]">
-                  {kpi1Label}
-                </div>
-              </div>
-
-              <div className="w-px h-7 bg-white/10" />
-
-              {/* KPI 2 */}
-              <div className="text-center min-w-[50px]">
-                <div className="font-bold text-lg leading-tight" style={{ color: "#E8A43C" }}>
-                  {isLoadingKpis ? kpiSkeleton : kpi2Display}
-                </div>
-                <div className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5px]">
-                  {kpi2Label}
-                </div>
-              </div>
-
-              <div className="w-px h-7 bg-white/10" />
-
-              {/* KPI 3 */}
-              <div className="text-center min-w-[50px]">
-                <div className="font-bold text-lg leading-tight" style={{ color: "#AFC040" }}>
-                  {isLoadingKpis ? kpiSkeleton : kpi3Display}
-                </div>
-                <div className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5px]">
-                  {kpi3Label}
-                </div>
-              </div>
-
-              <button
-                onClick={() => navigate(ctaHref)}
-                className="ml-auto bg-primary text-primary-foreground text-[13px] font-medium py-[7px] px-3.5 rounded-lg border-none cursor-pointer whitespace-nowrap"
-              >
-                {ctaLabel} →
-              </button>
-            </div>
-          </div>
-        )}
+function KpiCell({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="min-w-[64px]">
+      <div className="font-serif-display text-2xl leading-none text-foreground">{value}</div>
+      <div className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        {label}
       </div>
     </div>
-    </>
   );
 }
