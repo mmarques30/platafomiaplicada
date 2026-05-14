@@ -214,59 +214,57 @@ export function WelcomeHeader() {
     <>
       <style>{`@keyframes kpiPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
       <div className="w-full">
-        <div className="flex flex-col gap-6 rounded-2xl border border-brand-hairline bg-brand-cream-soft px-5 py-6 md:px-8 md:py-8">
-          {/* Top: saudação + data */}
-          <div className="flex flex-row items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <p className="lp-eyebrow mb-3">
-                <span>HOJE</span>
+        <div className="flex flex-col gap-4 rounded-2xl border border-brand-hairline bg-brand-cream-soft px-5 py-4 md:flex-row md:items-center md:gap-8 md:px-6 md:py-5">
+          {/* Saudação + tagline */}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+              {saudacao}
+            </h1>
+            {aulaAtiva ? (
+              <p className="mt-1 truncate text-xs text-muted-foreground md:text-sm">
+                <span className="font-medium text-foreground">Aula:</span> {aulaAtiva.tema}
               </p>
-              <h1 className="font-serif-display text-2xl leading-[1.05] tracking-tight text-foreground md:text-4xl">
-                {saudacao}
-              </h1>
-              {aulaAtiva ? (
-                <p className="mt-3 max-w-prose text-sm font-light text-muted-foreground md:text-base">
-                  <span className="font-medium text-foreground">Aula:</span> {aulaAtiva.tema}
-                </p>
-              ) : (
-                <p className="mt-3 max-w-prose text-sm font-light text-muted-foreground md:text-base">
-                  {tagline}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-shrink-0 items-center gap-3 border-l border-brand-hairline pl-4 md:pl-6">
-              <Calendar className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-              <div className="flex flex-col leading-tight">
-                <span className="font-serif-display text-2xl text-foreground md:text-3xl">{dia}</span>
-                <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  {diaSemana} · {mes}
-                </span>
-              </div>
-            </div>
+            ) : (
+              <p className="mt-1 truncate text-xs text-muted-foreground md:text-sm">
+                {tagline}
+              </p>
+            )}
           </div>
 
-          {/* KPIs + CTA */}
+          {/* KPIs inline (mesma linha em desktop) */}
           {showKpis && (
-            <div data-welcome-kpis className="border-t border-brand-hairline pt-5">
-              <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-                <KpiCell label={kpi1Label} value={isLoadingKpis ? kpiSkeleton : kpi1Display} />
-                <span className="hidden h-8 w-px bg-brand-hairline sm:block" />
-                <KpiCell label={kpi2Label} value={isLoadingKpis ? kpiSkeleton : kpi2Display} />
-                <span className="hidden h-8 w-px bg-brand-hairline sm:block" />
-                <KpiCell label={kpi3Label} value={isLoadingKpis ? kpiSkeleton : kpi3Display} />
+            <div
+              data-welcome-kpis
+              className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-brand-hairline pt-3 md:border-t-0 md:border-l md:pl-6 md:pt-0"
+            >
+              <KpiCell label={kpi1Label} value={isLoadingKpis ? kpiSkeleton : kpi1Display} />
+              <span className="hidden h-7 w-px bg-brand-hairline sm:block" />
+              <KpiCell label={kpi2Label} value={isLoadingKpis ? kpiSkeleton : kpi2Display} />
+              <span className="hidden h-7 w-px bg-brand-hairline sm:block" />
+              <KpiCell label={kpi3Label} value={isLoadingKpis ? kpiSkeleton : kpi3Display} />
 
-                <Button
-                  onClick={() => navigate(ctaHref)}
-                  variant="brand-pill"
-                  size="pill"
-                  className="ml-auto"
-                >
-                  {ctaLabel}
-                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" strokeWidth={1.75} />
-                </Button>
-              </div>
+              <Button
+                onClick={() => navigate(ctaHref)}
+                variant="brand-pill"
+                size="sm"
+                className="ml-auto rounded-full"
+              >
+                {ctaLabel}
+                <ArrowRight className="ml-1 h-3.5 w-3.5" strokeWidth={1.75} />
+              </Button>
             </div>
           )}
+
+          {/* Data */}
+          <div className="hidden flex-shrink-0 items-center gap-2 border-l border-brand-hairline pl-6 md:flex">
+            <Calendar className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+            <div className="flex flex-col leading-tight">
+              <span className="text-lg font-semibold text-foreground">{dia}</span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                {diaSemana} · {mes}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </>
@@ -275,9 +273,9 @@ export function WelcomeHeader() {
 
 function KpiCell({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="min-w-[64px]">
-      <div className="font-serif-display text-2xl leading-none text-foreground">{value}</div>
-      <div className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+    <div className="min-w-[56px]">
+      <div className="text-lg font-semibold leading-none text-foreground">{value}</div>
+      <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </div>
     </div>
