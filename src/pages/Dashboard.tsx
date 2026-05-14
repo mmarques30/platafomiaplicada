@@ -21,8 +21,20 @@ import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
 import { BriefingSemanal } from "@/components/dashboard/BriefingSemanal";
-import { SectionHeader } from "@/components/dashboard/SectionHeader";
 
+/**
+ * Eyebrow simples pra cabeçalho de seção do Dashboard.
+ * Usado em vez do SectionHeader numerado pra evitar a estética de "documento"
+ * (numeração 01/02/03 + título grande serif funciona em LP, mas no app
+ * polui sem agregar ação).
+ */
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+      {children}
+    </h2>
+  );
+}
 
 export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
@@ -41,8 +53,7 @@ export default function Dashboard() {
   }, [loadingProfile, isVisitante, profile]);
 
   /* Espelha a query do NovidadesSemana — TanStack faz dedup pela mesma key.
-     Usado pra esconder a section 03 inteira quando não há novidade publicada,
-     evitando título órfão sobre conteúdo nulo. */
+     Esconde a section "Comunidade" quando não há novidade publicada. */
   const { data: novidadesSemana } = useQuery({
     queryKey: ["novidades-semana"],
     queryFn: async () => {
@@ -68,9 +79,9 @@ export default function Dashboard() {
       {/* Tour guiado no primeiro acesso */}
       {showTour && <DashboardTour run={showTour} />}
 
-      <main className="w-full space-y-8 px-4 pb-10 md:space-y-12 md:px-6 md:pb-14 lg:px-8">
+      <main className="w-full space-y-6 px-4 pb-10 md:space-y-8 md:px-6 md:pb-14 lg:px-8">
         {isVisitante ? (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <WelcomeHeader />
             <PWAInstallBanner />
             <CentralConteudoGratuito />
@@ -103,30 +114,32 @@ export default function Dashboard() {
 
             <WelcomeHeader />
 
-            {/* 01 — Pra hoje */}
-            <section className="space-y-4 md:space-y-5">
-              <SectionHeader index={1} eyebrow="Pra hoje" title="Pra hoje" />
-              <div className="space-y-4 md:space-y-6">
-                <BriefingSemanal />
-                <DashboardUrgencias />
-                <PWAInstallBanner />
-                <AcademyWelcomeCard />
-                <WeeklyProgressCard />
-                <PendenciasOnboarding />
-              </div>
-            </section>
+            {/* Grid 2 colunas em xl+: "Pra hoje" à esquerda, "Aprender na semana" à direita.
+                Em telas menores empilha verticalmente. Corta ~40-50% da altura total
+                em monitores wide e elimina scroll desnecessário. */}
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-8">
+              <section className="space-y-4">
+                <SectionLabel>Pra hoje</SectionLabel>
+                <div className="space-y-4">
+                  <BriefingSemanal />
+                  <DashboardUrgencias />
+                  <PWAInstallBanner />
+                  <AcademyWelcomeCard />
+                  <WeeklyProgressCard />
+                  <PendenciasOnboarding />
+                </div>
+              </section>
 
-            {/* 02 — Aprender na semana */}
-            <section className="space-y-4 md:space-y-5">
-              <SectionHeader index={2} eyebrow="Central de conteúdo" title="Aprender na semana" />
-              <CentralConteudo />
-              <RankingTicker />
-            </section>
+              <section className="space-y-4">
+                <SectionLabel>Aprender na semana</SectionLabel>
+                <CentralConteudo />
+                <RankingTicker />
+              </section>
+            </div>
 
-            {/* 03 — Na comunidade (só se há novidade publicada) */}
             {novidadesSemana && (
-              <section className="space-y-4 md:space-y-5">
-                <SectionHeader index={3} eyebrow="Na comunidade" title="Na comunidade" />
+              <section className="space-y-4">
+                <SectionLabel>Na comunidade</SectionLabel>
                 <NovidadesSemana />
               </section>
             )}
