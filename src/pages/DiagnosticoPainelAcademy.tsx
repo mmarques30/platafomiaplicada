@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DiagnosticoAcademyPanel } from "@/components/mentoria/DiagnosticoAcademyPanel";
 import { FeedbackMentora } from "@/components/mentoria/FeedbackMentora";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DiagnosticoPainelAcademy() {
@@ -44,18 +45,19 @@ export default function DiagnosticoPainelAcademy() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
-      {/* Header */}
-      <div>
-        <PageTitle primary="Meu" secondary="Diagnóstico" />
-        {isPageLoading ? (
-          <Skeleton className="h-5 w-40 mt-2" />
-        ) : (
-          nomeCompleto && (nomeCompleto !== "Admin" || isSimulating) && (
-            <p className="text-muted-foreground mt-2">{nomeCompleto}</p>
-          )
-        )}
-      </div>
+    <PageContainer>
+      <PageTitle
+        primary="Meu"
+        secondary="diagnóstico"
+        eyebrow="Academy"
+        description={
+          isPageLoading
+            ? undefined
+            : nomeCompleto && (nomeCompleto !== "Admin" || isSimulating)
+              ? nomeCompleto
+              : undefined
+        }
+      />
 
       {/* Sistema de Abas */}
       <Tabs defaultValue="diagnostico" className="w-full">
@@ -170,6 +172,6 @@ export default function DiagnosticoPainelAcademy() {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }

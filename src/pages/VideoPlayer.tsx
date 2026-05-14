@@ -19,6 +19,7 @@ import { useVideoRating } from "@/hooks/useVideoRating";
 import { CustomVideoPlayer } from "@/components/video/CustomVideoPlayer";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { getYouTubeThumbnail } from "@/lib/youtube";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function VideoPlayer() {
   const { id } = useParams();
@@ -189,8 +190,7 @@ export default function VideoPlayer() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container py-6">
+    <PageContainer>
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -338,7 +338,6 @@ export default function VideoPlayer() {
             </Card>
           </div>
         </div>
-      </main>
-    </div>
+    </PageContainer>
   );
 }

@@ -2,6 +2,7 @@ import { Check, Minus, Copy, ExternalLink, Gift } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import mariAvatar from "@/assets/mari-avatar-new.png";
@@ -47,13 +48,12 @@ export default function Cupons() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container py-6 px-4 space-y-6">
-        {/* Header - Sem ícone */}
-        <PageTitle 
-          primary="Descontos" 
-          secondary="IAplicada"
-        />
+    <PageContainer>
+      <PageTitle
+        primary="Descontos"
+        secondary="IAplicada"
+        eyebrow="Ofertas"
+      />
 
         {/* Sistema de Abas */}
         <Tabs defaultValue="academy" className="w-full">
@@ -220,7 +220,6 @@ export default function Cupons() {
             </section>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+    </PageContainer>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ExternalLink, FileText, Play, Monitor, Video, ChevronLeft, ChevronRight, ArrowLeft, Package } from "lucide-react";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -61,16 +62,16 @@ export default function MentoriaEntregas() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 space-y-3">
+      <PageContainer>
         <SkeletonCard variant="list" count={4} />
-      </div>
+      </PageContainer>
     );
   }
 
   if (!contrato) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
+      <PageContainer>
+        <Button variant="ghost" onClick={() => navigate("/mentoria")} className="-ml-2 w-fit">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
         </Button>
@@ -82,23 +83,23 @@ export default function MentoriaEntregas() {
             </p>
           </CardContent>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-8 overflow-hidden min-w-0">
+    <PageContainer>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => navigate("/mentoria")}
-        className="text-muted-foreground hover:text-foreground"
+        className="-ml-2 w-fit text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar
       </Button>
 
-      <PageTitle primary="Minhas" secondary="Entregas" />
+      <PageTitle primary="Minhas" secondary="entregas" eyebrow="Mentoria" />
 
       {/* Guia de Ferramentas */}
       <section className="space-y-3">
@@ -437,6 +438,6 @@ export default function MentoriaEntregas() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 }

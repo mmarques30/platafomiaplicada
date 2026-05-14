@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function MentoriaSessoes() {
   const navigate = useNavigate();
@@ -71,26 +72,30 @@ export default function MentoriaSessoes() {
 
   if (isLoading) {
     return (
-      <div className="p-4 md:p-6 space-y-3">
+      <PageContainer>
         <SkeletonCard variant="list" count={3} />
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
+    <PageContainer>
       <Button
         variant="ghost"
         onClick={() => navigate("/mentoria")}
-        className="mb-6"
+        className="-ml-2 w-fit"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar para Mentoria
       </Button>
 
       <div className="mb-8">
-        <PageTitle primary="Sessões" secondary="de Mentoria" />
-        <p className="text-muted-foreground text-lg mt-2">
+        <PageTitle
+          primary="Sessões"
+          secondary="de mentoria"
+          eyebrow="Mentoria"
+        />
+        <p className="text-muted-foreground text-base mt-2">
           Acompanhe suas sessões e acesse gravações e transcrições
         </p>
       </div>
@@ -272,6 +277,6 @@ export default function MentoriaSessoes() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 }

@@ -14,6 +14,7 @@ import { useFormulariosDisponiveis, useResponderFormulario } from "@/hooks/useFo
 import { CalendarIcon, Loader2, Save, Send, FileText, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 const ResponderFormulario = () => {
   const { id } = useParams<{ id: string }>();
@@ -69,12 +70,12 @@ const ResponderFormulario = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <PageContainer size="narrow">
         <div className="text-center py-12">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
           <p className="text-muted-foreground">Carregando formulário...</p>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -83,8 +84,7 @@ const ResponderFormulario = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-3xl py-8">
+    <PageContainer size="narrow">
         <Card className="p-8">
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
@@ -224,8 +224,7 @@ const ResponderFormulario = () => {
             </Button>
           </div>
         </Card>
-      </div>
-    </div>
+    </PageContainer>
   );
 };
 

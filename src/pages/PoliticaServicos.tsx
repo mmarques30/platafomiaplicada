@@ -9,6 +9,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function PoliticaServicos() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function PoliticaServicos() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-4xl py-8">
+      <PageContainer size="narrow">
         <Skeleton className="h-10 w-48 mb-6" />
         <Card>
           <CardHeader>
@@ -50,13 +51,13 @@ export default function PoliticaServicos() {
             <Skeleton className="h-96 w-full" />
           </CardContent>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
   if (!documento) {
     return (
-      <div className="container max-w-4xl py-8">
+      <PageContainer size="narrow">
         <Button variant="ghost" onClick={handleVoltar} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
@@ -66,12 +67,12 @@ export default function PoliticaServicos() {
             <p className="text-muted-foreground">Documento não encontrado.</p>
           </CardContent>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container max-w-4xl py-8">
+    <PageContainer size="narrow">
       <Button variant="ghost" onClick={handleVoltar} className="mb-6">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar
@@ -97,6 +98,6 @@ export default function PoliticaServicos() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

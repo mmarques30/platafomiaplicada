@@ -25,6 +25,7 @@ import { useVideoRating } from "@/hooks/useVideoRating";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { toast } from "sonner";
 import { TrilhaOverview } from "@/components/shared/TrilhaOverview";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function TrilhaDetalhes() {
   const { id: rawId } = useParams();
@@ -231,7 +232,7 @@ export default function TrilhaDetalhes() {
   }
 
   return (
-    <div className="container py-4 md:py-6 px-4">
+    <PageContainer>
       <Link to="/trilhas">
         <Button variant="ghost" className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -553,6 +554,6 @@ export default function TrilhaDetalhes() {
           <p className="text-muted-foreground">Vídeo não encontrado</p>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

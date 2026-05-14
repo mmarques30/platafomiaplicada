@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -168,17 +169,19 @@ export default function MentoriaTarefas() {
   if (isLoading) return <div className="p-8">Carregando...</div>;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
+    <PageContainer>
+      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="-ml-2 w-fit">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar para Mentoria
       </Button>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <PageTitle primary="Minhas" secondary="Tarefas" />
-          <p className="text-muted-foreground mt-2">Gerencie suas entregas e acompanhe seu progresso</p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <PageTitle
+          primary="Minhas"
+          secondary="tarefas"
+          eyebrow="Mentoria"
+          description="Gerencie suas entregas e acompanhe seu progresso."
+        />
         
         {/* Toggle de visualização */}
         <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
@@ -465,6 +468,6 @@ export default function MentoriaTarefas() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 }
