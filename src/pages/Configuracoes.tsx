@@ -17,6 +17,7 @@ import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, C
 import { useTheme } from "next-themes";
 import { forceFullAppReload } from "@/lib/pwaUpdate";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { OnboardingProgressCard } from "@/components/configuracoes/OnboardingProgressCard";
 
 export default function Configuracoes() {
@@ -91,9 +92,12 @@ export default function Configuracoes() {
 
 
   return (
-    <div className="container max-w-4xl py-4 md:py-8 px-4">
-      <PageTitle primary="Configurações" />
-      <div className="mb-6 md:mb-8" />
+    <PageContainer size="narrow">
+      <PageTitle
+        primary="Configurações"
+        secondary="da conta"
+        eyebrow="Conta"
+      />
 
       <div className="space-y-6">
         {/* Progresso do Perfil */}
@@ -313,6 +317,6 @@ export default function Configuracoes() {
         )}
 
       </div>
-    </div>
+    </PageContainer>
   );
 }

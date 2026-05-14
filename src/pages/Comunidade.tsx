@@ -7,17 +7,19 @@ import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function Comunidade() {
   const { data: ranking } = useRankingEngajamento();
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Page Title */}
-        <section className="mb-6">
-          <PageTitle primary="Comunidade" secondary="Aplicada" />
-        </section>
+    <PageContainer>
+      <PageTitle
+        primary="Comunidade"
+        secondary="aplicada"
+        eyebrow="Comunidade"
+        description="Quem está aplicando IA na rotina, ao vivo."
+      />
 
         {/* Hero Dashboard */}
         <CommunityHeroDashboard />
@@ -71,7 +73,6 @@ export default function Comunidade() {
             <CommunitySidebar />
           </div>
         </div>
-      </div>
-    </div>
+    </PageContainer>
   );
 }

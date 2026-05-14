@@ -16,6 +16,7 @@ import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 const tipoEventoConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   aula_ao_vivo: { label: "Aula ao Vivo", icon: Video, color: "text-primary" },
@@ -111,14 +112,13 @@ function ProximoEncontroCard() {
 
 export default function Calendario() {
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container py-6 md:py-8 px-4 md:px-6 space-y-6">
-        <div>
-          <PageTitle primary="Calendário" secondary="de Aulas" />
-          <p className="text-muted-foreground mt-2">
-            Confira as próximas aulas semanais e seus temas
-          </p>
-        </div>
+    <PageContainer>
+      <PageTitle
+        primary="Calendário"
+        secondary="de aulas"
+        eyebrow="Aprender"
+        description="Confira as próximas aulas semanais e seus temas."
+      />
 
         <Tabs defaultValue="calendario" className="w-full">
           <TabsList className="w-full md:w-auto grid grid-cols-2 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40">
@@ -148,7 +148,6 @@ export default function Calendario() {
             <CalendarioVisaoTabela />
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+    </PageContainer>
   );
 }

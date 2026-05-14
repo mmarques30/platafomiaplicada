@@ -15,11 +15,17 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent/50 hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        /* CTA pill estilo LP academy.iaplicada.com — verde-escuro sólido com radius alto */
+        "brand-pill": "rounded-full bg-brand-strong text-brand-strong-foreground hover:bg-brand-strong/90 font-medium tracking-tight",
+        /* Pill secundário em outline pra co-existir com brand-pill */
+        "brand-pill-outline": "rounded-full border border-foreground bg-transparent text-foreground hover:bg-foreground hover:text-background font-medium tracking-tight",
       },
       size: {
         default: "h-10 px-5 py-2",
         sm: "h-9 rounded-lg px-4 text-xs",
         lg: "h-11 rounded-lg px-8",
+        pill: "h-11 px-6 text-sm",
+        "pill-lg": "h-12 px-8 text-base",
         icon: "h-10 w-10",
       },
     },

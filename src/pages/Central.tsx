@@ -78,14 +78,13 @@ export default function Central() {
         />
       </div>
 
-      <main className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6 relative z-10 flex-1 flex flex-col">
-        {/* Header */}
-        <div>
-          <PageTitle primary="Central" secondary="de Conteúdo" />
-          <p className="text-muted-foreground mt-2">
-            Fique por dentro das novidades e aplique hoje
-          </p>
-        </div>
+      <main className="mx-auto w-full max-w-[1600px] space-y-8 px-4 py-2 md:space-y-12 md:px-8 md:py-4 lg:px-12 relative z-10 flex-1 flex flex-col">
+        <PageTitle
+          primary="Central"
+          secondary="de conteúdo"
+          eyebrow="Aprender"
+          description="Fique por dentro das novidades e aplique hoje."
+        />
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="flex-1 flex flex-col">

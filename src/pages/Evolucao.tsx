@@ -17,6 +17,7 @@ import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
 
@@ -30,11 +31,8 @@ export default function Evolucao() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
-      {/* Header */}
-      <div>
-        <PageTitle primary="Minha" secondary="Evolução" />
-      </div>
+    <PageContainer>
+      <PageTitle primary="Minha" secondary="evolução" eyebrow="Progresso" />
 
       {/* Sistema de Abas */}
       <Tabs defaultValue="minha-evolucao" className="w-full">
@@ -89,6 +87,6 @@ export default function Evolucao() {
           <AbaFavoritos />
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }

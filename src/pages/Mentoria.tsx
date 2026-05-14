@@ -9,6 +9,7 @@ import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { MentoriaHeroDashboard } from "@/components/mentoria/MentoriaHeroDashboard";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { StatusDiagnostico } from "@/components/mentoria/StatusDiagnostico";
 import { ProximaSessao } from "@/components/mentoria/ProximaSessao";
 import { TarefasUrgentes } from "@/components/mentoria/TarefasUrgentes";
@@ -148,7 +149,7 @@ export default function Mentoria() {
   const sectionIds = ['visao-geral', 'roadmap', 'evolucao'];
 
   return (
-    <div className="container mx-auto py-4 md:py-8 px-4 max-w-7xl">
+    <PageContainer>
       {/* Hero Dashboard */}
       <MentoriaHeroDashboard />
 
@@ -261,6 +262,6 @@ export default function Mentoria() {
           )}
         </Tabs>
       )}
-    </div>
+    </PageContainer>
   );
 }
