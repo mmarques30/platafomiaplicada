@@ -5,6 +5,8 @@ import { useMeusCertificados } from "@/hooks/useCertificados";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { PageContainer } from "@/components/shared/PageContainer";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function EvolucaoConquistas() {
   const { user } = useAuth();
@@ -32,14 +34,14 @@ export default function EvolucaoConquistas() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Conquistas</h1>
+      <PageContainer>
+        <PageTitle primary="Minhas" secondary="conquistas" eyebrow="Progresso" />
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -112,8 +114,8 @@ export default function EvolucaoConquistas() {
   const bloqueadas = conquistas.filter((c) => !c.desbloqueada);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Conquistas</h1>
+    <PageContainer>
+      <PageTitle primary="Minhas" secondary="conquistas" eyebrow="Progresso" />
 
       <div className="space-y-8">
         <div>
@@ -140,6 +142,6 @@ export default function EvolucaoConquistas() {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

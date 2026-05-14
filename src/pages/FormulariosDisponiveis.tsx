@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { format, differenceInDays, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { FileText, Clock, Calendar, CheckCircle2 } from "lucide-react";
+import { PageContainer } from "@/components/shared/PageContainer";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 const FormulariosDisponiveis = () => {
   const { user } = useAuth();
@@ -24,23 +26,22 @@ const FormulariosDisponiveis = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <PageContainer size="narrow">
         <div className="text-center py-12">
           <p className="text-muted-foreground">Carregando formulários...</p>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl py-8 space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Seus Formulários</h1>
-          <p className="text-muted-foreground">
-            Responda aos formulários para compartilhar seu progresso e feedback
-          </p>
-        </div>
+    <PageContainer size="narrow">
+      <PageTitle
+        primary="Seus"
+        secondary="formulários"
+        eyebrow="Tarefas"
+        description="Responda aos formulários para compartilhar seu progresso e feedback."
+      />
 
         {/* Pendentes */}
         <div>
@@ -143,8 +144,7 @@ const FormulariosDisponiveis = () => {
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </PageContainer>
   );
 };
 

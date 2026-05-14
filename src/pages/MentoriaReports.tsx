@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
@@ -39,14 +40,14 @@ export default function MentoriaReports() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
+    <PageContainer size="narrow">
+      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="-ml-2 w-fit">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar para Mentoria
       </Button>
-      
-      <div className="flex items-center justify-between mb-2">
-        <PageTitle primary="Reports" secondary="Executivos" />
+
+      <div className="flex items-start justify-between gap-4">
+        <PageTitle primary="Reports" secondary="executivos" eyebrow="Mentoria" />
         <Button
           variant="outline"
           size="sm"
@@ -104,6 +105,6 @@ export default function MentoriaReports() {
           ))}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

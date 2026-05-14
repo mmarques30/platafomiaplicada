@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { formatProjetoTitulo } from "@/lib/utils";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function MentoriaProjetos() {
   const navigate = useNavigate();
@@ -132,23 +133,23 @@ export default function MentoriaProjetos() {
   );
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <PageContainer>
       <Button
         variant="ghost"
         onClick={() => navigate("/mentoria")}
-        className="mb-6 -ml-2"
+        className="-ml-2 w-fit"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar para Mentoria
       </Button>
 
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <PageTitle primary="Projetos" secondary="de Mentoria" />
-          <p className="text-muted-foreground text-lg mt-2">
-            Acompanhe seus projetos e receba feedback do mentor
-          </p>
-        </div>
+      <div className="flex justify-between items-start gap-4">
+        <PageTitle
+          primary="Projetos"
+          secondary="de mentoria"
+          eyebrow="Mentoria"
+          description="Acompanhe seus projetos e receba feedback do mentor."
+        />
         <Button onClick={() => { setEditingProjeto(undefined); setModalOpen(true); }}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Projeto
@@ -372,6 +373,6 @@ export default function MentoriaProjetos() {
         isLoading={isCreating || isUpdating}
         isAdmin={false}
       />
-    </div>
+    </PageContainer>
   );
 }

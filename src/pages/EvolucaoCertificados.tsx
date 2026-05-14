@@ -5,6 +5,8 @@ import { useMeusCertificados } from "@/hooks/useCertificados";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { PageContainer } from "@/components/shared/PageContainer";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function EvolucaoCertificados() {
   const { user } = useAuth();
@@ -26,22 +28,22 @@ export default function EvolucaoCertificados() {
 
   if (loadingCertificados) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Meus Certificados</h1>
+      <PageContainer>
+        <PageTitle primary="Meus" secondary="certificados" eyebrow="Progresso" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-80 w-full" />
           ))}
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   const certificadosEmitidos = certificados?.filter((c) => c.status === "emitido") || [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Meus Certificados</h1>
+    <PageContainer>
+      <PageTitle primary="Meus" secondary="certificados" eyebrow="Progresso" />
 
       {certificadosEmitidos.length === 0 ? (
         <Alert>
@@ -64,6 +66,6 @@ export default function EvolucaoCertificados() {
           ))}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }
