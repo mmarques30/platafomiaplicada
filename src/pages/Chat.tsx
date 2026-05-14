@@ -511,7 +511,7 @@ const Chat = () => {
                         "rounded-2xl px-4 py-2",
                         message.role === "user"
                           ? "bg-brand-strong text-brand-strong-foreground rounded-br-sm"
-                          : "bg-muted text-foreground rounded-bl-sm"
+                          : "bg-brand-cream-soft text-foreground border border-brand-hairline rounded-bl-sm"
                       )}
                     >
                       {message.role === "assistant" ? (
@@ -580,7 +580,7 @@ const Chat = () => {
                       e.currentTarget.src = mariAvatarFallback;
                     }}
                   />
-                  <div className="rounded-2xl rounded-bl-sm bg-muted px-4 py-2 text-muted-foreground">
+                  <div className="rounded-2xl rounded-bl-sm bg-brand-cream-soft border border-brand-hairline px-4 py-2 text-muted-foreground">
                     <span className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Pensando...
