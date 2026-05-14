@@ -18,6 +18,8 @@ import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { Json } from "@/integrations/supabase/types";
+import { PageContainer } from "@/components/shared/PageContainer";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 type Material = {
   id: string;
@@ -113,29 +115,25 @@ export default function MateriaisGratuitos() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="container mx-auto px-4 py-6">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => navigate("/comunidade")}
-          className="mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar para Comunidade
-        </Button>
-        
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Materiais Gratuitos
-        </h1>
-        <p className="text-muted-foreground">
-          Acesse templates, guias, prompts e recursos para aplicar IA no seu dia a dia
-        </p>
-      </div>
+    <PageContainer>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate("/comunidade")}
+        className="-ml-2 w-fit"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar para Comunidade
+      </Button>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <PageTitle
+        primary="Materiais"
+        secondary="gratuitos"
+        eyebrow="Recursos"
+        description="Templates, guias, prompts e recursos pra aplicar IA no seu dia a dia."
+      />
+
+      <div>
         {/* Filters and View Toggle */}
         <div className="flex items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
@@ -391,6 +389,6 @@ export default function MateriaisGratuitos() {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

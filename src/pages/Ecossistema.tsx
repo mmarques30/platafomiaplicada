@@ -5,6 +5,7 @@ import { ProdutoDetalhesModal } from "@/components/ecossistema/ProdutoDetalhesMo
 import { useProdutos, Produto } from "@/hooks/admin/useProdutos";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function Ecossistema() {
   const { data: produtos, isLoading } = useProdutos();
@@ -16,13 +17,13 @@ export default function Ecossistema() {
   const produtosB2B = produtosAtivos.filter((p) => p.tipo === 'b2b');
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
-      <div>
-        <PageTitle primary="Ecossistema" secondary="IAplicada" icon={<Layers className="h-6 w-6 md:h-8 md:w-8 text-primary shrink-0" />} />
-        <p className="text-sm md:text-base text-muted-foreground mt-2">
-          Conheça todos os produtos e escolha o melhor para você
-        </p>
-      </div>
+    <PageContainer>
+      <PageTitle
+        primary="Ecossistema"
+        secondary="IAplicada"
+        eyebrow="Produtos"
+        description="Conheça todos os produtos e escolha o melhor para você."
+      />
 
       {isLoading ? (
         <div className="space-y-8">
@@ -86,6 +87,6 @@ export default function Ecossistema() {
         onOpenChange={(open) => !open && setSelectedProduto(null)}
         produto={selectedProduto}
       />
-    </div>
+    </PageContainer>
   );
 }

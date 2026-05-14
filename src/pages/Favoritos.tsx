@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Heart, Search } from "lucide-react";
 import FavoritoRow from "@/components/favoritos/FavoritoRow";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function Favoritos() {
   const { data: favoritos, isLoading } = useFavoritos();
@@ -110,10 +111,10 @@ export default function Favoritos() {
     return matchesSearch && matchesTab;
   });
 
-  if (isLoading) return <div className="container mx-auto py-8 px-4"><p>Carregando...</p></div>;
+  if (isLoading) return <PageContainer><p>Carregando...</p></PageContainer>;
 
   return (
-    <div className="container mx-auto py-4 md:py-8 px-4">
+    <PageContainer>
       <div className="mb-6 md:mb-8">
         <PageTitle primary="Meus" secondary="Favoritos" icon={<Heart className="h-7 w-7 md:h-8 md:w-8 text-primary shrink-0" />} />
         <p className="text-sm md:text-base text-muted-foreground mt-2">Acesse rapidamente seus conteúdos favoritos</p>
@@ -174,6 +175,6 @@ export default function Favoritos() {
           </Card>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

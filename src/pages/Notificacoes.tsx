@@ -3,6 +3,7 @@ import { useAvisosPublicos, useMarcarAvisosComoLidos } from "@/hooks/useAvisosPu
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bell, BellOff, Video, FileText, Bot, Wrench, BookOpen, Target, Lightbulb, FileDown, Newspaper, Megaphone, Star, Users, Zap, CircleDot } from "lucide-react";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PageTitle } from "@/components/shared/PageTitle";
@@ -131,14 +132,16 @@ export default function Notificacoes() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
+      <PageContainer>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container mx-auto py-6 md:py-8 px-4">
+    <PageContainer>
       <div className="mb-6 md:mb-8">
         <PageTitle primary="Avisos" icon={<Bell className="h-7 w-7 md:h-8 md:w-8 text-primary shrink-0" />} />
         <p className="text-sm md:text-base text-muted-foreground mt-2">Acompanhe os avisos e comunicados da plataforma</p>
@@ -199,6 +202,6 @@ export default function Notificacoes() {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

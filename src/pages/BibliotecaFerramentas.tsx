@@ -10,6 +10,7 @@ import { FerramentaCardHorizontal } from "@/components/bibliotecas/FerramentaCar
 import { FerramentaDetalhesModal } from "@/components/bibliotecas/FerramentaDetalhesModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import {
   Select,
   SelectContent,
@@ -68,9 +69,9 @@ export default function BibliotecaFerramentas() {
   }, [searchTerm, filtroCategoria, filtroPreco, filtroValeAPena]);
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+    <PageContainer>
       {/* Cabeçalho */}
-      <PageTitle primary="Biblioteca" secondary="de Ferramentas" />
+      <PageTitle primary="Biblioteca" secondary="de ferramentas" eyebrow="Recursos" />
 
       {/* Ranking Top 3 */}
       {!isLoading && ferramentas && ferramentas.length > 0 && (
@@ -199,6 +200,6 @@ export default function BibliotecaFerramentas() {
         ferramenta={ferramentaSelecionada}
         onClose={() => setFerramentaSelecionada(null)}
       />
-    </div>
+    </PageContainer>
   );
 }

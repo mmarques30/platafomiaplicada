@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { User, Briefcase, Calendar, Linkedin, Edit2, Save, X, Camera } from "lucide-react";
@@ -200,14 +201,16 @@ export default function Perfil() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
+      <PageContainer>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container mx-auto py-4 md:py-8 px-4">
+    <PageContainer>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
         <PageTitle primary="Meu" secondary="Perfil" />
         {!isEditing && (
@@ -412,6 +415,6 @@ export default function Perfil() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }
