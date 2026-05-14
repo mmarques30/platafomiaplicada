@@ -15,6 +15,7 @@ import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { cn } from "@/lib/utils";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -221,7 +222,7 @@ export default function MentoriaTasksBusiness() {
   }
 
   return (
-    <div className="container py-8 space-y-6">
+    <PageContainer>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -336,6 +337,6 @@ export default function MentoriaTasksBusiness() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 }

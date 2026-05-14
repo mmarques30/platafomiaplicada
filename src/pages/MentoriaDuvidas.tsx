@@ -9,6 +9,8 @@ import { useState } from "react";
 import { NovaDuvidaModal } from "@/components/mentoria/NovaDuvidaModal";
 import { format, formatDistanceToNow, differenceInHours } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PageContainer } from "@/components/shared/PageContainer";
+import { PageTitle } from "@/components/shared/PageTitle";
 
 export default function MentoriaDuvidas() {
   const navigate = useNavigate();
@@ -61,25 +63,25 @@ export default function MentoriaDuvidas() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <PageContainer size="narrow">
         <p>Carregando...</p>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
     <>
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <PageContainer size="narrow">
         <Button
           variant="ghost"
           onClick={() => navigate("/mentoria")}
-          className="mb-6"
+          className="-ml-2 w-fit"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar para Mentoria
         </Button>
 
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Minhas Dúvidas</h1>
             <p className="text-muted-foreground">
@@ -180,7 +182,7 @@ export default function MentoriaDuvidas() {
             })
           )}
         </div>
-      </div>
+      </PageContainer>
 
       <NovaDuvidaModal open={modalOpen} onOpenChange={setModalOpen} />
     </>

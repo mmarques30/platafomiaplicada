@@ -13,6 +13,7 @@ import { differenceInDays, parseISO, format, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TarefaModal } from "@/components/admin/mentoria/TarefaModal";
+import { PageContainer } from "@/components/shared/PageContainer";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
@@ -185,17 +186,17 @@ export default function MentoriaTarefasDetalhes() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <PageContainer>
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-48 bg-muted rounded" />
           <div className="h-96 bg-muted rounded-xl" />
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container mx-auto py-4 md:py-8 px-4 max-w-7xl">
+    <PageContainer>
       <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
 
       {/* Header */}
@@ -322,6 +323,6 @@ export default function MentoriaTarefasDetalhes() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </PageContainer>
   );
 }

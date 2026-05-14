@@ -16,6 +16,7 @@ import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 const STATUS_CONFIG = {
   pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const, color: "text-muted-foreground" },
@@ -71,19 +72,19 @@ export default function MentoriaEtapa() {
 
   if (loadingEtapa || loadingEntregas) {
     return (
-      <div className="container mx-auto py-8 px-4 space-y-6">
+      <PageContainer>
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-24 w-full" />
         <Skeleton className="h-48 w-full" />
-      </div>
+      </PageContainer>
     );
   }
 
   if (!etapa) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <PageContainer>
         <p className="text-muted-foreground">Etapa não encontrada</p>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -176,8 +177,7 @@ export default function MentoriaEtapa() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8">
-      {/* Header com botão voltar */}
+    <PageContainer>
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -248,6 +248,6 @@ export default function MentoriaEtapa() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

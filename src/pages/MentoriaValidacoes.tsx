@@ -13,6 +13,7 @@ import { format, differenceInDays, isPast } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 const TIPO_LABELS: Record<string, string> = {
   validacao: 'Validação',
@@ -238,7 +239,7 @@ export default function MentoriaValidacoes() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-5xl">
+      <PageContainer>
         <Skeleton className="h-10 w-48 mb-6" />
         <Skeleton className="h-12 w-64 mb-2" />
         <Skeleton className="h-5 w-96 mb-6" />
@@ -247,12 +248,12 @@ export default function MentoriaValidacoes() {
           <Skeleton className="h-40 w-full" />
           <Skeleton className="h-40 w-full" />
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-5xl">
+    <PageContainer>
       <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar para Mentoria
@@ -294,6 +295,6 @@ export default function MentoriaValidacoes() {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }

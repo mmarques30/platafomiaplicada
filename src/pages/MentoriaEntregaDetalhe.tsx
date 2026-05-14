@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { normalizeEntregaPrioridade, normalizeEntregaStatus } from "@/lib/business-entregas-normalizers";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 const STATUS_CONFIG = {
   pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const, color: "text-muted-foreground" },
@@ -59,18 +60,18 @@ export default function MentoriaEntregaDetalhe() {
 
   if (loadingEntrega) {
     return (
-      <div className="container max-w-4xl py-8 space-y-6">
+      <PageContainer size="narrow">
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-24 w-full" />
         <Skeleton className="h-48 w-full" />
-      </div>
+      </PageContainer>
     );
   }
 
   if (!entrega) {
     return (
-      <div className="container max-w-4xl py-8">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+      <PageContainer size="narrow">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="-ml-2 w-fit">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
         </Button>
@@ -80,7 +81,7 @@ export default function MentoriaEntregaDetalhe() {
             <p className="text-muted-foreground">Entrega não encontrada</p>
           </CardContent>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -91,7 +92,7 @@ export default function MentoriaEntregaDetalhe() {
   const StatusIcon = statusConfig.icon;
 
   return (
-    <div className="container max-w-4xl py-8 space-y-8">
+    <PageContainer size="narrow">
       {/* Header */}
       <div className="space-y-4">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-2">
@@ -226,6 +227,6 @@ export default function MentoriaEntregaDetalhe() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

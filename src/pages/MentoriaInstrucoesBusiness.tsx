@@ -13,6 +13,7 @@ import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { InstrucaoCard } from "@/components/mentoria/business/InstrucaoCard";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { cn } from "@/lib/utils";
 
 interface FaseAgrupada {
@@ -176,24 +177,23 @@ export default function MentoriaInstrucoesBusiness() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-6">
-      {/* Header */}
+    <PageContainer>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => navigate("/mentoria")}
-        className="mb-4"
+        className="-ml-2 w-fit"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar
       </Button>
 
-      <div className="mb-8">
-        <PageTitle primary="Minhas" secondary="Instruções" />
-        <p className="text-muted-foreground text-lg mt-2">
-          Instruções organizadas por fase e entrega
-        </p>
-      </div>
+      <PageTitle
+        primary="Minhas"
+        secondary="instruções"
+        eyebrow="Mentoria"
+        description="Instruções organizadas por fase e entrega."
+      />
 
       {/* Filtros */}
       <Card>
@@ -405,6 +405,6 @@ export default function MentoriaInstrucoesBusiness() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }
