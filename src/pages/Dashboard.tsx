@@ -22,20 +22,6 @@ import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
 import { BriefingSemanal } from "@/components/dashboard/BriefingSemanal";
 
-/**
- * Eyebrow simples pra cabeçalho de seção do Dashboard.
- * Usado em vez do SectionHeader numerado pra evitar a estética de "documento"
- * (numeração 01/02/03 + título grande serif funciona em LP, mas no app
- * polui sem agregar ação).
- */
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-      {children}
-    </h2>
-  );
-}
-
 export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
   const { profile, isLoading: loadingProfile } = useUserProfile();
@@ -114,35 +100,19 @@ export default function Dashboard() {
 
             <WelcomeHeader />
 
-            {/* Grid 2 colunas em xl+: "Pra hoje" à esquerda, "Aprender na semana" à direita.
-                Em telas menores empilha verticalmente. Corta ~40-50% da altura total
-                em monitores wide e elimina scroll desnecessário. */}
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-8">
-              <section className="space-y-4">
-                <SectionLabel>Pra hoje</SectionLabel>
-                <div className="space-y-4">
-                  <BriefingSemanal />
-                  <DashboardUrgencias />
-                  <PWAInstallBanner />
-                  <AcademyWelcomeCard />
-                  <WeeklyProgressCard />
-                  <PendenciasOnboarding />
-                </div>
-              </section>
-
-              <section className="space-y-4">
-                <SectionLabel>Aprender na semana</SectionLabel>
-                <CentralConteudo />
-                <RankingTicker />
-              </section>
-            </div>
-
-            {novidadesSemana && (
-              <section className="space-y-4">
-                <SectionLabel>Na comunidade</SectionLabel>
-                <NovidadesSemana />
-              </section>
-            )}
+            {/* Layout linear single-column. Ordem prioriza ação imediata em cima
+               (briefing + urgências), depois progresso e onboarding condicional,
+               depois consumo de conteúdo e ranking, comunidade no fim. Banner PWA
+               desce pro último por ser infra, não ação. */}
+            <BriefingSemanal />
+            <DashboardUrgencias />
+            <AcademyWelcomeCard />
+            <WeeklyProgressCard />
+            <PendenciasOnboarding />
+            <CentralConteudo />
+            <RankingTicker />
+            {novidadesSemana && <NovidadesSemana />}
+            <PWAInstallBanner />
           </>
         )}
       </main>
