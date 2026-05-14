@@ -33,7 +33,7 @@ export function TrilhaCardBloqueavel({
   if (isVisitante && !temConteudoDisponivel) {
     return (
       <Link to="/servicos" className="block">
-        <div className="relative overflow-hidden rounded-xl shadow-md w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow aspect-[9/16]">
+        <div className="relative overflow-hidden rounded-xl shadow-md w-full bg-muted border-2 border-primary/10 cursor-pointer hover:shadow-lg transition-shadow aspect-[9/16] max-h-[55vh] md:aspect-[3/4] md:max-h-[420px] lg:max-h-[460px]">
           {!imageLoaded && (
             <div className="absolute inset-0 bg-muted animate-pulse" />
           )}
@@ -66,7 +66,7 @@ export function TrilhaCardBloqueavel({
   if (!isVisitante && bloqueada) {
     return (
       <Link to={`/trilhas/${id}`} className="block">
-        <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-lg w-full bg-muted border-2 border-primary/10 hover:border-primary/20 cursor-pointer transition-all aspect-[9/16]">
+        <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-lg w-full bg-muted border-2 border-primary/10 hover:border-primary/20 cursor-pointer transition-all aspect-[9/16] max-h-[55vh] md:aspect-[3/4] md:max-h-[420px] lg:max-h-[460px]">
           {visivel_apenas_pro && (
             <div className="absolute top-2 left-2 md:top-4 md:left-4 z-10 bg-primary text-primary-foreground px-2 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1 md:gap-2 shadow-lg">
               <Lock className="h-3.5 w-3.5" /> PRO
@@ -106,7 +106,7 @@ export function TrilhaCardBloqueavel({
   // Trilha disponível → Card normal clicável
   return (
     <Link to={`/trilhas/${id}`} className="block group">
-      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative w-full bg-muted border-2 border-primary/10 hover:border-primary/30 aspect-[9/16]">
+      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative w-full bg-muted border-2 border-primary/10 hover:border-primary/30 aspect-[9/16] max-h-[55vh] md:aspect-[3/4] md:max-h-[420px] lg:max-h-[460px]">
         {visivel_apenas_pro && (
           <div className="absolute top-2 left-2 md:top-4 md:left-4 z-10 bg-primary text-primary-foreground px-2 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1 md:gap-2 shadow-lg">
             <Lock className="h-3.5 w-3.5" /> PRO
