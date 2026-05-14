@@ -16,6 +16,7 @@ import { IACopieUseDetalhesModal } from "@/components/bibliotecas/IACopieUseDeta
 import { Sparkles, Search, LayoutGrid, List } from "lucide-react";
 import { IACopieUseRow } from "@/components/bibliotecas/IACopieUseRow";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -47,9 +48,9 @@ export default function IACopieUse() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
+    <PageContainer>
       <div className="mb-6 md:mb-8">
-        <PageTitle primary="IA" secondary="Copie e Use" />
+        <PageTitle primary="IA" secondary="copie e use" eyebrow="Recursos" />
         <p className="text-sm md:text-base text-muted-foreground mt-1">
           Ferramentas de IA prontas para você copiar e usar
         </p>
@@ -198,6 +199,6 @@ export default function IACopieUse() {
         open={!!selectedIA}
         onOpenChange={(open) => !open && setSelectedIA(null)}
       />
-    </div>
+    </PageContainer>
   );
 }

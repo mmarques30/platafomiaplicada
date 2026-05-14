@@ -2,6 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { VideosVisitante } from "@/components/dashboard/VideosVisitante";
 import { MateriaisGratuitosTab } from "@/components/comunidade/MateriaisGratuitosTab";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GraduationCap } from "lucide-react";
 
@@ -10,12 +11,8 @@ export default function VideosBonus() {
   const initialTab = searchParams.get('tab') || 'aula';
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container py-6 space-y-6">
-        {/* Header */}
-        <section>
-          <PageTitle primary="Sala" secondary="de Aula" icon={<GraduationCap className="h-7 w-7 text-primary" />} />
-        </section>
+    <PageContainer>
+      <PageTitle primary="Sala" secondary="de aula" eyebrow="Aprender" icon={<GraduationCap className="h-7 w-7 text-primary" />} />
 
         {/* Tabs */}
         <Tabs defaultValue={initialTab} className="w-full">
@@ -41,7 +38,6 @@ export default function VideosBonus() {
             <MateriaisGratuitosTab />
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+    </PageContainer>
   );
 }

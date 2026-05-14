@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function BibliotecaPrompts() {
   const { data: prompts, isLoading } = usePrompts();
@@ -79,9 +80,8 @@ export default function BibliotecaPrompts() {
   }, [searchTerm, filtroCategoria, filtroNivel, filtroTag, filtroFerramenta]);
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
-      {/* Header */}
-      <PageTitle primary="Biblioteca" secondary="de Prompts" />
+    <PageContainer>
+      <PageTitle primary="Biblioteca" secondary="de prompts" eyebrow="Recursos" />
 
       {/* Barra de Busca e Filtros Dropdown */}
       <div className="flex flex-col md:flex-row gap-3">
@@ -226,6 +226,6 @@ export default function BibliotecaPrompts() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }
