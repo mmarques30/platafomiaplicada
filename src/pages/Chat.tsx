@@ -374,16 +374,15 @@ const Chat = () => {
   }
 
   const sidebar = (
-    <aside className="flex h-full w-full flex-col border-r border-border bg-card md:w-72 md:flex-shrink-0">
-      <header className="flex items-center justify-between border-b border-border p-4">
-        <div className="flex items-center gap-2">
-          <History className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold tracking-tight">Histórico</h2>
-        </div>
+    <aside className="flex h-full w-full flex-col bg-background md:w-64 md:flex-shrink-0 md:border-r md:border-brand-hairline">
+      <div className="flex items-center justify-between px-4 pt-5 pb-3">
+        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          Histórico
+        </span>
         <Button
           size="sm"
           variant="ghost"
-          className="h-8 w-8 p-0"
+          className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
           onClick={() => {
             setSelectedDate(todayKey());
             setHistorySheetOpen(false);
@@ -393,10 +392,10 @@ const Chat = () => {
         >
           <MessageSquarePlus className="h-4 w-4" />
         </Button>
-      </header>
-      <div className="flex-1 overflow-y-auto py-1">
+      </div>
+      <div className="flex-1 overflow-y-auto px-2 pb-4">
         {dateGroups.length === 0 && !isLoadingHistory && (
-          <p className="px-4 py-6 text-center text-xs text-muted-foreground">
+          <p className="px-2 py-6 text-center text-xs text-muted-foreground">
             Nenhuma conversa ainda.
           </p>
         )}
@@ -413,22 +412,15 @@ const Chat = () => {
               setHistorySheetOpen(false);
             }}
             className={cn(
-              "flex w-full flex-col items-start gap-1 border-l-2 px-4 py-3 text-left transition-colors",
+              "flex w-full flex-col items-start gap-0.5 rounded-lg px-3 py-2.5 text-left transition-colors",
               selectedDate === g.date
-                ? "border-brand-strong bg-accent/40"
-                : "border-transparent hover:bg-accent/20"
+                ? "bg-brand-strong/10 text-foreground"
+                : "text-foreground/75 hover:bg-foreground/5 hover:text-foreground"
             )}
           >
-            <div className="flex w-full items-center justify-between">
-              <span className="text-sm font-medium text-foreground">
-                {formatDateLabel(g.date)}
-              </span>
-              <span className="text-[10px] text-muted-foreground">
-                {g.count} {g.count === 1 ? "msg" : "msgs"}
-              </span>
-            </div>
-            <span className="line-clamp-1 text-xs text-muted-foreground">
-              {g.preview || "—"}
+            <span className="text-sm font-medium">{formatDateLabel(g.date)}</span>
+            <span className="line-clamp-1 w-full text-xs text-muted-foreground">
+              {g.preview || `${g.count} ${g.count === 1 ? "mensagem" : "mensagens"}`}
             </span>
           </button>
         ))}
@@ -443,44 +435,22 @@ const Chat = () => {
 
       {/* Painel da conversa */}
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Header mobile com toggle do histórico */}
-        <header className="flex items-center gap-3 border-b border-border bg-card px-3 py-2 md:hidden">
+        {/* Header mobile: só o trigger do histórico + data atual em sutil */}
+        <header className="flex items-center gap-3 px-3 py-3 md:hidden">
           <Sheet open={historySheetOpen} onOpenChange={setHistorySheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5">
+              <Button variant="ghost" size="sm" className="gap-1.5 -ml-2">
                 <History className="h-4 w-4" />
                 Histórico
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-80 p-0">
+            <SheetContent side="left" className="w-72 p-0">
               {sidebar}
             </SheetContent>
           </Sheet>
-          <span className="text-sm font-medium text-foreground">
+          <span className="text-xs text-muted-foreground">
             {dateGroups.length > 0 ? formatDateLabel(selectedDate) : "Nova conversa"}
           </span>
-        </header>
-
-        {/* Header desktop com data selecionada */}
-        <header className="hidden items-center justify-between border-b border-border bg-card px-6 py-3 md:flex">
-          <div className="flex items-center gap-3">
-            <img
-              src={mariAvatar}
-              alt="Mari"
-              className="h-8 w-8 rounded-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = mariAvatarFallback;
-              }}
-            />
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-foreground">
-                Mar<span className="text-primary">IA</span>na
-              </span>
-              <span className="text-[11px] text-muted-foreground">
-                {dateGroups.length > 0 ? formatDateLabel(selectedDate) : "Sem conversas ainda"}
-              </span>
-            </div>
-          </div>
         </header>
 
         {/* Mensagens */}
@@ -623,9 +593,9 @@ const Chat = () => {
         </div>
 
         {/* Input */}
-        <div className="border-t border-border bg-card px-3 py-3 md:px-8 md:py-4">
+        <div className="px-3 py-3 md:px-8 md:py-4">
           <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-            <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 shadow-sm">
+            <div className="flex items-center gap-2 rounded-full border border-brand-hairline bg-background px-4 py-1.5 shadow-sm focus-within:border-brand-strong/40 transition-colors">
               <Textarea
                 ref={inputRef}
                 value={input}
@@ -644,7 +614,7 @@ const Chat = () => {
                 type="submit"
                 size="icon"
                 disabled={isLoading || isStreaming || !input.trim()}
-                className="h-10 w-10 flex-shrink-0 rounded-full"
+                className="h-9 w-9 flex-shrink-0 rounded-full bg-brand-strong text-brand-strong-foreground hover:bg-brand-strong/90"
               >
                 <Send className="h-4 w-4" />
               </Button>
