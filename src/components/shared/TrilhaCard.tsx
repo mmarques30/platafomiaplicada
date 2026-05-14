@@ -16,7 +16,7 @@ export function TrilhaCard({ id, titulo, imagem_url, visivel_apenas_pro }: Trilh
 
   return (
     <Link to={`/trilhas/${id}`} className="block group">
-      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative w-full aspect-[9/16] max-h-[55vh] md:aspect-[3/4] md:max-h-[540px] lg:max-h-[620px] xl:max-h-[680px] bg-muted border-2 border-primary/10 hover:border-primary/30 card-interactive">
+      <div className="overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 relative w-full aspect-[9/16] max-h-[55vh] md:aspect-[3/4] md:max-h-[600px] lg:max-h-[700px] xl:max-h-[780px] bg-muted border-2 border-primary/10 hover:border-primary/30 card-interactive">
         {visivel_apenas_pro && (
           <div className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
             <Lock className="h-4 w-4" /> PRO
