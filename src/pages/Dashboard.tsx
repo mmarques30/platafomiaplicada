@@ -43,11 +43,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-2">
+    <div className="min-h-screen bg-background">
       {/* Tour guiado no primeiro acesso */}
       {showTour && <DashboardTour run={showTour} />}
 
-      <main className="container space-y-10 px-3 py-4 md:space-y-14 md:px-4 md:py-8">
+      <main className="mx-auto w-full max-w-[1600px] space-y-10 px-4 py-2 md:space-y-14 md:px-8 md:py-4 lg:px-12">
         {isVisitante ? (
           <div className="space-y-8">
             <WelcomeHeader />

@@ -256,8 +256,8 @@ export function AppSidebar() {
                           <span className={cn(
                             "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                             isActive 
-                              ? "bg-[#0D0D0D] opacity-100" 
-                              : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                              ? "bg-brand-strong opacity-100" 
+                              : "bg-brand-strong opacity-0 group-hover:opacity-50"
                           )} />
                             <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                             {!collapsed && <span className="text-sm">{menu.label}</span>}
@@ -394,8 +394,8 @@ export function AppSidebar() {
                         <span className={cn(
                           "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                           isActive 
-                            ? "bg-[#0D0D0D] opacity-100" 
-                            : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                            ? "bg-brand-strong opacity-100" 
+                            : "bg-brand-strong opacity-0 group-hover:opacity-50"
                         )} />
                         <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                         {!collapsed && <span className="text-sm">{menu.label}</span>}
@@ -419,8 +419,8 @@ export function AppSidebar() {
                           <span className={cn(
                             "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                             ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
-                              ? "bg-[#0D0D0D] opacity-100" 
-                              : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                              ? "bg-brand-strong opacity-100" 
+                              : "bg-brand-strong opacity-0 group-hover:opacity-50"
                           )} />
                           <div className={cn(
                             "flex items-center gap-3 rounded-lg transition-all duration-200 font-medium py-2.5 w-full",
@@ -576,8 +576,8 @@ export function AppSidebar() {
                     <span className={cn(
                       "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
                       isActive 
-                        ? "bg-[#0D0D0D] opacity-100" 
-                        : "bg-[#0D0D0D] opacity-0 group-hover:opacity-60"
+                        ? "bg-brand-strong opacity-100" 
+                        : "bg-brand-strong opacity-0 group-hover:opacity-50"
                     )} />
                     <Settings className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                     {!collapsed && <span className="text-sm">Configurações</span>}
