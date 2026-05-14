@@ -175,7 +175,7 @@ export function DiagnosticoPreviewModal({
               return (
                 <div key={index}>
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-full bg-aplicada-green-700 text-white flex items-center justify-center text-xs font-bold">
+                    <div className="w-6 h-6 rounded-full bg-brand-strong text-white flex items-center justify-center text-xs font-bold">
                       {index + 1}
                     </div>
                     <h3 className="font-semibold text-foreground">{etapa.titulo}</h3>

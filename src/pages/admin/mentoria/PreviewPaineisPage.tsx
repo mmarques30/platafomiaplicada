@@ -159,8 +159,8 @@ export default function PreviewPaineisPage() {
       </div>
 
       <div className="flex items-center gap-4 mb-8">
-        <div className="p-3 rounded-xl bg-aplicada-green-700/10">
-          <Eye className="h-6 w-6 text-aplicada-green-700" />
+        <div className="p-3 rounded-xl bg-brand-strong/10">
+          <Eye className="h-6 w-6 text-brand-strong" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Preview dos Painéis de Diagnóstico</h1>
@@ -183,7 +183,7 @@ export default function PreviewPaineisPage() {
                   variant={viewMode === "demo" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("demo")}
-                  className={viewMode === "demo" ? "bg-aplicada-green-700 hover:bg-aplicada-green-800" : ""}
+                  className={viewMode === "demo" ? "bg-brand-strong hover:bg-brand-strong/90" : ""}
                 >
                   Dados de Demonstração
                 </Button>
@@ -191,7 +191,7 @@ export default function PreviewPaineisPage() {
                   variant={viewMode === "user" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("user")}
-                  className={viewMode === "user" ? "bg-aplicada-green-700 hover:bg-aplicada-green-800" : ""}
+                  className={viewMode === "user" ? "bg-brand-strong hover:bg-brand-strong/90" : ""}
                 >
                   Usuário Existente
                 </Button>

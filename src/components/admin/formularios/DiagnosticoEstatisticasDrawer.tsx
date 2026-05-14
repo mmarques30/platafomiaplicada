@@ -144,14 +144,14 @@ export function DiagnosticoEstatisticasDrawer({
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-aplicada-green-700" />
+            <BarChart3 className="h-5 w-5 text-brand-strong" />
             Estatísticas: {titulo}
           </SheetTitle>
         </SheetHeader>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-aplicada-green-700" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-strong" />
           </div>
         ) : (
           <div className="space-y-6 mt-6">
@@ -208,7 +208,7 @@ export function DiagnosticoEstatisticasDrawer({
                   {estatisticas?.respostasPorDia.map((dia, i) => (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1">
                       <div 
-                        className="w-full bg-aplicada-green-700/80 rounded-t"
+                        className="w-full bg-brand-strong/80 rounded-t"
                         style={{ 
                           height: `${Math.max((dia.count / Math.max(...estatisticas.respostasPorDia.map(d => d.count || 1))) * 60, 4)}px` 
                         }}
