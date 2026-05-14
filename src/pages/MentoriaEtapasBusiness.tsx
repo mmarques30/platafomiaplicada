@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 const statusConfig = {
   pendente: { label: "Pendente", className: "bg-muted text-muted-foreground" },
@@ -57,25 +58,23 @@ export default function MentoriaEtapasBusiness() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-6">
-      {/* Header */}
+    <PageContainer>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => navigate("/mentoria")}
-        className="text-muted-foreground hover:text-foreground mb-4"
+        className="-ml-2 w-fit text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar
       </Button>
 
-      <div className="mb-8">
-        <PageTitle primary="Minhas" secondary="Fases" />
-        <p className="text-muted-foreground text-lg mt-2">
-          Acompanhe o progresso das fases do seu projeto
-        </p>
-      </div>
-
+      <PageTitle
+        primary="Minhas"
+        secondary="fases"
+        eyebrow="Mentoria"
+        description="Acompanhe o progresso das fases do seu projeto."
+      />
       {/* Progresso Geral */}
       <Card>
         <CardHeader className="pb-3">
@@ -184,6 +183,6 @@ export default function MentoriaEtapasBusiness() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

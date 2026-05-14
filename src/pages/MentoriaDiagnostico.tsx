@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Loader2, Info, Download } from "lucide-react";
 import { toast } from "sonner";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function MentoriaDiagnostico() {
   const navigate = useNavigate();
@@ -98,8 +99,7 @@ export default function MentoriaDiagnostico() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-2">
-      {/* Botão de voltar */}
+    <PageContainer>
       <Button
         variant="ghost"
         onClick={() => navigate(voltarUrl)}
@@ -153,6 +153,6 @@ export default function MentoriaDiagnostico() {
           />
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

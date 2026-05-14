@@ -10,6 +10,7 @@ import { ArrowLeft, Calendar, CheckCircle2, Clock, PlayCircle, AlertCircle } fro
 import { cn } from "@/lib/utils";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 const STATUS_CONFIG = {
   pendente: { label: "Pendente", icon: Clock, color: "text-muted-foreground", borderColor: "border-l-muted-foreground/30" },
@@ -40,22 +41,22 @@ export default function MeuSistemaEtapaDetalhe() {
 
   if (loadingEtapa || loadingEntregas) {
     return (
-      <div className="container mx-auto py-8 px-4 space-y-6">
+      <PageContainer>
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-32 w-full" />
         <Skeleton className="h-48 w-full" />
-      </div>
+      </PageContainer>
     );
   }
 
   if (!etapa) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <PageContainer>
         <p className="text-muted-foreground">Etapa não encontrada</p>
-        <Button variant="ghost" onClick={() => navigate("/meu-sistema")} className="mt-4">
+        <Button variant="ghost" onClick={() => navigate("/meu-sistema")} className="-ml-2 w-fit">
           <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
         </Button>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -69,8 +70,7 @@ export default function MeuSistemaEtapaDetalhe() {
   const marcos = etapa.marcos_proxima_etapa as string[] | null;
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-6 max-w-5xl">
-      {/* Header */}
+    <PageContainer>
       <div className="flex items-start gap-4">
         <Button
           variant="ghost"
@@ -242,6 +242,6 @@ export default function MeuSistemaEtapaDetalhe() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

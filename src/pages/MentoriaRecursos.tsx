@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/collapsible";
 import { toast } from "@/hooks/use-toast";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function MentoriaRecursos() {
   const navigate = useNavigate();
@@ -51,18 +52,18 @@ export default function MentoriaRecursos() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
-      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="mb-6">
+    <PageContainer>
+      <Button variant="ghost" onClick={() => navigate("/mentoria")} className="-ml-2 w-fit">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar para Mentoria
       </Button>
 
-      <div className="mb-8">
-        <PageTitle primary="Recursos" secondary="e Ferramentas" />
-        <p className="text-muted-foreground text-lg mt-2">
-          Ferramentas recomendadas para seu desenvolvimento em IA
-        </p>
-      </div>
+      <PageTitle
+        primary="Recursos"
+        secondary="e ferramentas"
+        eyebrow="Mentoria"
+        description="Ferramentas recomendadas para seu desenvolvimento em IA."
+      />
 
       {/* Bônus Section */}
       {bonus.length > 0 && (
@@ -282,6 +283,6 @@ export default function MentoriaRecursos() {
           </Card>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }
