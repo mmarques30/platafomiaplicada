@@ -78,7 +78,7 @@ export default function Central() {
         />
       </div>
 
-      <main className="w-full space-y-6 px-4 pb-10 md:space-y-8 md:px-6 md:pb-14 lg:space-y-10 lg:px-10 relative z-10 flex-1 flex flex-col">
+      <main className="w-full space-y-6 px-4 pt-6 pb-8 md:space-y-8 md:px-8 md:pt-6 md:pb-10 lg:space-y-10 lg:px-12 lg:pt-8 lg:pb-12 relative z-10 flex-1 flex flex-col">
         <PageTitle
           primary="Central"
           secondary="de conteúdo"

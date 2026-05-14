@@ -20,7 +20,7 @@ export function PageContainer({ children, className, size = "default" }: PageCon
     <div className="min-h-screen bg-background">
       <main
         className={cn(
-          "w-full space-y-6 px-4 pb-10 md:space-y-8 md:px-6 md:pb-14 lg:space-y-10 lg:px-10",
+          "w-full space-y-6 px-4 pt-6 pb-8 md:space-y-8 md:px-8 md:pt-6 md:pb-10 lg:space-y-10 lg:px-12 lg:pt-8 lg:pb-12",
           size === "narrow" && "mx-auto max-w-3xl",
           className,
         )}

@@ -65,7 +65,7 @@ export default function Dashboard() {
       {/* Tour guiado no primeiro acesso */}
       {showTour && <DashboardTour run={showTour} />}
 
-      <main className="w-full space-y-6 px-4 pb-10 md:space-y-8 md:px-6 md:pb-14 lg:px-10">
+      <main className="w-full space-y-6 px-4 pt-6 pb-8 md:space-y-8 md:px-8 md:pt-6 md:pb-10 lg:px-12 lg:pt-8 lg:pb-12">
         {isVisitante ? (
           <div className="space-y-6">
             <WelcomeHeader />
