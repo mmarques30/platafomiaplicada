@@ -59,8 +59,8 @@ export function SidebarAdminSection({
                 className={({ isActive }) => cn(
                   "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
                   isActive
-                    ? "text-primary font-semibold"
-                    : "text-sidebar-foreground hover:text-primary"
+                    ? "text-foreground font-semibold"
+                    : "text-foreground/75 hover:text-foreground"
                 )}
               >
                 {({ isActive }) => (
