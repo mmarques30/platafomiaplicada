@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles } from "lucide-react";
 
 export function NovidadesSemana() {
   const { data: novidades, isLoading } = useQuery({
@@ -23,7 +21,7 @@ export function NovidadesSemana() {
   });
 
   if (isLoading) {
-    return <Skeleton className="w-full h-64" />;
+    return <Skeleton className="w-full h-48" />;
   }
 
   if (!novidades) {
@@ -31,32 +29,23 @@ export function NovidadesSemana() {
   }
 
   return (
-    <Card data-novidades className="card-interactive relative overflow-hidden card-primary p-3 sm:p-4 md:p-8 lg:p-12 border border-primary/20 sm:border-2 shadow-lg sm:shadow-xl">
-      {/* Decorative circles - hidden on mobile */}
-      <div className="hidden sm:block absolute top-4 right-4 w-20 md:w-32 h-20 md:h-32 opacity-20">
-        <div className="absolute inset-0 rounded-full border-2 border-primary"></div>
-        <div className="absolute inset-2 md:inset-4 rounded-full border-2 border-primary"></div>
-        <div className="absolute inset-4 md:inset-8 rounded-full border-2 border-primary"></div>
-      </div>
-
-      {/* Large asterisk decoration - hidden on mobile */}
-      <div className="hidden sm:block absolute top-4 md:top-8 left-4 md:left-8 text-primary/20">
-        <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20" strokeWidth={1.5} />
-      </div>
-
-      <div className="relative z-10 space-y-3 md:space-y-4">
-        <h3 className="font-serif-display text-xl leading-tight text-foreground md:text-3xl">
+    <article
+      data-novidades
+      className="rounded-xl border border-brand-hairline bg-card p-5 md:p-7"
+    >
+      <div className="space-y-3">
+        <h3 className="font-serif-display text-xl leading-tight text-foreground md:text-2xl">
           {novidades.titulo}
         </h3>
         <div className="whitespace-pre-wrap text-sm font-light leading-relaxed text-foreground/85 md:text-base">
           {novidades.mensagem}
         </div>
         {novidades.created_at && (
-          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="pt-2 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Publicado em {new Date(novidades.created_at).toLocaleDateString('pt-BR')}
           </p>
         )}
       </div>
-    </Card>
+    </article>
   );
 }
