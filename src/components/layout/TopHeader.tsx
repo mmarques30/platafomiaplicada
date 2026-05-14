@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library, Eye, Maximize2, Minimize2 } from "lucide-react";
-import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
+import logoMarcaCompleta from "@/assets/logo-aplicada-marca-completa.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -129,15 +129,12 @@ export function TopHeader() {
         {/* LEFT: SidebarTrigger + Logo + Mobile Menu */}
         <div className="absolute left-0 top-0 h-full flex items-center gap-2 ml-1 md:ml-2">
           <SidebarTrigger className="h-10 w-10 md:h-8 md:w-8 text-foreground hover:text-foreground hover:bg-foreground/10 bg-foreground/5 rounded-md transition-colors" />
-          <Link to="/" className="hidden sm:flex items-center gap-2.5">
+          <Link to="/" className="hidden sm:block">
             <img
-              src={logoSimbolo}
+              src={logoMarcaCompleta}
               alt="IAplicada"
-              className="h-7 w-7 md:h-8 md:w-8"
+              className="h-6 md:h-7 w-auto"
             />
-            <span className="font-serif-display text-base md:text-lg leading-none text-foreground">
-              IAplicada
-            </span>
           </Link>
 
         </div>

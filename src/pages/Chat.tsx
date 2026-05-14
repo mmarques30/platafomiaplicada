@@ -25,15 +25,48 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  /* Carrega histórico persistido em chat_messages no primeiro mount.
+     Se a navegação trouxer initialMessages, esses têm prioridade. */
   useEffect(() => {
     if (location.state?.initialMessages) {
       setMessages(location.state.initialMessages);
+      setIsLoadingHistory(false);
+      return;
     }
-  }, [location.state]);
+    if (!user) {
+      setIsLoadingHistory(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("chat_messages")
+        .select("role, content")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true });
+      if (cancelled) return;
+      if (error) {
+        console.error("Erro ao carregar histórico do chat:", error);
+      } else if (data) {
+        setMessages(
+          data
+            .filter((m): m is { role: "user" | "assistant"; content: string } =>
+              m.role === "user" || m.role === "assistant"
+            )
+            .map((m) => ({ role: m.role, content: m.content }))
+        );
+      }
+      setIsLoadingHistory(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, location.state]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -274,7 +307,13 @@ const Chat = () => {
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 space-y-4"
       >
-        {messages.length === 0 && (
+        {isLoadingHistory && (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        )}
+
+        {!isLoadingHistory && messages.length === 0 && (
           <div className="flex flex-col items-center justify-center text-center p-4 md:p-6 py-12 md:py-16">
             <img
               src={mariAvatar}
