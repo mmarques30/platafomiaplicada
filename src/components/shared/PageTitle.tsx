@@ -2,34 +2,21 @@ import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface PageTitleProps {
-  /** Título principal (será renderizado em Fraunces serif) */
   primary: string;
-  /** Texto secundário italico ao lado do principal (também Fraunces, em cor accent) */
+  /** Texto secundário em itálico color accent ao lado do principal */
   secondary?: string;
-  /** Eyebrow opcional acima do título — pequeno CAPS com tracking, no padrão "01 — TÍTULO" da LP */
+  /** Eyebrow opcional acima do título */
   eyebrow?: string;
-  /** Numeração opcional do eyebrow (renderiza como "01 — eyebrow"). Se ausente, eyebrow vira só texto */
+  /** Numeração opcional. Se ausente, eyebrow vira só texto */
   index?: number;
-  /** Ícone à esquerda (mantido por compat — recomendado evitar; LP é mais editorial) */
+  /** Ícone à esquerda (compat) */
   icon?: ReactNode;
   /** Linha de apoio sob o título */
   description?: ReactNode;
   className?: string;
 }
 
-/**
- * Título de página interno no padrão da LP academy.iaplicada.com:
- *
- *   ── 01 — APRENDER
- *
- *   Trilhas *de aprendizado*
- *   Descrição opcional aqui.
- *
- * Substituiu o estilo anterior (h1 sans com underline gradient) por
- * Fraunces serif + secondary em itálico color accent, alinhado com
- * "Aplicar IA *de verdade*" da LP. API retrocompatível: continua
- * aceitando `primary` + `secondary` opcional.
- */
+/** Título padrão das páginas internas. */
 export function PageTitle({
   primary,
   secondary,

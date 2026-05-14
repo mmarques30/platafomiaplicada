@@ -449,7 +449,7 @@
     font-variation-settings: "opsz" 72;
   }
 
-  /* Section eyebrow estilo "01 — O PROBLEMA" da LP */
+  /* Eyebrow CAPS muted-foreground com tracking — usado em headers de seção. */
   .lp-eyebrow {
     @apply inline-flex items-center gap-3 text-[11px] font-medium tracking-[0.18em] uppercase text-muted-foreground;
   }
