@@ -257,9 +257,9 @@ export function WelcomeHeader() {
 
                 <Button
                   onClick={() => navigate(ctaHref)}
-                  variant="default"
-                  size="sm"
-                  className="ml-auto bg-brand-strong text-brand-strong-foreground hover:bg-brand-strong/90"
+                  variant="brand-pill"
+                  size="pill"
+                  className="ml-auto"
                 >
                   {ctaLabel}
                   <ArrowRight className="ml-1.5 h-3.5 w-3.5" strokeWidth={1.75} />

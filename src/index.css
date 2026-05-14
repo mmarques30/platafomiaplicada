@@ -207,14 +207,13 @@
 
 @layer components {
   .skills-tabs-list {
-    @apply inline-flex items-center gap-0.5 rounded-full bg-[#F5F5DC] p-1;
+    @apply inline-flex items-center gap-0.5 rounded-full bg-brand-cream-soft p-1 border border-brand-hairline;
   }
   .skills-tabs-trigger {
     @apply rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-all;
   }
   .skills-tabs-trigger[data-state="active"] {
-    @apply bg-[#0D0D0D] shadow-sm;
-    color: #9EB038 !important;
+    @apply bg-brand-strong text-brand-strong-foreground shadow-sm;
   }
 }
 
