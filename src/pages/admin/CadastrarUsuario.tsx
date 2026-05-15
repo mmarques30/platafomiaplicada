@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { adminTheme } from "@/components/admin/adminTheme";
 
 type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha";
 
@@ -58,10 +59,12 @@ export default function CadastrarUsuario() {
   };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">Cadastrar Novo Usuário</h1>
+    <div className={adminTheme.page}>
+      <div className={adminTheme.pageTitleWrapper}>
+        <h1 className={adminTheme.pageTitle}>Cadastrar Novo Usuário</h1>
+      </div>
 
-      <Card className="max-w-2xl">
+      <Card className={`${adminTheme.card} max-w-2xl`}>
         <CardHeader>
           <CardTitle>Informações do Usuário</CardTitle>
         </CardHeader>
