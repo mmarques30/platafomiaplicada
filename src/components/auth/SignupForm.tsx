@@ -6,8 +6,6 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
-import { GoogleLoginVerificationModal } from "@/components/auth/GoogleLoginVerificationModal";
 import {
   Select,
   SelectContent,
@@ -22,7 +20,6 @@ const selectTriggerClasses = "bg-zinc-800/80 border-white/10 text-white h-12 rou
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [showGoogleVerification, setShowGoogleVerification] = useState(false);
   const [objetivo, setObjetivo] = useState("");
   const [areaAtuacao, setAreaAtuacao] = useState("");
   const [desafio, setDesafio] = useState("");
@@ -240,26 +237,7 @@ export function SignupForm() {
         >
           {isLoading ? "Criando conta..." : "Criar conta grátis"}
         </Button>
-
-        {/* Divisor */}
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-white/10" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-zinc-900 px-4 text-white/40">ou</span>
-          </div>
-        </div>
-
-        {/* Botão Google */}
-        <GoogleLoginButton onClick={() => setShowGoogleVerification(true)} />
       </form>
-
-      {/* Modal de verificação Google */}
-      <GoogleLoginVerificationModal
-        open={showGoogleVerification}
-        onOpenChange={setShowGoogleVerification}
-      />
     </>
   );
 }
