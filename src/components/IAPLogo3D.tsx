@@ -4,88 +4,75 @@ import { useRef, useMemo } from "react";
 import * as THREE from "three";
 
 interface IAPLogo3DProps {
-  /** Tamanho do canvas em px (default 600) */
   width?: number;
-  /** Tamanho do canvas em px (default 600) */
   height?: number;
-  /** Escala do logo dentro da cena (default 1) */
   scale?: number;
 }
 
 /**
- * Logo 3D do símbolo IAplicada — 4 pétalas em diferentes tons de verde
- * arranjadas como uma flor estilizada, com rotação suave e float.
- *
- * Replica o símbolo flat da marca em 3D extrudado. Fundo transparente.
+ * Logo 3D do símbolo IAplicada — 4 pétalas (folha/gota) arranjadas
+ * em uma flor: cada pétala fica em um quadrante, pivô na origem.
  */
 function leafShape(): THREE.Shape {
-  // Forma de pétala/folha — um "diamond" curvado tipo gota larga
+  // Forma de pétala/folha — gota com base em (0,0) apontando pra (1,1).
+  // Lados curvos por bezier, pivô natural em (0,0) = centro da flor.
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
-  shape.bezierCurveTo(0, 0.4, 0.5, 0.85, 0.95, 1);
-  shape.bezierCurveTo(0.95, 1, 1, 0.95, 1, 0.95);
-  shape.bezierCurveTo(0.85, 0.5, 0.4, 0, 0, 0);
+  shape.bezierCurveTo(0, 0.55, 0.55, 1, 1, 1);
+  shape.bezierCurveTo(1, 0.55, 0.55, 0, 0, 0);
   return shape;
 }
 
 const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-  depth: 0.18,
+  depth: 0.2,
   bevelEnabled: true,
-  bevelThickness: 0.03,
-  bevelSize: 0.025,
-  bevelSegments: 6,
+  bevelThickness: 0.04,
+  bevelSize: 0.035,
+  bevelSegments: 8,
   curveSegments: 32,
 };
 
 function Logo({ scale = 1 }: { scale?: number }) {
   const groupRef = useRef<THREE.Group>(null);
 
-  const geometry = useMemo(() => {
-    const geo = new THREE.ExtrudeGeometry(leafShape(), extrudeSettings);
-    geo.center();
-    return geo;
-  }, []);
+  // Geometria SEM center() — pivô fica em (0,0), as 4 rotações em Z
+  // distribuem cada pétala num quadrante.
+  const geometry = useMemo(() => new THREE.ExtrudeGeometry(leafShape(), extrudeSettings), []);
 
-  // 4 pétalas — cores fiéis ao PNG flat (creme claro / verde escuro / creme / verde médio)
+  // Posicionamento correto pelos quadrantes (rotação Z anti-horária):
+  //   rotation 0       → quadrante TR (top-right)
+  //   rotation π/2     → quadrante TL
+  //   rotation π       → quadrante BL
+  //   rotation -π/2    → quadrante BR
+  // Cores fiéis ao PNG flat.
   const petals = [
-    { color: "#D8DCB1", rotation: 0 },       // top-left: creme-esverdeado claro
-    { color: "#7C8E2F", rotation: -Math.PI / 2 }, // top-right: verde escuro
-    { color: "#9EB038", rotation: Math.PI }, // bottom-right: verde médio (primary brand)
-    { color: "#E0E1B8", rotation: Math.PI / 2 },  // bottom-left: creme claro
+    { color: "#7C8E2F", rotation: 0 },                 // TR — verde escuro
+    { color: "#D8DCB1", rotation: Math.PI / 2 },       // TL — creme claro
+    { color: "#E0E1B8", rotation: Math.PI },           // BL — creme bem claro
+    { color: "#9EB038", rotation: -Math.PI / 2 },      // BR — verde médio (primary)
   ];
 
   useFrame((state) => {
     if (groupRef.current) {
-      // Rotação contínua eixo Y + oscilação X visível
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.6;
-      groupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.7) * 0.15;
+      // Rotação lenta no eixo Y + oscilação suave no X
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.25;
+      groupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.4) * 0.08;
     }
   });
 
   return (
-    <group ref={groupRef} scale={scale}>
-      {petals.map((petal, i) => {
-        // Cada pétala apontando pro centro, rotacionada 90° em torno do eixo Z
-        const offset = 0.05; // pequeno gap visual no centro pra ver o "X" interno
-        const dx = Math.cos(petal.rotation + Math.PI / 4) * offset;
-        const dy = Math.sin(petal.rotation + Math.PI / 4) * offset;
-        return (
-          <mesh
-            key={i}
-            geometry={geometry}
-            position={[dx, dy, 0]}
-            rotation={[0, 0, petal.rotation]}
-            castShadow
-            receiveShadow
-          >
-            <meshStandardMaterial
-              color={petal.color}
-              roughness={0.45}
-              metalness={0.1}
-            />
-          </mesh>
-        );
-      })}
+    <group ref={groupRef} scale={scale} position={[0, 0, 0]}>
+      {petals.map((petal, i) => (
+        <mesh
+          key={i}
+          geometry={geometry}
+          rotation={[0, 0, petal.rotation]}
+          castShadow
+          receiveShadow
+        >
+          <meshStandardMaterial color={petal.color} roughness={0.5} metalness={0.05} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -102,21 +89,21 @@ export function IAPLogo3D({ width = 600, height = 600, scale = 1 }: IAPLogo3DPro
       }}
     >
       <Canvas
-        camera={{ position: [0, 0, 3.5], fov: 38 }}
+        camera={{ position: [0, 0, 4.2], fov: 38 }}
         resize={{ scroll: false, offsetSize: true }}
         gl={{ alpha: true, antialias: true }}
         style={{ background: "transparent", width: "100%", height: "100%" }}
       >
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[3, 3, 5]} intensity={1.1} castShadow />
+        <ambientLight intensity={0.65} />
+        <directionalLight position={[3, 3, 5]} intensity={1.0} castShadow />
         <directionalLight position={[-3, -2, 2]} intensity={0.4} color="#C9D89B" />
-        <pointLight position={[0, 0, 2]} intensity={0.5} color="#ffffff" />
+        <pointLight position={[0, 0, 2]} intensity={0.45} color="#ffffff" />
         <Environment preset="apartment" />
         <Float
-          speed={2}
-          rotationIntensity={0.5}
-          floatIntensity={0.6}
-          floatingRange={[-0.08, 0.08]}
+          speed={1.2}
+          rotationIntensity={0.2}
+          floatIntensity={0.35}
+          floatingRange={[-0.05, 0.05]}
         >
           <Logo scale={scale} />
         </Float>

@@ -140,29 +140,17 @@ export default function EnvironmentSelector() {
               whileHover={isAvailable ? { scale: 1.05, y: -4 } : {}}
               whileTap={isAvailable ? { scale: 0.98 } : {}}
             >
-              {/* Card clean: fundo creme + ícone grande na cor do environment.
-                  Substituiu a foto JPG por um visual editorial alinhado com a
-                  paleta brand e o "menos hype" da LP. */}
+              {/* Card uniforme em creme — sem "carnaval" de cores. Apenas o
+                  ícone diferencia cada ambiente. Hover: borda brand-strong +
+                  ícone cresce + shadow sutil. */}
               <div
                 className={cn(
-                  "relative w-40 h-40 md:w-48 md:h-48 rounded-3xl overflow-hidden border border-brand-hairline transition-all duration-300 flex items-center justify-center bg-brand-cream-soft",
-                  !isAvailable && "opacity-50 bg-brand-cream-soft/60",
-                  isAvailable && "group-hover:border-brand-strong/40 group-hover:shadow-xl group-hover:shadow-foreground/5"
+                  "relative w-40 h-40 md:w-48 md:h-48 rounded-3xl border border-brand-hairline bg-brand-cream-soft transition-all duration-300 flex items-center justify-center",
+                  !isAvailable && "opacity-60",
+                  isAvailable &&
+                    "group-hover:border-brand-strong/50 group-hover:shadow-xl group-hover:shadow-foreground/5"
                 )}
-                style={
-                  isAvailable
-                    ? { backgroundColor: `${config.color}10` }
-                    : undefined
-                }
               >
-                {/* Glow effect no hover */}
-                {isAvailable && (
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-25 transition-opacity duration-300 blur-2xl"
-                    style={{ backgroundColor: config.color }}
-                  />
-                )}
-
                 {/* Lock overlay para ambientes bloqueados */}
                 {isLocked && (
                   <div className="absolute inset-0 flex items-center justify-center z-10">
@@ -172,16 +160,15 @@ export default function EnvironmentSelector() {
                   </div>
                 )}
 
-                {/* Ícone grande na cor do environment */}
+                {/* Ícone grande em brand-strong (verde escuro brand) */}
                 <Icon
                   className={cn(
-                    "h-16 w-16 md:h-20 md:w-20 transition-all relative z-[1]",
+                    "h-16 w-16 md:h-20 md:w-20 transition-transform",
                     isAvailable
-                      ? "group-hover:scale-110"
+                      ? "text-brand-strong group-hover:scale-110"
                       : "text-muted-foreground/40"
                   )}
                   strokeWidth={1.5}
-                  style={isAvailable ? { color: config.color } : {}}
                 />
               </div>
 
