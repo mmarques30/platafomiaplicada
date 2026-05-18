@@ -10,30 +10,18 @@ interface IAPLogo3DProps {
 }
 
 /**
- * Pétala em formato "quarto de círculo" igual ao símbolo flat da marca:
- * dois lados retos internos (formando o "+" no centro) e um arco curvo
- * externo (a borda arredondada que fica de frente para o canto).
+ * Pétala em formato folha/amêndoa — duas curvas suaves entre (0,0) e (1,1)
+ * passando por (0,1) e (1,0). Cada pétala ocupa o quadrante TR no seu
+ * frame local; as 4 rotações em Z distribuem nos demais quadrantes.
  *
- * Construção (vista de cima, sentido anti-horário):
- *   (0,0)  → ponto central da flor (origem)
- *   (1,0)  → ponta da pétala no eixo X
- *   arco até (0,1) → borda externa arredondada
- *   volta a (0,0)  → ponta da pétala no eixo Y
- *
- * Quando as 4 pétalas são rotacionadas em Z (0, 90°, 180°, 270°),
- * as quatro arestas retas se encontram no centro formando uma cruz
- * com um pequeno espaço — exatamente como no PNG flat da marca.
+ * Mantida igual ao primeiro design. O ajuste fino do "+" central é feito
+ * via offset radial de cada mesh, não modificando a forma em si.
  */
 function leafShape(): THREE.Shape {
   const shape = new THREE.Shape();
-  // Pequeno offset interno para criar o "+" gap entre as pétalas no centro.
-  const innerGap = 0.06;
-  shape.moveTo(innerGap, innerGap);
-  shape.lineTo(1, innerGap);
-  // Arco circular convexo da ponta X até a ponta Y, formando o "quarto de círculo"
-  // típico da marca. Ponto de controle em (1,1) puxa a curva pra fora.
-  shape.quadraticCurveTo(1, 1, innerGap, 1);
-  shape.lineTo(innerGap, innerGap);
+  shape.moveTo(0, 0);
+  shape.quadraticCurveTo(0, 1, 1, 1);
+  shape.quadraticCurveTo(1, 0, 0, 0);
   return shape;
 }
 
@@ -53,18 +41,17 @@ function Logo({ scale = 1 }: { scale?: number }) {
   // distribuem cada pétala num quadrante.
   const geometry = useMemo(() => new THREE.ExtrudeGeometry(leafShape(), extrudeSettings), []);
 
-  // Posicionamento correto pelos quadrantes (rotação Z anti-horária):
-  //   rotation 0       → quadrante TR (top-right)
-  //   rotation π/2     → quadrante TL
-  //   rotation π       → quadrante BL
-  //   rotation -π/2    → quadrante BR
-  // Cores fiéis ao PNG flat.
+  // Posicionamento correto pelos quadrantes (rotação Z anti-horária).
+  // O offset radial empurra cada pétala diagonalmente para fora do centro,
+  // criando o espaço em "+" entre as 4 sem mexer no formato da folha.
+  const radial = 0.07;
+  const d = radial / Math.SQRT2;
   const petals = [
-    { color: "#7C8E2F", rotation: 0 },                 // TR — verde escuro
-    { color: "#D8DCB1", rotation: Math.PI / 2 },       // TL — creme claro
-    { color: "#E0E1B8", rotation: Math.PI },           // BL — creme bem claro
-    { color: "#9EB038", rotation: -Math.PI / 2 },      // BR — verde médio (primary)
-  ];
+    { color: "#7C8E2F", rotation: 0,              offset: [ d,  d] }, // TR — verde escuro
+    { color: "#D8DCB1", rotation: Math.PI / 2,    offset: [-d,  d] }, // TL — creme claro
+    { color: "#E0E1B8", rotation: Math.PI,        offset: [-d, -d] }, // BL — creme bem claro
+    { color: "#9EB038", rotation: -Math.PI / 2,   offset: [ d, -d] }, // BR — verde médio (primary)
+  ] as const;
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -81,6 +68,7 @@ function Logo({ scale = 1 }: { scale?: number }) {
           key={i}
           geometry={geometry}
           rotation={[0, 0, petal.rotation]}
+          position={[petal.offset[0], petal.offset[1], 0]}
           castShadow
           receiveShadow
         >
