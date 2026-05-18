@@ -92,13 +92,20 @@ function Logo({ scale = 1 }: { scale?: number }) {
 
 export function IAPLogo3D({ width = 600, height = 600, scale = 1 }: IAPLogo3DProps) {
   return (
-    <div style={{ width, height }}>
+    <div
+      style={{
+        width: `${width}px`,
+        height: `${height}px`,
+        minWidth: `${width}px`,
+        minHeight: `${height}px`,
+        display: "block",
+      }}
+    >
       <Canvas
         camera={{ position: [0, 0, 3.5], fov: 38 }}
-        dpr={1}
         resize={{ scroll: false, offsetSize: true }}
         gl={{ alpha: true, antialias: true }}
-        style={{ background: "transparent" }}
+        style={{ background: "transparent", width: "100%", height: "100%" }}
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[3, 3, 5]} intensity={1.1} castShadow />

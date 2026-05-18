@@ -93,9 +93,9 @@ export default function EnvironmentSelector() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="-mb-2"
+        className="-mb-4 w-[300px] h-[300px] flex items-center justify-center"
       >
-        <IAPLogo3D width={220} height={220} scale={1.15} />
+        <IAPLogo3D width={300} height={300} scale={1.2} />
       </motion.div>
 
       {/* Título */}
