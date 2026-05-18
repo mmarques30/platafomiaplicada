@@ -114,7 +114,7 @@ export function GoogleLoginVerificationModal({ open, onOpenChange }: GoogleLogin
                 setError(null);
               }}
               placeholder="seu@email.com"
-              className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+              className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30"
               disabled={isVerifying || isRedirecting}
               autoComplete="email"
             />
@@ -142,7 +142,7 @@ export function GoogleLoginVerificationModal({ open, onOpenChange }: GoogleLogin
             <Button
               type="submit"
               disabled={isVerifying || isRedirecting || !email.trim()}
-              className="flex-1 bg-[#9EB038] hover:bg-[#8a9a31] text-white"
+              className="flex-1 bg-brand-strong hover:bg-brand-strong/90 text-brand-strong-foreground"
             >
               {isVerifying || isRedirecting ? (
                 <>

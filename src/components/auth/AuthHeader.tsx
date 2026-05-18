@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoAplicada from "@/assets/logo-aplicada-nova.png";
+import logoAplicada from "@/assets/logo-aplicada-marca-completa-clara.png";
 
 interface AnimatedNavLinkProps {
   to: string;

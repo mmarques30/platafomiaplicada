@@ -92,14 +92,14 @@ export default function EnvironmentSelector() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a]">
+      <div className="min-h-screen flex items-center justify-center bg-brand-ink">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a] p-6 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-brand-ink p-6 relative">
       {/* Botão Voltar */}
       <motion.div
         className="absolute top-6 left-6"

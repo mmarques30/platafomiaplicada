@@ -51,7 +51,7 @@ export function LoginForm() {
             type="email"
             placeholder="seu@email.com"
             required
-            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
+            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
           />
         </div>
         
@@ -64,13 +64,13 @@ export function LoginForm() {
             name="signin-password"
             placeholder="••••••••"
             required
-            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
+            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
           />
         </div>
         
         <Button 
           type="submit" 
-          className="w-full h-12 bg-[#9EB038] hover:bg-[#8a9a31] text-white font-medium rounded-lg transition-all mt-4" 
+          className="w-full h-12 bg-brand-strong hover:bg-brand-strong/90 text-brand-strong-foreground font-medium rounded-lg transition-all mt-4" 
           disabled={isLoading}
         >
           {isLoading ? "Acessando..." : "Acessar"}
@@ -94,7 +94,7 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => setShowRecuperarSenha(true)}
-            className="text-sm text-white/50 hover:text-[#9EB038] transition-colors"
+            className="text-sm text-white/50 hover:text-primary transition-colors"
           >
             Esqueceu a senha?
           </button>

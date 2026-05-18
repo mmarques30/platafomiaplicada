@@ -32,7 +32,7 @@ export default function PoliticaPrivacidade() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#1a1c19]">
+      <div className="min-h-screen bg-brand-ink">
         <AuthHeader />
         <div className="container max-w-4xl pt-24 pb-12 px-4">
           <Card className="bg-white/5 border-white/10">
@@ -51,7 +51,7 @@ export default function PoliticaPrivacidade() {
 
   if (!documento) {
     return (
-      <div className="min-h-screen bg-[#1a1c19]">
+      <div className="min-h-screen bg-brand-ink">
         <AuthHeader />
         <div className="container max-w-4xl pt-24 pb-12 px-4">
           <Card className="bg-white/5 border-white/10">
@@ -65,7 +65,7 @@ export default function PoliticaPrivacidade() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1c19]">
+    <div className="min-h-screen bg-brand-ink">
       <AuthHeader />
       <div className="container max-w-4xl pt-24 pb-12 px-4">
         <Card className="bg-white/5 border-white/10">

@@ -16,9 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const inputClasses = "bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]";
+const inputClasses = "bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]";
 
-const selectTriggerClasses = "bg-zinc-800/80 border-white/10 text-white h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 data-[placeholder]:text-white/40";
+const selectTriggerClasses = "bg-zinc-800/80 border-white/10 text-white h-12 rounded-lg focus:border-primary focus:ring-primary/30 data-[placeholder]:text-white/40";
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -228,14 +228,14 @@ export function SignupForm() {
             onChange={(e) => setDesafio(e.target.value.slice(0, 200))}
             placeholder="Descreva brevemente..."
             maxLength={200}
-            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20 min-h-[80px] resize-none"
+            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 rounded-lg focus:border-primary focus:ring-primary/30 min-h-[80px] resize-none"
           />
           <p className="text-xs text-white/40 text-right">{desafio.length}/200</p>
         </div>
         
         <Button 
           type="submit" 
-          className="w-full h-12 bg-[#9EB038] hover:bg-[#8a9a31] text-white font-medium rounded-lg transition-all mt-2" 
+          className="w-full h-12 bg-brand-strong hover:bg-brand-strong/90 text-brand-strong-foreground font-medium rounded-lg transition-all mt-2" 
           disabled={isLoading}
         >
           {isLoading ? "Criando conta..." : "Criar conta grátis"}
