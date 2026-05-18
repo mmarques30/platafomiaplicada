@@ -14,9 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const inputClasses = "bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 ";
+const inputClasses = "bg-brand-cream-soft border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 ";
 
-const selectTriggerClasses = "bg-background border-brand-hairline text-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 data-[placeholder]:text-muted-foreground";
+const selectTriggerClasses = "bg-brand-cream-soft border-brand-hairline text-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 data-[placeholder]:text-muted-foreground";
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -225,7 +225,7 @@ export function SignupForm() {
             onChange={(e) => setDesafio(e.target.value.slice(0, 200))}
             placeholder="Descreva brevemente..."
             maxLength={200}
-            className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground rounded-lg focus:border-primary focus:ring-primary/30 min-h-[80px] resize-none"
+            className="bg-brand-cream-soft border-brand-hairline text-foreground placeholder:text-muted-foreground rounded-lg focus:border-primary focus:ring-primary/30 min-h-[80px] resize-none"
           />
           <p className="text-xs text-muted-foreground text-right">{desafio.length}/200</p>
         </div>

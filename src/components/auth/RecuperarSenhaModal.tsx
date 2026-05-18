@@ -108,7 +108,7 @@ export function RecuperarSenhaModal({ open, onOpenChange }: RecuperarSenhaModalP
               required
               autoFocus
               disabled={isLoading}
-              className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30"
+              className="bg-brand-cream-soft border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30"
             />
             <p className="text-xs text-muted-foreground">
               Apenas emails já cadastrados podem recuperar a senha
