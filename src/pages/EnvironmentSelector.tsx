@@ -105,9 +105,6 @@ export default function EnvironmentSelector() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
-          IAplicada · Ambientes
-        </p>
         <h1 className="font-serif-display text-3xl md:text-4xl leading-[1.05] tracking-tight text-foreground mb-3">
           Selecione seu{" "}
           <em className="font-serif-italic text-primary">ambiente</em>
