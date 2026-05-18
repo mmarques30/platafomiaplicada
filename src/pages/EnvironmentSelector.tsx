@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gift, GraduationCap, Users, Crown, Lock, LucideProps, Wrench } from "lucide-react";
+import { Sparkles, BookOpen, Users2, Briefcase, Lock, LucideProps, Wrench } from "lucide-react";
 import { useEnvironment, Environment, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,10 +11,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 const ICONS: Record<Environment, React.ComponentType<LucideProps>> = {
-  gratuito: Gift,
-  academy: GraduationCap,
-  skills: Users,
-  business_parceria: Crown,
+  gratuito: Sparkles,
+  academy: BookOpen,
+  skills: Users2,
+  business_parceria: Briefcase,
   business_sistemas: Wrench,
 };
 
@@ -163,12 +163,12 @@ export default function EnvironmentSelector() {
                 {/* Ícone grande em brand-strong (verde escuro brand) */}
                 <Icon
                   className={cn(
-                    "h-16 w-16 md:h-20 md:w-20 transition-transform",
+                    "h-12 w-12 md:h-14 md:w-14 transition-transform",
                     isAvailable
                       ? "text-brand-strong group-hover:scale-110"
                       : "text-muted-foreground/40"
                   )}
-                  strokeWidth={1.5}
+                  strokeWidth={1.25}
                 />
               </div>
 

@@ -72,7 +72,7 @@ export function AuthHeader() {
       className={cn(
         "fixed top-4 left-0 right-0 z-50 mx-auto",
         "bg-foreground border border-foreground/20 shadow-lg shadow-foreground/10",
-        "px-10 py-2 w-fit max-w-2xl",
+        "px-6 py-1.5 w-fit max-w-2xl",
         "transition-all duration-300 ease-in-out",
         headerShapeClass
       )}
@@ -84,7 +84,7 @@ export function AuthHeader() {
           <img 
             src={logoAplicada}
             alt="IAplicada" 
-            className="h-12 md:h-14 w-auto cursor-pointer"
+            className="h-8 md:h-9 w-auto cursor-pointer"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
@@ -92,7 +92,7 @@ export function AuthHeader() {
         </Link>
 
         {/* Desktop Nav Links */}
-        <nav className="hidden md:flex items-center gap-8 ml-12">
+        <nav className="hidden md:flex items-center gap-6 ml-6">
           {navLinksData.map((link) => (
             <AnimatedNavLink key={link.label} to={link.to}>
               {link.label}
