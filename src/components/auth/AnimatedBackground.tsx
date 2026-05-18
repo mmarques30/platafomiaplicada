@@ -45,7 +45,9 @@ export function AnimatedBackground() {
     window.addEventListener("mousemove", handleMouseMove);
 
     const animate = () => {
-      ctx.fillStyle = "#2a2c28";
+      // Fundo verde-musgo profundo, derivado da paleta brand (alinha com brand-ink
+      // + tom suave de verde da marca em vez do cinza-grafite original)
+      ctx.fillStyle = "#1a1d14";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle, i) => {
@@ -66,7 +68,8 @@ export function AnimatedBackground() {
 
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(157, 184, 96, 0.2)";
+        // primary #9EB038 (verde-oliva claro brand) com 28% alpha
+        ctx.fillStyle = "rgba(158, 176, 56, 0.28)";
         ctx.fill();
 
         particlesRef.current.forEach((otherParticle, j) => {
@@ -79,7 +82,8 @@ export function AnimatedBackground() {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(121, 141, 60, ${0.1 * (1 - distance / 120)})`;
+            // brand-strong #5C6F1D (verde-escuro brand) alpha variável
+            ctx.strokeStyle = `rgba(92, 111, 29, ${0.18 * (1 - distance / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }

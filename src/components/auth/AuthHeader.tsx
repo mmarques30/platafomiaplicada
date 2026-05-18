@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoAplicada from "@/assets/logo-aplicada-marca-completa-clara.png";
+import logoAplicada from "@/assets/logo-aplicada-simbolo.png";
 
 interface AnimatedNavLinkProps {
   to: string;
@@ -61,7 +61,6 @@ export function AuthHeader() {
 
   const navLinksData = [
     { label: 'Sobre', to: '/sobre' },
-    { label: 'Serviços', to: '/servicos' },
     { label: 'Entrar', to: '/auth' },
   ];
 
