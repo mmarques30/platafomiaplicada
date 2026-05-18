@@ -14,12 +14,12 @@ const AnimatedNavLink = ({ to, children }: AnimatedNavLinkProps) => {
   return (
     <Link
       to={to}
-      className="relative overflow-hidden inline-block group text-sm text-muted-foreground hover:text-foreground transition-colors"
+      className="relative overflow-hidden inline-block group text-sm text-background/70 hover:text-background transition-colors"
     >
       <span className="block transition-transform duration-300 group-hover:-translate-y-full">
         {children}
       </span>
-      <span className="absolute top-full left-0 block transition-transform duration-300 group-hover:-translate-y-full text-foreground">
+      <span className="absolute top-full left-0 block transition-transform duration-300 group-hover:-translate-y-full text-background">
         {children}
       </span>
     </Link>
@@ -71,7 +71,7 @@ export function AuthHeader() {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn(
         "fixed top-4 left-0 right-0 z-50 mx-auto",
-        "bg-brand-cream border border-brand-hairline shadow-lg shadow-foreground/5",
+        "bg-foreground border border-foreground/20 shadow-lg shadow-foreground/10",
         "px-10 py-2 w-fit max-w-2xl",
         "transition-all duration-300 ease-in-out",
         headerShapeClass
@@ -103,7 +103,7 @@ export function AuthHeader() {
         {/* Mobile Menu Button */}
         <button
           onClick={toggleMenu}
-          className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+          className="md:hidden p-2 text-background/70 hover:text-background transition-colors"
         >
           {isOpen ? (
             <X className="h-5 w-5" />
@@ -129,7 +129,7 @@ export function AuthHeader() {
                   key={link.label}
                   to={link.to}
                   onClick={() => setIsOpen(false)}
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm py-2"
+                  className="text-background/70 hover:text-background transition-colors text-sm py-2"
                 >
                   {link.label}
                 </Link>
