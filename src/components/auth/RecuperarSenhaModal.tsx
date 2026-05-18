@@ -86,7 +86,7 @@ export function RecuperarSenhaModal({ open, onOpenChange }: RecuperarSenhaModalP
       <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-white/10 text-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-white flex items-center gap-2">
-            <Mail className="h-5 w-5 text-[#9EB038]" />
+            <Mail className="h-5 w-5 text-primary" />
             Recuperar Senha
           </DialogTitle>
           <DialogDescription className="text-white/60">
@@ -108,7 +108,7 @@ export function RecuperarSenhaModal({ open, onOpenChange }: RecuperarSenhaModalP
               required
               autoFocus
               disabled={isLoading}
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30"
             />
             <p className="text-xs text-white/50">
               Apenas emails já cadastrados podem recuperar a senha
@@ -129,7 +129,7 @@ export function RecuperarSenhaModal({ open, onOpenChange }: RecuperarSenhaModalP
             <Button
               type="submit"
               disabled={isLoading || !email.trim()}
-              className="flex-1 bg-[#9EB038] hover:bg-[#8a9a31] text-white"
+              className="flex-1 bg-brand-strong hover:bg-brand-strong/90 text-brand-strong-foreground"
             >
               {isLoading ? (
                 <>

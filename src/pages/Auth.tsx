@@ -43,45 +43,50 @@ export default function Auth() {
       
       {/* Conteúdo central */}
       <main className="flex-1 flex items-center justify-center px-6 pt-24 pb-8 relative z-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md text-center"
         >
           {/* Título com efeito typewriter */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="text-3xl md:text-4xl font-extrabold text-white mb-8"
+            className="mb-8"
           >
-            <Typewriter
-              text={["Bem Vindo a IAplicada"]}
-              speed={120}
-              delay={30000}
-              loop={true}
-              className="text-white font-extrabold"
-              cursorClassName="bg-[#9EB038]"
-            />
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/50 mb-3">
+              IAplicada · Academy
+            </p>
+            <h1 className="font-serif-display text-3xl md:text-5xl leading-[1.05] tracking-tight text-white">
+              <Typewriter
+                text={["Bem-vindo à IAplicada"]}
+                speed={120}
+                delay={30000}
+                loop={true}
+                className="text-white"
+                cursorClassName="bg-primary"
+              />
+            </h1>
           </motion.div>
-          
+
           {/* Card com sub-abas */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.5 }}
-            className="bg-white/5 backdrop-blur-[8px] border border-white/15 rounded-2xl p-6 shadow-xl shadow-black/20"
+            className="bg-white/[0.06] backdrop-blur-[8px] border border-white/15 rounded-2xl p-6 shadow-xl shadow-black/20"
           >
-            {/* Sub-abas discretas */}
+            {/* Sub-abas */}
             <div className="flex justify-center gap-8 mb-6 border-b border-white/10 pb-4">
               <button
                 onClick={() => setActiveTab("login")}
                 className={cn(
                   "text-sm font-medium transition-all duration-300 pb-2 border-b-2 -mb-[17px]",
-                  activeTab === "login" 
-                    ? "text-white border-[#9EB038]" 
-                    : "text-white/50 border-transparent hover:text-white/70"
+                  activeTab === "login"
+                    ? "text-white border-primary"
+                    : "text-white/50 border-transparent hover:text-white/80"
                 )}
               >
                 Entrar
@@ -90,15 +95,15 @@ export default function Auth() {
                 onClick={() => setActiveTab("signup")}
                 className={cn(
                   "text-sm font-medium transition-all duration-300 pb-2 border-b-2 -mb-[17px]",
-                  activeTab === "signup" 
-                    ? "text-white border-[#9EB038]" 
-                    : "text-white/50 border-transparent hover:text-white/70"
+                  activeTab === "signup"
+                    ? "text-white border-primary"
+                    : "text-white/50 border-transparent hover:text-white/80"
                 )}
               >
                 Criar Conta
               </button>
             </div>
-            
+
             {/* Formulário com animação */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -112,24 +117,24 @@ export default function Auth() {
               </motion.div>
             </AnimatePresence>
           </motion.div>
-          
+
           {/* Termos */}
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.7 }}
             className="text-xs text-white/40 mt-6"
           >
             Ao continuar, você concorda com nossos{" "}
-            <a href="/termos-uso" className="text-[#9EB038] hover:underline">
+            <a href="/termos-uso" className="text-primary hover:underline">
               Termos
             </a>{" "}
             e{" "}
-            <a href="/politica-privacidade" className="text-[#9EB038] hover:underline">
+            <a href="/politica-privacidade" className="text-primary hover:underline">
               Privacidade
             </a>
           </motion.p>
-          
+
         </motion.div>
       </main>
     </div>
