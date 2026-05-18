@@ -11,6 +11,8 @@ interface SimpleVideoPlayerProps {
   thumbnail?: string;
   title?: string;
   aspectRatio?: "video" | "reels" | "square";
+  /** Quando true, oculta a thumbnail e inicia o player no mount (muted pra obedecer policy do browser). */
+  autoplay?: boolean;
 }
 
 export function SimpleVideoPlayer({
@@ -20,9 +22,10 @@ export function SimpleVideoPlayer({
   thumbnail,
   title,
   aspectRatio = "video",
+  autoplay = false,
 }: SimpleVideoPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showThumbnail, setShowThumbnail] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(autoplay);
+  const [showThumbnail, setShowThumbnail] = useState(!autoplay);
   const [hasError, setHasError] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -115,6 +118,7 @@ export function SimpleVideoPlayer({
         <ReactPlayer
           src={videoUrl}
           playing={isPlaying}
+          muted={autoplay}
           controls
           width="100%"
           height="100%"

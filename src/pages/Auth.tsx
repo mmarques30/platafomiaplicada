@@ -56,17 +56,17 @@ export default function Auth() {
             transition={{ duration: 0.4, delay: 0.3 }}
             className="mb-8"
           >
-            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/50 mb-3">
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
               IAplicada · Academy
             </p>
-            <h1 className="font-serif-display text-3xl md:text-5xl leading-[1.05] tracking-tight text-white">
+            <h1 className="font-serif-display text-3xl md:text-5xl leading-[1.05] tracking-tight text-foreground">
               <Typewriter
                 text={["Bem-vindo à IAplicada"]}
                 speed={120}
                 delay={30000}
                 loop={true}
-                className="text-white"
-                cursorClassName="bg-primary"
+                className="text-foreground"
+                cursorClassName="bg-brand-strong"
               />
             </h1>
           </motion.div>
@@ -76,17 +76,17 @@ export default function Auth() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.5 }}
-            className="bg-white/[0.06] backdrop-blur-[8px] border border-white/15 rounded-2xl p-6 shadow-xl shadow-black/20"
+            className="bg-card/80 backdrop-blur-[8px] border border-brand-hairline rounded-2xl p-6 shadow-xl shadow-foreground/5"
           >
             {/* Sub-abas */}
-            <div className="flex justify-center gap-8 mb-6 border-b border-white/10 pb-4">
+            <div className="flex justify-center gap-8 mb-6 border-b border-brand-hairline pb-4">
               <button
                 onClick={() => setActiveTab("login")}
                 className={cn(
                   "text-sm font-medium transition-all duration-300 pb-2 border-b-2 -mb-[17px]",
                   activeTab === "login"
-                    ? "text-white border-primary"
-                    : "text-white/50 border-transparent hover:text-white/80"
+                    ? "text-foreground border-brand-strong"
+                    : "text-muted-foreground border-transparent hover:text-foreground"
                 )}
               >
                 Entrar
@@ -96,8 +96,8 @@ export default function Auth() {
                 className={cn(
                   "text-sm font-medium transition-all duration-300 pb-2 border-b-2 -mb-[17px]",
                   activeTab === "signup"
-                    ? "text-white border-primary"
-                    : "text-white/50 border-transparent hover:text-white/80"
+                    ? "text-foreground border-brand-strong"
+                    : "text-muted-foreground border-transparent hover:text-foreground"
                 )}
               >
                 Criar Conta
@@ -123,14 +123,14 @@ export default function Auth() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.7 }}
-            className="text-xs text-white/40 mt-6"
+            className="text-xs text-muted-foreground mt-6"
           >
             Ao continuar, você concorda com nossos{" "}
-            <a href="/termos-uso" className="text-primary hover:underline">
+            <a href="/termos-uso" className="text-brand-strong hover:underline">
               Termos
             </a>{" "}
             e{" "}
-            <a href="/politica-privacidade" className="text-primary hover:underline">
+            <a href="/politica-privacidade" className="text-brand-strong hover:underline">
               Privacidade
             </a>
           </motion.p>
