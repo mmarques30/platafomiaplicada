@@ -6,7 +6,7 @@ import { useEnvironment, Environment, ENVIRONMENT_CONFIG } from "@/contexts/Envi
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import logoAplicada from "@/assets/logo-aplicada-simbolo.png";
+import { IAPLogo3D } from "@/components/IAPLogo3D";
 import envBusinessImage from "@/assets/env-business.jpg";
 import envSkillsImage from "@/assets/env-skills.jpg";
 import envAcademyImage from "@/assets/env-academy.jpg";
@@ -118,15 +118,15 @@ export default function EnvironmentSelector() {
         </Button>
       </motion.div>
 
-      {/* Logo */}
-      <motion.img
-        src={logoAplicada}
-        alt="IAplicada"
-        className="h-12 md:h-14 w-auto mb-8"
+      {/* Logo 3D */}
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-      />
+        className="-mb-2"
+      >
+        <IAPLogo3D width={220} height={220} scale={1.15} />
+      </motion.div>
 
       {/* Título */}
       <motion.div
