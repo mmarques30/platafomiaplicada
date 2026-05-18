@@ -31,9 +31,10 @@ function leafShape(): THREE.Shape {
   shape.moveTo(1, 0);
   // Arco circular real (raio 1) do leste até o norte — esse é o "lado de fora".
   shape.absarc(0, 0, 1, 0, Math.PI / 2, false);
-  // Curva interna côncava de volta para a ponta leste; o control point
-  // próximo à origem deixa um pequeno gap central em formato de estrela.
-  const innerBulge = 0.22;
+  // Curva interna côncava de volta para a ponta leste. Control point bem
+  // perto da origem para deixar as pétalas "gordinhas" e o gap central
+  // bem pequeno (apenas um "+" sutil).
+  const innerBulge = 0.06;
   shape.quadraticCurveTo(innerBulge, innerBulge, 1, 0);
   return shape;
 }
@@ -41,8 +42,8 @@ function leafShape(): THREE.Shape {
 const extrudeSettings: THREE.ExtrudeGeometryOptions = {
   depth: 0.18,
   bevelEnabled: true,
-  bevelThickness: 0.035,
-  bevelSize: 0.03,
+  bevelThickness: 0.025,
+  bevelSize: 0.012,
   bevelSegments: 8,
   curveSegments: 40,
 };
