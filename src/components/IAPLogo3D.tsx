@@ -56,9 +56,9 @@ function Logo({ scale = 1 }: { scale?: number }) {
 
   useFrame((state) => {
     if (groupRef.current) {
-      // Rotação lenta no eixo Y + oscilação sutil
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.3;
-      groupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.4) * 0.1;
+      // Rotação contínua eixo Y + oscilação X visível
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.6;
+      groupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.7) * 0.15;
     }
   });
 
@@ -106,10 +106,10 @@ export function IAPLogo3D({ width = 600, height = 600, scale = 1 }: IAPLogo3DPro
         <pointLight position={[0, 0, 2]} intensity={0.5} color="#ffffff" />
         <Environment preset="apartment" />
         <Float
-          speed={1.4}
-          rotationIntensity={0.25}
-          floatIntensity={0.4}
-          floatingRange={[-0.05, 0.05]}
+          speed={2}
+          rotationIntensity={0.5}
+          floatIntensity={0.6}
+          floatingRange={[-0.08, 0.08]}
         >
           <Logo scale={scale} />
         </Float>
