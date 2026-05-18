@@ -48,7 +48,7 @@ export function LoginForm() {
             type="email"
             placeholder="seu@email.com"
             required
-            className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 "
+            className="bg-brand-cream-soft border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 "
           />
         </div>
         
@@ -61,7 +61,7 @@ export function LoginForm() {
             name="signin-password"
             placeholder="••••••••"
             required
-            className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 "
+            className="bg-brand-cream-soft border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 "
           />
         </div>
         

@@ -71,7 +71,7 @@ export function AuthHeader() {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn(
         "fixed top-4 left-0 right-0 z-50 mx-auto",
-        "bg-brand-cream-soft/80 backdrop-blur-md border border-brand-hairline",
+        "bg-brand-cream border border-brand-hairline shadow-lg shadow-foreground/5",
         "px-10 py-2 w-fit max-w-2xl",
         "transition-all duration-300 ease-in-out",
         headerShapeClass
