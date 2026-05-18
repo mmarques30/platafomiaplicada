@@ -6,7 +6,7 @@ import { useEnvironment, Environment, ENVIRONMENT_CONFIG } from "@/contexts/Envi
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import logoAplicada from "@/assets/logo-aplicada-nova.png";
+import logoAplicada from "@/assets/logo-aplicada-simbolo.png";
 import envBusinessImage from "@/assets/env-business.jpg";
 import envSkillsImage from "@/assets/env-skills.jpg";
 import envAcademyImage from "@/assets/env-academy.jpg";
@@ -92,14 +92,14 @@ export default function EnvironmentSelector() {
 
   if (isLoading || authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-ink">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-strong"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-brand-ink p-6 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 relative">
       {/* Botão Voltar */}
       <motion.div
         className="absolute top-6 left-6"
@@ -111,7 +111,7 @@ export default function EnvironmentSelector() {
           variant="ghost"
           size="sm"
           onClick={handleBackToAuth}
-          className="text-white/60 hover:text-white hover:bg-white/10 gap-2"
+          className="text-muted-foreground hover:text-foreground hover:bg-foreground/5 gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
           Sair
@@ -122,7 +122,7 @@ export default function EnvironmentSelector() {
       <motion.img
         src={logoAplicada}
         alt="IAplicada"
-        className="h-12 md:h-16 w-auto mb-8 opacity-90"
+        className="h-12 md:h-14 w-auto mb-8"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -135,10 +135,14 @@ export default function EnvironmentSelector() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <h1 className="text-2xl md:text-3xl font-semibold text-white mb-2">
-          Selecione seu Ambiente
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
+          IAplicada · Ambientes
+        </p>
+        <h1 className="font-serif-display text-3xl md:text-4xl leading-[1.05] tracking-tight text-foreground mb-3">
+          Selecione seu{" "}
+          <em className="font-serif-italic text-primary">ambiente</em>
         </h1>
-        <p className="text-white/60 text-sm md:text-base">
+        <p className="text-sm md:text-base font-light text-muted-foreground">
           Escolha o ambiente que deseja acessar
         </p>
       </motion.div>
@@ -185,8 +189,8 @@ export default function EnvironmentSelector() {
                 {/* Lock overlay para ambientes bloqueados - visual clean */}
                 {isLocked && (
                   <div className="absolute inset-0 flex items-center justify-center z-10">
-                    <div className="bg-black/30 backdrop-blur-[2px] rounded-full p-3">
-                      <Lock className="h-5 w-5 text-white/60" />
+                    <div className="bg-foreground/40 backdrop-blur-[2px] rounded-full p-3">
+                      <Lock className="h-5 w-5 text-background" />
                     </div>
                   </div>
                 )}
@@ -195,7 +199,7 @@ export default function EnvironmentSelector() {
                 {hasImage ? (
                   <>
                     {!loadedImages.has(env) && (
-                      <div className="absolute inset-0 bg-white/5 animate-pulse" />
+                      <div className="absolute inset-0 bg-brand-hairline/40 animate-pulse" />
                     )}
                     <img
                       src={ENVIRONMENT_IMAGES[env]}
@@ -210,15 +214,15 @@ export default function EnvironmentSelector() {
                 ) : (
                   <div
                     className={cn(
-                      "w-full h-full flex items-center justify-center",
-                      isAvailable ? "bg-white/5" : "bg-white/[0.02]"
+                      "w-full h-full flex items-center justify-center border border-brand-hairline",
+                      isAvailable ? "bg-brand-cream-soft" : "bg-brand-cream-soft/50"
                     )}
                     style={isAvailable ? { backgroundColor: `${config.color}15` } : {}}
                   >
                     <Icon
                       className={cn(
                         "h-10 w-10 md:h-12 md:w-12 transition-colors",
-                        isAvailable ? "text-white" : "text-white/30"
+                        isAvailable ? "text-foreground" : "text-muted-foreground/40"
                       )}
                       style={isAvailable ? { color: config.color } : {}}
                     />
@@ -230,7 +234,7 @@ export default function EnvironmentSelector() {
               <span
                 className={cn(
                   "text-sm md:text-base font-medium transition-colors",
-                  isAvailable ? "text-white" : "text-white/40"
+                  isAvailable ? "text-foreground" : "text-muted-foreground/60"
                 )}
               >
                 {config.label}
