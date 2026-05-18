@@ -14,9 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const inputClasses = "bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]";
+const inputClasses = "bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 ";
 
-const selectTriggerClasses = "bg-zinc-800/80 border-white/10 text-white h-12 rounded-lg focus:border-primary focus:ring-primary/30 data-[placeholder]:text-white/40";
+const selectTriggerClasses = "bg-background border-brand-hairline text-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 data-[placeholder]:text-muted-foreground";
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -119,7 +119,7 @@ export function SignupForm() {
     <>
       <form onSubmit={handleVisitorSignup} className="space-y-4">
         <div className="space-y-2 text-left">
-          <Label htmlFor="visitor-name" className="text-white/80 text-sm font-medium">
+          <Label htmlFor="visitor-name" className="text-foreground text-sm font-medium">
             Nome Completo
           </Label>
           <Input
@@ -133,7 +133,7 @@ export function SignupForm() {
         </div>
 
         <div className="space-y-2 text-left">
-          <Label htmlFor="visitor-email" className="text-white/80 text-sm font-medium">
+          <Label htmlFor="visitor-email" className="text-foreground text-sm font-medium">
             Email
           </Label>
           <Input
@@ -147,7 +147,7 @@ export function SignupForm() {
         </div>
 
         <div className="space-y-2 text-left">
-          <Label htmlFor="visitor-phone" className="text-white/80 text-sm font-medium">
+          <Label htmlFor="visitor-phone" className="text-foreground text-sm font-medium">
             Telefone
           </Label>
           <Input
@@ -161,7 +161,7 @@ export function SignupForm() {
         </div>
         
         <div className="space-y-2 text-left">
-          <Label htmlFor="visitor-password" className="text-white/80 text-sm font-medium">
+          <Label htmlFor="visitor-password" className="text-foreground text-sm font-medium">
             Crie uma senha
           </Label>
           <PasswordInput
@@ -172,21 +172,21 @@ export function SignupForm() {
             minLength={6}
             className={inputClasses}
           />
-          <p className="text-xs text-white/50">
+          <p className="text-xs text-muted-foreground">
             Você vai usar essa senha para acessar depois
           </p>
         </div>
 
         {/* Objetivo */}
         <div className="space-y-2 text-left">
-          <Label className="text-white/80 text-sm font-medium">
+          <Label className="text-foreground text-sm font-medium">
             Qual seu objetivo principal?
           </Label>
           <Select value={objetivo} onValueChange={setObjetivo} required>
             <SelectTrigger className={selectTriggerClasses}>
               <SelectValue placeholder="Selecione um objetivo" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-800 border-white/10">
+            <SelectContent className="bg-card border-brand-hairline">
               <SelectItem value="desenvolver_habilidades_ia">Desenvolver habilidades com IA</SelectItem>
               <SelectItem value="melhorar_produtividade_time">Melhorar produtividade do meu time</SelectItem>
               <SelectItem value="organizar_operacao">Organizar minha operação</SelectItem>
@@ -197,14 +197,14 @@ export function SignupForm() {
 
         {/* Área de atuação */}
         <div className="space-y-2 text-left">
-          <Label className="text-white/80 text-sm font-medium">
+          <Label className="text-foreground text-sm font-medium">
             Área de atuação
           </Label>
           <Select value={areaAtuacao} onValueChange={setAreaAtuacao} required>
             <SelectTrigger className={selectTriggerClasses}>
               <SelectValue placeholder="Selecione sua área" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-800 border-white/10">
+            <SelectContent className="bg-card border-brand-hairline">
               <SelectItem value="tecnologia">Tecnologia</SelectItem>
               <SelectItem value="marketing">Marketing</SelectItem>
               <SelectItem value="operacoes">Operações</SelectItem>
@@ -217,17 +217,17 @@ export function SignupForm() {
 
         {/* Desafio */}
         <div className="space-y-2 text-left">
-          <Label className="text-white/80 text-sm font-medium">
-            Qual seu maior desafio hoje? <span className="text-white/40">(opcional)</span>
+          <Label className="text-foreground text-sm font-medium">
+            Qual seu maior desafio hoje? <span className="text-muted-foreground">(opcional)</span>
           </Label>
           <Textarea
             value={desafio}
             onChange={(e) => setDesafio(e.target.value.slice(0, 200))}
             placeholder="Descreva brevemente..."
             maxLength={200}
-            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 rounded-lg focus:border-primary focus:ring-primary/30 min-h-[80px] resize-none"
+            className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground rounded-lg focus:border-primary focus:ring-primary/30 min-h-[80px] resize-none"
           />
-          <p className="text-xs text-white/40 text-right">{desafio.length}/200</p>
+          <p className="text-xs text-muted-foreground text-right">{desafio.length}/200</p>
         </div>
         
         <Button 

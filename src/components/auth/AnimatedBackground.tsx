@@ -45,9 +45,9 @@ export function AnimatedBackground() {
     window.addEventListener("mousemove", handleMouseMove);
 
     const animate = () => {
-      // Fundo verde-musgo profundo, derivado da paleta brand (alinha com brand-ink
-      // + tom suave de verde da marca em vez do cinza-grafite original)
-      ctx.fillStyle = "#1a1d14";
+      // Fundo creme suave (mesmo brand-cream-soft #F7F6E8 do topbar/welcome
+      // do app interno). Light, alinhado com a LP do Academy.
+      ctx.fillStyle = "#F7F6E8";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle, i) => {
@@ -68,8 +68,8 @@ export function AnimatedBackground() {
 
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        // primary #9EB038 (verde-oliva claro brand) com 28% alpha
-        ctx.fillStyle = "rgba(158, 176, 56, 0.28)";
+        // brand-strong #5C6F1D (verde-escuro brand) com 30% alpha — visível em fundo light
+        ctx.fillStyle = "rgba(92, 111, 29, 0.3)";
         ctx.fill();
 
         particlesRef.current.forEach((otherParticle, j) => {
@@ -82,8 +82,8 @@ export function AnimatedBackground() {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
-            // brand-strong #5C6F1D (verde-escuro brand) alpha variável
-            ctx.strokeStyle = `rgba(92, 111, 29, ${0.18 * (1 - distance / 120)})`;
+            // primary #9EB038 (verde-oliva médio brand) alpha variável
+            ctx.strokeStyle = `rgba(158, 176, 56, ${0.25 * (1 - distance / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }

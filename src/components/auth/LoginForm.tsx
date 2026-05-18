@@ -39,7 +39,7 @@ export function LoginForm() {
     <>
       <form onSubmit={handleSignIn} className="space-y-5">
         <div className="space-y-2 text-left">
-          <Label htmlFor="signin-email" className="text-white/80 text-sm font-medium">
+          <Label htmlFor="signin-email" className="text-foreground text-sm font-medium">
             Email
           </Label>
           <Input
@@ -48,12 +48,12 @@ export function LoginForm() {
             type="email"
             placeholder="seu@email.com"
             required
-            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
+            className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 "
           />
         </div>
         
         <div className="space-y-2 text-left">
-          <Label htmlFor="signin-password" className="text-white/80 text-sm font-medium">
+          <Label htmlFor="signin-password" className="text-foreground text-sm font-medium">
             Senha
           </Label>
           <PasswordInput
@@ -61,7 +61,7 @@ export function LoginForm() {
             name="signin-password"
             placeholder="••••••••"
             required
-            className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30 [&:-webkit-autofill]:bg-zinc-800 [&:-webkit-autofill]:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:shadow-[0_0_0_1000px_rgb(39,39,42)_inset]"
+            className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 "
           />
         </div>
         
@@ -78,7 +78,7 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => setShowRecuperarSenha(true)}
-            className="text-sm text-white/50 hover:text-primary transition-colors"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Esqueceu a senha?
           </button>

@@ -83,20 +83,20 @@ export function RecuperarSenhaModal({ open, onOpenChange }: RecuperarSenhaModalP
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-white/10 text-white">
+      <DialogContent className="sm:max-w-md bg-card border-brand-hairline text-foreground">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
             <Mail className="h-5 w-5 text-primary" />
             Recuperar Senha
           </DialogTitle>
-          <DialogDescription className="text-white/60">
+          <DialogDescription className="text-muted-foreground">
             Digite o email cadastrado para criar uma nova senha
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor="recuperar-email" className="text-white/80 text-sm font-medium">
+            <Label htmlFor="recuperar-email" className="text-foreground text-sm font-medium">
               Email cadastrado
             </Label>
             <Input
@@ -108,9 +108,9 @@ export function RecuperarSenhaModal({ open, onOpenChange }: RecuperarSenhaModalP
               required
               autoFocus
               disabled={isLoading}
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30"
+              className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30"
             />
-            <p className="text-xs text-white/50">
+            <p className="text-xs text-muted-foreground">
               Apenas emails já cadastrados podem recuperar a senha
             </p>
           </div>
@@ -121,7 +121,7 @@ export function RecuperarSenhaModal({ open, onOpenChange }: RecuperarSenhaModalP
               variant="outline"
               onClick={handleClose}
               disabled={isLoading}
-              className="flex-1 bg-transparent border-white/10 text-white hover:bg-white/5"
+              className="flex-1 bg-transparent border-brand-hairline text-foreground hover:bg-foreground/5"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar
