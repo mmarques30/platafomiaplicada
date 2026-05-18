@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Gift, GraduationCap, Users, Crown, Lock, LucideProps, Wrench } from "lucide-react";
@@ -7,10 +7,6 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { IAPLogo3D } from "@/components/IAPLogo3D";
-import envBusinessImage from "@/assets/env-business.jpg";
-import envSkillsImage from "@/assets/env-skills.jpg";
-import envAcademyImage from "@/assets/env-academy.jpg";
-import envGratuitoImage from "@/assets/env-gratuito.jpg";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -22,42 +18,20 @@ const ICONS: Record<Environment, React.ComponentType<LucideProps>> = {
   business_sistemas: Wrench,
 };
 
-const ENVIRONMENT_IMAGES: Partial<Record<Environment, string>> = {
-  gratuito: envGratuitoImage,
-  academy: envAcademyImage,
-  skills: envSkillsImage,
-  business_parceria: envBusinessImage,
-  business_sistemas: envBusinessImage, // Usa mesma imagem do business
-};
-
-// Importante: o ambiente "business_sistemas" não deve aparecer na seleção inicial.
-// Usuários desse plano entram via "business_parceria" e a experiência é ajustada por identificação interna.
+// "business_sistemas" não aparece na seleção inicial — usuários desse plano
+// entram via "business_parceria" e a experiência é ajustada internamente.
 const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "skills", "business_parceria"];
 
 export default function EnvironmentSelector() {
   const navigate = useNavigate();
   const { signOut, user, loading: authLoading } = useAuth();
-  const { 
-    availableEnvironments, 
-    setEnvironment, 
+  const {
+    availableEnvironments,
+    setEnvironment,
     isLoading,
-    currentEnvironment 
+    currentEnvironment,
   } = useEnvironment();
   const { isAdmin } = useUserRole();
-
-  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
-
-  // Preload images
-  useEffect(() => {
-    const images = [envBusinessImage, envSkillsImage, envAcademyImage, envGratuitoImage];
-    images.forEach(src => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.as = 'image';
-      link.href = src;
-      document.head.appendChild(link);
-    });
-  }, []);
 
   // Guard: redirecionar para /auth se não autenticado
   useEffect(() => {
@@ -71,10 +45,6 @@ export default function EnvironmentSelector() {
       navigate("/", { replace: true });
     }
   }, [currentEnvironment, isLoading, navigate]);
-
-  const handleImageLoad = (env: Environment) => {
-    setLoadedImages(prev => new Set(prev).add(env));
-  };
 
   const handleSelectEnvironment = (env: Environment) => {
     if (!availableEnvironments.includes(env)) {
@@ -154,7 +124,6 @@ export default function EnvironmentSelector() {
           const Icon = ICONS[env];
           const isAvailable = availableEnvironments.includes(env);
           const isLocked = !isAvailable;
-          const hasImage = ENVIRONMENT_IMAGES[env];
 
           return (
             <motion.button
@@ -171,22 +140,30 @@ export default function EnvironmentSelector() {
               whileHover={isAvailable ? { scale: 1.05, y: -4 } : {}}
               whileTap={isAvailable ? { scale: 0.98 } : {}}
             >
-              {/* Card com imagem ou ícone */}
+              {/* Card clean: fundo creme + ícone grande na cor do environment.
+                  Substituiu a foto JPG por um visual editorial alinhado com a
+                  paleta brand e o "menos hype" da LP. */}
               <div
                 className={cn(
-                  "relative w-40 h-40 md:w-48 md:h-48 rounded-3xl overflow-hidden transition-all duration-300",
-                  !isAvailable && "opacity-40"
+                  "relative w-40 h-40 md:w-48 md:h-48 rounded-3xl overflow-hidden border border-brand-hairline transition-all duration-300 flex items-center justify-center bg-brand-cream-soft",
+                  !isAvailable && "opacity-50 bg-brand-cream-soft/60",
+                  isAvailable && "group-hover:border-brand-strong/40 group-hover:shadow-xl group-hover:shadow-foreground/5"
                 )}
+                style={
+                  isAvailable
+                    ? { backgroundColor: `${config.color}10` }
+                    : undefined
+                }
               >
-                {/* Glow effect */}
+                {/* Glow effect no hover */}
                 {isAvailable && (
                   <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 blur-xl z-0"
+                    className="absolute inset-0 opacity-0 group-hover:opacity-25 transition-opacity duration-300 blur-2xl"
                     style={{ backgroundColor: config.color }}
                   />
                 )}
 
-                {/* Lock overlay para ambientes bloqueados - visual clean */}
+                {/* Lock overlay para ambientes bloqueados */}
                 {isLocked && (
                   <div className="absolute inset-0 flex items-center justify-center z-10">
                     <div className="bg-foreground/40 backdrop-blur-[2px] rounded-full p-3">
@@ -195,46 +172,26 @@ export default function EnvironmentSelector() {
                   </div>
                 )}
 
-                {/* Conteúdo do card */}
-                {hasImage ? (
-                  <>
-                    {!loadedImages.has(env) && (
-                      <div className="absolute inset-0 bg-brand-hairline/40 animate-pulse" />
-                    )}
-                    <img
-                      src={ENVIRONMENT_IMAGES[env]}
-                      alt={config.label}
-                      onLoad={() => handleImageLoad(env)}
-                      className={cn(
-                        "w-full h-full object-cover transition-opacity duration-300",
-                        loadedImages.has(env) ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </>
-                ) : (
-                  <div
-                    className={cn(
-                      "w-full h-full flex items-center justify-center border border-brand-hairline",
-                      isAvailable ? "bg-brand-cream-soft" : "bg-brand-cream-soft/50"
-                    )}
-                    style={isAvailable ? { backgroundColor: `${config.color}15` } : {}}
-                  >
-                    <Icon
-                      className={cn(
-                        "h-10 w-10 md:h-12 md:w-12 transition-colors",
-                        isAvailable ? "text-foreground" : "text-muted-foreground/40"
-                      )}
-                      style={isAvailable ? { color: config.color } : {}}
-                    />
-                  </div>
-                )}
+                {/* Ícone grande na cor do environment */}
+                <Icon
+                  className={cn(
+                    "h-16 w-16 md:h-20 md:w-20 transition-all relative z-[1]",
+                    isAvailable
+                      ? "group-hover:scale-110"
+                      : "text-muted-foreground/40"
+                  )}
+                  strokeWidth={1.5}
+                  style={isAvailable ? { color: config.color } : {}}
+                />
               </div>
 
               {/* Título abaixo do card */}
               <span
                 className={cn(
                   "text-sm md:text-base font-medium transition-colors",
-                  isAvailable ? "text-foreground" : "text-muted-foreground/60"
+                  isAvailable
+                    ? "text-foreground group-hover:text-brand-strong"
+                    : "text-muted-foreground/60"
                 )}
               >
                 {config.label}
