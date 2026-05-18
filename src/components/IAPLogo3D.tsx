@@ -10,26 +10,27 @@ interface IAPLogo3DProps {
 }
 
 /**
- * Logo 3D do símbolo IAplicada — 4 pétalas (folha/gota) arranjadas
- * em uma flor: cada pétala fica em um quadrante, pivô na origem.
+ * Pétala em formato "quarto de círculo arredondado" — uma folha larga que
+ * ocupa um quadrante completo do bounding box, igual ao símbolo flat
+ * da marca. Vértice interno em (0,0) = centro da flor.
  */
 function leafShape(): THREE.Shape {
-  // Forma de pétala/folha — gota com base em (0,0) apontando pra (1,1).
-  // Lados curvos por bezier, pivô natural em (0,0) = centro da flor.
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
-  shape.bezierCurveTo(0, 0.55, 0.55, 1, 1, 1);
-  shape.bezierCurveTo(1, 0.55, 0.55, 0, 0, 0);
+  // sobe pelo eixo Y com curva suave, vai até o canto externo (1,1)
+  shape.quadraticCurveTo(0, 1, 1, 1);
+  // volta do canto externo pra origem por curva pelo eixo X
+  shape.quadraticCurveTo(1, 0, 0, 0);
   return shape;
 }
 
 const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-  depth: 0.2,
+  depth: 0.18,
   bevelEnabled: true,
-  bevelThickness: 0.04,
-  bevelSize: 0.035,
+  bevelThickness: 0.035,
+  bevelSize: 0.03,
   bevelSegments: 8,
-  curveSegments: 32,
+  curveSegments: 40,
 };
 
 function Logo({ scale = 1 }: { scale?: number }) {
@@ -89,7 +90,7 @@ export function IAPLogo3D({ width = 600, height = 600, scale = 1 }: IAPLogo3DPro
       }}
     >
       <Canvas
-        camera={{ position: [0, 0, 4.2], fov: 38 }}
+        camera={{ position: [0, 0, 5.5], fov: 38 }}
         resize={{ scroll: false, offsetSize: true }}
         gl={{ alpha: true, antialias: true }}
         style={{ background: "transparent", width: "100%", height: "100%" }}
