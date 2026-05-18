@@ -10,17 +10,30 @@ interface IAPLogo3DProps {
 }
 
 /**
- * Pétala em formato "quarto de círculo arredondado" — uma folha larga que
- * ocupa um quadrante completo do bounding box, igual ao símbolo flat
- * da marca. Vértice interno em (0,0) = centro da flor.
+ * Pétala em formato "quarto de círculo" igual ao símbolo flat da marca:
+ * dois lados retos internos (formando o "+" no centro) e um arco curvo
+ * externo (a borda arredondada que fica de frente para o canto).
+ *
+ * Construção (vista de cima, sentido anti-horário):
+ *   (0,0)  → ponto central da flor (origem)
+ *   (1,0)  → ponta da pétala no eixo X
+ *   arco até (0,1) → borda externa arredondada
+ *   volta a (0,0)  → ponta da pétala no eixo Y
+ *
+ * Quando as 4 pétalas são rotacionadas em Z (0, 90°, 180°, 270°),
+ * as quatro arestas retas se encontram no centro formando uma cruz
+ * com um pequeno espaço — exatamente como no PNG flat da marca.
  */
 function leafShape(): THREE.Shape {
   const shape = new THREE.Shape();
-  shape.moveTo(0, 0);
-  // sobe pelo eixo Y com curva suave, vai até o canto externo (1,1)
-  shape.quadraticCurveTo(0, 1, 1, 1);
-  // volta do canto externo pra origem por curva pelo eixo X
-  shape.quadraticCurveTo(1, 0, 0, 0);
+  // Pequeno offset interno para criar o "+" gap entre as pétalas no centro.
+  const innerGap = 0.06;
+  shape.moveTo(innerGap, innerGap);
+  shape.lineTo(1, innerGap);
+  // Arco circular convexo da ponta X até a ponta Y, formando o "quarto de círculo"
+  // típico da marca. Ponto de controle em (1,1) puxa a curva pra fora.
+  shape.quadraticCurveTo(1, 1, innerGap, 1);
+  shape.lineTo(innerGap, innerGap);
   return shape;
 }
 
