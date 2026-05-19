@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { FileText, Download, Eye, Calendar, Shield, DollarSign, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, TrendingUp, Clock, Lightbulb, CheckCircle2, Building2, Loader2, Plus, Edit2, Trash2, AlertCircle, Info, ChevronDown } from "lucide-react";
+import { FileText, Download, Eye, Calendar, Shield, Package, ExternalLink, Link2, FolderOpen, HardDrive, Wrench, Video, Table, StickyNote, CheckCircle2, Building2, Loader2, Plus, Edit2, Trash2, ChevronDown } from "lucide-react";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useDocumentosBusiness } from "@/hooks/useDocumentosBusiness";
 import { useLinksBusiness, LinkBusiness } from "@/hooks/useLinksBusiness";
@@ -26,7 +25,7 @@ import { ptBR } from "date-fns/locale";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { ArquivosProjetoSection } from "@/components/admin/business/ArquivosProjetoSection";
 import { NotasProjetoSection } from "@/components/admin/business/NotasProjetoSection";
-import { ProjetoResumoDashboard } from "@/components/business/ProjetoResumoDashboard";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const iconeOptions = [
@@ -70,15 +69,6 @@ export default function MentoriaDocumentos() {
   useEffect(() => {
     if (storageKey) localStorage.setItem(storageKey, String(documentosExpandido));
   }, [storageKey, documentosExpandido]);
-
-  // Atividade recente
-  const atividadeRecente = useMemo(() => {
-    const items: { tipo: string; titulo: string; data: string; icon: typeof FileText }[] = [];
-    documentos.filter(d => d.arquivo_url).forEach(d => items.push({ tipo: "Arquivo", titulo: d.titulo, data: d.created_at || "", icon: FileText }));
-    notas.forEach(n => items.push({ tipo: "Anotação", titulo: n.titulo, data: n.created_at || "", icon: StickyNote }));
-    links.forEach(l => items.push({ tipo: "Link", titulo: l.titulo, data: l.created_at || "", icon: Link2 }));
-    return items.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).slice(0, 4);
-  }, [documentos, notas, links]);
 
   // Cronograma
   const cronograma = useMemo(() => {
@@ -189,30 +179,6 @@ export default function MentoriaDocumentos() {
     return { label: "Atrasado", classe: "bg-destructive/15 text-destructive border-transparent" };
   })();
 
-  // Insights dinâmicos (Painel do Projeto)
-  const insights: { label: string; valor: string; tipo: "info" | "warning" | "success" }[] = [];
-  if (progresso.percentual === 100) {
-    insights.push({ label: "Todas as entregas concluídas", valor: "100%", tipo: "success" });
-  } else if (progresso.percentual > 0) {
-    insights.push({ label: "Entregas concluídas", valor: `${progresso.percentual}%`, tipo: "info" });
-  } else if ((contrato.entregas_esperadas || []).length > 0) {
-    insights.push({ label: "Nenhuma entrega concluída", valor: "0%", tipo: "warning" });
-  }
-  if (cronograma) {
-    if (cronograma.diasRestantes <= 30) {
-      insights.push({ label: "Prazo se aproximando", valor: `${cronograma.diasRestantes} dias`, tipo: "warning" });
-    } else {
-      insights.push({ label: "Prazo restante", valor: `${cronograma.diasRestantes} dias`, tipo: "info" });
-    }
-  }
-  insights.push({ label: "Documentos no projeto", valor: String(totalItens), tipo: "info" });
-  if (notas.length === 0) {
-    insights.push({ label: "Nenhuma anotação registrada", valor: "Registre decisões", tipo: "warning" });
-  }
-  if (reports && reports.length > 0) {
-    insights.push({ label: "Reports gerados", valor: String(reports.length), tipo: "success" });
-  }
-
   return (
     <div className="p-4 md:p-6 space-y-6">
       <PageTitle primary="Documentos" />
@@ -220,14 +186,14 @@ export default function MentoriaDocumentos() {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {statCards.map((s) => (
-          <Card key={s.label} className="bg-[hsl(var(--chart-4))] border-0">
+          <Card key={s.label} className="bg-brand-cream-soft border border-brand-hairline shadow-none">
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center">
-                <s.icon className="h-5 w-5 text-white/70" />
+              <div className="h-10 w-10 rounded-lg bg-brand-strong/10 flex items-center justify-center">
+                <s.icon className="h-5 w-5 text-brand-strong" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{s.count}</p>
-                <p className="text-xs text-white/60">{s.label}</p>
+                <p className="text-2xl font-serif-display text-foreground tabular-nums leading-tight">{s.count}</p>
+                <p className="text-xs text-muted-foreground">{s.label}</p>
               </div>
             </CardContent>
           </Card>
@@ -500,20 +466,99 @@ export default function MentoriaDocumentos() {
         </CollapsibleContent>
       </Collapsible>
 
-      {/* Resumo do Projeto */}
-      <ProjetoResumoDashboard
-        totalEntregas={(contrato.entregas_esperadas || []).length}
-        progresso={progresso}
-        cronograma={cronograma}
-        saudeProjeto={saudeProjeto}
-        dataFim={contrato.data_fim}
-        arquivosCount={arquivosCount}
-        notasCount={notas.length}
-        linksCount={links.length}
-        reportsCount={reports.length}
-        atividadeRecente={atividadeRecente}
-        insights={insights}
-      />
+      {/* Painel Estratégico — versão enxuta e premium. Só o essencial: progresso,
+          saúde, timeline e 3 métricas-chave. Tudo o que estava em gráficos
+          redundantes (radial / donut / lista de insights / atividade) foi
+          removido porque os mesmos números já aparecem nos stat cards do topo
+          e nos badges dentro dos tabs de documentos. */}
+      <Card className="bg-brand-cream-soft border border-brand-hairline shadow-none">
+        <CardContent className="p-6 md:p-8 space-y-6">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="min-w-0">
+              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-brand-strong mb-2">
+                Painel Estratégico
+              </p>
+              <h3 className="font-serif-display text-2xl md:text-3xl text-foreground leading-tight tracking-tight">
+                {progresso.percentual}% das entregas concluídas
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1.5">
+                {progresso.modulosConcluidos} de {(contrato.entregas_esperadas || []).length} marcos do projeto
+              </p>
+            </div>
+            <span className={cn(
+              "text-xs font-medium px-3 py-1.5 rounded-full border whitespace-nowrap",
+              saudeProjeto.label === "No prazo" && "bg-brand-strong/10 text-brand-strong border-brand-strong/25",
+              saudeProjeto.label === "Atenção" && "bg-amber-500/10 text-amber-700 border-amber-500/25",
+              saudeProjeto.label === "Atrasado" && "bg-destructive/10 text-destructive border-destructive/25",
+              saudeProjeto.label === "Sem cronograma definido" && "bg-muted text-muted-foreground border-transparent"
+            )}>
+              {saudeProjeto.label}
+            </span>
+          </div>
+
+          {/* Timeline elegante: trilha hairline, fill cronograma em brand-strong/30,
+              fill entregas em brand-strong sólido. */}
+          {cronograma && (
+            <div>
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
+                <span>Início</span>
+                <span>Hoje · {cronograma.percentual}% do tempo</span>
+                <span>Fim · {formatDate(contrato.data_fim)}</span>
+              </div>
+              <div className="relative h-1.5 rounded-full bg-brand-hairline overflow-hidden">
+                <div
+                  className="absolute inset-y-0 left-0 bg-brand-strong/25 rounded-full transition-[width] duration-700"
+                  style={{ width: `${cronograma.percentual}%` }}
+                />
+                <div
+                  className="absolute inset-y-0 left-0 bg-brand-strong rounded-full transition-[width] duration-700"
+                  style={{ width: `${progresso.percentual}%` }}
+                />
+              </div>
+              <div className="flex items-center gap-4 mt-3 text-xs flex-wrap">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-brand-strong" />
+                  <span className="text-muted-foreground">Entregas {progresso.percentual}%</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-brand-strong/30" />
+                  <span className="text-muted-foreground">Cronograma {cronograma.percentual}%</span>
+                </div>
+                {(() => {
+                  const delta = progresso.percentual - cronograma.percentual;
+                  return (
+                    <span className={cn(
+                      "ml-auto text-xs font-medium tabular-nums",
+                      delta >= 0 ? "text-brand-strong" : delta >= -15 ? "text-amber-700" : "text-destructive"
+                    )}>
+                      {delta >= 0 ? "+" : ""}{delta}% vs cronograma
+                    </span>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
+          {/* 3 métricas-chave, alinhadas e sem caixinhas. */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-2 border-t border-brand-hairline">
+            <StrategicMetric
+              label="Prazo restante"
+              value={cronograma ? `${cronograma.diasRestantes}` : "—"}
+              suffix={cronograma ? "dias" : undefined}
+            />
+            <StrategicMetric
+              label="Entregas concluídas"
+              value={`${progresso.modulosConcluidos}`}
+              suffix={`de ${(contrato.entregas_esperadas || []).length}`}
+            />
+            <StrategicMetric
+              label="Documentos no projeto"
+              value={String(totalItens)}
+              suffix={totalItens === 1 ? "item" : "itens"}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Dialog para visualizar report HTML */}
       <Dialog open={!!viewingReport} onOpenChange={() => setViewingReport(null)}>
@@ -583,6 +628,22 @@ function InfoItem({ label, value, icon }: { label: string; value?: string | null
         {icon} {label}
       </p>
       <p className="text-sm font-medium text-foreground mt-0.5">{value || "—"}</p>
+    </div>
+  );
+}
+
+function StrategicMetric({ label, value, suffix }: { label: string; value: string; suffix?: string }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-medium">{label}</p>
+      <p className="flex items-baseline gap-1.5">
+        <span className="font-serif-display text-2xl md:text-3xl text-foreground tabular-nums leading-none">
+          {value}
+        </span>
+        {suffix && (
+          <span className="text-xs text-muted-foreground">{suffix}</span>
+        )}
+      </p>
     </div>
   );
 }
