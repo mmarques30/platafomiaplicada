@@ -11,7 +11,8 @@ import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { X } from "lucide-react";
+import { X, Check, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type StepStatus = "feito" | "agora" | "proximo";
 
@@ -31,37 +32,34 @@ interface PlanConfig {
   passos: Passo[];
   ctaLabel: string;
   ctaHref: string;
-  ctaBg: string;
-  ctaTextColor: string;
 }
 
 function StepCircle({ status }: { status: StepStatus }) {
-  const base = "w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-semibold";
+  const base = "w-9 h-9 rounded-full flex items-center justify-center shrink-0";
   if (status === "feito") {
     return (
-      <div className={base} style={{ background: "rgba(175,192,64,0.15)", color: "#AFC040", border: "1.5px solid #AFC040" }}>
-        ✓
+      <div className={cn(base, "bg-brand-strong/12 border border-brand-strong/50 text-brand-strong")}>
+        <Check className="h-4 w-4" strokeWidth={2.25} />
       </div>
     );
   }
   if (status === "agora") {
     return (
-      <div className={base} style={{ background: "#AFC040", color: "#0C0F0A" }}>
-        →
+      <div className={cn(base, "bg-brand-strong text-brand-cream shadow-sm shadow-brand-strong/20")}>
+        <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
       </div>
     );
   }
   return (
-    <div className={base} style={{ background: "#2E3229", color: "rgba(255,255,255,0.3)", border: "1.5px solid #2E3229" }}>
-      ○
+    <div className={cn(base, "border border-brand-hairline text-muted-foreground/50")}>
+      <span className="block h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
     </div>
   );
 }
 
-function labelColor(status: StepStatus) {
-  if (status === "feito") return "#AFC040";
-  if (status === "agora") return "#AFC040";
-  return "rgba(255,255,255,0.3)";
+function labelColorClass(status: StepStatus) {
+  if (status === "feito" || status === "agora") return "text-brand-strong";
+  return "text-muted-foreground/70";
 }
 
 interface ProximosPassosCardProps {
@@ -136,8 +134,6 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
         passos,
         ctaLabel: "Assistir primeiro vídeo →",
         ctaHref: `/videos/${v[0]?.id ?? ""}`,
-        ctaBg: "#AFC040",
-        ctaTextColor: "#0C0F0A",
       };
     }
 
@@ -154,8 +150,6 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
         ],
         ctaLabel: "Iniciar meu Diagnóstico →",
         ctaHref: "/mentoria/diagnostico",
-        ctaBg: "#AFC040",
-        ctaTextColor: "#0C0F0A",
       };
     }
 
@@ -172,8 +166,6 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
         ],
         ctaLabel: "Iniciar meu Diagnóstico →",
         ctaHref: "/skills/diagnostico",
-        ctaBg: "#E8A43C",
-        ctaTextColor: "#0C0F0A",
       };
     }
 
@@ -202,8 +194,6 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
         ],
         ctaLabel: "Ver meu Roadmap →",
         ctaHref: "/mentoria",
-        ctaBg: "#2CBBA6",
-        ctaTextColor: "#ffffff",
       };
     }
 
@@ -220,8 +210,6 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
         ],
         ctaLabel: "Ir para Meu Sistema →",
         ctaHref: "/meu-sistema",
-        ctaBg: "#2CBBA6",
-        ctaTextColor: "#ffffff",
       };
     }
 
@@ -245,21 +233,20 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
 
   if (!mostrar || !config) return null;
 
-  // Loading state for gratuito
+  // Loading skeleton (gratuito carrega vídeos)
   if (isGratuito && loadingVideos) {
     return createPortal(
-      <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", display: "flex", alignItems: "center", justifyContent: "center", overflowY: "auto", padding: "16px 0" }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #AFC040 1px, transparent 1px)", backgroundSize: "28px 28px", opacity: 0.025 }} />
-        <div style={{ position: "relative", zIndex: 1, background: "#141810", border: "0.5px solid rgba(175,192,64,0.15)", borderRadius: 20, maxWidth: 680, width: "100%", margin: "auto 16px", maxHeight: "calc(100vh - 32px)", overflowY: "auto", padding: 32 }}>
-          <Skeleton className="h-4 w-32 mb-4" style={{ background: "#2E3229" }} />
-          <Skeleton className="h-6 w-full mb-2" style={{ background: "#2E3229" }} />
-          <Skeleton className="h-4 w-3/4 mb-6" style={{ background: "#2E3229" }} />
+      <div className="fixed inset-0 z-[9998] bg-foreground/40 backdrop-blur-sm flex items-center justify-center overflow-y-auto py-4">
+        <div className="relative bg-brand-cream-soft border border-brand-hairline rounded-2xl max-w-[680px] w-full mx-4 max-h-[calc(100vh-32px)] overflow-y-auto p-8 shadow-2xl shadow-foreground/15">
+          <Skeleton className="h-4 w-32 mb-4 bg-brand-hairline" />
+          <Skeleton className="h-7 w-full mb-2 bg-brand-hairline" />
+          <Skeleton className="h-4 w-3/4 mb-6 bg-brand-hairline" />
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex gap-3 mb-4">
-              <Skeleton className="h-8 w-8 rounded-full" style={{ background: "#2E3229" }} />
+              <Skeleton className="h-9 w-9 rounded-full bg-brand-hairline" />
               <div className="flex-1">
-                <Skeleton className="h-4 w-full mb-1" style={{ background: "#2E3229" }} />
-                <Skeleton className="h-3 w-2/3" style={{ background: "#2E3229" }} />
+                <Skeleton className="h-4 w-full mb-1 bg-brand-hairline" />
+                <Skeleton className="h-3 w-2/3 bg-brand-hairline" />
               </div>
             </div>
           ))}
@@ -273,56 +260,56 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
   const total = config.passos.length;
 
   return createPortal(
-    <div style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0C0F0A", display: "flex", alignItems: "center", justifyContent: "center", overflowY: "auto", padding: "16px 0" }}>
-      {/* Dot grid */}
-      <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #AFC040 1px, transparent 1px)", backgroundSize: "28px 28px", opacity: 0.025 }} />
-
+    <div className="fixed inset-0 z-[9998] bg-foreground/40 backdrop-blur-sm flex items-center justify-center overflow-y-auto py-4">
       {/* Modal */}
-      <div style={{ position: "relative", zIndex: 1, background: "#141810", border: "0.5px solid rgba(175,192,64,0.15)", borderRadius: 20, maxWidth: 680, width: "100%", margin: "auto 16px", maxHeight: "calc(100vh - 32px)", overflowY: "auto" }}>
+      <div className="relative bg-brand-cream-soft border border-brand-hairline rounded-2xl max-w-[680px] w-full mx-4 max-h-[calc(100vh-32px)] overflow-y-auto shadow-2xl shadow-foreground/15">
         {/* Close button */}
         <button
           onClick={handleClose}
-          style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", padding: 4, zIndex: 2 }}
+          className="absolute top-4 right-4 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors z-10"
           aria-label="Fechar"
         >
-          <X style={{ width: 18, height: 18, color: "rgba(255,255,255,0.3)" }} />
+          <X className="h-4 w-4" />
         </button>
 
         {/* Header */}
-        <div style={{ padding: "28px 32px 20px", borderBottom: "0.5px solid rgba(255,255,255,0.06)" }}>
-          <div style={{ fontSize: 10, color: "#AFC040", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10, fontWeight: 600 }}>
-            ✱ IAplicada — {config.planoLabel}
-          </div>
-          <h2 style={{ fontSize: 22, fontWeight: 600, color: "#E2E5DC", lineHeight: 1.3, margin: 0 }}>
+        <div className="px-8 pt-8 pb-6 border-b border-brand-hairline">
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-brand-strong mb-3">
+            IAplicada · {config.planoLabel}
+          </p>
+          <h2 className="font-serif-display text-2xl md:text-[28px] leading-[1.15] tracking-tight text-foreground">
             {config.titulo}
           </h2>
-          <p style={{ fontSize: 13, color: "#6B7060", lineHeight: 1.6, margin: "8px 0 0" }}>
+          <p className="text-sm text-muted-foreground leading-relaxed mt-3">
             {config.sub}
           </p>
         </div>
 
         {/* Steps */}
-        <div style={{ padding: "20px 32px" }}>
+        <div className="px-8 py-6 space-y-5">
           {config.passos.map((passo, i) => (
-            <div key={i} style={{ display: "flex", gap: 14, marginBottom: i < config.passos.length - 1 ? 16 : 0 }}>
+            <div key={i} className="flex gap-4">
               <StepCircle status={passo.status} />
-              <div style={{ minWidth: 0, flex: 1 }}>
+              <div className="min-w-0 flex-1 pt-1">
                 {passo.label && (
-                  <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", color: labelColor(passo.status), marginBottom: 3, fontWeight: 500 }}>
+                  <div className={cn("text-[10px] uppercase tracking-[0.08em] font-medium mb-1", labelColorClass(passo.status))}>
                     {passo.label}
                   </div>
                 )}
-                <div style={{ fontSize: 14, fontWeight: 500, color: "#E2E5DC", lineHeight: 1.4 }}>
+                <div className={cn(
+                  "text-sm font-medium leading-snug",
+                  passo.status === "proximo" ? "text-muted-foreground" : "text-foreground"
+                )}>
                   {passo.titulo}
                 </div>
-                <div style={{ fontSize: 12, color: "#6B7060", lineHeight: 1.55, marginTop: 2 }}>
+                <div className="text-xs text-muted-foreground/90 leading-relaxed mt-1.5">
                   {passo.desc}
                 </div>
                 {passo.cta && passo.href && (
                   <Link
                     to={passo.href}
                     onClick={handleClose}
-                    style={{ fontSize: 12, fontWeight: 500, color: config.ctaBg, textDecoration: "none", display: "inline-block", marginTop: 6 }}
+                    className="inline-block text-xs font-medium text-brand-strong hover:text-brand-strong/80 transition-colors mt-2"
                   >
                     {passo.cta}
                   </Link>
@@ -333,30 +320,20 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "16px 32px", borderTop: "0.5px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: 16 }}>
-          <span style={{ fontSize: 11, color: "#6B7060", whiteSpace: "nowrap" }}>
+        <div className="px-8 py-4 border-t border-brand-hairline flex items-center gap-4">
+          <span className="text-[11px] text-muted-foreground whitespace-nowrap">
             {feitos} de {total}
           </span>
-          <div style={{ flex: 1, height: 3, background: "#2E3229", borderRadius: 2, overflow: "hidden" }}>
-            <div style={{ width: `${(feitos / total) * 100}%`, height: "100%", background: "#AFC040", borderRadius: 2, transition: "width 400ms ease" }} />
+          <div className="flex-1 h-[3px] bg-brand-hairline rounded-full overflow-hidden">
+            <div
+              className="h-full bg-brand-strong rounded-full transition-[width] duration-500 ease-out"
+              style={{ width: `${(feitos / total) * 100}%` }}
+            />
           </div>
           <Link
             to={config.ctaHref}
             onClick={handleClose}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "8px 20px",
-              fontSize: 13,
-              fontWeight: 600,
-              borderRadius: 10,
-              background: config.ctaBg,
-              color: config.ctaTextColor,
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-              transition: "opacity 150ms",
-            }}
+            className="inline-flex items-center justify-center px-5 py-2 text-sm font-medium rounded-lg bg-brand-strong text-brand-cream hover:bg-brand-strong/90 whitespace-nowrap transition-colors shadow-sm"
           >
             {config.ctaLabel}
           </Link>
