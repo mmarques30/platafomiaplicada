@@ -27,15 +27,23 @@ interface IAPLogo3DProps {
  */
 function leafShape(): THREE.Shape {
   const shape = new THREE.Shape();
-  // Inicia na ponta leste.
-  shape.moveTo(1, 0);
-  // Arco circular real (raio 1) do leste até o norte — esse é o "lado de fora".
-  shape.absarc(0, 0, 1, 0, Math.PI / 2, false);
-  // Curva interna côncava de volta para a ponta leste. Control point bem
-  // perto da origem para deixar as pétalas "gordinhas" e o gap central
-  // bem pequeno (apenas um "+" sutil).
+  // Pequeno gap angular em cada eixo cardinal — as pétalas NÃO se encostam,
+  // ficando 4 ilhas separadas com finos slivers de fundo visíveis entre elas
+  // (igual ao símbolo flat da marca).
+  const cardinalGap = 0.09; // ~5.2°
+  const startAngle = cardinalGap;
+  const endAngle = Math.PI / 2 - cardinalGap;
+  const startX = Math.cos(startAngle);
+  const startY = Math.sin(startAngle);
+
+  // Inicia na ponta inferior-direita do arco (próxima ao eixo X, mas não nele).
+  shape.moveTo(startX, startY);
+  // Arco circular (raio 1) ao longo do "lado de fora" — não vai até os eixos.
+  shape.absarc(0, 0, 1, startAngle, endAngle, false);
+  // Curva interna côncava de volta para o ponto inicial. Control próximo
+  // à origem deixa as pétalas "gordinhas" com gap central pequeno.
   const innerBulge = 0.06;
-  shape.quadraticCurveTo(innerBulge, innerBulge, 1, 0);
+  shape.quadraticCurveTo(innerBulge, innerBulge, startX, startY);
   return shape;
 }
 
