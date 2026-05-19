@@ -36,10 +36,10 @@ export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVide
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-[8px]">
-      <div className="bg-[#14160F] rounded-2xl overflow-hidden w-full max-w-[560px] shadow-[0_24px_80px_rgba(0,0,0,0.6)] border border-white/[0.06]">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/40 backdrop-blur-sm">
+      <div className="bg-brand-cream-soft border border-brand-hairline rounded-2xl overflow-hidden w-full max-w-[560px] shadow-2xl shadow-foreground/15 mx-4">
         {VIDEO_CONFIGURADO ? (
-          <div className="relative pb-[56.25%] bg-[#0C0F0A]">
+          <div className="relative pb-[56.25%] bg-brand-cream">
             <iframe
               src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?rel=0&modestbranding=1`}
               title="Bem-vindo à IAplicada"
@@ -49,24 +49,36 @@ export function OnboardingVideo({ previewMode = false, onClose }: OnboardingVide
             />
           </div>
         ) : (
-          <div className="h-[280px] flex flex-col items-center justify-center gap-4" style={{ background: 'linear-gradient(135deg, #0C0F0A 0%, #1A1E14 100%)' }}>
-            <div className="w-20 h-20 rounded-full flex items-center justify-center text-[28px] font-bold text-[#AFC040]" style={{ background: 'rgba(175,192,64,0.15)', border: '2px solid rgba(175,192,64,0.4)' }}>
+          <div className="h-[280px] flex flex-col items-center justify-center gap-4 bg-brand-cream">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center text-[28px] font-serif-display text-brand-strong bg-brand-strong/12 border-2 border-brand-strong/40">
               M
             </div>
-            <p className="text-sm text-[#6B7060] text-center max-w-[300px] leading-[1.6]">
+            <p className="text-sm text-muted-foreground text-center max-w-[300px] leading-[1.6]">
               Em breve: uma mensagem especial da Mariana para você começar.
             </p>
           </div>
         )}
         <div className="px-8 py-7">
-          <p className="text-[10px] font-semibold text-[#AFC040] uppercase tracking-[0.1em] mb-2">✱ IAplicada</p>
-          <p className="text-[21px] font-semibold text-[#E2E5DC] mb-2 leading-[1.3]">Bem-vindo à sua jornada.</p>
-          <p className="text-sm text-[#6B7060] leading-[1.7] mb-7">Assista ao vídeo acima — preparei uma mensagem especial para você começar com tudo. Quando estiver pronto, clique em entrar.</p>
+          <p className="text-[10px] font-medium text-brand-strong uppercase tracking-[0.16em] mb-3">
+            IAplicada
+          </p>
+          <h2 className="font-serif-display text-2xl md:text-[26px] leading-[1.15] tracking-tight text-foreground mb-3">
+            Bem-vindo à sua jornada.
+          </h2>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-7">
+            Assista ao vídeo acima — preparei uma mensagem especial para você começar com tudo. Quando estiver pronto, clique em entrar.
+          </p>
           <div className="flex items-center gap-4">
-            <button onClick={handleEnter} className="bg-[#AFC040] text-[#0C0F0A] text-sm font-semibold px-8 py-3 rounded-[10px] border-none font-[inherit] transition-opacity duration-150 cursor-pointer opacity-100">
+            <button
+              onClick={handleEnter}
+              className="bg-brand-strong text-brand-cream text-sm font-medium px-6 py-2.5 rounded-lg hover:bg-brand-strong/90 transition-colors shadow-sm"
+            >
               Entrar na plataforma →
             </button>
-            <button onClick={handleEnter} className="bg-transparent text-[#6B7060] text-[13px] border-none cursor-pointer font-[inherit] py-3 px-0">
+            <button
+              onClick={handleEnter}
+              className="bg-transparent text-muted-foreground hover:text-foreground text-[13px] py-2.5 transition-colors"
+            >
               Pular
             </button>
           </div>

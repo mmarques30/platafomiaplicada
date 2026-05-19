@@ -123,12 +123,13 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
       run={run}
       continuous
       options={{
-        backgroundColor: "#1a1c19",
-        primaryColor: "#9EB038",
-        textColor: "#ffffff",
-        overlayColor: "rgba(0, 0, 0, 0.7)",
+        // Tokens da marca em HSL → hex equivalentes (Joyride não aceita CSS vars)
+        backgroundColor: "#F7F6E8",      // brand-cream-soft
+        primaryColor: "#5C6F1D",         // brand-strong
+        textColor: "#0A0A0A",            // foreground
+        overlayColor: "rgba(10, 10, 10, 0.45)",
         showProgress: true,
-        arrowColor: "#1a1c19",
+        arrowColor: "#F7F6E8",           // brand-cream-soft (continua o tooltip)
         zIndex: 10000,
       }}
       locale={{
@@ -139,13 +140,50 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
         skip: "Pular tour",
       }}
       styles={{
+        tooltip: {
+          borderRadius: 14,
+          border: "1px solid #EAEAE0",   // brand-hairline
+          boxShadow: "0 24px 60px rgba(10, 10, 10, 0.15)",
+          padding: 20,
+        },
         tooltipTitle: {
-          color: '#ffffff',
-          fontSize: 16,
+          color: "#0A0A0A",
+          fontSize: 17,
           fontWeight: 600,
+          fontFamily: "var(--font-serif-display, 'Fraunces', serif)",
+          letterSpacing: "-0.01em",
+          marginBottom: 6,
         },
         tooltipContent: {
-          color: '#ffffff',
+          color: "#5A5A52",              // muted-foreground aproximado
+          fontSize: 14,
+          lineHeight: 1.55,
+          padding: "8px 0 4px",
+        },
+        buttonNext: {
+          backgroundColor: "#5C6F1D",    // brand-strong
+          color: "#F0EFD9",              // brand-cream
+          borderRadius: 8,
+          padding: "8px 16px",
+          fontSize: 13,
+          fontWeight: 500,
+          outline: "none",
+        },
+        buttonBack: {
+          color: "#5A5A52",
+          fontSize: 13,
+          marginRight: 8,
+        },
+        buttonSkip: {
+          color: "#8A8A82",
+          fontSize: 12,
+        },
+        buttonClose: {
+          color: "#8A8A82",
+          width: 12,
+          height: 12,
+          top: 14,
+          right: 14,
         },
       }}
       onEvent={handleEvent}
