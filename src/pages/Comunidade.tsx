@@ -6,7 +6,6 @@ import { CommunityHeroDashboard } from "@/components/comunidade/CommunityHeroDas
 import { CommunitySidebar } from "@/components/comunidade/CommunitySidebar";
 import { useRankingEngajamento } from "@/hooks/useRankingEngajamento";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function Comunidade() {
@@ -14,18 +13,11 @@ export default function Comunidade() {
 
   return (
     <PageContainer>
-      <PageTitle
-        primary="Comunidade"
-        secondary="aplicada"
-        eyebrow="Comunidade"
-        description="Quem está aplicando IA na rotina, ao vivo."
-      />
-
-        {/* Hero Dashboard */}
-        <CommunityHeroDashboard />
+      {/* Banner imersivo (título + stats inline) */}
+      <CommunityHeroDashboard />
 
         {/* Main Content with Sidebar */}
-        <div className="flex gap-6">
+        <div className="flex gap-6 mt-6">
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             <Tabs defaultValue="feed" className="w-full">
