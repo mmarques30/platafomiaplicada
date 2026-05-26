@@ -10,18 +10,19 @@ export default function Comunidade() {
   const { data: ranking } = useRankingEngajamento();
 
   return (
-    <PageContainer>
-      {/* Background decorativo — UM símbolo da marca, grande e centralizado,
-          fixo e discreto (sem repetir). */}
+    <PageContainer className="relative overflow-hidden">
+      {/* Background decorativo — UM símbolo da marca grande, ancorado no
+          espaço vazio à ESQUERDA. É absolute (não fixed), então acompanha
+          o conteúdo: rola junto com a página. */}
       <div
         aria-hidden
-        className="fixed inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none"
         style={{
           backgroundImage: "url(/background-symbol.png)",
           backgroundRepeat: "no-repeat",
-          backgroundPosition: "center 60%",
-          backgroundSize: "min(70vw, 720px)",
-          opacity: 0.05,
+          backgroundPosition: "left -120px top 260px",
+          backgroundSize: "min(42vw, 560px)",
+          opacity: 0.06,
         }}
       />
 
