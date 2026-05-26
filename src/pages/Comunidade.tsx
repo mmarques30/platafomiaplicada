@@ -29,30 +29,30 @@ export default function Comunidade() {
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             <Tabs defaultValue="feed" className="w-full">
-              {/* Standardized Tabs */}
-              <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6">
-                <TabsTrigger 
+              {/* Tabs estilo pill da marca */}
+              <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-brand-cream/60 border border-brand-hairline p-1 rounded-full mb-6 h-auto">
+                <TabsTrigger
                   value="feed"
-                  className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+                  className="flex items-center justify-center gap-1 sm:gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-3 sm:px-5 py-1.5 sm:py-2 transition-colors text-xs sm:text-sm"
                 >
                   Feed
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="ranking"
-                  className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+                  className="flex items-center justify-center gap-1 sm:gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-3 sm:px-5 py-1.5 sm:py-2 transition-colors text-xs sm:text-sm"
                 >
                   Ranking
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="members"
-                  className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+                  className="flex items-center justify-center gap-1 sm:gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-3 sm:px-5 py-1.5 sm:py-2 transition-colors text-xs sm:text-sm"
                 >
                   Membros
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="feed" className="mt-0">
-                <div className="bg-card rounded-xl border overflow-hidden">
+                <div className="bg-brand-cream-soft rounded-2xl border border-brand-hairline overflow-hidden">
                   <CommunityFeed />
                 </div>
               </TabsContent>

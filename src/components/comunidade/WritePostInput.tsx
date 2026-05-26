@@ -11,8 +11,8 @@ export function WritePostInput({ onClick }: WritePostInputProps) {
   const { profile } = useUserProfile();
 
   return (
-    <div 
-      className="border-b border-neutral-800 p-4 hover:bg-neutral-800/30 transition-colors cursor-pointer"
+    <div
+      className="border-b border-brand-hairline p-4 hover:bg-brand-cream/50 transition-colors cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-start gap-3">

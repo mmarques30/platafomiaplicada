@@ -29,13 +29,13 @@ export function CommunitySidebar() {
     if (position === 1) return "bg-yellow-500/10 border-yellow-500/30";
     if (position === 2) return "bg-gray-400/10 border-gray-400/30";
     if (position === 3) return "bg-amber-700/10 border-amber-700/30";
-    return "bg-neutral-800 border-neutral-700";
+    return "bg-brand-cream/50 border-brand-hairline";
   };
 
   return (
     <div className="sticky top-6 space-y-4">
       {/* Top 3 Card */}
-      <div className="bg-card rounded-xl border border-primary/20 p-4">
+      <div className="bg-brand-cream-soft rounded-2xl border border-brand-hairline p-4">
         <div className="flex items-center gap-2 mb-4">
           <Trophy className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold">Top 3 do Mês</h3>
@@ -73,7 +73,7 @@ export function CommunitySidebar() {
       </div>
 
       {/* Community Stats Card */}
-      <div className="bg-card rounded-xl border p-4">
+      <div className="bg-brand-cream-soft rounded-2xl border border-brand-hairline p-4">
         <div className="flex items-center gap-2 mb-4">
           <Users className="w-4 h-4 text-muted-foreground" />
           <h3 className="text-sm font-semibold">Comunidade</h3>

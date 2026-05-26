@@ -89,18 +89,18 @@ export function PostComments({ postId }: PostCommentsProps) {
           return (
             <div key={comment.id} className="flex gap-3">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-                  {getInitials(comment.profiles.nome_completo)}
+                <AvatarFallback className="bg-brand-strong/15 text-brand-strong text-xs">
+                  {getInitials(comment.profiles?.nome_completo || "Usuário")}
                 </AvatarFallback>
               </Avatar>
 
               <div className="flex-1 space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-medium text-foreground">
-                    {comment.profiles.nome_completo}
+                    {comment.profiles?.nome_completo || "Usuário"}
                   </span>
                   <Badge variant="outline" className="text-xs">
-                    Nível {comment.profiles.nivel_comunidade}
+                    Nível {comment.profiles?.nivel_comunidade ?? 1}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(comment.created_at), {

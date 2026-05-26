@@ -37,6 +37,12 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
       .toUpperCase();
   };
 
+  // Profile pode vir nulo do join (autor sem profile / profile removido).
+  // Sem este fallback, o feed inteiro quebra ao renderizar o post.
+  const autorNome = post.profiles?.nome_completo || "Usuário";
+  const autorAvatar = post.profiles?.avatar_url || null;
+  const autorNivel = post.profiles?.nivel_comunidade ?? 1;
+
   // Parse media array from post
   const mediaItems: MediaItem[] = Array.isArray(post.media)
     ? (post.media as MediaItem[]).filter((m) => m.type === "image" && m.url)
@@ -49,11 +55,11 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
       <div className="flex gap-3">
         {/* Avatar */}
         <Avatar className="h-10 w-10 flex-shrink-0">
-          {post.profiles.avatar_url && (
-            <AvatarImage src={post.profiles.avatar_url} />
+          {autorAvatar && (
+            <AvatarImage src={autorAvatar} />
           )}
-          <AvatarFallback className="bg-primary/20 text-primary text-sm">
-            {getInitials(post.profiles.nome_completo)}
+          <AvatarFallback className="bg-brand-strong/15 text-brand-strong text-sm">
+            {getInitials(autorNome)}
           </AvatarFallback>
         </Avatar>
 
@@ -63,10 +69,10 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-1 flex-wrap">
               <span className="font-semibold hover:underline cursor-pointer">
-                {post.profiles.nome_completo}
+                {autorNome}
               </span>
               <span className="text-muted-foreground text-sm">
-                @lvl{post.profiles.nivel_comunidade}
+                @lvl{autorNivel}
               </span>
               <span className="text-muted-foreground/50">·</span>
               <span className="text-muted-foreground text-sm hover:underline cursor-pointer">

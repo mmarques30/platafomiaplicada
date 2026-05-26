@@ -39,15 +39,15 @@ export function MembersList() {
 
   return (
     <div className="space-y-4">
-      {/* Filters - Standardized Style */}
-      <div className="flex items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 bg-primary/20 dark:bg-primary/30 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 w-fit">
+      {/* Filtros — pill da marca */}
+      <div className="flex items-center gap-0.5 sm:gap-1 p-1 bg-brand-cream/60 rounded-full border border-brand-hairline w-fit">
         <button
           onClick={() => { setFilter("all"); setDisplayCount(20); }}
           className={cn(
-            "px-3 sm:px-4 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all duration-200",
+            "px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors",
             filter === "all"
-              ? "bg-[#0D0D0D] text-white shadow-lg"
-              : "text-foreground/70 hover:bg-neutral-800/50"
+              ? "bg-brand-strong text-brand-cream shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
           Todos {stats.totalMembers}
@@ -55,10 +55,10 @@ export function MembersList() {
         <button
           onClick={() => { setFilter("facilitador"); setDisplayCount(20); }}
           className={cn(
-            "px-3 sm:px-4 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all duration-200",
+            "px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors",
             filter === "facilitador"
-              ? "bg-[#0D0D0D] text-white shadow-lg"
-              : "text-foreground/70 hover:bg-neutral-800/50"
+              ? "bg-brand-strong text-brand-cream shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
           Facilitadores {stats.facilitadorCount}
@@ -66,10 +66,10 @@ export function MembersList() {
         <button
           onClick={() => { setFilter("online"); setDisplayCount(20); }}
           className={cn(
-            "px-3 sm:px-4 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all duration-200",
+            "px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors",
             filter === "online"
-              ? "bg-[#0D0D0D] text-white shadow-lg"
-              : "text-foreground/70 hover:bg-neutral-800/50"
+              ? "bg-brand-strong text-brand-cream shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
           Online {stats.onlineMembers}

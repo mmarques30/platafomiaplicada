@@ -25,27 +25,27 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
   const getMedalColor = (posicao: number) => {
     switch (posicao) {
       case 1: return "text-amber-600 border-amber-600";
-      case 2: return "text-[#0D0D0D]/70 border-[#0D0D0D]/30";
+      case 2: return "text-brand-strong border-brand-strong/40";
       case 3: return "text-amber-700 border-amber-700";
-      default: return "text-muted-foreground border-border";
+      default: return "text-muted-foreground border-brand-hairline";
     }
   };
 
   const getMedalBg = (posicao: number) => {
     switch (posicao) {
-      case 1: return "bg-[#E9EBC6] border-[#E9EBC6]/50";
-      case 2: return "bg-[#E9EBC6]/60 border-[#E9EBC6]/40";
-      case 3: return "bg-[#E9EBC6]/40 border-[#E9EBC6]/30";
-      default: return "border-border";
+      case 1: return "bg-brand-cream border-brand-hairline";
+      case 2: return "bg-brand-cream/60 border-brand-hairline";
+      case 3: return "bg-brand-cream/40 border-brand-hairline";
+      default: return "border-brand-hairline";
     }
   };
 
   const getAvatarBg = (posicao: number) => {
     switch (posicao) {
       case 1: return "bg-amber-600";
-      case 2: return "bg-[#0D0D0D]/60";
+      case 2: return "bg-brand-strong";
       case 3: return "bg-amber-700";
-      default: return "bg-primary";
+      default: return "bg-brand-strong";
     }
   };
 
@@ -88,7 +88,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
               
               {/* Nome */}
               <p className={cn(
-                "font-medium truncate w-full text-center text-[#0D0D0D]",
+                "font-medium truncate w-full text-center text-foreground",
                 item.user_id === user?.id && "font-semibold"
               )}>
                 {item.nome_completo}
@@ -98,12 +98,12 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
               </p>
               
               {/* Stats */}
-              <p className="text-xs text-[#0D0D0D]/60 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {item.total_videos_assistidos} vídeos • {item.total_videos_reassistidos} reassistidos • {item.total_materiais_baixados} downloads • {item.total_aulas_presentes} presenças
               </p>
               
               {/* Pontos */}
-              <p className="font-bold text-xl mt-3 text-[#0D0D0D]">
+              <p className="font-bold text-xl mt-3 text-foreground">
                 {item.total_pontos} pts
               </p>
             </div>
