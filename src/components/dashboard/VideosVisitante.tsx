@@ -29,7 +29,7 @@ export function VideosVisitante() {
     return (
     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-[240px] sm:h-[320px] md:h-[400px] rounded-xl" />
+          <Skeleton key={i} className="aspect-video rounded-xl" />
         ))}
       </div>
     );
