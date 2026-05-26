@@ -105,7 +105,7 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
               return (
                 <CarouselItem
                   key={video.id}
-                  className="pl-4 basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                  className="pl-4 basis-1/3 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
                 >
                   <div
                     className={cn(
@@ -114,7 +114,7 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
                     )}
                     onClick={() => !trilha.bloqueada && onSelectVideo(video.id)}
                   >
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-brand-hairline shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div className="relative aspect-[9/16] overflow-hidden rounded-xl border border-brand-hairline shadow-sm hover:shadow-lg transition-all duration-300">
                       <img
                         src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url || video.thumbnail_url)}
                         alt={video.titulo}
@@ -136,8 +136,8 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
                         <>
                           {/* Overlay com Play (apenas para trilhas desbloqueadas) */}
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
-                              <Play className="h-8 w-8 text-primary-foreground ml-1" fill="currentColor" />
+                            <div className="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center">
+                              <Play className="h-5 w-5 text-primary-foreground ml-0.5" fill="currentColor" />
                             </div>
                           </div>
 
