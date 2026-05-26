@@ -23,12 +23,6 @@ export function CommunityHeroDashboard() {
 
   return (
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#4a5a17] via-brand-strong to-[#2b340a] p-6 sm:p-8">
-      {/* Marca d'água do símbolo da marca */}
-      <div
-        className="absolute -right-12 -top-12 w-72 h-72 opacity-[0.12] bg-no-repeat bg-contain pointer-events-none"
-        style={{ backgroundImage: "url(/background-symbol-soft.png)" }}
-      />
-
       <div className="relative">
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75 mb-2">
           ✺ Comunidade
