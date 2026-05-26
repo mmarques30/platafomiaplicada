@@ -25,19 +25,19 @@ export function MemberCard({ member }: MemberCardProps) {
       new Date(Date.now() - 5 * 60 * 1000);
 
   return (
-    <div className="flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer">
+    <div className="flex items-start gap-4 p-4 hover:bg-brand-cream/50 transition-colors cursor-pointer">
       {/* Avatar with Level Badge */}
       <div className="relative flex-shrink-0">
         <Avatar className="h-12 w-12">
           {member.avatar_url && (
             <AvatarImage src={member.avatar_url} alt={member.nome_completo} />
           )}
-          <AvatarFallback className="bg-primary text-primary-foreground">
+          <AvatarFallback className="bg-brand-strong/15 text-brand-strong">
             {getInitials(member.nome_completo)}
           </AvatarFallback>
         </Avatar>
         {/* Level Badge Overlay */}
-        <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-foreground border-2 border-background">
+        <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-brand-strong/15 flex items-center justify-center text-[10px] font-bold text-brand-strong border-2 border-brand-cream-soft">
           {member.nivel_comunidade}
         </div>
       </div>
@@ -50,7 +50,7 @@ export function MemberCard({ member }: MemberCardProps) {
             {member.nome_completo}
           </span>
           {member.is_admin && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-brand-strong/10 text-brand-strong">
               Admin
             </span>
           )}
