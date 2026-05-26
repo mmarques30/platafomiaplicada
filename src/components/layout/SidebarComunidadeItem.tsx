@@ -25,7 +25,10 @@ export function SidebarComunidadeItem({
   isMenuVisible,
   pathname,
 }: SidebarComunidadeItemProps) {
-  if (currentEnvironment !== 'gratuito') return null;
+  // Ambientes que têm acesso ao menu Comunidade. Antes era só 'gratuito'
+  // (visitante); agora também Academy e Business (parceria/sistemas).
+  const ALLOWED_ENVS = ["gratuito", "academy", "business_parceria", "business_sistemas"];
+  if (!currentEnvironment || !ALLOWED_ENVS.includes(currentEnvironment)) return null;
 
   return (
     <Collapsible
