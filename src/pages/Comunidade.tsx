@@ -11,18 +11,18 @@ export default function Comunidade() {
 
   return (
     <PageContainer className="relative overflow-hidden">
-      {/* Background decorativo — UM símbolo da marca grande, sangrando pela
-          ESQUERDA e integrado à página. absolute (não fixed) → rola junto
-          com o conteúdo. Tamanho responsivo (clamp) pra acompanhar a tela. */}
+      {/* Fundo ambiente — auroras/glows suaves nas cores da marca (verde +
+          creme). Dá profundidade e integra a página sem um logo "colado".
+          fixed + pointer-events-none, bem discreto. */}
       <div
         aria-hidden
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="fixed inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage: "url(/background-symbol.png)",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "left -160px top 150px",
-          backgroundSize: "clamp(460px, 52vw, 860px)",
-          opacity: 0.07,
+          background: [
+            "radial-gradient(60vw 55vh at 10% 12%, rgba(92,111,29,0.12), transparent 60%)",
+            "radial-gradient(50vw 50vh at 92% 28%, rgba(158,176,56,0.10), transparent 60%)",
+            "radial-gradient(55vw 50vh at 50% 112%, rgba(124,142,47,0.08), transparent 60%)",
+          ].join(", "),
         }}
       />
 
