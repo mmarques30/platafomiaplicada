@@ -73,10 +73,11 @@ export function useMenuConfig() {
         'meu_sistema'
       ],
       
-      // Business Parceria: oculta menus Academy-only e Skills-only + Squad + Projeto Skills
+      // Business Parceria: tem acesso completo ao Academy, então "Aprender"
+      // (trilhas) fica visível. Oculta apenas Skills-only + Squad + Projeto Skills.
       business_parceria: [
-        'trilhas', 'evolucao', 'meu_diagnostico', 'minhas_duvidas',
-        'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 
+        'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+        'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap',
         'skills_entregas', 'skills_painel_lider',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
         'squad', 'squad_lider',

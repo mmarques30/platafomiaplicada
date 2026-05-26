@@ -257,7 +257,7 @@ export default function TrilhaDetalhes() {
 
       {/* Se tem vídeo selecionado → Layout Lateral (Player + Sidebar) */}
       {currentVideoId && currentVideo && (
-        <div className="flex flex-col lg:flex-row gap-6 max-w-[1180px] mx-auto">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Coluna Esquerda: Player + Info + Avaliação + Tabs */}
           <div className="flex-1 flex flex-col gap-4 min-w-0">
             {/* 1. Player de Vídeo */}
@@ -347,7 +347,7 @@ export default function TrilhaDetalhes() {
 
             {/* 4. Card de Informações da Aula - Colapsável com header sempre visível */}
             <Collapsible open={infoExpanded} onOpenChange={setInfoExpanded}>
-              <Card className="border-brand-hairline">
+              <Card className="bg-brand-cream-soft border-brand-hairline">
                 {/* Header sempre visível */}
                 <div className="flex items-center justify-between p-4 border-b border-brand-hairline">
                   <h3 className="text-sm font-semibold">Informações da aula</h3>
@@ -476,7 +476,7 @@ export default function TrilhaDetalhes() {
 
           {/* Sidebar Direita: Lista de Vídeos (apenas desktop) */}
           <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-            <Card className="sticky top-4 border-brand-hairline overflow-hidden flex flex-col h-[calc(100vh-120px)] max-h-[calc(100vh-120px)]">
+            <Card className="sticky top-4 bg-brand-cream-soft border-brand-hairline overflow-hidden flex flex-col h-[calc(100vh-120px)] max-h-[calc(100vh-120px)]">
               <div className="p-3 border-b border-brand-hairline bg-brand-cream-soft flex-shrink-0">
                 <h3 className="font-semibold text-sm">
                   Vídeos da trilha ({allVideos.length})
