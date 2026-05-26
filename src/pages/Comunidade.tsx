@@ -11,17 +11,16 @@ export default function Comunidade() {
 
   return (
     <PageContainer>
-      {/* Background decorativo — símbolo da marca em dois cantos, fixo e
-          discreto (sem roubar atenção, mas visível). */}
+      {/* Background decorativo — símbolo da marca repetido cobrindo o fundo
+          inteiro (wallpaper sutil), fixo e discreto. */}
       <div
         aria-hidden
         className="fixed inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage: "url(/background-symbol.png), url(/background-symbol.png)",
-          backgroundRepeat: "no-repeat, no-repeat",
-          backgroundPosition: "112% -6%, -10% 112%",
-          backgroundSize: "min(40vw, 480px), min(30vw, 360px)",
-          opacity: 0.08,
+          backgroundImage: "url(/background-symbol.png)",
+          backgroundRepeat: "repeat",
+          backgroundSize: "150px",
+          opacity: 0.06,
         }}
       />
 
