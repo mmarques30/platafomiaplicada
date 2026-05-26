@@ -2,7 +2,6 @@ import { useState } from "react";
 import { FileText, Download, Trash2, Upload, Loader2, Image, FileArchive, File } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,14 +20,16 @@ const tipoLabels: Record<string, string> = {
   outro: "Outro",
 };
 
+// Paleta unificada com a marca: tons sutis em verde-brand para variar entre
+// os tipos sem sair da identidade. Evita o "carnaval" de cores anteriores.
 const tipoColors: Record<string, string> = {
-  proposta: "bg-primary/10 text-primary border-primary/20",
-  transcricao: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  anexo: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  solucao: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-  logo: "bg-violet-500/10 text-violet-600 border-violet-500/20",
-  imagem: "bg-pink-500/10 text-pink-600 border-pink-500/20",
-  outro: "bg-muted text-muted-foreground border-muted-foreground/20",
+  proposta: "bg-brand-strong/12 text-brand-strong border-brand-strong/25",
+  transcricao: "bg-brand-strong/8 text-brand-strong/85 border-brand-strong/20",
+  anexo: "bg-brand-cream text-brand-strong border-brand-strong/20",
+  solucao: "bg-brand-strong/15 text-brand-strong border-brand-strong/30",
+  logo: "bg-brand-strong/8 text-brand-strong/85 border-brand-strong/20",
+  imagem: "bg-brand-cream text-brand-strong border-brand-strong/20",
+  outro: "bg-muted text-muted-foreground border-brand-hairline",
 };
 
 const getFileIcon = (tipo: string) => {
@@ -122,112 +123,102 @@ export function ArquivosProjetoSection({ contratoId, readOnly = false }: Arquivo
   return (
     <div className="space-y-4">
       {!readOnly && (
-        <Card className="border-border/50">
-          <CardContent className="py-4">
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-              <div className="flex-1 flex gap-2 items-center">
-                <Select value={tipoUpload} onValueChange={setTipoUpload}>
-                  <SelectTrigger className="w-[140px] h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="anexo">Anexo</SelectItem>
-                    <SelectItem value="solucao">Solução/Guia</SelectItem>
-                    <SelectItem value="transcricao">Transcrição</SelectItem>
-                    <SelectItem value="logo">Logo</SelectItem>
-                    <SelectItem value="imagem">Imagem</SelectItem>
-                    <SelectItem value="outro">Outro</SelectItem>
-                  </SelectContent>
-                </Select>
-                <span className="text-sm text-muted-foreground">Tipo do arquivo</span>
-              </div>
-              <div className="relative">
-                <input
-                  type="file"
-                  id="file-upload-arquivos"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                  accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.pptx,.ppt,.html,.htm,.png,.jpg,.jpeg,.gif,.svg,.webp,.zip"
-                  disabled={uploadingFile}
-                />
-                <Button asChild size="sm" disabled={uploadingFile}>
-                  <label htmlFor="file-upload-arquivos" className="cursor-pointer">
-                    {uploadingFile ? (
-                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Enviando...</>
-                    ) : (
-                      <><Upload className="h-4 w-4 mr-2" />Enviar Arquivo</>
-                    )}
-                  </label>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between rounded-xl bg-brand-cream/50 border border-brand-hairline px-4 py-3">
+          <div className="flex gap-3 items-center">
+            <Select value={tipoUpload} onValueChange={setTipoUpload}>
+              <SelectTrigger className="w-[150px] h-9 bg-background border-brand-hairline focus:ring-brand-strong/30">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="anexo">Anexo</SelectItem>
+                <SelectItem value="solucao">Solução/Guia</SelectItem>
+                <SelectItem value="transcricao">Transcrição</SelectItem>
+                <SelectItem value="logo">Logo</SelectItem>
+                <SelectItem value="imagem">Imagem</SelectItem>
+                <SelectItem value="outro">Outro</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-xs text-muted-foreground">Tipo do arquivo</span>
+          </div>
+          <div className="relative">
+            <input
+              type="file"
+              id="file-upload-arquivos"
+              className="hidden"
+              onChange={handleFileUpload}
+              accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.pptx,.ppt,.html,.htm,.png,.jpg,.jpeg,.gif,.svg,.webp,.zip"
+              disabled={uploadingFile}
+            />
+            <Button asChild size="sm" disabled={uploadingFile} className="bg-brand-strong hover:bg-brand-strong/90 text-brand-cream rounded-full px-5">
+              <label htmlFor="file-upload-arquivos" className="cursor-pointer">
+                {uploadingFile ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Enviando...</>
+                ) : (
+                  <><Upload className="h-4 w-4 mr-2" />Enviar Arquivo</>
+                )}
+              </label>
+            </Button>
+          </div>
+        </div>
       )}
 
       {documentosDisponiveis.length === 0 ? (
-        <Card className="border-border/50">
-          <CardContent className="py-12 text-center">
-            <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-            <h3 className="text-lg font-medium mb-2">Nenhum arquivo</h3>
-            <p className="text-muted-foreground text-sm">
-              {readOnly ? "Arquivos do projeto aparecerão aqui." : "Envie arquivos usando o botão acima."}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border border-dashed border-brand-hairline bg-background py-12 text-center">
+          <FileText className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+          <h3 className="font-serif-display text-lg text-foreground mb-1">Nenhum arquivo</h3>
+          <p className="text-muted-foreground text-sm">
+            {readOnly ? "Arquivos do projeto aparecerão aqui." : "Envie arquivos usando o botão acima."}
+          </p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="rounded-xl border border-brand-hairline bg-background overflow-hidden divide-y divide-brand-hairline">
           {documentosDisponiveis.map((doc) => {
             const IconComp = getFileIcon(doc.tipo);
             const isImg = doc.arquivo_url ? isImageFile(doc.arquivo_url) : false;
             return (
-              <Card key={doc.id} className="border-border/50 hover:shadow-sm transition-shadow">
-                <CardContent className="py-3 px-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isImg ? "bg-pink-500/10" : "bg-primary/10"} ${isImg ? "cursor-pointer" : ""}`}
-                      onClick={() => isImg && handlePreview(doc)}
-                    >
-                      <IconComp className={`h-5 w-5 ${isImg ? "text-pink-600" : "text-primary"}`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm truncate">{doc.titulo}</h4>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <Badge variant="outline" className={`text-xs ${tipoColors[doc.tipo] || tipoColors.outro}`}>
-                          {tipoLabels[doc.tipo] || doc.tipo}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {format(parseISO(doc.created_at), "dd/MM/yy", { locale: ptBR })}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDownload(doc)} disabled={downloadingId === doc.id}>
-                        {downloadingId === doc.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                      </Button>
-                      {!readOnly && (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Excluir arquivo?</AlertDialogTitle>
-                              <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteDocumento.mutateAsync(doc.id)}>Excluir</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      )}
-                    </div>
+              <div key={doc.id} className="flex items-center gap-3 px-4 py-3 hover:bg-brand-cream/40 transition-colors">
+                <div
+                  className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-brand-strong/10 ${isImg ? "cursor-pointer hover:bg-brand-strong/15" : ""}`}
+                  onClick={() => isImg && handlePreview(doc)}
+                >
+                  <IconComp className="h-[18px] w-[18px] text-brand-strong" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-sm text-foreground truncate">{doc.titulo}</h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline" className={`text-[10px] font-medium px-2 py-0 h-5 ${tipoColors[doc.tipo] || tipoColors.outro}`}>
+                      {tipoLabels[doc.tipo] || doc.tipo}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {format(parseISO(doc.created_at), "dd/MM/yy", { locale: ptBR })}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-brand-strong hover:bg-brand-strong/10" onClick={() => handleDownload(doc)} disabled={downloadingId === doc.id}>
+                    {downloadingId === doc.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                  </Button>
+                  {!readOnly && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Excluir arquivo?</AlertDialogTitle>
+                          <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteDocumento.mutateAsync(doc.id)}>Excluir</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>

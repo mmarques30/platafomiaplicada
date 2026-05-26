@@ -12,13 +12,13 @@ export function CommunityFeed() {
     return (
       <div className="space-y-0">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="border-b border-neutral-800 p-4 animate-pulse">
+          <div key={i} className="border-b border-brand-hairline p-4 animate-pulse">
             <div className="flex gap-3">
-              <div className="h-10 w-10 rounded-full bg-neutral-800" />
+              <div className="h-10 w-10 rounded-full bg-brand-hairline" />
               <div className="flex-1 space-y-3">
-                <div className="h-4 w-1/3 bg-neutral-800 rounded" />
-                <div className="h-4 w-full bg-neutral-800 rounded" />
-                <div className="h-4 w-2/3 bg-neutral-800 rounded" />
+                <div className="h-4 w-1/3 bg-brand-hairline rounded" />
+                <div className="h-4 w-full bg-brand-hairline rounded" />
+                <div className="h-4 w-2/3 bg-brand-hairline rounded" />
               </div>
             </div>
           </div>

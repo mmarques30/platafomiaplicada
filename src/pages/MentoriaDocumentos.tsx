@@ -200,19 +200,19 @@ export default function MentoriaDocumentos() {
         ))}
       </div>
 
-      <Collapsible open={documentosExpandido} onOpenChange={setDocumentosExpandido} className="border border-border/60 rounded-lg bg-card">
+      <Collapsible open={documentosExpandido} onOpenChange={setDocumentosExpandido} className="bg-brand-cream-soft border border-brand-hairline rounded-2xl overflow-hidden">
         <CollapsibleTrigger asChild>
           <button
             type="button"
-            className="w-full flex items-center justify-between gap-4 px-4 py-3 hover:bg-muted/40 transition-colors rounded-t-lg"
+            className="w-full flex items-center justify-between gap-4 px-5 py-4 hover:bg-brand-cream/60 transition-colors"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <FolderOpen className="h-4 w-4 text-primary" />
+              <div className="h-10 w-10 rounded-xl bg-brand-strong/10 flex items-center justify-center flex-shrink-0">
+                <FolderOpen className="h-[18px] w-[18px] text-brand-strong" />
               </div>
               <div className="text-left min-w-0">
-                <h2 className="text-sm font-semibold text-foreground">Documentos do Projeto</h2>
-                <p className="text-xs text-muted-foreground truncate">
+                <h2 className="font-serif-display text-lg text-foreground leading-tight tracking-tight">Documentos do Projeto</h2>
+                <p className="text-xs text-muted-foreground truncate mt-0.5">
                   {arquivosCount} {arquivosCount === 1 ? "arquivo" : "arquivos"} · {notas.length} {notas.length === 1 ? "anotação" : "anotações"} · {links.length} {links.length === 1 ? "link" : "links"} · {reports.length} {reports.length === 1 ? "report" : "reports"}
                 </p>
               </div>
@@ -220,27 +220,27 @@ export default function MentoriaDocumentos() {
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform flex-shrink-0 ${documentosExpandido ? "rotate-180" : ""}`} />
           </button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="px-4 pb-4 pt-2">
-        <Tabs defaultValue="arquivos" className="space-y-4">
-          <TabsList className="bg-muted/40 border-0 rounded-lg p-1 flex-wrap h-auto">
-          <TabsTrigger value="arquivos" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <FileText className="h-4 w-4" />
+        <CollapsibleContent className="px-5 pb-5 pt-1 border-t border-brand-hairline">
+        <Tabs defaultValue="arquivos" className="space-y-4 mt-4">
+          <TabsList className="inline-flex items-center gap-0.5 rounded-full bg-brand-cream/60 border border-brand-hairline p-1 h-auto flex-wrap">
+          <TabsTrigger value="arquivos" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+            <FileText className="h-3.5 w-3.5" />
             Arquivos ({arquivosCount})
           </TabsTrigger>
-          <TabsTrigger value="anotacoes" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <StickyNote className="h-4 w-4" />
+          <TabsTrigger value="anotacoes" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+            <StickyNote className="h-3.5 w-3.5" />
             Anotações ({notas.length})
           </TabsTrigger>
-          <TabsTrigger value="links" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <Link2 className="h-4 w-4" />
+          <TabsTrigger value="links" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+            <Link2 className="h-3.5 w-3.5" />
             Links ({links.length})
           </TabsTrigger>
-          <TabsTrigger value="reports" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <FileText className="h-4 w-4" />
+          <TabsTrigger value="reports" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+            <FileText className="h-3.5 w-3.5" />
             Reports ({reports.length})
           </TabsTrigger>
-          <TabsTrigger value="contrato" className="text-sm rounded-md px-4 py-2 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <Shield className="h-4 w-4" />
+          <TabsTrigger value="contrato" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+            <Shield className="h-3.5 w-3.5" />
             Contrato
           </TabsTrigger>
         </TabsList>
