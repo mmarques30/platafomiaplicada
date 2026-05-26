@@ -35,7 +35,7 @@ export function VideoCardVertical({
       className="block group"
       onClick={handleClick}
     >
-      <div className="overflow-hidden rounded-xl border border-brand-hairline shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-brand-cream aspect-video">
+      <div className="overflow-hidden rounded-xl border border-brand-hairline shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-brand-cream aspect-[9/16]">
         {!imageLoaded && (
           <div className="absolute inset-0 bg-brand-hairline animate-pulse" />
         )}
