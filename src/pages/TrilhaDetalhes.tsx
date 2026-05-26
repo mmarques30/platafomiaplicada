@@ -234,7 +234,7 @@ export default function TrilhaDetalhes() {
   return (
     <PageContainer>
       <Link to="/trilhas">
-        <Button variant="ghost" className="mb-4">
+        <Button variant="ghost" size="sm" className="-ml-2 mb-3 text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar para Academy
         </Button>
@@ -257,7 +257,7 @@ export default function TrilhaDetalhes() {
 
       {/* Se tem vídeo selecionado → Layout Lateral (Player + Sidebar) */}
       {currentVideoId && currentVideo && (
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 max-w-[1180px] mx-auto">
           {/* Coluna Esquerda: Player + Info + Avaliação + Tabs */}
           <div className="flex-1 flex flex-col gap-4 min-w-0">
             {/* 1. Player de Vídeo */}
@@ -306,7 +306,7 @@ export default function TrilhaDetalhes() {
             </div>
 
             {/* 3. Avaliação + Botão Concluir */}
-            <Card className="bg-muted/30 border-border">
+            <Card className="bg-brand-cream-soft border-brand-hairline">
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   {/* Avaliação */}
@@ -326,7 +326,7 @@ export default function TrilhaDetalhes() {
                   {/* Botão Concluir */}
                   <div className="w-full sm:w-auto">
                     {getVideoProgress(currentVideoId || '')?.completado ? (
-                      <div className="flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg bg-primary text-primary-foreground">
+                      <div className="flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg bg-brand-strong text-brand-cream">
                         <CheckCircle2 className="h-4 w-4" />
                         <span className="font-medium text-sm">Concluída</span>
                       </div>
@@ -334,7 +334,7 @@ export default function TrilhaDetalhes() {
                       <Button
                         onClick={() => marcarConcluidoMutation.mutate()}
                         disabled={marcarConcluidoMutation.isPending}
-                        className="w-full sm:w-auto transition-colors bg-aplicada-dark hover:bg-aplicada-dark/90 text-white"
+                        className="w-full sm:w-auto transition-colors bg-brand-strong hover:bg-brand-strong/90 text-brand-cream"
                       >
                         <CheckCircle2 className="h-4 w-4 mr-2" />
                         Marcar como Concluída
@@ -347,9 +347,9 @@ export default function TrilhaDetalhes() {
 
             {/* 4. Card de Informações da Aula - Colapsável com header sempre visível */}
             <Collapsible open={infoExpanded} onOpenChange={setInfoExpanded}>
-              <Card className="border-border">
+              <Card className="border-brand-hairline">
                 {/* Header sempre visível */}
-                <div className="flex items-center justify-between p-4 border-b border-border">
+                <div className="flex items-center justify-between p-4 border-b border-brand-hairline">
                   <h3 className="text-sm font-semibold">Informações da aula</h3>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground h-8">
@@ -366,7 +366,7 @@ export default function TrilhaDetalhes() {
                 <CollapsibleContent>
                   <CardContent className="p-4 md:p-6">
                     <Tabs defaultValue="descricao" className="w-full">
-                      <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
+                      <TabsList className="w-full justify-start bg-transparent border-b border-brand-hairline rounded-none p-0 h-auto mb-4">
                         <TabsTrigger 
                           value="descricao"
                           className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
@@ -437,9 +437,9 @@ export default function TrilhaDetalhes() {
                           onClick={() => handleVideoSelect(video.id)}
                           className={cn(
                             "cursor-pointer rounded-lg overflow-hidden transition-all border group",
-                            isPlaying 
-                              ? "ring-2 ring-primary border-primary bg-primary/5" 
-                              : "hover:bg-muted/50 border-border bg-card"
+                            isPlaying
+                              ? "ring-2 ring-brand-strong border-brand-strong bg-brand-strong/5"
+                              : "hover:bg-brand-cream/50 border-brand-hairline bg-brand-cream-soft"
                           )}
                         >
                           <div className="aspect-video relative overflow-hidden">
@@ -476,8 +476,8 @@ export default function TrilhaDetalhes() {
 
           {/* Sidebar Direita: Lista de Vídeos (apenas desktop) */}
           <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-            <Card className="sticky top-4 border-border overflow-hidden flex flex-col h-[calc(100vh-120px)] max-h-[calc(100vh-120px)]">
-              <div className="p-3 border-b border-border bg-muted/30 flex-shrink-0">
+            <Card className="sticky top-4 border-brand-hairline overflow-hidden flex flex-col h-[calc(100vh-120px)] max-h-[calc(100vh-120px)]">
+              <div className="p-3 border-b border-brand-hairline bg-brand-cream-soft flex-shrink-0">
                 <h3 className="font-semibold text-sm">
                   Vídeos da trilha ({allVideos.length})
                 </h3>
@@ -496,9 +496,9 @@ export default function TrilhaDetalhes() {
                         onClick={() => handleVideoSelect(video.id)}
                         className={cn(
                           "flex gap-3 p-2 cursor-pointer transition-all border-l-2",
-                          isPlaying 
-                            ? "border-l-primary bg-primary/10" 
-                            : "border-l-transparent hover:bg-muted/50"
+                          isPlaying
+                            ? "border-l-brand-strong bg-brand-strong/10"
+                            : "border-l-transparent hover:bg-brand-cream/50"
                         )}
                       >
                         {/* Número do vídeo */}
