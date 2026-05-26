@@ -23,6 +23,24 @@ const categoriaIconMap: Record<string, typeof FileText> = {
 const categoriaLabel = (cat: string) =>
   cat.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 
+// Cor por tipo de material — tons harmônicos dentro da paleta da marca
+// (verdes/oliva/terra). Cada categoria ganha uma identidade sutil.
+const categoriaColor: Record<string, string> = {
+  guias: "#5C6F1D",          // verde-brand escuro
+  templates: "#7C8E2F",      // verde médio
+  prompts: "#9EB038",        // verde claro (símbolo)
+  ferramentas: "#4A5A17",    // verde profundo
+  checklists: "#8A7B2E",     // oliva/dourado
+  ebooks: "#6B7F3A",         // musgo
+  newsletter: "#A8924B",     // terra/areia
+  materiais_aula: "#7C8E2F",
+};
+const corDe = (cat: string) => categoriaColor[cat] || "#5C6F1D";
+const rgba = (hex: string, a: number) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+};
+
 const getLinksUrls = (links_url: Json | null): string[] => {
   if (!links_url) return [];
   if (Array.isArray(links_url)) {
@@ -112,9 +130,9 @@ export function MateriaisGratuitosTab() {
         </div>
       )}
 
-      {/* Grid de cards */}
+      {/* Grid de cards — menores, mais colunas, cor por tipo */}
       {!isLoading && filtered.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {filtered.map((material) => {
             const Icon = categoriaIconMap[material.categoria] || FileText;
             const links = getLinksUrls(material.links_url);
@@ -122,6 +140,7 @@ export function MateriaisGratuitosTab() {
             const primaryUrl = material.url || links[0];
             const hasFiles = arquivos.length > 0;
             const hasAnyContent = !!primaryUrl || hasFiles || !!material.descricao;
+            const cor = corDe(material.categoria);
 
             return (
               <div
@@ -141,33 +160,35 @@ export function MateriaisGratuitosTab() {
                     setSelectedMaterial(material);
                   }
                 }}
+                style={{ backgroundColor: rgba(cor, 0.07), borderColor: rgba(cor, 0.22) }}
                 className={cn(
-                  "group flex flex-col gap-3 rounded-2xl border border-brand-hairline bg-brand-cream-soft p-5 transition-all duration-200",
-                  hasAnyContent && "cursor-pointer hover:border-brand-strong/40 hover:shadow-lg hover:shadow-foreground/5 hover:-translate-y-0.5"
+                  "group flex flex-col gap-2.5 rounded-2xl border p-4 transition-all duration-200",
+                  hasAnyContent && "cursor-pointer hover:shadow-lg hover:shadow-foreground/5 hover:-translate-y-0.5"
                 )}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="h-11 w-11 rounded-xl bg-brand-strong/10 flex items-center justify-center flex-shrink-0">
-                    <Icon className="h-5 w-5 text-brand-strong" />
+                <div className="flex items-start justify-between gap-2">
+                  <div
+                    className="h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: rgba(cor, 0.15) }}
+                  >
+                    <Icon className="h-[18px] w-[18px]" style={{ color: cor }} />
                   </div>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-brand-cream border border-brand-hairline px-2.5 py-1 text-[11px] font-medium text-brand-strong capitalize">
+                  <span
+                    className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium capitalize"
+                    style={{ backgroundColor: rgba(cor, 0.12), color: cor }}
+                  >
                     {categoriaLabel(material.categoria)}
                   </span>
                 </div>
 
                 <div className="flex-1">
-                  <h3 className="font-medium text-foreground leading-snug line-clamp-2 group-hover:text-brand-strong transition-colors">
+                  <h3 className="font-medium text-sm text-foreground leading-snug line-clamp-2">
                     {material.titulo}
                   </h3>
-                  {material.descricao && (
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1.5">
-                      {material.descricao}
-                    </p>
-                  )}
                 </div>
 
-                {/* Ações */}
-                <div className="flex items-center gap-2 pt-1 mt-auto">
+                {/* Ações compactas */}
+                <div className="flex items-center gap-1.5 mt-auto">
                   {primaryUrl && (
                     <button
                       type="button"
@@ -176,9 +197,10 @@ export function MateriaisGratuitosTab() {
                         handleAccessClick(material);
                         window.open(primaryUrl, "_blank", "noopener,noreferrer");
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-brand-strong text-brand-cream px-3.5 py-1.5 text-xs font-medium hover:bg-brand-strong/90 transition-colors"
+                      style={{ backgroundColor: cor }}
+                      className="inline-flex items-center gap-1 rounded-full text-white px-3 py-1 text-[11px] font-medium hover:opacity-90 transition-opacity"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
+                      <ExternalLink className="h-3 w-3" />
                       Acessar
                     </button>
                   )}
@@ -190,19 +212,20 @@ export function MateriaisGratuitosTab() {
                         handleAccessClick(material);
                         void safeDownload(arquivos[0]);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-brand-hairline bg-background px-3.5 py-1.5 text-xs font-medium text-foreground hover:border-brand-strong/40 hover:text-brand-strong transition-colors"
+                      style={{ borderColor: rgba(cor, 0.3), color: cor }}
+                      className="inline-flex items-center gap-1 rounded-full border bg-background/60 px-3 py-1 text-[11px] font-medium hover:bg-background transition-colors"
                     >
-                      <Download className="h-3.5 w-3.5" />
+                      <Download className="h-3 w-3" />
                       Baixar
                     </button>
                   )}
                   {!primaryUrl && !hasFiles && material.descricao && (
-                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground group-hover:text-brand-strong transition-colors">
-                      Ver detalhes <ArrowUpRight className="h-3.5 w-3.5" />
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium" style={{ color: cor }}>
+                      Ver detalhes <ArrowUpRight className="h-3 w-3" />
                     </span>
                   )}
                   {!hasAnyContent && (
-                    <span className="text-xs text-muted-foreground">Em breve</span>
+                    <span className="text-[11px] text-muted-foreground">Em breve</span>
                   )}
                 </div>
               </div>
