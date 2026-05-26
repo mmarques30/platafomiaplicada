@@ -52,9 +52,7 @@ export default function Comunidade() {
               </TabsList>
 
               <TabsContent value="feed" className="mt-0">
-                <div className="bg-brand-cream-soft rounded-2xl border border-brand-hairline overflow-hidden">
-                  <CommunityFeed />
-                </div>
+                <CommunityFeed />
               </TabsContent>
 
               <TabsContent value="ranking" className="mt-0">

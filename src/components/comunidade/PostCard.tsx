@@ -51,7 +51,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
   const mediaCount = mediaItems.length;
 
   return (
-    <article className="border-b p-4 hover:bg-muted/30 transition-colors">
+    <article className="bg-brand-cream-soft border border-brand-hairline rounded-2xl p-5 hover:border-brand-strong/30 transition-colors">
       <div className="flex gap-3">
         {/* Avatar */}
         <Avatar className="h-10 w-10 flex-shrink-0">
@@ -189,21 +189,21 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           )}
 
           {/* Actions */}
-          <div className="flex items-center gap-6 mt-3 -ml-2">
+          <div className="flex items-center gap-2 mt-3 -ml-2 pt-2 border-t border-brand-hairline">
             <button
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors group"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-muted-foreground hover:text-brand-strong hover:bg-brand-strong/10 transition-colors text-sm mt-2"
             >
               <MessageCircle className="h-[18px] w-[18px]" />
-              <span className="text-sm">{post.comments_count || ""}</span>
+              <span>{post.comments_count || "Comentar"}</span>
             </button>
 
             <button
               onClick={onLike}
               className={cn(
-                "flex items-center gap-2 p-2 rounded-full transition-colors group",
+                "flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors text-sm mt-2",
                 post.user_has_liked
-                  ? "text-red-500"
+                  ? "text-red-500 bg-red-500/10"
                   : "text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
               )}
             >
@@ -213,13 +213,13 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
                   post.user_has_liked && "fill-red-500"
                 )}
               />
-              <span className="text-sm">{post.likes_count || ""}</span>
+              <span>{post.likes_count || "Curtir"}</span>
             </button>
           </div>
 
           {/* Comments Section */}
           {showComments && (
-            <div className="mt-4 pt-4 border-t">
+            <div className="mt-4 pt-4 border-t border-brand-hairline">
               <PostComments postId={post.id} />
             </div>
           )}
