@@ -83,7 +83,7 @@ export function MembersList() {
         </div>
       ) : (
         <>
-          <div className="divide-y bg-card rounded-xl border overflow-hidden">
+          <div className="divide-y divide-brand-hairline bg-brand-cream-soft rounded-2xl border border-brand-hairline overflow-hidden">
             {displayedMembers.map((member) => (
               <MemberCard key={member.id} member={member} />
             ))}

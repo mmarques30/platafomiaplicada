@@ -113,9 +113,9 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
 
       {/* Posições 4+ - Tabela simplificada */}
       {(posicoes4a10.length > 0 || alem10.length > 0) && (
-        <div className="bg-card rounded-xl border overflow-hidden">
+        <div className="bg-brand-cream-soft rounded-2xl border border-brand-hairline overflow-hidden">
           <table className="w-full">
-            <thead className="bg-muted/50">
+            <thead className="bg-brand-cream">
               <tr className="text-xs text-muted-foreground">
                 <th className="text-left p-3 font-medium w-12">#</th>
                 <th className="text-left p-3 font-medium">Membro</th>
@@ -126,14 +126,14 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                 <th className="text-right p-3 font-medium">Pontos</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-brand-hairline">
               {/* Posições 4 a 10 */}
               {posicoes4a10.map((item) => (
                 <tr 
                   key={item.user_id} 
                   className={cn(
-                    "hover:bg-muted/50 transition-colors",
-                    item.user_id === user?.id && "bg-primary/10"
+                    "hover:bg-brand-cream/50 transition-colors",
+                    item.user_id === user?.id && "bg-brand-strong/10"
                   )}
                 >
                   <td className="p-3 font-mono text-sm text-muted-foreground">{item.posicao}º</td>
@@ -141,17 +141,17 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={item.avatar_url} />
-                        <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                        <AvatarFallback className="bg-brand-strong/15 text-brand-strong text-xs">
                           {getInitials(item.nome_completo)}
                         </AvatarFallback>
                       </Avatar>
                       <span className={cn(
                         "truncate",
-                        item.user_id === user?.id ? "text-primary font-medium" : ""
+                        item.user_id === user?.id ? "text-brand-strong font-medium" : ""
                       )}>
                         {item.nome_completo}
                         {item.user_id === user?.id && (
-                          <span className="ml-1 text-xs text-primary">(Você)</span>
+                          <span className="ml-1 text-xs text-brand-strong">(Você)</span>
                         )}
                       </span>
                     </div>
@@ -169,8 +169,8 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                 <tr 
                   key={item.user_id} 
                   className={cn(
-                    "hover:bg-muted/50 transition-colors",
-                    item.user_id === user?.id && "bg-primary/10"
+                    "hover:bg-brand-cream/50 transition-colors",
+                    item.user_id === user?.id && "bg-brand-strong/10"
                   )}
                 >
                   <td className="p-3 font-mono text-sm text-muted-foreground">{item.posicao}º</td>
@@ -178,17 +178,17 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={item.avatar_url} />
-                        <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                        <AvatarFallback className="bg-brand-strong/15 text-brand-strong text-xs">
                           {getInitials(item.nome_completo)}
                         </AvatarFallback>
                       </Avatar>
                       <span className={cn(
                         "truncate",
-                        item.user_id === user?.id ? "text-primary font-medium" : ""
+                        item.user_id === user?.id ? "text-brand-strong font-medium" : ""
                       )}>
                         {item.nome_completo}
                         {item.user_id === user?.id && (
-                          <span className="ml-1 text-xs text-primary">(Você)</span>
+                          <span className="ml-1 text-xs text-brand-strong">(Você)</span>
                         )}
                       </span>
                     </div>
@@ -206,7 +206,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
           {alem10.length > 0 && (
             <button 
               onClick={() => setExpanded(!expanded)}
-              className="w-full p-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors flex items-center justify-center gap-2 border-t"
+              className="w-full p-3 text-sm text-muted-foreground hover:text-foreground hover:bg-brand-cream/50 transition-colors flex items-center justify-center gap-2 border-t border-brand-hairline"
             >
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", expanded && "rotate-180")} />
               {expanded ? 'Ver menos' : `Ver mais ${alem10.length} posições`}
@@ -216,14 +216,14 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
           {/* Minha posição (se não estiver visível no top 10) */}
           {minhaposicao && minhaposicao.posicao > 10 && !expanded && (
             <div className="border-t p-4">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border border-primary/30">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-brand-strong/10 border border-brand-strong/30">
                 <span className="font-mono text-sm text-muted-foreground w-8">{minhaposicao.posicao}º</span>
-                <Avatar className="h-10 w-10 border-2 border-primary">
+                <Avatar className="h-10 w-10 border-2 border-brand-strong">
                   <AvatarImage src={minhaposicao.avatar_url} />
-                  <AvatarFallback className="bg-primary/20 text-primary">{getInitials(minhaposicao.nome_completo)}</AvatarFallback>
+                  <AvatarFallback className="bg-brand-strong/15 text-brand-strong">{getInitials(minhaposicao.nome_completo)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="font-medium text-primary">Você - {minhaposicao.nome_completo}</p>
+                  <p className="font-medium text-brand-strong">Você - {minhaposicao.nome_completo}</p>
                   <p className="text-xs text-muted-foreground">Sua posição atual</p>
                 </div>
                 <div className="text-right">

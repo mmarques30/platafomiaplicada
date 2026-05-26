@@ -11,11 +11,27 @@ export default function Comunidade() {
 
   return (
     <PageContainer>
+      {/* Background decorativo sutil — símbolo da marca, fixo, baixíssima
+          opacidade pra não roubar atenção do conteúdo. */}
+      <div
+        aria-hidden
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: "url(/background-symbol-soft.png)",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "115% -8%",
+          backgroundSize: "min(46vw, 560px)",
+          opacity: 0.05,
+        }}
+      />
+
       {/* Banner imersivo (título + stats inline) */}
-      <CommunityHeroDashboard />
+      <div className="relative z-10">
+        <CommunityHeroDashboard />
+      </div>
 
       {/* Conteúdo em coluna única centralizada (sem sidebar) */}
-      <div className="mt-8">
+      <div className="relative z-10 mt-8">
         <Tabs defaultValue="feed" className="w-full">
           {/* Tabs centralizadas, estilo pill da marca */}
           <div className="flex justify-center mb-6">
