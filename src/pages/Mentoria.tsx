@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
@@ -74,43 +74,6 @@ export default function Mentoria() {
     { numero: 4, label: 'Certificado', status: 'proximo' as const },
   ];
   
-  // Business Parceria: scroll contínuo com IntersectionObserver
-  const [activeSection, setActiveSection] = useState('visao-geral');
-
-  useEffect(() => {
-    if (!isBusinessParceria) return;
-    const sectionIds = ['visao-geral', 'roadmap', 'evolucao'];
-    const observers = sectionIds.map(id => {
-      const el = document.getElementById(`sec-${id}`);
-      if (!el) return null;
-      const obs = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) setActiveSection(id);
-      }, { threshold: 0.3 });
-      obs.observe(el);
-      return obs;
-    });
-    return () => observers.forEach(obs => obs?.disconnect());
-  }, [isBusinessParceria]);
-
-  // Business Parceria: interceptar tabs e fazer scroll
-  useEffect(() => {
-    if (!isBusinessParceria) return;
-    const tab = searchParams.get("tab");
-    if (tab === "evolucao-aprendizado") {
-      searchParams.delete("tab");
-      setSearchParams(searchParams, { replace: true });
-      setTimeout(() => {
-        document.getElementById("sec-evolucao")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    } else if (tab === "roadmap") {
-      searchParams.delete("tab");
-      setSearchParams(searchParams, { replace: true });
-      setTimeout(() => {
-        document.getElementById("sec-roadmap")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    }
-  }, [isBusinessParceria, searchParams, setSearchParams]);
-
   // Redirecionar usuários Skills para suas páginas específicas
   useEffect(() => {
     if (isSkills && !isBusiness) {
@@ -145,9 +108,6 @@ export default function Mentoria() {
     }
   };
 
-  const sectionLabels = ['Visão Geral', 'Roadmap', 'Evolução'];
-  const sectionIds = ['visao-geral', 'roadmap', 'evolucao'];
-
   return (
     <PageContainer>
       {/* Hero Dashboard */}
@@ -160,108 +120,67 @@ export default function Mentoria() {
       {isBusinessSistemas && estagiosBusiness && <JornadaStrip estagios={estagiosBusiness} />}
       {isAcademy && <JornadaStrip estagios={estagiosAcademy} />}
 
-      {/* Business Parceria: scroll contínuo com nav-pill sticky */}
-      {isBusinessParceria ? (
-        <>
-          {/* Nav-pill sticky */}
-          <div className="sticky top-[64px] z-40 bg-background/80 backdrop-blur py-3 mt-6">
-            <div className="flex gap-1">
-              {sectionIds.map((id, i) => (
-                <button
-                  key={id}
-                  onClick={() => document.getElementById(`sec-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                  style={{
-                    padding: '5px 14px',
-                    borderRadius: 16,
-                    border: 'none',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    background: activeSection === id ? '#AFC040' : 'transparent',
-                    color: activeSection === id ? '#0C0F0A' : 'hsl(var(--muted-foreground))',
-                    transition: 'all 0.15s',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  {sectionLabels[i]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Seções contínuas */}
-          <section id="sec-visao-geral" className="scroll-mt-28 mt-6 space-y-4">
-            <h2 className="text-lg font-semibold text-foreground">Visão Geral</h2>
-            <BusinessVisaoGeralGrid />
-          </section>
-
-          <section id="sec-roadmap" className="scroll-mt-28 mt-10 space-y-4">
-            <h2 className="text-lg font-semibold text-foreground">Roadmap</h2>
-            <BusinessExecutiveRoadmap />
-          </section>
-
-          <section id="sec-evolucao" className="scroll-mt-28 mt-10 space-y-4">
-            <h2 className="text-lg font-semibold text-foreground">Evolução Aprendizado</h2>
-            <BusinessEvolucaoAprendizado />
-          </section>
-        </>
-      ) : (
-        /* Academy, Sistemas, etc.: manter abas */
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
-          <TabsList className={`w-full md:w-auto grid ${showEvolucaoTab ? 'grid-cols-3' : 'grid-cols-2'} md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6`}>
+      {/* Abas (por página) — unificado para Academy, Sistemas e Business Parceria */}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
+        <div className="flex mb-6">
+          <TabsList className="inline-flex gap-1 bg-brand-cream/60 border border-brand-hairline p-1 rounded-full h-auto">
             <TabsTrigger
               value="visao-geral"
-              className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+              className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-5 py-2 transition-colors text-sm"
             >
               Visão Geral
             </TabsTrigger>
             <TabsTrigger
               value="roadmap"
-              className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+              className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-5 py-2 transition-colors text-sm"
             >
               Roadmap
             </TabsTrigger>
             {showEvolucaoTab && (
               <TabsTrigger
                 value="evolucao-aprendizado"
-                className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+                className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-5 py-2 transition-colors text-sm"
               >
-                Evolução Aprendizado
+                Evolução
               </TabsTrigger>
             )}
           </TabsList>
+        </div>
 
-          <TabsContent value="visao-geral" className="mt-0 space-y-4">
-            {isBusinessSistemas ? (
-              <IAplicadaVisaoGeral />
-            ) : (
-              <>
-                <PendenciasUrgentes />
-                <AcademyProximoPasso />
-                <div className="space-y-2">
-                  <StatusDiagnostico />
-                  <ProximaSessao />
-                </div>
-                <TarefasUrgentes />
-              </>
-            )}
-          </TabsContent>
-
-          <TabsContent value="roadmap" className="mt-0 space-y-6">
-            {isBusinessSistemas ? (
-              <IAplicadaRoadmap />
-            ) : (
-              <AcademyRoadmapEducacional />
-            )}
-          </TabsContent>
-
-          {showEvolucaoTab && (
-            <TabsContent value="evolucao-aprendizado" className="mt-0 space-y-6">
-              <BusinessEvolucaoAprendizado />
-            </TabsContent>
+        <TabsContent value="visao-geral" className="mt-0 space-y-4">
+          {isBusinessSistemas ? (
+            <IAplicadaVisaoGeral />
+          ) : isBusinessParceria ? (
+            <BusinessVisaoGeralGrid />
+          ) : (
+            <>
+              <PendenciasUrgentes />
+              <AcademyProximoPasso />
+              <div className="space-y-2">
+                <StatusDiagnostico />
+                <ProximaSessao />
+              </div>
+              <TarefasUrgentes />
+            </>
           )}
-        </Tabs>
-      )}
+        </TabsContent>
+
+        <TabsContent value="roadmap" className="mt-0 space-y-6">
+          {isBusinessSistemas ? (
+            <IAplicadaRoadmap />
+          ) : isBusinessParceria ? (
+            <BusinessExecutiveRoadmap />
+          ) : (
+            <AcademyRoadmapEducacional />
+          )}
+        </TabsContent>
+
+        {showEvolucaoTab && (
+          <TabsContent value="evolucao-aprendizado" className="mt-0 space-y-6">
+            <BusinessEvolucaoAprendizado />
+          </TabsContent>
+        )}
+      </Tabs>
     </PageContainer>
   );
 }
