@@ -70,16 +70,17 @@ export default function MetodosAplicar() {
     return counts;
   }, [skills]);
 
-  // Filtrar skills pela ferramenta selecionada
+  // Filtrar skills pela ferramenta selecionada. "todas" → todas as skills
+  // (inclui as que não têm ferramenta associada).
   const filteredSkills = useMemo(() => {
     let items = skills;
-    if (selectedFerramenta) {
+    if (selectedFerramenta && selectedFerramenta !== "todas") {
       items = items.filter(s => s.ferramenta === selectedFerramenta);
     }
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      items = items.filter(s => 
-        s.titulo.toLowerCase().includes(term) || 
+      items = items.filter(s =>
+        s.titulo.toLowerCase().includes(term) ||
         s.descricao.toLowerCase().includes(term)
       );
     }
@@ -171,8 +172,17 @@ export default function MetodosAplicar() {
                 </Button>
                 <div>
                   <h2 className="text-lg font-semibold flex items-center gap-2">
-                    {ARSENAL_FERRAMENTAS.find(f => f.value === selectedFerramenta)?.icon}
-                    Skills para {selectedFerramenta}
+                    {selectedFerramenta === "todas" ? (
+                      <>
+                        <Sparkles className="h-5 w-5 text-brand-strong" />
+                        Todas as skills
+                      </>
+                    ) : (
+                      <>
+                        {ARSENAL_FERRAMENTAS.find(f => f.value === selectedFerramenta)?.icon}
+                        Skills para {selectedFerramenta}
+                      </>
+                    )}
                   </h2>
                   <p className="text-sm text-muted-foreground">{filteredSkills.length} skill(s) disponível(is)</p>
                 </div>
@@ -224,12 +234,26 @@ export default function MetodosAplicar() {
             </>
           ) : (
             <>
-              {/* Grid de ferramentas */}
+              {/* Grid de ferramentas + card "Todas" */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                {/* Card "Todas as skills" — pra ver tudo, incluindo skills sem ferramenta */}
+                <Card
+                  className="p-5 cursor-pointer hover:shadow-lg transition-all duration-200 border-2 border-brand-strong/30 hover:border-brand-strong bg-brand-cream-soft flex flex-col items-center text-center gap-3"
+                  onClick={() => setSelectedFerramenta("todas")}
+                >
+                  <Sparkles className="h-7 w-7 text-brand-strong" strokeWidth={1.75} />
+                  <div>
+                    <h3 className="font-semibold text-sm text-foreground">Todas</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {skills.length} skill{skills.length !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                </Card>
+
                 {ARSENAL_FERRAMENTAS.map(ferramenta => {
                   const count = contagemPorFerramenta[ferramenta.value] || 0;
                   return (
-                    <Card 
+                    <Card
                       key={ferramenta.value}
                       className={`p-5 cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/40 flex flex-col items-center text-center gap-3 ${ferramenta.color}`}
                       onClick={() => setSelectedFerramenta(ferramenta.value)}
@@ -238,7 +262,7 @@ export default function MetodosAplicar() {
                       <div>
                         <h3 className="font-semibold text-sm">{ferramenta.label}</h3>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {count} skill{count !== 1 ? 's' : ''}
+                          {count} skill{count !== 1 ? "s" : ""}
                         </p>
                       </div>
                     </Card>
