@@ -347,7 +347,7 @@ Deno.serve(async (req) => {
             plano: "Academy",
             telefone: customerPhone,
             offer_name: offerName,
-            plataforma_url: "https://platafomiaplicada.lovable.app",
+            plataforma_url: "https://plataforma.iaplicada.com",
             acao: userAction,
           }),
         });

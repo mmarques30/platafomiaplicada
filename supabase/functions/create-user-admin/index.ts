@@ -362,7 +362,7 @@ Deno.serve(async (req) => {
             plano_label: isBusiness
               ? (effectivePlanoMentoria === 'business_sistemas' ? 'Business Sistemas' : 'Business Parceria')
               : 'Academy',
-            plataforma_url: 'https://platafomiaplicada.lovable.app',
+            plataforma_url: 'https://plataforma.iaplicada.com',
             acao: isExistingUser ? 'existing_user_updated' : 'new_user_created',
           }),
         });
