@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useMetodos } from "@/hooks/useFerramentas";
-import { Search, Zap, BookOpen, FileText, ExternalLink, ArrowLeft, Users, Sparkles } from "lucide-react";
+import { Search, Zap, BookOpen, FileText, ExternalLink, ArrowLeft, Users, Sparkles, Copy, Check } from "lucide-react";
 import { ARSENAL_FERRAMENTAS, ARSENAL_NIVEIS, ARSENAL_TIPOS } from "@/lib/metodosCategories";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { MateriaisBibliotecaTab } from "@/components/biblioteca/MateriaisBibliotecaTab";
+import { toast } from "sonner";
 
 export default function MetodosAplicar() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,6 +23,19 @@ export default function MetodosAplicar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFerramenta, setSelectedFerramenta] = useState<string | null>(null);
   const [selectedBibliotecaTipo, setSelectedBibliotecaTipo] = useState<string | null>(null);
+  const [detailItem, setDetailItem] = useState<any | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast.success("Conteúdo copiado!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Não foi possível copiar. Selecione manualmente.");
+    }
+  };
 
   const handleTabChange = (value: string) => {
     if (value === "skills") {
@@ -178,29 +193,25 @@ export default function MetodosAplicar() {
               {filteredSkills.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredSkills.map(skill => (
-                    <Card key={skill.id} className="p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+                    <Card
+                      key={skill.id}
+                      onClick={() => setDetailItem(skill)}
+                      className="p-5 flex flex-col gap-3 hover:shadow-md hover:border-brand-strong/30 transition-all cursor-pointer"
+                    >
                       <div className="flex items-start justify-between gap-2">
                         <h3 className="font-semibold text-sm leading-tight line-clamp-2 flex-1">{skill.titulo}</h3>
-                        <FavoriteButton tipo="metodo" itemId={skill.id} variant="ghost" className="h-7 w-7 shrink-0" />
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <FavoriteButton tipo="metodo" itemId={skill.id} variant="ghost" className="h-7 w-7 shrink-0" />
+                        </div>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-3">{skill.descricao}</p>
                       <div className="flex items-center gap-2 flex-wrap mt-auto">
                         {getNivelBadge(skill.nivel)}
                         {skill.categoria && <Badge variant="secondary" className="text-xs">{skill.categoria}</Badge>}
                       </div>
-                      {(skill.link_documento || skill.template) && (
-                        <div className="flex gap-2 mt-1">
-                          {skill.link_documento && (
-                            <Button asChild size="sm" className="flex-1">
-                              <a href={skill.link_documento} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
-                                <FileText className="w-3.5 h-3.5" />
-                                Acessar
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
-                            </Button>
-                          )}
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1.5 text-xs text-brand-strong font-medium mt-1">
+                        Ver detalhes <ExternalLink className="h-3 w-3" />
+                      </div>
                     </Card>
                   ))}
                 </div>
@@ -244,10 +255,16 @@ export default function MetodosAplicar() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {skills.slice(0, 6).map(skill => (
-                      <Card key={skill.id} className="p-4 flex flex-col gap-2 hover:shadow-md transition-shadow">
+                      <Card
+                        key={skill.id}
+                        onClick={() => setDetailItem(skill)}
+                        className="p-4 flex flex-col gap-2 hover:shadow-md hover:border-brand-strong/30 transition-all cursor-pointer"
+                      >
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="font-medium text-sm line-clamp-1 flex-1">{skill.titulo}</h3>
-                          <FavoriteButton tipo="metodo" itemId={skill.id} variant="ghost" className="h-7 w-7 shrink-0" />
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <FavoriteButton tipo="metodo" itemId={skill.id} variant="ghost" className="h-7 w-7 shrink-0" />
+                          </div>
                         </div>
                         <p className="text-xs text-muted-foreground line-clamp-2">{skill.descricao}</p>
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -314,7 +331,11 @@ export default function MetodosAplicar() {
           ) : filteredBiblioteca.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredBiblioteca.map(item => (
-                <Card key={item.id} className="overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+                <Card
+                  key={item.id}
+                  onClick={() => setDetailItem(item)}
+                  className="overflow-hidden flex flex-col hover:shadow-md hover:border-brand-strong/30 transition-all cursor-pointer"
+                >
                   {item.imagem_url && (
                     <div className="h-36 bg-muted overflow-hidden">
                       <img src={item.imagem_url} alt={item.titulo} className="w-full h-full object-cover" />
@@ -323,22 +344,18 @@ export default function MetodosAplicar() {
                   <div className="p-5 flex flex-col gap-3 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-semibold text-sm leading-tight line-clamp-2 flex-1">{item.titulo}</h3>
-                      <FavoriteButton tipo="metodo" itemId={item.id} variant="ghost" className="h-7 w-7 shrink-0" />
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <FavoriteButton tipo="metodo" itemId={item.id} variant="ghost" className="h-7 w-7 shrink-0" />
+                      </div>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-3">{item.descricao}</p>
                     <div className="flex items-center gap-2 flex-wrap mt-auto">
                       {getTipoBadge(item.tipo)}
                       {getNivelBadge(item.nivel)}
                     </div>
-                    {item.link_documento && (
-                      <Button asChild size="sm" className="mt-1">
-                        <a href={item.link_documento} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
-                          <FileText className="w-3.5 h-3.5" />
-                          Acessar
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </Button>
-                    )}
+                    <div className="flex items-center gap-1.5 text-xs text-brand-strong font-medium mt-1">
+                      Ver detalhes <ExternalLink className="h-3 w-3" />
+                    </div>
                   </div>
                 </Card>
               ))}
@@ -356,6 +373,96 @@ export default function MetodosAplicar() {
           <MateriaisBibliotecaTab />
         </TabsContent>
       </Tabs>
+
+      {/* Modal de detalhes — exibe template/prompt copiável + link + metadados */}
+      <Dialog open={!!detailItem} onOpenChange={(open) => !open && setDetailItem(null)}>
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto bg-brand-cream-soft border-brand-hairline">
+          {detailItem && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-serif-display text-2xl text-foreground leading-tight tracking-tight pr-6">
+                  {detailItem.titulo}
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-5 pt-2">
+                {/* Badges */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {detailItem.tipo && getTipoBadge(detailItem.tipo)}
+                  {detailItem.nivel && getNivelBadge(detailItem.nivel)}
+                  {detailItem.ferramenta && (
+                    <Badge variant="outline" className="text-xs">
+                      {ARSENAL_FERRAMENTAS.find(f => f.value === detailItem.ferramenta)?.icon} {detailItem.ferramenta}
+                    </Badge>
+                  )}
+                  {detailItem.categoria && (
+                    <Badge variant="secondary" className="text-xs">{detailItem.categoria}</Badge>
+                  )}
+                </div>
+
+                {/* Descrição */}
+                {detailItem.descricao && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-medium mb-1.5">
+                      Descrição
+                    </p>
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                      {detailItem.descricao}
+                    </p>
+                  </div>
+                )}
+
+                {/* Template/Prompt — o conteúdo que estava escondido */}
+                {detailItem.template && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-medium">
+                        Prompt / Template
+                      </p>
+                      <Button
+                        size="sm"
+                        onClick={() => handleCopy(detailItem.template)}
+                        className="h-7 bg-brand-strong hover:bg-brand-strong/90 text-brand-cream rounded-full px-3 text-xs"
+                      >
+                        {copied ? (
+                          <><Check className="h-3.5 w-3.5 mr-1" />Copiado</>
+                        ) : (
+                          <><Copy className="h-3.5 w-3.5 mr-1" />Copiar</>
+                        )}
+                      </Button>
+                    </div>
+                    <pre className="text-sm text-foreground whitespace-pre-wrap bg-background border border-brand-hairline rounded-xl p-4 font-sans leading-relaxed select-text">
+                      {detailItem.template}
+                    </pre>
+                  </div>
+                )}
+
+                {/* Link documento */}
+                {detailItem.link_documento && (
+                  <Button asChild className="bg-brand-strong hover:bg-brand-strong/90 text-brand-cream w-full sm:w-auto">
+                    <a
+                      href={detailItem.link_documento}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Acessar documento
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </Button>
+                )}
+
+                {!detailItem.template && !detailItem.link_documento && (
+                  <p className="text-sm text-muted-foreground italic">
+                    Sem conteúdo adicional disponível para este item.
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
