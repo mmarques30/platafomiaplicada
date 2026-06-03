@@ -326,9 +326,18 @@ Deno.serve(async (req) => {
 
     // 13. Enviar dados para o Zapier (email de boas-vindas)
     const zapierWebhookUrl = Deno.env.get("ZAPIER_WEBHOOK_URL");
-    if (zapierWebhookUrl && userAction !== "already_has_academy") {
+    let emailStatus: "sent" | "skipped_already_active" | "skipped_no_zapier_url" | "failed" = "sent";
+    let emailError: string | null = null;
+
+    if (userAction === "already_has_academy") {
+      emailStatus = "skipped_already_active";
+      console.log("Email NÃO enviado: usuário já tem academy ativo");
+    } else if (!zapierWebhookUrl) {
+      emailStatus = "skipped_no_zapier_url";
+      console.error("Email NÃO enviado: env ZAPIER_WEBHOOK_URL não configurada");
+    } else {
       try {
-        await fetch(zapierWebhookUrl, {
+        const resp = await fetch(zapierWebhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -342,24 +351,33 @@ Deno.serve(async (req) => {
             acao: userAction,
           }),
         });
-        console.log("Dados enviados para Zapier com sucesso");
+        if (!resp.ok) {
+          emailStatus = "failed";
+          emailError = `Zapier respondeu HTTP ${resp.status}: ${await resp.text().catch(() => "")}`.slice(0, 500);
+          console.error("Zapier retornou erro:", emailError);
+        } else {
+          console.log("Dados enviados para Zapier com sucesso (HTTP", resp.status, ")");
+        }
       } catch (zapierError) {
-        console.error("Erro ao enviar para Zapier (nao-bloqueante):", zapierError);
+        emailStatus = "failed";
+        emailError = zapierError instanceof Error ? zapierError.message : String(zapierError);
+        console.error("Erro ao enviar para Zapier (nao-bloqueante):", emailError);
       }
     }
 
-    // 14. Atualizar log com sucesso
+    // 14. Atualizar log com sucesso (inclui status do email pra diagnóstico)
     if (logId) {
       await supabaseAdmin
         .from("webhook_lia_logs")
         .update({
           status: "processed",
           user_created_id: userId,
+          error_message: emailError ? `[email:${emailStatus}] ${emailError}` : `[email:${emailStatus}]`,
         })
         .eq("id", logId);
     }
 
-    console.log(`Webhook Lia processado com sucesso: ${userAction} - ${customerEmail} - ${userId}`);
+    console.log(`Webhook Lia processado: user=${userAction} email=${emailStatus} email=${customerEmail} id=${userId}`);
 
     return new Response(
       JSON.stringify({

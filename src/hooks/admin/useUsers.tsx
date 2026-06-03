@@ -126,20 +126,31 @@ export function useCreateUser() {
       });
 
       if (error) {
-        // Try to extract the actual error message from the response
-        const context = (error as any)?.context;
-        if (context && typeof context.json === 'function') {
+        // FunctionsHttpError do supabase-js v2 expõe a Response em error.context.
+        // Lê o body como texto e tenta extrair { error } JSON — caso contrário
+        // usa o texto cru. Sem isso o usuário só via "non-2xx status code".
+        let realMessage = error.message;
+        const resp = (error as any)?.context as Response | undefined;
+        if (resp && typeof resp.text === "function") {
           try {
-            const body = await context.json();
-            if (body?.error) throw new Error(body.error);
-          } catch (parseErr) {
-            // If parsing fails, fall through to generic error
+            const text = await resp.text();
+            if (text) {
+              try {
+                const json = JSON.parse(text);
+                if (json?.error) realMessage = json.error;
+                else if (json?.message) realMessage = json.message;
+              } catch {
+                realMessage = text.slice(0, 500);
+              }
+            }
+          } catch {
+            // ignora — mantém realMessage default
           }
         }
-        throw error;
+        throw new Error(realMessage);
       }
       if (data?.error) throw new Error(data.error);
-      
+
       return data;
     },
     onSuccess: () => {
