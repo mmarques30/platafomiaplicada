@@ -128,8 +128,29 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   const nextStep = async () => {
     const fields = getStepFields(currentStep);
     const isValid = await form.trigger(fields);
-    
-    if (isValid && currentStep < totalSteps - 1) {
+
+    if (!isValid) {
+      // BUG fix: antes a função saía silenciosa quando a validação falhava
+      // — cliente clicava "Próximo" e nada acontecia, sem feedback nenhum.
+      // Agora avisa em toast + rola até o primeiro erro.
+      toast({
+        title: "Preencha os campos obrigatórios",
+        description: "Há campos pendentes ou com menos texto que o mínimo. Veja os destaques em vermelho.",
+        variant: "destructive",
+      });
+      const errors = form.formState.errors as Record<string, unknown>;
+      const firstErrorField = Object.keys(errors)[0];
+      if (firstErrorField) {
+        const el = document.querySelector(`[name="${firstErrorField}"]`) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => el.focus?.(), 350);
+        }
+      }
+      return;
+    }
+
+    if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -183,8 +204,8 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   const getStepFields = (step: number): (keyof FormData)[] => {
     if (isBusiness) {
       switch (step) {
-        case 0: return ["tamanho_empresa"] as (keyof FormData)[]; // nome_completo preenchido automaticamente
-        case 1: return [] as (keyof FormData)[];
+        case 0: return ["cargo_atual", "empresa_nome", "tamanho_empresa"] as (keyof FormData)[];
+        case 1: return ["problema_principal", "processo_automatizar", "resultado_esperado"] as (keyof FormData)[];
         case 2: return [] as (keyof FormData)[];
         case 3: return [] as (keyof FormData)[];
         case 4: return [] as (keyof FormData)[];
@@ -192,15 +213,32 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
         default: return [];
       }
     }
-    
-    // Academy steps
+
+    // Academy steps — alinhado ao schema atual (academyStep1..5Schema)
     switch (step) {
-      case 0: return ["nome_completo", "idade", "profissao", "area_atuacao", "tempo_experiencia"];
-      case 1: return ["nivel_ia", "frequencia_uso_ia"];
-      case 2: return ["objetivo_principal", "area_aplicacao_ia", "meta_3_meses"];
-      case 3: return ["desafio_1", "desafio_2", "desafio_3", "tempo_disponivel", "maior_ladrao_tempo"];
-      case 4: return ["estilo_aprendizagem", "preferencia_aprendizado", "nivel_comprometimento"];
-      default: return [];
+      case 0:
+        return [
+          "profissao",
+          "area_atuacao",
+          "como_conheceu_iaplicada",
+          "motivo_compra",
+          "expectativa_produto",
+        ];
+      case 1:
+        return ["nivel_ia", "frequencia_uso_ia"];
+      case 2:
+        return [
+          "objetivo_principal",
+          "area_aplicacao_ia",
+          "resultado_esperado_30_dias",
+          "como_medir_sucesso",
+        ];
+      case 3:
+        return ["maior_desafio_profissional", "tempo_disponivel"];
+      case 4:
+        return ["nivel_comprometimento"];
+      default:
+        return [];
     }
   };
 
@@ -234,11 +272,8 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   };
 
   return (
-    <Card className={cn(
-      "w-full max-w-4xl mx-auto relative overflow-hidden",
-      isBusiness && "bg-zinc-900 border-zinc-700"
-    )}>
-      <CardContent className={cn("pt-6", isBusiness && "text-white")}>
+    <Card className="w-full max-w-4xl mx-auto relative overflow-hidden bg-brand-cream-soft border-brand-hairline">
+      <CardContent className="pt-6">
         <div className="flex justify-between items-center mb-4">
           {/* Business Premium Badge */}
           {isBusiness && (
