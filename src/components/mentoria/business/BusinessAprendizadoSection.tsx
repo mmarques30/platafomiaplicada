@@ -20,12 +20,12 @@ export function BusinessAprendizadoSection({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Card - Quer Aprender? */}
       <Card className="border-border overflow-hidden relative group hover:shadow-md transition-all">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-aplicada-green-700/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-strong/15 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
         
         <CardContent className="p-6 relative z-10">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-aplicada-green-700/10 flex items-center justify-center shrink-0">
-              <GraduationCap className="h-6 w-6 text-aplicada-green-700" />
+            <div className="w-12 h-12 rounded-xl bg-brand-strong/15 flex items-center justify-center shrink-0">
+              <GraduationCap className="h-6 w-6 text-brand-strong" />
             </div>
             
             <div className="flex-1">
@@ -39,7 +39,7 @@ export function BusinessAprendizadoSection({
               
               <Button 
                 onClick={() => navigate('/trilhas')}
-                className="bg-aplicada-green-700 hover:bg-aplicada-green-800 text-white group"
+                className="bg-brand-strong hover:bg-brand-strong text-white group"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
                 Acessar Trilha Academy

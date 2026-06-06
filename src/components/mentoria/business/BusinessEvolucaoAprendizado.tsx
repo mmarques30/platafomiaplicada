@@ -62,7 +62,7 @@ export function BusinessEvolucaoAprendizado() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-aplicada-green-300 bg-aplicada-green-100">
+            <Card key={i} className="border-brand-strong bg-aplicada-green-100">
               <CardHeader className="pb-1 pt-3">
                 <Skeleton className="h-4 w-24" />
               </CardHeader>
@@ -111,7 +111,7 @@ export function BusinessEvolucaoAprendizado() {
       {/* Cards de Métricas - Compactos e Verde */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Tempo de Tela */}
-        <Card className="border-aplicada-green-300 bg-aplicada-green-100">
+        <Card className="border-brand-strong bg-aplicada-green-100">
           <CardHeader className="pb-1 pt-3">
             <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
@@ -129,7 +129,7 @@ export function BusinessEvolucaoAprendizado() {
         </Card>
 
         {/* Prompts Consumidos */}
-        <Card className="border-aplicada-green-300 bg-aplicada-green-100">
+        <Card className="border-brand-strong bg-aplicada-green-100">
           <CardHeader className="pb-1 pt-3">
             <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <FileText className="h-3.5 w-3.5" />
@@ -147,7 +147,7 @@ export function BusinessEvolucaoAprendizado() {
         </Card>
 
         {/* Ferramentas Criadas */}
-        <Card className="border-aplicada-green-300 bg-aplicada-green-100">
+        <Card className="border-brand-strong bg-aplicada-green-100">
           <CardHeader className="pb-1 pt-3">
             <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <Wrench className="h-3.5 w-3.5" />

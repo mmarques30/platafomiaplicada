@@ -50,7 +50,7 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
     <Card className="border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
-          <MapPin className="h-5 w-5 text-aplicada-green-700" />
+          <MapPin className="h-5 w-5 text-brand-strong" />
           Roadmap da Mentoria
         </CardTitle>
       </CardHeader>
@@ -59,7 +59,7 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
         <div className="relative pb-2">
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute top-6 left-[5%] right-[5%] h-1 bg-gradient-to-r from-aplicada-green-700/50 via-aplicada-green-700/30 to-muted rounded-full" />
+            <div className="absolute top-6 left-[5%] right-[5%] h-1 bg-gradient-to-r from-brand-strong/15 via-brand-strong/15 to-muted rounded-full" />
             
             {/* Timeline nodes */}
             <div className="relative flex justify-between px-4">
@@ -115,13 +115,13 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
           <span className="text-muted-foreground">
             Progresso geral
           </span>
-          <span className="text-aplicada-green-700 font-medium">
+          <span className="text-brand-strong font-medium">
             {fases.filter(f => f.status === 'realizada').length} de {fases.length} etapas
           </span>
         </div>
         <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
           <div 
-            className="h-full bg-gradient-to-r from-aplicada-green-700 to-aplicada-green-600 rounded-full transition-all duration-500"
+            className="h-full bg-gradient-to-r from-brand-strong to-brand-strong rounded-full transition-all duration-500"
             style={{ 
               width: `${(fases.filter(f => f.status === 'realizada').length / fases.length) * 100}%` 
             }}

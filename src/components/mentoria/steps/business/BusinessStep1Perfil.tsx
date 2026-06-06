@@ -42,7 +42,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
         </div>
         <div>
           <h3 className="text-lg font-semibold text-white">Perfil e Contexto</h3>
-          <p className="text-sm text-zinc-400">Sobre você e sua empresa</p>
+          <p className="text-sm text-muted-foreground">Sobre você e sua empresa</p>
         </div>
       </div>
 
@@ -55,7 +55,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
             <FormControl>
               <Input 
                 placeholder="Ex: Diretor de Operações, CEO, Gerente de TI..." 
-                className="bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
+                className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground"
                 {...field} 
               />
             </FormControl>
@@ -73,7 +73,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
             <FormControl>
               <Input 
                 placeholder="Nome da sua empresa" 
-                className="bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
+                className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground"
                 {...field} 
               />
             </FormControl>
@@ -97,7 +97,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
                 {tamanhoEmpresaOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`size-${opt.value}`} />
-                    <label htmlFor={`size-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
+                    <label htmlFor={`size-${opt.value}`} className="text-sm cursor-pointer text-foreground">
                       {opt.label}
                     </label>
                   </div>
@@ -116,7 +116,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
           <FormItem className="flex items-center justify-between py-2">
             <div>
               <FormLabel className="text-base text-white">Você lidera uma equipe?</FormLabel>
-              <p className="text-sm text-zinc-400">Marque se você tem pessoas sob sua gestão</p>
+              <p className="text-sm text-muted-foreground">Marque se você tem pessoas sob sua gestão</p>
             </div>
             <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -136,7 +136,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
                 <Input
                   type="number"
                   placeholder="Número de pessoas"
-                  className="bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
+                  className="bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value) || "")}
                   value={field.value || ""}
@@ -163,7 +163,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
                 {comoConheceuOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`source-${opt.value}`} />
-                    <label htmlFor={`source-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
+                    <label htmlFor={`source-${opt.value}`} className="text-sm cursor-pointer text-foreground">
                       {opt.label}
                     </label>
                   </div>
@@ -184,7 +184,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
             <FormControl>
               <Textarea
                 placeholder="Ex: Escalar operações sem aumentar custos, melhorar atendimento ao cliente..."
-                className="min-h-[80px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
+                className="min-h-[80px] bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground"
                 {...field}
               />
             </FormControl>

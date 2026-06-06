@@ -29,8 +29,8 @@ export function BusinessHeader({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-start gap-4">
             {/* Avatar/Logo */}
-            <div className="w-16 h-16 rounded-2xl bg-aplicada-green-700/10 border border-aplicada-green-700/20 flex items-center justify-center">
-              <Building2 className="h-8 w-8 text-aplicada-green-700" />
+            <div className="w-16 h-16 rounded-2xl bg-brand-strong/15 border border-brand-strong/15 flex items-center justify-center">
+              <Building2 className="h-8 w-8 text-brand-strong" />
             </div>
             
             <div className="space-y-1">
@@ -41,7 +41,7 @@ export function BusinessHeader({
               <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
                 {empresa && (
                   <span className="flex items-center gap-1.5">
-                    <Building2 className="h-4 w-4 text-aplicada-green-700" />
+                    <Building2 className="h-4 w-4 text-brand-strong" />
                     {empresa}
                   </span>
                 )}
@@ -59,7 +59,7 @@ export function BusinessHeader({
             </div>
           </div>
           
-          <Badge className="self-start md:self-center bg-aplicada-green-700 text-white border-0 px-4 py-1.5 text-sm font-medium">
+          <Badge className="self-start md:self-center bg-brand-strong text-white border-0 px-4 py-1.5 text-sm font-medium">
             <Crown className="h-3.5 w-3.5 mr-1.5" />
             {plano}
           </Badge>

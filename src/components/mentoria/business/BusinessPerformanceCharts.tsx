@@ -68,7 +68,7 @@ export function BusinessPerformanceCharts({
       <Card className="border-border lg:col-span-2">
         <CardHeader className="pb-2">
           <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
-            <BarChart3 className="h-5 w-5 text-aplicada-green-700" />
+            <BarChart3 className="h-5 w-5 text-brand-strong" />
             Progresso por Projeto
           </CardTitle>
         </CardHeader>
@@ -107,7 +107,7 @@ export function BusinessPerformanceCharts({
       <Card className="border-border">
         <CardHeader className="pb-2">
           <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
-            <PieChartIcon className="h-5 w-5 text-aplicada-green-700" />
+            <PieChartIcon className="h-5 w-5 text-brand-strong" />
             Ferramentas por Categoria
           </CardTitle>
         </CardHeader>
@@ -145,7 +145,7 @@ export function BusinessPerformanceCharts({
       <Card className="border-border lg:col-span-3">
         <CardHeader className="pb-2">
           <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
-            <TrendingUp className="h-5 w-5 text-aplicada-green-700" />
+            <TrendingUp className="h-5 w-5 text-brand-strong" />
             Histórico de Entregas vs Meta
           </CardTitle>
         </CardHeader>

@@ -55,7 +55,7 @@ export default function DiagnosticoResults({
             {onRefill && (
               <Button
                 onClick={onRefill}
-                className="bg-[hsl(72,50%,35%)] text-white hover:bg-[hsl(72,50%,30%)]"
+                className="bg-brand-strong text-brand-cream hover:bg-brand-strong/90"
               >
                 Preencher Diagnóstico
               </Button>
@@ -86,7 +86,7 @@ export default function DiagnosticoResults({
                   variant={versaoSelecionada === v.versao ? "default" : "outline"}
                   size="sm"
                   onClick={() => onSelecionarVersao?.(v.versao || 1)}
-                  className={versaoSelecionada === v.versao ? "bg-[hsl(72,50%,35%)] text-white hover:bg-[hsl(72,50%,30%)]" : ""}
+                  className={versaoSelecionada === v.versao ? "bg-brand-strong text-brand-cream hover:bg-brand-strong/90" : ""}
                 >
                   Diagnóstico v{v.versao}
                 </Button>
@@ -129,7 +129,7 @@ export default function DiagnosticoResults({
                 <ul className="space-y-2">
                   {["Dores comuns da equipe", "Processos com maior potencial", "Recomendações consolidadas", "Economia total estimada"].map((item) => (
                     <li key={item} className="flex items-center gap-2 text-sm text-foreground">
-                      <CheckCircle2 className="h-4 w-4 text-[hsl(72,50%,35%)]" />
+                      <CheckCircle2 className="h-4 w-4 text-brand-strong" />
                       {item}
                     </li>
                   ))}
@@ -207,7 +207,7 @@ function MinhaAnaliseContent({
                 </div>
                 <Badge
                   variant={proc.impacto === "Alto" ? "default" : "secondary"}
-                  className={proc.impacto === "Alto" ? "bg-[hsl(72,50%,35%)] text-white hover:bg-[hsl(72,50%,30%)]" : ""}
+                  className={proc.impacto === "Alto" ? "bg-brand-strong text-brand-cream hover:bg-brand-strong/90" : ""}
                 >
                   {proc.impacto}
                 </Badge>
@@ -229,7 +229,7 @@ function MinhaAnaliseContent({
           </div>
           <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
             <p className="text-xs text-muted-foreground">Economia estimada</p>
-            <p className="mt-1 text-xl font-bold text-[hsl(72,50%,35%)]">
+            <p className="mt-1 text-xl font-bold text-brand-strong">
               {economia.economiaEstimada || `${economia.horasSemana || 0}h/sem`}
             </p>
           </div>

@@ -29,8 +29,8 @@ export function BusinessKPICards({ data }: BusinessKPICardsProps) {
       value: data.ferramentasAprendidas.toString(),
       icon: Wrench,
       trend: data.ferramentasTrend,
-      iconBg: "bg-aplicada-green-700/10",
-      iconColor: "text-aplicada-green-700",
+      iconBg: "bg-brand-strong/15",
+      iconColor: "text-brand-strong",
     },
     {
       label: "Implementação",
