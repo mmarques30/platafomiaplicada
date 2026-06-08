@@ -98,6 +98,28 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
     }
   }, [formulario, totalSteps]);
 
+  // BUG fix: defaultValues do useForm é lido só no PRIMEIRO render. Quando
+  // o componente monta, `formulario` ainda é undefined (carregando do
+  // Supabase) — o form usa o fallback vazio. Quando o `formulario` chega
+  // depois, react-hook-form NÃO atualiza os campos sozinho, e a cliente
+  // via toast "Rascunho restaurado" mas o form continuava em branco.
+  // Aqui chama form.reset() pra preencher os campos quando os dados chegam.
+  const lastResetIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!formulario) return;
+    if (lastResetIdRef.current === formulario.id) return;
+    lastResetIdRef.current = formulario.id;
+    form.reset({
+      ...formulario,
+      ferramentas_ia: Array.isArray(formulario.ferramentas_ia)
+        ? (formulario.ferramentas_ia as string[])
+        : [],
+      quick_wins: Array.isArray(formulario.quick_wins)
+        ? (formulario.quick_wins as string[])
+        : [],
+    } as FormData);
+  }, [formulario, form]);
+
   // Auto-save draft on form changes (debounced)
   useEffect(() => {
     const subscription = form.watch((data) => {
