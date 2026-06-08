@@ -134,7 +134,18 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
           setDraftSaved(true);
           setTimeout(() => setDraftSaved(false), 2000);
         } catch (error) {
+          // ANTES: erro caía em console.error silencioso. Cliente preenchia,
+          // o INSERT falhava (ex.: coluna inexistente) e nada era persistido.
+          // Próximo travava porque o form ficava em branco no próximo load.
+          // Agora avisa em toast — usuário sabe que algo deu errado e a gente
+          // descobre o problema rápido nos relatos.
           console.error("Erro ao salvar rascunho:", error);
+          const msg = error instanceof Error ? error.message : String(error);
+          toast({
+            title: "Não foi possível salvar suas respostas",
+            description: `Recarregue a página e tente de novo. Detalhe técnico: ${msg.slice(0, 120)}`,
+            variant: "destructive",
+          });
         }
       }, 2000);
     });
