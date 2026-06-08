@@ -45,7 +45,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         </div>
         <div>
           <h3 className="text-lg font-semibold text-white">Tomada de Decisão</h3>
-          <p className="text-sm text-zinc-400">Quem decide e por que escolheu a IAplicada</p>
+          <p className="text-sm text-muted-foreground">Quem decide e por que escolheu a IAplicada</p>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 {decisoresOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`dec-${opt.value}`} />
-                    <label htmlFor={`dec-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
+                    <label htmlFor={`dec-${opt.value}`} className="text-sm cursor-pointer text-foreground">
                       {opt.label}
                     </label>
                   </div>
@@ -85,7 +85,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
             <FormControl>
               <Textarea
                 placeholder="Ex: CEO João Silva, Diretora de TI Maria Santos..."
-                className="min-h-[60px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
+                className="min-h-[60px] bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground"
                 {...field}
               />
             </FormControl>
@@ -109,7 +109,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 {motivoEscolhaOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`motivo-${opt.value}`} />
-                    <label htmlFor={`motivo-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
+                    <label htmlFor={`motivo-${opt.value}`} className="text-sm cursor-pointer text-foreground">
                       {opt.label}
                     </label>
                   </div>
@@ -136,7 +136,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
                 {experienciaConsultoriasOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`exp-${opt.value}`} />
-                    <label htmlFor={`exp-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
+                    <label htmlFor={`exp-${opt.value}`} className="text-sm cursor-pointer text-foreground">
                       {opt.label}
                     </label>
                   </div>

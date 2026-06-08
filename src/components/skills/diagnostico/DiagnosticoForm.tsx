@@ -458,9 +458,9 @@ export default function DiagnosticoForm({ onSubmit, onSaveRascunho, isSaving, in
   };
 
   return (
-    <Card className="border-border bg-card">
+    <Card className="border-brand-hairline bg-brand-cream-soft">
       <CardHeader>
-        <CardTitle className="text-lg">Diagnóstico Inicial</CardTitle>
+        <CardTitle className="font-serif-display text-2xl text-foreground">Diagnóstico Inicial</CardTitle>
         <CardDescription>Preencha as informações para personalizar sua experiência</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -472,8 +472,8 @@ export default function DiagnosticoForm({ onSubmit, onSaveRascunho, isSaving, in
           </div>
           <Progress
             value={progress}
-            className="h-2"
-            indicatorClassName="bg-[hsl(72,50%,35%)]"
+            className="h-2 bg-brand-hairline"
+            indicatorClassName="bg-brand-strong"
           />
           <p className="text-xs text-muted-foreground">
             Etapa {step} de {TOTAL_STEPS}
@@ -508,7 +508,7 @@ export default function DiagnosticoForm({ onSubmit, onSaveRascunho, isSaving, in
             <Button
               onClick={handleSubmit}
               disabled={isSaving}
-              className="bg-[hsl(72,50%,35%)] hover:bg-[hsl(72,50%,30%)] text-white"
+              className="bg-brand-strong hover:bg-brand-strong/90 text-brand-cream"
             >
               {isSaving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

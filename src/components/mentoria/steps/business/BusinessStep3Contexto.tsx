@@ -38,12 +38,12 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         </div>
         <div>
           <h3 className="text-lg font-semibold text-white">Visão de Impacto</h3>
-          <p className="text-sm text-zinc-400">Quanto essa solução pode gerar de valor</p>
+          <p className="text-sm text-muted-foreground">Quanto essa solução pode gerar de valor</p>
         </div>
       </div>
 
-      <div className="p-4 rounded-lg bg-zinc-800 border border-zinc-700 mb-6">
-        <p className="text-sm text-zinc-300">
+      <div className="p-4 rounded-lg bg-brand-cream border border-brand-hairline mb-6">
+        <p className="text-sm text-muted-foreground">
           <strong className="text-primary">Por que perguntamos?</strong> Essas informações nos ajudam 
           a priorizar as entregas que geram mais impacto para você.
         </p>
@@ -55,7 +55,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-white">Qual o impacto financeiro estimado dessa solução?</FormLabel>
-            <p className="text-xs text-zinc-400 mb-2">
+            <p className="text-xs text-muted-foreground mb-2">
               Quanto você estima economizar ou gerar com essa automação por mês?
             </p>
             <FormControl>
@@ -67,7 +67,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
                 {impactoFinanceiroOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`impacto-${opt.value}`} />
-                    <label htmlFor={`impacto-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
+                    <label htmlFor={`impacto-${opt.value}`} className="text-sm cursor-pointer text-foreground">
                       {opt.label}
                     </label>
                   </div>
@@ -88,7 +88,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
             <FormControl>
               <Textarea
                 placeholder="Ex: Tempo de resposta ao cliente, taxa de conversão, custo por lead, NPS..."
-                className="min-h-[80px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
+                className="min-h-[80px] bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground"
                 {...field}
               />
             </FormControl>
@@ -106,7 +106,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
             <FormControl>
               <Textarea
                 placeholder="Ex: RH, Financeiro, Marketing, Vendas, Operações..."
-                className="min-h-[80px] bg-zinc-200 text-zinc-900 border-zinc-300 placeholder:text-zinc-500"
+                className="min-h-[80px] bg-background border-brand-hairline text-foreground placeholder:text-muted-foreground"
                 {...field}
               />
             </FormControl>
@@ -130,7 +130,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
                 {orcamentoExpansaoOptions.map((opt) => (
                   <div key={opt.value} className="flex items-center space-x-2">
                     <RadioGroupItem value={opt.value} id={`orc-${opt.value}`} />
-                    <label htmlFor={`orc-${opt.value}`} className="text-sm cursor-pointer text-zinc-200">
+                    <label htmlFor={`orc-${opt.value}`} className="text-sm cursor-pointer text-foreground">
                       {opt.label}
                     </label>
                   </div>

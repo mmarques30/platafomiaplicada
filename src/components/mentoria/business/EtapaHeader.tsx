@@ -11,7 +11,7 @@ interface EtapaHeaderProps {
 const statusConfig = {
   pendente: {
     label: "Pendente",
-    className: "bg-zinc-500/10 text-zinc-600 border-zinc-500/30",
+    className: "bg-muted text-muted-foreground border-brand-hairline",
   },
   em_andamento: {
     label: "Em Andamento",
