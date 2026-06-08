@@ -230,7 +230,15 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
         }, 1500);
       }
     } catch (error) {
+      // Antes ficava silencioso. Agora exibe pro usuário pra ele saber que
+      // a finalização não foi pra frente.
       console.error("Erro ao finalizar formulário:", error);
+      const msg = error instanceof Error ? error.message : String(error);
+      toast({
+        title: "Não foi possível finalizar o diagnóstico",
+        description: `Tente de novo em alguns instantes. Detalhe: ${msg.slice(0, 140)}`,
+        variant: "destructive",
+      });
     }
   };
 
