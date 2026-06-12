@@ -34,7 +34,14 @@ export default function MentoriaPainelDiagnostico() {
   // Se estamos visualizando outro usuário (userId), usamos o plano do profile desse usuário
   // Senão, usamos o plano efetivo (que considera simulação admin)
   const painelPlano = userId && profile ? profile.plano_mentoria : effectivePlan;
-  const isBusiness = painelPlano === "business";
+  // BUG: antes era `painelPlano === "business"`, mas os valores reais no banco
+  // são "business_parceria" e "business_sistemas" — então alunos Business
+  // caíam na renderização Academy genérica e o BusinessDashboard NUNCA era
+  // exibido (Mari reportou: "esse diagnóstico não aparece do aluno").
+  const isBusiness =
+    painelPlano === "business" ||
+    painelPlano === "business_parceria" ||
+    painelPlano === "business_sistemas";
   const theme = getPainelTheme(isBusiness);
   
   
