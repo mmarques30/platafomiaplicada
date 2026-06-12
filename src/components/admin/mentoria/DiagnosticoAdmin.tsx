@@ -25,7 +25,8 @@ interface DiagnosticoAdminProps {
 
 export function DiagnosticoAdmin({ userId, allowManualInput = true }: DiagnosticoAdminProps) {
   const navigate = useNavigate();
-  const { diagnostico, isLoading, deletarArquivo } = useDiagnosticoAdmin(userId);
+  const { diagnostico, isLoading, deletarArquivo, forcarFinalizacao, isForcingFinalize } =
+    useDiagnosticoAdmin(userId);
   const { objetivos } = useObjetivos(userId);
   const { tarefas } = useMentoriaTarefas(userId);
   const { sessoes } = useMentoriaSessoes();
@@ -147,9 +148,33 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
           <AlertCircle className="h-4 w-4 text-amber-600" />
           <AlertTitle className="text-amber-900">Diagnóstico incompleto — preview parcial</AlertTitle>
           <AlertDescription className="text-amber-900/80">
-            O mentorado ainda não finalizou o formulário. Você está vendo apenas
-            os campos que ele já preencheu e, se houver, o insight da IA
-            gerado a partir desses dados parciais.
+            <p>
+              O mentorado ainda não finalizou o formulário. Você está vendo
+              apenas os campos que ele já preencheu e, se houver, o insight da
+              IA gerado a partir desses dados parciais.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2 items-center">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={isForcingFinalize}
+                onClick={() => {
+                  if (
+                    confirm(
+                      "Marcar o diagnóstico como finalizado mesmo com dados parciais? Isso vai destravar o mentorado e gerar o insight com o que ele já respondeu."
+                    )
+                  ) {
+                    forcarFinalizacao(userId);
+                  }
+                }}
+                className="border-amber-400 bg-amber-100 text-amber-900 hover:bg-amber-200"
+              >
+                {isForcingFinalize ? "Finalizando..." : "Forçar finalização"}
+              </Button>
+              <span className="text-xs text-amber-900/70">
+                (marca como concluído + gera o insight com os dados parciais)
+              </span>
+            </div>
           </AlertDescription>
         </Alert>
       )}

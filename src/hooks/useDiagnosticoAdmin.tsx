@@ -184,6 +184,54 @@ export function useDiagnosticoAdmin(userId?: string) {
     },
   });
 
+  // Força finalização do diagnóstico mesmo com dados parciais (atende ao
+  // pedido de destravar manualmente alunos presos no formulário). Marca
+  // completado=true e dispara a Edge Function de geração do insight pra
+  // que o aluno receba o resultado imediatamente.
+  const forcarFinalizacao = useMutation({
+    mutationFn: async (userId: string) => {
+      // 1. Marca como completado
+      const { data: updated, error: updateError } = await supabase
+        .from("formulario_diagnostico")
+        .update({
+          completado: true,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", userId)
+        .select()
+        .single();
+
+      if (updateError) throw updateError;
+      if (!updated) throw new Error("Diagnóstico do mentorado não encontrado.");
+
+      // 2. Dispara o insight (não-bloqueante: se falhar, segue com completado=true)
+      try {
+        await supabase.functions.invoke("gerar-insight-mentoria", {
+          body: { formulario_id: updated.id },
+        });
+      } catch (e) {
+        console.warn("Falha ao gerar insight, mas o diagnóstico foi marcado como completo:", e);
+      }
+      return updated;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Diagnóstico finalizado",
+        description:
+          "Mentorado destravado. O insight será gerado em alguns segundos e ficará disponível no painel.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-formularios"] });
+      queryClient.invalidateQueries({ queryKey: ["diagnostico-admin"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao forçar finalização",
+        description: error.message ?? "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     diagnostico,
     isLoading,
@@ -191,6 +239,8 @@ export function useDiagnosticoAdmin(userId?: string) {
     salvarDiagnostico: salvarDiagnostico.mutate,
     deletarArquivo: deletarArquivo.mutate,
     deletarDiagnostico: deletarDiagnostico.mutate,
+    forcarFinalizacao: forcarFinalizacao.mutate,
+    isForcingFinalize: forcarFinalizacao.isPending,
     isUploading: uploadArquivo.isPending,
     isSaving: salvarDiagnostico.isPending,
     isDeleting: deletarDiagnostico.isPending,
