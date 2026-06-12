@@ -289,8 +289,12 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
             <Bot className="h-5 w-5" />
             Ferramentas que Você Vai Dominar
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {ferramentas.slice(0, 8).map((ferramenta, index) => (
+          {/* Limita a 5 ferramentas e usa 5 colunas em desktop pra todas
+              ficarem na mesma linha (Mari pediu: "no máximo 5, mas que não
+              ficassem embaixo, numa mesma linha"). Em telas menores quebra
+              naturalmente porque 5 cards não cabem horizontalmente. */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {ferramentas.slice(0, 5).map((ferramenta, index) => (
               <Card 
                 key={index}
                 className="bg-card border border-aplicada-green-800/20 hover:border-aplicada-green-700/40 transition-colors"
