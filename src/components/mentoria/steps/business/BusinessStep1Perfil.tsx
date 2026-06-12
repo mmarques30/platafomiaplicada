@@ -41,7 +41,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
           <Building2 className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-white">Perfil e Contexto</h3>
+          <h3 className="text-lg font-semibold text-brand-strong">Perfil e Contexto</h3>
           <p className="text-sm text-muted-foreground">Sobre você e sua empresa</p>
         </div>
       </div>
@@ -51,7 +51,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
         name="cargo_atual"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Seu cargo *</FormLabel>
+            <FormLabel className="text-foreground">Seu cargo *</FormLabel>
             <FormControl>
               <Input 
                 placeholder="Ex: Diretor de Operações, CEO, Gerente de TI..." 
@@ -69,7 +69,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
         name="empresa_nome"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Nome da empresa *</FormLabel>
+            <FormLabel className="text-foreground">Nome da empresa *</FormLabel>
             <FormControl>
               <Input 
                 placeholder="Nome da sua empresa" 
@@ -87,7 +87,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
         name="tamanho_empresa"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Tamanho da empresa *</FormLabel>
+            <FormLabel className="text-foreground">Tamanho da empresa *</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -115,7 +115,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
         render={({ field }) => (
           <FormItem className="flex items-center justify-between py-2">
             <div>
-              <FormLabel className="text-base text-white">Você lidera uma equipe?</FormLabel>
+              <FormLabel className="text-base text-foreground">Você lidera uma equipe?</FormLabel>
               <p className="text-sm text-muted-foreground">Marque se você tem pessoas sob sua gestão</p>
             </div>
             <FormControl>
@@ -131,7 +131,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
           name="tamanho_equipe"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white">Quantas pessoas na sua equipe?</FormLabel>
+              <FormLabel className="text-foreground">Quantas pessoas na sua equipe?</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -153,7 +153,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
         name="como_conheceu_iaplicada"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Como você conheceu a IAplicada?</FormLabel>
+            <FormLabel className="text-foreground">Como você conheceu a IAplicada?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -180,7 +180,7 @@ export function BusinessStep1Perfil({ form, onNext }: StepProps) {
         name="desafio_principal_negocio"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Qual o maior desafio do seu negócio hoje?</FormLabel>
+            <FormLabel className="text-foreground">Qual o maior desafio do seu negócio hoje?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: Escalar operações sem aumentar custos, melhorar atendimento ao cliente..."

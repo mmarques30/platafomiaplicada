@@ -1,42 +1,50 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useUsers } from "@/hooks/admin/useUsers";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Lightbulb } from "lucide-react";
-import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
-import { ProjetosIAAdmin } from "@/components/admin/mentoria/ProjetosIAAdmin";
+import { ArrowLeft, Users, ExternalLink, Eye, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { adminTheme } from "@/components/admin/adminTheme";
+import { DiagnosticoAcademyPanel } from "@/components/mentoria/DiagnosticoAcademyPanel";
+import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 
 export default function MentoriaAcademyPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { data: allUsers = [] } = useUsers();
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
   // Filtrar apenas usuários Academy
   const users = allUsers.filter(u => u.plano_mentoria === "academy");
-  const selectedUser = users.find(u => u.id === selectedUserId);
 
-  useEffect(() => {
-    if (selectedUserId) {
-      queryClient.invalidateQueries({ queryKey: ["projetos-mentoria", selectedUserId] });
-    }
-  }, [selectedUserId, queryClient]);
+  // Busca o diagnóstico do mentorado selecionado (mesma estrutura do PreviewPaineisPage)
+  const { data: diagnosticoUsuario, isLoading: loadingDiagnostico } = useQuery({
+    queryKey: ["diagnostico-usuario-academy", selectedUserId],
+    queryFn: async () => {
+      if (!selectedUserId) return null;
+      const { data, error } = await supabase
+        .from("formulario_diagnostico")
+        .select("*")
+        .eq("user_id", selectedUserId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedUserId,
+  });
 
   return (
     <div className={adminTheme.page}>
-      {/* Header compacto igual ao Business */}
+      {/* Header */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" className={adminTheme.buttonIcon} onClick={() => navigate("/admin/mentoria")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
-          <h1 className={adminTheme.pageTitle}>Mentoria Academy</h1>
+          <h1 className={adminTheme.pageTitle}>Aluno Academy</h1>
           <p className={adminTheme.pageSubtitle}>Gerenciar mentorados do plano Academy</p>
         </div>
         <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 text-xs">
@@ -63,6 +71,19 @@ export default function MentoriaAcademyPage() {
                 </SelectContent>
               </Select>
             </div>
+            {selectedUserId && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  navigate(`/mentoria/painel-diagnostico/${selectedUserId}`)
+                }
+                className="gap-1.5 whitespace-nowrap"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Ver como o aluno vê
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -77,29 +98,40 @@ export default function MentoriaAcademyPage() {
         </div>
       )}
 
+      {/* Painel consolidado: mesmo layout que o aluno vê (DiagnosticoAcademyPanel)
+          + bloco de ações admin (forçar finalização, editar etc) no topo. */}
       {selectedUserId && (
-        <Tabs defaultValue="diagnostico-ia" className="space-y-4">
-          <TabsList className={adminTheme.tabsList}>
-            <TabsTrigger value="diagnostico-ia" className={adminTheme.tabsTrigger}>
-              <FileText className={adminTheme.tabsIcon} />
-              Diagnóstico IA
-            </TabsTrigger>
-            {/* Aba "Feedback Mentora" removida — controle simples agora:
-                diagnóstico IA + projetos IA gerados automaticamente. */}
-            <TabsTrigger value="projetos-ia" className={adminTheme.tabsTrigger}>
-              <Lightbulb className={adminTheme.tabsIcon} />
-              Projetos IA
-            </TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
+          {/* Ações administrativas (Forçar finalização, status, etc) */}
+          <DiagnosticoAdmin userId={selectedUserId} allowManualInput={false} />
 
-          <TabsContent value="diagnostico-ia" className={adminTheme.tabsContent}>
-            <DiagnosticoAdmin userId={selectedUserId} allowManualInput={false} />
-          </TabsContent>
-
-          <TabsContent value="projetos-ia" className={adminTheme.tabsContent}>
-            <ProjetosIAAdmin userId={selectedUserId} />
-          </TabsContent>
-        </Tabs>
+          {/* Preview no mesmo layout do aluno */}
+          {loadingDiagnostico ? (
+            <Card><CardContent className="py-8 text-center text-muted-foreground">Carregando diagnóstico…</CardContent></Card>
+          ) : diagnosticoUsuario ? (
+            <div className="relative">
+              <div className="absolute -top-3 left-4 z-10">
+                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                  <Eye className="h-3 w-3 mr-1" />
+                  VISÃO DO ALUNO
+                </Badge>
+              </div>
+              <div className="border-2 border-dashed border-amber-500/30 rounded-xl p-4 pt-6 bg-card/50">
+                <DiagnosticoAcademyPanel diagnostico={diagnosticoUsuario} />
+              </div>
+              <div className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <span>Você está vendo exatamente o que o aluno vê no painel dele.</span>
+              </div>
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Este mentorado ainda não preencheu o diagnóstico.
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
     </div>
   );

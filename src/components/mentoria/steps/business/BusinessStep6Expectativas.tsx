@@ -40,7 +40,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
           <Trophy className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-white">Sucesso e Parceria</h3>
+          <h3 className="text-lg font-semibold text-brand-strong">Sucesso e Parceria</h3>
           <p className="text-sm text-muted-foreground">O que define sucesso para você</p>
         </div>
       </div>
@@ -50,7 +50,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="definicao_sucesso"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Como você define sucesso para esse projeto?</FormLabel>
+            <FormLabel className="text-foreground">Como você define sucesso para esse projeto?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: Reduzir tempo de atendimento em 50%, economizar R$ 20.000/mês, liberar 10h semanais da equipe..."
@@ -68,7 +68,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="importancia_projeto"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">De 1 a 10, qual a importância desse projeto para a empresa?</FormLabel>
+            <FormLabel className="text-foreground">De 1 a 10, qual a importância desse projeto para a empresa?</FormLabel>
             <div className="pt-4 pb-2">
               <FormControl>
                 <Slider
@@ -96,7 +96,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="gatilho_renovacao"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">O que faria você renovar/expandir a parceria conosco?</FormLabel>
+            <FormLabel className="text-foreground">O que faria você renovar/expandir a parceria conosco?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -123,7 +123,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="maior_preocupacao"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Qual seu maior medo ou preocupação com esse projeto?</FormLabel>
+            <FormLabel className="text-foreground">Qual seu maior medo ou preocupação com esse projeto?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Conte suas preocupações para que possamos endereçá-las..."
@@ -141,7 +141,7 @@ export function BusinessStep6Expectativas({ form, onPrev, onSubmit, isSubmitting
         name="agendar_call_alinhamento"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Gostaria de agendar uma call de alinhamento?</FormLabel>
+            <FormLabel className="text-foreground">Gostaria de agendar uma call de alinhamento?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}

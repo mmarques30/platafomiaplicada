@@ -37,7 +37,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
           <TrendingUp className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-white">Visão de Impacto</h3>
+          <h3 className="text-lg font-semibold text-brand-strong">Visão de Impacto</h3>
           <p className="text-sm text-muted-foreground">Quanto essa solução pode gerar de valor</p>
         </div>
       </div>
@@ -54,7 +54,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         name="impacto_financeiro_estimado"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Qual o impacto financeiro estimado dessa solução?</FormLabel>
+            <FormLabel className="text-foreground">Qual o impacto financeiro estimado dessa solução?</FormLabel>
             <p className="text-xs text-muted-foreground mb-2">
               Quanto você estima economizar ou gerar com essa automação por mês?
             </p>
@@ -84,7 +84,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         name="kpi_principal"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Qual é o principal indicador (KPI) que você quer melhorar?</FormLabel>
+            <FormLabel className="text-foreground">Qual é o principal indicador (KPI) que você quer melhorar?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: Tempo de resposta ao cliente, taxa de conversão, custo por lead, NPS..."
@@ -102,7 +102,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         name="outras_areas_potencial"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Além dessa solução, quais outras áreas da empresa poderiam usar IA?</FormLabel>
+            <FormLabel className="text-foreground">Além dessa solução, quais outras áreas da empresa poderiam usar IA?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: RH, Financeiro, Marketing, Vendas, Operações..."
@@ -120,7 +120,7 @@ export function BusinessStep3Contexto({ form, onNext, onPrev }: StepProps) {
         name="orcamento_expansao"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Qual orçamento você tem em mente para expandir o uso de IA?</FormLabel>
+            <FormLabel className="text-foreground">Qual orçamento você tem em mente para expandir o uso de IA?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}

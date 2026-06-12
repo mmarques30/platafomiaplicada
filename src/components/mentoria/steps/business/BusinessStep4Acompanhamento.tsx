@@ -44,7 +44,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
           <Users className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-white">Tomada de Decisão</h3>
+          <h3 className="text-lg font-semibold text-brand-strong">Tomada de Decisão</h3>
           <p className="text-sm text-muted-foreground">Quem decide e por que escolheu a IAplicada</p>
         </div>
       </div>
@@ -54,7 +54,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         name="decisores_tecnologia"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Quem são os decisores para projetos de tecnologia na empresa?</FormLabel>
+            <FormLabel className="text-foreground">Quem são os decisores para projetos de tecnologia na empresa?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -81,7 +81,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         name="decisor_especifico"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Quem especificamente precisa aprovar esse projeto?</FormLabel>
+            <FormLabel className="text-foreground">Quem especificamente precisa aprovar esse projeto?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Ex: CEO João Silva, Diretora de TI Maria Santos..."
@@ -99,7 +99,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         name="motivo_escolha_iaplicada"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Por que você escolheu a IAplicada?</FormLabel>
+            <FormLabel className="text-foreground">Por que você escolheu a IAplicada?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -126,7 +126,7 @@ export function BusinessStep4Acompanhamento({ form, onNext, onPrev }: StepProps)
         name="experiencia_consultorias"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Qual sua experiência com consultorias/agências de tecnologia?</FormLabel>
+            <FormLabel className="text-foreground">Qual sua experiência com consultorias/agências de tecnologia?</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
